@@ -1,0 +1,97 @@
+
+
+
+1. Getting your bearings.
+
+The project uses QT (http://qt.nokia.com/products/) version 4.7.3, 
+which is was the current version as of April 2011. QT is simply
+a framework for cross-platform desktop applications, and it has
+windows, dialog boxes, buttons, event handling, etc.
+
+Part of QT is qmake and project files (.pro files). Like configure
+and other meta-Makefile programs. If you're using QTCreator, the IDE
+for creating QT apps, then the project file is what you point QTCreator to
+so that it knows what files to compile, special libraries it needs
+(OpenGL in our case), etc. 
+
+If you're not using QTCreator (Andrew: I have not as of 5/12/11), then
+to compile your project you need the project file to feed to qmake , 
+which then creates a normal makefile for compilation. For example, on
+Mac OS X, starting with a fresh SVN checkout, I call:
+
+qmake -spec macx-g++ canelib.pro
+
+Which produces a Makefile, and then simply:
+
+make
+
+Which produces an app. qmake is part of qt and is included with the QT SDK
+installation (Andrew: I think). 
+
+
+
+2. The code structure.
+
+The code has three significant pieces right now, based upon where
+the major complexity is coming from: the GUI, the OpenGL stuff, and the cane
+transforms. Right now the GUI is C++, while the OpenGL and cane implementations
+are C (Andrew: I am experienced with C but not C++).
+
+I will be working to continually improve the structure and documentation of the code
+through refactoring and adding comments/documents where needed. Please feel free to help
+and/or ask for help and/or point out bad spots when you find them.
+The code has been subject to random hacking sessions and so is in quite bad shape,
+and improving this will save time/pain in the long run.
+
+Of the three pieces I mentioned, the files roughly fit into these three types like so:
+
+
+GUI:
+controller.cpp/h
+librarycane.cpp/h
+main.cpp
+workwindow.cpp/h
+
+OpenGL:
+openglwidget.cpp/h
+
+Cane data/transforms:
+cane.cpp/h
+generator.cpp/h
+types.h
+convert.cpp/h
+
+
+Right now we are not doing Model-View-Controller architecture. 
+Currently the view and controller are merged into the `GUI' and
+the model is the OpenGL and Cane stuff. It may seem weird that OpenGL
+is part of the model; I claim that this is correct in that the 3D rendering
+of the cane is NOT part of the view of the data, it *is* the data, 
+along with the cane itself. (Andrew: I am open to discussions, especially
+as more functionality gets added, about the code structure and whether
+this separation makes sense. Talk to me!).
+
+
+
+3. Adding/changing code.
+
+I suspect that for the near future (Summer-Fall 2011) we will work
+across all the parts of the code to improve the GUI, the cane structure
+and transformations, and also the rendering. In general, 
+I think shooting for the current revision of the code to be compilable
+and runnable is a good goal, with exceptions where it makes sense.
+
+
+
+4. Contact.
+
+Erik Demaine (edemaine@mit.edu) is `the boss' in that he is the ultimate authority, as well
+as the SVN admin, etc. Andrew Winslow (awinslow@cs.tufts.edu) is the day-to-day code person.
+
+
+
+
+
+
+
+
