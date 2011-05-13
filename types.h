@@ -5,6 +5,7 @@
 
 #include "constants.h"
 
+
 typedef struct PolarPoint
 {
         float r;
@@ -17,6 +18,19 @@ typedef struct Point
     float y;
     float z;
 } Point;
+
+typedef struct TransformData
+{
+        float f_amt;
+        Point p_amt;
+        PolarPoint pp_amt;
+} TransformData;
+
+typedef struct Transform
+{
+        int type;
+        TransformData data;
+} Transform;
 
 typedef struct Color
 {

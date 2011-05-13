@@ -12,7 +12,7 @@ definition of a cane).
 
 #define PI 3.14159265358979323846f
 
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 
 Cane* init_cane()
@@ -55,7 +55,7 @@ Cane* twist_cane(Cane* c, float radians)
         return c;
 }
 
-Cane* stretch_cane(Cane* c, float amount, float min_stretch)
+Cane* stretch_cane(Cane* c, float amount, float max_stretch)
 {
         if (c == NULL)
                 return c;
@@ -69,7 +69,7 @@ Cane* stretch_cane(Cane* c, float amount, float min_stretch)
         }
 
         c->stretch += amount;
-        c->stretch = MAX(c->stretch, min_stretch);
+        c->stretch = MIN(c->stretch, max_stretch);
 
         return c;
 }

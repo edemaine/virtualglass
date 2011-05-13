@@ -20,7 +20,16 @@
 #define ALL_SUBCANES -1
 #define NO_SUBCANES -2
 
+#define TWIST_TRANSFORM 1
+#define STRETCH_TRANSFORM 2
+#define MOVE_TRANSFORM 3
+
+#define MAX_TRANSFORMS 10000
+
 #define PI 3.14159265358979323846f
+
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 #endif
 

@@ -9,29 +9,6 @@ in 3-space, each with a set of coordinates and a color.
 #include "types.h"
 #include "constants.h"
 
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-
-#define TWIST_TRANSFORM 1
-#define STRETCH_TRANSFORM 2
-#define MOVE_TRANSFORM 3
-
-#define MAX_TRANSFORMS 10000
-
-typedef struct TransformData
-{
-        float f_amt;
-        Point p_amt;
-        PolarPoint pp_amt;
-} TransformData;
-
-typedef struct Transform
-{
-        int type;
-        TransformData data;
-} Transform;
-
-
 Color brighten_color(Color c)
 {
         Color i;
@@ -90,11 +67,27 @@ Point apply_transforms(Point p, Transform* Ts, int num_Ts)
 }
 
 
+float compute_total_stretch(Transform* Ts, int num_Ts)
+{
+        float total_stretch;
+        int i;
+
+        total_stretch = 1;
+        for (i = 0; i < num_Ts; ++i)
+        {
+                if (Ts[i].type == STRETCH_TRANSFORM)
+                        total_stretch *= Ts[i].data.f_amt;
+        }
+
+        return total_stretch;
+}
+
 void convert_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Transform* Ts, int* num_Ts, Color color, int illuminated_subcane, int res_mode)
 {
         Point p1, p2, p3, p4;
         Triangle tmp_t;
         int i, j, angular_resolution, axial_resolution;
+        float total_stretch;
 
         switch (res_mode)
         {
@@ -110,25 +103,27 @@ void convert_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Tra
                         exit(1);
         }
 
+        
+        total_stretch = compute_total_stretch(Ts, *num_Ts);
 
         for (i = 0; i < axial_resolution - 1; ++i)
                 for (j = 0; j < angular_resolution; ++j)
                 {
                         p1.x = cos(2 * PI * ((float) j) / angular_resolution);
                         p1.y = sin(2 * PI * ((float) j) / angular_resolution);
-                        p1.z = ((float) i) / axial_resolution;
+                        p1.z = ((float) i) / (axial_resolution * total_stretch);
 
                         p2.x = cos(2 * PI * ((float) j) / angular_resolution);
                         p2.y = sin(2 * PI * ((float) j) / angular_resolution);
-                        p2.z = ((float) i+1) / axial_resolution;
+                        p2.z = ((float) i+1) / (axial_resolution * total_stretch);
 
                         p3.x = cos(2 * PI * ((float) j+1) / angular_resolution);
                         p3.y = sin(2 * PI * ((float) j+1) / angular_resolution);
-                        p3.z = ((float) i) / axial_resolution;
+                        p3.z = ((float) i) / (axial_resolution * total_stretch);
 
                         p4.x = cos(2 * PI * ((float) j+1) / angular_resolution);
                         p4.y = sin(2 * PI * ((float) j+1) / angular_resolution);
-                        p4.z = ((float) i+1) / axial_resolution;
+                        p4.z = ((float) i+1) / (axial_resolution * total_stretch);
 
                         p1 = apply_transforms(p1, Ts, *num_Ts);
                         p2 = apply_transforms(p2, Ts, *num_Ts);

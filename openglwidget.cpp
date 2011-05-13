@@ -225,7 +225,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
         }
         else if (mode == 3)
         {
-                cane = stretch_cane(cane, (relY * 500.0 * PI / 180.0), 0.005);
+                cane = stretch_cane(cane, -(relY * 500.0 * PI / 180.0), 200);
         }
         else if (mode == 4)
         {

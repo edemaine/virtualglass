@@ -50,7 +50,7 @@ void WorkWindow::seedLibrary()
         Cane* stch = init_cane();
         stch->num_subcanes = 1;
         stch->subcanes[0] = c;
-        stch->stretch = 5.0;
+        stch->stretch = 12.0;
 
         c->color.r = 0.8;
         c->color.g = 0.8;
