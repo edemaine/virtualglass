@@ -23,7 +23,6 @@ typedef struct TransformData
 {
         float f_amt;
         Point p_amt;
-        PolarPoint pp_amt;
 } TransformData;
 
 typedef struct Transform

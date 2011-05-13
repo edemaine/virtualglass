@@ -12,11 +12,6 @@
 #define LOW_RESOLUTION 1
 #define HIGH_RESOLUTION 2
 
-#define STRETCH 1
-#define TWIST 2
-#define WRAP 3
-#define BUNDLE 4
-
 #define ALL_SUBCANES -1
 #define NO_SUBCANES -2
 

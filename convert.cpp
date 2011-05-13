@@ -106,7 +106,9 @@ void convert_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Tra
         
         total_stretch = compute_total_stretch(Ts, *num_Ts);
 
+        // Get cylinder sides
         for (i = 0; i < axial_resolution - 1; ++i)
+        {
                 for (j = 0; j < angular_resolution; ++j)
                 {
                         p1.x = cos(2 * PI * ((float) j) / angular_resolution);
@@ -139,11 +141,8 @@ void convert_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Tra
                                 tmp_t.c = darken_color(color);
 
                         // Cut off upper stuff
-                        if (!(tmp_t.v1.z > 1.0 || tmp_t.v2.z > 1.0 || tmp_t.v3.z > 1.0))
-                        { 
-                                triangles[*num_triangles] = tmp_t;
-                                *num_triangles += 1;
-                        }
+                        triangles[*num_triangles] = tmp_t;
+                        *num_triangles += 1;
 
                         tmp_t.v1 = p1;
                         tmp_t.v2 = p3;
@@ -153,14 +152,47 @@ void convert_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Tra
                         else
                                 tmp_t.c = darken_color(color);
 
-                        // Cut off upper stuff
-                        if (!(tmp_t.v1.z > 1.0 || tmp_t.v2.z > 1.0 || tmp_t.v3.z > 1.0))
-                        { 
-                                triangles[*num_triangles] = tmp_t;
-                                *num_triangles += 1;
-                        }
-
+                        triangles[*num_triangles] = tmp_t;
+                        *num_triangles += 1;
                 } 
+        }
+
+        // Get cylinder bottom
+        p1.x = 1.0;
+        p1.y = 0.0;
+        p1.z = p2.z = p3.z = 0.0;
+        tmp_t.v1 = apply_transforms(p1, Ts, *num_Ts);
+        if (illuminated_subcane == ALL_SUBCANES)
+                tmp_t.c = brighten_color(color);
+        else
+                tmp_t.c = darken_color(color);
+        for (j = 1; j < angular_resolution-1; ++j)
+        {
+                p2.x = cos(2 * PI * ((float) j) / angular_resolution);
+                p2.y = sin(2 * PI * ((float) j) / angular_resolution);
+                tmp_t.v3 = apply_transforms(p2, Ts, *num_Ts);
+                p3.x = cos(2 * PI * ((float) j+1) / angular_resolution);
+                p3.y = sin(2 * PI * ((float) j+1) / angular_resolution);
+                tmp_t.v2 = apply_transforms(p3, Ts, *num_Ts);
+                triangles[*num_triangles] = tmp_t;
+                *num_triangles += 1;
+        }
+
+        // Get cylinder top
+        p1.z = p2.z = p3.z = ((float) (axial_resolution-1)) / (axial_resolution * total_stretch);
+        tmp_t.v1 = apply_transforms(p1, Ts, *num_Ts);
+        for (j = 1; j < angular_resolution-1; ++j)
+        {
+                p2.x = cos(2 * PI * ((float) j) / angular_resolution);
+                p2.y = sin(2 * PI * ((float) j) / angular_resolution);
+                tmp_t.v2 = apply_transforms(p2, Ts, *num_Ts);
+                p3.x = cos(2 * PI * ((float) j+1) / angular_resolution);
+                p3.y = sin(2 * PI * ((float) j+1) / angular_resolution);
+                tmp_t.v3 = apply_transforms(p3, Ts, *num_Ts);
+                triangles[*num_triangles] = tmp_t;
+                *num_triangles += 1;
+        }
+         
 }
 
 
@@ -255,12 +287,14 @@ void convert_to_triangles(Cane* c, Triangle** triangles, int* num_triangles, int
         if (res_mode == LOW_RESOLUTION)
         {
                 *triangles = (Triangle*) malloc(sizeof(Triangle) 
-                        * LOW_AXIAL_RESOLUTION * LOW_ANGULAR_RESOLUTION * 2 * num_canes(c));
+                        * (LOW_AXIAL_RESOLUTION * LOW_ANGULAR_RESOLUTION * 2 * num_canes(c) 
+                                + LOW_ANGULAR_RESOLUTION * 2));
         }
         else 
         {
                 *triangles = (Triangle*) malloc(sizeof(Triangle) 
-                        * HIGH_AXIAL_RESOLUTION * HIGH_ANGULAR_RESOLUTION * 2 * num_canes(c));
+                        * (HIGH_AXIAL_RESOLUTION * HIGH_ANGULAR_RESOLUTION * 2 * num_canes(c) 
+                                + HIGH_ANGULAR_RESOLUTION * 2));
         }
         *num_triangles = 0;
 
