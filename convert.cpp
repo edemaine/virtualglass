@@ -76,7 +76,7 @@ Point apply_transforms(Point p, Transform* Ts, int num_Ts)
                         case TWIST_TRANSFORM: // f_amt to describe twist amount per unit length 
                                 theta = atan2(p.y, p.x);
                                 r = sqrt(p.x*p.x + p.y*p.y);
-                                theta += Ts[i].data.f_amt;
+                                theta += Ts[i].data.f_amt * p.z;
                                 p.x = r * cos(theta); 
                                 p.y = r * sin(theta); 
                                 // p.z is unchanged
@@ -143,8 +143,12 @@ void convert_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Tra
                         else
                                 tmp_t.c = darken_color(color);
 
-                        triangles[*num_triangles] = tmp_t;
-                        *num_triangles += 1;
+                        // Cut off upper stuff
+                        if (!(tmp_t.v1.z > 1.0 || tmp_t.v2.z > 1.0 || tmp_t.v3.z > 1.0))
+                        { 
+                                triangles[*num_triangles] = tmp_t;
+                                *num_triangles += 1;
+                        }
 
                         tmp_t.v1 = p1;
                         tmp_t.v2 = p3;
@@ -154,8 +158,12 @@ void convert_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Tra
                         else
                                 tmp_t.c = darken_color(color);
 
-                        triangles[*num_triangles] = tmp_t;
-                        *num_triangles += 1;
+                        // Cut off upper stuff
+                        if (!(tmp_t.v1.z > 1.0 || tmp_t.v2.z > 1.0 || tmp_t.v3.z > 1.0))
+                        { 
+                                triangles[*num_triangles] = tmp_t;
+                                *num_triangles += 1;
+                        }
 
                 } 
 }
