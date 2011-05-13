@@ -230,14 +230,12 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
         else if (mode == 4)
         {
                 cane = create_bundle(cane);
-                curCaneX = cane->subcane_locs[cur_active_subcane].r 
-                        * cos(cane->subcane_locs[cur_active_subcane].theta);
-                curCaneY = cane->subcane_locs[cur_active_subcane].r 
-                        * sin(cane->subcane_locs[cur_active_subcane].theta);
+                curCaneX = cane->subcane_locs[cur_active_subcane].x; 
+                curCaneY = cane->subcane_locs[cur_active_subcane].y; 
                 curCaneX += relX * cos(theta + PI / 2.0) + relY * cos(theta); 
                 curCaneY += relX * sin(theta + PI / 2.0) + relY * sin(theta); 
-                cane->subcane_locs[cur_active_subcane].r = sqrt(curCaneX*curCaneX + curCaneY*curCaneY); 
-                cane->subcane_locs[cur_active_subcane].theta = atan2(curCaneY, curCaneX);
+                cane->subcane_locs[cur_active_subcane].x = curCaneX;
+                cane->subcane_locs[cur_active_subcane].y = curCaneY;
         }
 
         //update global variable camera position relative to lookat point

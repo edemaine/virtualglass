@@ -48,10 +48,9 @@ void WorkWindow::seedLibrary()
         // Now seed the library with some basic canes
         Cane* c = init_cane();
         Cane* stch = init_cane();
-
         stch->num_subcanes = 1;
         stch->subcanes[0] = c;
-        stch->stretch = 0.1;
+        stch->stretch = 5.0;
 
         c->color.r = 0.8;
         c->color.g = 0.8;
@@ -74,8 +73,8 @@ void WorkWindow::seedLibrary()
         glassgl->setFocusCane(stch);
         saveCaneToLibrary();
 
-        glassgl->setFocusCane(make_wiki_cane());        
-        saveCaneToLibrary();
+        //glassgl->setFocusCane(make_wiki_cane());        
+        //saveCaneToLibrary();
 }
 
 void WorkWindow::zoomInButtonPressed()

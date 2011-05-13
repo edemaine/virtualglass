@@ -40,7 +40,7 @@ struct Cane
         float stretch;
         float twist;
         int num_subcanes;
-        PolarPoint subcane_locs[MAX_SUBCANE_COUNT];
+        Point subcane_locs[MAX_SUBCANE_COUNT];
         struct Cane* subcanes[MAX_SUBCANE_COUNT];
         Color color;
 };

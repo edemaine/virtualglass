@@ -5,6 +5,7 @@
 #include "constants.h"
 #include "cane.h"
 
+#ifdef UNDEF
 Cane* make_zanfirico_ballottini_N()
 {
         Cane* white, * stretched_white, * white_line, * twisted_line;
@@ -221,6 +222,6 @@ Cane* stretch_test()
 
         return ref; 
 }
-
+#endif
 
 

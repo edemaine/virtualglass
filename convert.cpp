@@ -9,9 +9,28 @@ in 3-space, each with a set of coordinates and a color.
 #include "types.h"
 #include "constants.h"
 
-
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
+
+#define TWIST_TRANSFORM 1
+#define STRETCH_TRANSFORM 2
+#define MOVE_TRANSFORM 3
+
+#define MAX_TRANSFORMS 10000
+
+typedef struct TransformData
+{
+        float f_amt;
+        Point p_amt;
+        PolarPoint pp_amt;
+} TransformData;
+
+typedef struct Transform
+{
+        int type;
+        TransformData data;
+} Transform;
+
 
 Color brighten_color(Color c)
 {
@@ -31,13 +50,51 @@ Color darken_color(Color c)
         return i;
 }
 
-void recurse(Cane* c, Triangle* triangles, int* cur_tri, 
-        Point origin_bot_pt, Point origin_top_pt, float origin_angle_bot, float origin_angle_top, float origin_stretch, int axial, int illuminated_subcane, int res_mode)
+// transforms should be provided top-down (and are processed bottom up)
+Point apply_transforms(Point p, Transform* Ts, int num_Ts)
 {
+        int i;
+        float r, theta;
+
+        for (i = num_Ts-1; i >= 0; --i)
+        {
+                switch (Ts[i].type)
+                {
+                        case MOVE_TRANSFORM: // uses p_amt to describe offset from center
+                                p.x += Ts[i].data.p_amt.x;
+                                p.y += Ts[i].data.p_amt.y;
+                                // p.z is unchanged
+                                break;
+                        case STRETCH_TRANSFORM: // uses f_amt to describe stretch amount
+                                theta = atan2(p.y, p.x);
+                                r = sqrt(p.x*p.x + p.y*p.y);
+                                r /= Ts[i].data.f_amt;
+                                p.x = r * cos(theta); 
+                                p.y = r * sin(theta); 
+                                p.z *= Ts[i].data.f_amt; // assume starting at z = 0
+                                break;
+                        case TWIST_TRANSFORM: // f_amt to describe twist amount per unit length 
+                                theta = atan2(p.y, p.x);
+                                r = sqrt(p.x*p.x + p.y*p.y);
+                                theta += Ts[i].data.f_amt;
+                                p.x = r * cos(theta); 
+                                p.y = r * sin(theta); 
+                                // p.z is unchanged
+                                break;
+                        default:
+                                exit(1);
+                }
+        }
+
+        return p;
+}
+
+
+void convert_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Transform* Ts, int* num_Ts, Color color, int illuminated_subcane, int res_mode)
+{
+        Point p1, p2, p3, p4;
         Triangle tmp_t;
-        int angular, i, angular_resolution, axial_resolution, illumination;
-        Point p1, p2, p3, p4, subcane_origin_bot_pt, subcane_origin_top_pt;
-        float subcane_origin_angle_bot, subcane_origin_angle_top, subcane_stretch;
+        int i, j, angular_resolution, axial_resolution;
 
         switch (res_mode)
         {
@@ -53,152 +110,111 @@ void recurse(Cane* c, Triangle* triangles, int* cur_tri,
                         exit(1);
         }
 
-        if (c->num_subcanes == 0 && (illuminated_subcane != ALL_SUBCANES && illuminated_subcane != NO_SUBCANES))
-        {
-                fprintf(stderr, "Error: Attempt to illuminate subcanes of a cane w/o subcanes.\n");  
-                exit(1);
-        }
 
-        if (c->twist != 0 && c->stretch != 1)
-        {
-                fprintf(stderr, "Error: Cannot stretch and twist same cane object (nest them).\n");
-                exit(1);
-        }
-
-        if ((c->twist != 0 || c->stretch != 1) && c->num_subcanes == 0)
-        {
-                fprintf(stderr, "Error: Cannot stretch/twist in a colored cane object (nest colored object in stretch/twist object).\n");
-                exit(1);
-        }
-
-
-        if (c->num_subcanes == 0)
-        {
-                for (angular = 0; angular < angular_resolution; ++angular)
+        for (i = 0; i < axial_resolution - 1; ++i)
+                for (j = 0; j < angular_resolution; ++j)
                 {
-                        p1.x = origin_bot_pt.x + origin_stretch * cos(2 * PI * angular / angular_resolution); 
-                        p1.y = origin_bot_pt.y + origin_stretch * sin(2 * PI * angular / angular_resolution); 
-                        p1.z = ((float) axial) / axial_resolution; 
+                        p1.x = cos(2 * PI * ((float) j) / angular_resolution);
+                        p1.y = sin(2 * PI * ((float) j) / angular_resolution);
+                        p1.z = ((float) i) / axial_resolution;
 
-                        p2.x = origin_top_pt.x + origin_stretch * cos(2 * PI * angular / angular_resolution); 
-                        p2.y = origin_top_pt.y + origin_stretch * sin(2 * PI * angular / angular_resolution); 
-                        p2.z = ((float) axial + 1) / axial_resolution;        
+                        p2.x = cos(2 * PI * ((float) j) / angular_resolution);
+                        p2.y = sin(2 * PI * ((float) j) / angular_resolution);
+                        p2.z = ((float) i+1) / axial_resolution;
 
-                        p3.x = origin_bot_pt.x + origin_stretch * cos(2 * PI * (angular+1) / angular_resolution); 
-                        p3.y = origin_bot_pt.y + origin_stretch * sin(2 * PI * (angular+1) / angular_resolution); 
-                        p3.z = ((float) axial) / axial_resolution;        
+                        p3.x = cos(2 * PI * ((float) j+1) / angular_resolution);
+                        p3.y = sin(2 * PI * ((float) j+1) / angular_resolution);
+                        p3.z = ((float) i) / axial_resolution;
 
-                        p4.x = origin_top_pt.x + origin_stretch * cos(2 * PI * (angular+1) / angular_resolution); 
-                        p4.y = origin_top_pt.y + origin_stretch * sin(2 * PI * (angular+1) / angular_resolution); 
-                        p4.z = ((float) axial + 1) / axial_resolution; 
+                        p4.x = cos(2 * PI * ((float) j+1) / angular_resolution);
+                        p4.y = sin(2 * PI * ((float) j+1) / angular_resolution);
+                        p4.z = ((float) i+1) / axial_resolution;
 
+                        p1 = apply_transforms(p1, Ts, *num_Ts);
+                        p2 = apply_transforms(p2, Ts, *num_Ts);
+                        p3 = apply_transforms(p3, Ts, *num_Ts);
+                        p4 = apply_transforms(p4, Ts, *num_Ts);
 
                         tmp_t.v1 = p2;
                         tmp_t.v2 = p1;
                         tmp_t.v3 = p4;
                         if (illuminated_subcane == ALL_SUBCANES)
-                                tmp_t.c = brighten_color(c->color);
+                                tmp_t.c = brighten_color(color);
                         else
-                                tmp_t.c = darken_color(c->color);
+                                tmp_t.c = darken_color(color);
 
-                        triangles[*cur_tri] = tmp_t;
-                        *cur_tri += 1;
+                        triangles[*num_triangles] = tmp_t;
+                        *num_triangles += 1;
 
                         tmp_t.v1 = p1;
                         tmp_t.v2 = p3;
                         tmp_t.v3 = p4;
                         if (illuminated_subcane == ALL_SUBCANES)
-                                tmp_t.c = brighten_color(c->color);
+                                tmp_t.c = brighten_color(color);
                         else
-                                tmp_t.c = darken_color(c->color);
+                                tmp_t.c = darken_color(color);
 
-                        triangles[*cur_tri] = tmp_t;
-                        *cur_tri += 1;
-                }
+                        triangles[*num_triangles] = tmp_t;
+                        *num_triangles += 1;
+
+                } 
+}
+
+
+
+
+
+/*
+Assumptions about parameters:
+
+1. c is non-null.
+2. The values of c->twist and c->stretch are not *both* non-zero and non-one, respectively.
+3. If c->twist or c->stretch are non-zero or non-one respective, then c has exactly one child.
+4. Ts is sufficiently long for the cane.
+5. illuminated_subcane is equal to neither ALL_SUBCANES nor NO_SUBCANES only if
+c->twist = 0.0 and c->stretch = 1.0. 
+*/
+void recurse(Cane* c, Triangle* triangles, int* num_triangles, Transform* Ts, int* num_Ts, int illuminated_subcane, int res_mode)
+{
+        int i, illumination;
+
+        if (c->num_subcanes == 0)
+        {
+                convert_cane_to_addl_triangles(triangles, num_triangles, Ts, num_Ts, c->color, illuminated_subcane, res_mode);
         } 
+        else if (c->twist != 0)
+        {
+                Ts[*num_Ts].type = TWIST_TRANSFORM;
+                Ts[*num_Ts].data.f_amt = c->twist;
+                *num_Ts += 1;
+                recurse(c->subcanes[0], triangles, num_triangles, Ts, num_Ts, illuminated_subcane, res_mode);
+                *num_Ts -= 1;
+        }
+        else if (c->stretch != 1.0)
+        {
+                Ts[*num_Ts].type = STRETCH_TRANSFORM;
+                Ts[*num_Ts].data.f_amt = c->stretch;
+                *num_Ts += 1;
+                recurse(c->subcanes[0], triangles, num_triangles, Ts, num_Ts, illuminated_subcane, res_mode);
+                *num_Ts -= 1;
+        }
         else
         {
-                if (c->twist != 0)
+                for (i = 0; i < c->num_subcanes; ++i)
                 {
-                        for (i = 0; i < c->num_subcanes; ++i)
-                        {
-                                subcane_origin_bot_pt.x = origin_bot_pt.x + origin_stretch * c->subcane_locs[i].r * 
-                                        cos(c->subcane_locs[i].theta + 2 * PI * c->twist * axial / axial_resolution + origin_angle_bot); 
-                                subcane_origin_bot_pt.y = origin_bot_pt.y + origin_stretch * c->subcane_locs[i].r * 
-                                        sin(c->subcane_locs[i].theta + 2 * PI * c->twist * axial / axial_resolution + origin_angle_bot); 
-                                subcane_origin_top_pt.x = origin_top_pt.x + origin_stretch * c->subcane_locs[i].r * 
-                                        cos(c->subcane_locs[i].theta + 2 * PI * c->twist * (axial + 1) / axial_resolution + origin_angle_top); 
-                                subcane_origin_top_pt.y = origin_top_pt.y + origin_stretch * c->subcane_locs[i].r * 
-                                        sin(c->subcane_locs[i].theta + 2 * PI * c->twist * (axial + 1) / axial_resolution + origin_angle_top); 
-                                subcane_origin_angle_bot = origin_angle_bot + 2 * PI * c->twist * (axial) / axial_resolution;
-                                subcane_origin_angle_top = origin_angle_top + 2 * PI * c->twist * (axial + 1) / axial_resolution;
-                                if (i == illuminated_subcane || illuminated_subcane == ALL_SUBCANES)
-                                        illumination = ALL_SUBCANES;
-                                else
-                                        illumination = NO_SUBCANES;
+                        Ts[*num_Ts].type = MOVE_TRANSFORM;
+                        Ts[*num_Ts].data.p_amt.x = c->subcane_locs[i].x;
+                        Ts[*num_Ts].data.p_amt.y = c->subcane_locs[i].y;
+                        *num_Ts += 1;
 
-                                recurse(c->subcanes[i], triangles, cur_tri, subcane_origin_bot_pt, 
-                                        subcane_origin_top_pt, subcane_origin_angle_bot, 
-                                        subcane_origin_angle_top, origin_stretch, axial, illumination, res_mode);
-                        }
-                }
-                else if (c->stretch != 1.0)
-                {
-                        /*
-                        There are a few things that happen when you stretch:
-                        1. The color material gets thinner.
-                        2. Everything gets drawn towards the center.
-                        3. The axial gets 'blown up' in that things are dilated along the axial direction.
-                        */
-                        for (i = 0; i < c->num_subcanes; ++i)
-                        {
-                                subcane_stretch = origin_stretch * c->stretch;
-                                subcane_origin_bot_pt.x = origin_bot_pt.x + subcane_stretch * c->subcane_locs[i].r * 
-                                        cos(c->subcane_locs[i].theta + origin_angle_bot);
-                                subcane_origin_bot_pt.y = origin_bot_pt.y + subcane_stretch * c->subcane_locs[i].r * 
-                                        sin(c->subcane_locs[i].theta + origin_angle_bot);
-                                subcane_origin_top_pt.x = origin_top_pt.x + subcane_stretch * c->subcane_locs[i].r * 
-                                        cos(c->subcane_locs[i].theta + origin_angle_top);
-                                subcane_origin_top_pt.y = origin_top_pt.y + subcane_stretch * c->subcane_locs[i].r * 
-                                        sin(c->subcane_locs[i].theta + origin_angle_top);
-                                subcane_origin_angle_bot = origin_angle_bot;
-                                subcane_origin_angle_top = origin_angle_top;
+                        if (i == illuminated_subcane || illuminated_subcane == ALL_SUBCANES)
+                                illumination = ALL_SUBCANES;
+                        else
+                                illumination = NO_SUBCANES;
 
+                        recurse(c->subcanes[i], triangles, num_triangles, Ts, num_Ts, illumination, res_mode);
 
-                                if (i == illuminated_subcane || illuminated_subcane == ALL_SUBCANES)
-                                        illumination = ALL_SUBCANES;
-                                else
-                                        illumination = NO_SUBCANES;
-
-                                recurse(c->subcanes[i], triangles, cur_tri, subcane_origin_bot_pt, 
-                                        subcane_origin_top_pt, subcane_origin_angle_bot, 
-                                        subcane_origin_angle_top, subcane_stretch, axial, illumination, res_mode);
-                        }
-                }
-                else
-                {
-                        for (i = 0; i < c->num_subcanes; ++i)
-                        {
-                                subcane_origin_bot_pt.x = origin_bot_pt.x + origin_stretch * c->subcane_locs[i].r * 
-                                        cos(c->subcane_locs[i].theta + origin_angle_bot); 
-                                subcane_origin_bot_pt.y = origin_bot_pt.y + origin_stretch * c->subcane_locs[i].r * 
-                                        sin(c->subcane_locs[i].theta + origin_angle_bot); 
-                                subcane_origin_top_pt.x = origin_top_pt.x + origin_stretch * c->subcane_locs[i].r * 
-                                        cos(c->subcane_locs[i].theta + origin_angle_top); 
-                                subcane_origin_top_pt.y = origin_top_pt.y + origin_stretch * c->subcane_locs[i].r * 
-                                        sin(c->subcane_locs[i].theta + origin_angle_top); 
-                                subcane_origin_angle_bot = origin_angle_bot;
-                                subcane_origin_angle_top = origin_angle_top;
-
-                                if (i == illuminated_subcane || illuminated_subcane == ALL_SUBCANES)
-                                        illumination = ALL_SUBCANES;
-                                else
-                                        illumination = NO_SUBCANES;
-
-                                recurse(c->subcanes[i], triangles, cur_tri, subcane_origin_bot_pt, 
-                                        subcane_origin_top_pt, subcane_origin_angle_bot, 
-                                        subcane_origin_angle_top, origin_stretch, axial, illumination, res_mode);
-                        }
+                        *num_Ts -= 1;
                 }
         }
 }
@@ -218,10 +234,8 @@ int num_canes(Cane* c)
 
 void convert_to_triangles(Cane* c, Triangle** triangles, int* num_triangles, int illuminated_subcane, int res_mode)
 {
-        Point origin;
-        int axial, axial_resolution, angular_resolution;
-
-        origin.x = origin.y = origin.z = 0;
+        Transform* Ts;
+        int num_Ts; 
 
         if (*triangles != NULL)
         {
@@ -237,22 +251,19 @@ void convert_to_triangles(Cane* c, Triangle** triangles, int* num_triangles, int
 
         if (res_mode == LOW_RESOLUTION)
         {
-                axial_resolution = LOW_AXIAL_RESOLUTION;
-                angular_resolution = LOW_ANGULAR_RESOLUTION;
+                *triangles = (Triangle*) malloc(sizeof(Triangle) 
+                        * LOW_AXIAL_RESOLUTION * LOW_ANGULAR_RESOLUTION * 2 * num_canes(c));
         }
-        else // mode == HIGH_RESOLUTION
+        else 
         {
-                axial_resolution = HIGH_AXIAL_RESOLUTION;
-                angular_resolution = HIGH_ANGULAR_RESOLUTION;
+                *triangles = (Triangle*) malloc(sizeof(Triangle) 
+                        * HIGH_AXIAL_RESOLUTION * HIGH_ANGULAR_RESOLUTION * 2 * num_canes(c));
         }
-
-        *triangles = (Triangle*) malloc(sizeof(Triangle) 
-                * axial_resolution * angular_resolution * 2 * num_canes(c));
         *num_triangles = 0;
 
-        for (axial = 0; axial < axial_resolution - 1; ++axial)
-        {
-                recurse(c, *triangles, num_triangles, origin, origin, 0, 0, 1, axial, illuminated_subcane, res_mode);
-        }
+        Ts = (Transform*) malloc(sizeof(Transform) * num_canes(c));
+        num_Ts = 0;
+
+        recurse(c, *triangles, num_triangles, Ts, &num_Ts, illuminated_subcane, res_mode);
 }
 

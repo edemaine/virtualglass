@@ -28,7 +28,7 @@ Cane* init_cane()
         for (i = 0; i < MAX_SUBCANE_COUNT; ++i)
         {
                 c->subcanes[i] = NULL;
-                c->subcane_locs[i].r = c->subcane_locs[i].theta = 0;
+                c->subcane_locs[i].x = c->subcane_locs[i].y = 0;
         }
         c->color.r = 1.0;
         c->color.g = 1.0;
@@ -101,8 +101,8 @@ Cane* add_cane(Cane* c, Cane* addl, int* addl_index_ptr)
 {
         Cane* cane = create_bundle(c);
         cane->subcanes[cane->num_subcanes] = addl;
-        cane->subcane_locs[cane->num_subcanes].theta = 0;
-        cane->subcane_locs[cane->num_subcanes].r = 0;
+        cane->subcane_locs[cane->num_subcanes].x = 0;
+        cane->subcane_locs[cane->num_subcanes].y = 0;
         *addl_index_ptr = cane->num_subcanes;
         cane->num_subcanes += 1;
 
@@ -125,8 +125,8 @@ Cane* deep_copy(Cane* c)
                 if (c->subcanes[i] != NULL)
                 {
                         copy->subcanes[i] = deep_copy(c->subcanes[i]);
-                        copy->subcane_locs[i].r = c->subcane_locs[i].r;
-                        copy->subcane_locs[i].theta = c->subcane_locs[i].theta;
+                        copy->subcane_locs[i].x = c->subcane_locs[i].x;
+                        copy->subcane_locs[i].y = c->subcane_locs[i].y;
                 }
                 else
                         copy->subcanes[i] = NULL;
