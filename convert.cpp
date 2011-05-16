@@ -6,8 +6,7 @@ in 3-space, each with a set of coordinates and a color.
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "types.h"
-#include "constants.h"
+#include "convert.h"
 
 Color brighten_color(Color c)
 {
@@ -267,7 +266,7 @@ int num_canes(Cane* c)
 }
 
 
-void convert_to_triangles(Cane* c, Triangle** triangles, int* num_triangles, int illuminated_subcane, int res_mode)
+void convert_to_mesh(Cane* c, Triangle** triangles, int* num_triangles, int illuminated_subcane, int res_mode)
 {
         Transform* Ts;
         int num_Ts; 

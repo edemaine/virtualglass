@@ -5,6 +5,16 @@
 
 #include "types.h"
 
+typedef struct Cane
+{
+        float stretch;
+        float twist;
+        int num_subcanes;
+        Point subcane_locs[MAX_SUBCANE_COUNT];
+        struct Cane* subcanes[MAX_SUBCANE_COUNT];
+        Color color;
+} Cane;
+
 Cane* init_cane();
 
 Cane* twist_cane(Cane* c, float radians);

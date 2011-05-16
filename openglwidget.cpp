@@ -16,8 +16,8 @@
   
 OpenGLWidget :: OpenGLWidget(QWidget *parent=0) : QGLWidget(parent)
 {
-        triangles = NULL; 
-        num_triangles = 0; 
+        mesh = NULL; 
+        num_mesh_elements = 0; 
         mode = 1;  
         mousePressed = 0;
 }
@@ -65,9 +65,9 @@ void OpenGLWidget :: paintGL()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // set GL state
         glEnable(GL_DEPTH_TEST);
-        for (i = 0; i < num_triangles; ++i)
+        for (i = 0; i < num_mesh_elements; ++i)
         {
-                drawTriangle(&(triangles[i]));
+                drawTriangle(&(mesh[i]));
         }
         swapBuffers();  // swap off screen and display buffers
 }  
@@ -121,7 +121,7 @@ void OpenGLWidget :: updateCane()
         else
                 illuminated_subcane = NO_SUBCANES; 
 
-        convert_to_triangles(cane, &triangles, &num_triangles, illuminated_subcane, resolution);
+        convert_to_mesh(cane, &mesh, &num_mesh_elements, illuminated_subcane, resolution);
 } 
 
 float OpenGLWidget :: abs(float v)

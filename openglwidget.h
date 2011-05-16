@@ -2,7 +2,7 @@
 #define OPENGLWIDGET_H
 
 #include <qgl.h>
-#include "types.h"
+#include "convert.h"
 #include "cane.h"
 
 #define LOOK_MODE 1
@@ -28,8 +28,8 @@ class OpenGLWidget : public QGLWidget
                 void setMode(int mode);
 
         private:
-                Triangle* triangles; 
-                int num_triangles; 
+                Triangle* mesh; 
+                int num_mesh_elements; 
                 int mode;
                 Cane* cane;
                 int cur_active_subcane;
