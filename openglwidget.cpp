@@ -1,18 +1,5 @@
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include <qgl.h>
-#include <qevent.h>
-#include "primitives.h"
-#include "constants.h"
-#include "convert.h"
-#include "openglwidget.h"
-#include "cane.h"
-
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-        
+#include "openglwidget.h" 
   
 OpenGLWidget :: OpenGLWidget(QWidget *parent=0) : QGLWidget(parent)
 {

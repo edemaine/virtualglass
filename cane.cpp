@@ -3,17 +3,7 @@ Initializes a cane node (i.e. a constructed top-level
 definition of a cane).
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "primitives.h"
 #include "cane.h"
-#include "constants.h"
-
-#define PI 3.14159265358979323846f
-
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-
 
 Cane* init_cane()
 {

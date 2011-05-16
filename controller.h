@@ -2,6 +2,7 @@
 #define CONTROLLER_H
 
 #include <QApplication>
+#include <string.h>
 #include "workwindow.h"
 
 class Controller

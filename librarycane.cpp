@@ -1,7 +1,5 @@
-#include <QtGui>
+
 #include "librarycane.h"
-#include "openglwidget.h"
-#include "cane.h"
 
 LibraryCane :: LibraryCane(OpenGLWidget* w, Cane* c, QWidget* parent=0): QLabel(parent)
 {

@@ -1,6 +1,4 @@
 
-#include <QApplication>
-#include <string.h>
 #include "controller.h"
 
 Controller::Controller()

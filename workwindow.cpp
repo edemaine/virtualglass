@@ -1,9 +1,4 @@
-#include <QtGui>
-#include "openglwidget.h"
-#include "generator.h"
 #include "workwindow.h"
-#include "constants.h"
-#include "librarycane.h"
 
 WorkWindow::WorkWindow()
 {

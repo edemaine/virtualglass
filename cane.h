@@ -3,6 +3,9 @@
 #ifndef CANE_H
 #define CANE_H
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
 #include "primitives.h"
 
 typedef struct Cane

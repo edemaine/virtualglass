@@ -2,8 +2,11 @@
 #define WORKWINDOW_H
 
 #include <QtGui>
-#include "cane.h"
 #include "openglwidget.h"
+#include "generator.h"
+#include "constants.h"
+#include "librarycane.h"
+#include "cane.h"
 
 class View;
 

@@ -3,6 +3,9 @@
 #ifndef CONVERT_H
 #define CONVERT_H
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
 #include "cane.h"
 #include "constants.h"
 #include "primitives.h"

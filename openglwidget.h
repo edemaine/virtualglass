@@ -1,7 +1,14 @@
 #ifndef OPENGLWIDGET_H
 #define OPENGLWIDGET_H
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
 #include <qgl.h>
+#include <qevent.h>
+#include "primitives.h"
+#include "constants.h"
 #include "convert.h"
 #include "cane.h"
 
