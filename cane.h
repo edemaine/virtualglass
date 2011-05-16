@@ -3,7 +3,7 @@
 #ifndef CANE_H
 #define CANE_H
 
-#include "types.h"
+#include "primitives.h"
 
 typedef struct Cane
 {

@@ -6,7 +6,7 @@ definition of a cane).
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "types.h"
+#include "primitives.h"
 #include "cane.h"
 #include "constants.h"
 

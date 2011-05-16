@@ -5,7 +5,7 @@
 
 #include "cane.h"
 #include "constants.h"
-#include "types.h"
+#include "primitives.h"
 
 // Object modelling stuff
 typedef struct TransformData

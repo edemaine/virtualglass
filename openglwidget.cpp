@@ -5,7 +5,7 @@
 #include <math.h>
 #include <qgl.h>
 #include <qevent.h>
-#include "types.h"
+#include "primitives.h"
 #include "constants.h"
 #include "convert.h"
 #include "openglwidget.h"

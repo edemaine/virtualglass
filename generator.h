@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "types.h"
+#include "primitives.h"
 #include "constants.h"
 #include "cane.h"
 

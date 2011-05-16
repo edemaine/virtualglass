@@ -1,6 +1,6 @@
 
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef PRIMITIVES_H
+#define PRIMITIVES_H
 
 #include "constants.h"
 
