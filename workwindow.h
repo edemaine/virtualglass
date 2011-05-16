@@ -3,7 +3,6 @@
 
 #include <QtGui>
 #include "openglwidget.h"
-#include "generator.h"
 #include "constants.h"
 #include "librarycane.h"
 #include "cane.h"
