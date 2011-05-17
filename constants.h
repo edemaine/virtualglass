@@ -1,6 +1,6 @@
 
 #ifndef CONSTANTS_H
-#define CONTANTS_H
+#define CONSTANTS_H
 
 #define LOW_AXIAL_RESOLUTION 100
 #define LOW_ANGULAR_RESOLUTION 20 

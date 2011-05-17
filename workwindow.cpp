@@ -17,7 +17,7 @@ WorkWindow::WorkWindow()
 void WorkWindow::saveCaneToLibrary()
 {
         LibraryCane* lc = new LibraryCane((OpenGLWidget*) this->glassgl, 
-                deep_copy(this->glassgl->getCane()), 0);
+                this->glassgl->getCane()->deep_copy(), 0);
         stock_layout->addWidget(lc);
 }
 
@@ -41,8 +41,8 @@ void WorkWindow::setupLibraryArea()
 void WorkWindow::seedLibrary()
 {
         // Now seed the library with some basic canes
-        Cane* c = init_cane();
-        Cane* stch = init_cane();
+        Cane* c = new Cane();
+        Cane* stch = new Cane();
         stch->num_subcanes = 1;
         stch->subcanes[0] = c;
         stch->stretch = 12.0;

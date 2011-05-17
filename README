@@ -57,7 +57,6 @@ openglwidget.cpp/h
 
 Cane data/transforms:
 cane.cpp/h
-generator.cpp/h
 primitives.h
 convert.cpp/h
 

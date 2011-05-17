@@ -8,27 +8,24 @@
 #include <math.h>
 #include "primitives.h"
 
-typedef struct Cane
+class Cane
 {
-        float stretch;
-        float twist;
-        int num_subcanes;
-        Point subcane_locs[MAX_SUBCANE_COUNT];
-        struct Cane* subcanes[MAX_SUBCANE_COUNT];
-        Color color;
-} Cane;
+        public:
+                Cane();
+                Cane* twist_cane(float radians);
+                Cane* stretch_cane(float amount, float min_stretch);
+                Cane* create_bundle();
+                Cane* add_cane(Cane* addl, int* addl_index_ptr);
+                Cane* deep_copy();
+                float stretch;
+                float twist;
+                int num_subcanes;
+                Point subcane_locs[MAX_SUBCANE_COUNT];
+                Cane* subcanes[MAX_SUBCANE_COUNT];
+                Color color;
+};
 
-Cane* init_cane();
 
-Cane* twist_cane(Cane* c, float radians);
-
-Cane* stretch_cane(Cane* c, float amount, float min_stretch);
-
-Cane* create_bundle(Cane* c);
-
-Cane* add_cane(Cane* c, Cane* addl, int* addl_index_ptr);
-
-Cane* deep_copy(Cane* c);
 
 #endif
 

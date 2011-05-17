@@ -206,17 +206,23 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
                 if (newFee > 0.0f && newFee < PI)
                         fee = newFee;
         }
-        else if (mode == 2) // if mode is 1 then change the cane
+        else if (mode == 2) 
         {
-                cane = twist_cane(cane, (relX * 500.0 * PI / 180.0));
+                //if (cane == NULL)
+                //        return;
+                cane = cane->twist_cane((relX * 500.0 * PI / 180.0));
         }
         else if (mode == 3)
         {
-                cane = stretch_cane(cane, -(relY * 500.0 * PI / 180.0), 200);
+                if (cane == NULL)
+                        return;
+                cane = cane->stretch_cane(-(relY * 500.0 * PI / 180.0), 200);
         }
         else if (mode == 4)
         {
-                cane = create_bundle(cane);
+                if (cane == NULL)
+                        return; 
+                cane = cane->create_bundle();
                 curCaneX = cane->subcane_locs[cur_active_subcane].x; 
                 curCaneY = cane->subcane_locs[cur_active_subcane].y; 
                 curCaneX += relX * cos(theta + PI / 2.0) + relY * cos(theta); 
@@ -265,7 +271,14 @@ void OpenGLWidget :: drawTriangle(Triangle* t)
 void OpenGLWidget :: addCane(Cane* c)
 {
         setMode(MOVE_MODE);
-        cane = add_cane(cane, c, &cur_active_subcane);
+        if (cane == NULL)
+        {
+                cane = c->deep_copy();
+        }
+        else
+        {
+                cane = cane->add_cane(c, &cur_active_subcane);
+        }
         updateCane();
         updateCamera();
         paintGL();

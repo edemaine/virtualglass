@@ -23,7 +23,6 @@ typedef struct Transform
         TransformData data;
 } Transform;
 
-
 // Mesh stuff
 typedef struct Triangle
 {

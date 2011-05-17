@@ -5,91 +5,73 @@ definition of a cane).
 
 #include "cane.h"
 
-Cane* init_cane()
+Cane :: Cane()
 {
-        Cane* c;
-        int i;
-
-        c = (Cane*) malloc(sizeof(Cane));
-
-        c->stretch = 1.0;
-        c->twist = 0.0;
-        c->num_subcanes = 0;
-        for (i = 0; i < MAX_SUBCANE_COUNT; ++i)
+        stretch = 1.0;
+        twist = 0.0;
+        num_subcanes = 0;
+        for (int i = 0; i < MAX_SUBCANE_COUNT; ++i)
         {
-                c->subcanes[i] = NULL;
-                c->subcane_locs[i].x = c->subcane_locs[i].y = 0;
+                subcanes[i] = NULL;
+                subcane_locs[i].x = subcane_locs[i].y = 0.0;
         }
-        c->color.r = 1.0;
-        c->color.g = 1.0;
-        c->color.b = 1.0;
 
-        return c;
+        color.r = color.g = color.b = 1.0;
 }
 
-Cane* twist_cane(Cane* c, float radians)
+Cane* Cane :: twist_cane(float radians)
 {
-        if (c == NULL)
-                return c;
-
-        if (c->twist == 0.0)
+        if (twist == 0.0)
         {
-                Cane* tmp = init_cane();
-                tmp->num_subcanes = 1;
-                tmp->subcanes[0] = c;
-                c = tmp;                 
-        }
-
-        c->twist += radians;
-
-        return c;
-}
-
-Cane* stretch_cane(Cane* c, float amount, float max_stretch)
-{
-        if (c == NULL)
-                return c;
-
-        if (c->stretch == 1.0)
-        {
-                Cane* tmp = init_cane();
-                tmp->num_subcanes = 1;
-                tmp->subcanes[0] = c;
-                c = tmp;                 
-        }
-
-        c->stretch += amount;
-        c->stretch = MIN(c->stretch, max_stretch);
-
-        return c;
-}
-
-Cane* create_bundle(Cane* c)
-{
-        Cane* root;
-
-        if (c == NULL)
-        {
-                return init_cane();
-        }
-
-        if (c->stretch != 1.0 || c->twist != 0.0)
-        {
-                root = init_cane();
-                root->num_subcanes = 1;
-                root->subcanes[0] = c;
+                Cane* new_root = new Cane();
+                new_root->num_subcanes = 1;
+                new_root->subcanes[0] = this;
+                new_root->twist = radians;
+                return new_root;
         }
         else
         {
-                root = c;
-        }
-
-        return root;
+                twist += radians;
+                return this;
+        }       
 }
 
-Cane* add_cane(Cane* c, Cane* addl, int* addl_index_ptr)
+Cane* Cane :: stretch_cane(float amount, float max_stretch)
 {
-        Cane* cane = create_bundle(c);
+        if (stretch == 1.0)
+        {
+                Cane* new_root = new Cane();
+                new_root->num_subcanes = 1;
+                new_root->subcanes[0] = this;
+                new_root->stretch += MIN(amount, max_stretch);
+                return new_root;
+        }
+        else
+        {
+                stretch += amount;
+                stretch = MIN(stretch, max_stretch);
+                return this;
+        }
+}
+
+Cane* Cane :: create_bundle()
+{
+        if (stretch != 1.0 || twist != 0.0)
+        {
+                Cane* new_root = new Cane();
+                new_root->num_subcanes = 1;
+                new_root->subcanes[0] = this;
+                return new_root;
+        }
+        else
+        {
+                return this;
+        }
+}
+
+Cane* Cane :: add_cane(Cane* addl, int* addl_index_ptr)
+{
+        Cane* cane = this->create_bundle();
         cane->subcanes[cane->num_subcanes] = addl;
         cane->subcane_locs[cane->num_subcanes].x = 0;
         cane->subcane_locs[cane->num_subcanes].y = 0;
@@ -99,31 +81,31 @@ Cane* add_cane(Cane* c, Cane* addl, int* addl_index_ptr)
         return cane;
 }
 
-Cane* deep_copy(Cane* c)
+Cane* Cane :: deep_copy()
 {
         Cane* copy;
         int i;
 
-        copy = init_cane();
+        copy = new Cane();
 
-        copy->stretch = c->stretch;
-        copy->twist = c->twist;
+        copy->stretch = this->stretch;
+        copy->twist = this->twist;
 
-        copy->num_subcanes = c->num_subcanes;
+        copy->num_subcanes = this->num_subcanes;
         for (i = 0; i < MAX_SUBCANE_COUNT; ++i)
         {
-                if (c->subcanes[i] != NULL)
+                if (this->subcanes[i] != NULL)
                 {
-                        copy->subcanes[i] = deep_copy(c->subcanes[i]);
-                        copy->subcane_locs[i].x = c->subcane_locs[i].x;
-                        copy->subcane_locs[i].y = c->subcane_locs[i].y;
+                        copy->subcanes[i] = this->subcanes[i]->deep_copy();
+                        copy->subcane_locs[i].x = this->subcane_locs[i].x;
+                        copy->subcane_locs[i].y = this->subcane_locs[i].y;
                 }
                 else
                         copy->subcanes[i] = NULL;
         }
-        copy->color.r = c->color.r;
-        copy->color.g = c->color.g;
-        copy->color.b = c->color.b;
+        copy->color.r = this->color.r;
+        copy->color.g = this->color.g;
+        copy->color.b = this->color.b;
 
         return copy;        
 }
