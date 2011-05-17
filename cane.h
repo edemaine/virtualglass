@@ -12,11 +12,14 @@ class Cane
 {
         public:
                 Cane();
-                Cane* twist_cane(float radians);
-                Cane* stretch_cane(float amount, float min_stretch);
-                Cane* create_bundle();
-                Cane* add_cane(Cane* addl, int* addl_index_ptr);
+                void reset();
+                void shallow_copy(Cane* dest);
+                void twist_cane(float radians);
+                void stretch_cane(float amount, float min_stretch);
+                void create_bundle();
+                void add_cane(Cane* addl, int* addl_index_ptr);
                 Cane* deep_copy();
+
                 float stretch;
                 float twist;
                 int num_subcanes;

@@ -208,21 +208,21 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
         }
         else if (mode == 2) 
         {
-                //if (cane == NULL)
-                //        return;
-                cane = cane->twist_cane((relX * 500.0 * PI / 180.0));
+                if (cane == NULL)
+                        return;
+                cane->twist_cane((relX * 500.0 * PI / 180.0));
         }
         else if (mode == 3)
         {
                 if (cane == NULL)
                         return;
-                cane = cane->stretch_cane(-(relY * 500.0 * PI / 180.0), 200);
+                cane->stretch_cane(-(relY * 500.0 * PI / 180.0), 200);
         }
         else if (mode == 4)
         {
                 if (cane == NULL)
                         return; 
-                cane = cane->create_bundle();
+                cane->create_bundle();
                 curCaneX = cane->subcane_locs[cur_active_subcane].x; 
                 curCaneY = cane->subcane_locs[cur_active_subcane].y; 
                 curCaneX += relX * cos(theta + PI / 2.0) + relY * cos(theta); 
@@ -277,7 +277,7 @@ void OpenGLWidget :: addCane(Cane* c)
         }
         else
         {
-                cane = cane->add_cane(c, &cur_active_subcane);
+                cane->add_cane(c, &cur_active_subcane);
         }
         updateCane();
         updateCamera();
