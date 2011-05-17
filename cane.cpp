@@ -5,16 +5,19 @@ definition of a cane).
 
 #include "cane.h"
 
-Cane :: Cane()
+Cane :: Cane(int type)
 {
         reset();
+        this->type = type;
 }
 
 // Resets the object to the default values of everything 
 void Cane :: reset()
 {
+        type = UNASSIGNED_CANETYPE;
         stretch = 1.0;
         twist = 0.0;
+        squareoff = 1.0;
         num_subcanes = 0;
         for (int i = 0; i < MAX_SUBCANE_COUNT; ++i)
         {
@@ -29,8 +32,10 @@ void Cane :: reset()
 // the destination cane object
 void Cane :: shallow_copy(Cane* dest)
 {
+        dest->type = this->type;
         dest->stretch = this->stretch;
         dest->twist = this->twist;
+        dest->squareoff = this->squareoff;
 
         dest->num_subcanes = this->num_subcanes;
         for (int i = 0; i < MAX_SUBCANE_COUNT; ++i)
@@ -51,11 +56,12 @@ void Cane :: shallow_copy(Cane* dest)
 
 void Cane :: twist_cane(float radians)
 {
-        if (twist == 0.0)
+        if (this->type != TWIST_CANETYPE)
         {
-                Cane* copy = new Cane();
+                Cane* copy = new Cane(UNASSIGNED_CANETYPE);
                 this->shallow_copy(copy);
                 this->reset();
+                this->type = TWIST_CANETYPE;
                 this->num_subcanes = 1;
                 this->subcanes[0] = copy;
                 this->twist = radians;
@@ -69,11 +75,12 @@ void Cane :: twist_cane(float radians)
 
 void Cane :: stretch_cane(float amount, float max_stretch)
 {
-        if (stretch == 1.0)
+        if (this->type != STRETCH_CANETYPE)
         {
-                Cane* copy = new Cane();
+                Cane* copy = new Cane(UNASSIGNED_CANETYPE);
                 this->shallow_copy(copy);
                 this->reset();
+                this->type = STRETCH_CANETYPE;
                 this->num_subcanes = 1;
                 this->subcanes[0] = copy;
                 this->stretch += MIN(amount, max_stretch);
@@ -85,13 +92,33 @@ void Cane :: stretch_cane(float amount, float max_stretch)
         }
 }
 
-void Cane :: create_bundle()
+void Cane :: squareoff_cane(float amount, float max_squareoff)
 {
-        if (stretch != 1.0 || twist != 0.0)
+        if (this->type != SQUAREOFF_CANETYPE)
         {
-                Cane* copy = new Cane();
+                Cane* copy = new Cane(UNASSIGNED_CANETYPE);
                 this->shallow_copy(copy);
                 this->reset();
+                this->type = SQUAREOFF_CANETYPE;
+                this->num_subcanes = 1;
+                this->subcanes[0] = copy;
+                this->squareoff += MIN(amount, max_squareoff);
+        }
+        else
+        {
+                squareoff += amount;
+                squareoff = MIN(squareoff, max_squareoff);
+        }
+}
+
+void Cane :: create_bundle()
+{
+        if (this->type != BUNDLE_CANETYPE)
+        {
+                Cane* copy = new Cane(UNASSIGNED_CANETYPE);
+                this->shallow_copy(copy);
+                this->reset();
+                this->type = BUNDLE_CANETYPE;
                 this->num_subcanes = 1;
                 this->subcanes[0] = copy;
         }
@@ -112,10 +139,10 @@ Cane* Cane :: deep_copy()
         Cane* copy;
         int i;
 
-        copy = new Cane();
-
+        copy = new Cane(this->type);
         copy->stretch = this->stretch;
         copy->twist = this->twist;
+        copy->squareoff = this->squareoff;
 
         copy->num_subcanes = this->num_subcanes;
         for (i = 0; i < MAX_SUBCANE_COUNT; ++i)

@@ -197,7 +197,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 
         //----calculate change in mouse r and theta
 
-        if (mode == 1)
+        if (mode == LOOK_MODE)
         {
                 //rotate eye position around lookat point
                 //only rotate in one direction at a time
@@ -206,19 +206,19 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
                 if (newFee > 0.0f && newFee < PI)
                         fee = newFee;
         }
-        else if (mode == 2) 
+        else if (mode == TWIST_MODE) 
         {
                 if (cane == NULL)
                         return;
                 cane->twist_cane((relX * 500.0 * PI / 180.0));
         }
-        else if (mode == 3)
+        else if (mode == STRETCH_MODE)
         {
                 if (cane == NULL)
                         return;
                 cane->stretch_cane(-(relY * 500.0 * PI / 180.0), 200);
         }
-        else if (mode == 4)
+        else if (mode == BUNDLE_MODE)
         {
                 if (cane == NULL)
                         return; 
@@ -229,6 +229,12 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
                 curCaneY += relX * sin(theta + PI / 2.0) + relY * sin(theta); 
                 cane->subcane_locs[cur_active_subcane].x = curCaneX;
                 cane->subcane_locs[cur_active_subcane].y = curCaneY;
+        }
+        else if (mode == SQUAREOFF_MODE)
+        {
+                if (cane == NULL)
+                        return; 
+                cane->squareoff_cane(-(relY * 500.0 * PI / 180.0), 200);
         }
 
         //update global variable camera position relative to lookat point
@@ -270,7 +276,7 @@ void OpenGLWidget :: drawTriangle(Triangle* t)
 
 void OpenGLWidget :: addCane(Cane* c)
 {
-        setMode(MOVE_MODE);
+        setMode(BUNDLE_MODE);
         if (cane == NULL)
         {
                 cane = c->deep_copy();

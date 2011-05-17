@@ -41,8 +41,8 @@ void WorkWindow::setupLibraryArea()
 void WorkWindow::seedLibrary()
 {
         // Now seed the library with some basic canes
-        Cane* c = new Cane();
-        Cane* stch = new Cane();
+        Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
+        Cane* stch = new Cane(STRETCH_CANETYPE);
         stch->num_subcanes = 1;
         stch->subcanes[0] = c;
         stch->stretch = 12.0;
@@ -67,9 +67,6 @@ void WorkWindow::seedLibrary()
         c->color.b = 1.0;
         glassgl->setFocusCane(stch);
         saveCaneToLibrary();
-
-        //glassgl->setFocusCane(make_wiki_cane());        
-        //saveCaneToLibrary();
 }
 
 void WorkWindow::zoomInButtonPressed()
@@ -99,12 +96,17 @@ void WorkWindow::stretchButtonPressed()
 
 void WorkWindow::bundleButtonPressed()
 {
-        glassgl->setMode(MOVE_MODE);
+        glassgl->setMode(BUNDLE_MODE);
 }
 
 void WorkWindow::nextButtonPressed()
 {
         glassgl->advanceActiveSubcane();
+}
+
+void WorkWindow::squareoffButtonPressed()
+{
+        glassgl->setMode(SQUAREOFF_MODE);
 }
 
 void WorkWindow::saveButtonPressed()
@@ -142,6 +144,9 @@ void WorkWindow::setupWorkArea()
         QPushButton* next_button = new QPushButton("Next");
         connect(next_button, SIGNAL(pressed()), this, SLOT(nextButtonPressed())); 
 
+        QPushButton* squareoff_button = new QPushButton("Square Off");
+        connect(squareoff_button, SIGNAL(pressed()), this, SLOT(squareoffButtonPressed())); 
+
         QPushButton* save_button = new QPushButton("Save");
         connect(save_button, SIGNAL(pressed()), this, SLOT(saveButtonPressed())); 
 
@@ -156,6 +161,7 @@ void WorkWindow::setupWorkArea()
         button_layout->addWidget(stretch_button);
         button_layout->addWidget(bundle_button);
         button_layout->addWidget(next_button);
+        button_layout->addWidget(squareoff_button);
         button_layout->addWidget(save_button);
         button_layout->addWidget(clear_button);
 
@@ -174,13 +180,15 @@ void WorkWindow::keyPressEvent(QKeyEvent* e)
         if (e->key() == 0x53) // S 
                 glassgl->zoomIn();
         if (e->key() == 0x31) // 1 
-                glassgl->setMode(1);
+                glassgl->setMode(LOOK_MODE);
         if (e->key() == 0x32) // 2 
-                glassgl->setMode(2);
+                glassgl->setMode(TWIST_MODE);
         if (e->key() == 0x33) // 3 
-                glassgl->setMode(3);
+                glassgl->setMode(STRETCH_MODE);
         if (e->key() == 0x34) // 4 
-                glassgl->setMode(4);
+                glassgl->setMode(BUNDLE_MODE);
+        if (e->key() == 0x35) // 5
+                glassgl->setMode(SQUAREOFF_MODE);
         if (e->key() == 0x59) // Y 
                 saveCaneToLibrary();
         if (e->key() == 0x4e) // N 

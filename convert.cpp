@@ -54,6 +54,11 @@ Point apply_transforms(Point p, Transform* Ts, int num_Ts)
                                 p.y = r * sin(theta); 
                                 // p.z is unchanged
                                 break;
+                        case SQUAREOFF_TRANSFORM: // f_amt to describe amount of compression amount
+                                p.x = p.x / Ts[i].data.f_amt;
+                                p.y = p.y * Ts[i].data.f_amt;
+                                // p.z is unchanged
+                                break;
                         default:
                                 exit(1);
                 }
@@ -78,7 +83,7 @@ float compute_total_stretch(Transform* Ts, int num_Ts)
         return total_stretch;
 }
 
-void convert_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Transform* Ts, int* num_Ts, Color color, int illuminated_subcane, int res_mode)
+void convert_circular_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Transform* Ts, int* num_Ts, Color color, int illuminated_subcane, int res_mode)
 {
         Point p1, p2, p3, p4;
         Triangle tmp_t;
@@ -136,7 +141,6 @@ void convert_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Tra
                         else
                                 tmp_t.c = darken_color(color);
 
-                        // Cut off upper stuff
                         triangles[*num_triangles] = tmp_t;
                         *num_triangles += 1;
 
@@ -192,9 +196,6 @@ void convert_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Tra
 }
 
 
-
-
-
 /*
 Assumptions about parameters:
 
@@ -209,44 +210,52 @@ void recurse(Cane* c, Triangle* triangles, int* num_triangles, Transform* Ts, in
 {
         int i, illumination;
 
-        if (c->num_subcanes == 0)
+
+        switch(c->type)
         {
-                convert_cane_to_addl_triangles(triangles, num_triangles, Ts, num_Ts, c->color, illuminated_subcane, res_mode);
-        } 
-        else if (c->twist != 0)
-        {
-                Ts[*num_Ts].type = TWIST_TRANSFORM;
-                Ts[*num_Ts].data.f_amt = c->twist;
-                *num_Ts += 1;
-                recurse(c->subcanes[0], triangles, num_triangles, Ts, num_Ts, illuminated_subcane, res_mode);
-                *num_Ts -= 1;
-        }
-        else if (c->stretch != 1.0)
-        {
-                Ts[*num_Ts].type = STRETCH_TRANSFORM;
-                Ts[*num_Ts].data.f_amt = c->stretch;
-                *num_Ts += 1;
-                recurse(c->subcanes[0], triangles, num_triangles, Ts, num_Ts, illuminated_subcane, res_mode);
-                *num_Ts -= 1;
-        }
-        else
-        {
-                for (i = 0; i < c->num_subcanes; ++i)
-                {
-                        Ts[*num_Ts].type = MOVE_TRANSFORM;
-                        Ts[*num_Ts].data.p_amt.x = c->subcane_locs[i].x;
-                        Ts[*num_Ts].data.p_amt.y = c->subcane_locs[i].y;
+                case TWIST_CANETYPE:
+                        Ts[*num_Ts].type = TWIST_TRANSFORM;
+                        Ts[*num_Ts].data.f_amt = c->twist;
                         *num_Ts += 1;
-
-                        if (i == illuminated_subcane || illuminated_subcane == ALL_SUBCANES)
-                                illumination = ALL_SUBCANES;
-                        else
-                                illumination = NO_SUBCANES;
-
-                        recurse(c->subcanes[i], triangles, num_triangles, Ts, num_Ts, illumination, res_mode);
-
+                        recurse(c->subcanes[0], triangles, num_triangles, Ts, num_Ts, illuminated_subcane, res_mode);
                         *num_Ts -= 1;
-                }
+                        break;
+                case BASE_CIRCLE_CANETYPE: 
+                        convert_circular_cane_to_addl_triangles(triangles, num_triangles, Ts, num_Ts, c->color, illuminated_subcane, res_mode);
+                        break;
+                case SQUAREOFF_CANETYPE: 
+                        Ts[*num_Ts].type = SQUAREOFF_TRANSFORM;
+                        Ts[*num_Ts].data.f_amt = c->squareoff;
+                        *num_Ts += 1;
+                        recurse(c->subcanes[0], triangles, num_triangles, Ts, num_Ts, illuminated_subcane, res_mode);
+                        *num_Ts -= 1;
+                        break;
+                case STRETCH_CANETYPE:
+                        Ts[*num_Ts].type = STRETCH_TRANSFORM;
+                        Ts[*num_Ts].data.f_amt = c->stretch;
+                        *num_Ts += 1;
+                        recurse(c->subcanes[0], triangles, num_triangles, Ts, num_Ts, illuminated_subcane, res_mode);
+                        *num_Ts -= 1;
+                        break;
+                case BUNDLE_CANETYPE:
+                        for (i = 0; i < c->num_subcanes; ++i)
+                        {
+                                Ts[*num_Ts].type = MOVE_TRANSFORM;
+                                Ts[*num_Ts].data.p_amt.x = c->subcane_locs[i].x;
+                                Ts[*num_Ts].data.p_amt.y = c->subcane_locs[i].y;
+                                *num_Ts += 1;
+
+                                if (i == illuminated_subcane || illuminated_subcane == ALL_SUBCANES)
+                                        illumination = ALL_SUBCANES;
+                                else
+                                        illumination = NO_SUBCANES;
+
+                                recurse(c->subcanes[i], triangles, num_triangles, Ts, num_Ts, illumination, res_mode);
+                                *num_Ts -= 1;
+                        }
+                        break;
+                default:
+                        exit(1);
         }
 }
 
