@@ -48,7 +48,7 @@ Of the three pieces I mentioned, the files roughly fit into these three types li
 
 GUI:
 controller.cpp/h
-librarycane.cpp/h
+librarycanewidget.cpp/h
 main.cpp
 workwindow.cpp/h
 

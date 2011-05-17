@@ -21,6 +21,11 @@
 
 #define MAX_TRANSFORMS 10000
 
+#define LOOK_MODE 1
+#define TWIST_MODE 2
+#define STRETCH_MODE 3
+#define MOVE_MODE 4
+
 #define PI 3.14159265358979323846f
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))

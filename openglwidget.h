@@ -5,17 +5,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <QtGui>
 #include <qgl.h>
-#include <qevent.h>
 #include "primitives.h"
 #include "constants.h"
 #include "convert.h"
 #include "cane.h"
-
-#define LOOK_MODE 1
-#define TWIST_MODE 2
-#define STRETCH_MODE 3
-#define MOVE_MODE 4
 
 class OpenGLWidget : public QGLWidget
 {

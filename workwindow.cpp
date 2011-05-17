@@ -10,7 +10,7 @@ WorkWindow::WorkWindow()
         setupWorkArea();
         setupLibraryArea();
 
-        setWindowTitle(tr("Chicane"));
+        setWindowTitle(tr("Virtual Glass"));
         resize(1000, 1000);
 }
 
