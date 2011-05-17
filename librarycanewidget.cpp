@@ -1,7 +1,7 @@
 
-#include "librarycane.h"
+#include "librarycanewidget.h"
 
-LibraryCane :: LibraryCane(OpenGLWidget* w, Cane* c, QWidget* parent=0): QLabel(parent)
+LibraryCaneWidget :: LibraryCaneWidget(OpenGLWidget* w, Cane* c, QWidget* parent=0): QLabel(parent)
 {
         cane = c;  
         widget = w;
@@ -15,13 +15,13 @@ LibraryCane :: LibraryCane(OpenGLWidget* w, Cane* c, QWidget* parent=0): QLabel(
 }
        
 
-Cane* LibraryCane :: getCane()
+Cane* LibraryCaneWidget :: getCane()
 {
         return cane;
 }
  
 
-void LibraryCane :: mousePressEvent(QMouseEvent* event)
+void LibraryCaneWidget :: mousePressEvent(QMouseEvent* event)
 {
         widget->setMode(MOVE_MODE);
         widget->addCane(cane);

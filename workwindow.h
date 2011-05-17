@@ -4,7 +4,7 @@
 #include <QtGui>
 #include "openglwidget.h"
 #include "constants.h"
-#include "librarycane.h"
+#include "librarycanewidget.h"
 #include "cane.h"
 
 class View;

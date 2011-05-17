@@ -9,8 +9,8 @@ INCLUDEPATH += .
 QT += opengl
 
 # Input
-HEADERS += workwindow.h openglwidget.h cane.h primitives.h convert.h controller.h librarycane.h
-SOURCES += main.cpp workwindow.cpp openglwidget.cpp cane.cpp convert.cpp controller.cpp librarycane.cpp
+HEADERS += workwindow.h openglwidget.h cane.h primitives.h convert.h controller.h librarycanewidget.h
+SOURCES += main.cpp workwindow.cpp openglwidget.cpp cane.cpp convert.cpp controller.cpp librarycanewidget.cpp
 
 
 

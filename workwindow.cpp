@@ -16,7 +16,7 @@ WorkWindow::WorkWindow()
 
 void WorkWindow::saveCaneToLibrary()
 {
-        LibraryCane* lc = new LibraryCane((OpenGLWidget*) this->glassgl, 
+        LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->glassgl, 
                 this->glassgl->getCane()->deep_copy(), 0);
         stock_layout->addWidget(lc);
 }

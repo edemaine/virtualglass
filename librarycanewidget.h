@@ -1,14 +1,14 @@
-#ifndef LIBRARYCANE_H
-#define LIBRARYCANE_H
+#ifndef LIBRARYCANEWIDGET_H
+#define LIBRARYCANEWIDGET_H
 
 #include <QtGui>
 #include "openglwidget.h"
 #include "cane.h"
 
-class LibraryCane : public QLabel
+class LibraryCaneWidget : public QLabel
 {
         public:
-                LibraryCane(OpenGLWidget* w, Cane* c, QWidget* parent);
+                LibraryCaneWidget(OpenGLWidget* w, Cane* c, QWidget* parent);
                 Cane* getCane();
                 void mousePressEvent(QMouseEvent* event);
 
