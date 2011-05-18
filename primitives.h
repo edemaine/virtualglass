@@ -16,7 +16,7 @@ typedef struct Color
     float r;
     float g;
     float b;
-    float trans;
+    float a;
 } Color;
 
 #endif

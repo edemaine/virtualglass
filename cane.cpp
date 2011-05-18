@@ -18,6 +18,8 @@ void Cane :: reset()
         stretch = 1.0;
         twist = 0.0;
         squareoff = 1.0;
+        is_root_bundle = 0;
+
         num_subcanes = 0;
         for (int i = 0; i < MAX_SUBCANE_COUNT; ++i)
         {
@@ -36,6 +38,7 @@ void Cane :: shallow_copy(Cane* dest)
         dest->stretch = this->stretch;
         dest->twist = this->twist;
         dest->squareoff = this->squareoff;
+        dest->is_root_bundle = this->is_root_bundle;
 
         dest->num_subcanes = this->num_subcanes;
         for (int i = 0; i < MAX_SUBCANE_COUNT; ++i)
@@ -83,13 +86,9 @@ void Cane :: stretch_cane(float amount, float max_stretch)
                 this->type = STRETCH_CANETYPE;
                 this->num_subcanes = 1;
                 this->subcanes[0] = copy;
-                this->stretch += MIN(amount, max_stretch);
         }
-        else
-        {
-                stretch += amount;
-                stretch = MIN(stretch, max_stretch);
-        }
+        stretch = stretch*(1.0 + amount);
+        stretch = MIN(stretch, max_stretch);
 }
 
 void Cane :: squareoff_cane(float amount, float max_squareoff)
@@ -121,12 +120,29 @@ void Cane :: create_bundle()
                 this->type = BUNDLE_CANETYPE;
                 this->num_subcanes = 1;
                 this->subcanes[0] = copy;
+                this->is_root_bundle = 1;
+                copy->turnOffRootBundle();
+        }
+}
+
+
+// Moves through the entire tree and turns off the flag for being
+// the bundle closest to the root (i.e. the root bundle).
+void Cane :: turnOffRootBundle()
+{
+        this->is_root_bundle = 0;
+        for (int i = 0; i < num_subcanes; ++i)
+        {
+                subcanes[i]->turnOffRootBundle();
         }
 }
 
 void Cane :: add_cane(Cane* addl, int* addl_index_ptr)
 {
+        // Create a root bundle node
         create_bundle();
+
+        // Add the new cane to the bundle
         subcanes[num_subcanes] = addl;
         subcane_locs[num_subcanes].x = 0;
         subcane_locs[num_subcanes].y = 0;
@@ -143,6 +159,7 @@ Cane* Cane :: deep_copy()
         copy->stretch = this->stretch;
         copy->twist = this->twist;
         copy->squareoff = this->squareoff;
+        copy->is_root_bundle = this->is_root_bundle;
 
         copy->num_subcanes = this->num_subcanes;
         for (i = 0; i < MAX_SUBCANE_COUNT; ++i)

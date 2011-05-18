@@ -83,12 +83,14 @@ float compute_total_stretch(Transform* Ts, int num_Ts)
         return total_stretch;
 }
 
-void convert_circular_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Transform* Ts, int* num_Ts, Color color, int illuminated_subcane, int res_mode)
+float convert_circular_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Transform* Ts, int* num_Ts, Color color, int illuminated_subcane, int res_mode)
 {
         Point p1, p2, p3, p4;
         Triangle tmp_t;
         int i, j, angular_resolution, axial_resolution;
-        float total_stretch;
+        float total_stretch, radius;
+
+        tmp_t.c.a = 0.5;
 
         switch (res_mode)
         {
@@ -106,6 +108,7 @@ void convert_circular_cane_to_addl_triangles(Triangle* triangles, int* num_trian
 
         
         total_stretch = compute_total_stretch(Ts, *num_Ts);
+        radius = 0.0;
 
         // Get cylinder sides
         for (i = 0; i < axial_resolution - 1; ++i)
@@ -132,6 +135,12 @@ void convert_circular_cane_to_addl_triangles(Triangle* triangles, int* num_trian
                         p2 = apply_transforms(p2, Ts, *num_Ts);
                         p3 = apply_transforms(p3, Ts, *num_Ts);
                         p4 = apply_transforms(p4, Ts, *num_Ts);
+
+                        radius = MAX(radius, 
+                                        MAX(sqrt(p1.x*p1.x + p1.y*p1.y),
+                                                MAX(sqrt(p2.x*p2.x + p2.y*p2.y),
+                                                        MAX(sqrt(p3.x*p3.x + p3.y*p3.y),
+                                                                sqrt(p4.x*p4.x + p4.y*p4.y)))));
 
                         tmp_t.v1 = p2;
                         tmp_t.v2 = p1;
@@ -192,7 +201,8 @@ void convert_circular_cane_to_addl_triangles(Triangle* triangles, int* num_trian
                 triangles[*num_triangles] = tmp_t;
                 *num_triangles += 1;
         }
-         
+        
+        return radius; 
 }
 
 
@@ -206,10 +216,11 @@ Assumptions about parameters:
 5. illuminated_subcane is equal to neither ALL_SUBCANES nor NO_SUBCANES only if
 c->twist = 0.0 and c->stretch = 1.0. 
 */
-void recurse(Cane* c, Triangle* triangles, int* num_triangles, Transform* Ts, int* num_Ts, int illuminated_subcane, int res_mode)
+float recurse(Cane* c, Triangle* triangles, int* num_triangles, 
+        Transform* Ts, int* num_Ts, int illuminated_subcane, int res_mode)
 {
         int i, illumination;
-
+        float radius;
 
         switch(c->type)
         {
@@ -217,27 +228,31 @@ void recurse(Cane* c, Triangle* triangles, int* num_triangles, Transform* Ts, in
                         Ts[*num_Ts].type = TWIST_TRANSFORM;
                         Ts[*num_Ts].data.f_amt = c->twist;
                         *num_Ts += 1;
-                        recurse(c->subcanes[0], triangles, num_triangles, Ts, num_Ts, illuminated_subcane, res_mode);
+                        radius = recurse(c->subcanes[0], triangles, num_triangles, 
+                                Ts, num_Ts, illuminated_subcane, res_mode);
                         *num_Ts -= 1;
-                        break;
+                        return radius; 
                 case BASE_CIRCLE_CANETYPE: 
-                        convert_circular_cane_to_addl_triangles(triangles, num_triangles, Ts, num_Ts, c->color, illuminated_subcane, res_mode);
-                        break;
+                        return convert_circular_cane_to_addl_triangles(triangles, num_triangles, 
+                                Ts, num_Ts, c->color, illuminated_subcane, res_mode);
                 case SQUAREOFF_CANETYPE: 
                         Ts[*num_Ts].type = SQUAREOFF_TRANSFORM;
                         Ts[*num_Ts].data.f_amt = c->squareoff;
                         *num_Ts += 1;
-                        recurse(c->subcanes[0], triangles, num_triangles, Ts, num_Ts, illuminated_subcane, res_mode);
+                        radius = recurse(c->subcanes[0], triangles, num_triangles, 
+                                Ts, num_Ts, illuminated_subcane, res_mode);
                         *num_Ts -= 1;
-                        break;
+                        return radius;
                 case STRETCH_CANETYPE:
                         Ts[*num_Ts].type = STRETCH_TRANSFORM;
                         Ts[*num_Ts].data.f_amt = c->stretch;
                         *num_Ts += 1;
-                        recurse(c->subcanes[0], triangles, num_triangles, Ts, num_Ts, illuminated_subcane, res_mode);
+                        radius = recurse(c->subcanes[0], triangles, num_triangles, 
+                                Ts, num_Ts, illuminated_subcane, res_mode);
                         *num_Ts -= 1;
-                        break;
+                        return radius;
                 case BUNDLE_CANETYPE:
+                        radius = 0.0;
                         for (i = 0; i < c->num_subcanes; ++i)
                         {
                                 Ts[*num_Ts].type = MOVE_TRANSFORM;
@@ -250,10 +265,11 @@ void recurse(Cane* c, Triangle* triangles, int* num_triangles, Transform* Ts, in
                                 else
                                         illumination = NO_SUBCANES;
 
-                                recurse(c->subcanes[i], triangles, num_triangles, Ts, num_Ts, illumination, res_mode);
+                                radius = MAX(radius, recurse(c->subcanes[i], triangles, num_triangles, 
+                                        Ts, num_Ts, illumination, res_mode));
                                 *num_Ts -= 1;
                         }
-                        break;
+                        return radius; 
                 default:
                         exit(1);
         }
@@ -276,6 +292,7 @@ void convert_to_mesh(Cane* c, Triangle** triangles, int* num_triangles, int illu
 {
         Transform* Ts;
         int num_Ts; 
+        float radius;
 
         if (*triangles != NULL)
         {
@@ -306,6 +323,20 @@ void convert_to_mesh(Cane* c, Triangle** triangles, int* num_triangles, int illu
         Ts = (Transform*) malloc(sizeof(Transform) * num_canes(c));
         num_Ts = 0;
 
-        recurse(c, *triangles, num_triangles, Ts, &num_Ts, illuminated_subcane, res_mode);
+        // Process all the shapes present
+        radius = recurse(c, *triangles, num_triangles, Ts, &num_Ts, illuminated_subcane, res_mode);
+
+        // Encase everything in a clear cylinder 
+        Color bundle_color;
+        Transform bundle_Ts[1];
+        int num_bundle_Ts;
+
+        bundle_color.r = bundle_color.g = bundle_color.b = 1.0; 
+        num_bundle_Ts = 1;
+        bundle_Ts[0].type = STRETCH_TRANSFORM;
+        bundle_Ts[0].data.f_amt = 1.0 / radius;
+
+        convert_circular_cane_to_addl_triangles(*triangles, num_triangles, 
+                bundle_Ts, &num_bundle_Ts, bundle_color, NO_SUBCANES, res_mode);
 }
 

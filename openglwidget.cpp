@@ -33,6 +33,9 @@ void OpenGLWidget :: initializeGL()
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
         glEnable(GL_LIGHT0);
+
+        //glEnable (GL_BLEND);
+        //glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
  
 void OpenGLWidget :: zeroCanes()
@@ -56,6 +59,7 @@ void OpenGLWidget :: paintGL()
         {
                 drawTriangle(&(mesh[i]));
         }
+        // draw guide line
         swapBuffers();  // swap off screen and display buffers
 }  
  
@@ -216,7 +220,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
         {
                 if (cane == NULL)
                         return;
-                cane->stretch_cane(-(relY * 500.0 * PI / 180.0), 200);
+                cane->stretch_cane(-10.0*relY, 200);
         }
         else if (mode == BUNDLE_MODE)
         {
@@ -266,6 +270,7 @@ void OpenGLWidget :: drawTriangle(Triangle* t)
 
         // define the triangle
         glNormal3d(norm.x, norm.y, norm.z);
+        //glColor4f(t->c.r, t->c.g, t->c.b, t->c.a);
         glColor3f(t->c.r, t->c.g, t->c.b);
         glBegin(GL_TRIANGLES);
         glVertex3f(t->v1.x, t->v1.y, t->v1.z);
