@@ -226,7 +226,7 @@ float recurse(Cane* c, Triangle* triangles, int* num_triangles,
         {
                 case TWIST_CANETYPE:
                         Ts[*num_Ts].type = TWIST_TRANSFORM;
-                        Ts[*num_Ts].data.f_amt = c->twist;
+                        Ts[*num_Ts].data.f_amt = c->amt;
                         *num_Ts += 1;
                         radius = recurse(c->subcanes[0], triangles, num_triangles, 
                                 Ts, num_Ts, illuminated_subcane, res_mode);
@@ -237,7 +237,7 @@ float recurse(Cane* c, Triangle* triangles, int* num_triangles,
                                 Ts, num_Ts, c->color, illuminated_subcane, res_mode);
                 case SQUAREOFF_CANETYPE: 
                         Ts[*num_Ts].type = SQUAREOFF_TRANSFORM;
-                        Ts[*num_Ts].data.f_amt = c->squareoff;
+                        Ts[*num_Ts].data.f_amt = c->amt;
                         *num_Ts += 1;
                         radius = recurse(c->subcanes[0], triangles, num_triangles, 
                                 Ts, num_Ts, illuminated_subcane, res_mode);
@@ -245,7 +245,7 @@ float recurse(Cane* c, Triangle* triangles, int* num_triangles,
                         return radius;
                 case STRETCH_CANETYPE:
                         Ts[*num_Ts].type = STRETCH_TRANSFORM;
-                        Ts[*num_Ts].data.f_amt = c->stretch;
+                        Ts[*num_Ts].data.f_amt = c->amt;
                         *num_Ts += 1;
                         radius = recurse(c->subcanes[0], triangles, num_triangles, 
                                 Ts, num_Ts, illuminated_subcane, res_mode);

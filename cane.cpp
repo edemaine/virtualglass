@@ -15,9 +15,7 @@ Cane :: Cane(int type)
 void Cane :: reset()
 {
         type = UNASSIGNED_CANETYPE;
-        stretch = 1.0;
-        twist = 0.0;
-        squareoff = 1.0;
+        amt = 0.0;
         is_root_bundle = 0;
 
         num_subcanes = 0;
@@ -32,12 +30,10 @@ void Cane :: reset()
 
 // Copies the information in a cane object into 
 // the destination cane object
-void Cane :: shallow_copy(Cane* dest)
+void Cane :: shallowCopy(Cane* dest)
 {
         dest->type = this->type;
-        dest->stretch = this->stretch;
-        dest->twist = this->twist;
-        dest->squareoff = this->squareoff;
+        dest->amt = this->amt;
         dest->is_root_bundle = this->is_root_bundle;
 
         dest->num_subcanes = this->num_subcanes;
@@ -45,7 +41,7 @@ void Cane :: shallow_copy(Cane* dest)
         {
                 if (this->subcanes[i] != NULL)
                 {
-                        dest->subcanes[i] = this->subcanes[i]->deep_copy();
+                        dest->subcanes[i] = this->subcanes[i]->deepCopy();
                         dest->subcane_locs[i].x = this->subcane_locs[i].x;
                         dest->subcane_locs[i].y = this->subcane_locs[i].y;
                 }
@@ -57,65 +53,63 @@ void Cane :: shallow_copy(Cane* dest)
         dest->color.b = this->color.b;
 }
 
-void Cane :: twist_cane(float radians)
+void Cane :: twist(float radians)
 {
         if (this->type != TWIST_CANETYPE)
         {
                 Cane* copy = new Cane(UNASSIGNED_CANETYPE);
-                this->shallow_copy(copy);
+                this->shallowCopy(copy);
                 this->reset();
                 this->type = TWIST_CANETYPE;
                 this->num_subcanes = 1;
                 this->subcanes[0] = copy;
-                this->twist = radians;
+                this->amt = radians;
         }
         else
         {
-                twist += radians;
+                this->amt += radians;
         }       
 }
 
 
-void Cane :: stretch_cane(float amount, float max_stretch)
+void Cane :: stretch(float amount, float max_stretch)
 {
         if (this->type != STRETCH_CANETYPE)
         {
                 Cane* copy = new Cane(UNASSIGNED_CANETYPE);
-                this->shallow_copy(copy);
+                this->shallowCopy(copy);
                 this->reset();
                 this->type = STRETCH_CANETYPE;
                 this->num_subcanes = 1;
                 this->subcanes[0] = copy;
+                this->amt = 1.0;
         }
-        stretch = stretch*(1.0 + amount);
-        stretch = MIN(stretch, max_stretch);
+        this->amt *= (1.0 + amount);
+        this->amt = MIN(this->amt, max_stretch);
 }
 
-void Cane :: squareoff_cane(float amount, float max_squareoff)
+void Cane :: squareoff(float amount, float max_squareoff)
 {
         if (this->type != SQUAREOFF_CANETYPE)
         {
                 Cane* copy = new Cane(UNASSIGNED_CANETYPE);
-                this->shallow_copy(copy);
+                this->shallowCopy(copy);
                 this->reset();
                 this->type = SQUAREOFF_CANETYPE;
                 this->num_subcanes = 1;
                 this->subcanes[0] = copy;
-                this->squareoff += MIN(amount, max_squareoff);
+                this->amt = 1.0;
         }
-        else
-        {
-                squareoff += amount;
-                squareoff = MIN(squareoff, max_squareoff);
-        }
+        this->amt += amount;
+        this->amt = MIN(this->amt, max_squareoff);
 }
 
-void Cane :: create_bundle()
+void Cane :: createBundle()
 {
         if (this->type != BUNDLE_CANETYPE)
         {
                 Cane* copy = new Cane(UNASSIGNED_CANETYPE);
-                this->shallow_copy(copy);
+                this->shallowCopy(copy);
                 this->reset();
                 this->type = BUNDLE_CANETYPE;
                 this->num_subcanes = 1;
@@ -137,10 +131,10 @@ void Cane :: turnOffRootBundle()
         }
 }
 
-void Cane :: add_cane(Cane* addl, int* addl_index_ptr)
+void Cane :: add(Cane* addl, int* addl_index_ptr)
 {
         // Create a root bundle node
-        create_bundle();
+        createBundle();
 
         // Add the new cane to the bundle
         subcanes[num_subcanes] = addl;
@@ -150,15 +144,13 @@ void Cane :: add_cane(Cane* addl, int* addl_index_ptr)
         num_subcanes += 1;
 }
 
-Cane* Cane :: deep_copy()
+Cane* Cane :: deepCopy()
 {
         Cane* copy;
         int i;
 
         copy = new Cane(this->type);
-        copy->stretch = this->stretch;
-        copy->twist = this->twist;
-        copy->squareoff = this->squareoff;
+        copy->amt = this->amt;
         copy->is_root_bundle = this->is_root_bundle;
 
         copy->num_subcanes = this->num_subcanes;
@@ -166,7 +158,7 @@ Cane* Cane :: deep_copy()
         {
                 if (this->subcanes[i] != NULL)
                 {
-                        copy->subcanes[i] = this->subcanes[i]->deep_copy();
+                        copy->subcanes[i] = this->subcanes[i]->deepCopy();
                         copy->subcane_locs[i].x = this->subcane_locs[i].x;
                         copy->subcane_locs[i].y = this->subcane_locs[i].y;
                 }

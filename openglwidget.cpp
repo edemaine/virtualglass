@@ -214,19 +214,19 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
         {
                 if (cane == NULL)
                         return;
-                cane->twist_cane((relX * 500.0 * PI / 180.0));
+                cane->twist((relX * 500.0 * PI / 180.0));
         }
         else if (mode == STRETCH_MODE)
         {
                 if (cane == NULL)
                         return;
-                cane->stretch_cane(-10.0*relY, 200);
+                cane->stretch(-10.0*relY, 200);
         }
         else if (mode == BUNDLE_MODE)
         {
                 if (cane == NULL)
                         return; 
-                cane->create_bundle();
+                cane->createBundle();
                 curCaneX = cane->subcane_locs[cur_active_subcane].x; 
                 curCaneY = cane->subcane_locs[cur_active_subcane].y; 
                 curCaneX += relX * cos(theta + PI / 2.0) + relY * cos(theta); 
@@ -238,7 +238,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
         {
                 if (cane == NULL)
                         return; 
-                cane->squareoff_cane(-(relY * 500.0 * PI / 180.0), 200);
+                cane->squareoff(-(relY * 500.0 * PI / 180.0), 200);
         }
 
         //update global variable camera position relative to lookat point
@@ -284,11 +284,11 @@ void OpenGLWidget :: addCane(Cane* c)
         setMode(BUNDLE_MODE);
         if (cane == NULL)
         {
-                cane = c->deep_copy();
+                cane = c->deepCopy();
         }
         else
         {
-                cane->add_cane(c, &cur_active_subcane);
+                cane->add(c, &cur_active_subcane);
         }
         updateCane();
         updateCamera();

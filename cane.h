@@ -14,19 +14,17 @@ class Cane
         public:
                 Cane(int type);
                 void reset();
-                void shallow_copy(Cane* dest);
-                void twist_cane(float radians);
-                void stretch_cane(float amount, float min_stretch);
-                void squareoff_cane(float amount, float min_stretch);
-                void create_bundle();
-                void add_cane(Cane* addl, int* addl_index_ptr);
+                void shallowCopy(Cane* dest);
+                void twist(float radians);
+                void stretch(float amount, float min_stretch);
+                void squareoff(float amount, float min_stretch);
+                void createBundle();
+                void add(Cane* addl, int* addl_index_ptr);
                 void turnOffRootBundle();
-                Cane* deep_copy();
+                Cane* deepCopy();
 
                 int type;
-                float stretch;
-                float twist;
-                float squareoff;
+                float amt;
                 int is_root_bundle;
                 int num_subcanes;
                 Point subcane_locs[MAX_SUBCANE_COUNT];
