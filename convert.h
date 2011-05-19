@@ -32,7 +32,7 @@ typedef struct Triangle
     Color c;
 } Triangle;
 
-void convert_to_mesh(Cane* c, Triangle** triangles, int* num_triangles, int illuminated_subcane, int res_mode);
+void convert_to_mesh(Cane* c, Triangle** triangles, int* num_triangles, int illuminated_subcane, int global_wrap, int res_mode);
 
 #endif
 

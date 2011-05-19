@@ -16,7 +16,6 @@ void Cane :: reset()
 {
         type = UNASSIGNED_CANETYPE;
         amt = 0.0;
-        is_root_bundle = 0;
 
         num_subcanes = 0;
         for (int i = 0; i < MAX_SUBCANE_COUNT; ++i)
@@ -25,7 +24,7 @@ void Cane :: reset()
                 subcane_locs[i].x = subcane_locs[i].y = 0.0;
         }
 
-        color.r = color.g = color.b = 1.0;
+        color.r = color.g = color.b = color.a = 1.0;
 }
 
 // Copies the information in a cane object into 
@@ -34,7 +33,6 @@ void Cane :: shallowCopy(Cane* dest)
 {
         dest->type = this->type;
         dest->amt = this->amt;
-        dest->is_root_bundle = this->is_root_bundle;
 
         dest->num_subcanes = this->num_subcanes;
         for (int i = 0; i < MAX_SUBCANE_COUNT; ++i)
@@ -48,9 +46,7 @@ void Cane :: shallowCopy(Cane* dest)
                 else
                         dest->subcanes[i] = NULL;
         }
-        dest->color.r = this->color.r;
-        dest->color.g = this->color.g;
-        dest->color.b = this->color.b;
+        dest->color = this->color;
 }
 
 void Cane :: twist(float radians)
@@ -114,26 +110,29 @@ void Cane :: createBundle()
                 this->type = BUNDLE_CANETYPE;
                 this->num_subcanes = 1;
                 this->subcanes[0] = copy;
-                this->is_root_bundle = 1;
-                copy->turnOffRootBundle();
         }
 }
 
 
-// Moves through the entire tree and turns off the flag for being
-// the bundle closest to the root (i.e. the root bundle).
-void Cane :: turnOffRootBundle()
+int Cane :: hasBundle()
 {
-        this->is_root_bundle = 0;
+        if (this->type == BUNDLE_CANETYPE)
+                return 1;
+
+        // Probably don't need a loop, as if it
+        // is not a bundle, then it only has one subcane,
+        // but maybe things will change in the future
         for (int i = 0; i < num_subcanes; ++i)
         {
-                subcanes[i]->turnOffRootBundle();
+                if (subcanes[i]->hasBundle())
+                        return 1;
         }
+
+        return 0;
 }
 
 void Cane :: add(Cane* addl, int* addl_index_ptr)
 {
-        // Create a root bundle node
         createBundle();
 
         // Add the new cane to the bundle
@@ -151,7 +150,6 @@ Cane* Cane :: deepCopy()
 
         copy = new Cane(this->type);
         copy->amt = this->amt;
-        copy->is_root_bundle = this->is_root_bundle;
 
         copy->num_subcanes = this->num_subcanes;
         for (i = 0; i < MAX_SUBCANE_COUNT; ++i)
@@ -165,9 +163,7 @@ Cane* Cane :: deepCopy()
                 else
                         copy->subcanes[i] = NULL;
         }
-        copy->color.r = this->color.r;
-        copy->color.g = this->color.g;
-        copy->color.b = this->color.b;
+        copy->color = this->color;
 
         return copy;        
 }

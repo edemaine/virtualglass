@@ -1,12 +1,29 @@
 
 #include "openglwidget.h" 
-  
+ 
+// Gives you a random bit back that
+// has probability `a' of being a 1
+int prob_bit(float a)
+{
+        return ((rand() % ((int) (1.0/(a)))) == 0);
+}
+ 
 OpenGLWidget :: OpenGLWidget(QWidget *parent=0) : QGLWidget(parent)
 {
         mesh = NULL; 
         num_mesh_elements = 0; 
         mode = 1;  
         mousePressed = 0;
+
+        for(int i = 0; i < 32*4; ++i)
+        { 
+                glass_stipple_data[i] = 0;
+                for (int j = 0; j < 8; ++j)
+                {
+                        glass_stipple_data[i] = glass_stipple_data[i] | (prob_bit(GLASS_STIPPLE_ALPHA) << j);
+                }
+        }
+
 }
 
 void OpenGLWidget :: initializeGL()
@@ -33,9 +50,6 @@ void OpenGLWidget :: initializeGL()
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
         glEnable(GL_LIGHT0);
-
-        //glEnable (GL_BLEND);
-        //glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
  
 void OpenGLWidget :: zeroCanes()
@@ -50,27 +64,25 @@ void OpenGLWidget :: paintGL()
 {
         int i;
 
-        // draw the scene
-        // clear display buffer to render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        // set GL state
         glEnable(GL_DEPTH_TEST);
+                
+        glBegin(GL_TRIANGLES);
         for (i = 0; i < num_mesh_elements; ++i)
         {
                 drawTriangle(&(mesh[i]));
         }
-        // draw guide line
-        swapBuffers();  // swap off screen and display buffers
+        glEnd();
+
+        swapBuffers();  
 }  
  
 void OpenGLWidget :: resizeGL(int width, int height)
 {
         glViewport(0, 0, width, height);
-        // set mode to projection
         glMatrixMode(GL_PROJECTION); 
         glLoadIdentity();
         gluPerspective(45.0, (float)width / (float)height, 0.01, 10.0);
-        // set mode to model
         glMatrixMode(GL_MODELVIEW);
         updateCamera();
 }
@@ -112,7 +124,7 @@ void OpenGLWidget :: updateCane()
         else
                 illuminated_subcane = NO_SUBCANES; 
 
-        convert_to_mesh(cane, &mesh, &num_mesh_elements, illuminated_subcane, resolution);
+        convert_to_mesh(cane, &mesh, &num_mesh_elements, illuminated_subcane, 0, resolution);
 } 
 
 float OpenGLWidget :: abs(float v)
@@ -270,13 +282,53 @@ void OpenGLWidget :: drawTriangle(Triangle* t)
 
         // define the triangle
         glNormal3d(norm.x, norm.y, norm.z);
-        //glColor4f(t->c.r, t->c.g, t->c.b, t->c.a);
-        glColor3f(t->c.r, t->c.g, t->c.b);
-        glBegin(GL_TRIANGLES);
-        glVertex3f(t->v1.x, t->v1.y, t->v1.z);
-        glVertex3f(t->v2.x, t->v2.y, t->v2.z);
-        glVertex3f(t->v3.x, t->v3.y, t->v3.z);
-        glEnd();
+        if (t->c.a == 1.0)
+        {
+                glColor3f(t->c.r, t->c.g, t->c.b);
+                glBegin(GL_TRIANGLES);
+                glVertex3f(t->v1.x, t->v1.y, t->v1.z);
+                glVertex3f(t->v2.x, t->v2.y, t->v2.z);
+                glVertex3f(t->v3.x, t->v3.y, t->v3.z);
+                glEnd();
+        } 
+        else if (t->c.a == GLASS_STIPPLE_ALPHA)
+        {
+                glEnable(GL_POLYGON_STIPPLE);
+                glPolygonStipple(glass_stipple_data);
+                glColor3f(t->c.r, t->c.g, t->c.b);
+                glBegin(GL_TRIANGLES); 
+                glVertex3f(t->v1.x, t->v1.y, t->v1.z);
+                glVertex3f(t->v2.x, t->v2.y, t->v2.z);
+                glVertex3f(t->v3.x, t->v3.y, t->v3.z);
+                glEnd(); 
+                glDisable(GL_POLYGON_STIPPLE); 
+        }
+        else // Generate new stipple data by hand
+        {
+                glEnable(GL_POLYGON_STIPPLE);
+                GLubyte stipple_data[128];
+
+                for(int i = 0; i < 128; ++i)
+                { 
+                        stipple_data[i] = 0;
+                        for (int j = 0; j < 8; ++j)
+                        {
+                                stipple_data[i] = stipple_data[i] | (prob_bit(t->c.a) << j);
+                        }
+                }
+                glPolygonStipple(stipple_data);
+
+                glColor3f(t->c.r, t->c.g, t->c.b);
+                glBegin(GL_TRIANGLES); 
+                glVertex3f(t->v1.x, t->v1.y, t->v1.z);
+                glVertex3f(t->v2.x, t->v2.y, t->v2.z);
+                glVertex3f(t->v3.x, t->v3.y, t->v3.z);
+                glEnd(); 
+                glDisable(GL_POLYGON_STIPPLE); 
+        }
+
+
+
 }
 
 void OpenGLWidget :: addCane(Cane* c)

@@ -20,12 +20,11 @@ class Cane
                 void squareoff(float amount, float min_stretch);
                 void createBundle();
                 void add(Cane* addl, int* addl_index_ptr);
-                void turnOffRootBundle();
+                int hasBundle();
                 Cane* deepCopy();
 
                 int type;
                 float amt;
-                int is_root_bundle;
                 int num_subcanes;
                 Point subcane_locs[MAX_SUBCANE_COUNT];
                 Cane* subcanes[MAX_SUBCANE_COUNT];
