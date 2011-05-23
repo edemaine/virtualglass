@@ -50,7 +50,7 @@ GUI:
 controller.cpp/h
 librarycanewidget.cpp/h
 main.cpp
-workwindow.cpp/h
+mainwindow.cpp/h
 
 OpenGL:
 openglwidget.cpp/h
@@ -77,8 +77,8 @@ this separation makes sense. Talk to me!).
 I suspect that for the near future (Summer-Fall 2011) we will work
 across all the parts of the code to improve the GUI, the cane structure
 and transformations, and also the rendering. In general, 
-I think shooting for the current revision of the code to be compilable
-and runnable is a good goal, with exceptions where it makes sense.
+I think shooting for the current revision of the code to be always be compilable
+and executable is a good goal, with exceptions where it makes sense.
 
 
 
