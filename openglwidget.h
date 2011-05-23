@@ -18,8 +18,9 @@ class OpenGLWidget : public QGLWidget
   
         public:
                 OpenGLWidget(QWidget *parent);
-                void twistCane(float radians);
-                void updateCane();
+                void updateCane(Cane* c);
+                void updateResolution(int new_resolution);
+                void updateIlluminatedSubcane(int new_ill_subcane);
                 void setFocusCane(Cane* c);
                 void addCane(Cane* c);
                 Cane* getCane();
@@ -30,25 +31,22 @@ class OpenGLWidget : public QGLWidget
                 void setMode(int mode);
 
         private:
-                Triangle* mesh; 
-                int num_mesh_elements; 
+                Mesh* mesh;
                 int mode;
                 Cane* cane;
                 int cur_active_subcane;
-                int mousePressed;
+                Triangle* triangles;
+                int num_triangles;
+                int resolution;
                 
                 float eye_loc[3];
                 float look_at_loc[3];
                 float theta, fee, rho;
 
-                int gLeftDown;
-                int gShiftLeftDown;
-                int gAltLeftDown;
                 int gNewX, gNewY;
 
                 GLfloat light_position[4];
 
-                float abs(float v);
                 void updateCamera();
                 void drawTriangle(Triangle* t);
 
@@ -60,7 +58,6 @@ class OpenGLWidget : public QGLWidget
                 void mousePressEvent(QMouseEvent* e);
                 void mouseReleaseEvent(QMouseEvent* e);
                 void mouseMoveEvent(QMouseEvent* e);
-                GLubyte glass_stipple_data[128];
 };
 
 #endif

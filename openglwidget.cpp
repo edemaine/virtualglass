@@ -1,29 +1,15 @@
 
 #include "openglwidget.h" 
  
-// Gives you a random bit back that
-// has probability `a' of being a 1
-int prob_bit(float a)
-{
-        return ((rand() % ((int) (1.0/(a)))) == 0);
-}
- 
 OpenGLWidget :: OpenGLWidget(QWidget *parent=0) : QGLWidget(parent)
 {
-        mesh = NULL; 
-        num_mesh_elements = 0; 
+        resolution = HIGH_RESOLUTION;
+        cur_active_subcane = NO_SUBCANES;
         mode = 1;  
-        mousePressed = 0;
-
-        for(int i = 0; i < 32*4; ++i)
-        { 
-                glass_stipple_data[i] = 0;
-                for (int j = 0; j < 8; ++j)
-                {
-                        glass_stipple_data[i] = glass_stipple_data[i] | (prob_bit(GLASS_STIPPLE_ALPHA) << j);
-                }
-        }
-
+        cane = NULL;
+        mesh = new Mesh(NULL);
+        triangles = mesh->getMesh(resolution);
+        num_triangles = mesh->getNumMeshTriangles(resolution);
 }
 
 void OpenGLWidget :: initializeGL()
@@ -31,10 +17,6 @@ void OpenGLWidget :: initializeGL()
         theta = -PI/2.0;
         fee = PI/4.0;
         rho = 3.0;
-
-        gLeftDown = 0;
-        gShiftLeftDown = 0;
-        gAltLeftDown = 0;
 
         light_position[0] = 0.0;
         light_position[1] = 0.0;
@@ -54,9 +36,7 @@ void OpenGLWidget :: initializeGL()
  
 void OpenGLWidget :: zeroCanes()
 {
-        cane = NULL;
-        updateCane();
-        updateCamera();
+        updateCane(NULL);
         paintGL();
 } 
 
@@ -68,9 +48,9 @@ void OpenGLWidget :: paintGL()
         glEnable(GL_DEPTH_TEST);
                 
         glBegin(GL_TRIANGLES);
-        for (i = 0; i < num_mesh_elements; ++i)
+        for (i = 0; i < num_triangles; ++i)
         {
-                drawTriangle(&(mesh[i]));
+                drawTriangle(&(triangles[i]));
         }
         glEnd();
 
@@ -103,37 +83,30 @@ void OpenGLWidget :: zoomOut()
 
 void OpenGLWidget :: setFocusCane(Cane* c)
 {
-        cane = c;
-        updateCane();
-        updateCamera();
+        updateCane(c);
         paintGL();
 } 
 
 
-void OpenGLWidget :: updateCane()
+void OpenGLWidget :: updateResolution(int new_resolution)
 {
-        int resolution, illuminated_subcane;
-
-        if (mousePressed)
-                resolution = LOW_RESOLUTION;
-        else
-                resolution = HIGH_RESOLUTION;
-
-        if (mode == 4)
-                illuminated_subcane = cur_active_subcane;
-        else
-                illuminated_subcane = NO_SUBCANES; 
-
-        convert_to_mesh(cane, &mesh, &num_mesh_elements, illuminated_subcane, 0, resolution);
-} 
-
-float OpenGLWidget :: abs(float v)
-{
-        if (v < 0)
-                return -v;
-        else
-                return v;
+        resolution = new_resolution;
+        triangles = mesh->getMesh(new_resolution);
+        num_triangles = mesh->getNumMeshTriangles(new_resolution);
 }
+
+void OpenGLWidget :: updateIlluminatedSubcane(int new_ill_subcane)
+{
+        cur_active_subcane = new_ill_subcane;
+}
+
+void OpenGLWidget :: updateCane(Cane* new_cane)
+{
+        cane = new_cane;
+        mesh->updateCane(new_cane);
+        triangles = mesh->getMesh(resolution);
+        num_triangles = mesh->getNumMeshTriangles(resolution);
+} 
 
 void OpenGLWidget :: setMode(int m)
 {
@@ -141,6 +114,11 @@ void OpenGLWidget :: setMode(int m)
         if (mode == 4)
         {
                 cur_active_subcane = 0;        
+                updateIlluminatedSubcane(cur_active_subcane);
+        }
+        else
+        {
+                updateIlluminatedSubcane(NO_SUBCANES);
         }
 }
 
@@ -150,8 +128,7 @@ void OpenGLWidget :: advanceActiveSubcane()
         {
                 cur_active_subcane++;
                 cur_active_subcane %= cane->num_subcanes;
-                updateCane();
-                updateCamera();
+                updateIlluminatedSubcane(cur_active_subcane);
                 paintGL();
         }
 }
@@ -174,19 +151,13 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
         gNewX = e->x();
         gNewY = e->y();
 
-        mousePressed = 1;
-
-        updateCane();
-        updateCamera();
+        updateResolution(LOW_RESOLUTION);
         paintGL();
 }
 
 void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 {
-        mousePressed = 0;
-
-        updateCane();
-        updateCamera();
+        updateResolution(HIGH_RESOLUTION);
         paintGL();
 }
 
@@ -221,18 +192,21 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
                 newFee = fee - (relY * 500.0 * PI / 180.0);
                 if (newFee > 0.0f && newFee < PI)
                         fee = newFee;
+                updateCamera();
         }
         else if (mode == TWIST_MODE) 
         {
                 if (cane == NULL)
                         return;
                 cane->twist((relX * 500.0 * PI / 180.0));
+                updateCane(cane);
         }
         else if (mode == STRETCH_MODE)
         {
                 if (cane == NULL)
                         return;
                 cane->stretch(-10.0*relY, 200);
+                updateCane(cane);
         }
         else if (mode == BUNDLE_MODE)
         {
@@ -245,17 +219,16 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
                 curCaneY += relX * sin(theta + PI / 2.0) + relY * sin(theta); 
                 cane->subcane_locs[cur_active_subcane].x = curCaneX;
                 cane->subcane_locs[cur_active_subcane].y = curCaneY;
+                updateCane(cane);
         }
         else if (mode == SQUAREOFF_MODE)
         {
                 if (cane == NULL)
                         return; 
                 cane->squareoff(-(relY * 500.0 * PI / 180.0), 200);
+                updateCane(cane);
         }
 
-        //update global variable camera position relative to lookat point
-        updateCane();
-        updateCamera();
         paintGL();
 }
 
@@ -280,55 +253,13 @@ void OpenGLWidget :: drawTriangle(Triangle* t)
         norm.y /= norm_mag;
         norm.z /= norm_mag;
 
-        // define the triangle
         glNormal3d(norm.x, norm.y, norm.z);
-        if (t->c.a == 1.0)
-        {
-                glColor3f(t->c.r, t->c.g, t->c.b);
-                glBegin(GL_TRIANGLES);
-                glVertex3f(t->v1.x, t->v1.y, t->v1.z);
-                glVertex3f(t->v2.x, t->v2.y, t->v2.z);
-                glVertex3f(t->v3.x, t->v3.y, t->v3.z);
-                glEnd();
-        } 
-        else if (t->c.a == GLASS_STIPPLE_ALPHA)
-        {
-                glEnable(GL_POLYGON_STIPPLE);
-                glPolygonStipple(glass_stipple_data);
-                glColor3f(t->c.r, t->c.g, t->c.b);
-                glBegin(GL_TRIANGLES); 
-                glVertex3f(t->v1.x, t->v1.y, t->v1.z);
-                glVertex3f(t->v2.x, t->v2.y, t->v2.z);
-                glVertex3f(t->v3.x, t->v3.y, t->v3.z);
-                glEnd(); 
-                glDisable(GL_POLYGON_STIPPLE); 
-        }
-        else // Generate new stipple data by hand
-        {
-                glEnable(GL_POLYGON_STIPPLE);
-                GLubyte stipple_data[128];
-
-                for(int i = 0; i < 128; ++i)
-                { 
-                        stipple_data[i] = 0;
-                        for (int j = 0; j < 8; ++j)
-                        {
-                                stipple_data[i] = stipple_data[i] | (prob_bit(t->c.a) << j);
-                        }
-                }
-                glPolygonStipple(stipple_data);
-
-                glColor3f(t->c.r, t->c.g, t->c.b);
-                glBegin(GL_TRIANGLES); 
-                glVertex3f(t->v1.x, t->v1.y, t->v1.z);
-                glVertex3f(t->v2.x, t->v2.y, t->v2.z);
-                glVertex3f(t->v3.x, t->v3.y, t->v3.z);
-                glEnd(); 
-                glDisable(GL_POLYGON_STIPPLE); 
-        }
-
-
-
+        glColor3f(t->c.r, t->c.g, t->c.b);
+        glBegin(GL_TRIANGLES);
+        glVertex3f(t->v1.x, t->v1.y, t->v1.z);
+        glVertex3f(t->v2.x, t->v2.y, t->v2.z);
+        glVertex3f(t->v3.x, t->v3.y, t->v3.z);
+        glEnd();
 }
 
 void OpenGLWidget :: addCane(Cane* c)
@@ -342,8 +273,7 @@ void OpenGLWidget :: addCane(Cane* c)
         {
                 cane->add(c, &cur_active_subcane);
         }
-        updateCane();
-        updateCamera();
+        updateCane(cane);
         paintGL();
 }
 

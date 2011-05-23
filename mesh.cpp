@@ -26,7 +26,7 @@ Color darken_color(Color c)
 }
 
 // transforms should be provided top-down (and are processed bottom up)
-Point apply_transforms(Point p, Transform* Ts, int num_Ts)
+Point Mesh :: apply_transforms(Point p, Transform* Ts, int num_Ts)
 {
         int i;
         float r, theta;
@@ -70,7 +70,7 @@ Point apply_transforms(Point p, Transform* Ts, int num_Ts)
 }
 
 
-float compute_total_stretch(Transform* Ts, int num_Ts)
+float Mesh :: compute_total_stretch(Transform* Ts, int num_Ts)
 {
         float total_stretch;
         int i;
@@ -85,7 +85,7 @@ float compute_total_stretch(Transform* Ts, int num_Ts)
         return total_stretch;
 }
 
-float convert_circular_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Transform* Ts, int num_Ts, Color color, int illuminated_subcane, int res_mode)
+float Mesh :: convert_circular_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Transform* Ts, int num_Ts, Color color, int illuminated_subcane, int res_mode)
 {
         Point p1, p2, p3, p4;
         Triangle tmp_t;
@@ -216,11 +216,14 @@ Assumptions about parameters:
 5. illuminated_subcane is equal to neither ALL_SUBCANES nor NO_SUBCANES only if
 c->twist = 0.0 and c->stretch = 1.0. 
 */
-float generate_mesh(Cane* c, Triangle* triangles, int* num_triangles, 
+float Mesh :: generateMesh(Cane* c, Triangle* triangles, int* num_triangles, 
         Transform* Ts, int* num_Ts, int illuminated_subcane, int global_wrap, int res_mode)
 {
         int i, illumination;
         float radius;
+
+        if (c == NULL)
+                return 0.0;
 
         switch(c->type)
         {
@@ -228,7 +231,7 @@ float generate_mesh(Cane* c, Triangle* triangles, int* num_triangles,
                         Ts[*num_Ts].type = TWIST_TRANSFORM;
                         Ts[*num_Ts].data.f_amt = c->amt;
                         *num_Ts += 1;
-                        radius = generate_mesh(c->subcanes[0], triangles, num_triangles, 
+                        radius = generateMesh(c->subcanes[0], triangles, num_triangles, 
                                 Ts, num_Ts, illuminated_subcane, global_wrap, res_mode);
                         *num_Ts -= 1;
                         return radius; 
@@ -239,7 +242,7 @@ float generate_mesh(Cane* c, Triangle* triangles, int* num_triangles,
                         Ts[*num_Ts].type = SQUAREOFF_TRANSFORM;
                         Ts[*num_Ts].data.f_amt = c->amt;
                         *num_Ts += 1;
-                        radius = generate_mesh(c->subcanes[0], triangles, num_triangles, 
+                        radius = generateMesh(c->subcanes[0], triangles, num_triangles, 
                                 Ts, num_Ts, illuminated_subcane, global_wrap, res_mode);
                         *num_Ts -= 1;
                         return radius;
@@ -247,7 +250,7 @@ float generate_mesh(Cane* c, Triangle* triangles, int* num_triangles,
                         Ts[*num_Ts].type = STRETCH_TRANSFORM;
                         Ts[*num_Ts].data.f_amt = c->amt;
                         *num_Ts += 1;
-                        radius = generate_mesh(c->subcanes[0], triangles, num_triangles, 
+                        radius = generateMesh(c->subcanes[0], triangles, num_triangles, 
                                 Ts, num_Ts, illuminated_subcane, global_wrap, res_mode);
                         *num_Ts -= 1;
                         return radius;
@@ -265,7 +268,7 @@ float generate_mesh(Cane* c, Triangle* triangles, int* num_triangles,
                                 else
                                         illumination = NO_SUBCANES;
 
-                                radius = MAX(radius, generate_mesh(c->subcanes[i], triangles, num_triangles, 
+                                radius = MAX(radius, generateMesh(c->subcanes[i], triangles, num_triangles, 
                                         Ts, num_Ts, illumination, 0, res_mode));
                                 *num_Ts -= 1;
                         }
@@ -276,7 +279,6 @@ float generate_mesh(Cane* c, Triangle* triangles, int* num_triangles,
                                 Color wrap_color;
 
                                 wrap_color.r = wrap_color.g = wrap_color.b = 1.0; 
-                                wrap_color.a = 1.0; //GLASS_STIPPLE_ALPHA;
                                 for (int i = 0; i < *num_Ts; ++i)
                                 {
                                         wrap_Ts[i] = Ts[i];
@@ -296,49 +298,45 @@ float generate_mesh(Cane* c, Triangle* triangles, int* num_triangles,
         }
 }
 
-int num_canes(Cane* c)
+Mesh :: Mesh(Cane* c)
 {
-        int subcanes, i;
-
-        subcanes = 0;
-        for (i = 0; i < c->num_subcanes; ++i)
-        {
-                subcanes += num_canes(c->subcanes[i]);
-        }
-        return (subcanes + 1);
+        low_res_tris = (Triangle*) malloc(sizeof(Triangle) 
+                * (LOW_AXIAL_RESOLUTION * LOW_ANGULAR_RESOLUTION * 2) * (MAX_NUM_CANES + 1));
+        num_low_res_tris = 0;
+        high_res_tris = (Triangle*) malloc(sizeof(Triangle) 
+                * (HIGH_AXIAL_RESOLUTION * HIGH_ANGULAR_RESOLUTION * 2) * (MAX_NUM_CANES + 1));
+        num_high_res_tris = 0;
+        
+        updateCane(c);
 }
 
-
-void convert_to_mesh(Cane* c, Triangle** triangles, int* num_triangles, int illuminated_subcane, int global_wrap, int res_mode)
+void Mesh :: updateCane(Cane* c)
 {
-        Transform* Ts;
-        int num_Ts; 
+        Transform Ts[MAX_TRANSFORMS];
+        int num_Ts;
 
-        // Formula for number of triangles:
-        // 1. (AXIAL_RESOLUTION - 1) * ANGULAR_RESOLUTION * 2 triangles per cane on its walls.
-        // 2. At most ANGULAR_RESOLUTION * 2 triangles per cane on its ends.
-        // 3. At most num_canes(c) + 1 total canes (the +1 is for the root bundle wrap cane).
-        // 
-        // Thus: ((AXIAL_RES - 1) * ANGULAR_RES * 2 + ANGULAR_RES * 2) * (num_canes(c) + 1)
-        // which equals (AXIAL_RES * ANGULAR_RES * 2) * (num_canes(c) + 1))
-        if (*triangles == NULL)
-        {
-                *triangles = (Triangle*) malloc(sizeof(Triangle) 
-                        * (HIGH_AXIAL_RESOLUTION * HIGH_ANGULAR_RESOLUTION * 2) * (MAX_NUM_CANES + 1));
-        }
-        *num_triangles = 0;
-
-        if (c == NULL)
-        {
-                return;
-        }
-
-        Ts = (Transform*) malloc(sizeof(Transform) * num_canes(c));
         num_Ts = 0;
+        num_low_res_tris = 0;
+        generateMesh(c, low_res_tris, &num_low_res_tris, Ts, &num_Ts, NO_SUBCANES, 0, LOW_RESOLUTION);
 
-        generate_mesh(c, *triangles, num_triangles, Ts, &num_Ts, illuminated_subcane, global_wrap, res_mode);
+        num_Ts = 0;
+        num_high_res_tris = 0;
+        generateMesh(c, high_res_tris, &num_high_res_tris, Ts, &num_Ts, NO_SUBCANES, 0, HIGH_RESOLUTION);
 }
 
 
+Triangle* Mesh :: getMesh(int resolution)
+{
+        if (resolution == LOW_RESOLUTION)
+                return low_res_tris;
+        else
+                return high_res_tris;
+}
 
-
+int Mesh :: getNumMeshTriangles(int resolution)
+{
+        if (resolution == LOW_RESOLUTION)
+                return num_low_res_tris;
+        else
+                return num_high_res_tris;
+}
