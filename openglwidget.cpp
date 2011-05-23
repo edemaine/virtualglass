@@ -15,13 +15,13 @@ void OpenGLWidget :: initializeGL()
         fee = PI/4.0;
         rho = 3.0;
 
-        light_position[0] = 0.0;
-        light_position[1] = 0.0;
-        light_position[2] = 1000.0;
-        light_position[3] = 0.0;
+        lightPosition[0] = 0.0;
+        lightPosition[1] = 0.0;
+        lightPosition[2] = 1000.0;
+        lightPosition[3] = 0.0;
 
-        look_at_loc[0] = look_at_loc[1] = 0;
-        look_at_loc[2] = 0.5;
+        lookAtLoc[0] = lookAtLoc[1] = 0;
+        lookAtLoc[2] = 0.5;
 
         glEnable(GL_LIGHTING);
 
@@ -120,21 +120,20 @@ void OpenGLWidget :: advanceActiveSubcane()
 
 void OpenGLWidget :: updateCamera()
 {
-        eye_loc[0] = look_at_loc[0] + rho*sin(fee)*cos(theta);
-        eye_loc[1] = look_at_loc[1] + rho*sin(fee)*sin(theta);
-        eye_loc[2] = look_at_loc[2] + rho*cos(fee);
+        eyeLoc[0] = lookAtLoc[0] + rho*sin(fee)*cos(theta);
+        eyeLoc[1] = lookAtLoc[1] + rho*sin(fee)*sin(theta);
+        eyeLoc[2] = lookAtLoc[2] + rho*cos(fee);
         glLoadIdentity();
-        gluLookAt(
-        eye_loc[0], eye_loc[1], eye_loc[2],
-        look_at_loc[0], look_at_loc[1], look_at_loc[2],
-        0.0, 0.0, 1.0);   // up vector
+        gluLookAt(eyeLoc[0], eyeLoc[1], eyeLoc[2],
+                lookAtLoc[0], lookAtLoc[1], lookAtLoc[2],
+                0.0, 0.0, 1.0);   
 }
 
 void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 {
         //----Init new location
-        gNewX = e->x();
-        gNewY = e->y();
+        mouseLocX = e->x();
+        mouseLocY = e->y();
 
         updateResolution(LOW_RESOLUTION);
         paintGL();
@@ -151,20 +150,20 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
         float relX, relY;
         float newFee;
         float windowWidth, windowHeight;
-        int gOldX, gOldY;
+        int oldMouseLocX, oldMouseLocY;
 
         windowWidth = this->width();
         windowHeight = this->height();
 
         //----calculate change in mouse x
-        gOldX = gNewX;
-        gNewX = e->x();
-        relX = (gNewX - gOldX) / windowWidth;
+        oldMouseLocX = mouseLocX;
+        mouseLocX = e->x();
+        relX = (mouseLocX - oldMouseLocX) / windowWidth;
 
         //----calculate change in mouse y
-        gOldY = gNewY;
-        gNewY = e->y();
-        relY = (gNewY - gOldY) / windowHeight;
+        oldMouseLocY = mouseLocY;
+        mouseLocY = e->y();
+        relY = (mouseLocY - oldMouseLocY) / windowHeight;
 
         //----calculate change in mouse r and theta
 
@@ -185,7 +184,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
         }
         else if (mode == STRETCH_MODE)
         {
-                mesh->stretchCane(-10.0*relY, 200);
+                mesh->stretchCane(-10.0*relY);
                 updateTriangles();
         }
         else if (mode == BUNDLE_MODE)
@@ -196,7 +195,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
         }
         else if (mode == SQUAREOFF_MODE)
         {
-                mesh->squareoffCane(-(relY * 500.0 * PI / 180.0), 200);
+                mesh->squareoffCane(-(relY * 500.0 * PI / 180.0));
                 updateTriangles();
         }
 

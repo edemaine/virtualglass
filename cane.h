@@ -16,8 +16,8 @@ class Cane
                 void reset();
                 void shallowCopy(Cane* dest);
                 void twist(float radians);
-                void stretch(float amount, float max_stretch);
-                void squareoff(float amount, float max_stretch);
+                void stretch(float amount);
+                void squareoff(float amount);
                 void createBundle();
                 void add(Cane* addl, int* addl_index_ptr);
                 void moveCane(int subcane, float delta_x, float delta_y);
@@ -26,8 +26,8 @@ class Cane
 
                 int type;
                 float amt;
-                int num_subcanes;
-                Point subcane_locs[MAX_SUBCANE_COUNT];
+                int subcaneCount;
+                Point subcaneLocations[MAX_SUBCANE_COUNT];
                 Cane* subcanes[MAX_SUBCANE_COUNT];
                 Color color;
 };

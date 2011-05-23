@@ -37,12 +37,12 @@ class MainWindow : public QMainWindow
 
                 OpenGLWidget* glassgl;
                 QWidget* centralWidget;
-                QVBoxLayout* window_layout;
+                QVBoxLayout* windowLayout;
                 QGraphicsView* workview;
                 QGraphicsScene* workscene;
                 QScrollArea* scrollArea;
                 QScrollArea* libraryScrollArea;
-                QHBoxLayout* stock_layout;
+                QHBoxLayout* stockLayout;
                 QLabel* imageLabel;
                 int librarySize;
 };

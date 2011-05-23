@@ -6,7 +6,7 @@ MainWindow::MainWindow()
         this->setCentralWidget(centralWidget);
         librarySize = 0;
 
-        window_layout = new QVBoxLayout(centralWidget);
+        windowLayout = new QVBoxLayout(centralWidget);
         setupWorkArea();
         setupLibraryArea();
 
@@ -18,24 +18,24 @@ void MainWindow::saveCaneToLibrary()
 {
         LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->glassgl, 
                 this->glassgl->getCane()->deepCopy(), 0);
-        stock_layout->addWidget(lc);
+        stockLayout->addWidget(lc);
 }
 
 void MainWindow::setupLibraryArea()
 {
-        QWidget* stock_widget = new QWidget;
-        stock_layout = new QHBoxLayout(stock_widget);
-        stock_layout->setSpacing(10);
+        QWidget* stockWidget = new QWidget;
+        stockLayout = new QHBoxLayout(stockWidget);
+        stockLayout->setSpacing(10);
 
         libraryScrollArea = new QScrollArea;
         libraryScrollArea->setBackgroundRole(QPalette::Dark);
-        libraryScrollArea->setWidget(stock_widget);
+        libraryScrollArea->setWidget(stockWidget);
         libraryScrollArea->setWidgetResizable(true);
         libraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
         libraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         libraryScrollArea->setFixedHeight(130);
         
-        window_layout->addWidget(libraryScrollArea);
+        windowLayout->addWidget(libraryScrollArea);
 }
 
 void MainWindow::seedLibrary()
@@ -43,7 +43,7 @@ void MainWindow::seedLibrary()
         // Now seed the library with some basic canes
         Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
         Cane* stch = new Cane(STRETCH_CANETYPE);
-        stch->num_subcanes = 1;
+        stch->subcaneCount = 1;
         stch->subcanes[0] = c;
         stch->amt = 12.0;
 
@@ -165,10 +165,10 @@ void MainWindow::setupWorkArea()
         button_layout->addWidget(save_button);
         button_layout->addWidget(clear_button);
 
-        QHBoxLayout* work_layout = new QHBoxLayout();
-        work_layout->addLayout(button_layout);
-        work_layout->addWidget(glassgl, 1);
-        window_layout->addLayout(work_layout, 5);
+        QHBoxLayout* workLayout = new QHBoxLayout();
+        workLayout->addLayout(button_layout);
+        workLayout->addWidget(glassgl, 1);
+        windowLayout->addLayout(workLayout, 5);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* e)

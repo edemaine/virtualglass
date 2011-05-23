@@ -35,13 +35,13 @@ class OpenGLWidget : public QGLWidget
                 int num_triangles;
                 int resolution;
                 
-                float eye_loc[3];
-                float look_at_loc[3];
+                float eyeLoc[3];
+                float lookAtLoc[3];
                 float theta, fee, rho;
 
-                int gNewX, gNewY;
+                int mouseLocX, mouseLocY;
 
-                GLfloat light_position[4];
+                GLfloat lightPosition[4];
 
                 void updateCamera();
                 void drawTriangle(Triangle* t);

@@ -42,33 +42,31 @@ class Mesh
                 Triangle* getMesh(int resolution);
                 int getNumMeshTriangles(int resolution);
                 void twistCane(float amt);
-                void stretchCane(float amt, float max_stretch);
+                void stretchCane(float amt);
                 void moveCane(float delta_x, float delta_y);
-                void squareoffCane(float amt, float max_squareoff);
+                void squareoffCane(float amt);
                 void addCane(Cane* c); 
                 void advanceActiveSubcane();
                 void startMoveMode();
 
         private:
                 Cane *cane;
-                Triangle* low_res_tris;
-                int num_low_res_tris;
-                Triangle* high_res_tris;
-                int num_high_res_tris;
-                int illuminated_subcane;
-                int low_res_up_to_date;
-                int high_res_up_to_date;
+                Triangle* lowResTriangles;
+                int lowResTriangleCount;
+                Triangle* highResTriangles;
+                int highResTriangleCount;
+                int lowResDataUpToDate;
+                int highResDataUpToDate;
                 int activeSubcane;
         
-                void generateMesh(Cane* c, Triangle* triangles, int* num_triangles,
-                        Transform* Ts, int* num_Ts, int res_mode);
-                void convert_circular_cane_to_addl_triangles(Triangle* triangles, 
-                        int* num_triangles, Transform* Ts, int num_Ts, Color color, 
-                        int res_mode);
-                float compute_total_stretch(Transform* Ts, int num_Ts);
-                Point apply_transforms(Point p, Transform* Ts, int num_Ts);
-                void updateLowRes();
-                void updateHighRes();
+                void generateMesh(Cane* c, Triangle* triangles, int* triangleCount,
+                        Transform* transforms, int* transformCount, int resolution);
+                void meshCircularBaseCane(Triangle* triangles, int* triangleCount, 
+                        Transform* transforms, int transformCount, Color color, int resolution);
+                float computeTotalStretch(Transform* transforms, int transformCount);
+                Point applyTransforms(Point p, Transform* transforms, int transformCount);
+                void updateLowResData();
+                void updateHighResData();
 };
 
 #endif

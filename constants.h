@@ -37,8 +37,6 @@
 #define BUNDLE_MODE 4
 #define SQUAREOFF_MODE 5
 
-#define GLASS_STIPPLE_ALPHA 0.05
-
 #define PI 3.14159265358979323846f
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
