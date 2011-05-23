@@ -37,9 +37,17 @@ class Mesh
 
         public:
                 Mesh(Cane* c);
-                void updateCane(Cane* c);
+                void setCane(Cane* c);
+                Cane* getCane();
                 Triangle* getMesh(int resolution);
                 int getNumMeshTriangles(int resolution);
+                void twistCane(float amt);
+                void stretchCane(float amt, float max_stretch);
+                void moveCane(int curActiveSubcane, float delta_x, float delta_y);
+                void squareoffCane(float amt, float max_squareoff);
+                void addCane(Cane* c, int* active_subcane); 
+                void advanceActiveSubcane(int* active_subcane);
+                void setIlluminatedSubcane(int new_ill_subcane);
 
         private:
                 Cane *cane;
@@ -47,6 +55,7 @@ class Mesh
                 int num_low_res_tris;
                 Triangle* high_res_tris;
                 int num_high_res_tris;
+                int illuminated_subcane;
         
                 float generateMesh(Cane* c, Triangle* triangles, int* num_triangles,
                         Transform* Ts, int* num_Ts, int illuminated_subcane, int global_wrap, int res_mode);

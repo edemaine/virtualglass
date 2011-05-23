@@ -302,28 +302,36 @@ Mesh :: Mesh(Cane* c)
 {
         low_res_tris = (Triangle*) malloc(sizeof(Triangle) 
                 * (LOW_AXIAL_RESOLUTION * LOW_ANGULAR_RESOLUTION * 2) * (MAX_NUM_CANES + 1));
-        num_low_res_tris = 0;
         high_res_tris = (Triangle*) malloc(sizeof(Triangle) 
                 * (HIGH_AXIAL_RESOLUTION * HIGH_ANGULAR_RESOLUTION * 2) * (MAX_NUM_CANES + 1));
-        num_high_res_tris = 0;
         
-        updateCane(c);
+        setCane(c);
 }
 
-void Mesh :: updateCane(Cane* c)
+void Mesh :: setCane(Cane* c)
 {
         Transform Ts[MAX_TRANSFORMS];
         int num_Ts;
 
+        cane = c;
+
+        illuminated_subcane = NO_SUBCANES;
+
         num_Ts = 0;
         num_low_res_tris = 0;
-        generateMesh(c, low_res_tris, &num_low_res_tris, Ts, &num_Ts, NO_SUBCANES, 0, LOW_RESOLUTION);
+        generateMesh(c, low_res_tris, &num_low_res_tris, Ts, &num_Ts, 
+                illuminated_subcane, 0, LOW_RESOLUTION);
 
         num_Ts = 0;
         num_high_res_tris = 0;
-        generateMesh(c, high_res_tris, &num_high_res_tris, Ts, &num_Ts, NO_SUBCANES, 0, HIGH_RESOLUTION);
+        generateMesh(c, high_res_tris, &num_high_res_tris, Ts, &num_Ts, 
+                illuminated_subcane, 0, HIGH_RESOLUTION);
 }
 
+Cane* Mesh :: getCane()
+{
+        return cane;
+} 
 
 Triangle* Mesh :: getMesh(int resolution)
 {
@@ -340,3 +348,67 @@ int Mesh :: getNumMeshTriangles(int resolution)
         else
                 return num_high_res_tris;
 }
+
+void Mesh :: twistCane(float amt)
+{
+        if (cane == NULL)
+                return;
+        cane->twist(amt);
+        setCane(cane);
+}
+
+void Mesh :: stretchCane(float amt, float max_stretch)
+{
+        if (cane == NULL)
+                return;
+        cane->stretch(amt, max_stretch);
+        setCane(cane);
+}
+
+void Mesh :: squareoffCane(float amt, float max_squareoff)
+{
+        if (cane == NULL)
+                return;
+        cane->squareoff(amt, max_squareoff);
+        setCane(cane);
+}
+
+void Mesh :: moveCane(int curActiveSubcane, float delta_x, float delta_y)
+{
+        if (cane == NULL)
+                return;
+        cane->createBundle();
+        cane->subcane_locs[curActiveSubcane].x += delta_x;
+        cane->subcane_locs[curActiveSubcane].y += delta_y; 
+        setCane(cane);
+}
+
+void Mesh :: addCane(Cane* c, int* active_subcane)
+{
+        if (cane == NULL)
+        {
+                cane = c->deepCopy();
+        }
+        else
+        {
+                cane->add(c, active_subcane);
+        }
+        setCane(cane);
+}
+
+void Mesh :: advanceActiveSubcane(int* active_subcane)
+{
+        *active_subcane += 1;
+        *active_subcane %= cane->num_subcanes;
+}
+
+void Mesh :: setIlluminatedSubcane(int new_ill_subcane)
+{
+        illuminated_subcane = new_ill_subcane;
+}
+
+
+
+
+
+

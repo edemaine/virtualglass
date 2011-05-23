@@ -6,7 +6,6 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent=0) : QGLWidget(parent)
         resolution = HIGH_RESOLUTION;
         cur_active_subcane = NO_SUBCANES;
         mode = 1;  
-        cane = NULL;
         mesh = new Mesh(NULL);
         triangles = mesh->getMesh(resolution);
         num_triangles = mesh->getNumMeshTriangles(resolution);
@@ -36,7 +35,7 @@ void OpenGLWidget :: initializeGL()
  
 void OpenGLWidget :: zeroCanes()
 {
-        updateCane(NULL);
+        mesh->setCane(NULL);
         paintGL();
 } 
 
@@ -83,7 +82,7 @@ void OpenGLWidget :: zoomOut()
 
 void OpenGLWidget :: setFocusCane(Cane* c)
 {
-        updateCane(c);
+        mesh->setCane(c);
         paintGL();
 } 
 
@@ -100,10 +99,8 @@ void OpenGLWidget :: updateIlluminatedSubcane(int new_ill_subcane)
         cur_active_subcane = new_ill_subcane;
 }
 
-void OpenGLWidget :: updateCane(Cane* new_cane)
+void OpenGLWidget :: updateTriangles()
 {
-        cane = new_cane;
-        mesh->updateCane(new_cane);
         triangles = mesh->getMesh(resolution);
         num_triangles = mesh->getNumMeshTriangles(resolution);
 } 
@@ -126,9 +123,8 @@ void OpenGLWidget :: advanceActiveSubcane()
 {
         if (mode == 4)
         {
-                cur_active_subcane++;
-                cur_active_subcane %= cane->num_subcanes;
-                updateIlluminatedSubcane(cur_active_subcane);
+                mesh->advanceActiveSubcane(&cur_active_subcane);
+                mesh->setIlluminatedSubcane(cur_active_subcane);
                 paintGL();
         }
 }
@@ -164,7 +160,6 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 {
         float relX, relY;
-        float curCaneX, curCaneY;
         float newFee;
         float windowWidth, windowHeight;
         int gOldX, gOldY;
@@ -196,37 +191,25 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
         }
         else if (mode == TWIST_MODE) 
         {
-                if (cane == NULL)
-                        return;
-                cane->twist((relX * 500.0 * PI / 180.0));
-                updateCane(cane);
+                mesh->twistCane((relX * 500.0 * PI / 180.0));
+                updateTriangles();
         }
         else if (mode == STRETCH_MODE)
         {
-                if (cane == NULL)
-                        return;
-                cane->stretch(-10.0*relY, 200);
-                updateCane(cane);
+                mesh->stretchCane(-10.0*relY, 200);
+                updateTriangles();
         }
         else if (mode == BUNDLE_MODE)
         {
-                if (cane == NULL)
-                        return; 
-                cane->createBundle();
-                curCaneX = cane->subcane_locs[cur_active_subcane].x; 
-                curCaneY = cane->subcane_locs[cur_active_subcane].y; 
-                curCaneX += relX * cos(theta + PI / 2.0) + relY * cos(theta); 
-                curCaneY += relX * sin(theta + PI / 2.0) + relY * sin(theta); 
-                cane->subcane_locs[cur_active_subcane].x = curCaneX;
-                cane->subcane_locs[cur_active_subcane].y = curCaneY;
-                updateCane(cane);
+                mesh->moveCane(cur_active_subcane, 
+                        relX * cos(theta + PI / 2.0) + relY * cos(theta), 
+                        relX * sin(theta + PI / 2.0) + relY * sin(theta));
+                updateTriangles();
         }
         else if (mode == SQUAREOFF_MODE)
         {
-                if (cane == NULL)
-                        return; 
-                cane->squareoff(-(relY * 500.0 * PI / 180.0), 200);
-                updateCane(cane);
+                mesh->squareoffCane(-(relY * 500.0 * PI / 180.0), 200);
+                updateTriangles();
         }
 
         paintGL();
@@ -265,21 +248,14 @@ void OpenGLWidget :: drawTriangle(Triangle* t)
 void OpenGLWidget :: addCane(Cane* c)
 {
         setMode(BUNDLE_MODE);
-        if (cane == NULL)
-        {
-                cane = c->deepCopy();
-        }
-        else
-        {
-                cane->add(c, &cur_active_subcane);
-        }
-        updateCane(cane);
+        mesh->addCane(c, &cur_active_subcane);
+        updateTriangles();
         paintGL();
 }
 
 Cane* OpenGLWidget :: getCane()
 {
-        return cane;
+        return mesh->getCane();
 }
 
 

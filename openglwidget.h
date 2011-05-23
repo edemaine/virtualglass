@@ -18,7 +18,6 @@ class OpenGLWidget : public QGLWidget
   
         public:
                 OpenGLWidget(QWidget *parent);
-                void updateCane(Cane* c);
                 void updateResolution(int new_resolution);
                 void updateIlluminatedSubcane(int new_ill_subcane);
                 void setFocusCane(Cane* c);
@@ -33,7 +32,6 @@ class OpenGLWidget : public QGLWidget
         private:
                 Mesh* mesh;
                 int mode;
-                Cane* cane;
                 int cur_active_subcane;
                 Triangle* triangles;
                 int num_triangles;
@@ -49,7 +47,7 @@ class OpenGLWidget : public QGLWidget
 
                 void updateCamera();
                 void drawTriangle(Triangle* t);
-
+                void updateTriangles();
 
         protected:
                 void initializeGL();
