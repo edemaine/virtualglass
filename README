@@ -58,7 +58,7 @@ openglwidget.cpp/h
 Cane data/transforms:
 cane.cpp/h
 primitives.h
-convert.cpp/h
+mesh.cpp/h
 
 
 Right now we are not doing Model-View-Controller architecture. 

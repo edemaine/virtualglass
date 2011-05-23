@@ -3,7 +3,7 @@ Converts a cane (constructed as a DAG) into a set of triangles
 in 3-space, each with a set of coordinates and a color. 
 */
 
-#include "convert.h"
+#include "mesh.h"
 
 Color brighten_color(Color c)
 {

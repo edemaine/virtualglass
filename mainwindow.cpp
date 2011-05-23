@@ -1,6 +1,6 @@
-#include "workwindow.h"
+#include "mainwindow.h"
 
-WorkWindow::WorkWindow()
+MainWindow::MainWindow()
 {
         centralWidget = new QWidget(this);
         this->setCentralWidget(centralWidget);
@@ -14,14 +14,14 @@ WorkWindow::WorkWindow()
         resize(1000, 1000);
 }
 
-void WorkWindow::saveCaneToLibrary()
+void MainWindow::saveCaneToLibrary()
 {
         LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->glassgl, 
                 this->glassgl->getCane()->deepCopy(), 0);
         stock_layout->addWidget(lc);
 }
 
-void WorkWindow::setupLibraryArea()
+void MainWindow::setupLibraryArea()
 {
         QWidget* stock_widget = new QWidget;
         stock_layout = new QHBoxLayout(stock_widget);
@@ -38,7 +38,7 @@ void WorkWindow::setupLibraryArea()
         window_layout->addWidget(libraryScrollArea);
 }
 
-void WorkWindow::seedLibrary()
+void MainWindow::seedLibrary()
 {
         // Now seed the library with some basic canes
         Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
@@ -70,57 +70,57 @@ void WorkWindow::seedLibrary()
         saveCaneToLibrary();
 }
 
-void WorkWindow::zoomInButtonPressed()
+void MainWindow::zoomInButtonPressed()
 {
         glassgl->zoomIn();
 }
 
-void WorkWindow::zoomOutButtonPressed()
+void MainWindow::zoomOutButtonPressed()
 {
         glassgl->zoomOut();
 }
 
-void WorkWindow::lookButtonPressed()
+void MainWindow::lookButtonPressed()
 {
         glassgl->setMode(LOOK_MODE);
 }
 
-void WorkWindow::twistButtonPressed()
+void MainWindow::twistButtonPressed()
 {
         glassgl->setMode(TWIST_MODE);
 }
 
-void WorkWindow::stretchButtonPressed()
+void MainWindow::stretchButtonPressed()
 {
         glassgl->setMode(STRETCH_MODE);
 }
 
-void WorkWindow::bundleButtonPressed()
+void MainWindow::bundleButtonPressed()
 {
         glassgl->setMode(BUNDLE_MODE);
 }
 
-void WorkWindow::nextButtonPressed()
+void MainWindow::nextButtonPressed()
 {
         glassgl->advanceActiveSubcane();
 }
 
-void WorkWindow::squareoffButtonPressed()
+void MainWindow::squareoffButtonPressed()
 {
         glassgl->setMode(SQUAREOFF_MODE);
 }
 
-void WorkWindow::saveButtonPressed()
+void MainWindow::saveButtonPressed()
 {
         saveCaneToLibrary();
 }
 
-void WorkWindow::clearButtonPressed()
+void MainWindow::clearButtonPressed()
 {
         glassgl->zeroCanes();
 }
 
-void WorkWindow::setupWorkArea()
+void MainWindow::setupWorkArea()
 {
         glassgl = new OpenGLWidget(this);
 
@@ -172,7 +172,7 @@ void WorkWindow::setupWorkArea()
         window_layout->addLayout(work_layout, 5);
 }
 
-void WorkWindow::keyPressEvent(QKeyEvent* e)
+void MainWindow::keyPressEvent(QKeyEvent* e)
 {
         if (e->key() == 0x58) // X 
                 exit(0);

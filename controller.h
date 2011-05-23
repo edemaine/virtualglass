@@ -3,7 +3,7 @@
 
 #include <QApplication>
 #include <string.h>
-#include "workwindow.h"
+#include "mainwindow.h"
 
 class Controller
 {
@@ -12,7 +12,7 @@ class Controller
                 int run();
 
         protected:
-                WorkWindow* workWindow;
+                MainWindow* mainWindow;
                 QApplication* app;
 };
 

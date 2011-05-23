@@ -12,13 +12,13 @@ Controller::Controller()
         strcpy(fake_argv[0], "canelib");
         
         app = new QApplication(fake_argc, fake_argv);
-        workWindow = new WorkWindow();
+        mainWindow = new MainWindow();
 }
 
 int Controller::run()
 {
-        workWindow->show();
-        workWindow->seedLibrary();
+        mainWindow->show();
+        mainWindow->seedLibrary();
         return app->exec();  
 }
 

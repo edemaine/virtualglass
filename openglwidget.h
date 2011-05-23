@@ -9,7 +9,7 @@
 #include <qgl.h>
 #include "primitives.h"
 #include "constants.h"
-#include "convert.h"
+#include "mesh.h"
 #include "cane.h"
 
 class OpenGLWidget : public QGLWidget

@@ -9,12 +9,12 @@
 
 class View;
 
-class WorkWindow : public QMainWindow
+class MainWindow : public QMainWindow
 {
         Q_OBJECT
 
         public:
-                WorkWindow();
+                MainWindow();
                 void saveCaneToLibrary();
                 void seedLibrary();
                 
