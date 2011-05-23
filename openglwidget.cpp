@@ -36,6 +36,7 @@ void OpenGLWidget :: initializeGL()
 void OpenGLWidget :: zeroCanes()
 {
         mesh->setCane(NULL);
+        updateTriangles();
         paintGL();
 } 
 
@@ -147,7 +148,8 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
         gNewX = e->x();
         gNewY = e->y();
 
-        updateResolution(LOW_RESOLUTION);
+        if (mode != 1) // keep things high res if in look mode
+                updateResolution(LOW_RESOLUTION);
         paintGL();
 }
 
@@ -191,7 +193,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
         }
         else if (mode == TWIST_MODE) 
         {
-                mesh->twistCane((relX * 500.0 * PI / 180.0));
+                mesh->twistCane((relX * 500.0 * PI / 100.0));
                 updateTriangles();
         }
         else if (mode == STRETCH_MODE)

@@ -56,6 +56,8 @@ class Mesh
                 Triangle* high_res_tris;
                 int num_high_res_tris;
                 int illuminated_subcane;
+                int low_res_up_to_date;
+                int high_res_up_to_date;
         
                 float generateMesh(Cane* c, Triangle* triangles, int* num_triangles,
                         Transform* Ts, int* num_Ts, int illuminated_subcane, int global_wrap, int res_mode);
@@ -64,7 +66,8 @@ class Mesh
                         int illuminated_subcane, int res_mode);
                 float compute_total_stretch(Transform* Ts, int num_Ts);
                 Point apply_transforms(Point p, Transform* Ts, int num_Ts);
-
+                void updateLowRes();
+                void updateHighRes();
 };
 
 #endif

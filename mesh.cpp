@@ -310,22 +310,35 @@ Mesh :: Mesh(Cane* c)
 
 void Mesh :: setCane(Cane* c)
 {
+        cane = c;
+        illuminated_subcane = NO_SUBCANES;
+
+        updateLowRes();
+        updateHighRes();
+}
+
+void Mesh :: updateLowRes()
+{
         Transform Ts[MAX_TRANSFORMS];
         int num_Ts;
 
-        cane = c;
-
-        illuminated_subcane = NO_SUBCANES;
-
         num_Ts = 0;
         num_low_res_tris = 0;
-        generateMesh(c, low_res_tris, &num_low_res_tris, Ts, &num_Ts, 
+        generateMesh(cane, low_res_tris, &num_low_res_tris, Ts, &num_Ts, 
                 illuminated_subcane, 0, LOW_RESOLUTION);
+        low_res_up_to_date = 1;
+}
+
+void Mesh :: updateHighRes()
+{
+        Transform Ts[MAX_TRANSFORMS];
+        int num_Ts;
 
         num_Ts = 0;
         num_high_res_tris = 0;
-        generateMesh(c, high_res_tris, &num_high_res_tris, Ts, &num_Ts, 
+        generateMesh(cane, high_res_tris, &num_high_res_tris, Ts, &num_Ts, 
                 illuminated_subcane, 0, HIGH_RESOLUTION);
+        high_res_up_to_date = 1;
 }
 
 Cane* Mesh :: getCane()
@@ -335,34 +348,86 @@ Cane* Mesh :: getCane()
 
 Triangle* Mesh :: getMesh(int resolution)
 {
+
         if (resolution == LOW_RESOLUTION)
+        {
+                if (!low_res_up_to_date)
+                        updateLowRes(); 
                 return low_res_tris;
+        }
         else
+        {
+                if (!high_res_up_to_date)
+                {
+                        updateHighRes();
+                        updateLowRes();
+                } 
                 return high_res_tris;
+        }
 }
 
 int Mesh :: getNumMeshTriangles(int resolution)
 {
         if (resolution == LOW_RESOLUTION)
+        {
+                if (!low_res_up_to_date)
+                        updateLowRes(); 
                 return num_low_res_tris;
+        }
         else
+        {
+                if (!high_res_up_to_date)
+                        updateHighRes();
                 return num_high_res_tris;
+        }
 }
 
 void Mesh :: twistCane(float amt)
 {
+        Transform twist_t;
+
         if (cane == NULL)
                 return;
         cane->twist(amt);
-        setCane(cane);
+
+        if (!low_res_up_to_date)
+                updateLowRes();
+
+        twist_t.type = TWIST_TRANSFORM;
+        twist_t.data.f_amt = amt;
+        for (int i = 0; i < num_low_res_tris; ++i)
+        {
+                low_res_tris[i].v1 = apply_transforms(low_res_tris[i].v1, &twist_t, 1);
+                low_res_tris[i].v2 = apply_transforms(low_res_tris[i].v2, &twist_t, 1);
+                low_res_tris[i].v3 = apply_transforms(low_res_tris[i].v3, &twist_t, 1);
+        }
+
+        low_res_up_to_date = 1;
+        high_res_up_to_date = 0;
 }
 
 void Mesh :: stretchCane(float amt, float max_stretch)
 {
+        Transform stretch_t;
+
         if (cane == NULL)
                 return;
         cane->stretch(amt, max_stretch);
-        setCane(cane);
+
+        if (!low_res_up_to_date)
+                updateLowRes();
+
+        stretch_t.type = STRETCH_TRANSFORM;
+        stretch_t.data.f_amt = MIN(1.0 + amt, max_stretch);
+        for (int i = 0; i < num_low_res_tris; ++i)
+        {
+                low_res_tris[i].v1 = apply_transforms(low_res_tris[i].v1, &stretch_t, 1);
+                low_res_tris[i].v2 = apply_transforms(low_res_tris[i].v2, &stretch_t, 1);
+                low_res_tris[i].v3 = apply_transforms(low_res_tris[i].v3, &stretch_t, 1);
+        }
+
+        low_res_up_to_date = 1;
+        high_res_up_to_date = 0;
 }
 
 void Mesh :: squareoffCane(float amt, float max_squareoff)
@@ -370,7 +435,7 @@ void Mesh :: squareoffCane(float amt, float max_squareoff)
         if (cane == NULL)
                 return;
         cane->squareoff(amt, max_squareoff);
-        setCane(cane);
+        low_res_up_to_date = high_res_up_to_date = 0;
 }
 
 void Mesh :: moveCane(int curActiveSubcane, float delta_x, float delta_y)
@@ -380,7 +445,7 @@ void Mesh :: moveCane(int curActiveSubcane, float delta_x, float delta_y)
         cane->createBundle();
         cane->subcane_locs[curActiveSubcane].x += delta_x;
         cane->subcane_locs[curActiveSubcane].y += delta_y; 
-        setCane(cane);
+        low_res_up_to_date = high_res_up_to_date = 0;
 }
 
 void Mesh :: addCane(Cane* c, int* active_subcane)
@@ -393,18 +458,20 @@ void Mesh :: addCane(Cane* c, int* active_subcane)
         {
                 cane->add(c, active_subcane);
         }
-        setCane(cane);
+        low_res_up_to_date = high_res_up_to_date = 0;
 }
 
 void Mesh :: advanceActiveSubcane(int* active_subcane)
 {
         *active_subcane += 1;
         *active_subcane %= cane->num_subcanes;
+        low_res_up_to_date = high_res_up_to_date = 0;
 }
 
 void Mesh :: setIlluminatedSubcane(int new_ill_subcane)
 {
         illuminated_subcane = new_ill_subcane;
+        low_res_up_to_date = high_res_up_to_date = 0;
 }
 
 
