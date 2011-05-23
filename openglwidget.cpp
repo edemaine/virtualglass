@@ -4,11 +4,9 @@
 OpenGLWidget :: OpenGLWidget(QWidget *parent=0) : QGLWidget(parent)
 {
         resolution = HIGH_RESOLUTION;
-        cur_active_subcane = NO_SUBCANES;
-        mode = 1;  
+        mode = LOOK_MODE;  
         mesh = new Mesh(NULL);
-        triangles = mesh->getMesh(resolution);
-        num_triangles = mesh->getNumMeshTriangles(resolution);
+        updateTriangles();
 }
 
 void OpenGLWidget :: initializeGL()
@@ -84,6 +82,7 @@ void OpenGLWidget :: zoomOut()
 void OpenGLWidget :: setFocusCane(Cane* c)
 {
         mesh->setCane(c);
+        updateTriangles();
         paintGL();
 } 
 
@@ -93,11 +92,6 @@ void OpenGLWidget :: updateResolution(int new_resolution)
         resolution = new_resolution;
         triangles = mesh->getMesh(new_resolution);
         num_triangles = mesh->getNumMeshTriangles(new_resolution);
-}
-
-void OpenGLWidget :: updateIlluminatedSubcane(int new_ill_subcane)
-{
-        cur_active_subcane = new_ill_subcane;
 }
 
 void OpenGLWidget :: updateTriangles()
@@ -111,12 +105,7 @@ void OpenGLWidget :: setMode(int m)
         this->mode = m;
         if (mode == 4)
         {
-                cur_active_subcane = 0;        
-                updateIlluminatedSubcane(cur_active_subcane);
-        }
-        else
-        {
-                updateIlluminatedSubcane(NO_SUBCANES);
+                mesh->startMoveMode();
         }
 }
 
@@ -124,8 +113,7 @@ void OpenGLWidget :: advanceActiveSubcane()
 {
         if (mode == 4)
         {
-                mesh->advanceActiveSubcane(&cur_active_subcane);
-                mesh->setIlluminatedSubcane(cur_active_subcane);
+                mesh->advanceActiveSubcane();
                 paintGL();
         }
 }
@@ -148,8 +136,7 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
         gNewX = e->x();
         gNewY = e->y();
 
-        if (mode != 1) // keep things high res if in look mode
-                updateResolution(LOW_RESOLUTION);
+        updateResolution(LOW_RESOLUTION);
         paintGL();
 }
 
@@ -203,8 +190,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
         }
         else if (mode == BUNDLE_MODE)
         {
-                mesh->moveCane(cur_active_subcane, 
-                        relX * cos(theta + PI / 2.0) + relY * cos(theta), 
+                mesh->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta), 
                         relX * sin(theta + PI / 2.0) + relY * sin(theta));
                 updateTriangles();
         }
@@ -249,8 +235,11 @@ void OpenGLWidget :: drawTriangle(Triangle* t)
 
 void OpenGLWidget :: addCane(Cane* c)
 {
-        setMode(BUNDLE_MODE);
-        mesh->addCane(c, &cur_active_subcane);
+        if (mesh->getCane() == NULL)
+                setMode(LOOK_MODE); 
+        else
+                setMode(BUNDLE_MODE);
+        mesh->addCane(c);
         updateTriangles();
         paintGL();
 }

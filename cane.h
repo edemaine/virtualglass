@@ -20,7 +20,8 @@ class Cane
                 void squareoff(float amount, float max_stretch);
                 void createBundle();
                 void add(Cane* addl, int* addl_index_ptr);
-                int hasBundle();
+                void moveCane(int subcane, float delta_x, float delta_y);
+                int leafNodes();
                 Cane* deepCopy();
 
                 int type;

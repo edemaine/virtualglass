@@ -43,11 +43,11 @@ class Mesh
                 int getNumMeshTriangles(int resolution);
                 void twistCane(float amt);
                 void stretchCane(float amt, float max_stretch);
-                void moveCane(int curActiveSubcane, float delta_x, float delta_y);
+                void moveCane(float delta_x, float delta_y);
                 void squareoffCane(float amt, float max_squareoff);
-                void addCane(Cane* c, int* active_subcane); 
-                void advanceActiveSubcane(int* active_subcane);
-                void setIlluminatedSubcane(int new_ill_subcane);
+                void addCane(Cane* c); 
+                void advanceActiveSubcane();
+                void startMoveMode();
 
         private:
                 Cane *cane;
@@ -58,12 +58,13 @@ class Mesh
                 int illuminated_subcane;
                 int low_res_up_to_date;
                 int high_res_up_to_date;
+                int activeSubcane;
         
-                float generateMesh(Cane* c, Triangle* triangles, int* num_triangles,
-                        Transform* Ts, int* num_Ts, int illuminated_subcane, int global_wrap, int res_mode);
-                float convert_circular_cane_to_addl_triangles(Triangle* triangles, 
+                void generateMesh(Cane* c, Triangle* triangles, int* num_triangles,
+                        Transform* Ts, int* num_Ts, int res_mode);
+                void convert_circular_cane_to_addl_triangles(Triangle* triangles, 
                         int* num_triangles, Transform* Ts, int num_Ts, Color color, 
-                        int illuminated_subcane, int res_mode);
+                        int res_mode);
                 float compute_total_stretch(Transform* Ts, int num_Ts);
                 Point apply_transforms(Point p, Transform* Ts, int num_Ts);
                 void updateLowRes();

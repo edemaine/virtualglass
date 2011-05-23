@@ -85,12 +85,12 @@ float Mesh :: compute_total_stretch(Transform* Ts, int num_Ts)
         return total_stretch;
 }
 
-float Mesh :: convert_circular_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Transform* Ts, int num_Ts, Color color, int illuminated_subcane, int res_mode)
+void Mesh :: convert_circular_cane_to_addl_triangles(Triangle* triangles, int* num_triangles, Transform* Ts, int num_Ts, Color color, int res_mode)
 {
         Point p1, p2, p3, p4;
         Triangle tmp_t;
         int i, j, angular_resolution, axial_resolution;
-        float total_stretch, radius;
+        float total_stretch;
 
         switch (res_mode)
         {
@@ -106,10 +106,8 @@ float Mesh :: convert_circular_cane_to_addl_triangles(Triangle* triangles, int* 
                         exit(1);
         }
 
-        
         total_stretch = compute_total_stretch(Ts, num_Ts);
-        radius = 0.0;
-
+        
         // Get cylinder sides
         for (i = 0; i < axial_resolution - 1; ++i)
         {
@@ -136,19 +134,10 @@ float Mesh :: convert_circular_cane_to_addl_triangles(Triangle* triangles, int* 
                         p3 = apply_transforms(p3, Ts, num_Ts);
                         p4 = apply_transforms(p4, Ts, num_Ts);
 
-                        radius = MAX(radius, 
-                                        MAX(sqrt(p1.x*p1.x + p1.y*p1.y),
-                                                MAX(sqrt(p2.x*p2.x + p2.y*p2.y),
-                                                        MAX(sqrt(p3.x*p3.x + p3.y*p3.y),
-                                                                sqrt(p4.x*p4.x + p4.y*p4.y)))));
-
                         tmp_t.v1 = p2;
                         tmp_t.v2 = p1;
                         tmp_t.v3 = p4;
-                        if (illuminated_subcane == ALL_SUBCANES)
-                                tmp_t.c = brighten_color(color);
-                        else
-                                tmp_t.c = darken_color(color);
+                        tmp_t.c = color;
 
                         triangles[*num_triangles] = tmp_t;
                         *num_triangles += 1;
@@ -156,10 +145,7 @@ float Mesh :: convert_circular_cane_to_addl_triangles(Triangle* triangles, int* 
                         tmp_t.v1 = p1;
                         tmp_t.v2 = p3;
                         tmp_t.v3 = p4;
-                        if (illuminated_subcane == ALL_SUBCANES)
-                                tmp_t.c = brighten_color(color);
-                        else
-                                tmp_t.c = darken_color(color);
+                        tmp_t.c = color;
 
                         triangles[*num_triangles] = tmp_t;
                         *num_triangles += 1;
@@ -171,10 +157,8 @@ float Mesh :: convert_circular_cane_to_addl_triangles(Triangle* triangles, int* 
         p1.y = 0.0;
         p1.z = p2.z = p3.z = 0.0;
         tmp_t.v1 = apply_transforms(p1, Ts, num_Ts);
-        if (illuminated_subcane == ALL_SUBCANES)
-                tmp_t.c = brighten_color(color);
-        else
-                tmp_t.c = darken_color(color);
+        tmp_t.c = color;
+
         for (j = 1; j < angular_resolution-1; ++j)
         {
                 p2.x = cos(2 * PI * ((float) j) / angular_resolution);
@@ -201,8 +185,6 @@ float Mesh :: convert_circular_cane_to_addl_triangles(Triangle* triangles, int* 
                 triangles[*num_triangles] = tmp_t;
                 *num_triangles += 1;
         }
-        
-        return radius; 
 }
 
 
@@ -213,17 +195,14 @@ Assumptions about parameters:
 2. The values of c->twist and c->stretch are not *both* non-zero and non-one, respectively.
 3. If c->twist or c->stretch are non-zero or non-one respective, then c has exactly one child.
 4. Ts is sufficiently long for the cane.
-5. illuminated_subcane is equal to neither ALL_SUBCANES nor NO_SUBCANES only if
-c->twist = 0.0 and c->stretch = 1.0. 
 */
-float Mesh :: generateMesh(Cane* c, Triangle* triangles, int* num_triangles, 
-        Transform* Ts, int* num_Ts, int illuminated_subcane, int global_wrap, int res_mode)
+void Mesh :: generateMesh(Cane* c, Triangle* triangles, int* num_triangles, 
+        Transform* Ts, int* num_Ts, int res_mode)
 {
-        int i, illumination;
-        float radius;
+        int i;
 
         if (c == NULL)
-                return 0.0;
+                return;
 
         switch(c->type)
         {
@@ -231,31 +210,31 @@ float Mesh :: generateMesh(Cane* c, Triangle* triangles, int* num_triangles,
                         Ts[*num_Ts].type = TWIST_TRANSFORM;
                         Ts[*num_Ts].data.f_amt = c->amt;
                         *num_Ts += 1;
-                        radius = generateMesh(c->subcanes[0], triangles, num_triangles, 
-                                Ts, num_Ts, illuminated_subcane, global_wrap, res_mode);
+                        generateMesh(c->subcanes[0], triangles, num_triangles, 
+                                Ts, num_Ts, res_mode);
                         *num_Ts -= 1;
-                        return radius; 
+                        return;
                 case BASE_CIRCLE_CANETYPE: 
-                        return convert_circular_cane_to_addl_triangles(triangles, num_triangles, 
-                                Ts, *num_Ts, c->color, illuminated_subcane, res_mode);
+                        convert_circular_cane_to_addl_triangles(triangles, num_triangles, 
+                                Ts, *num_Ts, c->color, res_mode);
+                        return;
                 case SQUAREOFF_CANETYPE: 
                         Ts[*num_Ts].type = SQUAREOFF_TRANSFORM;
                         Ts[*num_Ts].data.f_amt = c->amt;
                         *num_Ts += 1;
-                        radius = generateMesh(c->subcanes[0], triangles, num_triangles, 
-                                Ts, num_Ts, illuminated_subcane, global_wrap, res_mode);
+                        generateMesh(c->subcanes[0], triangles, num_triangles, 
+                                Ts, num_Ts, res_mode);
                         *num_Ts -= 1;
-                        return radius;
+                        return;
                 case STRETCH_CANETYPE:
                         Ts[*num_Ts].type = STRETCH_TRANSFORM;
                         Ts[*num_Ts].data.f_amt = c->amt;
                         *num_Ts += 1;
-                        radius = generateMesh(c->subcanes[0], triangles, num_triangles, 
-                                Ts, num_Ts, illuminated_subcane, global_wrap, res_mode);
+                        generateMesh(c->subcanes[0], triangles, num_triangles, 
+                                Ts, num_Ts, res_mode);
                         *num_Ts -= 1;
-                        return radius;
+                        return;
                 case BUNDLE_CANETYPE:
-                        radius = 0.0;
                         for (i = 0; i < c->num_subcanes; ++i)
                         {
                                 Ts[*num_Ts].type = MOVE_TRANSFORM;
@@ -263,36 +242,11 @@ float Mesh :: generateMesh(Cane* c, Triangle* triangles, int* num_triangles,
                                 Ts[*num_Ts].data.p_amt.y = c->subcane_locs[i].y;
                                 *num_Ts += 1;
 
-                                if (i == illuminated_subcane || illuminated_subcane == ALL_SUBCANES)
-                                        illumination = ALL_SUBCANES;
-                                else
-                                        illumination = NO_SUBCANES;
-
-                                radius = MAX(radius, generateMesh(c->subcanes[i], triangles, num_triangles, 
-                                        Ts, num_Ts, illumination, 0, res_mode));
+                                generateMesh(c->subcanes[i], triangles, num_triangles, 
+                                        Ts, num_Ts, res_mode);
                                 *num_Ts -= 1;
                         }
-                        if (global_wrap)
-                        {
-                                Transform wrap_Ts[MAX_TRANSFORMS];
-                                int num_wrap_Ts;
-                                Color wrap_color;
-
-                                wrap_color.r = wrap_color.g = wrap_color.b = 1.0; 
-                                for (int i = 0; i < *num_Ts; ++i)
-                                {
-                                        wrap_Ts[i] = Ts[i];
-                                }
-                                num_wrap_Ts = *num_Ts; 
-                                wrap_Ts[num_wrap_Ts].type = STRETCH_TRANSFORM; 
-                                wrap_Ts[num_wrap_Ts].data.f_amt 
-                                        = (1.0 / radius) * (1.0 / compute_total_stretch(Ts, *num_Ts));
-                                ++num_wrap_Ts;
-
-                                convert_circular_cane_to_addl_triangles(triangles, num_triangles, 
-                                        wrap_Ts, num_wrap_Ts, wrap_color, illuminated_subcane, res_mode);
-                        }
-                        return radius; 
+                        return;
                 default:
                         exit(1);
         }
@@ -311,7 +265,6 @@ Mesh :: Mesh(Cane* c)
 void Mesh :: setCane(Cane* c)
 {
         cane = c;
-        illuminated_subcane = NO_SUBCANES;
 
         updateLowRes();
         updateHighRes();
@@ -325,7 +278,7 @@ void Mesh :: updateLowRes()
         num_Ts = 0;
         num_low_res_tris = 0;
         generateMesh(cane, low_res_tris, &num_low_res_tris, Ts, &num_Ts, 
-                illuminated_subcane, 0, LOW_RESOLUTION);
+                LOW_RESOLUTION);
         low_res_up_to_date = 1;
 }
 
@@ -337,7 +290,7 @@ void Mesh :: updateHighRes()
         num_Ts = 0;
         num_high_res_tris = 0;
         generateMesh(cane, high_res_tris, &num_high_res_tris, Ts, &num_Ts, 
-                illuminated_subcane, 0, HIGH_RESOLUTION);
+                HIGH_RESOLUTION);
         high_res_up_to_date = 1;
 }
 
@@ -432,23 +385,72 @@ void Mesh :: stretchCane(float amt, float max_stretch)
 
 void Mesh :: squareoffCane(float amt, float max_squareoff)
 {
+        Transform squareoff_t;
+
         if (cane == NULL)
                 return;
         cane->squareoff(amt, max_squareoff);
-        low_res_up_to_date = high_res_up_to_date = 0;
+
+        if (!low_res_up_to_date)
+                updateLowRes();
+
+        squareoff_t.type = SQUAREOFF_TRANSFORM;
+        squareoff_t.data.f_amt = MIN(1.0 + amt, max_squareoff);
+        for (int i = 0; i < num_low_res_tris; ++i)
+        {
+                low_res_tris[i].v1 = apply_transforms(low_res_tris[i].v1, &squareoff_t, 1);
+                low_res_tris[i].v2 = apply_transforms(low_res_tris[i].v2, &squareoff_t, 1);
+                low_res_tris[i].v3 = apply_transforms(low_res_tris[i].v3, &squareoff_t, 1);
+        }
+
+        low_res_up_to_date = 1;
+        high_res_up_to_date = 0;
 }
 
-void Mesh :: moveCane(int curActiveSubcane, float delta_x, float delta_y)
+void Mesh :: startMoveMode()
 {
+        activeSubcane = 0;
+        if (cane != NULL)
+                cane->createBundle();
+}
+
+void Mesh :: moveCane(float delta_x, float delta_y)
+{
+        Transform move_t;
+        int num_prev_tris, num_cur_tris;
+
         if (cane == NULL)
                 return;
-        cane->createBundle();
-        cane->subcane_locs[curActiveSubcane].x += delta_x;
-        cane->subcane_locs[curActiveSubcane].y += delta_y; 
-        low_res_up_to_date = high_res_up_to_date = 0;
+
+        cane->moveCane(activeSubcane, delta_x, delta_y);
+
+        if (!low_res_up_to_date)
+                updateLowRes();
+
+        num_prev_tris = 0;
+        for (int i = 0; i < activeSubcane; ++i)
+        {
+                num_prev_tris += (2 * LOW_AXIAL_RESOLUTION * LOW_ANGULAR_RESOLUTION - 4) 
+                        * cane->subcanes[i]->leafNodes();
+        }
+
+        num_cur_tris = (2 * LOW_AXIAL_RESOLUTION * LOW_ANGULAR_RESOLUTION - 4) 
+                * cane->subcanes[activeSubcane]->leafNodes();
+        move_t.type = MOVE_TRANSFORM;
+        move_t.data.p_amt.x = delta_x;
+        move_t.data.p_amt.y = delta_y;
+        for (int i = num_prev_tris; i < num_prev_tris + num_cur_tris; ++i)
+        {
+                low_res_tris[i].v1 = apply_transforms(low_res_tris[i].v1, &move_t, 1);
+                low_res_tris[i].v2 = apply_transforms(low_res_tris[i].v2, &move_t, 1);
+                low_res_tris[i].v3 = apply_transforms(low_res_tris[i].v3, &move_t, 1);
+        }
+
+        low_res_up_to_date = 1;
+        high_res_up_to_date = 0;
 }
 
-void Mesh :: addCane(Cane* c, int* active_subcane)
+void Mesh :: addCane(Cane* c)
 {
         if (cane == NULL)
         {
@@ -456,23 +458,20 @@ void Mesh :: addCane(Cane* c, int* active_subcane)
         }
         else
         {
-                cane->add(c, active_subcane);
+                cane->add(c, &activeSubcane);
         }
         low_res_up_to_date = high_res_up_to_date = 0;
 }
 
-void Mesh :: advanceActiveSubcane(int* active_subcane)
+void Mesh :: advanceActiveSubcane()
 {
-        *active_subcane += 1;
-        *active_subcane %= cane->num_subcanes;
+        if (cane->type != BUNDLE_CANETYPE)
+                return;
+        activeSubcane += 1;
+        activeSubcane %= cane->num_subcanes;
         low_res_up_to_date = high_res_up_to_date = 0;
 }
 
-void Mesh :: setIlluminatedSubcane(int new_ill_subcane)
-{
-        illuminated_subcane = new_ill_subcane;
-        low_res_up_to_date = high_res_up_to_date = 0;
-}
 
 
 

@@ -27,6 +27,22 @@ void Cane :: reset()
         color.r = color.g = color.b = color.a = 1.0;
 }
 
+// Returns the number of nodes in the cane's DAG
+int Cane :: leafNodes()
+{
+        if (this->num_subcanes == 0)
+        {
+                return 1; 
+        }
+        else
+        {
+                int total = 0;
+                for (int i = 0; i < this->num_subcanes; ++i)
+                        total += this->subcanes[i]->leafNodes();
+                return total;
+        }
+}
+
 // Copies the information in a cane object into 
 // the destination cane object
 void Cane :: shallowCopy(Cane* dest)
@@ -96,7 +112,7 @@ void Cane :: squareoff(float amount, float max_squareoff)
                 this->subcanes[0] = copy;
                 this->amt = 1.0;
         }
-        this->amt += amount;
+        this->amt *= (1.0 + amount);
         this->amt = MIN(this->amt, max_squareoff);
 }
 
@@ -113,22 +129,10 @@ void Cane :: createBundle()
         }
 }
 
-
-int Cane :: hasBundle()
+void Cane :: moveCane(int subcane, float delta_x, float delta_y)
 {
-        if (this->type == BUNDLE_CANETYPE)
-                return 1;
-
-        // Probably don't need a loop, as if it
-        // is not a bundle, then it only has one subcane,
-        // but maybe things will change in the future
-        for (int i = 0; i < num_subcanes; ++i)
-        {
-                if (subcanes[i]->hasBundle())
-                        return 1;
-        }
-
-        return 0;
+        this->subcane_locs[subcane].x += delta_x;
+        this->subcane_locs[subcane].y += delta_y;
 }
 
 void Cane :: add(Cane* addl, int* addl_index_ptr)
