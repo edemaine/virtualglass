@@ -24,11 +24,12 @@ void OpenGLWidget :: initializeGL()
         lookAtLoc[2] = 0.5;
 
         glEnable(GL_LIGHTING);
-
+        glEnable(GL_LIGHT0);
         glEnable(GL_COLOR_MATERIAL);
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
-        glEnable(GL_LIGHT0);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA);
 }
  
 void OpenGLWidget :: zeroCanes()
@@ -43,8 +44,7 @@ void OpenGLWidget :: paintGL()
         int i;
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
-                
+
         glBegin(GL_TRIANGLES);
         for (i = 0; i < num_triangles; ++i)
         {
@@ -224,7 +224,7 @@ void OpenGLWidget :: drawTriangle(Triangle* t)
         norm.z /= norm_mag;
 
         glNormal3d(norm.x, norm.y, norm.z);
-        glColor3f(t->c.r, t->c.g, t->c.b);
+        glColor4f(t->c.r, t->c.g, t->c.b, t->c.a);
         glBegin(GL_TRIANGLES);
         glVertex3f(t->v1.x, t->v1.y, t->v1.z);
         glVertex3f(t->v2.x, t->v2.y, t->v2.z);

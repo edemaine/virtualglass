@@ -5,12 +5,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <algorithm>
 #include <QtGui>
 #include <qgl.h>
 #include "primitives.h"
 #include "constants.h"
 #include "mesh.h"
 #include "cane.h"
+using namespace std;
 
 class OpenGLWidget : public QGLWidget
 {

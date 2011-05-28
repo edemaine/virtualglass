@@ -50,11 +50,13 @@ void MainWindow::seedLibrary()
         c->color.r = 0.8;
         c->color.g = 0.8;
         c->color.b = 0.8;
+        c->color.a = 0.3;
         glassgl->setFocusCane(stch);
         saveCaneToLibrary();
         c->color.r = 1.0;
         c->color.g = 0.5;
         c->color.b = 0.5;
+        c->color.a = 0.7;
         glassgl->setFocusCane(stch);
         saveCaneToLibrary();
         c->color.r = 0.5;
