@@ -4,7 +4,7 @@
 int main(int argc, char** argv)
 {
         Controller c;
-        c.run();
+        return c.run();
 }     
 
 
