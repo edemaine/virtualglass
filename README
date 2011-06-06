@@ -1,6 +1,5 @@
 
 
-
 1. Getting your bearings.
 
 The project uses QT (http://qt.nokia.com/products/) version 4.7.3, 
@@ -33,9 +32,8 @@ installation (Andrew: I think).
 2. The code structure.
 
 The code has three significant pieces right now, based upon where
-the major complexity is coming from: the GUI, the OpenGL stuff, and the cane
-transforms. Right now the GUI is C++, while the OpenGL and cane implementations
-are C (Andrew: I am experienced with C but not C++).
+the major complexity is coming from: the GUI, the OpenGL portion of the GUI, and the cane
+transforms. 
 
 I will be working to continually improve the structure and documentation of the code
 through refactoring and adding comments/documents where needed. Please feel free to help
@@ -61,14 +59,12 @@ primitives.h
 mesh.cpp/h
 
 
-Right now we are not doing Model-View-Controller architecture. 
-Currently the view and controller are merged into the `GUI' and
-the model is the OpenGL and Cane stuff. It may seem weird that OpenGL
-is part of the model; I claim that this is correct in that the 3D rendering
-of the cane is NOT part of the view of the data, it *is* the data, 
-along with the cane itself. (Andrew: I am open to discussions, especially
-as more functionality gets added, about the code structure and whether
-this separation makes sense. Talk to me!).
+Right now we are not doing an explicit Model-View-Controller architecture,
+as the controller and view are mixed. There is also a separation of the 3D
+mesh of the object as part of the model (in mesh.cpp).  
+I claim that this is correct because the 3D mesh is another expression of the
+cane itself, and we are doing optimizations on mesh rendering that use 
+the cane DAG data structure.
 
 
 
@@ -88,6 +84,13 @@ Erik Demaine (edemaine@mit.edu) is `the boss' in that he is the ultimate authori
 as the SVN admin, etc. Andrew Winslow (awinslow@cs.tufts.edu) is the day-to-day code person.
 
 
+
+5. More documentation.
+
+The source files should have a description at the top of each of them describing 
+the role they play, along with intermittent descriptions of more complex portions
+of the code throughout the file. If what a portion of the code `does' or `how it works'
+is unclear, it needs more documentation! Email Andrew if you encounter this.
 
 
 
