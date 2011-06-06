@@ -1,6 +1,10 @@
 /*
-Converts a cane (constructed as a DAG) into a set of triangles
-in 3-space, each with a set of coordinates and a color. 
+The Mesh object plays the role of converting canes to 3D triangle meshes.
+A cane is represented as a directed acyclic graph of nodes, each of which
+represents a cane or a transformation on a cane. A 3D triangle mesh is simply
+a set of triangles with vertices in 3D and specific exterior and interior
+sides (we use the convention of specifying vertices in CCW order around the 
+exterior face).
 */
 
 #include "mesh.h"
