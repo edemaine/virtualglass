@@ -81,6 +81,11 @@ void MainWindow::zoomOutButtonPressed()
         glassgl->zoomOut();
 }
 
+void MainWindow::toggleAxesButtonPressed()
+{
+        glassgl->toggleAxes();
+}
+
 void MainWindow::lookButtonPressed()
 {
         glassgl->setMode(LOOK_MODE);
@@ -134,6 +139,9 @@ void MainWindow::setupWorkArea()
         QPushButton* zoom_out_button = new QPushButton("Zoom Out");
         connect(zoom_out_button, SIGNAL(pressed()), this, SLOT(zoomOutButtonPressed()));
 
+        QPushButton* toggle_axes_button = new QPushButton("Toggle Axes");
+        connect(toggle_axes_button, SIGNAL(pressed()), this, SLOT(toggleAxesButtonPressed()));
+
         QPushButton* twist_button = new QPushButton("Twist");
         connect(twist_button, SIGNAL(pressed()), this, SLOT(twistButtonPressed()));
 
@@ -159,6 +167,7 @@ void MainWindow::setupWorkArea()
         button_layout->addWidget(look_button);
         button_layout->addWidget(zoom_in_button);
         button_layout->addWidget(zoom_out_button);
+        button_layout->addWidget(toggle_axes_button);
         button_layout->addWidget(twist_button);
         button_layout->addWidget(stretch_button);
         button_layout->addWidget(bundle_button);

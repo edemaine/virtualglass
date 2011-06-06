@@ -21,6 +21,7 @@ class MainWindow : public QMainWindow
         public slots:
                 void zoomInButtonPressed();
                 void zoomOutButtonPressed();
+                void toggleAxesButtonPressed();
                 void lookButtonPressed();
                 void twistButtonPressed();
                 void stretchButtonPressed();

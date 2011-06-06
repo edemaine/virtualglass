@@ -97,6 +97,9 @@ void OpenGLWidget :: paintGL()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        if (showAxes)
+                drawAxes();
+
         glBegin(GL_TRIANGLES);
         for (i = 0; i < num_triangles; ++i)
         {
@@ -131,6 +134,12 @@ void OpenGLWidget :: zoomOut()
 {
         rho *= 1.2;
         updateCamera();
+        paintGL();
+}
+
+void OpenGLWidget :: toggleAxes()
+{
+        showAxes = !showAxes;
         paintGL();
 }
 
@@ -322,6 +331,22 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 }
 
 /*
+
+*/
+void OpenGLWidget :: drawAxes()
+{
+        glColor3f(1,1,1);
+        glBegin(GL_LINES);
+        glVertex3f(0,0,0);
+        glVertex3f(1,0,0);
+        glVertex3f(0,0,0);
+        glVertex3f(0,-1,0);
+        glVertex3f(0,0,0);
+        glVertex3f(0,0,1);
+        glEnd();
+}
+
+/*
 Convert a triangle in 3D to stuff OpenGL needs to draw it,
 namely its normal vector. Assumes the triangle is specified 
 in CCW order relative to its exterior.
@@ -374,6 +399,7 @@ void OpenGLWidget :: addCane(Cane* c)
         updateTriangles();
         paintGL();
 }
+
 
 /*
 Return a pointer to the cane curently being operated on.

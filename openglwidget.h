@@ -28,6 +28,7 @@ class OpenGLWidget : public QGLWidget
                 void zeroCanes();
                 void zoomIn();
                 void zoomOut();
+                void toggleAxes();
                 void setMode(int mode);
 
         private:
@@ -36,6 +37,7 @@ class OpenGLWidget : public QGLWidget
                 Triangle* triangles;
                 int num_triangles;
                 int resolution;
+                bool showAxes;
                 
                 float eyeLoc[3];
                 float lookAtLoc[3];
@@ -46,6 +48,7 @@ class OpenGLWidget : public QGLWidget
                 GLfloat lightPosition[4];
 
                 void updateCamera();
+                void drawAxes();
                 void drawTriangle(Triangle* t);
                 void updateTriangles();
 
