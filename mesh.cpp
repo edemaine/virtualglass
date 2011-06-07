@@ -5,26 +5,62 @@ represents a cane or a transformation on a cane. A 3D triangle mesh is simply
 a set of triangles with vertices in 3D and specific exterior and interior
 sides (we use the convention of specifying vertices in CCW order around the 
 exterior face).
+
+A Mesh object holds both a cane, and the Triangle arrays corresponding to a
+3D mesh of the cane. If the cane changes, it must be changed through one
+of the Mesh functions, and the Mesh object has functions that match all of the
+Cane functions (twist, stretch, etc.).
+
+Of course, the Mesh object can also have the Cane object which it meshes updated,
+for instance, if a new cane is loaded. However, this should be done if the
+cane being operated on is truly a new cane, and not just a modified version
+of the current cane. The reason is efficiency. Making calls to Mesh.twistCane()
+allows the Mesh object to quickly update the Triangle array (via direct operations
+on the array) instead of recomputing a mesh by traversing the cane.
 */
 
 #include "mesh.h"
 
-// transforms should be provided top-down (and are processed bottom up)
+/*
+This function applies a sequence of transformations to a 3D point.
+This is used during the meshing process to determine the location of
+a vertex after it has been moved via the transformations described
+by its ancestors in the cane DAG. 
+*/
 Point Mesh :: applyTransforms(Point p, Transform* transforms, int transformCount)
 {
         int i;
         float r, theta;
 
+        /*
+        The transformations are applied back to front to match how they
+        are loaded into the array. Because the transform array is created by
+        a depth-first traversal of the cane DAG, transforms lower in the DAG 
+        (i.e. closer to the leaves) are added later. However, they 
+        represent the first operations done on the cane, so need to be applied
+        first. 
+        */
         for (i = transformCount-1; i >= 0; --i)
         {
+                /*
+                Each transformation has a type and an amount.
+                Depending upon the type of transformation, the amount fields
+                take on different meanings. For instance, a twist transform
+                uses the `f_amt' or `float amount' field (since a twist has 
+                just a single real-valued parameter). The move transform has
+                two parameters, so it uses the `p_amt' or `point amount' field,
+                though the movement is really a vector, but whatever.
+                */
                 switch (transforms[i].type)
                 {
-                        case MOVE_TRANSFORM: // uses p_amt to describe offset from center
+                        // p_amt field describes offset from the z-axis
+                        case MOVE_TRANSFORM: 
                                 p.x += transforms[i].data.p_amt.x;
                                 p.y += transforms[i].data.p_amt.y;
                                 // p.z is unchanged
                                 break;
-                        case STRETCH_TRANSFORM: // uses f_amt to describe stretch amount
+                        // f_amt field describes magnitude of stretch
+                        case STRETCH_TRANSFORM: 
                                 theta = atan2(p.y, p.x);
                                 r = sqrt(p.x*p.x + p.y*p.y);
                                 r /= transforms[i].data.f_amt;
@@ -32,18 +68,18 @@ Point Mesh :: applyTransforms(Point p, Transform* transforms, int transformCount
                                 p.y = r * sin(theta); 
                                 p.z *= transforms[i].data.f_amt; // assume starting at z = 0
                                 break;
-                        case TWIST_TRANSFORM: // f_amt to describe twist amount per unit length 
+                        // f_amt describes twist magnitude
+                        case TWIST_TRANSFORM: 
                                 theta = atan2(p.y, p.x);
                                 r = sqrt(p.x*p.x + p.y*p.y);
                                 theta += transforms[i].data.f_amt * p.z;
                                 p.x = r * cos(theta); 
                                 p.y = r * sin(theta); 
-                                // p.z is unchanged
                                 break;
-                        case SQUAREOFF_TRANSFORM: // f_amt to describe amount of compression amount
+                        // f_amt describes magnitude of deformation 
+                        case SQUAREOFF_TRANSFORM: 
                                 p.x = p.x / transforms[i].data.f_amt;
                                 p.y = p.y * transforms[i].data.f_amt;
-                                // p.z is unchanged
                                 break;
                         default:
                                 exit(1);
@@ -53,7 +89,11 @@ Point Mesh :: applyTransforms(Point p, Transform* transforms, int transformCount
         return p;
 }
 
-
+/*
+This function is used in the process of reparameterizing the mesh after 
+a stretch, to a void losing vertices when the cane is cut down to just
+the z-region between 0 and 1.
+*/
 float Mesh :: computeTotalStretch(Transform* transforms, int transformCount)
 {
         float totalStretch;
@@ -69,6 +109,14 @@ float Mesh :: computeTotalStretch(Transform* transforms, int transformCount)
         return totalStretch;
 }
 
+/*
+Mesh::meshCircularBaseCane() creates a mesh for a radius 1, length 1 cylindrical piece of cane,
+and applies a sequences of transforms (coming from a depth-first traversal of the cane ending
+with this leaf base cane). The triangles are added to the end of the array passed in. 
+
+The resolution refers to the dual resolution modes used by the GUI, and the actual number of
+triangles for these resolutions are set in constants.h 
+*/
 void Mesh :: meshCircularBaseCane(Triangle* triangles, int* num_triangles, Transform* transforms, int transformCount, 
         Color color, int resolution)
 {
@@ -93,7 +141,11 @@ void Mesh :: meshCircularBaseCane(Triangle* triangles, int* num_triangles, Trans
 
         total_stretch = computeTotalStretch(transforms, transformCount);
         
-        // Get cylinder sides
+        /*
+        Draw the walls of the cylinder. Note that the z location is 
+        adjusted by the total stretch experienced by the cane so that
+        the z values range between 0 and 1.
+        */
         for (i = 0; i < axialResolution - 1; ++i)
         {
                 for (j = 0; j < angularResolution; ++j)
@@ -119,6 +171,8 @@ void Mesh :: meshCircularBaseCane(Triangle* triangles, int* num_triangles, Trans
                         p3 = applyTransforms(p3, transforms, transformCount);
                         p4 = applyTransforms(p4, transforms, transformCount);
 
+                        // Four points that define a (non-flat) quad are used
+                        // to create two triangles.
                         tmp_t.v1 = p2;
                         tmp_t.v2 = p1;
                         tmp_t.v3 = p4;
@@ -137,35 +191,38 @@ void Mesh :: meshCircularBaseCane(Triangle* triangles, int* num_triangles, Trans
                 } 
         }
 
-        // Get cylinder bottom
+        /*
+        Draw the cylinder bottom, then top.
+        The mesh uses a set of n-2 triangles with a common vertex
+        to draw a regular n-gon.
+        */
         p1.x = 1.0;
         p1.y = 0.0;
         p1.z = p2.z = p3.z = 0.0;
-        tmp_t.v1 = applyTransforms(p1, transforms, transformCount);
+        tmp_t.v1 = applyTransforms(p1, transforms, transformCount); // Common vertex
         tmp_t.c = color;
 
         for (j = 1; j < angularResolution-1; ++j)
         {
                 p2.x = cos(2 * PI * ((float) j) / angularResolution);
                 p2.y = sin(2 * PI * ((float) j) / angularResolution);
-                tmp_t.v3 = applyTransforms(p2, transforms, transformCount);
                 p3.x = cos(2 * PI * ((float) j+1) / angularResolution);
                 p3.y = sin(2 * PI * ((float) j+1) / angularResolution);
+                tmp_t.v3 = applyTransforms(p2, transforms, transformCount);
                 tmp_t.v2 = applyTransforms(p3, transforms, transformCount);
                 triangles[*num_triangles] = tmp_t;
                 *num_triangles += 1;
         }
 
-        // Get cylinder top
         p1.z = p2.z = p3.z = ((float) (axialResolution-1)) / (axialResolution * total_stretch);
         tmp_t.v1 = applyTransforms(p1, transforms, transformCount);
         for (j = 1; j < angularResolution-1; ++j)
         {
                 p2.x = cos(2 * PI * ((float) j) / angularResolution);
                 p2.y = sin(2 * PI * ((float) j) / angularResolution);
-                tmp_t.v2 = applyTransforms(p2, transforms, transformCount);
                 p3.x = cos(2 * PI * ((float) j+1) / angularResolution);
                 p3.y = sin(2 * PI * ((float) j+1) / angularResolution);
+                tmp_t.v2 = applyTransforms(p2, transforms, transformCount);
                 tmp_t.v3 = applyTransforms(p3, transforms, transformCount);
                 triangles[*num_triangles] = tmp_t;
                 *num_triangles += 1;
@@ -174,10 +231,13 @@ void Mesh :: meshCircularBaseCane(Triangle* triangles, int* num_triangles, Trans
 
 
 /*
-Assumptions about parameters:
-
-1. If c->twist or c->stretch are non-zero or non-one respective, then c has exactly one child.
-2. transforms is sufficiently long for the cane.
+Mesh::generateMesh() is the top-level function for turning a cane into an
+array of triangles. The triangle and transform arrays passed in are meant
+to be reusable, global arrays that are allocated in advance are sufficiently 
+large. As generateMesh() is called recursively, the transforms array is
+filled with with the transformations encountered at each node. When a 
+leaf is reached, these transformations are used to generate a complete mesh
+for the leaf node.
 */
 void Mesh :: generateMesh(Cane* c, Triangle* triangles, int* triangleCount, 
         Transform* transforms, int* transformCount, int resolution)
@@ -187,6 +247,7 @@ void Mesh :: generateMesh(Cane* c, Triangle* triangles, int* triangleCount,
         if (c == NULL)
                 return;
 
+        // Make recursive calls depending on the type of the current node
         switch(c->type)
         {
                 case TWIST_CANETYPE:
@@ -236,6 +297,7 @@ void Mesh :: generateMesh(Cane* c, Triangle* triangles, int* triangleCount,
 
 Mesh :: Mesh(Cane* c)
 {
+        // Allocate space for the two permanent arrays that hold both mesh versions 
         lowResTriangles = (Triangle*) malloc(sizeof(Triangle) 
                 * (LOW_AXIAL_RESOLUTION * LOW_ANGULAR_RESOLUTION * 2) * (MAX_NUM_CANES + 1));
         highResTriangles = (Triangle*) malloc(sizeof(Triangle) 
@@ -252,6 +314,11 @@ void Mesh :: setCane(Cane* c)
         updateHighResData();
 }
 
+/*
+Mesh::updateLowResData() and similarly updateHighResData() update the two
+Triangle arrays containing the two versions of the mesh. They are called
+when the mesh becomes out of date and is requested (by OpenGLWidget, for instance).
+*/
 void Mesh :: updateLowResData()
 {
         Transform transforms[MAX_TRANSFORMS];
@@ -281,6 +348,18 @@ Cane* Mesh :: getCane()
         return cane;
 } 
 
+/*
+Mesh::getMesh() is called by an external entity that
+wants to get an up-to-date mesh of the cane currently
+held by this Mesh object.
+
+If the mesh is out-of-date, it is updated, otherwise
+the current mesh is simply returned.
+
+Mesh::getNumMeshTriangles() is a companion method that
+returns the size of the array whose pointer is returned
+by getMesh().
+*/
 Triangle* Mesh :: getMesh(int resolution)
 {
 
