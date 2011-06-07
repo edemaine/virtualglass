@@ -122,6 +122,7 @@ void OpenGLWidget :: resizeGL(int width, int height)
         gluPerspective(45.0, (float)width / (float)height, 0.01, 10.0);
         glMatrixMode(GL_MODELVIEW);
         updateCamera();
+        paintGL(); 
 }
 
 void OpenGLWidget :: zoomIn()
