@@ -396,6 +396,14 @@ int Mesh :: getNumMeshTriangles(int resolution)
         }
 }
 
+/*
+The Mesh :: *Cane() methods (e.g. Mesh.twistCane(), Mesh.stretchCane(),..)
+are used to modify the cane held by the Mesh object in small ways. They
+should be used whenever possible over Mesh.setCane() because they are way
+more efficient. The technique is essentially to update the cane in the 
+background, and directly apply the twist transformation on the mesh vertices
+if possible instead of rebuilding the mesh from scratch from the cane object.
+*/
 void Mesh :: twistCane(float amt)
 {
         Transform twist_t;
@@ -468,6 +476,13 @@ void Mesh :: squareoffCane(float amt)
         highResDataUpToDate = 0;
 }
 
+/*
+Right now Mesh::startMoveMode() is a placeholder mostly.
+However, when subcane illumination (used to indicate to
+the user which subcane is currently selected) is reimplemented,
+it will perform the change in mesh colors needed to do
+the indication. 
+*/
 void Mesh :: startMoveMode()
 {
         activeSubcane = 0;
@@ -524,6 +539,14 @@ void Mesh :: addCane(Cane* c)
         lowResDataUpToDate = highResDataUpToDate = 0;
 }
 
+/*
+Mesh::advanceActiveSubcane() is used when in bundle
+mode (i.e. the root node of the cane being operated on
+is a bundle) to change the subcane currently under user
+control. It will (i.e. in the future) 
+also change the colors of the subcanes
+to illuminate the newly selected subcane.
+*/
 void Mesh :: advanceActiveSubcane()
 {
         if (cane->type != BUNDLE_CANETYPE)
