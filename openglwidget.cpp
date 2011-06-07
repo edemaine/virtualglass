@@ -41,6 +41,7 @@ stretch, down for decreased).
  
 OpenGLWidget :: OpenGLWidget(QWidget *parent=0) : QGLWidget(parent)
 {
+        showAxes = false;
         resolution = HIGH_RESOLUTION;
         mode = LOOK_MODE;  
         mesh = new Mesh(NULL);
