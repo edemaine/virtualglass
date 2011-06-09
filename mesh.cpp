@@ -34,7 +34,6 @@ Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
         float* amts;
         Point interp, horiz_itsc, vert_itsc, p_r, rect_dest;
         
-
         /*
         The transformations are applied back to front to match how they
         are loaded into the array. Because the transform array is created by
@@ -93,8 +92,8 @@ Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
                         case FLATTEN_CANETYPE: 
                                 amts = ancestors[i]->amts;
                                 // move point to rectangle XY system
-                                p_r.x = p.x; //cos(amts[1])*p.x - sin(amts[1])*p.y; 
-                                p_r.y = p.y; //sin(amts[1])*p.x + cos(amts[1])*p.y; 
+                                p_r.x = cos(-amts[1])*p.x - sin(-amts[1])*p.y; 
+                                p_r.y = sin(-amts[1])*p.x + cos(-amts[1])*p.y; 
                                 pt_radius = sqrt(p_r.x*p_r.x + p_r.y*p_r.y);
                                 pt_theta = atan2(p_r.y, p_r.x);
                                 if (pt_theta < 0)
@@ -102,41 +101,50 @@ Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
                                 arc_length = pt_radius * pt_theta;
 
                                 // We use a boundary-preserving circle to rectangle transformation
-                                rect_y = PI * pt_radius / (1.0 + amts[0]) / 2.0; 
-                                rect_x = rect_y * amts[0] / 2.0;
+                                rect_y = PI * pt_radius / (1.0 + amts[0]); 
+                                rect_x = rect_y * amts[0];
+                                rect_y /= 2.0;
+                                rect_x /= 2.0;
                                 if (arc_length < rect_y)
                                 {
-                                        p.x = rect_x;
-                                        p.y = arc_length;
-                                        break;
+                                        p_r.x = rect_x;
+                                        p_r.y = arc_length;
                                 }
-                                arc_length -= rect_y;
-                                if (arc_length < 2 * rect_x)
+                                else 
                                 {
-                                        p.x = rect_x - arc_length;
-                                        p.y = rect_y;
-                                        break;
+                                        arc_length -= rect_y;
+                                        if (arc_length < 2 * rect_x)
+                                        {
+                                                p_r.x = rect_x - arc_length;
+                                                p_r.y = rect_y;
+                                        }
+                                        else
+                                        {
+                                                arc_length -= 2 * rect_x;
+                                                if (arc_length < 2 * rect_y)
+                                                {
+                                                        p_r.x = -rect_x;
+                                                        p_r.y = rect_y - arc_length;
+                                                }
+                                                else
+                                                {
+                                                        arc_length -= 2 * rect_y;
+                                                        if (arc_length < 2 * rect_x)
+                                                        {
+                                                                p_r.x = -rect_x + arc_length;
+                                                                p_r.y = -rect_y;
+                                                        }
+                                                        else
+                                                        {
+                                                                arc_length -= 2 * rect_x;
+                                                                p_r.x = rect_x;
+                                                                p_r.y = -rect_y + arc_length;
+                                                        }
+                                                }
+                                        }
                                 }
-                                arc_length -= 2 * rect_x;
-                                if (arc_length < 2 * rect_y)
-                                {
-                                        p.x = -rect_x;
-                                        p.y = rect_y - arc_length;
-                                        break;
-                                }
-                                arc_length -= 2 * rect_y;
-                                if (arc_length < 2 * rect_x)
-                                {
-                                        p.x = -rect_x + arc_length;
-                                        p.y = -rect_y;
-                                        break;
-                                }
-                                arc_length -= 2 * rect_x;
-                                //if (arc_length < rect_y)
-                                {
-                                        p.x = rect_x;
-                                        p.y = -rect_y + arc_length;
-                                }
+                                p.x = amts[2] * (cos(amts[1])*p_r.x - sin(amts[1])*p_r.y) + p.x * (1-amts[2]); 
+                                p.y = amts[2] * (sin(amts[1])*p_r.x + cos(amts[1])*p_r.y) + p.y * (1-amts[2]); 
                                 break;
                         default: // BASE_CIRCLE_CANETYPE
                                 break;
