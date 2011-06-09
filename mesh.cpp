@@ -132,73 +132,11 @@ Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
                                         break;
                                 }
                                 arc_length -= 2 * rect_x;
-                                if (arc_length < rect_y)
+                                //if (arc_length < rect_y)
                                 {
                                         p.x = rect_x;
                                         p.y = -rect_y + arc_length;
                                 }
-                                break;
- 
-// Currently trying a different transformation
-#ifdef UNDEF
-                                // We use an area-preserving circle to rectangle transformation and
-                                // map a point on the circle to the point on the rectangle boundary in
-                                // the same direction
-
-                                // WARNING: there is a bug where rect_x/rect_y are twice as big as they should be
-                                rect_x = sqrt(amts[0]*PI*pt_radius*pt_radius);
-                                rect_y = rect_x / amts[0];
-                                if (p_r.x > 0 && p_r.y > 0) // Quadrant 1
-                                {
-                                        horiz_itsc.x = rect_y / p_r.y * p_r.x; 
-                                        horiz_itsc.y = rect_y; 
-                                        vert_itsc.x = rect_x; 
-                                        vert_itsc.y = rect_x / p_r.x * p_r.y; 
-                                }
-                                else if (p_r.x < 0 && p_r.y > 0) // Quadrant 2
-                                {
-                                        horiz_itsc.x = rect_y / p_r.y * p_r.x; 
-                                        horiz_itsc.y = rect_y; 
-                                        vert_itsc.x = -rect_x; 
-                                        vert_itsc.y = -rect_x / p_r.x * p_r.y; 
-                                }
-                                else if (p_r.x < 0 && p_r.y < 0) // Quadrant 3
-                                {
-                                        horiz_itsc.x = -rect_y / p_r.y * p_r.x; 
-                                        horiz_itsc.y = -rect_y; 
-                                        vert_itsc.x = -rect_x; 
-                                        vert_itsc.y = -rect_x / p_r.x * p_r.y; 
-                                }
-                                else // Quadrant 4
-                                {
-                                        horiz_itsc.x = -rect_y / p_r.y * p_r.x; 
-                                        horiz_itsc.y = -rect_y; 
-                                        vert_itsc.x = rect_x; 
-                                        vert_itsc.y = rect_x / p_r.x * p_r.y; 
-                                }
-
-                                // Take closer of two intersection points
-                                if ((horiz_itsc.x*horiz_itsc.x) + 
-                                        (horiz_itsc.y*horiz_itsc.y) > 
-                                        (vert_itsc.x*vert_itsc.x + 
-                                        vert_itsc.y*vert_itsc.y))
-                                {
-                                        rect_dest = vert_itsc;
-                                } 
-                                else
-                                {
-                                        rect_dest = horiz_itsc;
-                                } 
-
-                                // Average circle and rectangle locations
-                                interp.x = p_r.x * (1.0-amts[2]) + rect_dest.x * amts[2];
-                                interp.y = p_r.y * (1.0-amts[2]) + rect_dest.y * amts[2];
-
-                                // Move point back to global XY system
-                                p.x = interp.x; //cos(-amts[1])*interp.x - sin(-amts[1])*interp.y; 
-                                p.y = interp.y; //sin(-amts[1])*interp.x + cos(-amts[1])*interp.y; 
-#endif
-
                                 break;
                         default: // BASE_CIRCLE_CANETYPE
                                 break;
