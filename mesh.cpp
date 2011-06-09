@@ -30,7 +30,10 @@ by its ancestors in the cane DAG.
 Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
 {
         int i, j;
-        float r, theta;
+        float r, theta, rect_x, rect_y, pt_radius;
+        float* amts;
+        Point interp, horiz_itsc, vert_itsc, p_r, rect_dest;
+        
 
         /*
         The transformations are applied back to front to match how they
@@ -43,13 +46,13 @@ Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
         for (i = ancestorCount - 1; i >= 0; --i)
         {
                 /*
-                Each transformation has a type and an amount.
-                Depending upon the type of transformation, the amount fields
+                Each cane node has a type and an amount.
+                Depending upon the type, the amount fields
                 take on different meanings. For instance, a twist transform
-                uses an `f_amt' or `float amount' field (since a twist has 
-                just a single real-valued parameter). The move transform has
-                two parameters, so it uses the `p_amt' or `point amount' field,
-                though the movement is really a vector, but whatever.
+                uses amts[0] to mean the magnitude of the twist.
+                just a single real-valued parameter). 
+                The BUNDLE_CANETYPE is an exception, in that it simply uses
+                the location of the subcane to determine how to move the points.
                 */
                 switch (ancestors[i]->type)
                 {
@@ -84,10 +87,67 @@ Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
                                 p.x = r * cos(theta); 
                                 p.y = r * sin(theta); 
                                 break;
-                        // amts[0] describes magnitude of deformation 
+                        // amts[0] describes the width-to-height ratio of the goal rectangle
+                        // amts[1] describes the orientation w.r.t global XY
+                        // amts[2] describes how close of an approximation to the rectangle is achieved
                         case FLATTEN_CANETYPE: 
-                                p.x = p.x / ancestors[i]->amts[0];
-                                p.y = p.y * ancestors[i]->amts[0];
+                                amts = ancestors[i]->amts;
+                                // move point to rectangle XY system
+                                p_r.x = cos(amts[1])*p.x - sin(amts[1])*p.y; 
+                                p_r.y = sin(amts[1])*p.x + cos(amts[1])*p.y; 
+                                pt_radius = sqrt(p_r.x*p_r.x + p_r.y*p_r.y);
+                                rect_x = PI * pt_radius * pt_radius * amts[0]; 
+                                rect_y = PI * pt_radius * pt_radius / amts[0]; 
+                                if (p_r.x > 0 && p_r.y > 0) // Quadrant 1
+                                {
+                                        horiz_itsc.x = rect_y / p_r.y * p_r.x; 
+                                        horiz_itsc.y = rect_y; 
+                                        vert_itsc.x = rect_x; 
+                                        vert_itsc.y = rect_x / p_r.x * p_r.y; 
+                                }
+                                else if (p_r.x < 0 && p_r.y > 0) // Quadrant 2
+                                {
+                                        horiz_itsc.x = rect_y / p_r.y * p_r.y; 
+                                        horiz_itsc.y = rect_y; 
+                                        vert_itsc.x = -rect_x; 
+                                        vert_itsc.y = -rect_x / p_r.x * p_r.y; 
+                                }
+                                else if (p_r.x < 0 && p_r.y < 0) // Quadrant 3
+                                {
+                                        horiz_itsc.x = -rect_y / p_r.y * p_r.x; 
+                                        horiz_itsc.y = -rect_y; 
+                                        vert_itsc.x = -rect_x; 
+                                        vert_itsc.y = -rect_x / p_r.x * p_r.y; 
+                                }
+                                else // Quadrant 4
+                                {
+                                        horiz_itsc.x = -rect_y / p_r.y * p_r.x; 
+                                        horiz_itsc.y = -rect_y; 
+                                        vert_itsc.x = rect_x; 
+                                        vert_itsc.y = rect_x / p_r.x * p_r.y; 
+                                }
+
+                                // Take closer of two intersection points
+                                if ((horiz_itsc.x*horiz_itsc.x) + 
+                                        (horiz_itsc.y*horiz_itsc.y) > 
+                                        (vert_itsc.x*vert_itsc.x + 
+                                        vert_itsc.y*vert_itsc.y))
+                                {
+                                        rect_dest = vert_itsc;
+                                } 
+                                else
+                                {
+                                        rect_dest = horiz_itsc;
+                                } 
+
+                                // Average circle and rectangle locations
+                                interp.x = p_r.x * (1.0-amts[2]) + rect_dest.x * amts[2];
+                                interp.y = p_r.y * (1.0-amts[2]) + rect_dest.y * amts[2];
+
+                                // Move point back to global XY system
+                                p.x = cos(-amts[1])*interp.x - sin(-amts[1])*interp.y; 
+                                p.y = sin(-amts[1])*interp.x + cos(-amts[1])*interp.y; 
+
                                 break;
                         default: // BASE_CIRCLE_CANETYPE
                                 break;
@@ -431,17 +491,19 @@ void Mesh :: stretchCane(float amt)
         highResDataUpToDate = 0;
 }
 
-void Mesh :: flattenCane(float amt)
+void Mesh :: flattenCane(float rectangle_ratio, float rectangle_theta, float flatness)
 {
         Cane* ancestor;
 
         if (cane == NULL)
                 return;
-        cane->flatten(amt, 0, 1.0);
+        cane->flatten(0.5, 0.0, 0.7);
+        //cane->flatten(rectangle_ratio, rectangle_theta, flatness);
 
-        if (!lowResDataUpToDate)
+        //if (!lowResDataUpToDate)
                 updateLowResData();
 
+        /*
         ancestor = new Cane(FLATTEN_CANETYPE);
         ancestor->amts[0] = (1.0 + amt);
         ancestor->amts[1] = 0.0;
@@ -454,7 +516,10 @@ void Mesh :: flattenCane(float amt)
         }
 
         lowResDataUpToDate = 1;
+        */
+
         highResDataUpToDate = 0;
+
 }
 
 /*

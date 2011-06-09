@@ -123,7 +123,7 @@ the cane is deformed into a perfect rectangle.
 */
 void Cane :: flatten(float rectangle_ratio, float rectangle_theta, float flatness)
 {
-        if (this->type != FLATTEN_CANETYPE)
+        if (this->type != FLATTEN_CANETYPE || this->amts[1] != rectangle_theta)
         {
                 Cane* copy = new Cane(UNASSIGNED_CANETYPE);
                 this->shallowCopy(copy);
@@ -132,11 +132,10 @@ void Cane :: flatten(float rectangle_ratio, float rectangle_theta, float flatnes
                 this->subcaneCount = 1;
                 this->subcanes[0] = copy;
                 this->amts[0] = 1.0; // rectangle_ratio
-                this->amts[1] = 0.0; // rectangle_theta
+                this->amts[1] = rectangle_theta;
                 this->amts[2] = 0.0; // flatness
         }
         this->amts[0] *= (1.0 + rectangle_ratio);
-        this->amts[1] += rectangle_theta;
         this->amts[2] *= (1.0 + flatness);
 }
 
