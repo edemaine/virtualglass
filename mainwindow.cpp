@@ -16,10 +16,6 @@ MainWindow::MainWindow()
 
 void MainWindow::saveCaneToLibrary()
 {
-        QMessageBox msgBox;
-        msgBox.setText("Breakpoint0.");
-        msgBox.exec();
-
         LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->glassgl,
                 this->glassgl->getCane()->deepCopy(), 0);
         stockLayout->addWidget(lc);
@@ -47,7 +43,6 @@ void MainWindow::seedLibrary()
         // Now seed the library with some basic canes
         Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
         Cane* stch = new Cane(STRETCH_CANETYPE);
-        saveCaneToLibrary();
         stch->subcaneCount = 1;
         stch->subcanes[0] = c;
         stch->amts[0] = 12.0;
@@ -57,6 +52,7 @@ void MainWindow::seedLibrary()
         c->color.b = 0.8;
         c->color.a = 0.3;
         glassgl->setFocusCane(stch);
+        saveCaneToLibrary();
         c->color.r = 1.0;
         c->color.g = 0.5;
         c->color.b = 0.5;

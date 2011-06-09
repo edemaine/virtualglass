@@ -177,18 +177,6 @@ Cane* Cane :: deepCopy()
         int i;
         Cane* copy;
 
-        QMessageBox msgBox;
-        if (this == NULL)
-        {
-            msgBox.setText("this Cane is NULL");
-            msgBox.exec();
-            return NULL;
-        } else
-        {
-            msgBox.setText(QString("Breakpoint. %1").arg(this->type));
-            msgBox.exec();
-        }
-
         copy = new Cane(this->type);
 
         for (i = 0; i < MAX_AMT_TYPES; ++i)
