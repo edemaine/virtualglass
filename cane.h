@@ -17,7 +17,7 @@ class Cane
                 void shallowCopy(Cane* dest);
                 void twist(float radians);
                 void stretch(float amount);
-                void flatten(float amount);
+                void flatten(float rectangle_ratio, float rectangle_theta, float flatness);
                 void createBundle();
                 void add(Cane* addl, int* addl_index_ptr);
                 void moveCane(int subcane, float delta_x, float delta_y);
@@ -25,7 +25,7 @@ class Cane
                 Cane* deepCopy();
 
                 int type;
-                float amt;
+                float amts[MAX_AMT_TYPES];
                 int subcaneCount;
                 Point subcaneLocations[MAX_SUBCANE_COUNT];
                 Cane* subcanes[MAX_SUBCANE_COUNT];

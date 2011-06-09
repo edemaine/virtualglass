@@ -10,19 +10,6 @@
 #include "constants.h"
 #include "primitives.h"
 
-// Object modelling stuff
-typedef struct TransformData
-{
-        float f_amt;
-        Point p_amt;
-} TransformData;
-
-typedef struct Transform
-{
-        int type;
-        TransformData data;
-} Transform;
-
 // Mesh stuff
 typedef struct Triangle
 {
@@ -60,11 +47,11 @@ class Mesh
                 int activeSubcane;
         
                 void generateMesh(Cane* c, Triangle* triangles, int* triangleCount,
-                        Transform* transforms, int* transformCount, int resolution);
+                        Cane** ancestors, int* ancestorCount, int resolution);
                 void meshCircularBaseCane(Triangle* triangles, int* triangleCount, 
-                        Transform* transforms, int transformCount, Color color, int resolution);
-                float computeTotalStretch(Transform* transforms, int transformCount);
-                Point applyTransforms(Point p, Transform* transforms, int transformCount);
+                        Cane** ancestors, int ancestorCount, Color color, int resolution);
+                float computeTotalStretch(Cane** ancestors, int ancestorCount);
+                Point applyTransforms(Point p, Cane** ancestors, int ancestorCount);
                 void updateLowResData();
                 void updateHighResData();
 };

@@ -45,7 +45,7 @@ void MainWindow::seedLibrary()
         Cane* stch = new Cane(STRETCH_CANETYPE);
         stch->subcaneCount = 1;
         stch->subcanes[0] = c;
-        stch->amt = 12.0;
+        stch->amts[0] = 12.0;
 
         c->color.r = 0.8;
         c->color.g = 0.8;

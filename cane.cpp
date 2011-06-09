@@ -14,11 +14,16 @@ Cane :: Cane(int type)
 // Resets the object to the default values of everything 
 void Cane :: reset()
 {
+        int i;
+
         type = UNASSIGNED_CANETYPE;
-        amt = 0.0;
+        for (i = 0; i < MAX_AMT_TYPES; ++i)
+        {        
+                amts[i] = 0.0;
+        }
 
         subcaneCount = 0;
-        for (int i = 0; i < MAX_SUBCANE_COUNT; ++i)
+        for (i = 0; i < MAX_SUBCANE_COUNT; ++i)
         {
                 subcanes[i] = NULL;
                 subcaneLocations[i].x = subcaneLocations[i].y = 0.0;
@@ -47,11 +52,16 @@ int Cane :: leafNodes()
 // the destination cane object
 void Cane :: shallowCopy(Cane* dest)
 {
+        int i;
+
         dest->type = this->type;
-        dest->amt = this->amt;
+        for (i = 0; i < MAX_AMT_TYPES; ++i)
+        {
+                dest->amts[i] = this->amts[i]; 
+        }
 
         dest->subcaneCount = this->subcaneCount;
-        for (int i = 0; i < MAX_SUBCANE_COUNT; ++i)
+        for (i = 0; i < MAX_SUBCANE_COUNT; ++i)
         {
                 if (this->subcanes[i] != NULL)
                 {
@@ -75,11 +85,11 @@ void Cane :: twist(float radians)
                 this->type = TWIST_CANETYPE;
                 this->subcaneCount = 1;
                 this->subcanes[0] = copy;
-                this->amt = radians;
+                this->amts[0] = radians;
         }
         else
         {
-                this->amt += radians;
+                this->amts[0] += radians;
         }       
 }
 
@@ -94,12 +104,24 @@ void Cane :: stretch(float amount)
                 this->type = STRETCH_CANETYPE;
                 this->subcaneCount = 1;
                 this->subcanes[0] = copy;
-                this->amt = 1.0;
+                this->amts[0] = 1.0;
         }
-        this->amt *= (1.0 + amount);
+        this->amts[0] *= (1.0 + amount);
 }
 
-void Cane :: flatten(float amount)
+/*
+Cane::flatten() creates a new root node that deforms the cane
+from a circular shape to an approximation of a rectangle.
+The `rectangle_ratio' specifies the relative dimensions of
+the rectangle the cane will be flattened into. A ratio of
+1.0 is square, 2.0 is a rectangle twice as wide as it is tall, etc.
+`rectangle_theta' specifies the orientation of the x-axis of the 
+rectangle relative to the global cane x-axis. `flatness' specifies
+how closely the cane is squished into the goal rectangle. A
+flatness of 0 means the cane remains circular, while a ratio of 1 means
+the cane is deformed into a perfect rectangle.
+*/
+void Cane :: flatten(float rectangle_ratio, float rectangle_theta, float flatness)
 {
         if (this->type != FLATTEN_CANETYPE)
         {
@@ -109,9 +131,13 @@ void Cane :: flatten(float amount)
                 this->type = FLATTEN_CANETYPE;
                 this->subcaneCount = 1;
                 this->subcanes[0] = copy;
-                this->amt = 1.0;
+                this->amts[0] = 1.0; // rectangle_ratio
+                this->amts[1] = 0.0; // rectangle_theta
+                this->amts[2] = 0.0; // flatness
         }
-        this->amt *= (1.0 + amount);
+        this->amts[0] *= (1.0 + rectangle_ratio);
+        this->amts[1] += rectangle_theta;
+        this->amts[2] *= (1.0 + flatness);
 }
 
 void Cane :: createBundle()
@@ -151,7 +177,10 @@ Cane* Cane :: deepCopy()
         int i;
 
         copy = new Cane(this->type);
-        copy->amt = this->amt;
+        for (i = 0; i < MAX_AMT_TYPES; ++i)
+        {
+                copy->amts[i] = this->amts[i];
+        }
 
         copy->subcaneCount = this->subcaneCount;
         for (i = 0; i < MAX_SUBCANE_COUNT; ++i)
