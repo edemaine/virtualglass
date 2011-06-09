@@ -32,7 +32,7 @@ Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
         int i, j;
         float r, theta, rect_x, rect_y, pt_radius, pt_theta, arc_length;
         float* amts;
-        Point interp, horiz_itsc, vert_itsc, p_r, rect_dest;
+        Point p_r;
         
         /*
         The transformations are applied back to front to match how they
@@ -490,33 +490,14 @@ void Mesh :: stretchCane(float amt)
 
 void Mesh :: flattenCane(float rectangle_ratio, float rectangle_theta, float flatness)
 {
-        Cane* ancestor;
 
         if (cane == NULL)
                 return;
 
         cane->flatten(rectangle_ratio, rectangle_theta, flatness);
 
-        //if (!lowResDataUpToDate)
-                updateLowResData();
-
-        /*
-        ancestor = new Cane(FLATTEN_CANETYPE);
-        ancestor->amts[0] = (1.0 + amt);
-        ancestor->amts[1] = 0.0;
-        ancestor->amts[2] = 1.0;
-        for (int i = 0; i < lowResTriangleCount; ++i)
-        {
-                lowResTriangles[i].v1 = applyTransforms(lowResTriangles[i].v1, &ancestor, 1);
-                lowResTriangles[i].v2 = applyTransforms(lowResTriangles[i].v2, &ancestor, 1);
-                lowResTriangles[i].v3 = applyTransforms(lowResTriangles[i].v3, &ancestor, 1);
-        }
-
-        lowResDataUpToDate = 1;
-        */
-
+        lowResDataUpToDate = 0; 
         highResDataUpToDate = 0;
-
 }
 
 /*
@@ -588,7 +569,7 @@ void Mesh :: addCane(Cane* c)
         }
         else
         {
-                cane->add(c, &activeSubcane);
+                cane->add(c->deepCopy(), &activeSubcane);
         }
         lowResDataUpToDate = highResDataUpToDate = 0;
 }
