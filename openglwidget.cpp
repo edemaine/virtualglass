@@ -325,7 +325,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
         }
         else if (mode == FLATTEN_MODE)
         {
-                mesh->flattenCane(relY*100.0, theta, relX*100.0);
+                mesh->flattenCane(relY, theta + PI / 2.0, 1.0);
                 updateTriangles();
         }
 

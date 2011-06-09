@@ -30,7 +30,7 @@ by its ancestors in the cane DAG.
 Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
 {
         int i, j;
-        float r, theta, rect_x, rect_y, pt_radius;
+        float r, theta, rect_x, rect_y, pt_radius, pt_theta, arc_length;
         float* amts;
         Point interp, horiz_itsc, vert_itsc, p_r, rect_dest;
         
@@ -93,11 +93,61 @@ Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
                         case FLATTEN_CANETYPE: 
                                 amts = ancestors[i]->amts;
                                 // move point to rectangle XY system
-                                p_r.x = cos(amts[1])*p.x - sin(amts[1])*p.y; 
-                                p_r.y = sin(amts[1])*p.x + cos(amts[1])*p.y; 
+                                p_r.x = p.x; //cos(amts[1])*p.x - sin(amts[1])*p.y; 
+                                p_r.y = p.y; //sin(amts[1])*p.x + cos(amts[1])*p.y; 
                                 pt_radius = sqrt(p_r.x*p_r.x + p_r.y*p_r.y);
-                                rect_x = PI * pt_radius * pt_radius * amts[0]; 
-                                rect_y = PI * pt_radius * pt_radius / amts[0]; 
+                                pt_theta = atan2(p_r.y, p_r.x);
+                                if (pt_theta < 0)
+                                        pt_theta += 2*PI;
+                                arc_length = pt_radius * pt_theta;
+
+                                // We use a boundary-preserving circle to rectangle transformation
+                                rect_y = PI * pt_radius / (1.0 + amts[0]) / 2.0; 
+                                rect_x = rect_y * amts[0] / 2.0;
+                                if (arc_length < rect_y)
+                                {
+                                        p.x = rect_x;
+                                        p.y = arc_length;
+                                        break;
+                                }
+                                arc_length -= rect_y;
+                                if (arc_length < 2 * rect_x)
+                                {
+                                        p.x = rect_x - arc_length;
+                                        p.y = rect_y;
+                                        break;
+                                }
+                                arc_length -= 2 * rect_x;
+                                if (arc_length < 2 * rect_y)
+                                {
+                                        p.x = -rect_x;
+                                        p.y = rect_y - arc_length;
+                                        break;
+                                }
+                                arc_length -= 2 * rect_y;
+                                if (arc_length < 2 * rect_x)
+                                {
+                                        p.x = -rect_x + arc_length;
+                                        p.y = -rect_y;
+                                        break;
+                                }
+                                arc_length -= 2 * rect_x;
+                                if (arc_length < rect_y)
+                                {
+                                        p.x = rect_x;
+                                        p.y = -rect_y + arc_length;
+                                }
+                                break;
+ 
+// Currently trying a different transformation
+#ifdef UNDEF
+                                // We use an area-preserving circle to rectangle transformation and
+                                // map a point on the circle to the point on the rectangle boundary in
+                                // the same direction
+
+                                // WARNING: there is a bug where rect_x/rect_y are twice as big as they should be
+                                rect_x = sqrt(amts[0]*PI*pt_radius*pt_radius);
+                                rect_y = rect_x / amts[0];
                                 if (p_r.x > 0 && p_r.y > 0) // Quadrant 1
                                 {
                                         horiz_itsc.x = rect_y / p_r.y * p_r.x; 
@@ -107,7 +157,7 @@ Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
                                 }
                                 else if (p_r.x < 0 && p_r.y > 0) // Quadrant 2
                                 {
-                                        horiz_itsc.x = rect_y / p_r.y * p_r.y; 
+                                        horiz_itsc.x = rect_y / p_r.y * p_r.x; 
                                         horiz_itsc.y = rect_y; 
                                         vert_itsc.x = -rect_x; 
                                         vert_itsc.y = -rect_x / p_r.x * p_r.y; 
@@ -145,8 +195,9 @@ Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
                                 interp.y = p_r.y * (1.0-amts[2]) + rect_dest.y * amts[2];
 
                                 // Move point back to global XY system
-                                p.x = cos(-amts[1])*interp.x - sin(-amts[1])*interp.y; 
-                                p.y = sin(-amts[1])*interp.x + cos(-amts[1])*interp.y; 
+                                p.x = interp.x; //cos(-amts[1])*interp.x - sin(-amts[1])*interp.y; 
+                                p.y = interp.y; //sin(-amts[1])*interp.x + cos(-amts[1])*interp.y; 
+#endif
 
                                 break;
                         default: // BASE_CIRCLE_CANETYPE
@@ -497,8 +548,8 @@ void Mesh :: flattenCane(float rectangle_ratio, float rectangle_theta, float fla
 
         if (cane == NULL)
                 return;
-        cane->flatten(0.5, 0.0, 0.7);
-        //cane->flatten(rectangle_ratio, rectangle_theta, flatness);
+
+        cane->flatten(rectangle_ratio, rectangle_theta, flatness);
 
         //if (!lowResDataUpToDate)
                 updateLowResData();

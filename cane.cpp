@@ -136,7 +136,8 @@ void Cane :: flatten(float rectangle_ratio, float rectangle_theta, float flatnes
                 this->amts[2] = 0.0; // flatness
         }
         this->amts[0] *= (1.0 + rectangle_ratio);
-        this->amts[2] *= (1.0 + flatness);
+        this->amts[2] += flatness;
+        this->amts[2] = MIN(1.0, MAX(0.0, amts[2]));
 }
 
 void Cane :: createBundle()
