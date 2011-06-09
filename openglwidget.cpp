@@ -335,6 +335,16 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 /*
 
 */
+void OpenGLWidget :: setCamera(float theta, float fee)
+{
+        this->theta = theta;
+        this->fee = fee;
+        updateCamera();
+}
+
+/*
+
+*/
 void OpenGLWidget :: drawAxes()
 {
         glColor3f(1,1,1);

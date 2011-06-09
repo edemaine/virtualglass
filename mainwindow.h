@@ -23,6 +23,8 @@ class MainWindow : public QMainWindow
                 void zoomOutButtonPressed();
                 void toggleAxesButtonPressed();
                 void lookButtonPressed();
+                void topViewButtonPressed();
+                void sideViewButtonPressed();
                 void twistButtonPressed();
                 void stretchButtonPressed();
                 void bundleButtonPressed();
@@ -30,6 +32,8 @@ class MainWindow : public QMainWindow
                 void nextButtonPressed();
                 void saveButtonPressed();
                 void clearButtonPressed();
+                void exportLibraryButtonPressed();
+                void importLibraryButtonPressed();
 
         protected:
                 void keyPressEvent(QKeyEvent* e);

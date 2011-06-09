@@ -16,7 +16,11 @@ MainWindow::MainWindow()
 
 void MainWindow::saveCaneToLibrary()
 {
-        LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->glassgl, 
+        QMessageBox msgBox;
+        msgBox.setText("Breakpoint0.");
+        msgBox.exec();
+
+        LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->glassgl,
                 this->glassgl->getCane()->deepCopy(), 0);
         stockLayout->addWidget(lc);
 }
@@ -43,6 +47,7 @@ void MainWindow::seedLibrary()
         // Now seed the library with some basic canes
         Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
         Cane* stch = new Cane(STRETCH_CANETYPE);
+        saveCaneToLibrary();
         stch->subcaneCount = 1;
         stch->subcanes[0] = c;
         stch->amts[0] = 12.0;
@@ -52,7 +57,6 @@ void MainWindow::seedLibrary()
         c->color.b = 0.8;
         c->color.a = 0.3;
         glassgl->setFocusCane(stch);
-        saveCaneToLibrary();
         c->color.r = 1.0;
         c->color.g = 0.5;
         c->color.b = 0.5;
@@ -91,6 +95,18 @@ void MainWindow::lookButtonPressed()
         glassgl->setMode(LOOK_MODE);
 }
 
+void MainWindow::topViewButtonPressed()
+{
+        glassgl->setMode(LOOK_MODE);
+        glassgl->setCamera(0,0);
+}
+
+void MainWindow::sideViewButtonPressed()
+{
+        glassgl->setMode(LOOK_MODE);
+        glassgl->setCamera(PI/2,PI/2);
+}
+
 void MainWindow::twistButtonPressed()
 {
         glassgl->setMode(TWIST_MODE);
@@ -126,12 +142,28 @@ void MainWindow::clearButtonPressed()
         glassgl->zeroCanes();
 }
 
+void MainWindow::exportLibraryButtonPressed()
+{
+
+}
+
+void MainWindow::importLibraryButtonPressed()
+{
+
+}
+
 void MainWindow::setupWorkArea()
 {
         glassgl = new OpenGLWidget(this);
 
         QPushButton* look_button = new QPushButton("Look");
         connect(look_button, SIGNAL(clicked()), this, SLOT(lookButtonPressed()));
+
+        QPushButton* topView_button = new QPushButton("Top View");
+        connect(topView_button, SIGNAL(clicked()), this, SLOT(topViewButtonPressed()));
+
+        QPushButton* sideView_button = new QPushButton("Side View");
+        connect(sideView_button, SIGNAL(clicked()), this, SLOT(sideViewButtonPressed()));
 
         QPushButton* zoom_in_button = new QPushButton("Zoom In");
         connect(zoom_in_button, SIGNAL(pressed()), this, SLOT(zoomInButtonPressed()));
@@ -163,8 +195,16 @@ void MainWindow::setupWorkArea()
         QPushButton* clear_button = new QPushButton("Clear");
         connect(clear_button, SIGNAL(pressed()), this, SLOT(clearButtonPressed())); 
 
+        QPushButton* exportLibrary_button = new QPushButton("Export Library");
+        connect(exportLibrary_button, SIGNAL(pressed()), this, SLOT(exportLibraryButtonPressed()));
+
+        QPushButton* importLibrary_button = new QPushButton("Import Library");
+        connect(importLibrary_button, SIGNAL(pressed()), this, SLOT(importLibraryButtonPressed()));
+
         QVBoxLayout* button_layout = new QVBoxLayout();
         button_layout->addWidget(look_button);
+        button_layout->addWidget(topView_button);
+        button_layout->addWidget(sideView_button);
         button_layout->addWidget(zoom_in_button);
         button_layout->addWidget(zoom_out_button);
         button_layout->addWidget(toggle_axes_button);

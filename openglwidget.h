@@ -30,6 +30,7 @@ class OpenGLWidget : public QGLWidget
                 void zoomOut();
                 void toggleAxes();
                 void setMode(int mode);
+                void setCamera(float theta, float fee);
 
         private:
                 Mesh* mesh;
