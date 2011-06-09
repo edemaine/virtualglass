@@ -26,7 +26,7 @@ class MainWindow : public QMainWindow
                 void twistButtonPressed();
                 void stretchButtonPressed();
                 void bundleButtonPressed();
-                void squareoffButtonPressed();
+                void flattenButtonPressed();
                 void nextButtonPressed();
                 void saveButtonPressed();
                 void clearButtonPressed();

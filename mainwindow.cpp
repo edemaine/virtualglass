@@ -111,9 +111,9 @@ void MainWindow::nextButtonPressed()
         glassgl->advanceActiveSubcane();
 }
 
-void MainWindow::squareoffButtonPressed()
+void MainWindow::flattenButtonPressed()
 {
-        glassgl->setMode(SQUAREOFF_MODE);
+        glassgl->setMode(FLATTEN_MODE);
 }
 
 void MainWindow::saveButtonPressed()
@@ -154,8 +154,8 @@ void MainWindow::setupWorkArea()
         QPushButton* next_button = new QPushButton("Next");
         connect(next_button, SIGNAL(pressed()), this, SLOT(nextButtonPressed())); 
 
-        QPushButton* squareoff_button = new QPushButton("Square Off");
-        connect(squareoff_button, SIGNAL(pressed()), this, SLOT(squareoffButtonPressed())); 
+        QPushButton* flatten_button = new QPushButton("Flatten");
+        connect(flatten_button, SIGNAL(pressed()), this, SLOT(flattenButtonPressed())); 
 
         QPushButton* save_button = new QPushButton("Save");
         connect(save_button, SIGNAL(pressed()), this, SLOT(saveButtonPressed())); 
@@ -172,7 +172,7 @@ void MainWindow::setupWorkArea()
         button_layout->addWidget(stretch_button);
         button_layout->addWidget(bundle_button);
         button_layout->addWidget(next_button);
-        button_layout->addWidget(squareoff_button);
+        button_layout->addWidget(flatten_button);
         button_layout->addWidget(save_button);
         button_layout->addWidget(clear_button);
 
@@ -199,7 +199,7 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
         if (e->key() == 0x34) // 4 
                 glassgl->setMode(BUNDLE_MODE);
         if (e->key() == 0x35) // 5
-                glassgl->setMode(SQUAREOFF_MODE);
+                glassgl->setMode(FLATTEN_MODE);
         if (e->key() == 0x59) // Y 
                 saveCaneToLibrary();
         if (e->key() == 0x4e) // N 

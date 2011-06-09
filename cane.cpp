@@ -99,14 +99,14 @@ void Cane :: stretch(float amount)
         this->amt *= (1.0 + amount);
 }
 
-void Cane :: squareoff(float amount)
+void Cane :: flatten(float amount)
 {
-        if (this->type != SQUAREOFF_CANETYPE)
+        if (this->type != FLATTEN_CANETYPE)
         {
                 Cane* copy = new Cane(UNASSIGNED_CANETYPE);
                 this->shallowCopy(copy);
                 this->reset();
-                this->type = SQUAREOFF_CANETYPE;
+                this->type = FLATTEN_CANETYPE;
                 this->subcaneCount = 1;
                 this->subcanes[0] = copy;
                 this->amt = 1.0;

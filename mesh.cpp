@@ -77,7 +77,7 @@ Point Mesh :: applyTransforms(Point p, Transform* transforms, int transformCount
                                 p.y = r * sin(theta); 
                                 break;
                         // f_amt describes magnitude of deformation 
-                        case SQUAREOFF_TRANSFORM: 
+                        case FLATTEN_TRANSFORM: 
                                 p.x = p.x / transforms[i].data.f_amt;
                                 p.y = p.y * transforms[i].data.f_amt;
                                 break;
@@ -262,8 +262,8 @@ void Mesh :: generateMesh(Cane* c, Triangle* triangles, int* triangleCount,
                         meshCircularBaseCane(triangles, triangleCount,
                                 transforms, *transformCount, c->color, resolution);
                         return;
-                case SQUAREOFF_CANETYPE: 
-                        transforms[*transformCount].type = SQUAREOFF_TRANSFORM;
+                case FLATTEN_CANETYPE: 
+                        transforms[*transformCount].type = FLATTEN_TRANSFORM;
                         transforms[*transformCount].data.f_amt = c->amt;
                         *transformCount += 1;
                         generateMesh(c->subcanes[0], triangles, triangleCount, 
@@ -452,24 +452,24 @@ void Mesh :: stretchCane(float amt)
         highResDataUpToDate = 0;
 }
 
-void Mesh :: squareoffCane(float amt)
+void Mesh :: flattenCane(float amt)
 {
-        Transform squareoff_t;
+        Transform flatten_t;
 
         if (cane == NULL)
                 return;
-        cane->squareoff(amt);
+        cane->flatten(amt);
 
         if (!lowResDataUpToDate)
                 updateLowResData();
 
-        squareoff_t.type = SQUAREOFF_TRANSFORM;
-        squareoff_t.data.f_amt = 1.0 + amt;
+        flatten_t.type = FLATTEN_TRANSFORM;
+        flatten_t.data.f_amt = 1.0 + amt;
         for (int i = 0; i < lowResTriangleCount; ++i)
         {
-                lowResTriangles[i].v1 = applyTransforms(lowResTriangles[i].v1, &squareoff_t, 1);
-                lowResTriangles[i].v2 = applyTransforms(lowResTriangles[i].v2, &squareoff_t, 1);
-                lowResTriangles[i].v3 = applyTransforms(lowResTriangles[i].v3, &squareoff_t, 1);
+                lowResTriangles[i].v1 = applyTransforms(lowResTriangles[i].v1, &flatten_t, 1);
+                lowResTriangles[i].v2 = applyTransforms(lowResTriangles[i].v2, &flatten_t, 1);
+                lowResTriangles[i].v3 = applyTransforms(lowResTriangles[i].v3, &flatten_t, 1);
         }
 
         lowResDataUpToDate = 1;

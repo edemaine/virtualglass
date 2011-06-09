@@ -44,7 +44,7 @@ class Mesh
                 void twistCane(float amt);
                 void stretchCane(float amt);
                 void moveCane(float delta_x, float delta_y);
-                void squareoffCane(float amt);
+                void flattenCane(float amt);
                 void addCane(Cane* c); 
                 void advanceActiveSubcane();
                 void startMoveMode();
