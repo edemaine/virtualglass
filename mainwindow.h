@@ -52,7 +52,6 @@ class MainWindow : public QMainWindow
                 QScrollArea* libraryScrollArea;
                 QHBoxLayout* stockLayout;
                 QLabel* imageLabel;
-                QColorDialog* colorPickerDialog;
                 int librarySize;
 };
 #endif

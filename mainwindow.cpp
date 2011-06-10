@@ -227,8 +227,6 @@ void MainWindow::setupWorkArea()
         QPushButton* colorPicker_button = new QPushButton("New Cane Color");
         connect(colorPicker_button, SIGNAL(pressed()), this, SLOT(newColorPickerCaneButtonPressed()));
 
-        QColorDialog* colorPickerDialog = new QColorDialog();
-
         QVBoxLayout* button_layout = new QVBoxLayout();
         button_layout->addWidget(look_button);
         button_layout->addWidget(topView_button);
