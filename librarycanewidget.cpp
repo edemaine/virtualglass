@@ -10,7 +10,9 @@ LibraryCaneWidget :: LibraryCaneWidget(OpenGLWidget* w, Cane* c, QWidget* parent
         setFixedSize(100, 100);
         setScaledContents(true);
 
-        setPixmap(QPixmap::fromImage(w->grabFrameBuffer()));
+        //setPixmap(QPixmap::fromImage(w->grabFrameBuffer()));
+        setPixmap(QPixmap::grabWidget(w));
+
         setAttribute(Qt::WA_LayoutUsesWidgetRect);
 }
        

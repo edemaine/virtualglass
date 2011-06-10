@@ -74,6 +74,8 @@ void MainWindow::seedLibrary()
         saveCaneToLibrary();
 }
 
+
+
 void MainWindow::zoomInButtonPressed()
 {
         glassgl->zoomIn();
@@ -143,20 +145,21 @@ void MainWindow::clearButtonPressed()
 
 void MainWindow::exportLibraryButtonPressed()
 {
-    QList<LibraryCaneWidget*> libraryList = libraryScrollArea->findChildren<LibraryCaneWidget*>();
-    QMessageBox msg;
-    msg.setText(QString("%1, %1").arg(libraryList.size(),librarySize));
-    msg.exec();
+        QString fileName =  QFileDialog::getSaveFileName();
+        QList<LibraryCaneWidget*> libraryList = libraryScrollArea->findChildren<LibraryCaneWidget*>();
+        QMessageBox msg;
+        msg.setText(QString("%1, %1").arg(libraryList.size(),librarySize));
+        msg.exec();
 }
 
 void MainWindow::importLibraryButtonPressed()
 {
-
+        QString fileName = QFileDialog::getOpenFileName();
 }
 
 void MainWindow::newColorPickerCaneButtonPressed()
 {
-    colorPickerSelected(QColorDialog::getColor());
+        colorPickerSelected(QColorDialog::getColor());
 }
 
 void MainWindow::colorPickerSelected(QColor color)
