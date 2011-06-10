@@ -28,5 +28,3 @@ void LibraryCaneWidget :: mousePressEvent(QMouseEvent* event)
         widget->setMode(BUNDLE_MODE);
         widget->addCane(cane);
 }
-
-

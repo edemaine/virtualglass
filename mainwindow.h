@@ -39,6 +39,7 @@ class MainWindow : public QMainWindow
                 void newColorPickerCaneButtonPressed();
                 void colorPickerSelected(QColor color);
                 void buttonComboSelect(int index);
+                void removeCaneFromLibrary();
 
         protected:
                 void keyPressEvent(QKeyEvent* e);

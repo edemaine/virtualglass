@@ -14,11 +14,15 @@ MainWindow::MainWindow()
         resize(1000, 1000);
 }
 
+void MainWindow::removeCaneFromLibrary()
+{
+
+}
+
 void MainWindow::saveCaneToLibrary()
 {
         LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->glassgl,
                 this->glassgl->getCane()->deepCopy(), 0);
-
         stockLayout->addWidget(lc);
 }
 
