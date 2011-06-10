@@ -7,6 +7,7 @@
 #include "primitives.h"
 #include "librarycanewidget.h"
 #include "cane.h"
+#include "yaml-cpp/yaml.h"
 
 class View;
 

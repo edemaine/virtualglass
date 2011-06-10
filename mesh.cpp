@@ -20,7 +20,6 @@ on the array) instead of recomputing a mesh by traversing the cane.
 */
 
 #include "mesh.h"
-#include <QMessageBox>
 
 /*
 This function applies a sequence of transformations to a 3D point.

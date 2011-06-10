@@ -143,7 +143,10 @@ void MainWindow::clearButtonPressed()
 
 void MainWindow::exportLibraryButtonPressed()
 {
-
+    QList<LibraryCaneWidget*> libraryList = libraryScrollArea->findChildren<LibraryCaneWidget*>();
+    QMessageBox msg;
+    msg.setText(QString("%1, %1").arg(libraryList.size(),librarySize));
+    msg.exec();
 }
 
 void MainWindow::importLibraryButtonPressed()
