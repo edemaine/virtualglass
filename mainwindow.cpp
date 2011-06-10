@@ -18,6 +18,7 @@ void MainWindow::saveCaneToLibrary()
 {
         LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->glassgl,
                 this->glassgl->getCane()->deepCopy(), 0);
+
         stockLayout->addWidget(lc);
 }
 
@@ -43,6 +44,7 @@ void MainWindow::seedLibrary()
         // Now seed the library with some basic canes
         Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
         Cane* stch = new Cane(STRETCH_CANETYPE);
+
         stch->subcaneCount = 1;
         stch->subcanes[0] = c;
         stch->amts[0] = 12.0;
@@ -51,6 +53,7 @@ void MainWindow::seedLibrary()
         c->color.g = 0.8;
         c->color.b = 0.8;
         c->color.a = 0.3;
+
         glassgl->setFocusCane(stch);
         saveCaneToLibrary();
         c->color.r = 1.0;
@@ -94,7 +97,7 @@ void MainWindow::lookButtonPressed()
 void MainWindow::topViewButtonPressed()
 {
         glassgl->setMode(LOOK_MODE);
-        glassgl->setCamera(0,0);
+        glassgl->setCamera(0.0,0.01);
 }
 
 void MainWindow::sideViewButtonPressed()
@@ -148,6 +151,30 @@ void MainWindow::importLibraryButtonPressed()
 
 }
 
+void MainWindow::newColorPickerCaneButtonPressed()
+{
+    colorPickerSelected(QColorDialog::getColor());
+}
+
+void MainWindow::colorPickerSelected(QColor color)
+{
+        saveButtonPressed();
+        clearButtonPressed();
+        Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
+        Cane* stch = new Cane(STRETCH_CANETYPE);
+
+        stch->subcaneCount = 1;
+        stch->subcanes[0] = c;
+        stch->amts[0] = 12.0;
+
+        c->color.r = color.redF();
+        c->color.g = color.greenF();
+        c->color.b = color.blueF();
+        c->color.a = color.alphaF();
+
+        glassgl->setFocusCane(stch);
+}
+
 void MainWindow::setupWorkArea()
 {
         glassgl = new OpenGLWidget(this);
@@ -197,6 +224,11 @@ void MainWindow::setupWorkArea()
         QPushButton* importLibrary_button = new QPushButton("Import Library");
         connect(importLibrary_button, SIGNAL(pressed()), this, SLOT(importLibraryButtonPressed()));
 
+        QPushButton* colorPicker_button = new QPushButton("New Cane Color");
+        connect(colorPicker_button, SIGNAL(pressed()), this, SLOT(newColorPickerCaneButtonPressed()));
+
+        QColorDialog* colorPickerDialog = new QColorDialog();
+
         QVBoxLayout* button_layout = new QVBoxLayout();
         button_layout->addWidget(look_button);
         button_layout->addWidget(topView_button);
@@ -211,6 +243,9 @@ void MainWindow::setupWorkArea()
         button_layout->addWidget(flatten_button);
         button_layout->addWidget(save_button);
         button_layout->addWidget(clear_button);
+        button_layout->addWidget(exportLibrary_button);
+        button_layout->addWidget(importLibrary_button);
+        button_layout->addWidget(colorPicker_button);
 
         QHBoxLayout* workLayout = new QHBoxLayout();
         workLayout->addLayout(button_layout);

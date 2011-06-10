@@ -303,8 +303,10 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
         }
         else if (mode == STRETCH_MODE)
         {
+            if (relY<=0) {
                 mesh->stretchCane(-10.0*relY);
                 updateTriangles();
+            }
         }
         else if (mode == BUNDLE_MODE)
         {
@@ -340,6 +342,7 @@ void OpenGLWidget :: setCamera(float theta, float fee)
         this->theta = theta;
         this->fee = fee;
         updateCamera();
+        paintGL();
 }
 
 /*

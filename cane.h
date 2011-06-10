@@ -23,6 +23,7 @@ class Cane
                 void moveCane(int subcane, float delta_x, float delta_y);
                 int leafNodes();
                 Cane* deepCopy();
+                void setColor(Color color);
 
                 int type;
                 float amts[MAX_AMT_TYPES];

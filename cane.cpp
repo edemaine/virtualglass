@@ -201,3 +201,7 @@ Cane* Cane :: deepCopy()
         return copy;        
 }
 
+void Cane :: setColor(Color color)
+{
+    this->color = color;
+}

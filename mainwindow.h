@@ -4,6 +4,7 @@
 #include <QtGui>
 #include "openglwidget.h"
 #include "constants.h"
+#include "primitives.h"
 #include "librarycanewidget.h"
 #include "cane.h"
 
@@ -34,6 +35,8 @@ class MainWindow : public QMainWindow
                 void clearButtonPressed();
                 void exportLibraryButtonPressed();
                 void importLibraryButtonPressed();
+                void newColorPickerCaneButtonPressed();
+                void colorPickerSelected(QColor color);
 
         protected:
                 void keyPressEvent(QKeyEvent* e);
@@ -49,6 +52,7 @@ class MainWindow : public QMainWindow
                 QScrollArea* libraryScrollArea;
                 QHBoxLayout* stockLayout;
                 QLabel* imageLabel;
+                QColorDialog* colorPickerDialog;
                 int librarySize;
 };
 #endif

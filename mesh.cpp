@@ -20,6 +20,7 @@ on the array) instead of recomputing a mesh by traversing the cane.
 */
 
 #include "mesh.h"
+#include <QMessageBox>
 
 /*
 This function applies a sequence of transformations to a 3D point.
@@ -347,6 +348,7 @@ void Mesh :: setCane(Cane* c)
         cane = c;
 
         updateLowResData();
+
         updateHighResData();
 }
 
@@ -359,7 +361,6 @@ void Mesh :: updateLowResData()
 {
         Cane* ancestors[MAX_ANCESTORS];
         int ancestorCount;
-
         ancestorCount = 0;
         lowResTriangleCount = 0;
         generateMesh(cane, lowResTriangles, &lowResTriangleCount, ancestors, &ancestorCount, 
