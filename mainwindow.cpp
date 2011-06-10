@@ -182,6 +182,8 @@ void MainWindow::setupWorkArea()
 {
         glassgl = new OpenGLWidget(this);
 
+
+
         QPushButton* look_button = new QPushButton("Look");
         connect(look_button, SIGNAL(clicked()), this, SLOT(lookButtonPressed()));
 
@@ -200,6 +202,16 @@ void MainWindow::setupWorkArea()
         QPushButton* toggle_axes_button = new QPushButton("Toggle Axes");
         connect(toggle_axes_button, SIGNAL(pressed()), this, SLOT(toggleAxesButtonPressed()));
 
+        QVBoxLayout* viewButton_layout = new QVBoxLayout();
+        viewButton_layout->addWidget(look_button);
+        viewButton_layout->addWidget(topView_button);
+        viewButton_layout->addWidget(sideView_button);
+        viewButton_layout->addWidget(zoom_in_button);
+        viewButton_layout->addWidget(zoom_out_button);
+        viewButton_layout->addWidget(toggle_axes_button);
+        QWidget* viewButtonWidget = new QWidget();
+        viewButtonWidget->setLayout(viewButton_layout);
+
         QPushButton* twist_button = new QPushButton("Twist");
         connect(twist_button, SIGNAL(pressed()), this, SLOT(twistButtonPressed()));
 
@@ -209,11 +221,19 @@ void MainWindow::setupWorkArea()
         QPushButton* bundle_button = new QPushButton("Bundle");
         connect(bundle_button, SIGNAL(pressed()), this, SLOT(bundleButtonPressed())); 
 
-        QPushButton* next_button = new QPushButton("Next");
-        connect(next_button, SIGNAL(pressed()), this, SLOT(nextButtonPressed())); 
-
         QPushButton* flatten_button = new QPushButton("Flatten");
-        connect(flatten_button, SIGNAL(pressed()), this, SLOT(flattenButtonPressed())); 
+        connect(flatten_button, SIGNAL(pressed()), this, SLOT(flattenButtonPressed()));
+
+        QVBoxLayout* operButton_layout = new QVBoxLayout();
+        operButton_layout->addWidget(twist_button);
+        operButton_layout->addWidget(stretch_button);
+        operButton_layout->addWidget(bundle_button);
+        operButton_layout->addWidget(flatten_button);
+        QWidget* operButtonWidget = new QWidget();
+        operButtonWidget->setLayout(operButton_layout);
+
+        QPushButton* next_button = new QPushButton("Next");
+        connect(next_button, SIGNAL(pressed()), this, SLOT(nextButtonPressed()));
 
         QPushButton* save_button = new QPushButton("Save");
         connect(save_button, SIGNAL(pressed()), this, SLOT(saveButtonPressed())); 
@@ -230,23 +250,30 @@ void MainWindow::setupWorkArea()
         QPushButton* colorPicker_button = new QPushButton("New Cane Color");
         connect(colorPicker_button, SIGNAL(pressed()), this, SLOT(newColorPickerCaneButtonPressed()));
 
+        QVBoxLayout* utilButton_layout = new QVBoxLayout();
+        utilButton_layout->addWidget(next_button);
+        utilButton_layout->addWidget(save_button);
+        utilButton_layout->addWidget(clear_button);
+        utilButton_layout->addWidget(exportLibrary_button);
+        utilButton_layout->addWidget(importLibrary_button);
+        utilButton_layout->addWidget(colorPicker_button);
+        QWidget* utilButtonWidget = new QWidget();
+        utilButtonWidget->setLayout(utilButton_layout);
+
+        QStackedLayout *stackedLayout = new QStackedLayout();
+        stackedLayout->addWidget(utilButtonWidget);
+        stackedLayout->addWidget(viewButtonWidget);
+        stackedLayout->addWidget(operButtonWidget);
+
+        QComboBox *pageComboBox = new QComboBox;
+        pageComboBox->addItem(tr("Utility"));
+        pageComboBox->addItem(tr("View"));
+        pageComboBox->addItem(tr("Operations"));
+        connect(pageComboBox, SIGNAL(activated(int)), stackedLayout, SLOT(setCurrentIndex(int)));
+
         QVBoxLayout* button_layout = new QVBoxLayout();
-        button_layout->addWidget(look_button);
-        button_layout->addWidget(topView_button);
-        button_layout->addWidget(sideView_button);
-        button_layout->addWidget(zoom_in_button);
-        button_layout->addWidget(zoom_out_button);
-        button_layout->addWidget(toggle_axes_button);
-        button_layout->addWidget(twist_button);
-        button_layout->addWidget(stretch_button);
-        button_layout->addWidget(bundle_button);
-        button_layout->addWidget(next_button);
-        button_layout->addWidget(flatten_button);
-        button_layout->addWidget(save_button);
-        button_layout->addWidget(clear_button);
-        button_layout->addWidget(exportLibrary_button);
-        button_layout->addWidget(importLibrary_button);
-        button_layout->addWidget(colorPicker_button);
+        button_layout->addWidget(pageComboBox);
+        button_layout->addLayout(stackedLayout);
 
         QHBoxLayout* workLayout = new QHBoxLayout();
         workLayout->addLayout(button_layout);

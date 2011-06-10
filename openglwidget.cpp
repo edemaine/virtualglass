@@ -334,6 +334,18 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
         paintGL();
 }
 
+void OpenGLWidget :: wheelEvent(QWheelEvent *e)
+{
+    setMode(LOOK_MODE);
+    if (e->delta()>0)
+    {
+        zoomIn();
+    } else if (e->delta()<0)
+    {
+        zoomOut();
+    }
+}
+
 /*
 
 */
