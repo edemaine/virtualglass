@@ -72,9 +72,14 @@ void MainWindow::seedLibrary()
         c->color.b = 1.0;
         glassgl->setFocusCane(stch);
         saveCaneToLibrary();
+
+        glassgl->zeroCanes();
 }
 
-
+void MainWindow::buttonComboSelect(int index)
+{
+        glassgl->setMode(LOOK_MODE);
+}
 
 void MainWindow::zoomInButtonPressed()
 {
@@ -263,7 +268,7 @@ void MainWindow::setupWorkArea()
         QWidget* utilButtonWidget = new QWidget();
         utilButtonWidget->setLayout(utilButton_layout);
 
-        QStackedLayout *stackedLayout = new QStackedLayout();
+        stackedLayout = new QStackedLayout();
         stackedLayout->addWidget(utilButtonWidget);
         stackedLayout->addWidget(viewButtonWidget);
         stackedLayout->addWidget(operButtonWidget);
@@ -273,6 +278,7 @@ void MainWindow::setupWorkArea()
         pageComboBox->addItem(tr("View"));
         pageComboBox->addItem(tr("Operations"));
         connect(pageComboBox, SIGNAL(activated(int)), stackedLayout, SLOT(setCurrentIndex(int)));
+        connect(pageComboBox, SIGNAL(activated(int)), this, SLOT(buttonComboSelect(int)));
 
         QVBoxLayout* button_layout = new QVBoxLayout();
         button_layout->addWidget(pageComboBox);
