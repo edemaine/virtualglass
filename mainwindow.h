@@ -38,8 +38,8 @@ class MainWindow : public QMainWindow
                 void importLibraryButtonPressed();
                 void newColorPickerCaneButtonPressed();
                 void colorPickerSelected(QColor color);
-                void buttonComboSelect(int index);
-                void removeCaneFromLibrary();
+                void modeSelect(int index);
+                void libraryCaneDestroyed(QObject* obj);
 
         protected:
                 void keyPressEvent(QKeyEvent* e);
@@ -54,7 +54,7 @@ class MainWindow : public QMainWindow
                 QScrollArea* scrollArea;
                 QScrollArea* libraryScrollArea;
                 QHBoxLayout* stockLayout;
-                QStackedLayout* stackedLayout;
+                QTabWidget* tabWidget;
                 QLabel* imageLabel;
                 int librarySize;
 };

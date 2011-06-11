@@ -86,6 +86,11 @@ void OpenGLWidget :: zeroCanes()
         paintGL();
 } 
 
+bool OpenGLWidget :: hasCanes()
+{
+    return mesh->getCane()!=NULL;
+}
+
 /*
 Handles the drawing of a triangle mesh.
 The triangles array is created and lives in the

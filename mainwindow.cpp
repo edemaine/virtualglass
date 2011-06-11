@@ -14,9 +14,9 @@ MainWindow::MainWindow()
         resize(1000, 1000);
 }
 
-void MainWindow::removeCaneFromLibrary()
+void MainWindow::libraryCaneDestroyed(QObject* obj)
 {
-
+        stockLayout->removeWidget((QWidget*) obj);
 }
 
 void MainWindow::saveCaneToLibrary()
@@ -24,6 +24,7 @@ void MainWindow::saveCaneToLibrary()
         LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->glassgl,
                 this->glassgl->getCane()->deepCopy(), 0);
         stockLayout->addWidget(lc);
+        connect(stockLayout,SIGNAL(destroyed(QObject*)),this,SLOT(libraryCaneDestroyed(QObject*)));
 }
 
 void MainWindow::setupLibraryArea()
@@ -78,11 +79,6 @@ void MainWindow::seedLibrary()
         saveCaneToLibrary();
 
         glassgl->zeroCanes();
-}
-
-void MainWindow::buttonComboSelect(int index)
-{
-        glassgl->setMode(LOOK_MODE);
 }
 
 void MainWindow::zoomInButtonPressed()
@@ -144,6 +140,7 @@ void MainWindow::flattenButtonPressed()
 
 void MainWindow::saveButtonPressed()
 {
+    if (glassgl->hasCanes())
         saveCaneToLibrary();
 }
 
@@ -175,6 +172,7 @@ void MainWindow::colorPickerSelected(QColor color)
 {
         saveButtonPressed();
         clearButtonPressed();
+
         Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
         Cane* stch = new Cane(STRETCH_CANETYPE);
 
@@ -215,7 +213,7 @@ void MainWindow::setupWorkArea()
         connect(toggle_axes_button, SIGNAL(pressed()), this, SLOT(toggleAxesButtonPressed()));
 
         QVBoxLayout* viewButton_layout = new QVBoxLayout();
-        viewButton_layout->addWidget(look_button);
+        //viewButton_layout->addWidget(look_button);
         viewButton_layout->addWidget(topView_button);
         viewButton_layout->addWidget(sideView_button);
         viewButton_layout->addWidget(zoom_in_button);
@@ -272,26 +270,25 @@ void MainWindow::setupWorkArea()
         QWidget* utilButtonWidget = new QWidget();
         utilButtonWidget->setLayout(utilButton_layout);
 
-        stackedLayout = new QStackedLayout();
-        stackedLayout->addWidget(utilButtonWidget);
-        stackedLayout->addWidget(viewButtonWidget);
-        stackedLayout->addWidget(operButtonWidget);
-
-        QComboBox *pageComboBox = new QComboBox;
-        pageComboBox->addItem(tr("Utility"));
-        pageComboBox->addItem(tr("View"));
-        pageComboBox->addItem(tr("Operations"));
-        connect(pageComboBox, SIGNAL(activated(int)), stackedLayout, SLOT(setCurrentIndex(int)));
-        connect(pageComboBox, SIGNAL(activated(int)), this, SLOT(buttonComboSelect(int)));
+        tabWidget = new QTabWidget();
+        tabWidget->setTabPosition(QTabWidget::North);
+        tabWidget->addTab(viewButtonWidget,"View");
+        tabWidget->addTab(operButtonWidget,"Operations");
+        tabWidget->addTab(utilButtonWidget,"Util");
+        connect(tabWidget,SIGNAL(currentChanged(int)),this,SLOT(modeSelect(int)));
 
         QVBoxLayout* button_layout = new QVBoxLayout();
-        button_layout->addWidget(pageComboBox);
-        button_layout->addLayout(stackedLayout);
+        button_layout->addWidget(tabWidget);
 
         QHBoxLayout* workLayout = new QHBoxLayout();
         workLayout->addLayout(button_layout);
         workLayout->addWidget(glassgl, 1);
         windowLayout->addLayout(workLayout, 5);
+}
+
+void MainWindow::modeSelect(int index)
+{
+        glassgl->setMode(LOOK_MODE);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* e)

@@ -25,6 +25,16 @@ Cane* LibraryCaneWidget :: getCane()
 
 void LibraryCaneWidget :: mousePressEvent(QMouseEvent* event)
 {
+    if (event->button() == Qt::RightButton)
+        return;
         widget->setMode(BUNDLE_MODE);
         widget->addCane(cane);
+}
+
+void LibraryCaneWidget :: mouseReleaseEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::RightButton) {
+        //QMessageBox::exec();
+        this->deleteLater();
+    }
 }

@@ -11,6 +11,7 @@ class LibraryCaneWidget : public QLabel
                 LibraryCaneWidget(OpenGLWidget* w, Cane* c, QWidget* parent);
                 Cane* getCane();
                 void mousePressEvent(QMouseEvent* event);
+                void mouseReleaseEvent(QMouseEvent* event);
 
         protected:
                 Cane* cane;
@@ -18,4 +19,3 @@ class LibraryCaneWidget : public QLabel
 };
 
 #endif
-

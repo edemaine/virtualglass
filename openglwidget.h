@@ -26,6 +26,7 @@ class OpenGLWidget : public QGLWidget
                 Cane* getCane();
                 void advanceActiveSubcane();
                 void zeroCanes();
+                bool hasCanes();
                 void zoomIn();
                 void zoomOut();
                 void toggleAxes();
