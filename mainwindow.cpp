@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include <fstream>
 
 MainWindow::MainWindow()
 {
@@ -11,12 +12,18 @@ MainWindow::MainWindow()
         setupLibraryArea();
 
         setWindowTitle(tr("Virtual Glass"));
-        resize(1000, 1000);
+
+        statusBar = new QStatusBar(this);
+        setStatusBar(statusBar);
+
+        resize(1000, 8000);
 }
 
 void MainWindow::libraryCaneDestroyed(QObject* obj)
 {
         stockLayout->removeWidget((QWidget*) obj);
+
+        statusBar->showMessage("Deleted Cane From Library", 2000);
 }
 
 void MainWindow::saveCaneToLibrary()
@@ -25,6 +32,8 @@ void MainWindow::saveCaneToLibrary()
                 this->glassgl->getCane()->deepCopy(), 0);
         stockLayout->addWidget(lc);
         connect(stockLayout,SIGNAL(destroyed(QObject*)),this,SLOT(libraryCaneDestroyed(QObject*)));
+
+        statusBar->showMessage("Saved Cane to Library", 2000);
 }
 
 void MainWindow::setupLibraryArea()
@@ -79,26 +88,36 @@ void MainWindow::seedLibrary()
         saveCaneToLibrary();
 
         glassgl->zeroCanes();
+
+        statusBar->showMessage("Default Library Loaded", 2000);
 }
 
 void MainWindow::zoomInButtonPressed()
 {
         glassgl->zoomIn();
+
+        statusBar->showMessage("Zoomed In", 2000);
 }
 
 void MainWindow::zoomOutButtonPressed()
 {
         glassgl->zoomOut();
+
+        statusBar->showMessage("Zoomed Out", 2000);
 }
 
 void MainWindow::toggleAxesButtonPressed()
 {
         glassgl->toggleAxes();
+
+        statusBar->showMessage("Axes Toggled", 2000);
 }
 
 void MainWindow::lookButtonPressed()
 {
         glassgl->setMode(LOOK_MODE);
+
+        statusBar->showMessage("Entered Look Mode", 2000);
 }
 
 void MainWindow::topViewButtonPressed()
@@ -116,16 +135,22 @@ void MainWindow::sideViewButtonPressed()
 void MainWindow::twistButtonPressed()
 {
         glassgl->setMode(TWIST_MODE);
+
+        statusBar->showMessage("Entered Twist Mode", 2000);
 }
 
 void MainWindow::stretchButtonPressed()
 {
         glassgl->setMode(STRETCH_MODE);
+
+        statusBar->showMessage("Entered Stretch Mode", 2000);
 }
 
 void MainWindow::bundleButtonPressed()
 {
         glassgl->setMode(BUNDLE_MODE);
+
+        statusBar->showMessage("Entered Bundle Mode", 2000);
 }
 
 void MainWindow::nextButtonPressed()
@@ -136,6 +161,8 @@ void MainWindow::nextButtonPressed()
 void MainWindow::flattenButtonPressed()
 {
         glassgl->setMode(FLATTEN_MODE);
+
+        statusBar->showMessage("Entered Flatten Mode", 2000);
 }
 
 void MainWindow::saveButtonPressed()
@@ -147,20 +174,118 @@ void MainWindow::saveButtonPressed()
 void MainWindow::clearButtonPressed()
 {
         glassgl->zeroCanes();
+
+        statusBar->showMessage("Cleared", 2000);
 }
 
 void MainWindow::exportLibraryButtonPressed()
 {
         QString fileName =  QFileDialog::getSaveFileName();
         QList<LibraryCaneWidget*> libraryList = libraryScrollArea->findChildren<LibraryCaneWidget*>();
-        QMessageBox msg;
-        msg.setText(QString("%1, %1").arg(libraryList.size(),librarySize));
-        msg.exec();
+
+        YAML::Emitter out;
+        out << libraryList.size();
+        out << YAML::BeginSeq;
+
+        for (int i=0;i<libraryList.size();i++)
+        {
+
+            Cane* cane = libraryList.at(i)->getCane();
+
+            out << YAML::Literal << cane->yamlRepresentation();
+
+        }
+
+        out << YAML::EndSeq;
+
+        QFile file(fileName);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+            return;
+
+        file.reset();
+
+        QTextStream outStream(&file);
+        outStream << out.c_str() << "\n";
+        outStream.flush();
+        file.close();
+
+        statusBar->showMessage("Library Saved to: "+fileName, 2000);
+}
+
+void MainWindow::loadLibraryCane(const YAML::Node& node, Cane* cane)
+{
+
+    std::string caneLiteral;
+    node.GetScalar(caneLiteral);
+
+    istringstream sstream ( caneLiteral );
+    YAML::Parser newParser (sstream);
+    YAML::Node newNode;
+    newParser.GetNextDocument(newNode);
+
+    newNode["Type"] >> cane->type;
+
+    const YAML::Node& caneAmts = newNode["Amounts"];
+
+    int amtsCount=0;
+    for(YAML::Iterator it2=caneAmts.begin();it2!=caneAmts.end();++it2) {
+        *it2 >> cane->amts[amtsCount];
+        amtsCount++;
+    }
+
+    newNode["SubCaneCount"] >> cane->subcaneCount;
+
+    const YAML::Node& subLocations = newNode["SubCaneLocations"];
+    int subLocationCount=0;
+    for(YAML::Iterator it3=subLocations.begin();it3!=subLocations.end();++it3) {
+            const YAML::Node& subCaneLocation = *it3;
+
+            subCaneLocation[0] >> cane->subcaneLocations[subLocationCount].x;
+            subCaneLocation[1] >> cane->subcaneLocations[subLocationCount].y;
+            subCaneLocation[2] >> cane->subcaneLocations[subLocationCount].z;
+            subLocationCount++;
+    }
+
+    newNode["Color"][0] >> cane->color.r;
+    newNode["Color"][1] >> cane->color.g;
+    newNode["Color"][2] >> cane->color.b;
+    newNode["Color"][3] >> cane->color.a;
+
+    const YAML::Node& subCanes = newNode["SubCanes"];
+    int subCaneCount = 0;
+    for(YAML::Iterator it4=subCanes.begin();it4!=subCanes.end();++it4) {
+            const YAML::Node& subCane = *it4;
+
+            Cane* loadCane = new Cane(UNASSIGNED_CANETYPE);
+            loadLibraryCane(subCane,loadCane);
+
+            cane->subcanes[subCaneCount]=loadCane;
+            subCaneCount++;
+    }
 }
 
 void MainWindow::importLibraryButtonPressed()
 {
         QString fileName = QFileDialog::getOpenFileName();
+
+        std::ifstream fin(fileName.toStdString().c_str());
+        YAML::Parser parser(fin);
+
+        YAML::Node doc;
+        parser.GetNextDocument(doc);
+        parser.GetNextDocument(doc);
+
+        for(unsigned i=0;i<doc.size();i++) {
+            Cane loadCane = Cane(UNASSIGNED_CANETYPE);
+
+            loadLibraryCane(doc[i],&loadCane);
+            glassgl->setFocusCane(&loadCane);
+            saveCaneToLibrary();
+        }
+
+        glassgl->zeroCanes();
+
+        statusBar->showMessage("Library Loaded from: "+fileName, 2000);
 }
 
 void MainWindow::newColorPickerCaneButtonPressed()
@@ -224,15 +349,18 @@ void MainWindow::setupWorkArea()
 
         QPushButton* twist_button = new QPushButton("Twist");
         connect(twist_button, SIGNAL(pressed()), this, SLOT(twistButtonPressed()));
+        twist_button->setToolTip("Drag Mouse Horizontally");
 
         QPushButton* stretch_button = new QPushButton("Stretch");
         connect(stretch_button, SIGNAL(pressed()), this, SLOT(stretchButtonPressed()));
+        stretch_button->setToolTip("Drag Mouse Vertically");
 
         QPushButton* bundle_button = new QPushButton("Bundle");
         connect(bundle_button, SIGNAL(pressed()), this, SLOT(bundleButtonPressed())); 
 
         QPushButton* flatten_button = new QPushButton("Flatten");
         connect(flatten_button, SIGNAL(pressed()), this, SLOT(flattenButtonPressed()));
+        flatten_button->setToolTip("Drag Mouse Horizontally to Squish, Vertically to Flatten");
 
         QVBoxLayout* operButton_layout = new QVBoxLayout();
         operButton_layout->addWidget(twist_button);
@@ -244,21 +372,27 @@ void MainWindow::setupWorkArea()
 
         QPushButton* next_button = new QPushButton("Next");
         connect(next_button, SIGNAL(pressed()), this, SLOT(nextButtonPressed()));
+        next_button->setToolTip("Next Cane in Current Model");
 
         QPushButton* save_button = new QPushButton("Save");
         connect(save_button, SIGNAL(pressed()), this, SLOT(saveButtonPressed())); 
+        save_button->setToolTip("Save Current Model to Library");
 
         QPushButton* clear_button = new QPushButton("Clear");
         connect(clear_button, SIGNAL(pressed()), this, SLOT(clearButtonPressed())); 
+        clear_button->setToolTip("Clear Current Model");
 
         QPushButton* exportLibrary_button = new QPushButton("Export Library");
         connect(exportLibrary_button, SIGNAL(pressed()), this, SLOT(exportLibraryButtonPressed()));
+        exportLibrary_button->setToolTip("Save Library to File");
 
         QPushButton* importLibrary_button = new QPushButton("Import Library");
         connect(importLibrary_button, SIGNAL(pressed()), this, SLOT(importLibraryButtonPressed()));
+        importLibrary_button->setToolTip("Load Library from File");
 
         QPushButton* colorPicker_button = new QPushButton("New Cane Color");
         connect(colorPicker_button, SIGNAL(pressed()), this, SLOT(newColorPickerCaneButtonPressed()));
+        colorPicker_button->setToolTip("Create a New Cane with specified color");
 
         QVBoxLayout* utilButton_layout = new QVBoxLayout();
         utilButton_layout->addWidget(next_button);
@@ -289,6 +423,8 @@ void MainWindow::setupWorkArea()
 void MainWindow::modeSelect(int index)
 {
         glassgl->setMode(LOOK_MODE);
+
+        statusBar->showMessage("Entered Look Mode", 2000);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* e)

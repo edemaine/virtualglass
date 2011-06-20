@@ -4,6 +4,7 @@ definition of a cane).
 */
 
 #include "cane.h"
+#include <QMessageBox>
 
 Cane :: Cane(int type)
 {
@@ -203,4 +204,50 @@ Cane* Cane :: deepCopy()
 void Cane :: setColor(Color color)
 {
     this->color = color;
+}
+
+std::string Cane :: yamlRepresentation()
+{
+    YAML::Emitter out;
+    out << YAML::BeginMap;
+    out << YAML::Key << "Type";
+    out << YAML::Value << type;
+
+    out << YAML::Key << "Amounts";
+    out << YAML::Value << YAML::BeginSeq;
+    for (unsigned int j=0;j<sizeof(amts);j++){
+        out << amts[j];
+    }
+    out << YAML::EndSeq;
+
+    out << YAML::Key << "SubCaneCount";
+    out << YAML::Value << subcaneCount;
+
+    out << YAML::Key << "SubCaneLocations";
+    out << YAML::Value << YAML::BeginSeq;
+    for (int j=0;j<subcaneCount;j++){
+        Point loc = subcaneLocations[j];
+        out << YAML::BeginSeq;
+        out << loc.x << loc.y << loc.z;
+        out << YAML::EndSeq;
+    }
+    out << YAML::EndSeq;
+
+    out << YAML::Key << "Color";
+    out << YAML::Value << YAML::BeginSeq;
+    out << color.r << color.g << color.b << color.a;
+    out << YAML::EndSeq;
+
+    out << YAML::Key << "SubCanes";
+    out << YAML::Value << YAML::BeginSeq;
+    for (int j=0;j<subcaneCount;j++){
+        Cane* cane = subcanes[j];
+
+        out << YAML::Literal << cane->yamlRepresentation();
+    }
+    out << YAML::EndSeq;
+
+    out << YAML::EndMap;
+
+    return out.c_str();
 }

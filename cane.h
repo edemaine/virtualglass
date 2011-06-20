@@ -8,6 +8,7 @@
 #include <math.h>
 #include "primitives.h"
 #include "constants.h"
+#include "yaml-cpp/yaml.h"
 
 class Cane
 {
@@ -24,6 +25,7 @@ class Cane
                 int leafNodes();
                 Cane* deepCopy();
                 void setColor(Color color);
+                std::string yamlRepresentation();
 
                 int type;
                 float amts[MAX_AMT_TYPES];

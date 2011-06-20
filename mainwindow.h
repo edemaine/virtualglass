@@ -40,6 +40,7 @@ class MainWindow : public QMainWindow
                 void colorPickerSelected(QColor color);
                 void modeSelect(int index);
                 void libraryCaneDestroyed(QObject* obj);
+                void loadLibraryCane(const YAML::Node& node, Cane* cane);
 
         protected:
                 void keyPressEvent(QKeyEvent* e);
@@ -56,6 +57,7 @@ class MainWindow : public QMainWindow
                 QHBoxLayout* stockLayout;
                 QTabWidget* tabWidget;
                 QLabel* imageLabel;
+                QStatusBar* statusBar;
                 int librarySize;
 };
 #endif
