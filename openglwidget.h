@@ -33,6 +33,9 @@ class OpenGLWidget : public QGLWidget
                 void setMode(int mode);
                 void setCamera(float theta, float fee);
 
+        signals:
+                void modeChanged(int mode);
+
         private:
                 Mesh* mesh;
                 int mode;

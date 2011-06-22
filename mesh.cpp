@@ -276,6 +276,7 @@ void Mesh :: meshCircularBaseCane(Triangle* triangles, int* num_triangles, Cane*
                 tmp_t.v3 = applyTransforms(p2, ancestors, ancestorCount);
                 tmp_t.v2 = applyTransforms(p3, ancestors, ancestorCount);
                 triangles[*num_triangles] = tmp_t;
+
                 *num_triangles += 1;
         }
 
@@ -305,27 +306,42 @@ leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
 void Mesh :: generateMesh(Cane* c, Triangle* triangles, int* triangleCount, 
-        Cane** ancestors, int* ancestorCount, int resolution)
+        Cane** ancestors, int* ancestorCount, int resolution, bool isActive=false)
 {
         int i;
 
         if (c == NULL)
                 return;
 
+        isActive = isActive || (c == getActiveSubcane());
+
         // Make recursive calls depending on the type of the current node
         ancestors[*ancestorCount] = c;
         *ancestorCount += 1;
         if (c->type == BASE_CIRCLE_CANETYPE)
         {
+            if (isActive==false)
+            {
                 meshCircularBaseCane(triangles, triangleCount,
                         ancestors, *ancestorCount, c->color, resolution);
+            }
+            else
+            {
+                Color newColor = c->color;
+                newColor.a/=1;
+                newColor.r/=2;
+                newColor.g/=2;
+                newColor.b/=2;
+                meshCircularBaseCane(triangles, triangleCount,
+                        ancestors, *ancestorCount, newColor, resolution);
+            }
         }
         else
         {
                 for (i = 0; i < c->subcaneCount; ++i)
                 {
                         generateMesh(c->subcanes[i], triangles, triangleCount, 
-                                ancestors, ancestorCount, resolution);
+                                ancestors, ancestorCount, resolution,isActive);
                 }
         }
         *ancestorCount -= 1;
@@ -589,9 +605,14 @@ void Mesh :: advanceActiveSubcane()
         activeSubcane += 1;
         activeSubcane %= cane->subcaneCount;
         lowResDataUpToDate = highResDataUpToDate = 0;
+        updateHighResData();
+        updateLowResData();
 }
 
-
+Cane* Mesh :: getActiveSubcane()
+{
+    return getCane()->subcanes[activeSubcane];
+}
 
 
 

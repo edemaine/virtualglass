@@ -10,13 +10,13 @@ MainWindow::MainWindow()
         windowLayout = new QVBoxLayout(centralWidget);
         setupWorkArea();
         setupLibraryArea();
-
+        setupStatusBar();
         setWindowTitle(tr("Virtual Glass"));
 
-        statusBar = new QStatusBar(this);
-        setStatusBar(statusBar);
 
-        resize(1000, 8000);
+
+        resize(1000, 750);
+        move(75,25);
 }
 
 void MainWindow::libraryCaneDestroyed(QObject* obj)
@@ -34,6 +34,39 @@ void MainWindow::saveCaneToLibrary()
         connect(stockLayout,SIGNAL(destroyed(QObject*)),this,SLOT(libraryCaneDestroyed(QObject*)));
 
         statusBar->showMessage("Saved Cane to Library", 2000);
+}
+
+void MainWindow::userModeChanged(int mode){
+    statusBar->showMessage("Switching User Mode", 2000);
+    switch(mode)
+    {
+    case LOOK_MODE:
+        modeLabel->setText("LOOK MODE");
+        break;
+    case TWIST_MODE:
+        modeLabel->setText("TWIST MODE");
+        break;
+    case STRETCH_MODE:
+        modeLabel->setText("STRETCH MODE");
+        break;
+    case BUNDLE_MODE:
+        modeLabel->setText("BUNDLE MODE");
+        break;
+    case FLATTEN_MODE:
+        modeLabel->setText("FLATTEN MODE");
+        break;
+    default:
+        modeLabel->setText("NO MODE");
+    }
+}
+
+void MainWindow::setupStatusBar()
+{
+    statusBar = new QStatusBar(this);
+    modeLabel = new QLabel("NO MODE",statusBar);
+    statusBar->addPermanentWidget(modeLabel);
+    setStatusBar(statusBar);
+    connect(glassgl,SIGNAL(modeChanged(int)),this,SLOT(userModeChanged(int)));
 }
 
 void MainWindow::setupLibraryArea()
@@ -124,12 +157,14 @@ void MainWindow::topViewButtonPressed()
 {
         glassgl->setMode(LOOK_MODE);
         glassgl->setCamera(0.0,0.01);
+        statusBar->showMessage("Switched to Top View", 2000);
 }
 
 void MainWindow::sideViewButtonPressed()
 {
         glassgl->setMode(LOOK_MODE);
         glassgl->setCamera(PI/2,PI/2);
+        statusBar->showMessage("Switched to Side View", 2000);
 }
 
 void MainWindow::twistButtonPressed()
@@ -155,7 +190,9 @@ void MainWindow::bundleButtonPressed()
 
 void MainWindow::nextButtonPressed()
 {
-        glassgl->advanceActiveSubcane();
+    glassgl->setMode(BUNDLE_MODE);
+    glassgl->advanceActiveSubcane();
+
 }
 
 void MainWindow::flattenButtonPressed()
@@ -291,6 +328,11 @@ void MainWindow::importLibraryButtonPressed()
 void MainWindow::newColorPickerCaneButtonPressed()
 {
         colorPickerSelected(QColorDialog::getColor());
+}
+
+void MainWindow::newStatus(QString message)
+{
+    statusBar->showMessage(message,2000);
 }
 
 void MainWindow::colorPickerSelected(QColor color)
@@ -432,25 +474,26 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
         if (e->key() == 0x58) // X 
                 exit(0);
         if (e->key() == 0x41) // A 
-                glassgl->zoomOut();
+                this->zoomOutButtonPressed();
         if (e->key() == 0x53) // S 
-                glassgl->zoomIn();
+                this->zoomInButtonPressed();
         if (e->key() == 0x31) // 1 
-                glassgl->setMode(LOOK_MODE);
+                this->lookButtonPressed();
         if (e->key() == 0x32) // 2 
-                glassgl->setMode(TWIST_MODE);
+                this->twistButtonPressed();
         if (e->key() == 0x33) // 3 
-                glassgl->setMode(STRETCH_MODE);
+                this->stretchButtonPressed();
         if (e->key() == 0x34) // 4 
-                glassgl->setMode(BUNDLE_MODE);
+                this->bundleButtonPressed();
         if (e->key() == 0x35) // 5
-                glassgl->setMode(FLATTEN_MODE);
+                this->flattenButtonPressed();
         if (e->key() == 0x59) // Y 
-                saveCaneToLibrary();
+                saveButtonPressed();
         if (e->key() == 0x4e) // N 
-                glassgl->advanceActiveSubcane();
+                nextButtonPressed();
+                //glassgl->advanceActiveSubcane();
         if (e->key() == 0x01000007) // Delete 
-                glassgl->zeroCanes();
+                this->clearButtonPressed();
 }
 
 

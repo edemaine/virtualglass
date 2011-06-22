@@ -21,7 +21,7 @@ Controller::Controller()
 
 int Controller::run()
 {
-        mainWindow->show();
+        mainWindow->showMaximized();
         mainWindow->seedLibrary();
         return app->exec();  
 }

@@ -35,6 +35,7 @@ class Mesh
                 void addCane(Cane* c); 
                 void advanceActiveSubcane();
                 void startMoveMode();
+                Cane* getActiveSubcane();
 
         private:
                 Cane *cane;
@@ -45,9 +46,10 @@ class Mesh
                 int lowResDataUpToDate;
                 int highResDataUpToDate;
                 int activeSubcane;
+                Point* activePoints;
         
                 void generateMesh(Cane* c, Triangle* triangles, int* triangleCount,
-                        Cane** ancestors, int* ancestorCount, int resolution);
+                        Cane** ancestors, int* ancestorCount, int resolution,bool isActive);
                 void meshCircularBaseCane(Triangle* triangles, int* triangleCount, 
                         Cane** ancestors, int ancestorCount, Color color, int resolution);
                 float computeTotalStretch(Cane** ancestors, int ancestorCount);

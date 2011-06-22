@@ -113,6 +113,8 @@ void OpenGLWidget :: paintGL()
         }
         glEnd();
 
+
+
         swapBuffers();  
 }  
 
@@ -192,6 +194,9 @@ modes available (named *_MODE).
 */
 void OpenGLWidget :: setMode(int m)
 {
+    if (this->mode == m) {
+        return;
+    }
         this->mode = m;
 
         // Special call when entering BUNDLE_MODE
@@ -201,6 +206,7 @@ void OpenGLWidget :: setMode(int m)
         {
                 mesh->startMoveMode(); 
         }
+   emit modeChanged(m);
 }
 
 /*
@@ -239,6 +245,10 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
         // Update instance variables for mouse location
         mouseLocX = e->x();
         mouseLocY = e->y();
+
+         if (e->button() == Qt::RightButton){
+             setMode(LOOK_MODE);
+         }
 
         // Change as part of dual mode feature
         updateResolution(LOW_RESOLUTION); 

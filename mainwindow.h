@@ -19,6 +19,7 @@ class MainWindow : public QMainWindow
                 MainWindow();
                 void saveCaneToLibrary();
                 void seedLibrary();
+
                 
         public slots:
                 void zoomInButtonPressed();
@@ -41,10 +42,13 @@ class MainWindow : public QMainWindow
                 void modeSelect(int index);
                 void libraryCaneDestroyed(QObject* obj);
                 void loadLibraryCane(const YAML::Node& node, Cane* cane);
+                void newStatus(QString message);
+                void userModeChanged(int mode);
 
         protected:
                 void keyPressEvent(QKeyEvent* e);
                 void setupLibraryArea();
+                void setupStatusBar();
                 void setupWorkArea();
 
                 OpenGLWidget* glassgl;
@@ -58,6 +62,7 @@ class MainWindow : public QMainWindow
                 QTabWidget* tabWidget;
                 QLabel* imageLabel;
                 QStatusBar* statusBar;
+                QLabel* modeLabel;
                 int librarySize;
 };
 #endif
