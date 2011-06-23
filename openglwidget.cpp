@@ -265,6 +265,12 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
         // Change as part of dual mode feature
         updateResolution(LOW_RESOLUTION); 
 
+        if (mode == SELECT_MODE)
+        {
+
+                updateCamera();
+        }
+
         paintGL();
 }
 

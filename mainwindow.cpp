@@ -202,6 +202,20 @@ void MainWindow::flattenButtonPressed()
         statusBar->showMessage("Entered Flatten Mode", 2000);
 }
 
+void MainWindow::wrapButtonPressed()
+{
+        glassgl->setMode(WRAP_MODE);
+
+        statusBar->showMessage("Entered Wrap Mode", 2000);
+}
+
+void MainWindow::selectButtonPressed()
+{
+        glassgl->setMode(SELECT_MODE);
+
+        statusBar->showMessage("Entered Select Mode", 2000);
+}
+
 void MainWindow::saveButtonPressed()
 {
     if (glassgl->hasCanes())
@@ -404,11 +418,22 @@ void MainWindow::setupWorkArea()
         connect(flatten_button, SIGNAL(pressed()), this, SLOT(flattenButtonPressed()));
         flatten_button->setToolTip("Drag Mouse Horizontally to Squish, Vertically to Flatten");
 
+        QPushButton* wrap_button = new QPushButton("Wrap");
+        connect(wrap_button, SIGNAL(pressed()), this, SLOT(wrapButtonPressed()));
+        wrap_button->setToolTip("Not Implemented - Select must be functional first");
+
+        QPushButton* select_button = new QPushButton("Select");
+        connect(select_button, SIGNAL(pressed()), this, SLOT(selectButtonPressed()));
+        select_button->setToolTip("Click on a cane to select it.");
+
         QVBoxLayout* operButton_layout = new QVBoxLayout();
         operButton_layout->addWidget(twist_button);
         operButton_layout->addWidget(stretch_button);
         operButton_layout->addWidget(bundle_button);
         operButton_layout->addWidget(flatten_button);
+        operButton_layout->addWidget(wrap_button);
+        operButton_layout->addWidget(select_button);
+
         QWidget* operButtonWidget = new QWidget();
         operButtonWidget->setLayout(operButton_layout);
 

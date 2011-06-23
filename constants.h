@@ -31,6 +31,8 @@
 #define STRETCH_MODE 3
 #define BUNDLE_MODE 4
 #define FLATTEN_MODE 5
+#define WRAP_MODE 6
+#define SELECT_MODE 7
 
 #define PI 3.14159265358979323846f
 
