@@ -21,6 +21,27 @@ on the array) instead of recomputing a mesh by traversing the cane.
 
 #include "mesh.h"
 
+//compute normals by using area-weighted normals of adjacent triangles.
+//this may not be the correct approximation, but I just wanted some sort of hack
+//to hold us until proper normal transforms could be written.
+void Geometry::compute_normals_from_triangles() {
+	assert(valid());
+	std::vector< Vector3f > norms(vertices.size(), make_vector(0.0f, 0.0f, 0.0f));
+	for (std::vector< Triangle >::const_iterator tri = triangles.begin(); tri != triangles.end(); ++tri) {
+		Vector3f p1 = vertices[tri->v1].position;
+		Vector3f p2 = vertices[tri->v2].position;
+		Vector3f p3 = vertices[tri->v3].position;
+		norms[tri->v1] += cross_product(p2 - p1, p3 - p1);
+		norms[tri->v2] += cross_product(p3 - p2, p1 - p2);
+		norms[tri->v3] += cross_product(p1 - p3, p2 - p3);
+	}
+	for (unsigned int v = 0; v < norms.size(); ++v) {
+		if (norms[v] != make_vector(0.0f, 0.0f, 0.0f)) {
+			vertices[v].normal = normalize(norms[v]);
+		}
+	}
+}
+
 /*
 This function applies a sequence of transformations to a 3D point.
 This is used during the meshing process to determine the location of
@@ -29,11 +50,6 @@ by its ancestors in the cane DAG.
 */
 Vertex Mesh :: applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
 {
-        int i, j;
-        float r, theta, rect_x, rect_y, pt_radius, pt_theta, arc_length;
-        float* amts;
-        Point p_r;
-
         /*
         The transformations are applied back to front to match how they
         are loaded into the array. Because the transform array is created by
@@ -42,7 +58,7 @@ Vertex Mesh :: applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
         represent the first operations done on the cane, so need to be applied
         first. 
         */
-        for (i = ancestorCount - 1; i >= 0; --i)
+        for (int i = ancestorCount - 1; i >= 0; --i)
         {
                 /*
                 Each cane node has a type and an amount.
@@ -58,7 +74,7 @@ Vertex Mesh :: applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
                         case BUNDLE_CANETYPE: 
                                 // Find where subcane lives and apply translation 
                                 // to move it to this location
-                                for (j = 0; j < ancestors[i]->subcaneCount; ++j)
+                                for (int j = 0; j < ancestors[i]->subcaneCount; ++j)
                                 { 
                                         if (ancestors[i]->subcanes[j] == ancestors[i+1])
                                         {
@@ -77,31 +93,36 @@ Vertex Mesh :: applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
 								//TODO: normal transform
                                 break;
                         // amts[0] describes twist magnitude
-                        case TWIST_CANETYPE: 
-                                theta = atan2(v.position.y, v.position.x);
-                                r = length(v.position.xy);
+                        case TWIST_CANETYPE:
+						{
+                                float theta = atan2(v.position.y, v.position.x);
+                                float r = length(v.position.xy);
+
                                 theta += ancestors[i]->amts[0] * v.position.z;
                                 v.position.x = r * cos(theta); 
                                 v.position.y = r * sin(theta);
 								//TODO: normal transform
                                 break;
+						}
                         // amts[0] describes the width-to-height ratio of the goal rectangle
                         // amts[1] describes the orientation w.r.t global XY
                         // amts[2] describes how close of an approximation to the rectangle is achieved
                         case FLATTEN_CANETYPE: 
-                                amts = ancestors[i]->amts;
+						{
+                                float *amts = ancestors[i]->amts;
                                 // move point to rectangle XY system
+								Point p_r;
                                 p_r.x = cos(-amts[1])*v.position.x - sin(-amts[1])*v.position.y; 
                                 p_r.y = sin(-amts[1])*v.position.x + cos(-amts[1])*v.position.y; 
-                                pt_radius = length(p_r.xy);
-                                pt_theta = atan2(p_r.y, p_r.x);
+                                float pt_radius = length(p_r.xy);
+                                float pt_theta = atan2(p_r.y, p_r.x);
                                 if (pt_theta < 0)
                                         pt_theta += 2*PI;
-                                arc_length = pt_radius * pt_theta;
+                                float arc_length = pt_radius * pt_theta;
 
                                 // We use a boundary-preserving circle to rectangle transformation
-                                rect_y = PI * pt_radius / (1.0 + amts[0]); 
-                                rect_x = rect_y * amts[0];
+                                float rect_y = PI * pt_radius / (1.0 + amts[0]); 
+                                float rect_x = rect_y * amts[0];
                                 rect_y /= 2.0;
                                 rect_x /= 2.0;
                                 if (arc_length < rect_y)
@@ -146,6 +167,7 @@ Vertex Mesh :: applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
                                 v.position.y = amts[2] * (sin(amts[1])*p_r.x + cos(amts[1])*p_r.y) + v.position.y * (1-amts[2]); 
 								//TODO: normal transform
                                 break;
+						}
                         default: // BASE_CIRCLE_CANETYPE
                                 break;
                 }
@@ -291,6 +313,7 @@ void Mesh :: meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
         {
                 geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount);
         }
+		geometry->compute_normals_from_triangles();
 }
 
 
@@ -450,6 +473,7 @@ void Mesh :: twistCane(float amt)
         {
 		        lowResGeometry.vertices[i] = applyTransforms(lowResGeometry.vertices[i], &ancestor, 1);
         }
+		lowResGeometry.compute_normals_from_triangles();
 
         lowResDataUpToDate = 1;
         highResDataUpToDate = 0;
@@ -472,6 +496,7 @@ void Mesh :: stretchCane(float amt)
         {
 		        lowResGeometry.vertices[i] = applyTransforms(lowResGeometry.vertices[i], &ancestor, 1);
         }
+		lowResGeometry.compute_normals_from_triangles();
 
         lowResDataUpToDate = 1;
         highResDataUpToDate = 0;
@@ -544,6 +569,7 @@ void Mesh :: moveCane(float delta_x, float delta_y)
         {
                 lowResGeometry.vertices[i] = applyTransforms(lowResGeometry.vertices[i], ancestors, 1);
         }
+		lowResGeometry.compute_normals_from_triangles();
 
         lowResDataUpToDate = 1;
         highResDataUpToDate = 0;

@@ -48,6 +48,7 @@ class Geometry
 			}
 			return true;
 		}
+		void compute_normals_from_triangles();
 };
 
 class Mesh
@@ -83,7 +84,6 @@ class Mesh
                         Cane** ancestors, int ancestorCount, Color color, int resolution);
                 static float computeTotalStretch(Cane** ancestors, int ancestorCount);
                 static Vertex applyTransforms(Vertex p, Cane** ancestors, int ancestorCount);
-                static Point applyTransforms(Point p, Cane** ancestors, int ancestorCount);
                 void updateLowResData();
                 void updateHighResData();
 };
