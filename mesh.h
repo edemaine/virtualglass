@@ -6,18 +6,49 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <vector>
 #include "cane.h"
 #include "constants.h"
 #include "primitives.h"
 
 // Mesh stuff
-typedef struct Triangle
+class Vertex
 {
-        Point v1;
-        Point v2;
-        Point v3;
-        Color c;
-} Triangle;
+	public:
+		Vertex(Point const &_position = make_vector(0.0f, 0.0f, 0.0f), Point const &_normal = make_vector(0.0f, 0.0f, 0.0f), Color const &_color = make_vector(1.0f, 1.0f, 1.0f, 1.0f)) : position(_position), normal(_normal), color(_color) {
+		}
+		Point position;
+		Point normal;
+		Color color;
+};
+class Triangle
+{
+	public:
+		Triangle(uint32_t _v1 = -1U, uint32_t _v2 = -1U, uint32_t _v3 = -1U) : v1(_v1), v2(_v2), v3(_v3) {
+		}
+		uint32_t v1;
+		uint32_t v2;
+		uint32_t v3;
+};
+
+class Geometry
+{
+	public:
+		std::vector< Vertex > vertices;
+		std::vector< Triangle > triangles;
+		void clear() {
+			vertices.clear();
+			triangles.clear();
+		}
+		bool valid() const {
+			for (std::vector< Triangle >::const_iterator t = triangles.begin(); t != triangles.end(); ++t) {
+				if (t->v1 >= vertices.size()) return false;
+				if (t->v2 >= vertices.size()) return false;
+				if (t->v3 >= vertices.size()) return false;
+			}
+			return true;
+		}
+};
 
 class Mesh
 {
@@ -26,7 +57,7 @@ class Mesh
                 Mesh(Cane* c);
                 void setCane(Cane* c);
                 Cane* getCane();
-                Triangle* getMesh(int resolution);
+                Geometry* getGeometry(int resolution);
                 int getNumMeshTriangles(int resolution);
                 void twistCane(float amt);
                 void stretchCane(float amt);
@@ -39,21 +70,20 @@ class Mesh
 
         private:
                 Cane *cane;
-                Triangle* lowResTriangles;
-                int lowResTriangleCount;
-                Triangle* highResTriangles;
-                int highResTriangleCount;
+				Geometry lowResGeometry;
+				Geometry highResGeometry;
                 int lowResDataUpToDate;
                 int highResDataUpToDate;
                 int activeSubcane;
-                Point* activePoints;
+                //Point* activePoints;
         
-                void generateMesh(Cane* c, Triangle* triangles, int* triangleCount,
-                        Cane** ancestors, int* ancestorCount, int resolution,bool isActive);
-                void meshCircularBaseCane(Triangle* triangles, int* triangleCount, 
+                void generateMesh(Cane* c, Geometry *geometry,
+                        Cane** ancestors, int* ancestorCount, int resolution, bool isActive);
+                static void meshCircularBaseCane(Geometry *geometry, 
                         Cane** ancestors, int ancestorCount, Color color, int resolution);
-                float computeTotalStretch(Cane** ancestors, int ancestorCount);
-                Point applyTransforms(Point p, Cane** ancestors, int ancestorCount);
+                static float computeTotalStretch(Cane** ancestors, int ancestorCount);
+                static Vertex applyTransforms(Vertex p, Cane** ancestors, int ancestorCount);
+                static Point applyTransforms(Point p, Cane** ancestors, int ancestorCount);
                 void updateLowResData();
                 void updateHighResData();
 };

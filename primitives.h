@@ -3,21 +3,10 @@
 #define PRIMITIVES_H
 
 #include "constants.h"
+#include "Vector.hpp"
 
-typedef struct Point
-{
-    float x;
-    float y;
-    float z;
-} Point;
-
-typedef struct Color
-{
-    float r;
-    float g;
-    float b;
-    float a;
-} Color;
+typedef Vector3f Point;
+typedef Vector4f Color;
 
 #endif
  

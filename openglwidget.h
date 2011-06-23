@@ -39,8 +39,7 @@ class OpenGLWidget : public QGLWidget
         private:
                 Mesh* mesh;
                 int mode;
-                Triangle* triangles;
-                int num_triangles;
+				Geometry *geometry;
                 int resolution;
                 bool showAxes;
                 

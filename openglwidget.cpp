@@ -71,7 +71,9 @@ void OpenGLWidget :: initializeGL()
 
         // For transparency
         glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glEnable(GL_DEPTH_TEST);
 }
 
 /*
@@ -99,21 +101,32 @@ receives a pointer to this array.
 */
 void OpenGLWidget :: paintGL() 
 {
-        int i;
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (showAxes)
                 drawAxes();
 
-        glBegin(GL_TRIANGLES);
-        for (i = 0; i < num_triangles; ++i)
-        {
-                drawTriangle(&(triangles[i]));
+        if (geometry) {
+		        //JIM sez: blend not workin' out at the moment
+		        glDisable(GL_BLEND);
+
+                //Check that Vertex and Triangle have proper size:
+                assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3 + 4));
+                assert(sizeof(Triangle) == sizeof(GLuint) * 3);
+
+                glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].position));
+                glNormalPointer(GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].normal));
+                glColorPointer(4, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].color));
+                glEnableClientState(GL_VERTEX_ARRAY);
+                glEnableClientState(GL_NORMAL_ARRAY);
+                glEnableClientState(GL_COLOR_ARRAY);
+
+                glDrawElements(GL_TRIANGLES, geometry->triangles.size() * 3, GL_UNSIGNED_INT, &(geometry->triangles[0].v1));
+
+                glDisableClientState(GL_VERTEX_ARRAY);
+                glDisableClientState(GL_NORMAL_ARRAY);
+                glDisableClientState(GL_COLOR_ARRAY);
         }
-        glEnd();
-
-
 
         swapBuffers();  
 }  
@@ -184,8 +197,7 @@ modifying the cane it contains.
 */
 void OpenGLWidget :: updateTriangles()
 {
-        triangles = mesh->getMesh(resolution);
-        num_triangles = mesh->getNumMeshTriangles(resolution);
+        geometry = mesh->getGeometry(resolution);
 } 
 
 /*
@@ -260,7 +272,7 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 Currently catches all mouse release events 
 (left and right buttons, etc.).
 */
-void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
+void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* /*unused: e */)
 {
         // Change as part of dual mode feature
         updateResolution(HIGH_RESOLUTION);
@@ -385,40 +397,6 @@ void OpenGLWidget :: drawAxes()
         glVertex3f(0,-1,0);
         glVertex3f(0,0,0);
         glVertex3f(0,0,1);
-        glEnd();
-}
-
-/*
-Convert a triangle in 3D to stuff OpenGL needs to draw it,
-namely its normal vector. Assumes the triangle is specified 
-in CCW order relative to its exterior.
-*/
-void OpenGLWidget :: drawTriangle(Triangle* t)
-{
-        Point vec1, vec2, norm;
-        float norm_mag;
-
-        // compute normal (going CCW around the face vertices)
-        vec1.x = t->v2.x - t->v1.x;
-        vec1.y = t->v2.y - t->v1.y;
-        vec1.z = t->v2.z - t->v1.z;
-        vec2.x = t->v3.x - t->v1.x;
-        vec2.y = t->v3.y - t->v1.y;
-        vec2.z = t->v3.z - t->v1.z;
-        norm.x = vec1.y * vec2.z - vec1.z * vec2.y;
-        norm.y = -(vec1.x * vec2.z - vec1.z * vec2.x);
-        norm.z = vec1.x * vec2.y - vec1.y * vec2.x;
-        norm_mag = sqrt(norm.x * norm.x + norm.y * norm.y + norm.z * norm.z);
-        norm.x /= norm_mag;
-        norm.y /= norm_mag;
-        norm.z /= norm_mag;
-
-        glNormal3d(norm.x, norm.y, norm.z);
-        glColor4f(t->c.r, t->c.g, t->c.b, t->c.a);
-        glBegin(GL_TRIANGLES);
-        glVertex3f(t->v1.x, t->v1.y, t->v1.z);
-        glVertex3f(t->v2.x, t->v2.y, t->v2.z);
-        glVertex3f(t->v3.x, t->v3.y, t->v3.z);
         glEnd();
 }
 

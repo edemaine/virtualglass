@@ -27,13 +27,13 @@ This is used during the meshing process to determine the location of
 a vertex after it has been moved via the transformations described
 by its ancestors in the cane DAG. 
 */
-Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
+Vertex Mesh :: applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
 {
         int i, j;
         float r, theta, rect_x, rect_y, pt_radius, pt_theta, arc_length;
         float* amts;
         Point p_r;
-        
+
         /*
         The transformations are applied back to front to match how they
         are loaded into the array. Because the transform array is created by
@@ -62,8 +62,8 @@ Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
                                 { 
                                         if (ancestors[i]->subcanes[j] == ancestors[i+1])
                                         {
-                                                p.x += ancestors[i]->subcaneLocations[j].x;
-                                                p.y += ancestors[i]->subcaneLocations[j].y;
+                                                v.position.x += ancestors[i]->subcaneLocations[j].x;
+                                                v.position.y += ancestors[i]->subcaneLocations[j].y;
                                                 break;
                                         }
                                 }
@@ -71,20 +71,19 @@ Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
                                 break;
                         // amts[0] describes magnitude of stretch
                         case STRETCH_CANETYPE: 
-                                theta = atan2(p.y, p.x);
-                                r = sqrt(p.x*p.x + p.y*p.y);
-                                r /= ancestors[i]->amts[0];
-                                p.x = r * cos(theta); 
-                                p.y = r * sin(theta); 
-                                p.z *= ancestors[i]->amts[0];
+                                v.position.x /= sqrt(ancestors[i]->amts[0]);
+                                v.position.y /= sqrt(ancestors[i]->amts[0]);
+                                v.position.z *= ancestors[i]->amts[0];
+								//TODO: normal transform
                                 break;
                         // amts[0] describes twist magnitude
                         case TWIST_CANETYPE: 
-                                theta = atan2(p.y, p.x);
-                                r = sqrt(p.x*p.x + p.y*p.y);
-                                theta += ancestors[i]->amts[0] * p.z;
-                                p.x = r * cos(theta); 
-                                p.y = r * sin(theta); 
+                                theta = atan2(v.position.y, v.position.x);
+                                r = length(v.position.xy);
+                                theta += ancestors[i]->amts[0] * v.position.z;
+                                v.position.x = r * cos(theta); 
+                                v.position.y = r * sin(theta);
+								//TODO: normal transform
                                 break;
                         // amts[0] describes the width-to-height ratio of the goal rectangle
                         // amts[1] describes the orientation w.r.t global XY
@@ -92,9 +91,9 @@ Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
                         case FLATTEN_CANETYPE: 
                                 amts = ancestors[i]->amts;
                                 // move point to rectangle XY system
-                                p_r.x = cos(-amts[1])*p.x - sin(-amts[1])*p.y; 
-                                p_r.y = sin(-amts[1])*p.x + cos(-amts[1])*p.y; 
-                                pt_radius = sqrt(p_r.x*p_r.x + p_r.y*p_r.y);
+                                p_r.x = cos(-amts[1])*v.position.x - sin(-amts[1])*v.position.y; 
+                                p_r.y = sin(-amts[1])*v.position.x + cos(-amts[1])*v.position.y; 
+                                pt_radius = length(p_r.xy);
                                 pt_theta = atan2(p_r.y, p_r.x);
                                 if (pt_theta < 0)
                                         pt_theta += 2*PI;
@@ -143,15 +142,16 @@ Point Mesh :: applyTransforms(Point p, Cane** ancestors, int ancestorCount)
                                                 }
                                         }
                                 }
-                                p.x = amts[2] * (cos(amts[1])*p_r.x - sin(amts[1])*p_r.y) + p.x * (1-amts[2]); 
-                                p.y = amts[2] * (sin(amts[1])*p_r.x + cos(amts[1])*p_r.y) + p.y * (1-amts[2]); 
+                                v.position.x = amts[2] * (cos(amts[1])*p_r.x - sin(amts[1])*p_r.y) + v.position.x * (1-amts[2]); 
+                                v.position.y = amts[2] * (sin(amts[1])*p_r.x + cos(amts[1])*p_r.y) + v.position.y * (1-amts[2]); 
+								//TODO: normal transform
                                 break;
                         default: // BASE_CIRCLE_CANETYPE
                                 break;
                 }
         }
 
-        return p;
+        return v;
 }
 
 /*
@@ -182,12 +182,10 @@ with this leaf base cane). The triangles are added to the end of the array passe
 The resolution refers to the dual resolution modes used by the GUI, and the actual number of
 triangles for these resolutions are set in constants.h 
 */
-void Mesh :: meshCircularBaseCane(Triangle* triangles, int* num_triangles, Cane** ancestors, 
+void Mesh :: meshCircularBaseCane(Geometry *geometry, Cane** ancestors, 
         int ancestorCount, Color color, int resolution)
 {
-        Point p1, p2, p3, p4;
-        Triangle tmp_t;
-        int i, j, angularResolution, axialResolution;
+        unsigned int angularResolution, axialResolution;
         float total_stretch;
 
         switch (resolution)
@@ -204,94 +202,94 @@ void Mesh :: meshCircularBaseCane(Triangle* triangles, int* num_triangles, Cane*
                         exit(1);
         }
 
+        //DEBUG: total_stretch shortened... why is the top cap missing?
         total_stretch = computeTotalStretch(ancestors, ancestorCount);
+
+        //need to know first vertex position so we can transform 'em all later
+        uint32_t first_vert = geometry->vertices.size();
         
         /*
         Draw the walls of the cylinder. Note that the z location is 
         adjusted by the total stretch experienced by the cane so that
         the z values range between 0 and 1.
         */
-        for (i = 0; i < axialResolution - 1; ++i)
+		//Generate verts:
+        for (unsigned int i = 0; i < axialResolution; ++i)
         {
-                for (j = 0; j < angularResolution; ++j)
+                for (unsigned int j = 0; j < angularResolution; ++j)
                 {
-                        p1.x = cos(2 * PI * ((float) j) / angularResolution);
-                        p1.y = sin(2 * PI * ((float) j) / angularResolution);
-                        p1.z = ((float) i) / (axialResolution * total_stretch);
+                        Point p;
+                        Point n;
 
-                        p2.x = cos(2 * PI * ((float) j) / angularResolution);
-                        p2.y = sin(2 * PI * ((float) j) / angularResolution);
-                        p2.z = ((float) i+1) / (axialResolution * total_stretch);
-
-                        p3.x = cos(2 * PI * ((float) j+1) / angularResolution);
-                        p3.y = sin(2 * PI * ((float) j+1) / angularResolution);
-                        p3.z = ((float) i) / (axialResolution * total_stretch);
-
-                        p4.x = cos(2 * PI * ((float) j+1) / angularResolution);
-                        p4.y = sin(2 * PI * ((float) j+1) / angularResolution);
-                        p4.z = ((float) i+1) / (axialResolution * total_stretch);
-
-                        p1 = applyTransforms(p1, ancestors, ancestorCount);
-                        p2 = applyTransforms(p2, ancestors, ancestorCount);
-                        p3 = applyTransforms(p3, ancestors, ancestorCount);
-                        p4 = applyTransforms(p4, ancestors, ancestorCount);
-
+                        p.x = cos(2 * PI * ((float) j) / angularResolution);
+                        p.y = sin(2 * PI * ((float) j) / angularResolution);
+                        p.z = ((float) i) / ((axialResolution-1) * total_stretch);
+                        n.x = p.x;
+                        n.y = p.y;
+                        n.z = 0.0f;
+						geometry->vertices.push_back(Vertex(p,n,color));
+				}
+		}
+		//Generate triangles linking them:
+        for (unsigned int i = 0; i + 1 < axialResolution; ++i)
+        {
+                for (unsigned int j = 0; j < angularResolution; ++j)
+                {
+				        uint32_t p1 = first_vert + i * angularResolution + j;
+				        uint32_t p2 = first_vert + (i+1) * angularResolution + j;
+				        uint32_t p3 = first_vert + i * angularResolution + (j+1) % angularResolution;
+				        uint32_t p4 = first_vert + (i+1) * angularResolution + (j+1) % angularResolution;
                         // Four points that define a (non-flat) quad are used
                         // to create two triangles.
-                        tmp_t.v1 = p2;
-                        tmp_t.v2 = p1;
-                        tmp_t.v3 = p4;
-                        tmp_t.c = color;
+                        geometry->triangles.push_back(Triangle(p2, p1, p4));
+                        //was: tmp_t.v1 = p2; tmp_t.v2 = p1; tmp_t.v3 = p4;
 
-                        triangles[*num_triangles] = tmp_t;
-                        *num_triangles += 1;
 
-                        tmp_t.v1 = p1;
-                        tmp_t.v2 = p3;
-                        tmp_t.v3 = p4;
-                        tmp_t.c = color;
-
-                        triangles[*num_triangles] = tmp_t;
-                        *num_triangles += 1;
+                        geometry->triangles.push_back(Triangle(p1, p3, p4));
+                        //was: tmp_t.v1 = p1; tmp_t.v2 = p3; tmp_t.v3 = p4;
                 } 
         }
+		assert(geometry->valid());
 
         /*
         Draw the cylinder bottom, then top.
         The mesh uses a set of n-2 triangles with a common vertex
         to draw a regular n-gon.
         */
-        p1.x = 1.0;
-        p1.y = 0.0;
-        p1.z = p2.z = p3.z = 0.0;
-        tmp_t.v1 = applyTransforms(p1, ancestors, ancestorCount); // Common vertex
-        tmp_t.c = color;
-
-        for (j = 1; j < angularResolution-1; ++j)
-        {
-                p2.x = cos(2 * PI * ((float) j) / angularResolution);
-                p2.y = sin(2 * PI * ((float) j) / angularResolution);
-                p3.x = cos(2 * PI * ((float) j+1) / angularResolution);
-                p3.y = sin(2 * PI * ((float) j+1) / angularResolution);
-                tmp_t.v3 = applyTransforms(p2, ancestors, ancestorCount);
-                tmp_t.v2 = applyTransforms(p3, ancestors, ancestorCount);
-                triangles[*num_triangles] = tmp_t;
-
-                *num_triangles += 1;
+        for (int side = 0; side <= 1; ++side) {
+                float z = (side?1.0:0.0);
+                float nz = (side?1.0:-1.0);
+                uint32_t base = geometry->vertices.size();
+                for (unsigned int j = 0; j < angularResolution; ++j)
+                {
+                        Point p;
+                        p.x = cos(2 * PI * ((float) j) / angularResolution);
+                        p.y = sin(2 * PI * ((float) j) / angularResolution);
+                        p.z = z / total_stretch;
+                        Point n;
+                        n.x = 0.0; n.y = 0.0; n.z = nz;
+                        geometry->vertices.push_back(Vertex(p, n, color));
+                }
+                if (side)
+                {
+                        for (unsigned int j = 1; j + 1 < angularResolution; ++j)
+                        {
+                                 geometry->triangles.push_back(Triangle(base, base + j, base + j + 1));
+                        }
+                }
+                else
+                {
+                        for (unsigned int j = 1; j + 1 < angularResolution; ++j)
+                        {
+                                 geometry->triangles.push_back(Triangle(base, base + j + 1, base + j));
+                        }
+                }
         }
+		assert(geometry->valid());
 
-        p1.z = p2.z = p3.z = ((float) (axialResolution-1)) / (axialResolution * total_stretch);
-        tmp_t.v1 = applyTransforms(p1, ancestors, ancestorCount);
-        for (j = 1; j < angularResolution-1; ++j)
+        for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
         {
-                p2.x = cos(2 * PI * ((float) j) / angularResolution);
-                p2.y = sin(2 * PI * ((float) j) / angularResolution);
-                p3.x = cos(2 * PI * ((float) j+1) / angularResolution);
-                p3.y = sin(2 * PI * ((float) j+1) / angularResolution);
-                tmp_t.v2 = applyTransforms(p2, ancestors, ancestorCount);
-                tmp_t.v3 = applyTransforms(p3, ancestors, ancestorCount);
-                triangles[*num_triangles] = tmp_t;
-                *num_triangles += 1;
+                geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount);
         }
 }
 
@@ -305,7 +303,7 @@ filled with with the transformations encountered at each node. When a
 leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
-void Mesh :: generateMesh(Cane* c, Triangle* triangles, int* triangleCount, 
+void Mesh :: generateMesh(Cane* c, Geometry *geometry,
         Cane** ancestors, int* ancestorCount, int resolution, bool isActive=false)
 {
         int i;
@@ -322,7 +320,7 @@ void Mesh :: generateMesh(Cane* c, Triangle* triangles, int* triangleCount,
         {
             if (isActive==false)
             {
-                meshCircularBaseCane(triangles, triangleCount,
+                meshCircularBaseCane(geometry,
                         ancestors, *ancestorCount, c->color, resolution);
             }
             else
@@ -332,7 +330,7 @@ void Mesh :: generateMesh(Cane* c, Triangle* triangles, int* triangleCount,
                 newColor.r/=2;
                 newColor.g/=2;
                 newColor.b/=2;
-                meshCircularBaseCane(triangles, triangleCount,
+                meshCircularBaseCane(geometry,
                         ancestors, *ancestorCount, newColor, resolution);
             }
         }
@@ -340,20 +338,15 @@ void Mesh :: generateMesh(Cane* c, Triangle* triangles, int* triangleCount,
         {
                 for (i = 0; i < c->subcaneCount; ++i)
                 {
-                        generateMesh(c->subcanes[i], triangles, triangleCount, 
+                        generateMesh(c->subcanes[i], geometry,
                                 ancestors, ancestorCount, resolution,isActive);
                 }
         }
         *ancestorCount -= 1;
 }
 
-Mesh :: Mesh(Cane* c)
+Mesh :: Mesh(Cane* c) : cane(NULL), lowResDataUpToDate(0), highResDataUpToDate(0), activeSubcane(0)
 {
-        // Allocate space for the two permanent arrays that hold both mesh versions 
-        lowResTriangles = (Triangle*) malloc(sizeof(Triangle) 
-                * (LOW_AXIAL_RESOLUTION * LOW_ANGULAR_RESOLUTION * 2) * (MAX_NUM_CANES + 1));
-        highResTriangles = (Triangle*) malloc(sizeof(Triangle) 
-                * (HIGH_AXIAL_RESOLUTION * HIGH_ANGULAR_RESOLUTION * 2) * (MAX_NUM_CANES + 1));
         
         setCane(c);
 }
@@ -377,8 +370,8 @@ void Mesh :: updateLowResData()
         Cane* ancestors[MAX_ANCESTORS];
         int ancestorCount;
         ancestorCount = 0;
-        lowResTriangleCount = 0;
-        generateMesh(cane, lowResTriangles, &lowResTriangleCount, ancestors, &ancestorCount, 
+		lowResGeometry.clear();
+        generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount, 
                 LOW_RESOLUTION);
         lowResDataUpToDate = 1;
 }
@@ -389,8 +382,8 @@ void Mesh :: updateHighResData()
         int ancestorCount;
 
         ancestorCount = 0;
-        highResTriangleCount = 0;
-        generateMesh(cane, highResTriangles, &highResTriangleCount, ancestors, &ancestorCount, 
+		highResGeometry.clear();
+        generateMesh(cane, &highResGeometry, ancestors, &ancestorCount, 
                 HIGH_RESOLUTION);
         highResDataUpToDate = 1;
 }
@@ -412,14 +405,14 @@ Mesh::getNumMeshTriangles() is a companion method that
 returns the size of the array whose pointer is returned
 by getMesh().
 */
-Triangle* Mesh :: getMesh(int resolution)
+Geometry* Mesh :: getGeometry(int resolution)
 {
 
         if (resolution == LOW_RESOLUTION)
         {
                 if (!lowResDataUpToDate)
                         updateLowResData(); 
-                return lowResTriangles;
+                return &lowResGeometry;
         }
         else
         {
@@ -428,23 +421,7 @@ Triangle* Mesh :: getMesh(int resolution)
                         updateHighResData();
                         updateLowResData();
                 } 
-                return highResTriangles;
-        }
-}
-
-int Mesh :: getNumMeshTriangles(int resolution)
-{
-        if (resolution == LOW_RESOLUTION)
-        {
-                if (!lowResDataUpToDate)
-                        updateLowResData(); 
-                return lowResTriangleCount;
-        }
-        else
-        {
-                if (!highResDataUpToDate)
-                        updateHighResData();
-                return highResTriangleCount;
+                return &highResGeometry;
         }
 }
 
@@ -467,13 +444,11 @@ void Mesh :: twistCane(float amt)
         if (!lowResDataUpToDate)
                 updateLowResData();
 
-        ancestor = new Cane(TWIST_CANETYPE);
+        ancestor = new Cane(TWIST_CANETYPE); //JIM sez: Memory leak
         ancestor->amts[0] = amt;
-        for (int i = 0; i < lowResTriangleCount; ++i)
+        for (size_t i = 0; i < lowResGeometry.vertices.size(); ++i)
         {
-                lowResTriangles[i].v1 = applyTransforms(lowResTriangles[i].v1, &ancestor, 1);
-                lowResTriangles[i].v2 = applyTransforms(lowResTriangles[i].v2, &ancestor, 1);
-                lowResTriangles[i].v3 = applyTransforms(lowResTriangles[i].v3, &ancestor, 1);
+		        lowResGeometry.vertices[i] = applyTransforms(lowResGeometry.vertices[i], &ancestor, 1);
         }
 
         lowResDataUpToDate = 1;
@@ -491,13 +466,11 @@ void Mesh :: stretchCane(float amt)
         if (!lowResDataUpToDate)
                 updateLowResData();
 
-        ancestor = new Cane(STRETCH_CANETYPE);
+        ancestor = new Cane(STRETCH_CANETYPE); //JIM sez: Memory leak
         ancestor->amts[0] = (1.0 + amt);
-        for (int i = 0; i < lowResTriangleCount; ++i)
+        for (size_t i = 0; i < lowResGeometry.vertices.size(); ++i)
         {
-                lowResTriangles[i].v1 = applyTransforms(lowResTriangles[i].v1, &ancestor, 1);
-                lowResTriangles[i].v2 = applyTransforms(lowResTriangles[i].v2, &ancestor, 1);
-                lowResTriangles[i].v3 = applyTransforms(lowResTriangles[i].v3, &ancestor, 1);
+		        lowResGeometry.vertices[i] = applyTransforms(lowResGeometry.vertices[i], &ancestor, 1);
         }
 
         lowResDataUpToDate = 1;
@@ -532,7 +505,6 @@ void Mesh :: startMoveMode()
 
 void Mesh :: moveCane(float delta_x, float delta_y)
 {
-        int num_prev_tris, num_cur_tris;
         Cane* ancestors[2];
 
         if (cane == NULL)
@@ -543,14 +515,14 @@ void Mesh :: moveCane(float delta_x, float delta_y)
         if (!lowResDataUpToDate)
                 updateLowResData();
 
-        num_prev_tris = 0;
+        size_t num_prev_verts = 0;
         for (int i = 0; i < activeSubcane; ++i)
         {
-                num_prev_tris += (2 * LOW_AXIAL_RESOLUTION * LOW_ANGULAR_RESOLUTION - 4) 
+                num_prev_verts += ((LOW_AXIAL_RESOLUTION + 2) * LOW_ANGULAR_RESOLUTION)
                         * cane->subcanes[i]->leafNodes();
         }
 
-        num_cur_tris = (2 * LOW_AXIAL_RESOLUTION * LOW_ANGULAR_RESOLUTION - 4) 
+        size_t num_cur_verts = ((LOW_AXIAL_RESOLUTION + 2) * LOW_ANGULAR_RESOLUTION)
                 * cane->subcanes[activeSubcane]->leafNodes();
 
         /*
@@ -565,12 +537,12 @@ void Mesh :: moveCane(float delta_x, float delta_y)
         ancestors[0]->subcaneCount = 1;
         ancestors[0]->subcanes[0] = ancestors[1];
         ancestors[0]->subcaneLocations[0].x = delta_x; 
-        ancestors[0]->subcaneLocations[0].y = delta_y; 
-        for (int i = num_prev_tris; i < num_prev_tris + num_cur_tris; ++i)
+        ancestors[0]->subcaneLocations[0].y = delta_y;
+		//Make sure we computed some sort of reasonable numbers of verts:
+		assert(num_prev_verts + num_cur_verts <= lowResGeometry.vertices.size());
+        for (size_t i = num_prev_verts; i < num_prev_verts + num_cur_verts; ++i)
         {
-                lowResTriangles[i].v1 = applyTransforms(lowResTriangles[i].v1, ancestors, 1);
-                lowResTriangles[i].v2 = applyTransforms(lowResTriangles[i].v2, ancestors, 1);
-                lowResTriangles[i].v3 = applyTransforms(lowResTriangles[i].v3, ancestors, 1);
+                lowResGeometry.vertices[i] = applyTransforms(lowResGeometry.vertices[i], ancestors, 1);
         }
 
         lowResDataUpToDate = 1;
