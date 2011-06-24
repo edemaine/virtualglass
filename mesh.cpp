@@ -60,6 +60,92 @@ void Geometry::save_obj_file(std::string const &filename) const {
 	}
 }
 
+
+void Mesh::applyFlattenTransform(Vertex* v, float rectangleRatio, float rectangleTheta, float flatness)
+{
+	Point p_r;
+	p_r.x = cos(-rectangleTheta) * v->position.x - sin(-rectangleTheta) * v->position.y; 
+	p_r.y = sin(-rectangleTheta) * v->position.x + cos(-rectangleTheta) * v->position.y; 
+
+	float pt_radius = length(p_r.xy);
+	float pt_theta = atan2(p_r.y, p_r.x);
+	if (pt_theta < 0)
+		pt_theta += 2*PI;
+	float arc_length = pt_radius * pt_theta;
+
+	// We use a boundary-preserving circle to rectangle transformation
+	float rect_y = PI * pt_radius / (1.0 + rectangleRatio); 
+	float rect_x = rect_y * rectangleRatio;
+	rect_y /= 2.0;
+	rect_x /= 2.0;
+	if (arc_length < rect_y)
+	{
+		p_r.x = rect_x;
+		p_r.y = arc_length;
+	}
+	else 
+	{
+		arc_length -= rect_y;
+		if (arc_length < 2 * rect_x)
+		{
+			p_r.x = rect_x - arc_length;
+			p_r.y = rect_y;
+		}
+		else
+		{
+			arc_length -= 2 * rect_x;
+			if (arc_length < 2 * rect_y)
+			{
+				p_r.x = -rect_x;
+				p_r.y = rect_y - arc_length;
+			}
+			else
+			{
+				arc_length -= 2 * rect_y;
+				if (arc_length < 2 * rect_x)
+				{
+					p_r.x = -rect_x + arc_length;
+					p_r.y = -rect_y;
+				}
+				else
+				{
+					arc_length -= 2 * rect_x;
+					p_r.x = rect_x;
+					p_r.y = -rect_y + arc_length;
+				}
+			}
+		}
+	}
+
+	v->position.x = flatness * (cos(rectangleTheta) * p_r.x 
+		- sin(rectangleTheta) * p_r.y) + v->position.x * (1-flatness); 
+	v->position.y = flatness * (sin(rectangleTheta) * p_r.x 
+		+ cos(rectangleTheta) * p_r.y) + v->position.y * (1-flatness); 
+	//TODO: normal transform
+}  
+
+void Mesh :: applyBundleTransform(Vertex* v, Point location)
+{
+	v->position.x += location.x;
+	v->position.y += location.y;
+}
+
+void Mesh :: applyStretchTransform(Vertex* v, float amount)
+{
+	v->position.x /= sqrt(amount);
+	v->position.y /= sqrt(amount);
+	v->position.z *= amount;
+}
+
+void Mesh :: applyTwistTransform(Vertex* v, float amount)
+{
+	float theta = atan2(v->position.y, v->position.x);
+	float r = length(v->position.xy);
+	theta += amount * v->position.z;
+	v->position.x = r * cos(theta); 
+	v->position.y = r * sin(theta);
+}
+
 /*
 This function applies a sequence of transformations to a 3D point.
 This is used during the meshing process to determine the location of
@@ -92,100 +178,34 @@ Vertex Mesh :: applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
                         case BUNDLE_CANETYPE: 
                                 // Find where subcane lives and apply translation 
                                 // to move it to this location
+				int subcaneIndex;
                                 for (int j = 0; j < ancestors[i]->subcaneCount; ++j)
                                 { 
                                         if (ancestors[i]->subcanes[j] == ancestors[i+1])
                                         {
-                                                v.position.x += ancestors[i]->subcaneLocations[j].x;
-                                                v.position.y += ancestors[i]->subcaneLocations[j].y;
+						subcaneIndex = j;
                                                 break;
                                         }
                                 }
-                                // p.z is unchanged
+				applyBundleTransform(&v, ancestors[i]->subcaneLocations[subcaneIndex]);
                                 break;
                         // amts[0] describes magnitude of stretch
                         case STRETCH_CANETYPE: 
-                                v.position.x /= sqrt(ancestors[i]->amts[0]);
-                                v.position.y /= sqrt(ancestors[i]->amts[0]);
-                                v.position.z *= ancestors[i]->amts[0];
-								//TODO: normal transform
+				applyStretchTransform(&v, ancestors[i]->amts[0]);
+				//TODO: normal transform
                                 break;
                         // amts[0] describes twist magnitude
                         case TWIST_CANETYPE:
-						{
-                                float theta = atan2(v.position.y, v.position.x);
-                                float r = length(v.position.xy);
-
-                                theta += ancestors[i]->amts[0] * v.position.z;
-                                v.position.x = r * cos(theta); 
-                                v.position.y = r * sin(theta);
-								//TODO: normal transform
-                                break;
-						}
+				applyTwistTransform(&v, ancestors[i]->amts[0]);
+				//TODO: normal transform
+				break;
                         // amts[0] describes the width-to-height ratio of the goal rectangle
                         // amts[1] describes the orientation w.r.t global XY
                         // amts[2] describes how close of an approximation to the rectangle is achieved
                         case FLATTEN_CANETYPE: 
-						{
-                                float *amts = ancestors[i]->amts;
-                                // move point to rectangle XY system
-								Point p_r;
-                                p_r.x = cos(-amts[1])*v.position.x - sin(-amts[1])*v.position.y; 
-                                p_r.y = sin(-amts[1])*v.position.x + cos(-amts[1])*v.position.y; 
-                                float pt_radius = length(p_r.xy);
-                                float pt_theta = atan2(p_r.y, p_r.x);
-                                if (pt_theta < 0)
-                                        pt_theta += 2*PI;
-                                float arc_length = pt_radius * pt_theta;
-
-                                // We use a boundary-preserving circle to rectangle transformation
-                                float rect_y = PI * pt_radius / (1.0 + amts[0]); 
-                                float rect_x = rect_y * amts[0];
-                                rect_y /= 2.0;
-                                rect_x /= 2.0;
-                                if (arc_length < rect_y)
-                                {
-                                        p_r.x = rect_x;
-                                        p_r.y = arc_length;
-                                }
-                                else 
-                                {
-                                        arc_length -= rect_y;
-                                        if (arc_length < 2 * rect_x)
-                                        {
-                                                p_r.x = rect_x - arc_length;
-                                                p_r.y = rect_y;
-                                        }
-                                        else
-                                        {
-                                                arc_length -= 2 * rect_x;
-                                                if (arc_length < 2 * rect_y)
-                                                {
-                                                        p_r.x = -rect_x;
-                                                        p_r.y = rect_y - arc_length;
-                                                }
-                                                else
-                                                {
-                                                        arc_length -= 2 * rect_y;
-                                                        if (arc_length < 2 * rect_x)
-                                                        {
-                                                                p_r.x = -rect_x + arc_length;
-                                                                p_r.y = -rect_y;
-                                                        }
-                                                        else
-                                                        {
-                                                                arc_length -= 2 * rect_x;
-                                                                p_r.x = rect_x;
-                                                                p_r.y = -rect_y + arc_length;
-                                                        }
-                                                }
-                                        }
-                                }
-                                v.position.x = amts[2] * (cos(amts[1])*p_r.x - sin(amts[1])*p_r.y) + v.position.x * (1-amts[2]); 
-                                v.position.y = amts[2] * (sin(amts[1])*p_r.x + cos(amts[1])*p_r.y) + v.position.y * (1-amts[2]); 
-								//TODO: normal transform
+				applyFlattenTransform(&v, ancestors[i]->amts[0], ancestors[i]->amts[1],
+					ancestors[i]->amts[2]);	
                                 break;
-						}
                         default: // BASE_CIRCLE_CANETYPE
                                 break;
                 }
@@ -325,13 +345,13 @@ void Mesh :: meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
                         }
                 }
         }
-		assert(geometry->valid());
+	assert(geometry->valid());
 
-        for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
-        {
-                geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount);
-        }
-		geometry->compute_normals_from_triangles();
+	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
+	{
+		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount);
+	}
+	geometry->compute_normals_from_triangles();
 }
 
 
@@ -408,13 +428,14 @@ when the mesh becomes out of date and is requested (by OpenGLWidget, for instanc
 */
 void Mesh :: updateLowResData()
 {
-        Cane* ancestors[MAX_ANCESTORS];
-        int ancestorCount;
-        ancestorCount = 0;
-		lowResGeometry.clear();
-        generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount, 
-                LOW_RESOLUTION);
-        lowResDataUpToDate = 1;
+	Cane* ancestors[MAX_ANCESTORS];
+	int ancestorCount;
+
+	ancestorCount = 0;
+	lowResGeometry.clear();
+	generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount, 
+		LOW_RESOLUTION);
+	lowResDataUpToDate = 1;
 }
 
 void Mesh :: updateHighResData()
@@ -423,10 +444,10 @@ void Mesh :: updateHighResData()
         int ancestorCount;
 
         ancestorCount = 0;
-		highResGeometry.clear();
-        generateMesh(cane, &highResGeometry, ancestors, &ancestorCount, 
-                HIGH_RESOLUTION);
-        highResDataUpToDate = 1;
+	highResGeometry.clear();
+	generateMesh(cane, &highResGeometry, ancestors, &ancestorCount, 
+		HIGH_RESOLUTION);
+	highResDataUpToDate = 1;
 }
 
 Cane* Mesh :: getCane()
@@ -448,7 +469,6 @@ by getMesh().
 */
 Geometry* Mesh :: getGeometry(int resolution)
 {
-
         if (resolution == LOW_RESOLUTION)
         {
                 if (!lowResDataUpToDate)
@@ -458,10 +478,7 @@ Geometry* Mesh :: getGeometry(int resolution)
         else
         {
                 if (!highResDataUpToDate)
-                {
                         updateHighResData();
-                        updateLowResData();
-                } 
                 return &highResGeometry;
         }
 }
@@ -476,57 +493,27 @@ if possible instead of rebuilding the mesh from scratch from the cane object.
 */
 void Mesh :: twistCane(float amt)
 {
-        Cane* ancestor;
-
-        if (cane == NULL)
-                return;
-        cane->twist(amt);
-
-        if (!lowResDataUpToDate)
-                updateLowResData();
-
-        ancestor = new Cane(TWIST_CANETYPE); //JIM sez: Memory leak
-        ancestor->amts[0] = amt;
-        for (size_t i = 0; i < lowResGeometry.vertices.size(); ++i)
-        {
-		        lowResGeometry.vertices[i] = applyTransforms(lowResGeometry.vertices[i], &ancestor, 1);
-        }
-		lowResGeometry.compute_normals_from_triangles();
-
-        lowResDataUpToDate = 1;
-        highResDataUpToDate = 0;
+	if (cane == NULL)
+		return;
+	cane->twist(amt);
+	lowResDataUpToDate = 0;
+	highResDataUpToDate = 0;
 }
 
 void Mesh :: stretchCane(float amt)
 {
-        Cane* ancestor;
-
-        if (cane == NULL)
-                return;
-        cane->stretch(amt);
-
-        if (!lowResDataUpToDate)
-                updateLowResData();
-
-        ancestor = new Cane(STRETCH_CANETYPE); //JIM sez: Memory leak
-        ancestor->amts[0] = (1.0 + amt);
-        for (size_t i = 0; i < lowResGeometry.vertices.size(); ++i)
-        {
-		        lowResGeometry.vertices[i] = applyTransforms(lowResGeometry.vertices[i], &ancestor, 1);
-        }
-		lowResGeometry.compute_normals_from_triangles();
-
-        lowResDataUpToDate = 1;
-        highResDataUpToDate = 0;
+	if (cane == NULL)
+		return;
+	cane->stretch(amt);
+	lowResDataUpToDate = 0;
+	highResDataUpToDate = 0;
 }
 
 void Mesh :: flattenCane(float rectangle_ratio, float rectangle_theta, float flatness)
 {
         if (cane == NULL)
                 return;
-
         cane->flatten(rectangle_ratio, rectangle_theta, flatness);
-
         lowResDataUpToDate = 0; 
         highResDataUpToDate = 0;
 }
@@ -547,62 +534,20 @@ void Mesh :: startMoveMode()
 
 void Mesh :: moveCane(float delta_x, float delta_y)
 {
-        Cane* ancestors[2];
-
-        if (cane == NULL)
-                return;
-
-        cane->moveCane(activeSubcane, delta_x, delta_y);
-
-        if (!lowResDataUpToDate)
-                updateLowResData();
-
-        size_t num_prev_verts = 0;
-        for (int i = 0; i < activeSubcane; ++i)
-        {
-                num_prev_verts += ((LOW_AXIAL_RESOLUTION + 2) * LOW_ANGULAR_RESOLUTION)
-                        * cane->subcanes[i]->leafNodes();
-        }
-
-        size_t num_cur_verts = ((LOW_AXIAL_RESOLUTION + 2) * LOW_ANGULAR_RESOLUTION)
-                * cane->subcanes[activeSubcane]->leafNodes();
-
-        /*
-        Since the subcane location is an offset from center but a moveCane() 
-        call is actually a change in this offset, doing an update requires 
-        simulating a movement equivalent to a small change in the offset and 
-        not the offset itself. So we fake the small change on the mesh by
-        throwing away the global offset and replacing it with the change.
-        */
-        ancestors[0] = new Cane(BUNDLE_CANETYPE);
-        ancestors[1] = new Cane(UNASSIGNED_CANETYPE);
-        ancestors[0]->subcaneCount = 1;
-        ancestors[0]->subcanes[0] = ancestors[1];
-        ancestors[0]->subcaneLocations[0].x = delta_x; 
-        ancestors[0]->subcaneLocations[0].y = delta_y;
-		//Make sure we computed some sort of reasonable numbers of verts:
-		assert(num_prev_verts + num_cur_verts <= lowResGeometry.vertices.size());
-        for (size_t i = num_prev_verts; i < num_prev_verts + num_cur_verts; ++i)
-        {
-                lowResGeometry.vertices[i] = applyTransforms(lowResGeometry.vertices[i], ancestors, 1);
-        }
-		lowResGeometry.compute_normals_from_triangles();
-
-        lowResDataUpToDate = 1;
-        highResDataUpToDate = 0;
+	if (cane == NULL)
+		return;
+	cane->moveCane(activeSubcane, delta_x, delta_y);
+	lowResDataUpToDate = 0;
+	highResDataUpToDate = 0;
 }
 
 void Mesh :: addCane(Cane* c)
 {
-        if (cane == NULL)
-        {
-                cane = c->deepCopy();
-        }
-        else
-        {
-                cane->add(c->deepCopy(), &activeSubcane);
-        }
-        lowResDataUpToDate = highResDataUpToDate = 0;
+	if (cane == NULL)
+		cane = c->deepCopy();
+	else
+		cane->add(c->deepCopy(), &activeSubcane);
+	lowResDataUpToDate = highResDataUpToDate = 0;
 }
 
 /*
@@ -615,26 +560,24 @@ to illuminate the newly selected subcane.
 */
 void Mesh :: advanceActiveSubcane()
 {
-        if (cane->type != BUNDLE_CANETYPE)
-                return;
-        activeSubcane += 1;
-        activeSubcane %= cane->subcaneCount;
-        lowResDataUpToDate = highResDataUpToDate = 0;
-        updateHighResData();
-        updateLowResData();
+	if (cane->type != BUNDLE_CANETYPE)
+		return;
+	activeSubcane += 1;
+	activeSubcane %= cane->subcaneCount;
+	lowResDataUpToDate = highResDataUpToDate = 0;
+	updateHighResData();
+	updateLowResData();
 }
 
 Cane* Mesh :: getActiveSubcane()
 {
-    return getCane()->subcanes[activeSubcane];
+	return getCane()->subcanes[activeSubcane];
 }
-
-
 
 void Mesh :: saveObjFile(std::string const &filename)
 {
-        updateHighResData();
-		highResGeometry.save_obj_file(filename);
+	updateHighResData();
+	highResGeometry.save_obj_file(filename);
 }
 
 

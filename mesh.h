@@ -74,8 +74,8 @@ class Mesh
 
         private:
                 Cane *cane;
-				Geometry lowResGeometry;
-				Geometry highResGeometry;
+                Geometry lowResGeometry;
+                Geometry highResGeometry;
                 int lowResDataUpToDate;
                 int highResDataUpToDate;
                 int activeSubcane;
@@ -86,6 +86,11 @@ class Mesh
                 static void meshCircularBaseCane(Geometry *geometry, 
                         Cane** ancestors, int ancestorCount, Color color, int resolution);
                 static float computeTotalStretch(Cane** ancestors, int ancestorCount);
+                static void applyFlattenTransform(Vertex* v, float rectangleRatio,
+			float rectangleTheta, float flatness);
+                static void applyBundleTransform(Vertex* v, Point location);
+                static void applyStretchTransform(Vertex* v, float amount);
+                static void applyTwistTransform(Vertex* v, float amount);
                 static Vertex applyTransforms(Vertex p, Cane** ancestors, int ancestorCount);
                 void updateLowResData();
                 void updateHighResData();
