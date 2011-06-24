@@ -19,7 +19,6 @@ class MainWindow : public QMainWindow
                 MainWindow();
                 void saveCaneToLibrary();
                 void seedLibrary();
-
                 
         public slots:
                 void zoomInButtonPressed();
@@ -49,6 +48,7 @@ class MainWindow : public QMainWindow
 
         protected:
                 void keyPressEvent(QKeyEvent* e);
+		void keyReleaseEvent(QKeyEvent* e);
                 void setupLibraryArea();
                 void setupStatusBar();
                 void setupWorkArea();

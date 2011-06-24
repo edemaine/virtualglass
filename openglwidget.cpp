@@ -29,23 +29,24 @@ The OpenGLWidget object has a mode for each type of modification
 the user can make to the cane (in addition to a LOOK_MODE, which
 changes the orientation of the cane only). Changing modes is handled by
 other parts of the GUI, and a changed mode is indicated to the 
-OpenGLWidget object by calling setMode(). Depending upon the mode,
-mouse movement/clicks cause different behavior. For example, 
-dragging the mouse horizontally while in TWIST_MODE causes the cane
-to become twisted (left for CW, right for CCW), while moving the mouse
-vertically in stretch mode causes the cane to stretch (up for increased
-stretch, down for decreased).
+OpenGLWidget object by calling setMode(). 
 */
 
 #include "openglwidget.h" 
  
 OpenGLWidget :: OpenGLWidget(QWidget *parent=0) : QGLWidget(parent)
 {
-        showAxes = false;
+	shiftButtonDown = false;
+        showAxes = true;
         resolution = HIGH_RESOLUTION;
         mode = LOOK_MODE;  
         mesh = new Mesh(NULL);
         updateTriangles();
+}
+
+void OpenGLWidget :: setShiftButtonDown(bool state)
+{
+	shiftButtonDown = state;
 }
 
 void OpenGLWidget :: initializeGL()
@@ -331,7 +332,15 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
         }
         else if (mode == PULL_MODE) 
         {
-                mesh->twistAndStretchCane((relX * 500.0 * PI / 100.0), -5.0*relY);
+		if (shiftButtonDown)
+		{
+			if (abs(relX) > abs(relY))
+                		mesh->twistAndStretchCane((relX * 500.0 * PI / 100.0), 0.0);
+			else
+                		mesh->twistAndStretchCane(0.0, -5.0*relY);
+		}	
+		else		
+                	mesh->twistAndStretchCane((relX * 500.0 * PI / 100.0), -5.0*relY);
                 updateTriangles();
         }
         else if (mode == BUNDLE_MODE)

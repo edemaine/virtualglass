@@ -4,7 +4,6 @@ definition of a cane).
 */
 
 #include "cane.h"
-#include <QMessageBox>
 
 Cane :: Cane(int type)
 {

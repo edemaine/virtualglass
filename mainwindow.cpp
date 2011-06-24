@@ -398,8 +398,6 @@ void MainWindow::setupWorkArea()
 {
         glassgl = new OpenGLWidget(this);
 
-
-
         QPushButton* look_button = new QPushButton("Look");
         connect(look_button, SIGNAL(clicked()), this, SLOT(lookButtonPressed()));
 
@@ -430,7 +428,7 @@ void MainWindow::setupWorkArea()
 
         QPushButton* pull_button = new QPushButton("Pull");
         connect(pull_button, SIGNAL(pressed()), this, SLOT(pullButtonPressed()));
-        pull_button->setToolTip("Drag Mouse Horizontally to Twist, Vertically to Stretch");
+        pull_button->setToolTip("Drag Mouse Horizontally to Twist, Vertically to Stretch. Use Shift to twist and stretch independently.");
 
         QPushButton* bundle_button = new QPushButton("Bundle");
         connect(bundle_button, SIGNAL(pressed()), this, SLOT(bundleButtonPressed())); 
@@ -518,29 +516,45 @@ void MainWindow::modeSelect(int index)
         statusBar->showMessage("Entered Look Mode", 2000);
 }
 
+
 void MainWindow::keyPressEvent(QKeyEvent* e)
 {
-        if (e->key() == 0x58) // X 
-                exit(0);
-        if (e->key() == 0x41) // A 
-                this->zoomOutButtonPressed();
-        if (e->key() == 0x53) // S 
-                this->zoomInButtonPressed();
-        if (e->key() == 0x31) // 1 
-                this->lookButtonPressed();
-        if (e->key() == 0x32) // 2 
-                this->pullButtonPressed();
-        if (e->key() == 0x34) // 4 
-                this->bundleButtonPressed();
-        if (e->key() == 0x35) // 5
-                this->flattenButtonPressed();
-        if (e->key() == 0x59) // Y 
-                saveButtonPressed();
-        if (e->key() == 0x4e) // N 
-                nextButtonPressed();
-                //glassgl->advanceActiveSubcane();
-        if (e->key() == 0x01000007) // Delete 
-                this->clearButtonPressed();
+	switch (e->key())
+	{
+		case 0x58: // X
+                	exit(0);
+        	case 0x31: // 1
+                	this->lookButtonPressed();
+			break;
+        	case 0x32: // 2 
+                	this->pullButtonPressed();
+			break;
+		case 0x34: // 4 
+			this->bundleButtonPressed();
+			break;
+		case 0x35: // 5
+			this->flattenButtonPressed();
+			break;
+		case 0x01000020: // Shift
+			glassgl->setShiftButtonDown(true);
+			break;
+        	case 0x01000007: // Delete 
+                	this->clearButtonPressed();
+			break;
+		default:
+			break;
+	}
 }
 
+void MainWindow::keyReleaseEvent(QKeyEvent* e)
+{
+	switch(e->key())
+	{
+		case 0x01000020: // Shift
+			glassgl->setShiftButtonDown(false);
+			break;
+		default:
+			break;
+	}
+}
 

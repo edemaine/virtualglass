@@ -33,14 +33,16 @@ class OpenGLWidget : public QGLWidget
                 void setMode(int mode);
                 void setCamera(float theta, float fee);
 				void saveObjFile(std::string const &filename);
+		void setShiftButtonDown(bool state);
 
         signals:
                 void modeChanged(int mode);
 
         private:
+		bool shiftButtonDown;	
                 Mesh* mesh;
                 int mode;
-				Geometry *geometry;
+		Geometry *geometry;
                 int resolution;
                 bool showAxes;
                 
