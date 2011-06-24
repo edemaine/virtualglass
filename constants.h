@@ -27,8 +27,7 @@
 #define MAX_AMT_TYPES 5
 
 #define LOOK_MODE 1
-#define TWIST_MODE 2
-#define STRETCH_MODE 3
+#define PULL_MODE 2
 #define BUNDLE_MODE 4
 #define FLATTEN_MODE 5
 #define WRAP_MODE 6

@@ -483,28 +483,11 @@ Geometry* Mesh :: getGeometry(int resolution)
         }
 }
 
-/*
-The Mesh :: *Cane() methods (e.g. Mesh.twistCane(), Mesh.stretchCane(),..)
-are used to modify the cane held by the Mesh object in small ways. They
-should be used whenever possible over Mesh.setCane() because they are way
-more efficient. The technique is essentially to update the cane in the 
-background, and directly apply the twist transformation on the mesh vertices
-if possible instead of rebuilding the mesh from scratch from the cane object.
-*/
-void Mesh :: twistCane(float amt)
+void Mesh :: twistAndStretchCane(float twistAmount, float stretchAmount)
 {
 	if (cane == NULL)
 		return;
-	cane->twist(amt);
-	lowResDataUpToDate = 0;
-	highResDataUpToDate = 0;
-}
-
-void Mesh :: stretchCane(float amt)
-{
-	if (cane == NULL)
-		return;
-	cane->stretch(amt);
+	cane->twistAndStretch(twistAmount, stretchAmount);
 	lowResDataUpToDate = 0;
 	highResDataUpToDate = 0;
 }

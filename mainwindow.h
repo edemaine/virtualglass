@@ -28,8 +28,7 @@ class MainWindow : public QMainWindow
                 void lookButtonPressed();
                 void topViewButtonPressed();
                 void sideViewButtonPressed();
-                void twistButtonPressed();
-                void stretchButtonPressed();
+                void pullButtonPressed();
                 void bundleButtonPressed();
                 void flattenButtonPressed();
                 void wrapButtonPressed();

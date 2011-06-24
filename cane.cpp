@@ -76,6 +76,20 @@ void Cane :: shallowCopy(Cane* dest)
         dest->color = this->color;
 }
 
+void Cane :: twistAndStretch(float twistRadians, float stretchFactor)
+{
+	if (this->type != TWIST_CANETYPE || this->subcanes[0]->type != STRETCH_CANETYPE)
+	{
+		this->stretch(0.0); // Add stretch node if not present
+		this->twist(0.0); // Add twist node
+        }
+        else
+        {
+                this->subcanes[0]->stretch(stretchFactor);
+                this->twist(twistRadians);
+	}
+}
+
 void Cane :: twist(float radians)
 {
         if (this->type != TWIST_CANETYPE)

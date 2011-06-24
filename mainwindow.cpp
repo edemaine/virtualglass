@@ -34,28 +34,25 @@ void MainWindow::saveCaneToLibrary()
         statusBar->showMessage("Saved Cane to Library", 2000);
 }
 
-void MainWindow::userModeChanged(int mode){
-    statusBar->showMessage("Switching User Mode", 2000);
-    switch(mode)
-    {
-    case LOOK_MODE:
-        modeLabel->setText("LOOK MODE");
-        break;
-    case TWIST_MODE:
-        modeLabel->setText("TWIST MODE");
-        break;
-    case STRETCH_MODE:
-        modeLabel->setText("STRETCH MODE");
-        break;
-    case BUNDLE_MODE:
-        modeLabel->setText("BUNDLE MODE");
-        break;
-    case FLATTEN_MODE:
-        modeLabel->setText("FLATTEN MODE");
-        break;
-    default:
-        modeLabel->setText("NO MODE");
-    }
+void MainWindow::userModeChanged(int mode) {
+	statusBar->showMessage("Switching User Mode", 2000);
+	switch(mode)
+	{
+		case LOOK_MODE:
+			modeLabel->setText("LOOK MODE");
+			break;
+		case PULL_MODE:
+			modeLabel->setText("PULL MODE");
+			break;
+		case BUNDLE_MODE:
+			modeLabel->setText("BUNDLE MODE");
+			break;
+		case FLATTEN_MODE:
+			modeLabel->setText("FLATTEN MODE");
+			break;
+		default:
+			modeLabel->setText("NO MODE");
+	}
 }
 
 void MainWindow::setupStatusBar()
@@ -194,18 +191,10 @@ void MainWindow::sideViewButtonPressed()
         statusBar->showMessage("Switched to Side View", 2000);
 }
 
-void MainWindow::twistButtonPressed()
+void MainWindow::pullButtonPressed()
 {
-        glassgl->setMode(TWIST_MODE);
-
-        statusBar->showMessage("Entered Twist Mode", 2000);
-}
-
-void MainWindow::stretchButtonPressed()
-{
-        glassgl->setMode(STRETCH_MODE);
-
-        statusBar->showMessage("Entered Stretch Mode", 2000);
+        glassgl->setMode(PULL_MODE);
+        statusBar->showMessage("Entered Pull Mode", 2000);
 }
 
 void MainWindow::bundleButtonPressed()
@@ -439,13 +428,9 @@ void MainWindow::setupWorkArea()
         QWidget* viewButtonWidget = new QWidget();
         viewButtonWidget->setLayout(viewButton_layout);
 
-        QPushButton* twist_button = new QPushButton("Twist");
-        connect(twist_button, SIGNAL(pressed()), this, SLOT(twistButtonPressed()));
-        twist_button->setToolTip("Drag Mouse Horizontally");
-
-        QPushButton* stretch_button = new QPushButton("Stretch");
-        connect(stretch_button, SIGNAL(pressed()), this, SLOT(stretchButtonPressed()));
-        stretch_button->setToolTip("Drag Mouse Vertically");
+        QPushButton* pull_button = new QPushButton("Pull");
+        connect(pull_button, SIGNAL(pressed()), this, SLOT(pullButtonPressed()));
+        pull_button->setToolTip("Drag Mouse Horizontally to Twist, Vertically to Stretch");
 
         QPushButton* bundle_button = new QPushButton("Bundle");
         connect(bundle_button, SIGNAL(pressed()), this, SLOT(bundleButtonPressed())); 
@@ -463,8 +448,7 @@ void MainWindow::setupWorkArea()
         select_button->setToolTip("Click on a cane to select it.");
 
         QVBoxLayout* operButton_layout = new QVBoxLayout();
-        operButton_layout->addWidget(twist_button);
-        operButton_layout->addWidget(stretch_button);
+        operButton_layout->addWidget(pull_button);
         operButton_layout->addWidget(bundle_button);
         operButton_layout->addWidget(flatten_button);
         operButton_layout->addWidget(wrap_button);
@@ -531,7 +515,6 @@ void MainWindow::setupWorkArea()
 void MainWindow::modeSelect(int index)
 {
         glassgl->setMode(LOOK_MODE);
-
         statusBar->showMessage("Entered Look Mode", 2000);
 }
 
@@ -546,9 +529,7 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
         if (e->key() == 0x31) // 1 
                 this->lookButtonPressed();
         if (e->key() == 0x32) // 2 
-                this->twistButtonPressed();
-        if (e->key() == 0x33) // 3 
-                this->stretchButtonPressed();
+                this->pullButtonPressed();
         if (e->key() == 0x34) // 4 
                 this->bundleButtonPressed();
         if (e->key() == 0x35) // 5

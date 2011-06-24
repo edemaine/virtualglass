@@ -62,8 +62,7 @@ class Mesh
                 Cane* getCane();
                 Geometry* getGeometry(int resolution);
                 int getNumMeshTriangles(int resolution);
-                void twistCane(float amt);
-                void stretchCane(float amt);
+                void twistAndStretchCane(float twistAmount, float stretchFactor);
                 void moveCane(float delta_x, float delta_y);
                 void flattenCane(float rectangle_ratio, float rectangle_theta, float flatness);
                 void addCane(Cane* c); 

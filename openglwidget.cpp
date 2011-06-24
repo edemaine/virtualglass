@@ -329,17 +329,10 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
                         fee = newFee;
                 updateCamera();
         }
-        else if (mode == TWIST_MODE) 
+        else if (mode == PULL_MODE) 
         {
-                mesh->twistCane((relX * 500.0 * PI / 100.0));
+                mesh->twistAndStretchCane((relX * 500.0 * PI / 100.0), -5.0*relY);
                 updateTriangles();
-        }
-        else if (mode == STRETCH_MODE)
-        {
-            if (relY<=0) {
-                mesh->stretchCane(-10.0*relY);
-                updateTriangles();
-            }
         }
         else if (mode == BUNDLE_MODE)
         {
