@@ -557,10 +557,47 @@ Cane* Mesh :: getActiveSubcane()
 	return getCane()->subcanes[activeSubcane];
 }
 
+float Mesh :: matrixDeterminant3by3(Point a,Point b,Point c) // columns
+{
+    float detA = a.x*(b.y*c.z-b.z*c.y)-b.x*(a.y*c.z-a.z*c.y)+c.x*(a.y*b.z-a.z*b.y);
+    return detA;
+}
+
 void Mesh :: saveObjFile(std::string const &filename)
 {
+
+        updateHighResData();
+                highResGeometry.save_obj_file(filename);
+
 	updateHighResData();
 	highResGeometry.save_obj_file(filename);
+
 }
+
+bool Mesh :: intersectTriangle(Triangle plane,Point camera,Point camDir)
+{
+    Vertex va=lowResGeometry.vertices[plane.v1];
+    Vertex vb=lowResGeometry.vertices[plane.v2];
+    Vertex vc=lowResGeometry.vertices[plane.v3];
+    Point a=va.position;
+    Point b=vb.position;
+    Point c=vc.position;
+    Point ba=b-a;
+    Point ca=c-a;
+
+    float detA = matrixDeterminant3by3(a-b,a-c,camDir);
+    float beta = matrixDeterminant3by3(a-camera,a-c,camDir)/detA;
+    float gamma = matrixDeterminant3by3(a-b,a-camera,camDir)/detA;
+    float t = matrixDeterminant3by3(a-camera,a-c,a-camera)/detA;
+
+    if (beta+gamma<1 && beta>0 && gamma>0 && t>0)
+        return true;
+
+    return false;
+}
+
+
+
+
 
 
