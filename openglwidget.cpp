@@ -33,6 +33,7 @@ OpenGLWidget object by calling setMode().
 */
 
 #include "openglwidget.h" 
+#include <math.h>
  
 OpenGLWidget :: OpenGLWidget(QWidget *parent=0) : QGLWidget(parent)
 {
@@ -391,6 +392,23 @@ void OpenGLWidget :: setCamera(float theta, float fee)
         updateCamera();
         paintGL();
 }
+
+Point OpenGLWidget :: getCameraPoint()
+{
+
+    Point result;
+    result.z=rho*cos(fee);
+    result.x=rho*cos(theta)*sin(fee);
+    result.y=rho*sin(theta)*sin(fee);
+    return result;
+}
+
+Vector3f OpenGLWidget :: getCameraDirection()
+{
+    Point camPoint = -getCameraPoint()/rho;
+    return Vector3f(camPoint);
+}
+
 
 void OpenGLWidget :: saveObjFile(std::string const &filename)
 {

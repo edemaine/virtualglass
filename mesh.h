@@ -69,7 +69,7 @@ class Mesh
                 void advanceActiveSubcane();
                 void startMoveMode();
                 Cane* getActiveSubcane();
-				void saveObjFile(std::string const &filename);
+                void saveObjFile(std::string const &filename);
 
         private:
                 Cane *cane;
@@ -93,7 +93,8 @@ class Mesh
                 static Vertex applyTransforms(Vertex p, Cane** ancestors, int ancestorCount);
                 void updateLowResData();
                 void updateHighResData();
-
+                float matrixDeterminant3by3(Point a,Point b,Point c);
+                bool intersectTriangle(Triangle plane,Point camera,Point camDir);
 };
 
 #endif

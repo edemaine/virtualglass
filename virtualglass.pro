@@ -10,7 +10,8 @@ QT += opengl
 
 # Input
 HEADERS += mainwindow.h openglwidget.h cane.h primitives.h mesh.h controller.h librarycanewidget.h \
-    constants.h
+    constants.h \
+    Vector.hpp
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
     yaml-cpp/include/yaml-cpp/traits.h \
