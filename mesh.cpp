@@ -20,6 +20,7 @@ on the array) instead of recomputing a mesh by traversing the cane.
 */
 
 #include "mesh.h"
+#include <fstream>
 
 //compute normals by using area-weighted normals of adjacent triangles.
 //this may not be the correct approximation, but I just wanted some sort of hack
@@ -39,6 +40,23 @@ void Geometry::compute_normals_from_triangles() {
 		if (norms[v] != make_vector(0.0f, 0.0f, 0.0f)) {
 			vertices[v].normal = normalize(norms[v]);
 		}
+	}
+}
+
+void Geometry::save_obj_file(std::string const &filename) const {
+	std::ofstream file(filename.c_str());
+	for (std::vector< Vertex >::const_iterator v = vertices.begin(); v != vertices.end(); ++v) {
+		file << "vn " << v->normal.x << " "
+		              << v->normal.y << " "
+		              << v->normal.z << "\n";
+		file << "v " << v->position.x << " "
+		             << v->position.y << " "
+		             << v->position.z << "\n";
+	}
+	for (std::vector< Triangle >::const_iterator t = triangles.begin(); t != triangles.end(); ++t) {
+		file << "f " << (t->v1+1) << "//" << (t->v1+1) << " "
+		             << (t->v2+1) << "//" << (t->v2+1) << " "
+		             << (t->v3+1) << "//" << (t->v3+1) << "\n";
 	}
 }
 
@@ -614,5 +632,10 @@ Cane* Mesh :: getActiveSubcane()
 
 
 
+void Mesh :: saveObjFile(std::string const &filename)
+{
+        updateHighResData();
+		highResGeometry.save_obj_file(filename);
+}
 
 

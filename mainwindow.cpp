@@ -344,6 +344,15 @@ void MainWindow::newColorPickerCaneButtonPressed()
         colorPickerSelected(QColorDialog::getColor());
 }
 
+void MainWindow::saveObjButtonPressed()
+{
+        QString file = QFileDialog::getSaveFileName(this, tr("Save obj file"), "", tr("Wavefront obj files (*.obj);;All files (*)"));
+        if (!file.isNull())
+        {
+                glassgl->saveObjFile(qPrintable(file));
+        }
+}
+
 void MainWindow::newStatus(QString message)
 {
     statusBar->showMessage(message,2000);
@@ -461,6 +470,10 @@ void MainWindow::setupWorkArea()
         connect(colorPicker_button, SIGNAL(pressed()), this, SLOT(newColorPickerCaneButtonPressed()));
         colorPicker_button->setToolTip("Create a New Cane with specified color");
 
+        QPushButton* saveObj_button = new QPushButton("Save .obj file");
+        connect(saveObj_button, SIGNAL(pressed()), this, SLOT(saveObjButtonPressed()));
+        saveObj_button->setToolTip("Save an .obj file with the current cane geometry for rendering in an external program.");
+
         QVBoxLayout* utilButton_layout = new QVBoxLayout();
         utilButton_layout->addWidget(next_button);
         utilButton_layout->addWidget(save_button);
@@ -468,6 +481,7 @@ void MainWindow::setupWorkArea()
         utilButton_layout->addWidget(exportLibrary_button);
         utilButton_layout->addWidget(importLibrary_button);
         utilButton_layout->addWidget(colorPicker_button);
+        utilButton_layout->addWidget(saveObj_button);
         QWidget* utilButtonWidget = new QWidget();
         utilButtonWidget->setLayout(utilButton_layout);
 

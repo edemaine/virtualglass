@@ -7,6 +7,7 @@
 #define VECTOR_HPP
 
 #include <cmath>
+#include <stdint.h>
 
 template< typename NUM, int size >
 class Vector {

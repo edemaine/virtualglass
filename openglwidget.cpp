@@ -390,6 +390,11 @@ void OpenGLWidget :: setCamera(float theta, float fee)
         paintGL();
 }
 
+void OpenGLWidget :: saveObjFile(std::string const &filename)
+{
+        mesh->saveObjFile(filename);
+}
+
 /*
 
 */

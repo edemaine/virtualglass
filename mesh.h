@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <vector>
+#include <string>
 #include "cane.h"
 #include "constants.h"
 #include "primitives.h"
@@ -49,6 +50,7 @@ class Geometry
 			return true;
 		}
 		void compute_normals_from_triangles();
+		void save_obj_file(std::string const &filename) const;
 };
 
 class Mesh
@@ -68,6 +70,7 @@ class Mesh
                 void advanceActiveSubcane();
                 void startMoveMode();
                 Cane* getActiveSubcane();
+				void saveObjFile(std::string const &filename);
 
         private:
                 Cane *cane;
@@ -86,6 +89,7 @@ class Mesh
                 static Vertex applyTransforms(Vertex p, Cane** ancestors, int ancestorCount);
                 void updateLowResData();
                 void updateHighResData();
+
 };
 
 #endif

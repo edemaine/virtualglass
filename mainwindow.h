@@ -40,6 +40,7 @@ class MainWindow : public QMainWindow
                 void exportLibraryButtonPressed();
                 void importLibraryButtonPressed();
                 void newColorPickerCaneButtonPressed();
+				void saveObjButtonPressed();
                 void colorPickerSelected(QColor color);
                 void modeSelect(int index);
                 void libraryCaneDestroyed(QObject* obj);
