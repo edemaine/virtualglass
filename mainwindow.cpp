@@ -13,8 +13,6 @@ MainWindow::MainWindow()
         setupStatusBar();
         setWindowTitle(tr("Virtual Glass"));
 
-
-
         resize(1000, 750);
         move(75,25);
 }
@@ -94,7 +92,7 @@ void MainWindow::seedLibrary()
 
         stch->subcaneCount = 1;
         stch->subcanes[0] = c;
-        stch->amts[0] = 12.0;
+        stch->amts[0] = 100.0;
 
         c->color.r = 0.8;
         c->color.g = 0.8;
@@ -368,7 +366,7 @@ void MainWindow::colorPickerSelected(QColor color)
 
         stch->subcaneCount = 1;
         stch->subcanes[0] = c;
-        stch->amts[0] = 12.0;
+        stch->amts[0] = 100.0;
 
         c->color.r = color.redF();
         c->color.g = color.greenF();

@@ -522,7 +522,6 @@ void Mesh :: stretchCane(float amt)
 
 void Mesh :: flattenCane(float rectangle_ratio, float rectangle_theta, float flatness)
 {
-
         if (cane == NULL)
                 return;
 
