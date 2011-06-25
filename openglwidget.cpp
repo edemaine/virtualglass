@@ -3,14 +3,10 @@ This class is the QT GUI object that does 3D rendering.
 It also responds to mouse clicks and mouse movement within
 its extent.
 
-The actual computation of the cane mesh is handled by the
-Mesh object defined in mesh.h/cpp. This class only requests
-a pointer to the mesh and draws it using normal OpenGL calls.
-
 As this object handles mouse clicks and movement, it is
 involved in modifying the cane. For example, if the user
 is in twist mode and moves the mouse horizontally, this
-object tells the mesh object ``Hey, the cane has been twisted
+object tells the Model object ``Hey, the cane has been twisted
 by amount X''.
 
 Features:
@@ -41,10 +37,10 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent=0) : QGLWidget(parent)
 	showAxes = true;
 	resolution = HIGH_RESOLUTION;
 	mode = LOOK_MODE;
-	mesh = new Mesh(NULL);
+	model = new Model(NULL);
 	history = new CaneHistory();
 	updateTriangles();
-}
+	}
 
 void OpenGLWidget :: setShiftButtonDown(bool state)
 {
@@ -87,14 +83,14 @@ region (no triangles exist to be drawn).
 void OpenGLWidget :: zeroCanes()
 {
 	history->saveState(NULL);
-	mesh->setCane(NULL);
+	model->setCane(NULL);
 	updateTriangles();
 	paintGL();
-}
+} 
 
 bool OpenGLWidget :: hasCanes()
 {
-	return mesh->getCane()!=NULL;
+	return model->getCane()!=NULL;
 }
 
 void OpenGLWidget :: setBgColor(QColor color)
@@ -196,12 +192,12 @@ void OpenGLWidget :: toggleGrid()
 /*
 Sets the cane currently being interacted with to
 a new cane. This is achieved by passing the cane off
-to the Mesh object, getting a pointer back to a Triangle
+to the Model object, getting a pointer back to a Triangle
 array containing the mesh, and drawing it.
 */
 void OpenGLWidget :: setFocusCane(Cane* c)
 {
-	mesh->setCane(c);
+	model->setCane(c);
 	updateTriangles();
 	paintGL();
 }
@@ -225,7 +221,7 @@ modifying the cane it contains.
 */
 void OpenGLWidget :: updateTriangles()
 {
-	geometry = mesh->getGeometry(resolution);
+	geometry = model->getGeometry(resolution);
 }
 
 /*
@@ -244,7 +240,7 @@ void OpenGLWidget :: setMode(int m)
 	// change appearance (subcane illumination, etc.).
 	if (mode == BUNDLE_MODE)
 	{
-		mesh->startMoveMode();
+		model->startMoveMode();
 	}
 	emit modeChanged(m);
 }
@@ -257,7 +253,7 @@ void OpenGLWidget :: advanceActiveSubcane()
 {
 	if (mode == BUNDLE_MODE)
 	{
-		mesh->advanceActiveSubcane();
+		model->advanceActiveSubcane();
 		paintGL();
 	}
 }
@@ -344,7 +340,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	All modes except LOOK_MODE involve modifying the cane
 	itself, while LOOK_MODE moves the camera.
 
-	All of the calls to mesh->*Cane() are functions of relX/relY,
+	All of the calls to model->*Cane() are functions of relX/relY,
 	but the constants involved are determined by experiment,
 	i.e. how much twist `feels' reasonable for moving the mouse
 	an inch.
@@ -377,12 +373,12 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		if (shiftButtonDown)
 		{
 			if (abs(relX) > abs(relY))
-				mesh->twistAndStretchCane((relX * 500.0 * PI / 100.0), 0.0);
+				model->twistAndStretchCane((relX * 500.0 * PI / 100.0), 0.0);
 			else
-				mesh->twistAndStretchCane(0.0, -5.0*relY);
+				model->twistAndStretchCane(0.0, -5.0*relY);
 		}
 		else
-			mesh->twistAndStretchCane((relX * 500.0 * PI / 100.0), -5.0*relY);
+			model->twistAndStretchCane((relX * 500.0 * PI / 100.0), -5.0*relY);
 		updateTriangles();
 	}
 	else if (mode == BUNDLE_MODE)
@@ -398,13 +394,13 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 			(variables `relX' and `relY') to the amount moved in X and Y
 			according to axes on which the cane lives.
 		*/
-		mesh->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
+		model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
 					   relX * sin(theta + PI / 2.0) + relY * sin(theta));
 		updateTriangles();
 	}
 	else if (mode == FLATTEN_MODE)
 	{
-		mesh->flattenCane(relX, theta + PI / 2.0, -relY);
+		model->flattenCane(relX, theta + PI / 2.0, -relY);
 		updateTriangles();
 	}
 
@@ -453,7 +449,7 @@ Vector3f OpenGLWidget :: getCameraDirection()
 
 void OpenGLWidget :: saveObjFile(std::string const &filename)
 {
-	mesh->saveObjFile(filename);
+	model->saveObjFile(filename);
 }
 
 /*
@@ -505,11 +501,11 @@ void OpenGLWidget :: addCane(Cane* c)
 	start off by looking at it, otherwise start off by
 	adjusting its location.
 	*/
-	if (mesh->getCane() == NULL)
+	if (model->getCane() == NULL)
 		setMode(LOOK_MODE);
 	else
 		setMode(BUNDLE_MODE);
-	mesh->addCane(c);
+	model->addCane(c);
 	updateTriangles();
 	paintGL();
 }
@@ -521,5 +517,5 @@ DO NOT CHANGE THIS CANE, you will make the Mesh object cry.
 */
 Cane* OpenGLWidget :: getCane()
 {
-	return mesh->getCane();
+	return model->getCane();
 }

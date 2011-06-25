@@ -1,7 +1,7 @@
 
 
-#ifndef CONVERT_H
-#define CONVERT_H
+#ifndef MODEL_H
+#define MODEL_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -53,11 +53,11 @@ class Geometry
 	void save_obj_file(std::string const &filename) const;
 };
 
-class Mesh
+class Model
 {
 
 	public:
-		Mesh(Cane* c);
+		Model(Cane* c);
 		void setCane(Cane* c);
 		Cane* getCane();
 		Geometry* getGeometry(int resolution);
@@ -80,10 +80,10 @@ class Mesh
 		int activeSubcane;
 		//Point* activePoints;
 
-		void generateMesh(Cane* c, Geometry *geometry,
-						  Cane** ancestors, int* ancestorCount, int resolution, bool isActive);
-		static void meshCircularBaseCane(Geometry *geometry,
-										 Cane** ancestors, int ancestorCount, Color color, int resolution);
+		void generateMesh(Cane* c, Geometry *geometry, 
+			Cane** ancestors, int* ancestorCount, int resolution, bool isActive);
+		static void meshCircularBaseCane(Geometry *geometry, 
+			Cane** ancestors, int ancestorCount, Color color, int resolution);
 		static float computeTotalStretch(Cane** ancestors, int ancestorCount);
 		static void applyFlattenTransform(Vertex* v, float rectangleRatio,
 		float rectangleTheta, float flatness);

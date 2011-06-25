@@ -9,7 +9,7 @@ INCLUDEPATH += . yaml-cpp/include/ yaml-cpp/util/ yaml-cpp/src/ yaml-cpp/test/
 QT += opengl
 
 # Input
-HEADERS += mainwindow.h openglwidget.h cane.h primitives.h mesh.h controller.h librarycanewidget.h \
+HEADERS += mainwindow.h openglwidget.h cane.h primitives.h model.h controller.h librarycanewidget.h \
 	constants.h canehistory.h \
 	Vector.hpp
 
@@ -62,7 +62,7 @@ HEADERS += yaml-cpp/src/token.h \
 	yaml-cpp/src/directives.h \
 	yaml-cpp/src/collectionstack.h
 
-SOURCES += main.cpp mainwindow.cpp openglwidget.cpp cane.cpp mesh.cpp controller.cpp librarycanewidget.cpp \
+SOURCES += main.cpp mainwindow.cpp openglwidget.cpp cane.cpp model.cpp controller.cpp librarycanewidget.cpp \
 	canehistory.cpp
 
 SOURCES += yaml-cpp/src/tag.cpp \

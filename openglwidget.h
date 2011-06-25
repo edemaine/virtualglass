@@ -11,7 +11,7 @@
 #include "canehistory.h"
 #include "primitives.h"
 #include "constants.h"
-#include "mesh.h"
+#include "model.h"
 #include "cane.h"
 using namespace std;
 
@@ -41,16 +41,13 @@ class OpenGLWidget : public QGLWidget
 		void setBgColor(QColor color);
 		void switchView();
 
-	signals:
-		void modeChanged(int m);
-
 	private:
 		CaneHistory* history;
 		bool shiftButtonDown;
 		bool rightMouseDown;
 		bool isOrthographic;
 		QColor bgColor;
-		Mesh* mesh;
+		Model* model;
 		int mode;
 		Geometry *geometry;
 		int resolution;

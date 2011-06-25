@@ -1,25 +1,5 @@
-/*
-The Mesh object plays the role of converting canes to 3D triangle meshes.
-A cane is represented as a directed acyclic graph of nodes, each of which
-represents a cane or a transformation on a cane. A 3D triangle mesh is simply
-a set of triangles with vertices in 3D and specific exterior and interior
-sides (we use the convention of specifying vertices in CCW order around the
-exterior face).
 
-A Mesh object holds both a cane, and the Triangle arrays corresponding to a
-3D mesh of the cane. If the cane changes, it must be changed through one
-of the Mesh functions, and the Mesh object has functions that match all of the
-Cane functions (twist, stretch, etc.).
-
-Of course, the Mesh object can also have the Cane object which it meshes updated,
-for instance, if a new cane is loaded. However, this should be done if the
-cane being operated on is truly a new cane, and not just a modified version
-of the current cane. The reason is efficiency. Making calls to Mesh.twistCane()
-allows the Mesh object to quickly update the Triangle array (via direct operations
-on the array) instead of recomputing a mesh by traversing the cane.
-*/
-
-#include "mesh.h"
+#include "model.h"
 #include <fstream>
 
 //compute normals by using area-weighted normals of adjacent triangles.
@@ -61,7 +41,7 @@ void Geometry::save_obj_file(std::string const &filename) const {
 }
 
 
-void Mesh::applyFlattenTransform(Vertex* v, float rectangleRatio, float rectangleTheta, float flatness)
+void Model::applyFlattenTransform(Vertex* v, float rectangleRatio, float rectangleTheta, float flatness)
 {
 	Point p_r;
 	p_r.x = cos(-rectangleTheta) * v->position.x - sin(-rectangleTheta) * v->position.y;
@@ -124,20 +104,20 @@ void Mesh::applyFlattenTransform(Vertex* v, float rectangleRatio, float rectangl
 	//TODO: normal transform
 }
 
-void Mesh :: applyBundleTransform(Vertex* v, Point location)
+void Model :: applyBundleTransform(Vertex* v, Point location)
 {
 	v->position.x += location.x;
 	v->position.y += location.y;
 }
 
-void Mesh :: applyStretchTransform(Vertex* v, float amount)
+void Model :: applyStretchTransform(Vertex* v, float amount)
 {
 	v->position.x /= sqrt(amount);
 	v->position.y /= sqrt(amount);
 	v->position.z *= amount;
 }
 
-void Mesh :: applyTwistTransform(Vertex* v, float amount)
+void Model :: applyTwistTransform(Vertex* v, float amount)
 {
 	float theta = atan2(v->position.y, v->position.x);
 	float r = length(v->position.xy);
@@ -152,7 +132,7 @@ This is used during the meshing process to determine the location of
 a vertex after it has been moved via the transformations described
 by its ancestors in the cane DAG.
 */
-Vertex Mesh :: applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
+Vertex Model :: applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
 {
 	/*
 	The transformations are applied back to front to match how they
@@ -218,7 +198,7 @@ This function is used in the process of reparameterizing the mesh after
 a stretch, to a void losing vertices when the cane is cut down to just
 the z-region between 0 and 1.
 */
-float Mesh :: computeTotalStretch(Cane** ancestors, int ancestorCount)
+float Model :: computeTotalStretch(Cane** ancestors, int ancestorCount)
 {
 	float totalStretch;
 	int i;
@@ -234,14 +214,14 @@ float Mesh :: computeTotalStretch(Cane** ancestors, int ancestorCount)
 }
 
 /*
-Mesh::meshCircularBaseCane() creates a mesh for a radius 1, length 1 cylindrical piece of cane,
+Model::meshCircularBaseCane() creates a mesh for a radius 1, length 1 cylindrical piece of cane,
 and applies a sequences of transforms (coming from a depth-first traversal of the cane ending
 with this leaf base cane). The triangles are added to the end of the array passed in.
 
 The resolution refers to the dual resolution modes used by the GUI, and the actual number of
 triangles for these resolutions are set in constants.h
 */
-void Mesh :: meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
+void Model :: meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 	int ancestorCount, Color color, int resolution)
 {
 	unsigned int angularResolution, axialResolution;
@@ -354,7 +334,7 @@ void Mesh :: meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 
 
 /*
-Mesh::generateMesh() is the top-level function for turning a cane into an
+Model::generateMesh() is the top-level function for turning a cane into an
 array of triangles. The triangle and transform arrays passed in are meant
 to be reusable, global arrays that are allocated in advance are sufficiently
 large. As generateMesh() is called recursively, the transforms array is
@@ -362,7 +342,7 @@ filled with with the transformations encountered at each node. When a
 leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
-void Mesh :: generateMesh(Cane* c, Geometry *geometry,
+void Model :: generateMesh(Cane* c, Geometry *geometry,
 	Cane** ancestors, int* ancestorCount, int resolution, bool isActive=false)
 {
 	int i;
@@ -401,12 +381,12 @@ void Mesh :: generateMesh(Cane* c, Geometry *geometry,
 	*ancestorCount -= 1;
 }
 
-Mesh :: Mesh(Cane* c) : cane(NULL), lowResDataUpToDate(0), highResDataUpToDate(0), activeSubcane(0)
+Model :: Model(Cane* c) : cane(NULL), lowResDataUpToDate(0), highResDataUpToDate(0), activeSubcane(0)
 {
 	setCane(c);
 }
 
-void Mesh :: setCane(Cane* c)
+void Model :: setCane(Cane* c)
 {
 	cane = c;
 
@@ -415,12 +395,7 @@ void Mesh :: setCane(Cane* c)
 	updateHighResData();
 }
 
-/*
-Mesh::updateLowResData() and similarly updateHighResData() update the two
-Triangle arrays containing the two versions of the mesh. They are called
-when the mesh becomes out of date and is requested (by OpenGLWidget, for instance).
-*/
-void Mesh :: updateLowResData()
+void Model :: updateLowResData()
 {
 	Cane* ancestors[MAX_ANCESTORS];
 	int ancestorCount;
@@ -432,7 +407,7 @@ void Mesh :: updateLowResData()
 	lowResDataUpToDate = 1;
 }
 
-void Mesh :: updateHighResData()
+void Model :: updateHighResData()
 {
 	Cane* ancestors[MAX_ANCESTORS];
 	int ancestorCount;
@@ -444,24 +419,24 @@ void Mesh :: updateHighResData()
 	highResDataUpToDate = 1;
 }
 
-Cane* Mesh :: getCane()
+Cane* Model :: getCane()
 {
 	return cane;
 }
 
 /*
-Mesh::getMesh() is called by an external entity that
+Model::getMesh() is called by an external entity that
 wants to get an up-to-date mesh of the cane currently
-held by this Mesh object.
+held by this Model object.
 
 If the mesh is out-of-date, it is updated, otherwise
 the current mesh is simply returned.
 
-Mesh::getNumMeshTriangles() is a companion method that
+Model::getNumMeshTriangles() is a companion method that
 returns the size of the array whose pointer is returned
 by getMesh().
 */
-Geometry* Mesh :: getGeometry(int resolution)
+Geometry* Model :: getGeometry(int resolution)
 {
 	if (resolution == LOW_RESOLUTION)
 	{
@@ -477,7 +452,7 @@ Geometry* Mesh :: getGeometry(int resolution)
 	}
 }
 
-void Mesh :: twistAndStretchCane(float twistAmount, float stretchAmount)
+void Model :: twistAndStretchCane(float twistAmount, float stretchAmount)
 {
 	if (cane == NULL)
 		return;
@@ -486,7 +461,7 @@ void Mesh :: twistAndStretchCane(float twistAmount, float stretchAmount)
 	highResDataUpToDate = 0;
 }
 
-void Mesh :: flattenCane(float rectangle_ratio, float rectangle_theta, float flatness)
+void Model :: flattenCane(float rectangle_ratio, float rectangle_theta, float flatness)
 {
 	if (cane == NULL)
 		return;
@@ -496,20 +471,20 @@ void Mesh :: flattenCane(float rectangle_ratio, float rectangle_theta, float fla
 }
 
 /*
-Right now Mesh::startMoveMode() is a placeholder mostly.
+Right now Model::startMoveMode() is a placeholder mostly.
 However, when subcane illumination (used to indicate to
 the user which subcane is currently selected) is reimplemented,
 it will perform the change in mesh colors needed to do
 the indication.
 */
-void Mesh :: startMoveMode()
+void Model :: startMoveMode()
 {
 	activeSubcane = 0;
 	if (cane != NULL)
 		cane->createBundle();
 }
 
-void Mesh :: moveCane(float delta_x, float delta_y)
+void Model :: moveCane(float delta_x, float delta_y)
 {
 	if (cane == NULL)
 		return;
@@ -518,7 +493,7 @@ void Mesh :: moveCane(float delta_x, float delta_y)
 	highResDataUpToDate = 0;
 }
 
-void Mesh :: addCane(Cane* c)
+void Model :: addCane(Cane* c)
 {
 	if (cane == NULL)
 		cane = c->deepCopy();
@@ -528,14 +503,14 @@ void Mesh :: addCane(Cane* c)
 }
 
 /*
-Mesh::advanceActiveSubcane() is used when in bundle
+Model::advanceActiveSubcane() is used when in bundle
 mode (i.e. the root node of the cane being operated on
 is a bundle) to change the subcane currently under user
 control. It will (i.e. in the future)
 also change the colors of the subcanes
 to illuminate the newly selected subcane.
 */
-void Mesh :: advanceActiveSubcane()
+void Model :: advanceActiveSubcane()
 {
 	if (cane->type != BUNDLE_CANETYPE)
 		return;
@@ -546,18 +521,18 @@ void Mesh :: advanceActiveSubcane()
 	updateLowResData();
 }
 
-Cane* Mesh :: getActiveSubcane()
+Cane* Model :: getActiveSubcane()
 {
 	return getCane()->subcanes[activeSubcane];
 }
 
-float Mesh :: matrixDeterminant3by3(Point a,Point b,Point c) // columns
+float Model :: matrixDeterminant3by3(Point a,Point b,Point c) // columns
 {
 	float detA = a.x*(b.y*c.z-b.z*c.y)-b.x*(a.y*c.z-a.z*c.y)+c.x*(a.y*b.z-a.z*b.y);
 	return detA;
 }
 
-void Mesh :: saveObjFile(std::string const &filename)
+void Model :: saveObjFile(std::string const &filename)
 {
 	updateHighResData();
 	highResGeometry.save_obj_file(filename);
@@ -567,7 +542,7 @@ void Mesh :: saveObjFile(std::string const &filename)
 
 }
 
-float Mesh :: intersectTriangle(Triangle plane,Point camera,Point camDir,float tCurrent=-2)
+float Model :: intersectTriangle(Triangle plane,Point camera,Point camDir,float tCurrent=-2)
 {
 	Vertex va=lowResGeometry.vertices[plane.v1];
 	Vertex vb=lowResGeometry.vertices[plane.v2];
