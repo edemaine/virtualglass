@@ -29,6 +29,7 @@ class MainWindow : public QMainWindow
 		void frontViewButtonPressed();
 		void topViewButtonPressed();
 		void sideViewButtonPressed();
+		void switchViewButtonPressed();
 		void pullButtonPressed();
 		void bundleButtonPressed();
 		void flattenButtonPressed();

@@ -33,6 +33,11 @@
 #define WRAP_MODE 6
 #define SELECT_MODE 7
 
+#define FREE_VIEW 1
+#define FRONT_VIEW 2
+#define TOP_VIEW 3
+#define SIDE_VIEW 4
+
 #define PI 3.14159265358979323846f
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))

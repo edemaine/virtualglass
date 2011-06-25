@@ -37,13 +37,13 @@ OpenGLWidget object by calling setMode().
 
 OpenGLWidget :: OpenGLWidget(QWidget *parent=0) : QGLWidget(parent)
 {
-    shiftButtonDown = false;
-    showAxes = true;
-    resolution = HIGH_RESOLUTION;
-    mode = LOOK_MODE;
-    mesh = new Mesh(NULL);
-    history = new CaneHistory();
-    updateTriangles();
+	shiftButtonDown = false;
+	showAxes = true;
+	resolution = HIGH_RESOLUTION;
+	mode = LOOK_MODE;
+	mesh = new Mesh(NULL);
+	history = new CaneHistory();
+	updateTriangles();
 }
 
 void OpenGLWidget :: setShiftButtonDown(bool state)
@@ -86,11 +86,11 @@ region (no triangles exist to be drawn).
 */
 void OpenGLWidget :: zeroCanes()
 {
-    history->saveState(NULL);
-    mesh->setCane(NULL);
-    updateTriangles();
-    paintGL();
-} 
+	history->saveState(NULL);
+	mesh->setCane(NULL);
+	updateTriangles();
+	paintGL();
+}
 
 bool OpenGLWidget :: hasCanes()
 {
@@ -113,6 +113,7 @@ receives a pointer to this array.
 void OpenGLWidget :: paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
 	if (showAxes)
 		drawAxes();
@@ -145,11 +146,18 @@ void OpenGLWidget :: paintGL()
 	swapBuffers();
 }
 
+void OpenGLWidget :: switchView()
+{
+	isOrthographic=!isOrthographic;
+}
+
 /*
 Calls if the OpenGLWidget object is resized (in the GUI sense).
 */
 void OpenGLWidget :: resizeGL(int width, int height)
 {
+	//this->width = width;
+	//this->height = height;
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();

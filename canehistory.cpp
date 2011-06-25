@@ -1,7 +1,7 @@
 
 #include "canehistory.h"
 
-CaneHistory :: CaneHistory() 
+CaneHistory :: CaneHistory()
 {
 	past = new Cane*[100];
 	future = new Cane*[100];
@@ -13,8 +13,8 @@ void CaneHistory :: saveState(Cane* c)
 {
 	if (curPast == maxSize)
 		doubleSize();
-	
-	// If you have `undone' some things 
+
+	// If you have `undone' some things
 	// then saving the current state implies
 	// throwing away the other branch of the future
 	if (curFuture != 0)
@@ -23,7 +23,7 @@ void CaneHistory :: saveState(Cane* c)
 	curPast++;
 	past[curPast] = c;
 }
-		
+
 Cane* CaneHistory :: getState()
 {
 	return past[curPast];
@@ -35,7 +35,7 @@ void CaneHistory :: undo()
 		return;
 	curFuture++;
 	future[curFuture] = past[curPast];
-	curPast--;	
+	curPast--;
 }
 
 void CaneHistory :: redo()
@@ -48,7 +48,7 @@ void CaneHistory :: redo()
 	curFuture--;
 }
 
-		
+
 void CaneHistory :: doubleSize()
 {
 	Cane** newPast = new Cane*[2*maxSize];

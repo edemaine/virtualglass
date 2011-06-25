@@ -39,22 +39,16 @@ class OpenGLWidget : public QGLWidget
 		void saveObjFile(std::string const &filename);
 		void setShiftButtonDown(bool state);
 		void setBgColor(QColor color);
+		void switchView();
 
-    private:
-	CaneHistory* history;
-        bool shiftButtonDown;
-        bool rightMouseDown;
-        QColor bgColor;
-        Mesh* mesh;
-        int mode;
-    	Geometry *geometry;
-        int resolution;
-        bool showAxes;
-        bool showGrid;
+	signals:
+		void modeChanged(int m);
 
 	private:
+		CaneHistory* history;
 		bool shiftButtonDown;
 		bool rightMouseDown;
+		bool isOrthographic;
 		QColor bgColor;
 		Mesh* mesh;
 		int mode;

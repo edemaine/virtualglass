@@ -52,7 +52,7 @@ void MainWindow::userModeChanged(int mode) {
 			break;
 		default:
 			modeLabel->setText("NO MODE");
-    	}
+		}
 }
 
 void MainWindow::setupStatusBar()
@@ -83,35 +83,35 @@ void MainWindow::setupLibraryArea()
 
 void MainWindow::seedLibrary()
 {
-    // Now seed the library with some basic canes
-    Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
-    Cane* stretch = new Cane(STRETCH_CANETYPE);
+	// Now seed the library with some basic canes
+	Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
+	Cane* stretch = new Cane(STRETCH_CANETYPE);
 
-    stretch->subcaneCount = 1;
-    stretch->subcanes[0] = c;
-    stretch->amts[0] = 100.0;
+	stretch->subcaneCount = 1;
+	stretch->subcanes[0] = c;
+	stretch->amts[0] = 100.0;
 
 	c->color.r = 0.8;
 	c->color.g = 0.8;
 	c->color.b = 0.8;
 	c->color.a = 0.3;
 
-    glassgl->setFocusCane(stretch);
-    saveCaneToLibrary();
-    c->color.r = 1.0;
-    c->color.g = 0.5;
-    c->color.b = 0.5;
-    c->color.a = 0.7;
-    glassgl->setFocusCane(stretch);
-    saveCaneToLibrary();
-    c->color.r = 0.5;
-    c->color.g = 1.0;
-    c->color.b = 0.5;
-    glassgl->setFocusCane(stretch);
-    saveCaneToLibrary();
-    c->color.r = 0.5;
-    c->color.g = 0.5;
-    c->color.b = 1.0;
+	glassgl->setFocusCane(stretch);
+	saveCaneToLibrary();
+	c->color.r = 1.0;
+	c->color.g = 0.5;
+	c->color.b = 0.5;
+	c->color.a = 0.7;
+	glassgl->setFocusCane(stretch);
+	saveCaneToLibrary();
+	c->color.r = 0.5;
+	c->color.g = 1.0;
+	c->color.b = 0.5;
+	glassgl->setFocusCane(stretch);
+	saveCaneToLibrary();
+	c->color.r = 0.5;
+	c->color.g = 0.5;
+	c->color.b = 1.0;
 	glassgl->setFocusCane(stretch);
 	saveCaneToLibrary();
 
@@ -174,6 +174,12 @@ void MainWindow::sideViewButtonPressed()
 	glassgl->setMode(LOOK_MODE);
 	glassgl->setCamera(0,PI/2);
 	statusBar->showMessage("Switched to Side View", 2000);
+}
+
+void MainWindow::switchViewButtonPressed()
+{
+	glassgl->switchView();
+	statusBar->showMessage("Switched to Perspective/Orthographic View", 2000);
 }
 
 void MainWindow::pullButtonPressed()
@@ -393,6 +399,10 @@ void MainWindow::setupWorkArea()
 	QPushButton* sideView_button = new QPushButton("Side View");
 	connect(sideView_button, SIGNAL(clicked()), this, SLOT(sideViewButtonPressed()));
 
+	QPushButton* switchView_button = new QPushButton("Switch View");
+	connect(switchView_button, SIGNAL(clicked()), this, SLOT(switchViewButtonPressed()));
+	switchView_button->setToolTip("Switch between perspective and orthographic views");
+
 	QPushButton* zoom_in_button = new QPushButton("Zoom In");
 	connect(zoom_in_button, SIGNAL(pressed()), this, SLOT(zoomInButtonPressed()));
 
@@ -410,6 +420,7 @@ void MainWindow::setupWorkArea()
 	viewButton_layout->addWidget(frontView_button);
 	viewButton_layout->addWidget(topView_button);
 	viewButton_layout->addWidget(sideView_button);
+	viewButton_layout->addWidget(switchView_button);
 	viewButton_layout->addWidget(zoom_in_button);
 	viewButton_layout->addWidget(zoom_out_button);
 	viewButton_layout->addWidget(toggle_axes_button);

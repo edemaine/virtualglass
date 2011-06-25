@@ -19,7 +19,7 @@ class CaneHistory
 		int maxSize;
 		int curPast;
 		int curFuture;
-		void doubleSize();	
+		void doubleSize();
 };
 
 #endif
