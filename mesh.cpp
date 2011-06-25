@@ -567,7 +567,7 @@ void Mesh :: saveObjFile(std::string const &filename)
 
 }
 
-bool Mesh :: intersectTriangle(Triangle plane,Point camera,Point camDir)
+float Mesh :: intersectTriangle(Triangle plane,Point camera,Point camDir,float tCurrent=-2)
 {
     Vertex va=lowResGeometry.vertices[plane.v1];
     Vertex vb=lowResGeometry.vertices[plane.v2];
@@ -584,9 +584,12 @@ bool Mesh :: intersectTriangle(Triangle plane,Point camera,Point camDir)
     float t = matrixDeterminant3by3(a-camera,a-c,a-camera)/detA;
 
     if (beta+gamma<1 && beta>0 && gamma>0 && t>0)
-        return true;
+    {
+        if (t<tCurrent || tCurrent==-2)
+            return t;
+    }
 
-    return false;
+    return -1;
 }
 
 

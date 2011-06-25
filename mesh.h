@@ -38,16 +38,16 @@ class Geometry
     std::vector< Vertex > vertices;
     std::vector< Triangle > triangles;
     void clear() {
-       vertices.clear();
-       triangles.clear();
+        vertices.clear();
+        triangles.clear();
     }
     bool valid() const {
-       for (std::vector< Triangle >::const_iterator t = triangles.begin(); t != triangles.end(); ++t) {
-       if (t->v1 >= vertices.size()) return false;
-       if (t->v2 >= vertices.size()) return false;
-       if (t->v3 >= vertices.size()) return false;
-       }
-       return true;
+        for (std::vector< Triangle >::const_iterator t = triangles.begin(); t != triangles.end(); ++t) {
+            if (t->v1 >= vertices.size()) return false;
+            if (t->v2 >= vertices.size()) return false;
+            if (t->v3 >= vertices.size()) return false;
+        }
+        return true;
     }
     void compute_normals_from_triangles();
     void save_obj_file(std::string const &filename) const;
@@ -94,7 +94,7 @@ class Mesh
         void updateLowResData();
         void updateHighResData();
         float matrixDeterminant3by3(Point a,Point b,Point c);
-        bool intersectTriangle(Triangle plane,Point camera,Point camDir);
+        float intersectTriangle(Triangle plane,Point camera,Point camDir,float tCurrent);
 };
 
 #endif
