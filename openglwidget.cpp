@@ -37,45 +37,45 @@ OpenGLWidget object by calling setMode().
  
 OpenGLWidget :: OpenGLWidget(QWidget *parent=0) : QGLWidget(parent)
 {
-	shiftButtonDown = false;
-        showAxes = true;
-        resolution = HIGH_RESOLUTION;
-        mode = LOOK_MODE;  
-        mesh = new Mesh(NULL);
-        updateTriangles();
+    shiftButtonDown = false;
+    showAxes = true;
+    resolution = HIGH_RESOLUTION;
+    mode = LOOK_MODE;
+    mesh = new Mesh(NULL);
+    updateTriangles();
 }
 
 void OpenGLWidget :: setShiftButtonDown(bool state)
 {
-	shiftButtonDown = state;
+    shiftButtonDown = state;
 }
 
 void OpenGLWidget :: initializeGL()
 {
-        // Camera location
-        theta = -PI/2.0;
-        fee = PI/4.0;
-        rho = 3.0;
+    // Camera location
+    theta = -PI/2.0;
+    fee = PI/4.0;
+    rho = 3.0;
 
-        // Camera look-at location
-        lookAtLoc[0] = lookAtLoc[1] = 0;
-        lookAtLoc[2] = 0.5;
+    // Camera look-at location
+    lookAtLoc[0] = lookAtLoc[1] = 0;
+    lookAtLoc[2] = 0.5;
 
-        // For shadow/lighting
-        lightPosition[0] = 0.0;
-        lightPosition[1] = 0.0;
-        lightPosition[2] = 1000.0;
-        lightPosition[3] = 0.0;
-        glEnable(GL_LIGHTING);
-        glEnable(GL_LIGHT0);
-        glEnable(GL_COLOR_MATERIAL);
-        glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    // For shadow/lighting
+    lightPosition[0] = 0.0;
+    lightPosition[1] = 0.0;
+    lightPosition[2] = 1000.0;
+    lightPosition[3] = 0.0;
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
-        // For transparency
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // For transparency
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 }
 
 /*
@@ -85,9 +85,9 @@ region (no triangles exist to be drawn).
 */ 
 void OpenGLWidget :: zeroCanes()
 {
-        mesh->setCane(NULL);
-        updateTriangles();
-        paintGL();
+    mesh->setCane(NULL);
+    updateTriangles();
+    paintGL();
 } 
 
 bool OpenGLWidget :: hasCanes()
@@ -103,34 +103,34 @@ receives a pointer to this array.
 */
 void OpenGLWidget :: paintGL() 
 {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        if (showAxes)
-                drawAxes();
+    if (showAxes)
+        drawAxes();
 
-        if (geometry) {
-		        //JIM sez: blend not workin' out at the moment
-		        glDisable(GL_BLEND);
+    if (geometry) {
+        //JIM sez: blend not workin' out at the moment
+        glDisable(GL_BLEND);
 
-                //Check that Vertex and Triangle have proper size:
-                assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3 + 4));
-                assert(sizeof(Triangle) == sizeof(GLuint) * 3);
+        //Check that Vertex and Triangle have proper size:
+        assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3 + 4));
+        assert(sizeof(Triangle) == sizeof(GLuint) * 3);
 
-                glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].position));
-                glNormalPointer(GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].normal));
-                glColorPointer(4, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].color));
-                glEnableClientState(GL_VERTEX_ARRAY);
-                glEnableClientState(GL_NORMAL_ARRAY);
-                glEnableClientState(GL_COLOR_ARRAY);
+        glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].position));
+              glNormalPointer(GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].normal));
+        glColorPointer(4, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].color));
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
 
-                glDrawElements(GL_TRIANGLES, geometry->triangles.size() * 3, GL_UNSIGNED_INT, &(geometry->triangles[0].v1));
+        glDrawElements(GL_TRIANGLES, geometry->triangles.size() * 3, GL_UNSIGNED_INT, &(geometry->triangles[0].v1));
 
-                glDisableClientState(GL_VERTEX_ARRAY);
-                glDisableClientState(GL_NORMAL_ARRAY);
-                glDisableClientState(GL_COLOR_ARRAY);
-        }
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glDisableClientState(GL_COLOR_ARRAY);
+    }
 
-        swapBuffers();  
+    swapBuffers();
 }  
 
 /*
@@ -138,33 +138,33 @@ Calls if the OpenGLWidget object is resized (in the GUI sense).
 */ 
 void OpenGLWidget :: resizeGL(int width, int height)
 {
-        glViewport(0, 0, width, height);
-        glMatrixMode(GL_PROJECTION); 
-        glLoadIdentity();
-        gluPerspective(45.0, (float)width / (float)height, 0.01, 10.0);
-        glMatrixMode(GL_MODELVIEW);
-        updateCamera();
-        paintGL(); 
+    glViewport(0, 0, width, height);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0, (float)width / (float)height, 0.01, 10.0);
+    glMatrixMode(GL_MODELVIEW);
+    updateCamera();
+    paintGL();
 }
 
 void OpenGLWidget :: zoomIn()
 {
-        rho *= 0.8;
-        updateCamera();
-        paintGL();
+    rho *= 0.8;
+    updateCamera();
+    paintGL();
 }
 
 void OpenGLWidget :: zoomOut()
 {
-        rho *= 1.2;
-        updateCamera();
-        paintGL();
+    rho *= 1.2;
+    updateCamera();
+    paintGL();
 }
 
 void OpenGLWidget :: toggleAxes()
 {
-        showAxes = !showAxes;
-        paintGL();
+    showAxes = !showAxes;
+    paintGL();
 }
 
 /*
@@ -175,9 +175,9 @@ array containing the mesh, and drawing it.
 */
 void OpenGLWidget :: setFocusCane(Cane* c)
 {
-        mesh->setCane(c);
-        updateTriangles();
-        paintGL();
+    mesh->setCane(c);
+    updateTriangles();
+    paintGL();
 } 
 
 /*
@@ -189,8 +189,8 @@ object, updating its Triangle array pointer.
 */
 void OpenGLWidget :: updateResolution(int new_resolution)
 {
-        resolution = new_resolution;
-        updateTriangles();
+    resolution = new_resolution;
+    updateTriangles();
 }
 
 /*
@@ -199,7 +199,7 @@ modifying the cane it contains.
 */
 void OpenGLWidget :: updateTriangles()
 {
-        geometry = mesh->getGeometry(resolution);
+    geometry = mesh->getGeometry(resolution);
 } 
 
 /*
@@ -211,16 +211,16 @@ void OpenGLWidget :: setMode(int m)
     if (this->mode == m) {
         return;
     }
-        this->mode = m;
+    this->mode = m;
 
-        // Special call when entering BUNDLE_MODE
-        // because the mode causes the cane to
-        // change appearance (subcane illumination, etc.).
-        if (mode == BUNDLE_MODE)
-        {
-                mesh->startMoveMode(); 
-        }
-   emit modeChanged(m);
+    // Special call when entering BUNDLE_MODE
+    // because the mode causes the cane to
+    // change appearance (subcane illumination, etc.).
+    if (mode == BUNDLE_MODE)
+    {
+        mesh->startMoveMode();
+    }
+    emit modeChanged(m);
 }
 
 /*
@@ -229,11 +229,11 @@ the next subcane in the cane.
 */
 void OpenGLWidget :: advanceActiveSubcane()
 {
-        if (mode == BUNDLE_MODE)
-        {
-                mesh->advanceActiveSubcane();
-                paintGL();
-        }
+    if (mode == BUNDLE_MODE)
+    {
+        mesh->advanceActiveSubcane();
+        paintGL();
+    }
 }
 
 /*
@@ -241,13 +241,13 @@ Called after the camera changes location.
 */
 void OpenGLWidget :: updateCamera()
 {
-        eyeLoc[0] = lookAtLoc[0] + rho*sin(fee)*cos(theta);
-        eyeLoc[1] = lookAtLoc[1] + rho*sin(fee)*sin(theta);
-        eyeLoc[2] = lookAtLoc[2] + rho*cos(fee);
-        glLoadIdentity();
-        gluLookAt(eyeLoc[0], eyeLoc[1], eyeLoc[2],
-                lookAtLoc[0], lookAtLoc[1], lookAtLoc[2],
-                0.0, 0.0, 1.0);   
+    eyeLoc[0] = lookAtLoc[0] + rho*sin(fee)*cos(theta);
+    eyeLoc[1] = lookAtLoc[1] + rho*sin(fee)*sin(theta);
+    eyeLoc[2] = lookAtLoc[2] + rho*cos(fee);
+    glLoadIdentity();
+    gluLookAt(eyeLoc[0], eyeLoc[1], eyeLoc[2],
+               lookAtLoc[0], lookAtLoc[1], lookAtLoc[2],
+               0.0, 0.0, 1.0);
 }
 
 /*
@@ -256,24 +256,23 @@ Currently catches all mouse press events
 */
 void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 {
-        // Update instance variables for mouse location
-        mouseLocX = e->x();
-        mouseLocY = e->y();
+    // Update instance variables for mouse location
+    mouseLocX = e->x();
+    mouseLocY = e->y();
 
-         if (e->button() == Qt::RightButton){
-             setMode(LOOK_MODE);
-         }
+    if (e->button() == Qt::RightButton){
+        setMode(LOOK_MODE);
+    }
 
-        // Change as part of dual mode feature
-        updateResolution(LOW_RESOLUTION); 
+    // Change as part of dual mode feature
+    updateResolution(LOW_RESOLUTION);
 
-        if (mode == SELECT_MODE)
-        {
+    if (mode == SELECT_MODE)
+    {
+        updateCamera();
+    }
 
-                updateCamera();
-        }
-
-        paintGL();
+    paintGL();
 }
 
 /*
@@ -282,10 +281,10 @@ Currently catches all mouse release events
 */
 void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* /*unused: e */)
 {
-        // Change as part of dual mode feature
-        updateResolution(HIGH_RESOLUTION);
+    // Change as part of dual mode feature
+    updateResolution(HIGH_RESOLUTION);
 
-        paintGL();
+    paintGL();
 }
 
 /*
@@ -296,78 +295,79 @@ part of the mode feature.
 */
 void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 {
-        float relX, relY;
-        float newFee;
-        float windowWidth, windowHeight;
-        int oldMouseLocX, oldMouseLocY;
+    float relX, relY;
+    float newFee;
+    float windowWidth, windowHeight;
+    int oldMouseLocX, oldMouseLocY;
 
-        windowWidth = this->width();
-        windowHeight = this->height();
+    windowWidth = this->width();
+    windowHeight = this->height();
 
-        // Calculate how much mouse moved
-        oldMouseLocX = mouseLocX;
-        mouseLocX = e->x();
-        relX = (mouseLocX - oldMouseLocX) / windowWidth;
-        oldMouseLocY = mouseLocY;
-        mouseLocY = e->y();
-        relY = (mouseLocY - oldMouseLocY) / windowHeight;
+    // Calculate how much mouse moved
+    oldMouseLocX = mouseLocX;
+    mouseLocX = e->x();
+    relX = (mouseLocX - oldMouseLocX) / windowWidth;
+    oldMouseLocY = mouseLocY;
+    mouseLocY = e->y();
+    relY = (mouseLocY - oldMouseLocY) / windowHeight;
 
-        /* 
-        Do something depending on mode.
-        All modes except LOOK_MODE involve modifying the cane
-        itself, while LOOK_MODE moves the camera.
+    /*
+    Do something depending on mode.
+    All modes except LOOK_MODE involve modifying the cane
+    itself, while LOOK_MODE moves the camera.
 
-        All of the calls to mesh->*Cane() are functions of relX/relY,
-        but the constants involved are determined by experiment, 
-        i.e. how much twist `feels' reasonable for moving the mouse 
-        an inch.
-        */
-        if (mode == LOOK_MODE)
+    All of the calls to mesh->*Cane() are functions of relX/relY,
+    but the constants involved are determined by experiment,
+    i.e. how much twist `feels' reasonable for moving the mouse
+    an inch.
+    */
+    if (mode == LOOK_MODE)
+    {
+        // Rotate camera position around look-at location.
+
+        theta -= (relX * 500.0 * PI / 180.0);
+        newFee = fee - (relY * 500.0 * PI / 180.0);
+        if (newFee > 0.0f && newFee < PI)
+            fee = newFee;
+        updateCamera();
+    }
+    else if (mode == PULL_MODE)
+    {
+        if (shiftButtonDown)
         {
-                // Rotate camera position around look-at location.
-                theta -= (relX * 500.0 * PI / 180.0);
-                newFee = fee - (relY * 500.0 * PI / 180.0);
-                if (newFee > 0.0f && newFee < PI)
-                        fee = newFee;
-                updateCamera();
+            if (abs(relX) > abs(relY))
+                mesh->twistAndStretchCane((relX * 500.0 * PI / 100.0), 0.0);
+            else
+                mesh->twistAndStretchCane(0.0, -5.0*relY);
         }
-        else if (mode == PULL_MODE) 
-        {
-		if (shiftButtonDown)
-		{
-			if (abs(relX) > abs(relY))
-                		mesh->twistAndStretchCane((relX * 500.0 * PI / 100.0), 0.0);
-			else
-                		mesh->twistAndStretchCane(0.0, -5.0*relY);
-		}	
-		else		
-                	mesh->twistAndStretchCane((relX * 500.0 * PI / 100.0), -5.0*relY);
-                updateTriangles();
-        }
-        else if (mode == BUNDLE_MODE)
-        {
-                /*
-                How the parameters for moveCane() are calculated is not obvious.
-                The idea is to make mouse X/Y correspond to the cane moving 
-                left-right/up-down *regardless* of where the camera is. This
-                is why theta (the camera angle relative to the look-at point) is
-                also involved. 
+        else
+            mesh->twistAndStretchCane((relX * 500.0 * PI / 100.0), -5.0*relY);
+        updateTriangles();
+    }
+    else if (mode == BUNDLE_MODE)
+    {
+        /*
+            How the parameters for moveCane() are calculated is not obvious.
+            The idea is to make mouse X/Y correspond to the cane moving
+            left-right/up-down *regardless* of where the camera is. This
+            is why theta (the camera angle relative to the look-at point) is
+            also involved.
       
-                Essentially, the parameters convert the amount moved in X and Y
-                (variables `relX' and `relY') to the amount moved in X and Y
-                according to axes on which the cane lives.
-                */
-                mesh->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta), 
-                        relX * sin(theta + PI / 2.0) + relY * sin(theta));
-                updateTriangles();
-        }
-        else if (mode == FLATTEN_MODE)
-        {
-                mesh->flattenCane(relX, theta + PI / 2.0, -relY);
-                updateTriangles();
-        }
+            Essentially, the parameters convert the amount moved in X and Y
+            (variables `relX' and `relY') to the amount moved in X and Y
+            according to axes on which the cane lives.
+        */
+        mesh->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
+        relX * sin(theta + PI / 2.0) + relY * sin(theta));
+        updateTriangles();
+    }
+    else if (mode == FLATTEN_MODE)
+    {
+        mesh->flattenCane(relX, theta + PI / 2.0, -relY);
+        updateTriangles();
+    }
 
-        paintGL();
+    paintGL();
 }
 
 void OpenGLWidget :: wheelEvent(QWheelEvent *e)
@@ -387,10 +387,10 @@ void OpenGLWidget :: wheelEvent(QWheelEvent *e)
 */
 void OpenGLWidget :: setCamera(float theta, float fee)
 {
-        this->theta = theta;
-        this->fee = fee;
-        updateCamera();
-        paintGL();
+    this->theta = theta;
+    this->fee = fee;
+    updateCamera();
+    paintGL();
 }
 
 Point OpenGLWidget :: getCameraPoint()
@@ -412,7 +412,7 @@ Vector3f OpenGLWidget :: getCameraDirection()
 
 void OpenGLWidget :: saveObjFile(std::string const &filename)
 {
-        mesh->saveObjFile(filename);
+    mesh->saveObjFile(filename);
 }
 
 /*
@@ -420,15 +420,15 @@ void OpenGLWidget :: saveObjFile(std::string const &filename)
 */
 void OpenGLWidget :: drawAxes()
 {
-        glColor3f(1,1,1);
-        glBegin(GL_LINES);
-        glVertex3f(0,0,0);
-        glVertex3f(1,0,0);
-        glVertex3f(0,0,0);
-        glVertex3f(0,-1,0);
-        glVertex3f(0,0,0);
-        glVertex3f(0,0,1.2);
-        glEnd();
+    glColor3f(1,1,1);
+    glBegin(GL_LINES);
+    glVertex3f(0,0,0);
+    glVertex3f(1,0,0);
+    glVertex3f(0,0,0);
+    glVertex3f(0,-1,0);
+    glVertex3f(0,0,0);
+    glVertex3f(0,0,1.2);
+    glEnd();
 }
 
 /*
@@ -437,18 +437,18 @@ into the existing cane being operated on.
 */
 void OpenGLWidget :: addCane(Cane* c)
 {
-        /*
-        If there is no cane currently being operated on,
-        start off by looking at it, otherwise start off by
-        adjusting its location.
-        */
-        if (mesh->getCane() == NULL)
-                setMode(LOOK_MODE); 
-        else
-                setMode(BUNDLE_MODE);
-        mesh->addCane(c);
-        updateTriangles();
-        paintGL();
+    /*
+    If there is no cane currently being operated on,
+    start off by looking at it, otherwise start off by
+    adjusting its location.
+    */
+    if (mesh->getCane() == NULL)
+        setMode(LOOK_MODE);
+    else
+        setMode(BUNDLE_MODE);
+    mesh->addCane(c);
+    updateTriangles();
+    paintGL();
 }
 
 
@@ -458,7 +458,5 @@ DO NOT CHANGE THIS CANE, you will make the Mesh object cry.
 */
 Cane* OpenGLWidget :: getCane()
 {
-        return mesh->getCane();
+    return mesh->getCane();
 }
-
-
