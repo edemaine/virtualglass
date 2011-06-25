@@ -26,7 +26,7 @@ void Cane :: reset()
 	for (i = 0; i < MAX_SUBCANE_COUNT; ++i)
 	{
 		subcanes[i] = NULL;
-		subcaneLocations[i].x = subcaneLocations[i].y = 0.0;
+		subcaneLocations[i].x = subcaneLocations[i].y = subcaneLocations[i].z = 0.0;
 	}
 
 	color.r = color.g = color.b = color.a = 1.0;
@@ -219,6 +219,24 @@ void Cane :: setColor(Color color)
 	this->color = color;
 }
 
+bool isNaN(float n)
+{
+	return n!=n;
+}
+
+float changeIfNaN(float n,float base)
+{
+	if (isNaN(n))
+		return base;
+	else
+		return n;
+}
+
+float zeroIfNaN(float n)
+{
+	return changeIfNaN(n,0);
+}
+
 std::string Cane :: yamlRepresentation()
 {
 	YAML::Emitter out;
@@ -229,7 +247,7 @@ std::string Cane :: yamlRepresentation()
 	out << YAML::Key << "Amounts";
 	out << YAML::Value << YAML::BeginSeq;
 	for (unsigned int j=0;j<sizeof(amts);j++){
-	out << amts[j];
+		out << zeroIfNaN(amts[j]);
 	}
 	out << YAML::EndSeq;
 
@@ -238,11 +256,13 @@ std::string Cane :: yamlRepresentation()
 
 	out << YAML::Key << "SubCaneLocations";
 	out << YAML::Value << YAML::BeginSeq;
-	for (int j=0;j<subcaneCount;j++){
-	Point loc = subcaneLocations[j];
-	out << YAML::BeginSeq;
-	out << loc.x << loc.y << loc.z;
-	out << YAML::EndSeq;
+	for (int j=0;j<subcaneCount;j++)
+	{
+		Point loc = subcaneLocations[j];
+		out << YAML::BeginSeq;
+
+		out << zeroIfNaN(loc.x) << zeroIfNaN(loc.y) << zeroIfNaN(loc.z);
+		out << YAML::EndSeq;
 	}
 	out << YAML::EndSeq;
 
@@ -254,9 +274,9 @@ std::string Cane :: yamlRepresentation()
 	out << YAML::Key << "SubCanes";
 	out << YAML::Value << YAML::BeginSeq;
 	for (int j=0;j<subcaneCount;j++){
-	Cane* cane = subcanes[j];
+		Cane* cane = subcanes[j];
 
-	out << YAML::Literal << cane->yamlRepresentation();
+		out << YAML::Literal << cane->yamlRepresentation();
 	}
 	out << YAML::EndSeq;
 
