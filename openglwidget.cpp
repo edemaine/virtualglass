@@ -95,6 +95,13 @@ bool OpenGLWidget :: hasCanes()
     return mesh->getCane()!=NULL;
 }
 
+void OpenGLWidget :: setBgColor(QColor color)
+{
+    this->qglClearColor(color);
+    bgColor = color;
+    paintGL();
+}
+
 /*
 Handles the drawing of a triangle mesh.
 The triangles array is created and lives in the
@@ -107,6 +114,8 @@ void OpenGLWidget :: paintGL()
 
     if (showAxes)
         drawAxes();
+
+
 
     if (geometry) {
         //JIM sez: blend not workin' out at the moment
@@ -261,7 +270,7 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
     mouseLocY = e->y();
 
     if (e->button() == Qt::RightButton){
-        setMode(LOOK_MODE);
+        rightMouseDown = true;
     }
 
     // Change as part of dual mode feature
@@ -279,11 +288,13 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 Currently catches all mouse release events 
 (left and right buttons, etc.).
 */
-void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* /*unused: e */)
+void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 {
     // Change as part of dual mode feature
     updateResolution(HIGH_RESOLUTION);
-
+    if (e->button() == Qt::RightButton){
+        rightMouseDown = false;
+    }
     paintGL();
 }
 
@@ -321,6 +332,19 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
     i.e. how much twist `feels' reasonable for moving the mouse
     an inch.
     */
+    if (rightMouseDown)
+    {
+        // Rotate camera position around look-at location.
+
+        theta -= (relX * 500.0 * PI / 180.0);
+        newFee = fee - (relY * 500.0 * PI / 180.0);
+        if (newFee > 0.0f && newFee < PI)
+            fee = newFee;
+        updateCamera();
+        paintGL();
+        return;
+    }
+
     if (mode == LOOK_MODE)
     {
         // Rotate camera position around look-at location.
@@ -420,7 +444,7 @@ void OpenGLWidget :: saveObjFile(std::string const &filename)
 */
 void OpenGLWidget :: drawAxes()
 {
-    glColor3f(1,1,1);
+    glColor3f(1-bgColor.redF(),1-bgColor.greenF(),1-bgColor.blueF());
     glBegin(GL_LINES);
     glVertex3f(0,0,0);
     glVertex3f(1,0,0);

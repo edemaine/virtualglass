@@ -184,10 +184,17 @@ void MainWindow::topViewButtonPressed()
     statusBar->showMessage("Switched to Top View", 2000);
 }
 
+void MainWindow::frontViewButtonPressed()
+{
+    glassgl->setMode(LOOK_MODE);
+    glassgl->setCamera(-PI/2,PI/2);
+    statusBar->showMessage("Switched to front View", 2000);
+}
+
 void MainWindow::sideViewButtonPressed()
 {
     glassgl->setMode(LOOK_MODE);
-    glassgl->setCamera(PI/2,PI/2);
+    glassgl->setCamera(0,PI/2);
     statusBar->showMessage("Switched to Side View", 2000);
 }
 
@@ -353,6 +360,11 @@ void MainWindow::newColorPickerCaneButtonPressed()
     colorPickerSelected(QColorDialog::getColor());
 }
 
+void MainWindow::changeBgColorButtonPressed()
+{
+    glassgl->setBgColor(QColorDialog::getColor());
+}
+
 void MainWindow::saveObjButtonPressed()
 {
     QString file = QFileDialog::getSaveFileName(this, tr("Save obj file"), "", tr("Wavefront obj files (*.obj);;All files (*)"));
@@ -394,6 +406,9 @@ void MainWindow::setupWorkArea()
     QPushButton* look_button = new QPushButton("Look");
     connect(look_button, SIGNAL(clicked()), this, SLOT(lookButtonPressed()));
 
+    QPushButton* frontView_button = new QPushButton("Front View");
+    connect(frontView_button, SIGNAL(clicked()), this, SLOT(frontViewButtonPressed()));
+
     QPushButton* topView_button = new QPushButton("Top View");
     connect(topView_button, SIGNAL(clicked()), this, SLOT(topViewButtonPressed()));
 
@@ -411,6 +426,7 @@ void MainWindow::setupWorkArea()
 
     QVBoxLayout* viewButton_layout = new QVBoxLayout();
     //viewButton_layout->addWidget(look_button);
+    viewButton_layout->addWidget(frontView_button);
     viewButton_layout->addWidget(topView_button);
     viewButton_layout->addWidget(sideView_button);
     viewButton_layout->addWidget(zoom_in_button);
@@ -472,6 +488,9 @@ void MainWindow::setupWorkArea()
     connect(colorPicker_button, SIGNAL(pressed()), this, SLOT(newColorPickerCaneButtonPressed()));
     colorPicker_button->setToolTip("Create a New Cane with specified color");
 
+    QPushButton* bgColorPicker_button = new QPushButton("Change Background Color");
+    connect(bgColorPicker_button, SIGNAL(pressed()), this, SLOT(changeBgColorButtonPressed()));
+
     QPushButton* saveObj_button = new QPushButton("Save .obj file");
     connect(saveObj_button, SIGNAL(pressed()), this, SLOT(saveObjButtonPressed()));
     saveObj_button->setToolTip("Save an .obj file with the current cane geometry for rendering in an external program.");
@@ -483,6 +502,7 @@ void MainWindow::setupWorkArea()
     utilButton_layout->addWidget(exportLibrary_button);
     utilButton_layout->addWidget(importLibrary_button);
     utilButton_layout->addWidget(colorPicker_button);
+    utilButton_layout->addWidget(bgColorPicker_button);
     utilButton_layout->addWidget(saveObj_button);
     QWidget* utilButtonWidget = new QWidget();
     utilButtonWidget->setLayout(utilButton_layout);

@@ -25,6 +25,7 @@ class MainWindow : public QMainWindow
         void zoomOutButtonPressed();
         void toggleAxesButtonPressed();
         void lookButtonPressed();
+        void frontViewButtonPressed();
         void topViewButtonPressed();
         void sideViewButtonPressed();
         void pullButtonPressed();
@@ -38,6 +39,7 @@ class MainWindow : public QMainWindow
         void exportLibraryButtonPressed();
         void importLibraryButtonPressed();
         void newColorPickerCaneButtonPressed();
+        void changeBgColorButtonPressed();
         void saveObjButtonPressed();
         void colorPickerSelected(QColor color);
         void modeSelect(int index);

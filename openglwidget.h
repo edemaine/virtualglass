@@ -36,12 +36,15 @@ class OpenGLWidget : public QGLWidget
         Vector3f getCameraDirection();
         void saveObjFile(std::string const &filename);
     	void setShiftButtonDown(bool state);
+        void setBgColor(QColor color);
 
     signals:
         void modeChanged(int mode);
 
     private:
-    	bool shiftButtonDown;    
+        bool shiftButtonDown;
+        bool rightMouseDown;
+        QColor bgColor;
         Mesh* mesh;
         int mode;
     	Geometry *geometry;
