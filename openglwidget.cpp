@@ -444,12 +444,14 @@ void OpenGLWidget :: saveObjFile(std::string const &filename)
 */
 void OpenGLWidget :: drawAxes()
 {
-    glColor3f(1-bgColor.redF(),1-bgColor.greenF(),1-bgColor.blueF());
     glBegin(GL_LINES);
+    glColor3f(bgColor.redF(),1-bgColor.greenF(),1-bgColor.blueF());
     glVertex3f(0,0,0);
     glVertex3f(1,0,0);
+    glColor3f(1-bgColor.redF(),bgColor.greenF(),1-bgColor.blueF());
     glVertex3f(0,0,0);
     glVertex3f(0,-1,0);
+    glColor3f(1-bgColor.redF(),1-bgColor.greenF(),bgColor.blueF());
     glVertex3f(0,0,0);
     glVertex3f(0,0,1.2);
     glEnd();
