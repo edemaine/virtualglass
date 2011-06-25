@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <QtGui>
 #include <qgl.h>
+#include "canehistory.h"
 #include "primitives.h"
 #include "constants.h"
 #include "mesh.h"
@@ -39,8 +40,17 @@ class OpenGLWidget : public QGLWidget
 		void setShiftButtonDown(bool state);
 		void setBgColor(QColor color);
 
-	signals:
-		void modeChanged(int mode);
+    private:
+	CaneHistory* history;
+        bool shiftButtonDown;
+        bool rightMouseDown;
+        QColor bgColor;
+        Mesh* mesh;
+        int mode;
+    	Geometry *geometry;
+        int resolution;
+        bool showAxes;
+        bool showGrid;
 
 	private:
 		bool shiftButtonDown;

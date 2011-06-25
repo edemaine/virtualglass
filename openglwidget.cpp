@@ -37,12 +37,13 @@ OpenGLWidget object by calling setMode().
 
 OpenGLWidget :: OpenGLWidget(QWidget *parent=0) : QGLWidget(parent)
 {
-	shiftButtonDown = false;
-	showAxes = true;
-	resolution = HIGH_RESOLUTION;
-	mode = LOOK_MODE;
-	mesh = new Mesh(NULL);
-	updateTriangles();
+    shiftButtonDown = false;
+    showAxes = true;
+    resolution = HIGH_RESOLUTION;
+    mode = LOOK_MODE;
+    mesh = new Mesh(NULL);
+    history = new CaneHistory();
+    updateTriangles();
 }
 
 void OpenGLWidget :: setShiftButtonDown(bool state)
@@ -85,10 +86,11 @@ region (no triangles exist to be drawn).
 */
 void OpenGLWidget :: zeroCanes()
 {
-	mesh->setCane(NULL);
-	updateTriangles();
-	paintGL();
-}
+    history->saveState(NULL);
+    mesh->setCane(NULL);
+    updateTriangles();
+    paintGL();
+} 
 
 bool OpenGLWidget :: hasCanes()
 {

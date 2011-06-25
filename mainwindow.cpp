@@ -38,21 +38,21 @@ void MainWindow::userModeChanged(int mode) {
 	statusBar->showMessage("Switching User Mode", 2000);
 	switch(mode)
 	{
-	case LOOK_MODE:
-	   modeLabel->setText("LOOK MODE");
-	   break;
-	case PULL_MODE:
-	   modeLabel->setText("PULL MODE");
-	   break;
-	case BUNDLE_MODE:
-	   modeLabel->setText("BUNDLE MODE");
-	   break;
-	case FLATTEN_MODE:
-	   modeLabel->setText("FLATTEN MODE");
-	   break;
-	default:
-	   modeLabel->setText("NO MODE");
-	}
+		case LOOK_MODE:
+			modeLabel->setText("LOOK MODE");
+			break;
+		case PULL_MODE:
+			modeLabel->setText("PULL MODE");
+			break;
+		case BUNDLE_MODE:
+			modeLabel->setText("BUNDLE MODE");
+			break;
+		case FLATTEN_MODE:
+			modeLabel->setText("FLATTEN MODE");
+			break;
+		default:
+			modeLabel->setText("NO MODE");
+    	}
 }
 
 void MainWindow::setupStatusBar()
@@ -83,66 +83,37 @@ void MainWindow::setupLibraryArea()
 
 void MainWindow::seedLibrary()
 {
-	// Now seed the library with some basic canes
-	Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
-	Cane* stch = new Cane(STRETCH_CANETYPE);
-	Cane* stretch = new Cane(STRETCH_CANETYPE);
-	Cane* twist = new Cane(TWIST_CANETYPE);
-	Cane* bundle = new Cane(BUNDLE_CANETYPE);
+    // Now seed the library with some basic canes
+    Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
+    Cane* stretch = new Cane(STRETCH_CANETYPE);
 
-	stch->subcaneCount = 1;
-	stch->subcanes[0] = c;
-	stch->amts[0] = 100.0;
+    stretch->subcaneCount = 1;
+    stretch->subcanes[0] = c;
+    stretch->amts[0] = 100.0;
 
 	c->color.r = 0.8;
 	c->color.g = 0.8;
 	c->color.b = 0.8;
 	c->color.a = 0.3;
 
-	glassgl->setFocusCane(stch);
-	saveCaneToLibrary();
-	c->color.r = 1.0;
-	c->color.g = 0.5;
-	c->color.b = 0.5;
-	c->color.a = 0.7;
-	glassgl->setFocusCane(stch);
-	saveCaneToLibrary();
-	c->color.r = 0.5;
-	c->color.g = 1.0;
-	c->color.b = 0.5;
-	glassgl->setFocusCane(stch);
-	saveCaneToLibrary();
-	c->color.r = 0.5;
-	c->color.g = 0.5;
-	c->color.b = 1.0;
-	glassgl->setFocusCane(stch);
-	saveCaneToLibrary();
-
-	// tmp code to test whether stretch and twist are commutative
-	twist->amts[0] = 10.0;
-	stretch->amts[0] = 10.0;
-
-	bundle->subcaneCount = 1;
-	twist->subcaneCount = 1;
-	stretch->subcaneCount = 1;
-
-	bundle->subcanes[0] = stch;
-	bundle->subcaneLocations[0].x = 0.2;
-	bundle->subcaneLocations[0].y = 0.2;
-
-	stretch->subcanes[0] = twist;
-	twist->subcanes[0] = bundle;
-
+    glassgl->setFocusCane(stretch);
+    saveCaneToLibrary();
+    c->color.r = 1.0;
+    c->color.g = 0.5;
+    c->color.b = 0.5;
+    c->color.a = 0.7;
+    glassgl->setFocusCane(stretch);
+    saveCaneToLibrary();
+    c->color.r = 0.5;
+    c->color.g = 1.0;
+    c->color.b = 0.5;
+    glassgl->setFocusCane(stretch);
+    saveCaneToLibrary();
+    c->color.r = 0.5;
+    c->color.g = 0.5;
+    c->color.b = 1.0;
 	glassgl->setFocusCane(stretch);
 	saveCaneToLibrary();
-
-	twist->subcanes[0] = stretch;
-	stretch->subcanes[0] = bundle;
-
-	glassgl->setFocusCane(twist);
-	saveCaneToLibrary();
-	// end of tmp code
-
 
 	glassgl->zeroCanes();
 
