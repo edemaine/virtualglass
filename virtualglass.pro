@@ -10,7 +10,7 @@ QT += opengl
 
 # Input
 HEADERS += mainwindow.h openglwidget.h cane.h primitives.h model.h controller.h librarycanewidget.h \
-	constants.h canehistory.h \
+	constants.h canehistory.h geometry.h mesh.h \
 	Vector.hpp
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
@@ -63,7 +63,7 @@ HEADERS += yaml-cpp/src/token.h \
 	yaml-cpp/src/collectionstack.h
 
 SOURCES += main.cpp mainwindow.cpp openglwidget.cpp cane.cpp model.cpp controller.cpp librarycanewidget.cpp \
-	canehistory.cpp
+	canehistory.cpp geometry.cpp mesh.cpp
 
 SOURCES += yaml-cpp/src/tag.cpp \
 	yaml-cpp/src/stream.cpp \
