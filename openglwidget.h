@@ -30,6 +30,7 @@ class OpenGLWidget : public QGLWidget
         void zoomIn();
         void zoomOut();
         void toggleAxes();
+        void toggleGrid();
         void setMode(int mode);
         void setCamera(float theta, float fee);
         Point getCameraPoint();
@@ -50,6 +51,7 @@ class OpenGLWidget : public QGLWidget
     	Geometry *geometry;
         int resolution;
         bool showAxes;
+        bool showGrid;
 
         float eyeLoc[3];
         float lookAtLoc[3];
@@ -61,6 +63,7 @@ class OpenGLWidget : public QGLWidget
 
         void updateCamera();
         void drawAxes();
+        void drawGrid();
         void drawTriangle(Triangle* t);
         void updateTriangles();
 

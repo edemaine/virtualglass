@@ -170,6 +170,13 @@ void MainWindow::toggleAxesButtonPressed()
     statusBar->showMessage("Axes Toggled", 2000);
 }
 
+void MainWindow::toggleGridButtonPressed()
+{
+    glassgl->toggleGrid();
+
+    statusBar->showMessage("Grid Toggled", 2000);
+}
+
 void MainWindow::lookButtonPressed()
 {
     glassgl->setMode(LOOK_MODE);
@@ -424,6 +431,9 @@ void MainWindow::setupWorkArea()
     QPushButton* toggle_axes_button = new QPushButton("Toggle Axes");
     connect(toggle_axes_button, SIGNAL(pressed()), this, SLOT(toggleAxesButtonPressed()));
 
+    QPushButton* toggle_grid_button = new QPushButton("Toggle Grid");
+    connect(toggle_grid_button, SIGNAL(pressed()), this, SLOT(toggleGridButtonPressed()));
+
     QVBoxLayout* viewButton_layout = new QVBoxLayout();
     //viewButton_layout->addWidget(look_button);
     viewButton_layout->addWidget(frontView_button);
@@ -432,6 +442,7 @@ void MainWindow::setupWorkArea()
     viewButton_layout->addWidget(zoom_in_button);
     viewButton_layout->addWidget(zoom_out_button);
     viewButton_layout->addWidget(toggle_axes_button);
+    viewButton_layout->addWidget(toggle_grid_button);
     QWidget* viewButtonWidget = new QWidget();
     viewButtonWidget->setLayout(viewButton_layout);
 

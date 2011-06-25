@@ -24,6 +24,7 @@ class MainWindow : public QMainWindow
         void zoomInButtonPressed();
         void zoomOutButtonPressed();
         void toggleAxesButtonPressed();
+        void toggleGridButtonPressed();
         void lookButtonPressed();
         void frontViewButtonPressed();
         void topViewButtonPressed();

@@ -115,7 +115,8 @@ void OpenGLWidget :: paintGL()
     if (showAxes)
         drawAxes();
 
-
+    if (showGrid)
+        drawGrid();
 
     if (geometry) {
         //JIM sez: blend not workin' out at the moment
@@ -173,6 +174,12 @@ void OpenGLWidget :: zoomOut()
 void OpenGLWidget :: toggleAxes()
 {
     showAxes = !showAxes;
+    paintGL();
+}
+
+void OpenGLWidget :: toggleGrid()
+{
+    showGrid = !showGrid;
     paintGL();
 }
 
@@ -437,6 +444,26 @@ Vector3f OpenGLWidget :: getCameraDirection()
 void OpenGLWidget :: saveObjFile(std::string const &filename)
 {
     mesh->saveObjFile(filename);
+}
+
+/*
+
+*/
+void OpenGLWidget :: drawGrid()
+{
+    //return;
+    glBegin(GL_LINES);
+    glColor3f(1-bgColor.redF(),1-bgColor.greenF(),1-bgColor.blueF());
+    float max=1;
+    float resolution=10;
+    for (float i=-max;i<=max;i+=max/resolution)
+    {
+        glVertex3f(i,0,-max);
+        glVertex3f(i,0,max);
+        glVertex3f(-max,0,i);
+        glVertex3f(max,0,i);
+    }
+    glEnd();
 }
 
 /*
