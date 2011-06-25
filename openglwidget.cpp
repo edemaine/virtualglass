@@ -40,7 +40,7 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent=0) : QGLWidget(parent)
 	model = new Model(NULL);
 	history = new CaneHistory();
 	updateTriangles();
-	}
+}
 
 void OpenGLWidget :: setShiftButtonDown(bool state)
 {

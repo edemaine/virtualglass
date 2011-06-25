@@ -68,6 +68,9 @@ class OpenGLWidget : public QGLWidget
 		void drawTriangle(Triangle* t);
 		void updateTriangles();
 
+	signals:
+		void modeChanged(int mode);
+
 	protected:
 		void initializeGL();
 		void paintGL();
