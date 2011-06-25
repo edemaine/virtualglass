@@ -21,110 +21,110 @@
 
 namespace YAML
 {
-    class AliasManager;
-    class Content;
-    class NodeOwnership;
-    class Scanner;
-    class Emitter;
-    class EventHandler;
+	class AliasManager;
+	class Content;
+	class NodeOwnership;
+	class Scanner;
+	class Emitter;
+	class EventHandler;
 
-    struct NodeType { enum value { Null, Scalar, Sequence, Map }; };
+	struct NodeType { enum value { Null, Scalar, Sequence, Map }; };
 
-    class YAML_CPP_API Node: private noncopyable
-    {
-    public:
-    	friend class NodeOwnership;
-    	friend class NodeBuilder;
-    	
-    	Node();
-    	~Node();
+	class YAML_CPP_API Node: private noncopyable
+	{
+	public:
+		friend class NodeOwnership;
+		friend class NodeBuilder;
 
-    	void Clear();
-    	std::auto_ptr<Node> Clone() const;
-    	void EmitEvents(EventHandler& eventHandler) const;
-    	void EmitEvents(AliasManager& am, EventHandler& eventHandler) const;
-    	
-    	NodeType::value Type() const { return m_type; }
-    	bool IsAliased() const;
+		Node();
+		~Node();
 
-    	// file location of start of this node
-    	const Mark GetMark() const { return m_mark; }
+		void Clear();
+		std::auto_ptr<Node> Clone() const;
+		void EmitEvents(EventHandler& eventHandler) const;
+		void EmitEvents(AliasManager& am, EventHandler& eventHandler) const;
 
-    	// accessors
-    	Iterator begin() const;
-    	Iterator end() const;
-    	std::size_t size() const;
+		NodeType::value Type() const { return m_type; }
+		bool IsAliased() const;
 
-    	// extraction of scalars
-    	bool GetScalar(std::string& s) const;
+		// file location of start of this node
+		const Mark GetMark() const { return m_mark; }
 
-    	// we can specialize this for other values
-    	template <typename T>
-    	bool Read(T& value) const;
+		// accessors
+		Iterator begin() const;
+		Iterator end() const;
+		std::size_t size() const;
 
-    	template <typename T>
-    	const T to() const;
+		// extraction of scalars
+		bool GetScalar(std::string& s) const;
 
-    	template <typename T>
-    	friend YAML_CPP_API void operator >> (const Node& node, T& value);
+		// we can specialize this for other values
+		template <typename T>
+		bool Read(T& value) const;
 
-    	// retrieval for maps and sequences
-    	template <typename T>
-    	const Node *FindValue(const T& key) const;
+		template <typename T>
+		const T to() const;
 
-    	template <typename T>
-    	const Node& operator [] (const T& key) const;
-    	
-    	// specific to maps
-    	const Node *FindValue(const char *key) const;
-    	const Node& operator [] (const char *key) const;
+		template <typename T>
+		friend YAML_CPP_API void operator >> (const Node& node, T& value);
 
-    	// for tags
-    	const std::string& Tag() const { return m_tag; }
+		// retrieval for maps and sequences
+		template <typename T>
+		const Node *FindValue(const T& key) const;
 
-    	// emitting
-    	friend YAML_CPP_API Emitter& operator << (Emitter& out, const Node& node);
+		template <typename T>
+		const Node& operator [] (const T& key) const;
 
-    	// ordering
-    	int Compare(const Node& rhs) const;
-    	friend bool operator < (const Node& n1, const Node& n2);
+		// specific to maps
+		const Node *FindValue(const char *key) const;
+		const Node& operator [] (const char *key) const;
 
-    private:
-    	explicit Node(NodeOwnership& owner);
-    	Node& CreateNode();
-    	
-    	void Init(NodeType::value type, const Mark& mark, const std::string& tag);
-    	
-    	void MarkAsAliased();
-    	void SetScalarData(const std::string& data);
-    	void Append(Node& node);
-    	void Insert(Node& key, Node& value);
+		// for tags
+		const std::string& Tag() const { return m_tag; }
 
-    	// helper for sequences
-    	template <typename, bool> friend struct _FindFromNodeAtIndex;
-    	const Node *FindAtIndex(std::size_t i) const;
-    	
-    	// helper for maps
-    	template <typename T>
-    	const Node& GetValue(const T& key) const;
+		// emitting
+		friend YAML_CPP_API Emitter& operator << (Emitter& out, const Node& node);
 
-    	template <typename T>
-    	const Node *FindValueForKey(const T& key) const;
+		// ordering
+		int Compare(const Node& rhs) const;
+		friend bool operator < (const Node& n1, const Node& n2);
 
-    private:
-    	std::auto_ptr<NodeOwnership> m_pOwnership;
+	private:
+		explicit Node(NodeOwnership& owner);
+		Node& CreateNode();
 
-    	Mark m_mark;
-    	std::string m_tag;
+		void Init(NodeType::value type, const Mark& mark, const std::string& tag);
 
-    	typedef std::vector<Node *> node_seq;
-    	typedef std::map<Node *, Node *, ltnode> node_map;
+		void MarkAsAliased();
+		void SetScalarData(const std::string& data);
+		void Append(Node& node);
+		void Insert(Node& key, Node& value);
 
-    	NodeType::value m_type;
-    	std::string m_scalarData;
-    	node_seq m_seqData;
-    	node_map m_mapData;
-    };
+		// helper for sequences
+		template <typename, bool> friend struct _FindFromNodeAtIndex;
+		const Node *FindAtIndex(std::size_t i) const;
+
+		// helper for maps
+		template <typename T>
+		const Node& GetValue(const T& key) const;
+
+		template <typename T>
+		const Node *FindValueForKey(const T& key) const;
+
+	private:
+		std::auto_ptr<NodeOwnership> m_pOwnership;
+
+		Mark m_mark;
+		std::string m_tag;
+
+		typedef std::vector<Node *> node_seq;
+		typedef std::map<Node *, Node *, ltnode> node_map;
+
+		NodeType::value m_type;
+		std::string m_scalarData;
+		node_seq m_seqData;
+		node_map m_mapData;
+	};
 }
 
 #include "yaml-cpp/nodeimpl.h"

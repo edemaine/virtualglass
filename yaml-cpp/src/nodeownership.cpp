@@ -3,29 +3,29 @@
 
 namespace YAML
 {
-    NodeOwnership::NodeOwnership(NodeOwnership *pOwner): m_pOwner(pOwner)
-    {
-    	if(!m_pOwner)
-    	    m_pOwner = this;
-    }
-    
-    NodeOwnership::~NodeOwnership()
-    {
-    }
+	NodeOwnership::NodeOwnership(NodeOwnership *pOwner): m_pOwner(pOwner)
+	{
+		if(!m_pOwner)
+			m_pOwner = this;
+	}
 
-    Node& NodeOwnership::_Create()
-    {
-    	m_nodes.push_back(std::auto_ptr<Node>(new Node));
-    	return m_nodes.back();
-    }
+	NodeOwnership::~NodeOwnership()
+	{
+	}
 
-    void NodeOwnership::_MarkAsAliased(const Node& node)
-    {
-    	m_aliasedNodes.insert(&node);
-    }
+	Node& NodeOwnership::_Create()
+	{
+		m_nodes.push_back(std::auto_ptr<Node>(new Node));
+		return m_nodes.back();
+	}
 
-    bool NodeOwnership::_IsAliased(const Node& node) const
-    {
-    	return m_aliasedNodes.count(&node) > 0;
-    }
+	void NodeOwnership::_MarkAsAliased(const Node& node)
+	{
+		m_aliasedNodes.insert(&node);
+	}
+
+	bool NodeOwnership::_IsAliased(const Node& node) const
+	{
+		return m_aliasedNodes.count(&node) > 0;
+	}
 }

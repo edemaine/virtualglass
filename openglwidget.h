@@ -16,65 +16,65 @@ using namespace std;
 
 class OpenGLWidget : public QGLWidget
 {
-    Q_OBJECT
-  
-    public:
-        OpenGLWidget(QWidget *parent);
-        void updateResolution(int new_resolution);
-        void setFocusCane(Cane* c);
-        void addCane(Cane* c);
-        Cane* getCane();
-        void advanceActiveSubcane();
-        void zeroCanes();
-        bool hasCanes();
-        void zoomIn();
-        void zoomOut();
-        void toggleAxes();
-        void toggleGrid();
-        void setMode(int mode);
-        void setCamera(float theta, float fee);
-        Point getCameraPoint();
-        Vector3f getCameraDirection();
-        void saveObjFile(std::string const &filename);
-    	void setShiftButtonDown(bool state);
-        void setBgColor(QColor color);
+	Q_OBJECT
 
-    signals:
-        void modeChanged(int mode);
+	public:
+		OpenGLWidget(QWidget *parent);
+		void updateResolution(int new_resolution);
+		void setFocusCane(Cane* c);
+		void addCane(Cane* c);
+		Cane* getCane();
+		void advanceActiveSubcane();
+		void zeroCanes();
+		bool hasCanes();
+		void zoomIn();
+		void zoomOut();
+		void toggleAxes();
+		void toggleGrid();
+		void setMode(int mode);
+		void setCamera(float theta, float fee);
+		Point getCameraPoint();
+		Vector3f getCameraDirection();
+		void saveObjFile(std::string const &filename);
+		void setShiftButtonDown(bool state);
+		void setBgColor(QColor color);
 
-    private:
-        bool shiftButtonDown;
-        bool rightMouseDown;
-        QColor bgColor;
-        Mesh* mesh;
-        int mode;
-    	Geometry *geometry;
-        int resolution;
-        bool showAxes;
-        bool showGrid;
+	signals:
+		void modeChanged(int mode);
 
-        float eyeLoc[3];
-        float lookAtLoc[3];
-        float theta, fee, rho;
+	private:
+		bool shiftButtonDown;
+		bool rightMouseDown;
+		QColor bgColor;
+		Mesh* mesh;
+		int mode;
+		Geometry *geometry;
+		int resolution;
+		bool showAxes;
+		bool showGrid;
 
-        int mouseLocX, mouseLocY;
+		float eyeLoc[3];
+		float lookAtLoc[3];
+		float theta, fee, rho;
 
-        GLfloat lightPosition[4];
+		int mouseLocX, mouseLocY;
 
-        void updateCamera();
-        void drawAxes();
-        void drawGrid();
-        void drawTriangle(Triangle* t);
-        void updateTriangles();
+		GLfloat lightPosition[4];
 
-    protected:
-        void initializeGL();
-        void paintGL();
-        void resizeGL(int width, int height);
-        void mousePressEvent(QMouseEvent* e);
-        void mouseReleaseEvent(QMouseEvent* e);
-        void mouseMoveEvent(QMouseEvent* e);
-        void wheelEvent(QWheelEvent* e);
+		void updateCamera();
+		void drawAxes();
+		void drawGrid();
+		void drawTriangle(Triangle* t);
+		void updateTriangles();
+
+	protected:
+		void initializeGL();
+		void paintGL();
+		void resizeGL(int width, int height);
+		void mousePressEvent(QMouseEvent* e);
+		void mouseReleaseEvent(QMouseEvent* e);
+		void mouseMoveEvent(QMouseEvent* e);
+		void wheelEvent(QWheelEvent* e);
 };
 
 #endif

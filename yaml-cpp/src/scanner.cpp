@@ -7,381 +7,381 @@
 
 namespace YAML
 {
-    Scanner::Scanner(std::istream& in)
-    	: INPUT(in), m_startedStream(false), m_endedStream(false), m_simpleKeyAllowed(false), m_canBeJSONFlow(false)
-    {
-    }
+	Scanner::Scanner(std::istream& in)
+		: INPUT(in), m_startedStream(false), m_endedStream(false), m_simpleKeyAllowed(false), m_canBeJSONFlow(false)
+	{
+	}
 
-    Scanner::~Scanner()
-    {
-    }
+	Scanner::~Scanner()
+	{
+	}
 
-    // empty
-    // . Returns true if there are no more tokens to be read
-    bool Scanner::empty()
-    {
-    	EnsureTokensInQueue();
-    	return m_tokens.empty();
-    }
+	// empty
+	// . Returns true if there are no more tokens to be read
+	bool Scanner::empty()
+	{
+		EnsureTokensInQueue();
+		return m_tokens.empty();
+	}
 
-    // pop
-    // . Simply removes the next token on the queue.
-    void Scanner::pop()
-    {
-    	EnsureTokensInQueue();
-    	if(!m_tokens.empty())
-    	    m_tokens.pop();
-    }
+	// pop
+	// . Simply removes the next token on the queue.
+	void Scanner::pop()
+	{
+		EnsureTokensInQueue();
+		if(!m_tokens.empty())
+			m_tokens.pop();
+	}
 
-    // peek
-    // . Returns (but does not remove) the next token on the queue.
-    Token& Scanner::peek()
-    {
-    	EnsureTokensInQueue();
-    	assert(!m_tokens.empty());  // should we be asserting here? I mean, we really just be checking
-    	            // if it's empty before peeking.
+	// peek
+	// . Returns (but does not remove) the next token on the queue.
+	Token& Scanner::peek()
+	{
+		EnsureTokensInQueue();
+		assert(!m_tokens.empty());  // should we be asserting here? I mean, we really just be checking
+					// if it's empty before peeking.
 
 #if 0
-    	static Token *pLast = 0;
-    	if(pLast != &m_tokens.front())
-    	    std::cerr << "peek: " << m_tokens.front() << "\n";
-    	pLast = &m_tokens.front();
+		static Token *pLast = 0;
+		if(pLast != &m_tokens.front())
+			std::cerr << "peek: " << m_tokens.front() << "\n";
+		pLast = &m_tokens.front();
 #endif
 
-    	return m_tokens.front();
-    }
+		return m_tokens.front();
+	}
 
-    // EnsureTokensInQueue
-    // . Scan until there's a valid token at the front of the queue,
-    //   or we're sure the queue is empty.
-    void Scanner::EnsureTokensInQueue()
-    {
-    	while(1) {
-    	    if(!m_tokens.empty()) {
-    	    	Token& token = m_tokens.front();
+	// EnsureTokensInQueue
+	// . Scan until there's a valid token at the front of the queue,
+	//   or we're sure the queue is empty.
+	void Scanner::EnsureTokensInQueue()
+	{
+		while(1) {
+			if(!m_tokens.empty()) {
+				Token& token = m_tokens.front();
 
-    	    	// if this guy's valid, then we're done
-    	    	if(token.status == Token::VALID)
-    	    	    return;
+				// if this guy's valid, then we're done
+				if(token.status == Token::VALID)
+					return;
 
-    	    	// here's where we clean up the impossible tokens
-    	    	if(token.status == Token::INVALID) {
-    	    	    m_tokens.pop();
-    	    	    continue;
-    	    	}
+				// here's where we clean up the impossible tokens
+				if(token.status == Token::INVALID) {
+					m_tokens.pop();
+					continue;
+				}
 
-    	    	// note: what's left are the unverified tokens
-    	    }
+				// note: what's left are the unverified tokens
+			}
 
-    	    // no token? maybe we've actually finished
-    	    if(m_endedStream)
-    	    	return;
+			// no token? maybe we've actually finished
+			if(m_endedStream)
+				return;
 
-    	    // no? then scan...
-    	    ScanNextToken();
-    	}
-    }
+			// no? then scan...
+			ScanNextToken();
+		}
+	}
 
-    // ScanNextToken
-    // . The main scanning function; here we branch out and
-    //   scan whatever the next token should be.
-    void Scanner::ScanNextToken()
-    {
-    	if(m_endedStream)
-    	    return;
+	// ScanNextToken
+	// . The main scanning function; here we branch out and
+	//   scan whatever the next token should be.
+	void Scanner::ScanNextToken()
+	{
+		if(m_endedStream)
+			return;
 
-    	if(!m_startedStream)
-    	    return StartStream();
+		if(!m_startedStream)
+			return StartStream();
 
-    	// get rid of whitespace, etc. (in between tokens it should be irrelevent)
-    	ScanToNextToken();
+		// get rid of whitespace, etc. (in between tokens it should be irrelevent)
+		ScanToNextToken();
 
-    	// maybe need to end some blocks
-    	PopIndentToHere();
+		// maybe need to end some blocks
+		PopIndentToHere();
 
-    	// *****
-    	// And now branch based on the next few characters!
-    	// *****
-    	
-    	// end of stream
-    	if(!INPUT)
-    	    return EndStream();
+		// *****
+		// And now branch based on the next few characters!
+		// *****
 
-    	if(INPUT.column() == 0 && INPUT.peek() == Keys::Directive)
-    	    return ScanDirective();
+		// end of stream
+		if(!INPUT)
+			return EndStream();
 
-    	// document token
-    	if(INPUT.column() == 0 && Exp::DocStart().Matches(INPUT))
-    	    return ScanDocStart();
+		if(INPUT.column() == 0 && INPUT.peek() == Keys::Directive)
+			return ScanDirective();
 
-    	if(INPUT.column() == 0 && Exp::DocEnd().Matches(INPUT))
-    	    return ScanDocEnd();
+		// document token
+		if(INPUT.column() == 0 && Exp::DocStart().Matches(INPUT))
+			return ScanDocStart();
 
-    	// flow start/end/entry
-    	if(INPUT.peek() == Keys::FlowSeqStart || INPUT.peek() == Keys::FlowMapStart)
-    	    return ScanFlowStart();
+		if(INPUT.column() == 0 && Exp::DocEnd().Matches(INPUT))
+			return ScanDocEnd();
 
-    	if(INPUT.peek() == Keys::FlowSeqEnd || INPUT.peek() == Keys::FlowMapEnd)
-    	    return ScanFlowEnd();
-    
-    	if(INPUT.peek() == Keys::FlowEntry)
-    	    return ScanFlowEntry();
+		// flow start/end/entry
+		if(INPUT.peek() == Keys::FlowSeqStart || INPUT.peek() == Keys::FlowMapStart)
+			return ScanFlowStart();
 
-    	// block/map stuff
-    	if(Exp::BlockEntry().Matches(INPUT))
-    	    return ScanBlockEntry();
+		if(INPUT.peek() == Keys::FlowSeqEnd || INPUT.peek() == Keys::FlowMapEnd)
+			return ScanFlowEnd();
 
-    	if((InBlockContext() ? Exp::Key() : Exp::KeyInFlow()).Matches(INPUT))
-    	    return ScanKey();
+		if(INPUT.peek() == Keys::FlowEntry)
+			return ScanFlowEntry();
 
-    	if(GetValueRegex().Matches(INPUT))
-    	    return ScanValue();
+		// block/map stuff
+		if(Exp::BlockEntry().Matches(INPUT))
+			return ScanBlockEntry();
 
-    	// alias/anchor
-    	if(INPUT.peek() == Keys::Alias || INPUT.peek() == Keys::Anchor)
-    	    return ScanAnchorOrAlias();
+		if((InBlockContext() ? Exp::Key() : Exp::KeyInFlow()).Matches(INPUT))
+			return ScanKey();
 
-    	// tag
-    	if(INPUT.peek() == Keys::Tag)
-    	    return ScanTag();
+		if(GetValueRegex().Matches(INPUT))
+			return ScanValue();
 
-    	// special scalars
-    	if(InBlockContext() && (INPUT.peek() == Keys::LiteralScalar || INPUT.peek() == Keys::FoldedScalar))
-    	    return ScanBlockScalar();
+		// alias/anchor
+		if(INPUT.peek() == Keys::Alias || INPUT.peek() == Keys::Anchor)
+			return ScanAnchorOrAlias();
 
-    	if(INPUT.peek() == '\'' || INPUT.peek() == '\"')
-    	    return ScanQuotedScalar();
+		// tag
+		if(INPUT.peek() == Keys::Tag)
+			return ScanTag();
 
-    	// plain scalars
-    	if((InBlockContext() ? Exp::PlainScalar() : Exp::PlainScalarInFlow()).Matches(INPUT))
-    	    return ScanPlainScalar();
+		// special scalars
+		if(InBlockContext() && (INPUT.peek() == Keys::LiteralScalar || INPUT.peek() == Keys::FoldedScalar))
+			return ScanBlockScalar();
 
-    	// don't know what it is!
-    	throw ParserException(INPUT.mark(), ErrorMsg::UNKNOWN_TOKEN);
-    }
+		if(INPUT.peek() == '\'' || INPUT.peek() == '\"')
+			return ScanQuotedScalar();
 
-    // ScanToNextToken
-    // . Eats input until we reach the next token-like thing.
-    void Scanner::ScanToNextToken()
-    {
-    	while(1) {
-    	    // first eat whitespace
-    	    while(INPUT && IsWhitespaceToBeEaten(INPUT.peek())) {
-    	    	if(InBlockContext() && Exp::Tab().Matches(INPUT))
-    	    	    m_simpleKeyAllowed = false;
-    	    	INPUT.eat(1);
-    	    }
+		// plain scalars
+		if((InBlockContext() ? Exp::PlainScalar() : Exp::PlainScalarInFlow()).Matches(INPUT))
+			return ScanPlainScalar();
 
-    	    // then eat a comment
-    	    if(Exp::Comment().Matches(INPUT)) {
-    	    	// eat until line break
-    	    	while(INPUT && !Exp::Break().Matches(INPUT))
-    	    	    INPUT.eat(1);
-    	    }
+		// don't know what it is!
+		throw ParserException(INPUT.mark(), ErrorMsg::UNKNOWN_TOKEN);
+	}
 
-    	    // if it's NOT a line break, then we're done!
-    	    if(!Exp::Break().Matches(INPUT))
-    	    	break;
+	// ScanToNextToken
+	// . Eats input until we reach the next token-like thing.
+	void Scanner::ScanToNextToken()
+	{
+		while(1) {
+			// first eat whitespace
+			while(INPUT && IsWhitespaceToBeEaten(INPUT.peek())) {
+				if(InBlockContext() && Exp::Tab().Matches(INPUT))
+					m_simpleKeyAllowed = false;
+				INPUT.eat(1);
+			}
 
-    	    // otherwise, let's eat the line break and keep going
-    	    int n = Exp::Break().Match(INPUT);
-    	    INPUT.eat(n);
+			// then eat a comment
+			if(Exp::Comment().Matches(INPUT)) {
+				// eat until line break
+				while(INPUT && !Exp::Break().Matches(INPUT))
+					INPUT.eat(1);
+			}
 
-    	    // oh yeah, and let's get rid of that simple key
-    	    InvalidateSimpleKey();
+			// if it's NOT a line break, then we're done!
+			if(!Exp::Break().Matches(INPUT))
+				break;
 
-    	    // new line - we may be able to accept a simple key now
-    	    if(InBlockContext())
-    	    	m_simpleKeyAllowed = true;
-    }
-    }
+			// otherwise, let's eat the line break and keep going
+			int n = Exp::Break().Match(INPUT);
+			INPUT.eat(n);
 
-    ///////////////////////////////////////////////////////////////////////
-    // Misc. helpers
+			// oh yeah, and let's get rid of that simple key
+			InvalidateSimpleKey();
 
-    // IsWhitespaceToBeEaten
-    // . We can eat whitespace if it's a space or tab
-    // . Note: originally tabs in block context couldn't be eaten
-    //    "where a simple key could be allowed
-    //    (i.e., not at the beginning of a line, or following '-', '?', or ':')"
-    //   I think this is wrong, since tabs can be non-content whitespace; it's just
-    //   that they can't contribute to indentation, so once you've seen a tab in a
-    //   line, you can't start a simple key
-    bool Scanner::IsWhitespaceToBeEaten(char ch)
-    {
-    	if(ch == ' ')
-    	    return true;
+			// new line - we may be able to accept a simple key now
+			if(InBlockContext())
+				m_simpleKeyAllowed = true;
+	}
+	}
 
-    	if(ch == '\t')
-    	    return true;
+	///////////////////////////////////////////////////////////////////////
+	// Misc. helpers
 
-    	return false;
-    }
+	// IsWhitespaceToBeEaten
+	// . We can eat whitespace if it's a space or tab
+	// . Note: originally tabs in block context couldn't be eaten
+	//    "where a simple key could be allowed
+	//    (i.e., not at the beginning of a line, or following '-', '?', or ':')"
+	//   I think this is wrong, since tabs can be non-content whitespace; it's just
+	//   that they can't contribute to indentation, so once you've seen a tab in a
+	//   line, you can't start a simple key
+	bool Scanner::IsWhitespaceToBeEaten(char ch)
+	{
+		if(ch == ' ')
+			return true;
 
-    // GetValueRegex
-    // . Get the appropriate regex to check if it's a value token
-    const RegEx& Scanner::GetValueRegex() const
-    {
-    	if(InBlockContext())
-    	    return Exp::Value();
-    	
-    	return m_canBeJSONFlow ? Exp::ValueInJSONFlow() : Exp::ValueInFlow();
-    }
+		if(ch == '\t')
+			return true;
 
-    // StartStream
-    // . Set the initial conditions for starting a stream.
-    void Scanner::StartStream()
-    {
-    	m_startedStream = true;
-    	m_simpleKeyAllowed = true;
-    	std::auto_ptr<IndentMarker> pIndent(new IndentMarker(-1, IndentMarker::NONE));
-    	m_indentRefs.push_back(pIndent);
-    	m_indents.push(&m_indentRefs.back());
-    }
+		return false;
+	}
 
-    // EndStream
-    // . Close out the stream, finish up, etc.
-    void Scanner::EndStream()
-    {
-    	// force newline
-    	if(INPUT.column() > 0)
-    	    INPUT.ResetColumn();
+	// GetValueRegex
+	// . Get the appropriate regex to check if it's a value token
+	const RegEx& Scanner::GetValueRegex() const
+	{
+		if(InBlockContext())
+			return Exp::Value();
 
-    	PopAllIndents();
-    	PopAllSimpleKeys();
+		return m_canBeJSONFlow ? Exp::ValueInJSONFlow() : Exp::ValueInFlow();
+	}
 
-    	m_simpleKeyAllowed = false;
-    	m_endedStream = true;
-    }
+	// StartStream
+	// . Set the initial conditions for starting a stream.
+	void Scanner::StartStream()
+	{
+		m_startedStream = true;
+		m_simpleKeyAllowed = true;
+		std::auto_ptr<IndentMarker> pIndent(new IndentMarker(-1, IndentMarker::NONE));
+		m_indentRefs.push_back(pIndent);
+		m_indents.push(&m_indentRefs.back());
+	}
 
-    Token *Scanner::PushToken(Token::TYPE type)
-    {
-    	m_tokens.push(Token(type, INPUT.mark()));
-    	return &m_tokens.back();
-    }
+	// EndStream
+	// . Close out the stream, finish up, etc.
+	void Scanner::EndStream()
+	{
+		// force newline
+		if(INPUT.column() > 0)
+			INPUT.ResetColumn();
 
-    Token::TYPE Scanner::GetStartTokenFor(IndentMarker::INDENT_TYPE type) const
-    {
-    	switch(type) {
-    	    case IndentMarker::SEQ: return Token::BLOCK_SEQ_START;
-    	    case IndentMarker::MAP: return Token::BLOCK_MAP_START;
-    	    case IndentMarker::NONE: assert(false); break;
-    	}
-    	assert(false);
-    	throw std::runtime_error("yaml-cpp: internal error, invalid indent type");
-    }
+		PopAllIndents();
+		PopAllSimpleKeys();
 
-    // PushIndentTo
-    // . Pushes an indentation onto the stack, and enqueues the
-    //   proper token (sequence start or mapping start).
-    // . Returns the indent marker it generates (if any).
-    Scanner::IndentMarker *Scanner::PushIndentTo(int column, IndentMarker::INDENT_TYPE type)
-    {
-    	// are we in flow?
-    	if(InFlowContext())
-    	    return 0;
-    	
-    	std::auto_ptr<IndentMarker> pIndent(new IndentMarker(column, type));
-    	IndentMarker& indent = *pIndent;
-    	const IndentMarker& lastIndent = *m_indents.top();
+		m_simpleKeyAllowed = false;
+		m_endedStream = true;
+	}
 
-    	// is this actually an indentation?
-    	if(indent.column < lastIndent.column)
-    	    return 0;
-    	if(indent.column == lastIndent.column && !(indent.type == IndentMarker::SEQ && lastIndent.type == IndentMarker::MAP))
-    	    return 0;
+	Token *Scanner::PushToken(Token::TYPE type)
+	{
+		m_tokens.push(Token(type, INPUT.mark()));
+		return &m_tokens.back();
+	}
 
-    	// push a start token
-    	indent.pStartToken = PushToken(GetStartTokenFor(type));
+	Token::TYPE Scanner::GetStartTokenFor(IndentMarker::INDENT_TYPE type) const
+	{
+		switch(type) {
+			case IndentMarker::SEQ: return Token::BLOCK_SEQ_START;
+			case IndentMarker::MAP: return Token::BLOCK_MAP_START;
+			case IndentMarker::NONE: assert(false); break;
+		}
+		assert(false);
+		throw std::runtime_error("yaml-cpp: internal error, invalid indent type");
+	}
 
-    	// and then the indent
-    	m_indents.push(&indent);
-    	m_indentRefs.push_back(pIndent);
-    	return &m_indentRefs.back();
-    }
+	// PushIndentTo
+	// . Pushes an indentation onto the stack, and enqueues the
+	//   proper token (sequence start or mapping start).
+	// . Returns the indent marker it generates (if any).
+	Scanner::IndentMarker *Scanner::PushIndentTo(int column, IndentMarker::INDENT_TYPE type)
+	{
+		// are we in flow?
+		if(InFlowContext())
+			return 0;
 
-    // PopIndentToHere
-    // . Pops indentations off the stack until we reach the current indentation level,
-    //   and enqueues the proper token each time.
-    // . Then pops all invalid indentations off.
-    void Scanner::PopIndentToHere()
-    {
-    	// are we in flow?
-    	if(InFlowContext())
-    	    return;
+		std::auto_ptr<IndentMarker> pIndent(new IndentMarker(column, type));
+		IndentMarker& indent = *pIndent;
+		const IndentMarker& lastIndent = *m_indents.top();
 
-    	// now pop away
-    	while(!m_indents.empty()) {
-    	    const IndentMarker& indent = *m_indents.top();
-    	    if(indent.column < INPUT.column())
-    	    	break;
-    	    if(indent.column == INPUT.column() && !(indent.type == IndentMarker::SEQ && !Exp::BlockEntry().Matches(INPUT)))
-    	    	break;
-    	    	
-    	    PopIndent();
-    	}
-    	
-    	while(!m_indents.empty() && m_indents.top()->status == IndentMarker::INVALID)
-    	    PopIndent();
-    }
-    
-    // PopAllIndents
-    // . Pops all indentations (except for the base empty one) off the stack,
-    //   and enqueues the proper token each time.
-    void Scanner::PopAllIndents()
-    {
-    	// are we in flow?
-    	if(InFlowContext())
-    	    return;
+		// is this actually an indentation?
+		if(indent.column < lastIndent.column)
+			return 0;
+		if(indent.column == lastIndent.column && !(indent.type == IndentMarker::SEQ && lastIndent.type == IndentMarker::MAP))
+			return 0;
 
-    	// now pop away
-    	while(!m_indents.empty()) {
-    	    const IndentMarker& indent = *m_indents.top();
-    	    if(indent.type == IndentMarker::NONE)
-    	    	break;
-    	    
-    	    PopIndent();
-    	}
-    }
-    
-    // PopIndent
-    // . Pops a single indent, pushing the proper token
-    void Scanner::PopIndent()
-    {
-    	const IndentMarker& indent = *m_indents.top();
-    	m_indents.pop();
+		// push a start token
+		indent.pStartToken = PushToken(GetStartTokenFor(type));
 
-    	if(indent.status != IndentMarker::VALID) {
-    	    InvalidateSimpleKey();
-    	    return;
-    	}
-    	
-    	if(indent.type == IndentMarker::SEQ)
-    	    m_tokens.push(Token(Token::BLOCK_SEQ_END, INPUT.mark()));
-    	else if(indent.type == IndentMarker::MAP)
-    	    m_tokens.push(Token(Token::BLOCK_MAP_END, INPUT.mark()));
-    }
+		// and then the indent
+		m_indents.push(&indent);
+		m_indentRefs.push_back(pIndent);
+		return &m_indentRefs.back();
+	}
 
-    // GetTopIndent
-    int Scanner::GetTopIndent() const
-    {
-    	if(m_indents.empty())
-    	    return 0;
-    	return m_indents.top()->column;
-    }
+	// PopIndentToHere
+	// . Pops indentations off the stack until we reach the current indentation level,
+	//   and enqueues the proper token each time.
+	// . Then pops all invalid indentations off.
+	void Scanner::PopIndentToHere()
+	{
+		// are we in flow?
+		if(InFlowContext())
+			return;
 
-    // ThrowParserException
-    // . Throws a ParserException with the current token location
-    //   (if available).
-    // . Does not parse any more tokens.
-    void Scanner::ThrowParserException(const std::string& msg) const
-    {
-    	Mark mark = Mark::null();
-    	if(!m_tokens.empty()) {
-    	    const Token& token = m_tokens.front();
-    	    mark = token.mark;
-    	}
-    	throw ParserException(mark, msg);
-    }
+		// now pop away
+		while(!m_indents.empty()) {
+			const IndentMarker& indent = *m_indents.top();
+			if(indent.column < INPUT.column())
+				break;
+			if(indent.column == INPUT.column() && !(indent.type == IndentMarker::SEQ && !Exp::BlockEntry().Matches(INPUT)))
+				break;
+
+			PopIndent();
+		}
+
+		while(!m_indents.empty() && m_indents.top()->status == IndentMarker::INVALID)
+			PopIndent();
+	}
+
+	// PopAllIndents
+	// . Pops all indentations (except for the base empty one) off the stack,
+	//   and enqueues the proper token each time.
+	void Scanner::PopAllIndents()
+	{
+		// are we in flow?
+		if(InFlowContext())
+			return;
+
+		// now pop away
+		while(!m_indents.empty()) {
+			const IndentMarker& indent = *m_indents.top();
+			if(indent.type == IndentMarker::NONE)
+				break;
+
+			PopIndent();
+		}
+	}
+
+	// PopIndent
+	// . Pops a single indent, pushing the proper token
+	void Scanner::PopIndent()
+	{
+		const IndentMarker& indent = *m_indents.top();
+		m_indents.pop();
+
+		if(indent.status != IndentMarker::VALID) {
+			InvalidateSimpleKey();
+			return;
+		}
+
+		if(indent.type == IndentMarker::SEQ)
+			m_tokens.push(Token(Token::BLOCK_SEQ_END, INPUT.mark()));
+		else if(indent.type == IndentMarker::MAP)
+			m_tokens.push(Token(Token::BLOCK_MAP_END, INPUT.mark()));
+	}
+
+	// GetTopIndent
+	int Scanner::GetTopIndent() const
+	{
+		if(m_indents.empty())
+			return 0;
+		return m_indents.top()->column;
+	}
+
+	// ThrowParserException
+	// . Throws a ParserException with the current token location
+	//   (if available).
+	// . Does not parse any more tokens.
+	void Scanner::ThrowParserException(const std::string& msg) const
+	{
+		Mark mark = Mark::null();
+		if(!m_tokens.empty()) {
+			const Token& token = m_tokens.front();
+			mark = token.mark;
+		}
+		throw ParserException(mark, msg);
+	}
 }
 

@@ -7,13 +7,13 @@
 
 class Controller
 {
-    public:
-        Controller();
-        int run();
+	public:
+		Controller();
+		int run();
 
-    protected:
-        MainWindow* mainWindow;
-        QApplication* app;
+	protected:
+		MainWindow* mainWindow;
+		QApplication* app;
 };
 
 #endif

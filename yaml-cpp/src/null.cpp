@@ -3,10 +3,10 @@
 
 namespace YAML
 {
-    _Null Null;
+	_Null Null;
 
-    bool IsNull(const Node& node)
-    {
-    	return node.Read(Null);
-    }
+	bool IsNull(const Node& node)
+	{
+		return node.Read(Null);
+	}
 }

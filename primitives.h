@@ -9,4 +9,4 @@ typedef Vector3f Point;
 typedef Vector4f Color;
 
 #endif
- 
+
