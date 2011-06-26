@@ -294,8 +294,8 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 
 
 /*
-generateMesh() is the top-level function for turning a cane into 
-a geometry that can be rendered. As generateMesh() is called recursively, 
+generateMesh() is the top-level function for turning a cane into
+a geometry that can be rendered. As generateMesh() is called recursively,
 the transforms array is filled with with the transformations encountered at each node. When a
 leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
@@ -333,7 +333,7 @@ void generateMesh(Cane* c, Geometry *geometry,
 	{
 		for (i = 0; i < c->subcaneCount; ++i)
 		{
-			generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount, 
+			generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
 				resolution, NULL, isActive);
 		}
 	}

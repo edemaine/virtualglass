@@ -6,7 +6,7 @@
 #include "cane.h"
 #include "geometry.h"
 
-void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount, 
+void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
 	int resolution, Cane* activeSubcane, bool isActive);
 void meshCircularBaseCane(Geometry *geometry,
 	Cane** ancestors, int ancestorCount, Color color, int resolution);

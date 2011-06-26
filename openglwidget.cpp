@@ -86,7 +86,7 @@ void OpenGLWidget :: zeroCanes()
 	model->setCane(NULL);
 	updateTriangles();
 	paintGL();
-} 
+}
 
 bool OpenGLWidget :: hasCanes()
 {

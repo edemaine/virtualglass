@@ -23,10 +23,10 @@ void Model :: updateLowResData()
 	ancestorCount = 0;
 	lowResGeometry.clear();
 	if (cane != NULL && cane->type == BUNDLE_CANETYPE)
-		generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount, 
+		generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount,
 			LOW_RESOLUTION, cane->subcanes[activeSubcane], false);
 	else
-		generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount, 
+		generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount,
 			LOW_RESOLUTION, NULL, false);
 	lowResDataUpToDate = 1;
 }
@@ -39,10 +39,10 @@ void Model :: updateHighResData()
 	ancestorCount = 0;
 	highResGeometry.clear();
 	if (cane != NULL && cane->type == BUNDLE_CANETYPE)
-		generateMesh(cane, &highResGeometry, ancestors, &ancestorCount, 
+		generateMesh(cane, &highResGeometry, ancestors, &ancestorCount,
 			HIGH_RESOLUTION, cane->subcanes[activeSubcane], false);
 	else
-		generateMesh(cane, &highResGeometry, ancestors, &ancestorCount, 
+		generateMesh(cane, &highResGeometry, ancestors, &ancestorCount,
 			HIGH_RESOLUTION, NULL, false);
 	highResDataUpToDate = 1;
 }
