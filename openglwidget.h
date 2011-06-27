@@ -23,11 +23,7 @@ class OpenGLWidget : public QGLWidget
 		Model* getModel();	
 		OpenGLWidget(QWidget* parent, Model* model);
 		void updateResolution(int new_resolution);
-		void setFocusCane(Cane* c);
-		Cane* getCane();
 		void advanceActiveSubcane();
-		void zeroCanes();
-		bool hasCanes();
 		void zoomIn();
 		void zoomOut();
 		void toggleAxes();
@@ -48,7 +44,6 @@ class OpenGLWidget : public QGLWidget
 		bool isOrthographic;
 		QColor bgColor;
 		Model* model;
-		int mode;
 		Geometry *geometry;
 		int resolution;
 		bool showAxes;
@@ -69,12 +64,12 @@ class OpenGLWidget : public QGLWidget
 		void updateTriangles();
 
 	signals:
-		void modeChangedSig(int mode);
 		void zoomInCommandSig();
 		void zoomOutCommandSig();
+		void modeChangedSig(int mode);
 
 	public slots:
-		void modelChangedSlot();
+		void caneChangedSlot();
 		void zoomInCommandSlot();
 		void zoomOutCommandSlot();
 		void frontViewCommandSlot();

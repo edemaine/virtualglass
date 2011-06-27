@@ -22,30 +22,28 @@ class Model : public QObject
 
 	public:
 		Model();
-		void setCane(Cane* c);
 		Cane* getCane();
+		void setCane(Cane* c);
 		Geometry* getGeometry(int resolution);
 		void pullCane(float twistAmount, float stretchFactor);
 		void moveCane(float delta_x, float delta_y);
 		void flattenCane(float rectangle_ratio, float rectangle_theta, float flatness);
 		void addCane(Cane* c);
-		void advanceActiveSubcane();
 		void startMoveMode();
 		void saveObjFile(std::string const &filename);
-		void undo();
-		void redo();
-		bool canRedo();
 		int getMode();
 
 	signals:
 		void caneChangedSig();
-		void modeChangedSig(int mode);
 		void textMessageSig(QString msg);
+		void modeChangedSig(int mode);
 
-	public slots:
-		void modeChangedSlot(int mode);
-		void advanceActiveSubcaneCommandSlot();
-	
+	public slots:	
+		void advanceActiveSubcaneSlot();
+		void undo();
+		void setMode(int mode);
+		void clearCurrentCane();
+
 	private:
 		int mode;
 		Cane *cane;

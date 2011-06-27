@@ -16,16 +16,9 @@ class Controller : public QObject
 		Controller();
 		int startUp();
 
-	signals:
-		void modelChangedSig();
-
-	public slots:
-		void undoCommandSlot(); 
-
 	protected:
 		MainWindow* mainWindow;
 		Model* model;
-		OpenGLWidget* openglWidget;
 		QApplication* app;
 };
 

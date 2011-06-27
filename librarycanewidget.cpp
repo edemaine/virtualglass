@@ -1,16 +1,17 @@
 
 #include "librarycanewidget.h"
 
-LibraryCaneWidget :: LibraryCaneWidget(OpenGLWidget* w, Model* m, Cane* c, QWidget* parent=0): QLabel(parent)
+LibraryCaneWidget :: LibraryCaneWidget(OpenGLWidget* o, Model* m, 
+	QWidget* parent=0): QLabel(parent)
 {
-	cane = c;
 	model = m;
-
+	cane = model->getCane()->deepCopy();
+	
 	setBackgroundRole(QPalette::Base);
 	setFixedSize(100, 100);
 	setScaledContents(true);
 
-	setPixmap(QPixmap::grabWidget(w));
+	setPixmap(QPixmap::grabWidget(o));
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 }
 
@@ -24,6 +25,7 @@ void LibraryCaneWidget :: mousePressEvent(QMouseEvent* event)
 	if (event->button() == Qt::RightButton)
 		return;
 	model->addCane(cane);
+	model->setMode(BUNDLE_MODE);
 }
 
 void LibraryCaneWidget :: mouseReleaseEvent(QMouseEvent* event)

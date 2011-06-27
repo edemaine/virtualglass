@@ -19,18 +19,18 @@ MODES:
 The OpenGLWidget object has a mode for each type of modification
 the user can make to the cane (in addition to a LOOK_MODE, which
 changes the orientation of the cane only). Changing modes is handled by
-other parts of the GUI, and a changed mode is indicated to the
-OpenGLWidget object by calling setMode().
+other parts of the GUI.
 */
 
 #include "openglwidget.h"
 
 OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* model) : QGLWidget(parent)
 {
+	rightMouseDown = false;
 	shiftButtonDown = false;
 	showAxes = true;
+	showGrid = false;
 	resolution = HIGH_RESOLUTION;
-	mode = LOOK_MODE;
 	this->model = model; 
 	history = new CaneHistory();
 	updateTriangles();
@@ -41,7 +41,7 @@ Model* OpenGLWidget :: getModel()
 	return this->model;
 }
 
-void OpenGLWidget :: modelChangedSlot()
+void OpenGLWidget :: caneChangedSlot()
 {
 	updateTriangles();
 	paintGL();		
@@ -78,19 +78,6 @@ void OpenGLWidget :: initializeGL()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glEnable(GL_DEPTH_TEST);
-}
-
-/*
-Resets the cane currently being operated on to ``nothing''.
-This immediately causes the rendering to be updated to a blank
-region (no triangles exist to be drawn).
-*/
-void OpenGLWidget :: zeroCanes()
-{
-	history->saveState(NULL);
-	model->setCane(NULL);
-	updateTriangles();
-	paintGL();
 }
 
 void OpenGLWidget :: setBgColor(QColor color)
@@ -152,8 +139,6 @@ Calls if the OpenGLWidget object is resized (in the GUI sense).
 */
 void OpenGLWidget :: resizeGL(int width, int height)
 {
-	//this->width = width;
-	//this->height = height;
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -204,18 +189,6 @@ void OpenGLWidget :: toggleGridCommandSlot()
 	paintGL();
 }
 
-/*
-Sets the cane currently being interacted with to
-a new cane. This is achieved by passing the cane off
-to the Model object, getting a pointer back to a Triangle
-array containing the mesh, and drawing it.
-*/
-void OpenGLWidget :: setFocusCane(Cane* c)
-{
-	model->setCane(c);
-	updateTriangles();
-	paintGL();
-}
 
 /*
 Is called when the resolution of the rendered cane is changed.
@@ -240,35 +213,14 @@ void OpenGLWidget :: updateTriangles()
 }
 
 /*
-Updates the mode. See constants.h for the various
-modes available (named *_MODE).
-*/
-void OpenGLWidget :: setMode(int m)
-{
-	if (this->mode == m) {
-		return;
-	}
-	this->mode = m;
-
-	// Special call when entering BUNDLE_MODE
-	// because the mode causes the cane to
-	// change appearance (subcane illumination, etc.).
-	if (mode == BUNDLE_MODE)
-	{
-		model->startMoveMode();
-	}
-	emit modeChangedSig(m);
-}
-
-/*
 Changes the current subcane undergoing change to
 the next subcane in the cane.
 */
 void OpenGLWidget :: advanceActiveSubcane()
 {
-	if (mode == BUNDLE_MODE)
+	if (model->getMode() == BUNDLE_MODE)
 	{
-		model->advanceActiveSubcane();
+		model->advanceActiveSubcaneSlot();
 		paintGL();
 	}
 }
@@ -303,11 +255,6 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 
 	// Change as part of dual mode feature
 	updateResolution(LOW_RESOLUTION);
-
-	if (mode == SELECT_MODE)
-	{
-		updateCamera();
-	}
 
 	paintGL();
 }
@@ -376,7 +323,6 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	if (model->getMode() == LOOK_MODE)
 	{
 		// Rotate camera position around look-at location.
-
 		theta -= (relX * 500.0 * PI / 180.0);
 		newFee = fee - (relY * 500.0 * PI / 180.0);
 		if (newFee > 0.0f && newFee < PI)
@@ -394,7 +340,6 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		}
 		else
 			model->pullCane((relX * 500.0 * PI / 100.0), -5.0*relY);
-		updateTriangles();
 	}
 	else if (model->getMode() == BUNDLE_MODE)
 	{
@@ -410,22 +355,16 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 			according to axes on which the cane lives.
 		*/
 		model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
-					   relX * sin(theta + PI / 2.0) + relY * sin(theta));
-		updateTriangles();
+			relX * sin(theta + PI / 2.0) + relY * sin(theta));
 	}
 	else if (model->getMode() == FLATTEN_MODE)
 	{
 		model->flattenCane(relX, theta + PI / 2.0, -relY);
-		updateTriangles();
 	}
-
-	paintGL();
 }
 
 void OpenGLWidget :: wheelEvent(QWheelEvent *e)
 {
-	emit modeChangedSig(LOOK_MODE);
-	setMode(LOOK_MODE);
 	if (e->delta() > 0)
 	{
 		emit zoomInCommandSig();
@@ -507,11 +446,3 @@ void OpenGLWidget :: drawAxes()
 }
 
 
-/*
-Return a pointer to the cane curently being operated on.
-DO NOT CHANGE THIS CANE, you will make the Mesh object cry.
-*/
-Cane* OpenGLWidget :: getCane()
-{
-	return model->getCane();
-}

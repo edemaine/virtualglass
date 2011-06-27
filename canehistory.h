@@ -11,15 +11,11 @@ class CaneHistory
 		void saveState(Cane* c);
 		Cane* getState();
 		void undo();
-		void redo();
-		bool canRedo();
 
 	private:
 		Cane** past;
-		Cane** future;
 		int maxSize;
 		int curPast;
-		int curFuture;
 		void doubleSize();
 };
 

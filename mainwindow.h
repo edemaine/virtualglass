@@ -1,5 +1,5 @@
-#ifndef WORKWINDOW_H
-#define WORKWINDOW_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
 #include <QtGui>
 #include "openglwidget.h"
@@ -18,27 +18,41 @@ class MainWindow : public QMainWindow
 
 	public:
 		MainWindow(Model* model);
-		void saveCaneToLibrary();
 		void seedLibrary();
-		OpenGLWidget* getOpenGLWidget();
+		OpenGLWidget* openglWidget;
+		QPushButton* look_button;
+		QPushButton* zoom_in_button;
+		QPushButton* zoom_out_button;
+		QPushButton* frontView_button;
+		QPushButton* sideView_button;
+		QPushButton* topView_button;
+		QPushButton* switchView_button;
+		QPushButton* toggle_axes_button;
+		QPushButton* toggle_grid_button;
+		QPushButton* pull_button;
+		QPushButton* bundle_button;
+		QPushButton* flatten_button;
+		QPushButton* wrap_button;
+		QPushButton* undo_button;
+		QPushButton* next_button;
+		QPushButton* save_button;
+		QPushButton* clear_button;
+		QPushButton* exportLibrary_button;
+		QPushButton* importLibrary_button;
+		QPushButton* colorPicker_button;
+		QPushButton* bgColorPicker_button;
+		QPushButton* saveObj_button;
 
 	signals:
-		void modeChangedCommandSig(int mode);
-		void zoomInCommandSig();
-		void zoomOutCommandSig();
-                void undoCommandSig();
-                void redoCommandSig();
-		void toggleAxesCommandSig();
-		void toggleGridCommandSig();
-		void switchViewCommandSig();
+		void setCaneSig(Cane* c);
 		void advanceActiveCaneCommandSig();
-		void saveCommandSig();
 		void clearCommandSig();
 		void textMessageSig(QString message);
+		void saveCaneToLibrarySig();
 
 	public slots:
 		void modeChangedSlot(int mode);
-		void saveCommandSlot();
+		void saveCaneToLibrarySlot();
 		void exportLibraryButtonPressed();
 		void importLibraryButtonPressed();
 		void newColorPickerCaneButtonPressed();
@@ -58,7 +72,6 @@ class MainWindow : public QMainWindow
 		void setupStatusBar();
 		void setupWorkArea();
 
-		OpenGLWidget* glassgl;
 		QWidget* centralWidget;
 		QVBoxLayout* windowLayout;
 		QGraphicsView* workview;
@@ -74,6 +87,7 @@ class MainWindow : public QMainWindow
 
 
 };
+
 #endif
 
 

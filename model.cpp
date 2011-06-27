@@ -4,16 +4,14 @@
 Model :: Model()
 {
 	history = new CaneHistory();
+	cane = NULL;	
 	lowResDataUpToDate = 0;
 	highResDataUpToDate = 0;
-	setCane(NULL);
 }
 
-void Model :: advanceActiveSubcaneCommandSlot()
+void Model :: clearCurrentCane()
 {
-	if (mode != BUNDLE_MODE)
-		return;
-	advanceActiveSubcane();
+	setCane(NULL);
 }
 
 int Model :: getMode()
@@ -21,39 +19,17 @@ int Model :: getMode()
 	return mode;
 }
 
-void Model :: modeChangedSlot(int mode)
+void Model :: setMode(int mode)
 {
 	this->mode = mode;
 	emit modeChangedSig(mode);
-	emit caneChangedSig();
-	switch (mode)
-	{
-		case LOOK_MODE:
-			emit textMessageSig("Entered look mode.");
-			break;
-		case PULL_MODE:
-			emit textMessageSig("Entered pull mode.");
-			break;
-		case BUNDLE_MODE:
-			emit textMessageSig("Entered bundle mode.");
-			break;
-		case WRAP_MODE:
-			emit textMessageSig("Entered wrap mode.");
-			break;
-		case FLATTEN_MODE:
-			emit textMessageSig("Entered flatten mode.");
-			break;
-		default:
-			break;
-	}
 }
 
 void Model :: setCane(Cane* c)
 {
 	history->saveState(cane);
 	cane = c;
-	updateLowResData();
-	updateHighResData();
+	lowResDataUpToDate = highResDataUpToDate = 0; 
 	emit caneChangedSig();
 }
 
@@ -164,8 +140,6 @@ void Model :: addCane(Cane* c)
 	else
 		cane->add(c->deepCopy(), &activeSubcane);
 	lowResDataUpToDate = highResDataUpToDate = 0;
-	mode = BUNDLE_MODE;
-	emit modeChangedSig(mode);
 	emit caneChangedSig();
 }
 
@@ -177,38 +151,22 @@ control. It will (i.e. in the future)
 also change the colors of the subcanes
 to illuminate the newly selected subcane.
 */
-void Model :: advanceActiveSubcane()
+void Model :: advanceActiveSubcaneSlot()
 {
 	if (cane->type != BUNDLE_CANETYPE)
 		return;
 	activeSubcane += 1;
 	activeSubcane %= cane->subcaneCount;
 	lowResDataUpToDate = highResDataUpToDate = 0;
-	updateHighResData();
-	updateLowResData();
 	emit caneChangedSig();
 }
 
 void Model :: undo()
 {
+        cane = history->getState();
 	history->undo();
-	cane = history->getState();
-	lowResDataUpToDate = highResDataUpToDate = 0;
-}
-
-bool Model :: canRedo()
-{
-	return history->canRedo();
-}
-
-void Model :: redo()
-{
-	if (history->canRedo())
-	{
-		history->redo();
-		cane = history->getState();
-		lowResDataUpToDate = highResDataUpToDate = 0;
-	}
+        lowResDataUpToDate = highResDataUpToDate = 0;
+        emit caneChangedSig();
 }
 
 void Model :: saveObjFile(std::string const &filename)

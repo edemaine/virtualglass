@@ -89,7 +89,7 @@ void Cane :: pull(float twistRadians, float stretchFactor)
 		this->amts[1] = 1.0; // stretch amount
 	}
 	this->amts[0] += twistRadians;
-	this->amts[1] *= (1.0 + stretchFactor);
+	this->amts[1] += stretchFactor;
 }
 
 /*

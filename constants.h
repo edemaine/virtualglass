@@ -30,7 +30,6 @@
 #define BUNDLE_MODE 4
 #define FLATTEN_MODE 5
 #define WRAP_MODE 6
-#define SELECT_MODE 7
 
 #define FREE_VIEW 1
 #define FRONT_VIEW 2

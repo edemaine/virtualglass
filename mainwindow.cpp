@@ -4,7 +4,6 @@
 MainWindow::MainWindow(Model* model)
 {
 	this->model = model;
-
 	centralWidget = new QWidget(this);
 	this->setCentralWidget(centralWidget);
 	librarySize = 0;
@@ -17,45 +16,6 @@ MainWindow::MainWindow(Model* model)
 
 	resize(1000, 750);
 	move(75,25);
-}
-
-OpenGLWidget* MainWindow::getOpenGLWidget()
-{
-	return glassgl;
-}
-
-void MainWindow::libraryCaneDestroyed(QObject* obj)
-{
-	stockLayout->removeWidget((QWidget*) obj);
-
-	emit textMessageSig("Deleted cane from library");
-}
-
-void MainWindow::textMessageSlot(QString msg)
-{
-	statusBar->showMessage(msg, 2000);
-}
-
-void MainWindow::saveCaneToLibrary()
-{
-	if (this->glassgl->getCane() == NULL)
-		return;
-
-	LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->glassgl,
-			   this->model, this->glassgl->getCane()->deepCopy(), 0);
-	stockLayout->addWidget(lc);
-	connect(stockLayout,SIGNAL(destroyed(QObject*)),this,SLOT(libraryCaneDestroyed(QObject*)));
-
-	emit textMessageSig("Saved cane to library");
-}
-
-void MainWindow::setupStatusBar()
-{
-	statusBar = new QStatusBar(this);
-	modeLabel = new QLabel("NO MODE",statusBar);
-	statusBar->addPermanentWidget(modeLabel);
-	setStatusBar(statusBar);
-	connect(model, SIGNAL(modeChangedSig(int)), this, SLOT(modeChangedSlot()));
 }
 
 void MainWindow::modeChangedSlot(int mode)
@@ -78,6 +38,39 @@ void MainWindow::modeChangedSlot(int mode)
 			modeLabel->setText("UNKNOWN MODE");
 			break;
 	}
+
+}
+
+void MainWindow::libraryCaneDestroyed(QObject* obj)
+{
+	stockLayout->removeWidget((QWidget*) obj);
+	emit textMessageSig("Deleted cane from library");
+}
+
+void MainWindow::textMessageSlot(QString msg)
+{
+	statusBar->showMessage(msg, 2000);
+}
+
+void MainWindow::saveCaneToLibrarySlot()
+{
+	if (model->getCane() == NULL)
+		return;
+
+	LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->openglWidget,
+			   this->model, 0);
+	stockLayout->addWidget(lc);
+	connect(stockLayout, SIGNAL(destroyed(QObject*)), this, SLOT(libraryCaneDestroyed(QObject*)));
+
+	emit textMessageSig("Saved cane to library");
+}
+
+void MainWindow::setupStatusBar()
+{
+	statusBar = new QStatusBar(this);
+	modeLabel = new QLabel("NO MODE",statusBar);
+	statusBar->addPermanentWidget(modeLabel);
+	setStatusBar(statusBar);
 }
 
 void MainWindow::setupLibraryArea()
@@ -105,6 +98,7 @@ void MainWindow::seedLibrary()
 
 	stretch->subcaneCount = 1;
 	stretch->subcanes[0] = c;
+	stretch->amts[0] = 0.0;
 	stretch->amts[1] = 100.0; // amts[0] = twist, amts[1] = stretch
 
 	c->color.r = 0.8;
@@ -112,33 +106,27 @@ void MainWindow::seedLibrary()
 	c->color.b = 0.8;
 	c->color.a = 0.3;
 
-	glassgl->setFocusCane(stretch);
-	saveCaneToLibrary();
+	model->setCane(stretch);
+	emit saveCaneToLibrarySig();
 	c->color.r = 1.0;
 	c->color.g = 0.5;
 	c->color.b = 0.5;
 	c->color.a = 0.7;
-	glassgl->setFocusCane(stretch);
-	saveCaneToLibrary();
+	model->setCane(stretch);
+	emit saveCaneToLibrarySig();
 	c->color.r = 0.5;
 	c->color.g = 1.0;
 	c->color.b = 0.5;
-	glassgl->setFocusCane(stretch);
-	saveCaneToLibrary();
+	model->setCane(stretch);
+	emit saveCaneToLibrarySig();
 	c->color.r = 0.5;
 	c->color.g = 0.5;
 	c->color.b = 1.0;
-	glassgl->setFocusCane(stretch);
-	saveCaneToLibrary();
+	model->setCane(stretch);
+	emit saveCaneToLibrarySig();
 
-	glassgl->zeroCanes();
-
+	model->setCane(NULL);
 	emit textMessageSig("Default library loaded");
-}
-
-void MainWindow::saveCommandSlot()
-{
-	saveCaneToLibrary();
 }
 
 void MainWindow::exportLibraryButtonPressed()
@@ -235,12 +223,11 @@ void MainWindow::importLibraryButtonPressed()
 	for(unsigned i=0;i<doc.size();i++) {
 		Cane loadCane = Cane(UNASSIGNED_CANETYPE);
 		loadLibraryCane(doc[i],&loadCane);
-		glassgl->setFocusCane(&loadCane);
-		saveCaneToLibrary();
+		emit setCaneSig(&loadCane);
+		emit saveCaneToLibrarySig();
 	}
 
-	glassgl->zeroCanes();
-
+	emit setCaneSig(NULL);
 	emit textMessageSig("Library loaded from: " + fileName);
 }
 
@@ -251,7 +238,7 @@ void MainWindow::newColorPickerCaneButtonPressed()
 
 void MainWindow::changeBgColorButtonPressed()
 {
-	glassgl->setBgColor(QColorDialog::getColor());
+	openglWidget->setBgColor(QColorDialog::getColor());
 }
 
 void MainWindow::saveObjButtonPressed()
@@ -259,14 +246,14 @@ void MainWindow::saveObjButtonPressed()
 	QString file = QFileDialog::getSaveFileName(this, tr("Save obj file"), "", tr("Wavefront obj files (*.obj);;All files (*)"));
 	if (!file.isNull())
 	{
-		glassgl->saveObjFile(qPrintable(file));
+		openglWidget->saveObjFile(qPrintable(file));
 	}
 }
 
 void MainWindow::colorPickerSelected(QColor color)
 {
-	saveCaneToLibrary();	
-	model->setCane(NULL);
+	emit saveCaneToLibrarySig();
+	emit setCaneSig(NULL);
 
 	Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
 	Cane* stch = new Cane(PULL_CANETYPE);
@@ -280,53 +267,23 @@ void MainWindow::colorPickerSelected(QColor color)
 	c->color.b = color.blueF();
 	c->color.a = color.alphaF();
 
-	model->setCane(stch);
+	emit setCaneSig(stch);
 }
 
 void MainWindow::setupWorkArea()
 {
-	glassgl = new OpenGLWidget(this, model);
+	openglWidget = new OpenGLWidget(this, model);
 
-	// Connect openglwidget to model 
-	connect(model, SIGNAL(caneChangedSig()), glassgl, SLOT(modelChangedSlot()));
-
-	// Connect mainwindow to model
-	connect(model, SIGNAL(textMessageSig(QString)), this, SLOT(textMessageSlot(QString)));
-	connect(model, SIGNAL(modeChangedSig(QString)), this, SLOT(modeChangedSlot(QString)));
-
-	// Connect model to mainwindow
-	QPushButton* look_button = new QPushButton("Look");
-	connect(look_button, SIGNAL(clicked()), model, SLOT(modeChangedSlot(LOOK_MODE)));
-
-	QPushButton* zoom_in_button = new QPushButton("Zoom In");
-	connect(zoom_in_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(LOOK_MODE)));
-	connect(zoom_in_button, SIGNAL(pressed()), glassgl, SLOT(zoomInCommandSlot()));
-
-	QPushButton* zoom_out_button = new QPushButton("Zoom Out");
-	connect(zoom_in_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(LOOK_MODE)));
-	connect(zoom_out_button, SIGNAL(pressed()), glassgl, SLOT(zoomOutCommandSlot()));
-
-	QPushButton* frontView_button = new QPushButton("Front View");
-	connect(zoom_in_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(LOOK_MODE)));
-	connect(frontView_button, SIGNAL(clicked()), glassgl, SLOT(frontViewCommandSlot()));
-
-	QPushButton* topView_button = new QPushButton("Top View");
-	connect(zoom_in_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(LOOK_MODE)));
-	connect(topView_button, SIGNAL(clicked()), glassgl, SLOT(topViewCommandSlot()));
-
-	QPushButton* sideView_button = new QPushButton("Side View");
-	connect(zoom_in_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(LOOK_MODE)));
-	connect(sideView_button, SIGNAL(clicked()), glassgl, SLOT(sideViewCommandSlot()));
-
-	QPushButton* switchView_button = new QPushButton("Switch View");
-	connect(switchView_button, SIGNAL(clicked()), glassgl, SLOT(switchViewCommandSlot()));
+	look_button = new QPushButton("Look");
+	zoom_in_button = new QPushButton("Zoom In");
+	zoom_out_button = new QPushButton("Zoom Out");
+	frontView_button = new QPushButton("Front View");
+	topView_button = new QPushButton("Top View");
+	sideView_button = new QPushButton("Side View");
+	switchView_button = new QPushButton("Switch View");
 	switchView_button->setToolTip("Switch between perspective and orthographic views");
-
-	QPushButton* toggle_axes_button = new QPushButton("Toggle Axes");
-	connect(toggle_axes_button, SIGNAL(pressed()), glassgl, SLOT(toggleAxesCommandSlot()));
-
-	QPushButton* toggle_grid_button = new QPushButton("Toggle Grid");
-	connect(toggle_grid_button, SIGNAL(pressed()), this, SLOT(toggleGridCommandSlot()));
+	toggle_axes_button = new QPushButton("Toggle Axes");
+	toggle_grid_button = new QPushButton("Toggle Grid");
 
 	QVBoxLayout* viewButton_layout = new QVBoxLayout();
 	viewButton_layout->addWidget(frontView_button);
@@ -340,69 +297,39 @@ void MainWindow::setupWorkArea()
 	QWidget* viewButtonWidget = new QWidget();
 	viewButtonWidget->setLayout(viewButton_layout);
 
-	QPushButton* pull_button = new QPushButton("Pull");
-	connect(pull_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(PULL_MODE)));
+	pull_button = new QPushButton("Pull");
 	pull_button->setToolTip("Drag Mouse Horizontally to Twist, Vertically to Stretch. Use Shift to twist and stretch independently.");
-
-	QPushButton* bundle_button = new QPushButton("Bundle");
-	connect(bundle_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(BUNDLE_MODE)));
-
-	QPushButton* flatten_button = new QPushButton("Flatten");
-	connect(bundle_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(FLATTEN_MODE)));
+	bundle_button = new QPushButton("Bundle");
+	flatten_button = new QPushButton("Flatten");
 	flatten_button->setToolTip("Drag Mouse Horizontally to Squish, Vertically to Flatten");
-
-	QPushButton* wrap_button = new QPushButton("Wrap");
-	connect(wrap_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(WRAP_MODE)));
+	wrap_button = new QPushButton("Wrap");
 	wrap_button->setToolTip("Not Implemented - Select must be functional first");
-
-	QPushButton* undo_button = new QPushButton("Undo");
-	connect(undo_button, SIGNAL(pressed()), model, SLOT(undoCommandSlot()));
+	undo_button = new QPushButton("Undo");
 	undo_button->setToolTip("Undo the last operation.");
-
-	QPushButton* redo_button = new QPushButton("Redo");
-	connect(redo_button, SIGNAL(pressed()), model, SLOT(redoCommandSlot()));
-	redo_button->setToolTip("Redo the last operation.");
-
+	
 	QVBoxLayout* operButton_layout = new QVBoxLayout();
 	operButton_layout->addWidget(pull_button);
 	operButton_layout->addWidget(bundle_button);
 	operButton_layout->addWidget(flatten_button);
 	operButton_layout->addWidget(wrap_button);
 	operButton_layout->addWidget(undo_button);
-	operButton_layout->addWidget(redo_button);
 
 	QWidget* operButtonWidget = new QWidget();
 	operButtonWidget->setLayout(operButton_layout);
-
-	QPushButton* next_button = new QPushButton("Next");
-	connect(next_button, SIGNAL(pressed()), model, SLOT(advanceActiveSubcaneCommandSlot()));
+	next_button = new QPushButton("Next");
 	next_button->setToolTip("Next Cane in Current Model");
-
-	QPushButton* save_button = new QPushButton("Save");
-	connect(save_button, SIGNAL(pressed()), this, SLOT(saveButtonPressed()));
+	save_button = new QPushButton("Save");
 	save_button->setToolTip("Save Current Model to Library");
-
-	QPushButton* clear_button = new QPushButton("Clear");
-	connect(clear_button, SIGNAL(pressed()), model, SLOT(setCane(NULL)));
+	clear_button = new QPushButton("Clear");
 	clear_button->setToolTip("Clear Current Model");
-
-	QPushButton* exportLibrary_button = new QPushButton("Export Library");
-	connect(exportLibrary_button, SIGNAL(pressed()), this, SLOT(exportLibraryButtonPressed()));
+	exportLibrary_button = new QPushButton("Export Library");
 	exportLibrary_button->setToolTip("Save Library to File");
-
-	QPushButton* importLibrary_button = new QPushButton("Import Library");
-	connect(importLibrary_button, SIGNAL(pressed()), this, SLOT(importLibraryButtonPressed()));
+	importLibrary_button = new QPushButton("Import Library");
 	importLibrary_button->setToolTip("Load Library from File");
-
-	QPushButton* colorPicker_button = new QPushButton("New Cane Color");
-	connect(colorPicker_button, SIGNAL(pressed()), this, SLOT(newColorPickerCaneButtonPressed()));
+	colorPicker_button = new QPushButton("New Cane Color");
 	colorPicker_button->setToolTip("Create a New Cane with specified color");
-
-	QPushButton* bgColorPicker_button = new QPushButton("Change Background Color");
-	connect(bgColorPicker_button, SIGNAL(pressed()), this, SLOT(changeBgColorButtonPressed()));
-
-	QPushButton* saveObj_button = new QPushButton("Save .obj file");
-	connect(saveObj_button, SIGNAL(pressed()), this, SLOT(saveObjButtonPressed()));
+	bgColorPicker_button = new QPushButton("Change Background Color");
+	saveObj_button = new QPushButton("Save .obj file");
 	saveObj_button->setToolTip("Save an .obj file with the current cane geometry for rendering in an external program.");
 
 	QVBoxLayout* utilButton_layout = new QVBoxLayout();
@@ -422,14 +349,14 @@ void MainWindow::setupWorkArea()
 	tabWidget->addTab(viewButtonWidget,"View");
 	tabWidget->addTab(operButtonWidget,"Operations");
 	tabWidget->addTab(utilButtonWidget,"Util");
-	connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(modeSelect(int)));
+	//connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(modeSelect(int)));
 
 	QVBoxLayout* button_layout = new QVBoxLayout();
 	button_layout->addWidget(tabWidget);
 
 	QHBoxLayout* workLayout = new QHBoxLayout();
 	workLayout->addLayout(button_layout);
-	workLayout->addWidget(glassgl, 1);
+	workLayout->addWidget(openglWidget, 1);
 	windowLayout->addLayout(workLayout, 5);
 }
 
@@ -440,7 +367,7 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
 		case 0x58: // X
 	   		exit(0);
 		case 0x01000020: // Shift
-	   		glassgl->setShiftButtonDown(true);
+	   		openglWidget->setShiftButtonDown(true);
 	   		break;
 		default:
 			break;
@@ -452,7 +379,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent* e)
 	switch(e->key())
 	{
 		case 0x01000020: // Shift
-			glassgl->setShiftButtonDown(false);
+			openglWidget->setShiftButtonDown(false);
 			break;
 		default:
 			break;
