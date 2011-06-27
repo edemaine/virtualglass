@@ -12,14 +12,14 @@ class Controller : public QObject
 {
 	Q_OBJECT
 
-	public:
-		Controller();
-		int startUp();
+public:
+	Controller();
+	int startUp();
 
-	protected:
-		MainWindow* mainWindow;
-		Model* model;
-		QApplication* app;
+protected:
+	MainWindow* mainWindow;
+	Model* model;
+	QApplication* app;
 };
 
 #endif

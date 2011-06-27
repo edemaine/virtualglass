@@ -7,22 +7,22 @@
 #include "cane.h"
 #include "model.h"
 
-class LibraryCaneWidget : public QLabel 
+class LibraryCaneWidget : public QLabel
 {
 	Q_OBJECT
 
-	public:
-		LibraryCaneWidget(OpenGLWidget* o, Model* m, QWidget* parent);
-		void mousePressEvent(QMouseEvent* event);
-		void mouseReleaseEvent(QMouseEvent* event);
-		Cane* getCane();
+public:
+	LibraryCaneWidget(OpenGLWidget* o, Model* m, QWidget* parent);
+	void mousePressEvent(QMouseEvent* event);
+	void mouseReleaseEvent(QMouseEvent* event);
+	Cane* getCane();
 
-	signals:
-		void modeChangedSig(int mode);
+signals:
+	void modeChangedSig(int mode);
 
-	private:
-		Cane* cane;
-		Model* model;
+private:
+	Cane* cane;
+	Model* model;
 };
 
 #endif

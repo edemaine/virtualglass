@@ -7,12 +7,12 @@
 #include "geometry.h"
 
 void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
-	int resolution, Cane* activeSubcane, bool isActive);
+				  int resolution, Cane* activeSubcane, bool isActive);
 void meshCircularBaseCane(Geometry *geometry,
-	Cane** ancestors, int ancestorCount, Color color, int resolution);
+						  Cane** ancestors, int ancestorCount, Color color, int resolution);
 float computeTotalStretch(Cane** ancestors, int ancestorCount);
 void applyFlattenTransform(Vertex* v, float rectangleRatio,
-	float rectangleTheta, float flatness);
+						   float rectangleTheta, float flatness);
 void applyBundleTransform(Vertex* v, Point location);
 void applyPullTransform(Vertex* v, float twistAmount, float stretchAmount);
 Vertex applyTransforms(Vertex p, Cane** ancestors, int ancestorCount);

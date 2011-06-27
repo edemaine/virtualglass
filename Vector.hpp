@@ -31,156 +31,156 @@ public:
 
 template< typename NUM >
 class Vector< NUM, 0 > {
-	public:
-		NUM *c; //sure, why not.
-		//empty.
+public:
+	NUM *c; //sure, why not.
+	//empty.
 };
 
 template< typename NUM >
 class Vector< NUM, 2 > {
-	public:
+public:
 #ifndef NOUNION
-		union {
+	union {
 #endif
-			NUM c[2];
+		NUM c[2];
 #ifndef NOUNION
-			struct {
-				NUM x;
-				NUM y;
-			};
-			struct {
-				NUM u;
-				NUM v;
-			};
+		struct {
+			NUM x;
+			NUM y;
 		};
+		struct {
+			NUM u;
+			NUM v;
+		};
+	};
 #endif
-		NUM & operator[](int const &i) {
-			return c[i];
+	NUM & operator[](int const &i) {
+		return c[i];
+	}
+	const NUM & operator[](int const &i) const {
+		return c[i];
+	}
+	template< typename NUM2 >
+	inline Vector< NUM, 2 > &operator=( Vector< NUM2, 2 > const & b) {
+		for (unsigned int i = 0; i < 2; ++i) {
+			c[i] = (NUM)b.c[i];
 		}
-		const NUM & operator[](int const &i) const {
-			return c[i];
-		}
-		template< typename NUM2 >
-		inline Vector< NUM, 2 > &operator=( Vector< NUM2, 2 > const & b) {
-			for (unsigned int i = 0; i < 2; ++i) {
-				c[i] = (NUM)b.c[i];
-			}
-			return *this;
-		}
+		return *this;
+	}
 
 };
 
 
 template< typename NUM >
 class Vector< NUM, 3 > {
-	public:
+public:
 #ifndef NOUNION
-		union {
+	union {
 #endif
-			NUM c[3];
+		NUM c[3];
 #ifndef NOUNION
-			struct {
-				NUM x;
-				NUM y;
-				NUM z;
-			};
-			struct {
-				Vector< NUM, 2 > xy;
-				NUM pad1;
-			};
-			struct {
-				NUM pad2;
-				Vector< NUM, 2 > yz;
-			};
-			struct {
-				NUM r;
-				NUM g;
-				NUM b;
-			};
-			struct {
-				NUM h;
-				NUM s;
-				NUM v;
-			};
-
+		struct {
+			NUM x;
+			NUM y;
+			NUM z;
 		};
-#endif
-		NUM & operator[](int const &i) {
-			return c[i];
-		}
-		const NUM & operator[](int const &i) const {
-			return c[i];
-		}
-		template< typename NUM2 >
-		inline Vector< NUM, 3 > &operator=( Vector< NUM2, 3 > const & b) {
-			for (unsigned int i = 0; i < 3; ++i) {
-				c[i] = (NUM)b.c[i];
-			}
-			return *this;
-		}
+		struct {
+			Vector< NUM, 2 > xy;
+			NUM pad1;
+		};
+		struct {
+			NUM pad2;
+			Vector< NUM, 2 > yz;
+		};
+		struct {
+			NUM r;
+			NUM g;
+			NUM b;
+		};
+		struct {
+			NUM h;
+			NUM s;
+			NUM v;
+		};
 
-		void set(NUM const &v1, NUM const &v2, NUM const &v3) {
-			c[0] = v1;
-			c[1] = v2;
-			c[2] = v3;
+	};
+#endif
+	NUM & operator[](int const &i) {
+		return c[i];
+	}
+	const NUM & operator[](int const &i) const {
+		return c[i];
+	}
+	template< typename NUM2 >
+	inline Vector< NUM, 3 > &operator=( Vector< NUM2, 3 > const & b) {
+		for (unsigned int i = 0; i < 3; ++i) {
+			c[i] = (NUM)b.c[i];
 		}
+		return *this;
+	}
+
+	void set(NUM const &v1, NUM const &v2, NUM const &v3) {
+		c[0] = v1;
+		c[1] = v2;
+		c[2] = v3;
+	}
 
 };
 
 
 template< typename NUM >
 class Vector< NUM, 4 > {
-	public:
+public:
 #ifndef NOUNION
-		union {
+	union {
 #endif
-			NUM c[4];
+		NUM c[4];
 #ifndef NOUNION
-			struct {
-				NUM x;
-				NUM y;
-				NUM z;
-				NUM w;
-			};
-			struct {
-				NUM r;
-				NUM g;
-				NUM b;
-				NUM a;
-			};
-			struct {
-				NUM pad1;
-				Vector< NUM, 2 > yz;
-				NUM pad2;
-			};
-			struct {
-				Vector< NUM, 2 > xy;
-				Vector< NUM, 2 > zw;
-			};
-			struct {
-				Vector< NUM, 3 > xyz;
-				NUM pad3;
-			};
-			struct {
-				NUM pad4;
-				Vector< NUM, 3 > yzw;
-			};
+		struct {
+			NUM x;
+			NUM y;
+			NUM z;
+			NUM w;
 		};
+		struct {
+			NUM r;
+			NUM g;
+			NUM b;
+			NUM a;
+		};
+		struct {
+			NUM pad1;
+			Vector< NUM, 2 > yz;
+			NUM pad2;
+		};
+		struct {
+			Vector< NUM, 2 > xy;
+			Vector< NUM, 2 > zw;
+		};
+		struct {
+			Vector< NUM, 3 > xyz;
+			NUM pad3;
+		};
+		struct {
+			NUM pad4;
+			Vector< NUM, 3 > yzw;
+		};
+	};
 #endif
-		NUM & operator[](int const &i) {
-			return c[i];
-		}
-		const NUM & operator[](int const &i) const {
-			return c[i];
-		}
+	NUM & operator[](int const &i) {
+		return c[i];
+	}
+	const NUM & operator[](int const &i) const {
+		return c[i];
+	}
 
-		template< typename NUM2 >
-		inline Vector< NUM, 4 > &operator=( Vector< NUM2, 4 > const & b) {
-			for (unsigned int i = 0; i < 4; ++i) {
-				c[i] = (NUM)b.c[i];
-			}
-			return *this;
+	template< typename NUM2 >
+	inline Vector< NUM, 4 > &operator=( Vector< NUM2, 4 > const & b) {
+		for (unsigned int i = 0; i < 4; ++i) {
+			c[i] = (NUM)b.c[i];
 		}
+		return *this;
+	}
 
 };
 
@@ -479,8 +479,8 @@ istream &operator>>(istream &in, Vector< NUM, SIZE > &vec) {
 			}
 		}
 		if (!(in >> vec.c[i])) {
-				in.setstate( std::ios::failbit );
-				return in;
+			in.setstate( std::ios::failbit );
+			return in;
 		}
 	}
 	if (!(in >> c) || c != ')') {

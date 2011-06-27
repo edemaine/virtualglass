@@ -4,7 +4,7 @@
 Model :: Model()
 {
 	history = new CaneHistory();
-	cane = NULL;	
+	cane = NULL;
 	lowResDataUpToDate = 0;
 	highResDataUpToDate = 0;
 }
@@ -29,7 +29,7 @@ void Model :: setCane(Cane* c)
 {
 	history->saveState(cane);
 	cane = c;
-	lowResDataUpToDate = highResDataUpToDate = 0; 
+	lowResDataUpToDate = highResDataUpToDate = 0;
 	emit caneChangedSig();
 }
 
@@ -42,10 +42,10 @@ void Model :: updateLowResData()
 	lowResGeometry.clear();
 	if (cane != NULL && cane->type == BUNDLE_CANETYPE)
 		generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount,
-			LOW_RESOLUTION, cane->subcanes[activeSubcane], false);
+					 LOW_RESOLUTION, cane->subcanes[activeSubcane], false);
 	else
 		generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount,
-			LOW_RESOLUTION, NULL, false);
+					 LOW_RESOLUTION, NULL, false);
 	lowResDataUpToDate = 1;
 }
 
@@ -58,10 +58,10 @@ void Model :: updateHighResData()
 	highResGeometry.clear();
 	if (cane != NULL && cane->type == BUNDLE_CANETYPE)
 		generateMesh(cane, &highResGeometry, ancestors, &ancestorCount,
-			HIGH_RESOLUTION, cane->subcanes[activeSubcane], false);
+					 HIGH_RESOLUTION, cane->subcanes[activeSubcane], false);
 	else
 		generateMesh(cane, &highResGeometry, ancestors, &ancestorCount,
-			HIGH_RESOLUTION, NULL, false);
+					 HIGH_RESOLUTION, NULL, false);
 	highResDataUpToDate = 1;
 }
 
@@ -134,7 +134,7 @@ void Model :: moveCane(float delta_x, float delta_y)
 
 void Model :: addCane(Cane* c)
 {
-	history->saveState(cane);	
+	history->saveState(cane);
 	if (cane == NULL)
 		cane = c->deepCopy();
 	else
@@ -163,10 +163,10 @@ void Model :: advanceActiveSubcaneSlot()
 
 void Model :: undo()
 {
-        cane = history->getState();
+	cane = history->getState();
 	history->undo();
-        lowResDataUpToDate = highResDataUpToDate = 0;
-        emit caneChangedSig();
+	lowResDataUpToDate = highResDataUpToDate = 0;
+	emit caneChangedSig();
 }
 
 void Model :: saveObjFile(std::string const &filename)

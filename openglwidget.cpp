@@ -1,8 +1,8 @@
 /*
 This class is the QT GUI object that does 3D rendering.
 It also responds to mouse clicks and mouse movement within
-its extent. As this object handles mouse clicks and movement, 
-it is involved in modifying the cane. 
+its extent. As this object handles mouse clicks and movement,
+it is involved in modifying the cane.
 
 Features:
 
@@ -31,7 +31,7 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* model) : QGLWidget(parent)
 	showAxes = true;
 	showGrid = false;
 	resolution = HIGH_RESOLUTION;
-	this->model = model; 
+	this->model = model;
 	history = new CaneHistory();
 	updateTriangles();
 }
@@ -44,7 +44,7 @@ Model* OpenGLWidget :: getModel()
 void OpenGLWidget :: caneChangedSlot()
 {
 	updateTriangles();
-	paintGL();		
+	paintGL();
 }
 
 void OpenGLWidget :: setShiftButtonDown(bool state)
@@ -164,17 +164,17 @@ void OpenGLWidget :: zoomOutCommandSlot()
 
 void OpenGLWidget :: topViewCommandSlot()
 {
-        setCamera(0.0,0.01);
+	setCamera(0.0,0.01);
 }
 
 void OpenGLWidget :: sideViewCommandSlot()
 {
-        setCamera(0.0, PI/2);
+	setCamera(0.0, PI/2);
 }
 
 void OpenGLWidget :: frontViewCommandSlot()
 {
-        setCamera(-PI/2, PI/2);
+	setCamera(-PI/2, PI/2);
 }
 
 void OpenGLWidget :: toggleAxesCommandSlot()
@@ -298,15 +298,15 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	relY = (mouseLocY - oldMouseLocY) / windowHeight;
 
 	/*
-	Do something depending on mode.
-	All modes except LOOK_MODE involve modifying the cane
-	itself, while LOOK_MODE moves the camera.
+ Do something depending on mode.
+ All modes except LOOK_MODE involve modifying the cane
+ itself, while LOOK_MODE moves the camera.
 
-	All of the calls to model->*Cane() are functions of relX/relY,
-	but the constants involved are determined by experiment,
-	i.e. how much twist `feels' reasonable for moving the mouse
-	an inch.
-	*/
+ All of the calls to model->*Cane() are functions of relX/relY,
+ but the constants involved are determined by experiment,
+ i.e. how much twist `feels' reasonable for moving the mouse
+ an inch.
+ */
 	if (rightMouseDown)
 	{
 		// Rotate camera position around look-at location.
@@ -344,18 +344,18 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	else if (model->getMode() == BUNDLE_MODE)
 	{
 		/*
-			How the parameters for moveCane() are calculated is not obvious.
-			The idea is to make mouse X/Y correspond to the cane moving
-			left-right/up-down *regardless* of where the camera is. This
-			is why theta (the camera angle relative to the look-at point) is
-			also involved.
+   How the parameters for moveCane() are calculated is not obvious.
+   The idea is to make mouse X/Y correspond to the cane moving
+   left-right/up-down *regardless* of where the camera is. This
+   is why theta (the camera angle relative to the look-at point) is
+   also involved.
 
-			Essentially, the parameters convert the amount moved in X and Y
-			(variables `relX' and `relY') to the amount moved in X and Y
-			according to axes on which the cane lives.
-		*/
+   Essentially, the parameters convert the amount moved in X and Y
+   (variables `relX' and `relY') to the amount moved in X and Y
+   according to axes on which the cane lives.
+  */
 		model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
-			relX * sin(theta + PI / 2.0) + relY * sin(theta));
+						relX * sin(theta + PI / 2.0) + relY * sin(theta));
 	}
 	else if (model->getMode() == FLATTEN_MODE)
 	{

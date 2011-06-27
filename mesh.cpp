@@ -10,7 +10,7 @@ void applyFlattenTransform(Vertex* v, float rectangleRatio, float rectangleTheta
 	float pt_radius = length(p_r.xy);
 	float pt_theta = atan2(p_r.y, p_r.x);
 	if (pt_theta < 0)
-	pt_theta += 2*PI;
+		pt_theta += 2*PI;
 	float arc_length = pt_radius * pt_theta;
 
 	// We use a boundary-preserving circle to rectangle transformation
@@ -33,34 +33,34 @@ void applyFlattenTransform(Vertex* v, float rectangleRatio, float rectangleTheta
 		}
 		else
 		{
-		arc_length -= 2 * rect_x;
+			arc_length -= 2 * rect_x;
 			if (arc_length < 2 * rect_y)
 			{
-		 p_r.x = -rect_x;
-		 p_r.y = rect_y - arc_length;
+				p_r.x = -rect_x;
+				p_r.y = rect_y - arc_length;
 			}
 			else
 			{
-		 arc_length -= 2 * rect_y;
-		 if (arc_length < 2 * rect_x)
-		 {
-			 p_r.x = -rect_x + arc_length;
-			 p_r.y = -rect_y;
-		 }
-		 else
-		 {
-			 arc_length -= 2 * rect_x;
-			 p_r.x = rect_x;
-			 p_r.y = -rect_y + arc_length;
-		 }
+				arc_length -= 2 * rect_y;
+				if (arc_length < 2 * rect_x)
+				{
+					p_r.x = -rect_x + arc_length;
+					p_r.y = -rect_y;
+				}
+				else
+				{
+					arc_length -= 2 * rect_x;
+					p_r.x = rect_x;
+					p_r.y = -rect_y + arc_length;
+				}
 			}
 		}
 	}
 
 	v->position.x = flatness * (cos(rectangleTheta) * p_r.x
-			 - sin(rectangleTheta) * p_r.y) + v->position.x * (1-flatness);
+								- sin(rectangleTheta) * p_r.y) + v->position.x * (1-flatness);
 	v->position.y = flatness * (sin(rectangleTheta) * p_r.x
-			 + cos(rectangleTheta) * p_r.y) + v->position.y * (1-flatness);
+								+ cos(rectangleTheta) * p_r.y) + v->position.y * (1-flatness);
 	//TODO: normal transform
 }
 
@@ -94,54 +94,54 @@ by its ancestors in the cane DAG.
 Vertex applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
 {
 	/*
-	The transformations are applied back to front to match how they
-	are loaded into the array. Because the transform array is created by
-	a depth-first traversal of the cane DAG, transforms lower in the DAG
-	(i.e. closer to the leaves) are added later. However, they
-	represent the first operations done on the cane, so need to be applied
-	first.
-	*/
+ The transformations are applied back to front to match how they
+ are loaded into the array. Because the transform array is created by
+ a depth-first traversal of the cane DAG, transforms lower in the DAG
+ (i.e. closer to the leaves) are added later. However, they
+ represent the first operations done on the cane, so need to be applied
+ first.
+ */
 	for (int i = ancestorCount - 1; i >= 0; --i)
 	{
 		/*
-		Each cane node has a type and an amount.
-		Depending upon the type, the amount fields
-		take on different meanings. For instance, a twist transform
-		uses amts[0] to mean the magnitude of the twist.
-		just a single real-valued parameter).
-		The BUNDLE_CANETYPE is an exception, in that it simply uses
-		the location of the subcane to determine how to move the points.
-		*/
+  Each cane node has a type and an amount.
+  Depending upon the type, the amount fields
+  take on different meanings. For instance, a twist transform
+  uses amts[0] to mean the magnitude of the twist.
+  just a single real-valued parameter).
+  The BUNDLE_CANETYPE is an exception, in that it simply uses
+  the location of the subcane to determine how to move the points.
+  */
 		switch (ancestors[i]->type)
 		{
-			case BUNDLE_CANETYPE:
-				// Find where subcane lives and apply translation
-				// to move it to this location
-				int subcaneIndex;
-				for (int j = 0; j < ancestors[i]->subcaneCount; ++j)
+		case BUNDLE_CANETYPE:
+			// Find where subcane lives and apply translation
+			// to move it to this location
+			int subcaneIndex;
+			for (int j = 0; j < ancestors[i]->subcaneCount; ++j)
+			{
+				if (ancestors[i]->subcanes[j] == ancestors[i+1])
 				{
-					if (ancestors[i]->subcanes[j] == ancestors[i+1])
-					{
-						subcaneIndex = j;
-						break;
-					}
+					subcaneIndex = j;
+					break;
 				}
-				applyBundleTransform(&v, ancestors[i]->subcaneLocations[subcaneIndex]);
-				break;
+			}
+			applyBundleTransform(&v, ancestors[i]->subcaneLocations[subcaneIndex]);
+			break;
 			// amts[0] is twist, amts[1] is stretch
-			case PULL_CANETYPE:
-				applyPullTransform(&v, ancestors[i]->amts[0], ancestors[i]->amts[1]);
-				//TODO: normal transform
-				break;
+		case PULL_CANETYPE:
+			applyPullTransform(&v, ancestors[i]->amts[0], ancestors[i]->amts[1]);
+			//TODO: normal transform
+			break;
 			// amts[0] describes the width-to-height ratio of the goal rectangle
 			// amts[1] describes the orientation w.r.t global XY
 			// amts[2] describes how close of an approximation to the rectangle is achieved
-			case FLATTEN_CANETYPE:
-				applyFlattenTransform(&v, ancestors[i]->amts[0], ancestors[i]->amts[1],
-				ancestors[i]->amts[2]);
-				break;
-			default: // BASE_CIRCLE_CANETYPE
-				break;
+		case FLATTEN_CANETYPE:
+			applyFlattenTransform(&v, ancestors[i]->amts[0], ancestors[i]->amts[1],
+								  ancestors[i]->amts[2]);
+			break;
+		default: // BASE_CIRCLE_CANETYPE
+			break;
 		}
 	}
 	return v;
@@ -176,23 +176,23 @@ The resolution refers to the dual resolution modes used by the GUI, and the actu
 triangles for these resolutions are set in constants.h
 */
 void meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
-	int ancestorCount, Color color, int resolution)
+						  int ancestorCount, Color color, int resolution)
 {
 	unsigned int angularResolution, axialResolution;
 	float total_stretch;
 
 	switch (resolution)
 	{
-		case LOW_RESOLUTION:
-			angularResolution = LOW_ANGULAR_RESOLUTION;
-			axialResolution = LOW_AXIAL_RESOLUTION;
-			break;
-		case HIGH_RESOLUTION:
-			angularResolution = HIGH_ANGULAR_RESOLUTION;
-			axialResolution = HIGH_AXIAL_RESOLUTION;
-			break;
-		default:
-			exit(1);
+	case LOW_RESOLUTION:
+		angularResolution = LOW_ANGULAR_RESOLUTION;
+		axialResolution = LOW_AXIAL_RESOLUTION;
+		break;
+	case HIGH_RESOLUTION:
+		angularResolution = HIGH_ANGULAR_RESOLUTION;
+		axialResolution = HIGH_AXIAL_RESOLUTION;
+		break;
+	default:
+		exit(1);
 	}
 
 	//DEBUG: total_stretch shortened... why is the top cap missing?
@@ -202,10 +202,10 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 	uint32_t first_vert = geometry->vertices.size();
 
 	/*
-	Draw the walls of the cylinder. Note that the z location is
-	adjusted by the total stretch experienced by the cane so that
-	the z values range between 0 and 1.
-	*/
+ Draw the walls of the cylinder. Note that the z location is
+ adjusted by the total stretch experienced by the cane so that
+ the z values range between 0 and 1.
+ */
 	//Generate verts:
 	for (unsigned int i = 0; i < axialResolution; ++i)
 	{
@@ -221,7 +221,7 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 			n.y = p.y;
 			n.z = 0.0f;
 			geometry->vertices.push_back(Vertex(p,n,color));
-	   }
+		}
 	}
 	//Generate triangles linking them:
 	for (unsigned int i = 0; i + 1 < axialResolution; ++i)
@@ -244,10 +244,10 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 	assert(geometry->valid());
 
 	/*
-	Draw the cylinder bottom, then top.
-	The mesh uses a set of n-2 triangles with a common vertex
-	to draw a regular n-gon.
-	*/
+ Draw the cylinder bottom, then top.
+ The mesh uses a set of n-2 triangles with a common vertex
+ to draw a regular n-gon.
+ */
 	for (int side = 0; side <= 1; ++side) {
 		float z = (side?1.0:0.0);
 		float nz = (side?1.0:-1.0);
@@ -295,7 +295,7 @@ leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
 void generateMesh(Cane* c, Geometry *geometry,
-	Cane** ancestors, int* ancestorCount, int resolution, Cane* activeSubcane, bool isActive)
+				  Cane** ancestors, int* ancestorCount, int resolution, Cane* activeSubcane, bool isActive)
 {
 	int i;
 
@@ -328,7 +328,7 @@ void generateMesh(Cane* c, Geometry *geometry,
 		for (i = 0; i < c->subcaneCount; ++i)
 		{
 			generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
-				resolution, NULL, isActive);
+						 resolution, NULL, isActive);
 		}
 	}
 	*ancestorCount -= 1;

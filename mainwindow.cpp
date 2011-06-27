@@ -22,21 +22,21 @@ void MainWindow::modeChangedSlot(int mode)
 {
 	switch (mode)
 	{
-		case PULL_MODE:
-			modeLabel->setText("PULL MODE");
-			break;
-		case BUNDLE_MODE:
-			modeLabel->setText("BUNDLE MODE");
-			break;
-		case FLATTEN_MODE:
-			modeLabel->setText("FLATTEN MODE");
-			break;
-		case LOOK_MODE:
-			modeLabel->setText("LOOK MODE");
-			break;
-		default:
-			modeLabel->setText("UNKNOWN MODE");
-			break;
+	case PULL_MODE:
+		modeLabel->setText("PULL MODE");
+		break;
+	case BUNDLE_MODE:
+		modeLabel->setText("BUNDLE MODE");
+		break;
+	case FLATTEN_MODE:
+		modeLabel->setText("FLATTEN MODE");
+		break;
+	case LOOK_MODE:
+		modeLabel->setText("LOOK MODE");
+		break;
+	default:
+		modeLabel->setText("UNKNOWN MODE");
+		break;
 	}
 
 }
@@ -58,7 +58,7 @@ void MainWindow::saveCaneToLibrarySlot()
 		return;
 
 	LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->openglWidget,
-			   this->model, 0);
+												  this->model, 0);
 	stockLayout->addWidget(lc);
 	connect(stockLayout, SIGNAL(destroyed(QObject*)), this, SLOT(libraryCaneDestroyed(QObject*)));
 
@@ -148,7 +148,7 @@ void MainWindow::exportLibraryButtonPressed()
 
 	QFile file(fileName);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-		   return;
+		return;
 
 	file.reset();
 
@@ -177,8 +177,8 @@ void MainWindow::loadLibraryCane(const YAML::Node& node, Cane* cane)
 
 	int amtsCount=0;
 	for(YAML::Iterator it2=caneAmts.begin();it2!=caneAmts.end();++it2) {
-	*it2 >> cane->amts[amtsCount];
-	amtsCount++;
+		*it2 >> cane->amts[amtsCount];
+		amtsCount++;
 	}
 
 	newNode["SubCaneCount"] >> cane->subcaneCount;
@@ -186,11 +186,11 @@ void MainWindow::loadLibraryCane(const YAML::Node& node, Cane* cane)
 	const YAML::Node& subLocations = newNode["SubCaneLocations"];
 	int subLocationCount=0;
 	for(YAML::Iterator it3=subLocations.begin();it3!=subLocations.end();++it3) {
-	const YAML::Node& subCaneLocation = *it3;
-	subCaneLocation[0] >> cane->subcaneLocations[subLocationCount].x;
-	subCaneLocation[1] >> cane->subcaneLocations[subLocationCount].y;
-	subCaneLocation[2] >> cane->subcaneLocations[subLocationCount].z;
-	subLocationCount++;
+		const YAML::Node& subCaneLocation = *it3;
+		subCaneLocation[0] >> cane->subcaneLocations[subLocationCount].x;
+		subCaneLocation[1] >> cane->subcaneLocations[subLocationCount].y;
+		subCaneLocation[2] >> cane->subcaneLocations[subLocationCount].z;
+		subLocationCount++;
 	}
 
 	newNode["Color"][0] >> cane->color.r;
@@ -306,7 +306,7 @@ void MainWindow::setupWorkArea()
 	wrap_button->setToolTip("Not Implemented - Select must be functional first");
 	undo_button = new QPushButton("Undo");
 	undo_button->setToolTip("Undo the last operation.");
-	
+
 	QVBoxLayout* operButton_layout = new QVBoxLayout();
 	operButton_layout->addWidget(pull_button);
 	operButton_layout->addWidget(bundle_button);
@@ -364,13 +364,13 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
 {
 	switch (e->key())
 	{
-		case 0x58: // X
-	   		exit(0);
-		case 0x01000020: // Shift
-	   		openglWidget->setShiftButtonDown(true);
-	   		break;
-		default:
-			break;
+	case 0x58: // X
+		exit(0);
+	case 0x01000020: // Shift
+		openglWidget->setShiftButtonDown(true);
+		break;
+	default:
+		break;
 	}
 }
 
@@ -378,11 +378,11 @@ void MainWindow::keyReleaseEvent(QKeyEvent* e)
 {
 	switch(e->key())
 	{
-		case 0x01000020: // Shift
-			openglWidget->setShiftButtonDown(false);
-			break;
-		default:
-			break;
+	case 0x01000020: // Shift
+		openglWidget->setShiftButtonDown(false);
+		break;
+	default:
+		break;
 	}
 }
 

@@ -43,7 +43,7 @@ int Cane :: leafNodes()
 	{
 		int total = 0;
 		for (int i = 0; i < this->subcaneCount; ++i)
-		 total += this->subcanes[i]->leafNodes();
+			total += this->subcanes[i]->leafNodes();
 		return total;
 	}
 }
@@ -65,12 +65,12 @@ void Cane :: shallowCopy(Cane* dest)
 	{
 		if (this->subcanes[i] != NULL)
 		{
-		 dest->subcanes[i] = this->subcanes[i]->deepCopy();
-		 dest->subcaneLocations[i].x = this->subcaneLocations[i].x;
-		 dest->subcaneLocations[i].y = this->subcaneLocations[i].y;
+			dest->subcanes[i] = this->subcanes[i]->deepCopy();
+			dest->subcaneLocations[i].x = this->subcaneLocations[i].x;
+			dest->subcaneLocations[i].y = this->subcaneLocations[i].y;
 		}
 		else
-		 dest->subcanes[i] = NULL;
+			dest->subcanes[i] = NULL;
 	}
 	dest->color = this->color;
 }
@@ -171,12 +171,12 @@ Cane* Cane :: deepCopy()
 	{
 		if (this->subcanes[i] != NULL)
 		{
-		 copy->subcanes[i] = this->subcanes[i]->deepCopy();
-		 copy->subcaneLocations[i].x = this->subcaneLocations[i].x;
-		 copy->subcaneLocations[i].y = this->subcaneLocations[i].y;
+			copy->subcanes[i] = this->subcanes[i]->deepCopy();
+			copy->subcaneLocations[i].x = this->subcaneLocations[i].x;
+			copy->subcaneLocations[i].y = this->subcaneLocations[i].y;
 		}
 		else
-		 copy->subcanes[i] = NULL;
+			copy->subcanes[i] = NULL;
 	}
 	copy->color = this->color;
 
