@@ -3,16 +3,29 @@
 
 #include <QApplication>
 #include <string.h>
+#include <QObject>
+#include "openglwidget.h"
 #include "mainwindow.h"
+#include "model.h"
 
-class Controller
+class Controller : public QObject
 {
+	Q_OBJECT
+
 	public:
 		Controller();
-		int run();
+		int startUp();
+
+	signals:
+		void modelChangedSig();
+
+	public slots:
+		void undoCommandSlot(); 
 
 	protected:
 		MainWindow* mainWindow;
+		Model* model;
+		OpenGLWidget* openglWidget;
 		QApplication* app;
 };
 

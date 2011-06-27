@@ -4,18 +4,19 @@
 #include <QtGui>
 #include "openglwidget.h"
 #include "cane.h"
+#include "model.h"
 
-class LibraryCaneWidget : public QLabel
+class LibraryCaneWidget : public QLabel 
 {
 	public:
-		LibraryCaneWidget(OpenGLWidget* w, Cane* c, QWidget* parent);
-		Cane* getCane();
+		LibraryCaneWidget(OpenGLWidget* w, Model* m, Cane* c, QWidget* parent);
 		void mousePressEvent(QMouseEvent* event);
 		void mouseReleaseEvent(QMouseEvent* event);
+		Cane* getCane();
 
-	protected:
+	private:
 		Cane* cane;
-		OpenGLWidget* widget;
+		Model* model;
 };
 
 #endif

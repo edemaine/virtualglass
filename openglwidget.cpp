@@ -1,13 +1,8 @@
 /*
 This class is the QT GUI object that does 3D rendering.
 It also responds to mouse clicks and mouse movement within
-its extent.
-
-As this object handles mouse clicks and movement, it is
-involved in modifying the cane. For example, if the user
-is in twist mode and moves the mouse horizontally, this
-object tells the Model object ``Hey, the cane has been twisted
-by amount X''.
+its extent. As this object handles mouse clicks and movement, 
+it is involved in modifying the cane. 
 
 Features:
 
@@ -29,17 +24,27 @@ OpenGLWidget object by calling setMode().
 */
 
 #include "openglwidget.h"
-#include <math.h>
 
-OpenGLWidget :: OpenGLWidget(QWidget *parent=0) : QGLWidget(parent)
+OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* model) : QGLWidget(parent)
 {
 	shiftButtonDown = false;
 	showAxes = true;
 	resolution = HIGH_RESOLUTION;
 	mode = LOOK_MODE;
-	model = new Model(NULL);
+	this->model = model; 
 	history = new CaneHistory();
 	updateTriangles();
+}
+
+Model* OpenGLWidget :: getModel()
+{
+	return this->model;
+}
+
+void OpenGLWidget :: modelChangedSlot()
+{
+	updateTriangles();
+	paintGL();		
 }
 
 void OpenGLWidget :: setShiftButtonDown(bool state)
@@ -86,11 +91,6 @@ void OpenGLWidget :: zeroCanes()
 	model->setCane(NULL);
 	updateTriangles();
 	paintGL();
-}
-
-bool OpenGLWidget :: hasCanes()
-{
-	return model->getCane()!=NULL;
 }
 
 void OpenGLWidget :: setBgColor(QColor color)
@@ -142,7 +142,7 @@ void OpenGLWidget :: paintGL()
 	swapBuffers();
 }
 
-void OpenGLWidget :: switchView()
+void OpenGLWidget :: switchProjectionCommandSlot()
 {
 	isOrthographic=!isOrthographic;
 }
@@ -163,27 +163,42 @@ void OpenGLWidget :: resizeGL(int width, int height)
 	paintGL();
 }
 
-void OpenGLWidget :: zoomIn()
+void OpenGLWidget :: zoomInCommandSlot()
 {
 	rho *= 0.8;
 	updateCamera();
 	paintGL();
 }
 
-void OpenGLWidget :: zoomOut()
+void OpenGLWidget :: zoomOutCommandSlot()
 {
 	rho *= 1.2;
 	updateCamera();
 	paintGL();
 }
 
-void OpenGLWidget :: toggleAxes()
+void OpenGLWidget :: topViewCommandSlot()
+{
+        setCamera(0.0,0.01);
+}
+
+void OpenGLWidget :: sideViewCommandSlot()
+{
+        setCamera(0.0, PI/2);
+}
+
+void OpenGLWidget :: frontViewCommandSlot()
+{
+        setCamera(-PI/2, PI/2);
+}
+
+void OpenGLWidget :: toggleAxesCommandSlot()
 {
 	showAxes = !showAxes;
 	paintGL();
 }
 
-void OpenGLWidget :: toggleGrid()
+void OpenGLWidget :: toggleGridCommandSlot()
 {
 	showGrid = !showGrid;
 	paintGL();
@@ -242,7 +257,7 @@ void OpenGLWidget :: setMode(int m)
 	{
 		model->startMoveMode();
 	}
-	emit modeChanged(m);
+	emit modeChangedSig(m);
 }
 
 /*
@@ -358,7 +373,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		return;
 	}
 
-	if (mode == LOOK_MODE)
+	if (model->getMode() == LOOK_MODE)
 	{
 		// Rotate camera position around look-at location.
 
@@ -368,20 +383,20 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 			fee = newFee;
 		updateCamera();
 	}
-	else if (mode == PULL_MODE)
+	else if (model->getMode() == PULL_MODE)
 	{
 		if (shiftButtonDown)
 		{
 			if (abs(relX) > abs(relY))
-				model->twistAndStretchCane((relX * 500.0 * PI / 100.0), 0.0);
+				model->pullCane((relX * 500.0 * PI / 100.0), 0.0);
 			else
-				model->twistAndStretchCane(0.0, -5.0*relY);
+				model->pullCane(0.0, -5.0*relY);
 		}
 		else
-			model->twistAndStretchCane((relX * 500.0 * PI / 100.0), -5.0*relY);
+			model->pullCane((relX * 500.0 * PI / 100.0), -5.0*relY);
 		updateTriangles();
 	}
-	else if (mode == BUNDLE_MODE)
+	else if (model->getMode() == BUNDLE_MODE)
 	{
 		/*
 			How the parameters for moveCane() are calculated is not obvious.
@@ -398,7 +413,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 					   relX * sin(theta + PI / 2.0) + relY * sin(theta));
 		updateTriangles();
 	}
-	else if (mode == FLATTEN_MODE)
+	else if (model->getMode() == FLATTEN_MODE)
 	{
 		model->flattenCane(relX, theta + PI / 2.0, -relY);
 		updateTriangles();
@@ -409,13 +424,14 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 
 void OpenGLWidget :: wheelEvent(QWheelEvent *e)
 {
+	emit modeChangedSig(LOOK_MODE);
 	setMode(LOOK_MODE);
-	if (e->delta()>0)
+	if (e->delta() > 0)
 	{
-		zoomIn();
-	} else if (e->delta()<0)
+		emit zoomInCommandSig();
+	} else if (e->delta() < 0)
 	{
-		zoomOut();
+		emit zoomOutCommandSig();
 	}
 }
 
@@ -488,26 +504,6 @@ void OpenGLWidget :: drawAxes()
 	glVertex3f(0,0,0);
 	glVertex3f(0,0,1.2);
 	glEnd();
-}
-
-/*
-Places an additional cane (given as an argument)
-into the existing cane being operated on.
-*/
-void OpenGLWidget :: addCane(Cane* c)
-{
-	/*
-	If there is no cane currently being operated on,
-	start off by looking at it, otherwise start off by
-	adjusting its location.
-	*/
-	if (model->getCane() == NULL)
-		setMode(LOOK_MODE);
-	else
-		setMode(BUNDLE_MODE);
-	model->addCane(c);
-	updateTriangles();
-	paintGL();
 }
 
 

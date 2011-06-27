@@ -38,6 +38,12 @@ void CaneHistory :: undo()
 	curPast--;
 }
 
+// Returns whether there's a future to roll forward into
+bool CaneHistory :: canRedo()
+{
+	return (curFuture > 0);
+}
+
 void CaneHistory :: redo()
 {
 	if (curFuture == 0)

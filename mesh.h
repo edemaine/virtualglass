@@ -14,8 +14,7 @@ float computeTotalStretch(Cane** ancestors, int ancestorCount);
 void applyFlattenTransform(Vertex* v, float rectangleRatio,
 	float rectangleTheta, float flatness);
 void applyBundleTransform(Vertex* v, Point location);
-void applyStretchTransform(Vertex* v, float amount);
-void applyTwistTransform(Vertex* v, float amount);
+void applyPullTransform(Vertex* v, float twistAmount, float stretchAmount);
 Vertex applyTransforms(Vertex p, Cane** ancestors, int ancestorCount);
 
 #endif

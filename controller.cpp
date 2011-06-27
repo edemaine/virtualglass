@@ -16,13 +16,23 @@ Controller::Controller()
 	fake_argv[0] = new char[10];
 	strcpy(fake_argv[0], "virtualglass");
 	app = new QApplication(fake_argc, fake_argv);
-	mainWindow = new MainWindow();
+	model = new Model();
+	mainWindow = new MainWindow(model);
 }
 
-int Controller::run()
+int Controller::startUp()
 {
 	mainWindow->showMaximized();
 	mainWindow->seedLibrary();
 	return app->exec();
 }
+
+void Controller::undoCommandSlot()
+{
+	model->undo();	
+} 
+
+
+
+
 

@@ -4,7 +4,7 @@
 int main(int /*argc*/, char** /*argv*/)
 {
 	Controller c;
-	return c.run();
+	return c.startUp();
 }
 
 

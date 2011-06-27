@@ -1,18 +1,60 @@
 
 #include "model.h"
 
-Model :: Model(Cane* c)
+Model :: Model()
 {
+	history = new CaneHistory();
 	lowResDataUpToDate = 0;
 	highResDataUpToDate = 0;
-	setCane(c);
+	setCane(NULL);
+}
+
+void Model :: advanceActiveSubcaneCommandSlot()
+{
+	if (mode != BUNDLE_MODE)
+		return;
+	advanceActiveSubcane();
+}
+
+int Model :: getMode()
+{
+	return mode;
+}
+
+void Model :: modeChangedSlot(int mode)
+{
+	this->mode = mode;
+	emit modeChangedSig(mode);
+	emit caneChangedSig();
+	switch (mode)
+	{
+		case LOOK_MODE:
+			emit textMessageSig("Entered look mode.");
+			break;
+		case PULL_MODE:
+			emit textMessageSig("Entered pull mode.");
+			break;
+		case BUNDLE_MODE:
+			emit textMessageSig("Entered bundle mode.");
+			break;
+		case WRAP_MODE:
+			emit textMessageSig("Entered wrap mode.");
+			break;
+		case FLATTEN_MODE:
+			emit textMessageSig("Entered flatten mode.");
+			break;
+		default:
+			break;
+	}
 }
 
 void Model :: setCane(Cane* c)
 {
+	history->saveState(cane);
 	cane = c;
 	updateLowResData();
 	updateHighResData();
+	emit caneChangedSig();
 }
 
 void Model :: updateLowResData()
@@ -68,29 +110,40 @@ Geometry* Model :: getGeometry(int resolution)
 	}
 }
 
-void Model :: twistAndStretchCane(float twistAmount, float stretchAmount)
+void Model :: pullCane(float twistAmount, float stretchAmount)
 {
 	if (cane == NULL)
 		return;
-	cane->twistAndStretch(twistAmount, stretchAmount);
+	if (cane->type != PULL_CANETYPE)
+		history->saveState(cane);
+	cane->pull(twistAmount, stretchAmount);
 	lowResDataUpToDate = 0;
 	highResDataUpToDate = 0;
+	emit caneChangedSig();
 }
 
 void Model :: flattenCane(float rectangle_ratio, float rectangle_theta, float flatness)
 {
 	if (cane == NULL)
 		return;
+	if (cane->type != FLATTEN_CANETYPE)
+		history->saveState(cane);
 	cane->flatten(rectangle_ratio, rectangle_theta, flatness);
 	lowResDataUpToDate = 0;
 	highResDataUpToDate = 0;
+	emit caneChangedSig();
 }
 
 void Model :: startMoveMode()
 {
+	if (cane == NULL)
+		return;
 	activeSubcane = 0;
-	if (cane != NULL)
+	if (cane->type != BUNDLE_CANETYPE)
+	{
+		history->saveState(cane);
 		cane->createBundle();
+	}
 }
 
 void Model :: moveCane(float delta_x, float delta_y)
@@ -100,15 +153,20 @@ void Model :: moveCane(float delta_x, float delta_y)
 	cane->moveCane(activeSubcane, delta_x, delta_y);
 	lowResDataUpToDate = 0;
 	highResDataUpToDate = 0;
+	emit caneChangedSig();
 }
 
 void Model :: addCane(Cane* c)
 {
+	history->saveState(cane);	
 	if (cane == NULL)
 		cane = c->deepCopy();
 	else
 		cane->add(c->deepCopy(), &activeSubcane);
 	lowResDataUpToDate = highResDataUpToDate = 0;
+	mode = BUNDLE_MODE;
+	emit modeChangedSig(mode);
+	emit caneChangedSig();
 }
 
 /*
@@ -128,8 +186,30 @@ void Model :: advanceActiveSubcane()
 	lowResDataUpToDate = highResDataUpToDate = 0;
 	updateHighResData();
 	updateLowResData();
+	emit caneChangedSig();
 }
 
+void Model :: undo()
+{
+	history->undo();
+	cane = history->getState();
+	lowResDataUpToDate = highResDataUpToDate = 0;
+}
+
+bool Model :: canRedo()
+{
+	return history->canRedo();
+}
+
+void Model :: redo()
+{
+	if (history->canRedo())
+	{
+		history->redo();
+		cane = history->getState();
+		lowResDataUpToDate = highResDataUpToDate = 0;
+	}
+}
 
 void Model :: saveObjFile(std::string const &filename)
 {

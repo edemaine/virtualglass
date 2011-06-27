@@ -16,9 +16,7 @@ class Cane
 		Cane(int type);
 		void reset();
 		void shallowCopy(Cane* dest);
-		void twistAndStretch(float twistRadians, float stretchMultiplier);
-		void stretch(float multiplier);
-		void twist(float radians);
+		void pull(float twistRadians, float stretchMultiplier);
 		void flatten(float rectangle_ratio, float rectangle_theta, float flatness);
 		void createBundle();
 		void add(Cane* addl, int* addl_index_ptr);

@@ -1,8 +1,10 @@
 #include "mainwindow.h"
 #include <fstream>
 
-MainWindow::MainWindow()
+MainWindow::MainWindow(Model* model)
 {
+	this->model = model;
+
 	centralWidget = new QWidget(this);
 	this->setCentralWidget(centralWidget);
 	librarySize = 0;
@@ -17,30 +19,49 @@ MainWindow::MainWindow()
 	move(75,25);
 }
 
+OpenGLWidget* MainWindow::getOpenGLWidget()
+{
+	return glassgl;
+}
+
 void MainWindow::libraryCaneDestroyed(QObject* obj)
 {
 	stockLayout->removeWidget((QWidget*) obj);
 
-	statusBar->showMessage("Deleted Cane From Library", 2000);
+	emit textMessageSig("Deleted cane from library");
+}
+
+void MainWindow::textMessageSlot(QString msg)
+{
+	statusBar->showMessage(msg, 2000);
 }
 
 void MainWindow::saveCaneToLibrary()
 {
+	if (this->glassgl->getCane() == NULL)
+		return;
+
 	LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->glassgl,
-			   this->glassgl->getCane()->deepCopy(), 0);
+			   this->model, this->glassgl->getCane()->deepCopy(), 0);
 	stockLayout->addWidget(lc);
 	connect(stockLayout,SIGNAL(destroyed(QObject*)),this,SLOT(libraryCaneDestroyed(QObject*)));
 
-	statusBar->showMessage("Saved Cane to Library", 2000);
+	emit textMessageSig("Saved cane to library");
 }
 
-void MainWindow::userModeChanged(int mode) {
-	statusBar->showMessage("Switching User Mode", 2000);
-	switch(mode)
+void MainWindow::setupStatusBar()
+{
+	statusBar = new QStatusBar(this);
+	modeLabel = new QLabel("NO MODE",statusBar);
+	statusBar->addPermanentWidget(modeLabel);
+	setStatusBar(statusBar);
+	connect(model, SIGNAL(modeChangedSig(int)), this, SLOT(modeChangedSlot()));
+}
+
+void MainWindow::modeChangedSlot(int mode)
+{
+	switch (mode)
 	{
-		case LOOK_MODE:
-			modeLabel->setText("LOOK MODE");
-			break;
 		case PULL_MODE:
 			modeLabel->setText("PULL MODE");
 			break;
@@ -50,18 +71,13 @@ void MainWindow::userModeChanged(int mode) {
 		case FLATTEN_MODE:
 			modeLabel->setText("FLATTEN MODE");
 			break;
+		case LOOK_MODE:
+			modeLabel->setText("LOOK MODE");
+			break;
 		default:
-			modeLabel->setText("NO MODE");
-		}
-}
-
-void MainWindow::setupStatusBar()
-{
-	statusBar = new QStatusBar(this);
-	modeLabel = new QLabel("NO MODE",statusBar);
-	statusBar->addPermanentWidget(modeLabel);
-	setStatusBar(statusBar);
-	connect(glassgl,SIGNAL(modeChanged(int)),this,SLOT(userModeChanged(int)));
+			modeLabel->setText("UNKNOWN MODE");
+			break;
+	}
 }
 
 void MainWindow::setupLibraryArea()
@@ -85,11 +101,11 @@ void MainWindow::seedLibrary()
 {
 	// Now seed the library with some basic canes
 	Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
-	Cane* stretch = new Cane(STRETCH_CANETYPE);
+	Cane* stretch = new Cane(PULL_CANETYPE);
 
 	stretch->subcaneCount = 1;
 	stretch->subcanes[0] = c;
-	stretch->amts[0] = 100.0;
+	stretch->amts[1] = 100.0; // amts[0] = twist, amts[1] = stretch
 
 	c->color.r = 0.8;
 	c->color.g = 0.8;
@@ -117,123 +133,12 @@ void MainWindow::seedLibrary()
 
 	glassgl->zeroCanes();
 
-	statusBar->showMessage("Default Library Loaded", 2000);
+	emit textMessageSig("Default library loaded");
 }
 
-void MainWindow::zoomInButtonPressed()
+void MainWindow::saveCommandSlot()
 {
-	glassgl->zoomIn();
-
-	statusBar->showMessage("Zoomed In", 2000);
-}
-
-void MainWindow::zoomOutButtonPressed()
-{
-	glassgl->zoomOut();
-
-	statusBar->showMessage("Zoomed Out", 2000);
-}
-
-void MainWindow::toggleAxesButtonPressed()
-{
-	glassgl->toggleAxes();
-
-	statusBar->showMessage("Axes Toggled", 2000);
-}
-
-void MainWindow::toggleGridButtonPressed()
-{
-	glassgl->toggleGrid();
-
-	statusBar->showMessage("Grid Toggled", 2000);
-}
-
-void MainWindow::lookButtonPressed()
-{
-	glassgl->setMode(LOOK_MODE);
-
-	statusBar->showMessage("Entered Look Mode", 2000);
-}
-
-void MainWindow::topViewButtonPressed()
-{
-	glassgl->setMode(LOOK_MODE);
-	glassgl->setCamera(0.0,0.01);
-	statusBar->showMessage("Switched to Top View", 2000);
-}
-
-void MainWindow::frontViewButtonPressed()
-{
-	glassgl->setMode(LOOK_MODE);
-	glassgl->setCamera(-PI/2,PI/2);
-	statusBar->showMessage("Switched to front View", 2000);
-}
-
-void MainWindow::sideViewButtonPressed()
-{
-	glassgl->setMode(LOOK_MODE);
-	glassgl->setCamera(0,PI/2);
-	statusBar->showMessage("Switched to Side View", 2000);
-}
-
-void MainWindow::switchViewButtonPressed()
-{
-	glassgl->switchView();
-	statusBar->showMessage("Switched to Perspective/Orthographic View", 2000);
-}
-
-void MainWindow::pullButtonPressed()
-{
-	glassgl->setMode(PULL_MODE);
-	statusBar->showMessage("Entered Pull Mode", 2000);
-}
-
-void MainWindow::bundleButtonPressed()
-{
-	glassgl->setMode(BUNDLE_MODE);
-
-	statusBar->showMessage("Entered Bundle Mode", 2000);
-}
-
-void MainWindow::nextButtonPressed()
-{
-	glassgl->setMode(BUNDLE_MODE);
-	glassgl->advanceActiveSubcane();
-
-}
-
-void MainWindow::flattenButtonPressed()
-{
-	glassgl->setMode(FLATTEN_MODE);
-
-	statusBar->showMessage("Entered Flatten Mode", 2000);
-}
-
-void MainWindow::wrapButtonPressed()
-{
-	glassgl->setMode(WRAP_MODE);
-
-	statusBar->showMessage("Entered Wrap Mode", 2000);
-}
-
-void MainWindow::selectButtonPressed()
-{
-	glassgl->setMode(SELECT_MODE);
-
-	statusBar->showMessage("Entered Select Mode", 2000);
-}
-
-void MainWindow::saveButtonPressed()
-{
-	if (glassgl->hasCanes())
-		saveCaneToLibrary();
-}
-
-void MainWindow::clearButtonPressed()
-{
-	glassgl->zeroCanes();
-
-	statusBar->showMessage("Cleared", 2000);
+	saveCaneToLibrary();
 }
 
 void MainWindow::exportLibraryButtonPressed()
@@ -264,7 +169,7 @@ void MainWindow::exportLibraryButtonPressed()
 	outStream.flush();
 	file.close();
 
-	statusBar->showMessage("Library Saved to: "+fileName, 2000);
+	emit textMessageSig("Library Saved to: " + fileName);
 }
 
 void MainWindow::loadLibraryCane(const YAML::Node& node, Cane* cane)
@@ -336,7 +241,7 @@ void MainWindow::importLibraryButtonPressed()
 
 	glassgl->zeroCanes();
 
-	statusBar->showMessage("Library Loaded from: "+fileName, 2000);
+	emit textMessageSig("Library loaded from: " + fileName);
 }
 
 void MainWindow::newColorPickerCaneButtonPressed()
@@ -358,65 +263,72 @@ void MainWindow::saveObjButtonPressed()
 	}
 }
 
-void MainWindow::newStatus(QString message)
-{
-	statusBar->showMessage(message,2000);
-}
-
 void MainWindow::colorPickerSelected(QColor color)
 {
-	saveButtonPressed();
-	clearButtonPressed();
+	saveCaneToLibrary();	
+	model->setCane(NULL);
 
 	Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
-	Cane* stch = new Cane(STRETCH_CANETYPE);
+	Cane* stch = new Cane(PULL_CANETYPE);
 
 	stch->subcaneCount = 1;
 	stch->subcanes[0] = c;
-	stch->amts[0] = 100.0;
+	stch->amts[1] = 100.0;
 
 	c->color.r = color.redF();
 	c->color.g = color.greenF();
 	c->color.b = color.blueF();
 	c->color.a = color.alphaF();
 
-	glassgl->setFocusCane(stch);
+	model->setCane(stch);
 }
 
 void MainWindow::setupWorkArea()
 {
-	glassgl = new OpenGLWidget(this);
+	glassgl = new OpenGLWidget(this, model);
 
+	// Connect openglwidget to model 
+	connect(model, SIGNAL(caneChangedSig()), glassgl, SLOT(modelChangedSlot()));
+
+	// Connect mainwindow to model
+	connect(model, SIGNAL(textMessageSig(QString)), this, SLOT(textMessageSlot(QString)));
+	connect(model, SIGNAL(modeChangedSig(QString)), this, SLOT(modeChangedSlot(QString)));
+
+	// Connect model to mainwindow
 	QPushButton* look_button = new QPushButton("Look");
-	connect(look_button, SIGNAL(clicked()), this, SLOT(lookButtonPressed()));
-
-	QPushButton* frontView_button = new QPushButton("Front View");
-	connect(frontView_button, SIGNAL(clicked()), this, SLOT(frontViewButtonPressed()));
-
-	QPushButton* topView_button = new QPushButton("Top View");
-	connect(topView_button, SIGNAL(clicked()), this, SLOT(topViewButtonPressed()));
-
-	QPushButton* sideView_button = new QPushButton("Side View");
-	connect(sideView_button, SIGNAL(clicked()), this, SLOT(sideViewButtonPressed()));
-
-	QPushButton* switchView_button = new QPushButton("Switch View");
-	connect(switchView_button, SIGNAL(clicked()), this, SLOT(switchViewButtonPressed()));
-	switchView_button->setToolTip("Switch between perspective and orthographic views");
+	connect(look_button, SIGNAL(clicked()), model, SLOT(modeChangedSlot(LOOK_MODE)));
 
 	QPushButton* zoom_in_button = new QPushButton("Zoom In");
-	connect(zoom_in_button, SIGNAL(pressed()), this, SLOT(zoomInButtonPressed()));
+	connect(zoom_in_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(LOOK_MODE)));
+	connect(zoom_in_button, SIGNAL(pressed()), glassgl, SLOT(zoomInCommandSlot()));
 
 	QPushButton* zoom_out_button = new QPushButton("Zoom Out");
-	connect(zoom_out_button, SIGNAL(pressed()), this, SLOT(zoomOutButtonPressed()));
+	connect(zoom_in_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(LOOK_MODE)));
+	connect(zoom_out_button, SIGNAL(pressed()), glassgl, SLOT(zoomOutCommandSlot()));
+
+	QPushButton* frontView_button = new QPushButton("Front View");
+	connect(zoom_in_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(LOOK_MODE)));
+	connect(frontView_button, SIGNAL(clicked()), glassgl, SLOT(frontViewCommandSlot()));
+
+	QPushButton* topView_button = new QPushButton("Top View");
+	connect(zoom_in_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(LOOK_MODE)));
+	connect(topView_button, SIGNAL(clicked()), glassgl, SLOT(topViewCommandSlot()));
+
+	QPushButton* sideView_button = new QPushButton("Side View");
+	connect(zoom_in_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(LOOK_MODE)));
+	connect(sideView_button, SIGNAL(clicked()), glassgl, SLOT(sideViewCommandSlot()));
+
+	QPushButton* switchView_button = new QPushButton("Switch View");
+	connect(switchView_button, SIGNAL(clicked()), glassgl, SLOT(switchViewCommandSlot()));
+	switchView_button->setToolTip("Switch between perspective and orthographic views");
 
 	QPushButton* toggle_axes_button = new QPushButton("Toggle Axes");
-	connect(toggle_axes_button, SIGNAL(pressed()), this, SLOT(toggleAxesButtonPressed()));
+	connect(toggle_axes_button, SIGNAL(pressed()), glassgl, SLOT(toggleAxesCommandSlot()));
 
 	QPushButton* toggle_grid_button = new QPushButton("Toggle Grid");
-	connect(toggle_grid_button, SIGNAL(pressed()), this, SLOT(toggleGridButtonPressed()));
+	connect(toggle_grid_button, SIGNAL(pressed()), this, SLOT(toggleGridCommandSlot()));
 
 	QVBoxLayout* viewButton_layout = new QVBoxLayout();
-	//viewButton_layout->addWidget(look_button);
 	viewButton_layout->addWidget(frontView_button);
 	viewButton_layout->addWidget(topView_button);
 	viewButton_layout->addWidget(sideView_button);
@@ -429,36 +341,41 @@ void MainWindow::setupWorkArea()
 	viewButtonWidget->setLayout(viewButton_layout);
 
 	QPushButton* pull_button = new QPushButton("Pull");
-	connect(pull_button, SIGNAL(pressed()), this, SLOT(pullButtonPressed()));
+	connect(pull_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(PULL_MODE)));
 	pull_button->setToolTip("Drag Mouse Horizontally to Twist, Vertically to Stretch. Use Shift to twist and stretch independently.");
 
 	QPushButton* bundle_button = new QPushButton("Bundle");
-	connect(bundle_button, SIGNAL(pressed()), this, SLOT(bundleButtonPressed()));
+	connect(bundle_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(BUNDLE_MODE)));
 
 	QPushButton* flatten_button = new QPushButton("Flatten");
-	connect(flatten_button, SIGNAL(pressed()), this, SLOT(flattenButtonPressed()));
+	connect(bundle_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(FLATTEN_MODE)));
 	flatten_button->setToolTip("Drag Mouse Horizontally to Squish, Vertically to Flatten");
 
 	QPushButton* wrap_button = new QPushButton("Wrap");
-	connect(wrap_button, SIGNAL(pressed()), this, SLOT(wrapButtonPressed()));
+	connect(wrap_button, SIGNAL(pressed()), model, SLOT(modeChangedSlot(WRAP_MODE)));
 	wrap_button->setToolTip("Not Implemented - Select must be functional first");
 
-	QPushButton* select_button = new QPushButton("Select");
-	connect(select_button, SIGNAL(pressed()), this, SLOT(selectButtonPressed()));
-	select_button->setToolTip("Click on a cane to select it.");
+	QPushButton* undo_button = new QPushButton("Undo");
+	connect(undo_button, SIGNAL(pressed()), model, SLOT(undoCommandSlot()));
+	undo_button->setToolTip("Undo the last operation.");
+
+	QPushButton* redo_button = new QPushButton("Redo");
+	connect(redo_button, SIGNAL(pressed()), model, SLOT(redoCommandSlot()));
+	redo_button->setToolTip("Redo the last operation.");
 
 	QVBoxLayout* operButton_layout = new QVBoxLayout();
 	operButton_layout->addWidget(pull_button);
 	operButton_layout->addWidget(bundle_button);
 	operButton_layout->addWidget(flatten_button);
 	operButton_layout->addWidget(wrap_button);
-	operButton_layout->addWidget(select_button);
+	operButton_layout->addWidget(undo_button);
+	operButton_layout->addWidget(redo_button);
 
 	QWidget* operButtonWidget = new QWidget();
 	operButtonWidget->setLayout(operButton_layout);
 
 	QPushButton* next_button = new QPushButton("Next");
-	connect(next_button, SIGNAL(pressed()), this, SLOT(nextButtonPressed()));
+	connect(next_button, SIGNAL(pressed()), model, SLOT(advanceActiveSubcaneCommandSlot()));
 	next_button->setToolTip("Next Cane in Current Model");
 
 	QPushButton* save_button = new QPushButton("Save");
@@ -466,7 +383,7 @@ void MainWindow::setupWorkArea()
 	save_button->setToolTip("Save Current Model to Library");
 
 	QPushButton* clear_button = new QPushButton("Clear");
-	connect(clear_button, SIGNAL(pressed()), this, SLOT(clearButtonPressed()));
+	connect(clear_button, SIGNAL(pressed()), model, SLOT(setCane(NULL)));
 	clear_button->setToolTip("Clear Current Model");
 
 	QPushButton* exportLibrary_button = new QPushButton("Export Library");
@@ -505,7 +422,7 @@ void MainWindow::setupWorkArea()
 	tabWidget->addTab(viewButtonWidget,"View");
 	tabWidget->addTab(operButtonWidget,"Operations");
 	tabWidget->addTab(utilButtonWidget,"Util");
-	connect(tabWidget,SIGNAL(currentChanged(int)),this,SLOT(modeSelect(int)));
+	connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(modeSelect(int)));
 
 	QVBoxLayout* button_layout = new QVBoxLayout();
 	button_layout->addWidget(tabWidget);
@@ -516,39 +433,17 @@ void MainWindow::setupWorkArea()
 	windowLayout->addLayout(workLayout, 5);
 }
 
-void MainWindow::modeSelect(int index)
-{
-	glassgl->setMode(LOOK_MODE);
-	statusBar->showMessage("Entered Look Mode", 2000);
-}
-
-
 void MainWindow::keyPressEvent(QKeyEvent* e)
 {
 	switch (e->key())
 	{
-	case 0x58: // X
-	   exit(0);
-	case 0x31: // 1
-	   this->lookButtonPressed();
-	   break;
-	case 0x32: // 2
-	   this->pullButtonPressed();
-	   break;
-	case 0x34: // 4
-	   this->bundleButtonPressed();
-	   break;
-	case 0x35: // 5
-	   this->flattenButtonPressed();
-	   break;
-	case 0x01000020: // Shift
-	   glassgl->setShiftButtonDown(true);
-	   break;
-	case 0x01000007: // Delete
-	   this->clearButtonPressed();
-	   break;
-	default:
-	   break;
+		case 0x58: // X
+	   		exit(0);
+		case 0x01000020: // Shift
+	   		glassgl->setShiftButtonDown(true);
+	   		break;
+		default:
+			break;
 	}
 }
 
@@ -556,11 +451,11 @@ void MainWindow::keyReleaseEvent(QKeyEvent* e)
 {
 	switch(e->key())
 	{
-	case 0x01000020: // Shift
-	   glassgl->setShiftButtonDown(false);
-	   break;
-	default:
-	   break;
+		case 0x01000020: // Shift
+			glassgl->setShiftButtonDown(false);
+			break;
+		default:
+			break;
 	}
 }
 

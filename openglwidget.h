@@ -20,10 +20,10 @@ class OpenGLWidget : public QGLWidget
 	Q_OBJECT
 
 	public:
-		OpenGLWidget(QWidget *parent);
+		Model* getModel();	
+		OpenGLWidget(QWidget* parent, Model* model);
 		void updateResolution(int new_resolution);
 		void setFocusCane(Cane* c);
-		void addCane(Cane* c);
 		Cane* getCane();
 		void advanceActiveSubcane();
 		void zeroCanes();
@@ -69,7 +69,20 @@ class OpenGLWidget : public QGLWidget
 		void updateTriangles();
 
 	signals:
-		void modeChanged(int mode);
+		void modeChangedSig(int mode);
+		void zoomInCommandSig();
+		void zoomOutCommandSig();
+
+	public slots:
+		void modelChangedSlot();
+		void zoomInCommandSlot();
+		void zoomOutCommandSlot();
+		void frontViewCommandSlot();
+		void topViewCommandSlot();
+		void sideViewCommandSlot();
+		void switchProjectionCommandSlot();
+		void toggleAxesCommandSlot();
+		void toggleGridCommandSlot();
 
 	protected:
 		void initializeGL();

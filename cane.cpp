@@ -75,52 +75,21 @@ void Cane :: shallowCopy(Cane* dest)
 	dest->color = this->color;
 }
 
-void Cane :: twistAndStretch(float twistRadians, float stretchFactor)
+void Cane :: pull(float twistRadians, float stretchFactor)
 {
-	if (this->type != TWIST_CANETYPE || this->subcanes[0]->type != STRETCH_CANETYPE)
-	{
-		this->stretch(0.0); // Add stretch node if not present
-		this->twist(0.0); // Add twist node
-	}
-	else
-	{
-		this->subcanes[0]->stretch(stretchFactor);
-		this->twist(twistRadians);
-	}
-}
-
-void Cane :: twist(float radians)
-{
-	if (this->type != TWIST_CANETYPE)
+	if (this->type != PULL_CANETYPE)
 	{
 		Cane* copy = new Cane(UNASSIGNED_CANETYPE);
 		this->shallowCopy(copy);
 		this->reset();
-		this->type = TWIST_CANETYPE;
+		this->type = PULL_CANETYPE;
 		this->subcaneCount = 1;
 		this->subcanes[0] = copy;
-		this->amts[0] = radians;
+		this->amts[0] = 0.0; // twist amount
+		this->amts[1] = 1.0; // stretch amount
 	}
-	else
-	{
-		this->amts[0] += radians;
-	}
-}
-
-
-void Cane :: stretch(float amount)
-{
-	if (this->type != STRETCH_CANETYPE)
-	{
-		Cane* copy = new Cane(UNASSIGNED_CANETYPE);
-		this->shallowCopy(copy);
-		this->reset();
-		this->type = STRETCH_CANETYPE;
-		this->subcaneCount = 1;
-		this->subcanes[0] = copy;
-		this->amts[0] = 1.0;
-	}
-	this->amts[0] *= (1.0 + amount);
+	this->amts[0] += twistRadians;
+	this->amts[1] *= (1.0 + stretchFactor);
 }
 
 /*

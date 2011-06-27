@@ -12,6 +12,7 @@ class CaneHistory
 		Cane* getState();
 		void undo();
 		void redo();
+		bool canRedo();
 
 	private:
 		Cane** past;

@@ -8,6 +8,7 @@
 #include "librarycanewidget.h"
 #include "cane.h"
 #include "yaml-cpp/yaml.h"
+#include "model.h"
 
 class View;
 
@@ -16,40 +17,41 @@ class MainWindow : public QMainWindow
 	Q_OBJECT
 
 	public:
-		MainWindow();
+		MainWindow(Model* model);
 		void saveCaneToLibrary();
 		void seedLibrary();
+		OpenGLWidget* getOpenGLWidget();
+
+	signals:
+		void modeChangedCommandSig(int mode);
+		void zoomInCommandSig();
+		void zoomOutCommandSig();
+                void undoCommandSig();
+                void redoCommandSig();
+		void toggleAxesCommandSig();
+		void toggleGridCommandSig();
+		void switchViewCommandSig();
+		void advanceActiveCaneCommandSig();
+		void saveCommandSig();
+		void clearCommandSig();
+		void textMessageSig(QString message);
 
 	public slots:
-		void zoomInButtonPressed();
-		void zoomOutButtonPressed();
-		void toggleAxesButtonPressed();
-		void toggleGridButtonPressed();
-		void lookButtonPressed();
-		void frontViewButtonPressed();
-		void topViewButtonPressed();
-		void sideViewButtonPressed();
-		void switchViewButtonPressed();
-		void pullButtonPressed();
-		void bundleButtonPressed();
-		void flattenButtonPressed();
-		void wrapButtonPressed();
-		void selectButtonPressed();
-		void nextButtonPressed();
-		void saveButtonPressed();
-		void clearButtonPressed();
+		void modeChangedSlot(int mode);
+		void saveCommandSlot();
 		void exportLibraryButtonPressed();
 		void importLibraryButtonPressed();
 		void newColorPickerCaneButtonPressed();
 		void changeBgColorButtonPressed();
 		void saveObjButtonPressed();
 		void colorPickerSelected(QColor color);
-		void modeSelect(int index);
 		void libraryCaneDestroyed(QObject* obj);
 		void loadLibraryCane(const YAML::Node& node, Cane* cane);
-		void newStatus(QString message);
-		void userModeChanged(int mode);
-	protected:
+		void textMessageSlot(QString message);
+
+	private:
+		Model* model;
+
 		void keyPressEvent(QKeyEvent* e);
 		void keyReleaseEvent(QKeyEvent* e);
 		void setupLibraryArea();
@@ -69,6 +71,8 @@ class MainWindow : public QMainWindow
 		QStatusBar* statusBar;
 		QLabel* modeLabel;
 		int librarySize;
+
+
 };
 #endif
 

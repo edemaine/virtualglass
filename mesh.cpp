@@ -70,20 +70,19 @@ void applyBundleTransform(Vertex* v, Point location)
 	v->position.y += location.y;
 }
 
-void applyStretchTransform(Vertex* v, float amount)
+void applyPullTransform(Vertex* v, float twistAmount, float stretchAmount)
 {
-	v->position.x /= sqrt(amount);
-	v->position.y /= sqrt(amount);
-	v->position.z *= amount;
-}
-
-void applyTwistTransform(Vertex* v, float amount)
-{
+	// Apply twist first
 	float theta = atan2(v->position.y, v->position.x);
 	float r = length(v->position.xy);
-	theta += amount * v->position.z;
+	theta += twistAmount * v->position.z;
 	v->position.x = r * cos(theta);
 	v->position.y = r * sin(theta);
+
+	// Then apply stretch
+	v->position.x /= sqrt(stretchAmount);
+	v->position.y /= sqrt(stretchAmount);
+	v->position.z *= stretchAmount;
 }
 
 /*
@@ -116,38 +115,33 @@ Vertex applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
 		switch (ancestors[i]->type)
 		{
 			case BUNDLE_CANETYPE:
-			// Find where subcane lives and apply translation
-			// to move it to this location
-			int subcaneIndex;
-			for (int j = 0; j < ancestors[i]->subcaneCount; ++j)
-			{
-				if (ancestors[i]->subcanes[j] == ancestors[i+1])
+				// Find where subcane lives and apply translation
+				// to move it to this location
+				int subcaneIndex;
+				for (int j = 0; j < ancestors[i]->subcaneCount; ++j)
 				{
-					subcaneIndex = j;
-					break;
+					if (ancestors[i]->subcanes[j] == ancestors[i+1])
+					{
+						subcaneIndex = j;
+						break;
+					}
 				}
-			}
-			applyBundleTransform(&v, ancestors[i]->subcaneLocations[subcaneIndex]);
-			break;
-			// amts[0] describes magnitude of stretch
-		case STRETCH_CANETYPE:
-			applyStretchTransform(&v, ancestors[i]->amts[0]);
-			//TODO: normal transform
-			break;
-		// amts[0] describes twist magnitude
-		case TWIST_CANETYPE:
-			applyTwistTransform(&v, ancestors[i]->amts[0]);
-			//TODO: normal transform
-			break;
-		// amts[0] describes the width-to-height ratio of the goal rectangle
-		// amts[1] describes the orientation w.r.t global XY
-		// amts[2] describes how close of an approximation to the rectangle is achieved
-		case FLATTEN_CANETYPE:
-			applyFlattenTransform(&v, ancestors[i]->amts[0], ancestors[i]->amts[1],
-			ancestors[i]->amts[2]);
-			break;
-		default: // BASE_CIRCLE_CANETYPE
-			break;
+				applyBundleTransform(&v, ancestors[i]->subcaneLocations[subcaneIndex]);
+				break;
+			// amts[0] is twist, amts[1] is stretch
+			case PULL_CANETYPE:
+				applyPullTransform(&v, ancestors[i]->amts[0], ancestors[i]->amts[1]);
+				//TODO: normal transform
+				break;
+			// amts[0] describes the width-to-height ratio of the goal rectangle
+			// amts[1] describes the orientation w.r.t global XY
+			// amts[2] describes how close of an approximation to the rectangle is achieved
+			case FLATTEN_CANETYPE:
+				applyFlattenTransform(&v, ancestors[i]->amts[0], ancestors[i]->amts[1],
+				ancestors[i]->amts[2]);
+				break;
+			default: // BASE_CIRCLE_CANETYPE
+				break;
 		}
 	}
 	return v;
@@ -166,8 +160,8 @@ float computeTotalStretch(Cane** ancestors, int ancestorCount)
 	totalStretch = 1;
 	for (i = 0; i < ancestorCount; ++i)
 	{
-		if (ancestors[i]->type == STRETCH_CANETYPE)
-			totalStretch *= ancestors[i]->amts[0];
+		if (ancestors[i]->type == PULL_CANETYPE)
+			totalStretch *= ancestors[i]->amts[1];
 	}
 
 	return totalStretch;
