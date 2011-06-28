@@ -44,7 +44,6 @@ void MainWindow::modeChangedSlot(int mode)
 void MainWindow::libraryCaneDestroyed(QObject* obj)
 {
 	stockLayout->removeWidget((QWidget*) obj);
-	emit textMessageSig("Deleted cane from library");
 }
 
 void MainWindow::textMessageSlot(QString msg)
@@ -57,18 +56,15 @@ void MainWindow::saveCaneToLibrarySlot()
 	if (model->getCane() == NULL)
 		return;
 
-	LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->openglWidget,
-												  this->model, 0);
+	LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->openglWidget, this->model, 0);
 	stockLayout->addWidget(lc);
 	connect(stockLayout, SIGNAL(destroyed(QObject*)), this, SLOT(libraryCaneDestroyed(QObject*)));
-
-	emit textMessageSig("Saved cane to library");
 }
 
 void MainWindow::setupStatusBar()
 {
 	statusBar = new QStatusBar(this);
-	modeLabel = new QLabel("NO MODE",statusBar);
+	modeLabel = new QLabel("????",statusBar);
 	statusBar->addPermanentWidget(modeLabel);
 	setStatusBar(statusBar);
 }

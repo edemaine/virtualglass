@@ -334,26 +334,26 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		if (shiftButtonDown)
 		{
 			if (abs(relX) > abs(relY))
-				model->pullCane((relX * 500.0 * PI / 100.0), 0.0);
+				model->pullCane(relX * PI, 0.0);
 			else
 				model->pullCane(0.0, -5.0*relY);
 		}
 		else
-			model->pullCane((relX * 500.0 * PI / 100.0), -5.0*relY);
+			model->pullCane(relX * PI, -5.0*relY);
 	}
 	else if (model->getMode() == BUNDLE_MODE)
 	{
 		/*
-   How the parameters for moveCane() are calculated is not obvious.
-   The idea is to make mouse X/Y correspond to the cane moving
-   left-right/up-down *regardless* of where the camera is. This
-   is why theta (the camera angle relative to the look-at point) is
-   also involved.
+		How the parameters for moveCane() are calculated is not obvious.
+		The idea is to make mouse X/Y correspond to the cane moving
+		left-right/up-down *regardless* of where the camera is. This
+		is why theta (the camera angle relative to the look-at point) is
+		also involved.
 
-   Essentially, the parameters convert the amount moved in X and Y
-   (variables `relX' and `relY') to the amount moved in X and Y
-   according to axes on which the cane lives.
-  */
+		Essentially, the parameters convert the amount moved in X and Y
+		(variables `relX' and `relY') to the amount moved in X and Y
+		according to axes on which the cane lives.
+		*/
 		model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
 						relX * sin(theta + PI / 2.0) + relY * sin(theta));
 	}

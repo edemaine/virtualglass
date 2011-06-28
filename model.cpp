@@ -21,7 +21,19 @@ int Model :: getMode()
 
 void Model :: setMode(int mode)
 {
+	int prev_mode = this->mode;
 	this->mode = mode;
+	if (cane != NULL)
+	{
+		if (prev_mode != BUNDLE_MODE && this->mode == BUNDLE_MODE)
+		{
+			history->saveState(cane);
+			activeSubcane = 0;
+			cane->createBundle();
+			emit caneChangedSig(); // illumination
+		}
+	}
+	
 	emit modeChangedSig(mode);
 }
 
@@ -92,7 +104,7 @@ void Model :: pullCane(float twistAmount, float stretchAmount)
 		return;
 	if (cane->type != PULL_CANETYPE)
 		history->saveState(cane);
-	cane->pull(twistAmount, stretchAmount);
+	cane->pullIntuitive(twistAmount, stretchAmount);
 	lowResDataUpToDate = 0;
 	highResDataUpToDate = 0;
 	emit caneChangedSig();
@@ -108,18 +120,6 @@ void Model :: flattenCane(float rectangle_ratio, float rectangle_theta, float fl
 	lowResDataUpToDate = 0;
 	highResDataUpToDate = 0;
 	emit caneChangedSig();
-}
-
-void Model :: startMoveMode()
-{
-	if (cane == NULL)
-		return;
-	activeSubcane = 0;
-	if (cane->type != BUNDLE_CANETYPE)
-	{
-		history->saveState(cane);
-		cane->createBundle();
-	}
 }
 
 void Model :: moveCane(float delta_x, float delta_y)

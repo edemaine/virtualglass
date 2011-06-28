@@ -75,7 +75,7 @@ void Cane :: shallowCopy(Cane* dest)
 	dest->color = this->color;
 }
 
-void Cane :: pull(float twistRadians, float stretchFactor)
+void Cane :: pullLinear(float twistFactor, float stretchFactor)
 {
 	if (this->type != PULL_CANETYPE)
 	{
@@ -88,8 +88,41 @@ void Cane :: pull(float twistRadians, float stretchFactor)
 		this->amts[0] = 0.0; // twist amount
 		this->amts[1] = 1.0; // stretch amount
 	}
-	this->amts[0] += twistRadians;
-	this->amts[1] += stretchFactor;
+	this->amts[0] += twistFactor;
+	this->amts[0] += stretchFactor;
+}
+
+void Cane :: pullIntuitive(float twistFactor, float stretchFactor)
+{
+	// The amount twist and stretch are changed are functions
+	// of the amount already present. The exact function is 
+	// determined by feel/playing with the tool. 
+	if (this->type != PULL_CANETYPE)
+	{
+		Cane* copy = new Cane(UNASSIGNED_CANETYPE);
+		this->shallowCopy(copy);
+		this->reset();
+		this->type = PULL_CANETYPE;
+		this->subcaneCount = 1;
+		this->subcanes[0] = copy;
+		this->amts[0] = 0.0; // twist amount
+		this->amts[1] = 1.0; // stretch amount
+	}
+	if (this->amts[0] < 0.0)
+	{
+		if (this->amts[0] > -1.0)
+			this->amts[0] -= 8 * -twistFactor;
+		else
+			this->amts[0] *= (1.0 + -twistFactor);
+	}
+	else
+	{
+		if (this->amts[0] < 1.0)
+			this->amts[0] += 8 * twistFactor;
+		else
+			this->amts[0] *= (1.0 + twistFactor);
+	}
+	this->amts[1] *= (1.0 + stretchFactor);
 }
 
 /*
@@ -125,15 +158,12 @@ void Cane :: flatten(float rectangle_ratio, float rectangle_theta, float flatnes
 
 void Cane :: createBundle()
 {
-	if (this->type != BUNDLE_CANETYPE)
-	{
-		Cane* copy = new Cane(UNASSIGNED_CANETYPE);
-		this->shallowCopy(copy);
-		this->reset();
-		this->type = BUNDLE_CANETYPE;
-		this->subcaneCount = 1;
-		this->subcanes[0] = copy;
-	}
+	Cane* copy = new Cane(UNASSIGNED_CANETYPE);
+	this->shallowCopy(copy);
+	this->reset();
+	this->type = BUNDLE_CANETYPE;
+	this->subcaneCount = 1;
+	this->subcanes[0] = copy;
 }
 
 void Cane :: moveCane(int subcane, float delta_x, float delta_y)
