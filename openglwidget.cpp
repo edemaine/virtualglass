@@ -148,14 +148,14 @@ void OpenGLWidget :: resizeGL(int width, int height)
 	paintGL();
 }
 
-void OpenGLWidget :: zoomInCommandSlot()
+void OpenGLWidget :: zoomIn()
 {
 	rho *= 0.8;
 	updateCamera();
 	paintGL();
 }
 
-void OpenGLWidget :: zoomOutCommandSlot()
+void OpenGLWidget :: zoomOut()
 {
 	rho *= 1.2;
 	updateCamera();
@@ -298,15 +298,15 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	relY = (mouseLocY - oldMouseLocY) / windowHeight;
 
 	/*
- Do something depending on mode.
- All modes except LOOK_MODE involve modifying the cane
- itself, while LOOK_MODE moves the camera.
+	Do something depending on mode.
+	All modes except LOOK_MODE involve modifying the cane
+	itself, while LOOK_MODE moves the camera.
 
- All of the calls to model->*Cane() are functions of relX/relY,
- but the constants involved are determined by experiment,
- i.e. how much twist `feels' reasonable for moving the mouse
- an inch.
- */
+	All of the calls to model->*Cane() are functions of relX/relY,
+	but the constants involved are determined by experiment,
+	i.e. how much twist `feels' reasonable for moving the mouse
+	an inch.
+	*/
 	if (rightMouseDown)
 	{
 		// Rotate camera position around look-at location.
@@ -367,10 +367,10 @@ void OpenGLWidget :: wheelEvent(QWheelEvent *e)
 {
 	if (e->delta() > 0)
 	{
-		emit zoomInCommandSig();
+		zoomIn();
 	} else if (e->delta() < 0)
 	{
-		emit zoomOutCommandSig();
+		zoomOut();
 	}
 }
 

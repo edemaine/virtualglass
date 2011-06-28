@@ -63,9 +63,9 @@ Controller::Controller()
 	connect(mainWindow->toggle_axes_button, SIGNAL(pressed()),
 			mainWindow->openglWidget, SLOT(toggleAxesCommandSlot()));
 	connect(mainWindow->zoom_in_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(zoomInCommandSlot()));
+			mainWindow->openglWidget, SLOT(zoomIn()));
 	connect(mainWindow->zoom_out_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(zoomOutCommandSlot()));
+			mainWindow->openglWidget, SLOT(zoomOut()));
 	connect(mainWindow->frontView_button, SIGNAL(pressed()),
 			mainWindow->openglWidget, SLOT(frontViewCommandSlot()));
 	connect(mainWindow->topView_button, SIGNAL(pressed()),
