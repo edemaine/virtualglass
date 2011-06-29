@@ -23,8 +23,6 @@ class OpenGLWidget : public QGLWidget
 		Model* getModel();
 		OpenGLWidget(QWidget* parent, Model* model);
 		void updateResolution(int new_resolution);
-		void toggleAxes();
-		void toggleGrid();
 		void setMode(int mode);
 		void setCamera(float theta, float fee);
 		Point getCameraPoint();
@@ -67,13 +65,13 @@ class OpenGLWidget : public QGLWidget
 	public slots:
 		void zoomIn();
 		void zoomOut();
-		void caneChangedSlot();
-		void frontViewCommandSlot();
-		void topViewCommandSlot();
-		void sideViewCommandSlot();
-		void switchProjectionCommandSlot();
-		void toggleAxesCommandSlot();
-		void toggleGridCommandSlot();
+		void caneChanged();
+		void setFrontView();
+		void setTopView();
+		void setSideView();
+		void switchProjection();
+		void toggleAxes();
+		void toggleGrid();
 
 	protected:
 		void initializeGL();

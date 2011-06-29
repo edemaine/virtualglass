@@ -32,7 +32,7 @@ void Model :: setMode(int mode)
 		}
 	}
 	
-	emit modeChangedSig(mode);
+	emit modeChanged(mode);
 }
 
 void Model :: setActiveSubcane(int subcane)
@@ -43,7 +43,7 @@ void Model :: setActiveSubcane(int subcane)
 	{
 		activeSubcane = subcane;
 		geometryOutOfDate();
-		emit caneChangedSig();
+		emit caneChanged();
 	}
 }
 
@@ -52,10 +52,10 @@ void Model :: setCane(Cane* c)
 	history->saveState(cane);
 	cane = c;
 	geometryOutOfDate();
-	emit caneChangedSig();
+	emit caneChanged();
 }
 
-void Model :: updateSelectData()
+void Model :: updateSelectGeometry()
 {
 	Cane* ancestors[MAX_ANCESTORS];
 	int ancestorCount;
@@ -65,10 +65,10 @@ void Model :: updateSelectData()
 	if (cane != NULL) // && cane->type == BUNDLE_CANETYPE) // && mode == BUNDLE_MODE)
 		generateMesh(cane, &selectGeometry, ancestors, &ancestorCount,
 			LOW_RESOLUTION, NULL, false, true, -1);
-	selectDataUpToDate = 1;
+	selectGeometryFresh = 1;
 }
 
-void Model :: updateLowResData()
+void Model :: updateLowResGeometry()
 {
 	Cane* ancestors[MAX_ANCESTORS];
 	int ancestorCount;
@@ -83,10 +83,10 @@ void Model :: updateLowResData()
 	else
 		generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount,
 			LOW_RESOLUTION, NULL, false, false, 0);
-	lowResDataUpToDate = 1;
+	lowResGeometryFresh = 1;
 }
 
-void Model :: updateHighResData()
+void Model :: updateHighResGeometry()
 {
 	Cane* ancestors[MAX_ANCESTORS];
 	int ancestorCount;
@@ -99,7 +99,7 @@ void Model :: updateHighResData()
 	else
 		generateMesh(cane, &highResGeometry, ancestors, &ancestorCount,
 			HIGH_RESOLUTION, NULL, false, false, 0);
-	highResDataUpToDate = 1;
+	highResGeometryFresh = 1;
 }
 
 Cane* Model :: getCane()
@@ -109,8 +109,8 @@ Cane* Model :: getCane()
 
 Geometry* Model :: getSelectionGeometry()
 {
-	if (!selectDataUpToDate)
-		updateSelectData();
+	if (!selectGeometryFresh)
+		updateSelectGeometry();
 	return &selectGeometry;	
 }
 
@@ -118,23 +118,23 @@ Geometry* Model :: getGeometry(int resolution)
 {
 	if (resolution == LOW_RESOLUTION)
 	{
-		if (!lowResDataUpToDate)
-			updateLowResData();
+		if (!lowResGeometryFresh)
+			updateLowResGeometry();
 		return &lowResGeometry;
 	}
 	else
 	{
-		if (!highResDataUpToDate)
-			updateHighResData();
+		if (!highResGeometryFresh)
+			updateHighResGeometry();
 		return &highResGeometry;
 	}
 }
 
 void Model :: geometryOutOfDate()
 {
-	selectDataUpToDate = 0;
-	lowResDataUpToDate = 0;
-	highResDataUpToDate = 0;
+	selectGeometryFresh = 0;
+	lowResGeometryFresh = 0;
+	highResGeometryFresh = 0;
 }
 
 void Model :: pullCane(float twistAmount, float stretchAmount)
@@ -145,7 +145,7 @@ void Model :: pullCane(float twistAmount, float stretchAmount)
 		history->saveState(cane);
 	cane->pullIntuitive(twistAmount, stretchAmount);
 	geometryOutOfDate();
-	emit caneChangedSig();
+	emit caneChanged();
 }
 
 void Model :: flattenCane(float rectangle_ratio, float rectangle_theta, float flatness)
@@ -156,7 +156,7 @@ void Model :: flattenCane(float rectangle_ratio, float rectangle_theta, float fl
 		history->saveState(cane);
 	cane->flatten(rectangle_ratio, rectangle_theta, flatness);
 	geometryOutOfDate();
-	emit caneChangedSig();
+	emit caneChanged();
 }
 
 void Model :: moveCane(float delta_x, float delta_y)
@@ -165,7 +165,7 @@ void Model :: moveCane(float delta_x, float delta_y)
 		return;
 	cane->moveCane(activeSubcane, delta_x, delta_y);
 	geometryOutOfDate();
-	emit caneChangedSig();
+	emit caneChanged();
 }
 
 void Model :: addCane(Cane* c)
@@ -176,7 +176,7 @@ void Model :: addCane(Cane* c)
 	else
 		cane->add(c->deepCopy());
 	geometryOutOfDate();
-	emit caneChangedSig();
+	emit caneChanged();
 }
 
 void Model :: undo()
@@ -184,15 +184,15 @@ void Model :: undo()
 	cane = history->getState();
 	history->undo();
 	geometryOutOfDate();
-	emit caneChangedSig();
+	emit caneChanged();
 }
 
 void Model :: saveObjFile(std::string const &filename)
 {
-	updateHighResData();
+	updateHighResGeometry();
 	highResGeometry.save_obj_file(filename);
 
-	updateHighResData();
+	updateHighResGeometry();
 	highResGeometry.save_obj_file(filename);
 }
 

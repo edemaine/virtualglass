@@ -36,9 +36,9 @@ class Model : public QObject
 		int getMode();
 
 	signals:
-		void caneChangedSig();
-		void textMessageSig(QString msg);
-		void modeChangedSig(int mode);
+		void caneChanged();
+		void textMessage(QString msg);
+		void modeChanged(int mode);
 
 	public slots:
 		void undo();
@@ -52,15 +52,15 @@ class Model : public QObject
 		Geometry selectGeometry;
 		Geometry lowResGeometry;
 		Geometry highResGeometry;
-		int lowResDataUpToDate;
-		int highResDataUpToDate;
-		int selectDataUpToDate;
+		int lowResGeometryFresh;
+		int highResGeometryFresh;
+		int selectGeometryFresh;
 		int activeSubcane;
 
 		void geometryOutOfDate();
-		void updateSelectData();
-		void updateLowResData();
-		void updateHighResData();
+		void updateSelectGeometry();
+		void updateLowResGeometry();
+		void updateHighResGeometry();
 };
 
 #endif

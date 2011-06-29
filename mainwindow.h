@@ -46,11 +46,10 @@ signals:
 	void setCaneSig(Cane* c);
 	void clearCommandSig();
 	void textMessageSig(QString message);
-	void saveCaneToLibrarySig();
 
 public slots:
-	void modeChangedSlot(int mode);
-	void saveCaneToLibrarySlot();
+	void modeChanged(int mode);
+	void saveCaneToLibrary();
 	void exportLibraryButtonPressed();
 	void importLibraryButtonPressed();
 	void newColorPickerCaneButtonPressed();
@@ -59,7 +58,7 @@ public slots:
 	void colorPickerSelected(QColor color);
 	void libraryCaneDestroyed(QObject* obj);
 	void loadLibraryCane(const YAML::Node& node, Cane* cane);
-	void textMessageSlot(QString message);
+	void displayTextMessage(QString message);
 
 private:
 	Model* model;

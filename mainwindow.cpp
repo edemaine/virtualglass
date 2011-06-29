@@ -18,25 +18,28 @@ MainWindow::MainWindow(Model* model)
 	move(75,25);
 }
 
-void MainWindow::modeChangedSlot(int mode)
+void MainWindow::modeChanged(int mode)
 {
 	switch (mode)
 	{
-	case PULL_MODE:
-		modeLabel->setText("PULL MODE");
-		break;
-	case BUNDLE_MODE:
-		modeLabel->setText("BUNDLE MODE");
-		break;
-	case FLATTEN_MODE:
-		modeLabel->setText("FLATTEN MODE");
-		break;
-	case LOOK_MODE:
-		modeLabel->setText("LOOK MODE");
-		break;
-	default:
-		modeLabel->setText("UNKNOWN MODE");
-		break;
+		case PULL_MODE:
+			modeLabel->setText("PULL MODE");
+			break;
+		case BUNDLE_MODE:
+			modeLabel->setText("BUNDLE MODE");
+			break;
+		case FLATTEN_MODE:
+			modeLabel->setText("FLATTEN MODE");
+			break;
+		case LOOK_MODE:
+			modeLabel->setText("LOOK MODE");
+			break;
+		case WRAP_MODE:
+			modeLabel->setText("WRAP MODE");
+			break;
+		default:
+			modeLabel->setText("UNKNOWN MODE");
+			break;
 	}
 
 }
@@ -46,12 +49,12 @@ void MainWindow::libraryCaneDestroyed(QObject* obj)
 	stockLayout->removeWidget((QWidget*) obj);
 }
 
-void MainWindow::textMessageSlot(QString msg)
+void MainWindow::displayTextMessage(QString msg)
 {
 	statusBar->showMessage(msg, 2000);
 }
 
-void MainWindow::saveCaneToLibrarySlot()
+void MainWindow::saveCaneToLibrary()
 {
 	if (model->getCane() == NULL)
 		return;
@@ -103,23 +106,23 @@ void MainWindow::seedLibrary()
 	c->color.a = 0.3;
 
 	model->setCane(stretch);
-	emit saveCaneToLibrarySig();
+	saveCaneToLibrary();
 	c->color.r = 1.0;
 	c->color.g = 0.5;
 	c->color.b = 0.5;
 	c->color.a = 0.7;
 	model->setCane(stretch);
-	emit saveCaneToLibrarySig();
+	saveCaneToLibrary();
 	c->color.r = 0.5;
 	c->color.g = 1.0;
 	c->color.b = 0.5;
 	model->setCane(stretch);
-	emit saveCaneToLibrarySig();
+	saveCaneToLibrary();
 	c->color.r = 0.5;
 	c->color.g = 0.5;
 	c->color.b = 1.0;
 	model->setCane(stretch);
-	emit saveCaneToLibrarySig();
+	saveCaneToLibrary();
 
 	model->setCane(NULL);
 	emit textMessageSig("Default library loaded");
@@ -220,7 +223,7 @@ void MainWindow::importLibraryButtonPressed()
 		Cane loadCane = Cane(UNASSIGNED_CANETYPE);
 		loadLibraryCane(doc[i],&loadCane);
 		emit setCaneSig(&loadCane);
-		emit saveCaneToLibrarySig();
+		saveCaneToLibrary();
 	}
 
 	emit setCaneSig(NULL);
@@ -248,7 +251,7 @@ void MainWindow::saveObjButtonPressed()
 
 void MainWindow::colorPickerSelected(QColor color)
 {
-	emit saveCaneToLibrarySig();
+	saveCaneToLibrary();
 	emit setCaneSig(NULL);
 
 	Cane* c = new Cane(BASE_CIRCLE_CANETYPE);

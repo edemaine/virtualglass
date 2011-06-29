@@ -42,7 +42,7 @@ Model* OpenGLWidget :: getModel()
 	return this->model;
 }
 
-void OpenGLWidget :: caneChangedSlot()
+void OpenGLWidget :: caneChanged()
 {
 	updateTriangles();
 	paintGL();
@@ -154,7 +154,7 @@ void OpenGLWidget :: paintGL()
 	swapBuffers();
 }
 
-void OpenGLWidget :: switchProjectionCommandSlot()
+void OpenGLWidget :: switchProjection()
 {
 	isOrthographic=!isOrthographic;
 }
@@ -187,28 +187,28 @@ void OpenGLWidget :: zoomOut()
 	paintGL();
 }
 
-void OpenGLWidget :: topViewCommandSlot()
+void OpenGLWidget :: setTopView()
 {
 	setCamera(0.0,0.01);
 }
 
-void OpenGLWidget :: sideViewCommandSlot()
+void OpenGLWidget :: setSideView()
 {
 	setCamera(0.0, PI/2);
 }
 
-void OpenGLWidget :: frontViewCommandSlot()
+void OpenGLWidget :: setFrontView()
 {
 	setCamera(-PI/2, PI/2);
 }
 
-void OpenGLWidget :: toggleAxesCommandSlot()
+void OpenGLWidget :: toggleAxes()
 {
 	showAxes = !showAxes;
 	paintGL();
 }
 
-void OpenGLWidget :: toggleGridCommandSlot()
+void OpenGLWidget :: toggleGrid()
 {
 	showGrid = !showGrid;
 	paintGL();

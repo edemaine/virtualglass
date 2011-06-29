@@ -20,11 +20,11 @@ Controller::Controller()
 	mainWindow = new MainWindow(model);
 
 	// connect openglwidget to model
-	connect(model, SIGNAL(caneChangedSig()), mainWindow->openglWidget, SLOT(caneChangedSlot()));
+	connect(model, SIGNAL(caneChanged()), mainWindow->openglWidget, SLOT(caneChanged()));
 
 	// Connect mainwindow to model
-	connect(model, SIGNAL(textMessageSig(QString)), mainWindow, SLOT(textMessageSlot(QString)));
-	connect(model, SIGNAL(modeChangedSig(int)), mainWindow, SLOT(modeChangedSlot(int)));
+	connect(model, SIGNAL(textMessage(QString)), mainWindow, SLOT(displayTextMessage(QString)));
+	connect(model, SIGNAL(modeChanged(int)), mainWindow, SLOT(modeChanged(int)));
 
 	// connect mainwindow buttons to model
 	QSignalMapper* modeSignalMapper = new QSignalMapper(model);
@@ -42,7 +42,7 @@ Controller::Controller()
 	connect(mainWindow->clear_button, SIGNAL(pressed()), model, SLOT(clearCurrentCane()));
 
 	// Connect mainwindow buttons to mainwindow
-	connect(mainWindow->save_button, SIGNAL(pressed()), mainWindow, SLOT(saveCaneToLibrarySlot()));
+	connect(mainWindow->save_button, SIGNAL(pressed()), mainWindow, SLOT(saveCaneToLibrary()));
 	connect(mainWindow->exportLibrary_button, SIGNAL(pressed()),
 			mainWindow, SLOT(exportLibraryButtonPressed()));
 	connect(mainWindow->importLibrary_button, SIGNAL(pressed()),
@@ -53,28 +53,23 @@ Controller::Controller()
 			mainWindow, SLOT(changeBgColorButtonPressed()));
 	connect(mainWindow->saveObj_button, SIGNAL(pressed()), mainWindow, SLOT(saveObjButtonPressed()));
 
-	connect(mainWindow, SIGNAL(saveCaneToLibrarySig()), mainWindow, SLOT(saveCaneToLibrarySlot()));
-
 	// connect openglwidget to mainwindow buttons
 	connect(mainWindow->toggle_axes_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(toggleAxesCommandSlot()));
-	connect(mainWindow->toggle_axes_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(toggleAxesCommandSlot()));
+			mainWindow->openglWidget, SLOT(toggleAxes()));
+	connect(mainWindow->toggle_grid_button, SIGNAL(pressed()),
+			mainWindow->openglWidget, SLOT(toggleGrid()));
 	connect(mainWindow->zoom_in_button, SIGNAL(pressed()),
 			mainWindow->openglWidget, SLOT(zoomIn()));
 	connect(mainWindow->zoom_out_button, SIGNAL(pressed()),
 			mainWindow->openglWidget, SLOT(zoomOut()));
 	connect(mainWindow->frontView_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(frontViewCommandSlot()));
+			mainWindow->openglWidget, SLOT(setFrontView()));
 	connect(mainWindow->topView_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(topViewCommandSlot()));
+			mainWindow->openglWidget, SLOT(setTopView()));
 	connect(mainWindow->sideView_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(sideViewCommandSlot()));
+			mainWindow->openglWidget, SLOT(setSideView()));
 	connect(mainWindow->switchView_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(switchProjectionCommandSlot()));
-	connect(mainWindow->toggle_grid_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(toggleGridCommandSlot()));
-
+			mainWindow->openglWidget, SLOT(switchProjection()));
 }
 
 int Controller::startUp()
