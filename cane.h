@@ -20,7 +20,7 @@ public:
 	void pullLinear(float twistFactor, float stretchFactor);
 	void flatten(float rectangle_ratio, float rectangle_theta, float flatness);
 	void createBundle();
-	void add(Cane* addl, int* addl_index_ptr);
+	void add(Cane* addl);
 	void moveCane(int subcane, float delta_x, float delta_y);
 	int leafNodes();
 	Cane* deepCopy();

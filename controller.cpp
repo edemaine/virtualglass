@@ -39,8 +39,6 @@ Controller::Controller()
 	connect(modeSignalMapper, SIGNAL(mapped(int)), model, SLOT(setMode(int)));
 
 	connect(mainWindow->undo_button, SIGNAL(pressed()), model, SLOT(undo()));
-	connect(mainWindow->next_button, SIGNAL(pressed()),
-			model, SLOT(advanceActiveSubcaneSlot()));
 	connect(mainWindow->clear_button, SIGNAL(pressed()), model, SLOT(clearCurrentCane()));
 
 	// Connect mainwindow buttons to mainwindow

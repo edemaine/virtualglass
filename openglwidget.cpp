@@ -32,6 +32,7 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* model) : QGLWidget(parent)
 	showGrid = false;
 	resolution = HIGH_RESOLUTION;
 	this->model = model;
+	setMouseTracking(true);	
 	history = new CaneHistory();
 	updateTriangles();
 }
@@ -73,10 +74,6 @@ void OpenGLWidget :: initializeGL()
 	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
-	// For transparency
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	glEnable(GL_DEPTH_TEST);
 }
 
@@ -86,6 +83,37 @@ void OpenGLWidget :: setBgColor(QColor color)
 	bgColor = color;
 	paintGL();
 }
+		
+int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
+{
+	geometry = model->getSelectionGeometry();	
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//Check that Vertex and Triangle have proper size:
+	assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3 + 4));
+	assert(sizeof(Triangle) == sizeof(GLuint) * 3);
+
+	glDisable(GL_LIGHTING);
+	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].position));
+	glColorPointer(4, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].color));
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+	glDrawElements(GL_TRIANGLES, geometry->triangles.size() * 3, 
+		GL_UNSIGNED_INT, &(geometry->triangles[0].v1));
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+	GLfloat c;
+	glReadPixels(mouseX, this->height() - mouseY, 1, 1, GL_RED, GL_FLOAT, &c);
+
+	glEnable(GL_LIGHTING);
+	updateTriangles();
+	paintGL();
+
+	if (c == 0.0) // background color
+		return -1;
+	return (int) ((c - 0.1) / (0.9 / MAX_SUBCANE_COUNT) + 0.1);
+}	
 
 /*
 Handles the drawing of a triangle mesh.
@@ -97,7 +125,6 @@ void OpenGLWidget :: paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
 	if (showAxes)
 		drawAxes();
 
@@ -105,9 +132,6 @@ void OpenGLWidget :: paintGL()
 		drawGrid();
 
 	if (geometry) {
-		//JIM sez: blend not workin' out at the moment
-		glDisable(GL_BLEND);
-
 		//Check that Vertex and Triangle have proper size:
 		assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3 + 4));
 		assert(sizeof(Triangle) == sizeof(GLuint) * 3);
@@ -119,7 +143,8 @@ void OpenGLWidget :: paintGL()
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glEnableClientState(GL_COLOR_ARRAY);
 
-		glDrawElements(GL_TRIANGLES, geometry->triangles.size() * 3, GL_UNSIGNED_INT, &(geometry->triangles[0].v1));
+		glDrawElements(GL_TRIANGLES, geometry->triangles.size() * 3, 
+			GL_UNSIGNED_INT, &(geometry->triangles[0].v1));
 
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_NORMAL_ARRAY);
@@ -213,19 +238,6 @@ void OpenGLWidget :: updateTriangles()
 }
 
 /*
-Changes the current subcane undergoing change to
-the next subcane in the cane.
-*/
-void OpenGLWidget :: advanceActiveSubcane()
-{
-	if (model->getMode() == BUNDLE_MODE)
-	{
-		model->advanceActiveSubcaneSlot();
-		paintGL();
-	}
-}
-
-/*
 Called after the camera changes location.
 */
 void OpenGLWidget :: updateCamera()
@@ -285,6 +297,11 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	float newFee;
 	float windowWidth, windowHeight;
 	int oldMouseLocX, oldMouseLocY;
+
+	// only admit mouse moves without a button down if in
+	// bundle mode (for illumination upon scrollover of cane)
+	if (model->getMode() != BUNDLE_MODE && e->buttons() == 0)
+		return; 
 
 	windowWidth = this->width();
 	windowHeight = this->height();
@@ -354,8 +371,15 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		(variables `relX' and `relY') to the amount moved in X and Y
 		according to axes on which the cane lives.
 		*/
-		model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
-						relX * sin(theta + PI / 2.0) + relY * sin(theta));
+	
+		model->setActiveSubcane(getSubcaneUnderMouse(oldMouseLocX, oldMouseLocY));
+		if (e->buttons() & 0x00000001) // if left mouse button is down
+		{
+			relX *= 5; // tone it down
+			relY *= 5; // tone it down
+			model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
+				relX * sin(theta + PI / 2.0) + relY * sin(theta));
+		}
 	}
 	else if (model->getMode() == FLATTEN_MODE)
 	{

@@ -5,8 +5,7 @@ Model :: Model()
 {
 	history = new CaneHistory();
 	cane = NULL;
-	lowResDataUpToDate = 0;
-	highResDataUpToDate = 0;
+	geometryOutOfDate();
 }
 
 void Model :: clearCurrentCane()
@@ -28,21 +27,45 @@ void Model :: setMode(int mode)
 		if (prev_mode != BUNDLE_MODE && this->mode == BUNDLE_MODE)
 		{
 			history->saveState(cane);
-			activeSubcane = 0;
+			activeSubcane = -1;
 			cane->createBundle();
-			emit caneChangedSig(); // illumination
 		}
 	}
 	
 	emit modeChangedSig(mode);
 }
 
+void Model :: setActiveSubcane(int subcane)
+{
+	if (cane == NULL)
+		return;
+	if (activeSubcane != subcane)
+	{
+		activeSubcane = subcane;
+		geometryOutOfDate();
+		emit caneChangedSig();
+	}
+}
+
 void Model :: setCane(Cane* c)
 {
 	history->saveState(cane);
 	cane = c;
-	lowResDataUpToDate = highResDataUpToDate = 0;
+	geometryOutOfDate();
 	emit caneChangedSig();
+}
+
+void Model :: updateSelectData()
+{
+	Cane* ancestors[MAX_ANCESTORS];
+	int ancestorCount;
+
+	ancestorCount = 0;
+	selectGeometry.clear();
+	if (cane != NULL) // && cane->type == BUNDLE_CANETYPE) // && mode == BUNDLE_MODE)
+		generateMesh(cane, &selectGeometry, ancestors, &ancestorCount,
+			LOW_RESOLUTION, NULL, false, true, -1);
+	selectDataUpToDate = 1;
 }
 
 void Model :: updateLowResData()
@@ -52,12 +75,14 @@ void Model :: updateLowResData()
 
 	ancestorCount = 0;
 	lowResGeometry.clear();
-	if (cane != NULL && cane->type == BUNDLE_CANETYPE)
+	if (cane != NULL && cane->type == BUNDLE_CANETYPE && mode == BUNDLE_MODE && activeSubcane != -1)
+	{
 		generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount,
-					 LOW_RESOLUTION, cane->subcanes[activeSubcane], false);
+			LOW_RESOLUTION, cane->subcanes[activeSubcane], false, false, 0);
+	}
 	else
 		generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount,
-					 LOW_RESOLUTION, NULL, false);
+			LOW_RESOLUTION, NULL, false, false, 0);
 	lowResDataUpToDate = 1;
 }
 
@@ -68,18 +93,25 @@ void Model :: updateHighResData()
 
 	ancestorCount = 0;
 	highResGeometry.clear();
-	if (cane != NULL && cane->type == BUNDLE_CANETYPE)
+	if (cane != NULL && cane->type == BUNDLE_CANETYPE && mode == BUNDLE_MODE && activeSubcane != -1)
 		generateMesh(cane, &highResGeometry, ancestors, &ancestorCount,
-					 HIGH_RESOLUTION, cane->subcanes[activeSubcane], false);
+			HIGH_RESOLUTION, cane->subcanes[activeSubcane], false, false, 0);
 	else
 		generateMesh(cane, &highResGeometry, ancestors, &ancestorCount,
-					 HIGH_RESOLUTION, NULL, false);
+			HIGH_RESOLUTION, NULL, false, false, 0);
 	highResDataUpToDate = 1;
 }
 
 Cane* Model :: getCane()
 {
 	return cane;
+}
+
+Geometry* Model :: getSelectionGeometry()
+{
+	if (!selectDataUpToDate)
+		updateSelectData();
+	return &selectGeometry;	
 }
 
 Geometry* Model :: getGeometry(int resolution)
@@ -98,6 +130,13 @@ Geometry* Model :: getGeometry(int resolution)
 	}
 }
 
+void Model :: geometryOutOfDate()
+{
+	selectDataUpToDate = 0;
+	lowResDataUpToDate = 0;
+	highResDataUpToDate = 0;
+}
+
 void Model :: pullCane(float twistAmount, float stretchAmount)
 {
 	if (cane == NULL)
@@ -105,8 +144,7 @@ void Model :: pullCane(float twistAmount, float stretchAmount)
 	if (cane->type != PULL_CANETYPE)
 		history->saveState(cane);
 	cane->pullIntuitive(twistAmount, stretchAmount);
-	lowResDataUpToDate = 0;
-	highResDataUpToDate = 0;
+	geometryOutOfDate();
 	emit caneChangedSig();
 }
 
@@ -117,18 +155,16 @@ void Model :: flattenCane(float rectangle_ratio, float rectangle_theta, float fl
 	if (cane->type != FLATTEN_CANETYPE)
 		history->saveState(cane);
 	cane->flatten(rectangle_ratio, rectangle_theta, flatness);
-	lowResDataUpToDate = 0;
-	highResDataUpToDate = 0;
+	geometryOutOfDate();
 	emit caneChangedSig();
 }
 
 void Model :: moveCane(float delta_x, float delta_y)
 {
-	if (cane == NULL)
+	if (cane == NULL || activeSubcane == -1)
 		return;
 	cane->moveCane(activeSubcane, delta_x, delta_y);
-	lowResDataUpToDate = 0;
-	highResDataUpToDate = 0;
+	geometryOutOfDate();
 	emit caneChangedSig();
 }
 
@@ -138,26 +174,8 @@ void Model :: addCane(Cane* c)
 	if (cane == NULL)
 		cane = c->deepCopy();
 	else
-		cane->add(c->deepCopy(), &activeSubcane);
-	lowResDataUpToDate = highResDataUpToDate = 0;
-	emit caneChangedSig();
-}
-
-/*
-Model::advanceActiveSubcane() is used when in bundle
-mode (i.e. the root node of the cane being operated on
-is a bundle) to change the subcane currently under user
-control. It will (i.e. in the future)
-also change the colors of the subcanes
-to illuminate the newly selected subcane.
-*/
-void Model :: advanceActiveSubcaneSlot()
-{
-	if (cane->type != BUNDLE_CANETYPE)
-		return;
-	activeSubcane += 1;
-	activeSubcane %= cane->subcaneCount;
-	lowResDataUpToDate = highResDataUpToDate = 0;
+		cane->add(c->deepCopy());
+	geometryOutOfDate();
 	emit caneChangedSig();
 }
 
@@ -165,7 +183,7 @@ void Model :: undo()
 {
 	cane = history->getState();
 	history->undo();
-	lowResDataUpToDate = highResDataUpToDate = 0;
+	geometryOutOfDate();
 	emit caneChangedSig();
 }
 

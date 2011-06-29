@@ -34,7 +34,6 @@ public:
 	QPushButton* flatten_button;
 	QPushButton* wrap_button;
 	QPushButton* undo_button;
-	QPushButton* next_button;
 	QPushButton* save_button;
 	QPushButton* clear_button;
 	QPushButton* exportLibrary_button;
@@ -45,7 +44,6 @@ public:
 
 signals:
 	void setCaneSig(Cane* c);
-	void advanceActiveCaneCommandSig();
 	void clearCommandSig();
 	void textMessageSig(QString message);
 	void saveCaneToLibrarySig();

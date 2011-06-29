@@ -295,7 +295,7 @@ leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
 void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount, 
-	int resolution, Cane* activeSubcane, bool isActive)
+	int resolution, Cane* activeSubcane, bool isActive, bool selectionColoring, int coloringIndex)
 {
 	int i;
 
@@ -309,24 +309,46 @@ void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCo
 	*ancestorCount += 1;
 	if (c->type == BASE_CIRCLE_CANETYPE)
 	{
-		if (!isActive)
+		if (selectionColoring)
 		{
-			Color newColor = c->color;
-			newColor.r = MAX(0.1, c->color.r - 0.1);
-			newColor.g = MAX(0.1, c->color.g - 0.1);
-			newColor.b = MAX(0.1, c->color.b - 0.1);
-			meshCircularBaseCane(geometry, ancestors, *ancestorCount, newColor, resolution);
+			Color selectionColor;
+			selectionColor.a = 1.0;
+			selectionColor.r = selectionColor.g = selectionColor.b = 
+				(0.1 + 0.9 / MAX_SUBCANE_COUNT * coloringIndex);
+			meshCircularBaseCane(geometry, ancestors, *ancestorCount, 
+				selectionColor, resolution);
 		}
 		else
-			meshCircularBaseCane(geometry, ancestors, *ancestorCount, c->color, resolution);
-
+		{
+			// If we're bundling and this isn't the active cane
+			if (activeSubcane != NULL && isActive)
+			{
+				Color newColor;
+				newColor.a = c->color.a;
+				newColor.r = MIN(1.0, c->color.r + 0.1);
+				newColor.g = MIN(1.0, c->color.g + 0.1);
+				newColor.b = MIN(1.0, c->color.b + 0.1);
+				meshCircularBaseCane(geometry, ancestors, *ancestorCount, 
+					newColor, resolution);
+			} // If this is the active cane or we're not bundling
+			else
+				meshCircularBaseCane(geometry, ancestors, 
+					*ancestorCount, c->color, resolution);
+		}
 	}
 	else
 	{
 		for (i = 0; i < c->subcaneCount; ++i)
 		{
-			generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
-						 resolution, activeSubcane, isActive);
+			if (!selectionColoring)
+				generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
+					resolution, activeSubcane, isActive, false, 0);
+			else if (coloringIndex == -1)
+				generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
+					resolution, NULL, false, true, i);
+			else
+				generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
+					resolution, NULL, false, true, coloringIndex);
 		}
 	}
 	*ancestorCount -= 1;

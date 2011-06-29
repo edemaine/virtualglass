@@ -172,15 +172,15 @@ void Cane :: moveCane(int subcane, float delta_x, float delta_y)
 	this->subcaneLocations[subcane].y += delta_y;
 }
 
-void Cane :: add(Cane* addl, int* addl_index_ptr)
+void Cane :: add(Cane* addl)
 {
-	createBundle();
+	if (this->type != BUNDLE_CANETYPE)
+		createBundle();
 
 	// Add the new cane to the bundle
 	subcanes[subcaneCount] = addl;
 	subcaneLocations[subcaneCount].x = 0;
 	subcaneLocations[subcaneCount].y = 0;
-	*addl_index_ptr = subcaneCount;
 	subcaneCount += 1;
 }
 

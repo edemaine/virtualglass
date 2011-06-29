@@ -312,8 +312,6 @@ void MainWindow::setupWorkArea()
 
 	QWidget* operButtonWidget = new QWidget();
 	operButtonWidget->setLayout(operButton_layout);
-	next_button = new QPushButton("Next");
-	next_button->setToolTip("Next Cane in Current Model");
 	save_button = new QPushButton("Save");
 	save_button->setToolTip("Save Current Model to Library");
 	clear_button = new QPushButton("Clear");
@@ -329,7 +327,6 @@ void MainWindow::setupWorkArea()
 	saveObj_button->setToolTip("Save an .obj file with the current cane geometry for rendering in an external program.");
 
 	QVBoxLayout* utilButton_layout = new QVBoxLayout();
-	utilButton_layout->addWidget(next_button);
 	utilButton_layout->addWidget(save_button);
 	utilButton_layout->addWidget(clear_button);
 	utilButton_layout->addWidget(exportLibrary_button);

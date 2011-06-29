@@ -23,7 +23,6 @@ class OpenGLWidget : public QGLWidget
 		Model* getModel();
 		OpenGLWidget(QWidget* parent, Model* model);
 		void updateResolution(int new_resolution);
-		void advanceActiveSubcane();
 		void toggleAxes();
 		void toggleGrid();
 		void setMode(int mode);
@@ -55,6 +54,7 @@ class OpenGLWidget : public QGLWidget
 
 		GLfloat lightPosition[4];
 
+		int getSubcaneUnderMouse(int mouseX, int mouseY);
 		void updateCamera();
 		void drawAxes();
 		void drawGrid();
