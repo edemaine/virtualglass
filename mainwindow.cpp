@@ -12,10 +12,44 @@ MainWindow::MainWindow(Model* model)
 	setupWorkArea();
 	setupLibraryArea();
 	setupStatusBar();
+	setupMenuBar();
 	setWindowTitle(tr("Virtual Glass"));
 
 	resize(1000, 750);
 	move(75,25);
+}
+
+void MainWindow::setupMenuBar()
+{
+     	fileMenu = menuBar()->addMenu(tr("&File"));
+
+	QAction* importLibrary = new QAction(tr("&Import library file"), this);
+     	importLibrary->setStatusTip(tr("Load a saved library of canes"));
+     	connect(importLibrary, SIGNAL(triggered()), this, SLOT(importLibraryButtonPressed()));
+	fileMenu->addAction(importLibrary);
+
+	QAction* exportLibrary = new QAction(tr("&Export library file"), this);
+     	exportLibrary->setStatusTip(tr("Save the current library of canes to a file"));
+     	connect(exportLibrary, SIGNAL(triggered()), this, SLOT(exportLibraryButtonPressed()));
+	fileMenu->addAction(exportLibrary);
+
+	QAction* exportObj = new QAction(tr("&Export to .obj"), this);
+     	exportObj->setStatusTip(tr("Save the geometry of the current cane as a .obj file"));
+     	connect(exportObj, SIGNAL(triggered()), this, SLOT(saveObjButtonPressed()));
+	fileMenu->addAction(exportObj);
+
+     	viewMenu = menuBar()->addMenu(tr("&View"));
+
+	QAction* toggleAxes = new QAction(tr("&Toggle Axes"), this);
+     	toggleAxes->setStatusTip(tr("Toggle the references lines on the X, Y, and Z axes."));
+     	connect(toggleAxes, SIGNAL(triggered()), openglWidget, SLOT((toggleAxes())));
+	viewMenu->addAction(toggleAxes);
+
+	QAction* toggleGrid = new QAction(tr("&Toggle Grid"), this);
+     	toggleGrid->setStatusTip(tr("Toggle the references grid."));
+     	connect(toggleGrid, SIGNAL(triggered()), openglWidget, SLOT((toggleGrid())));
+	viewMenu->addAction(toggleGrid);
+
 }
 
 void MainWindow::modeChanged(int mode)
@@ -125,7 +159,7 @@ void MainWindow::seedLibrary()
 	saveCaneToLibrary();
 
 	model->setCane(NULL);
-	emit textMessageSig("Default library loaded");
+	displayTextMessage("Default library loaded");
 }
 
 void MainWindow::exportLibraryButtonPressed()
@@ -156,7 +190,7 @@ void MainWindow::exportLibraryButtonPressed()
 	outStream.flush();
 	file.close();
 
-	emit textMessageSig("Library Saved to: " + fileName);
+	displayTextMessage("Library Saved to: " + fileName);
 }
 
 void MainWindow::loadLibraryCane(const YAML::Node& node, Cane* cane)
@@ -227,7 +261,7 @@ void MainWindow::importLibraryButtonPressed()
 	}
 
 	emit setCaneSig(NULL);
-	emit textMessageSig("Library loaded from: " + fileName);
+	displayTextMessage("Library loaded from: " + fileName);
 }
 
 void MainWindow::newColorPickerCaneButtonPressed()

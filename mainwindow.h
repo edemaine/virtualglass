@@ -45,7 +45,6 @@ public:
 signals:
 	void setCaneSig(Cane* c);
 	void clearCommandSig();
-	void textMessageSig(QString message);
 
 public slots:
 	void modeChanged(int mode);
@@ -68,7 +67,10 @@ private:
 	void setupLibraryArea();
 	void setupStatusBar();
 	void setupWorkArea();
+	void setupMenuBar();
 
+	QMenu* viewMenu;
+	QMenu* fileMenu;
 	QWidget* centralWidget;
 	QVBoxLayout* windowLayout;
 	QGraphicsView* workview;
