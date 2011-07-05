@@ -30,6 +30,8 @@ class OpenGLWidget : public QGLWidget
 		void saveObjFile(std::string const &filename);
 		void setShiftButtonDown(bool state);
 		void setBgColor(QColor color);
+		void setAxes(bool show);
+		void setGrid(bool show);
 
 	private:
 		CaneHistory* history;

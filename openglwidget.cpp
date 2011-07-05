@@ -205,13 +205,23 @@ void OpenGLWidget :: setFrontView()
 
 void OpenGLWidget :: toggleAxes()
 {
-	showAxes = !showAxes;
-	paintGL();
+	setAxes(!showAxes);
 }
 
 void OpenGLWidget :: toggleGrid()
 {
-	showGrid = !showGrid;
+	setGrid(!showGrid);
+}
+
+void OpenGLWidget :: setAxes(bool show)
+{
+	showAxes = show;
+	paintGL();
+}
+
+void OpenGLWidget :: setGrid(bool show)
+{
+	showGrid = show;
 	paintGL();
 }
 

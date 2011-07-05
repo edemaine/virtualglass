@@ -23,47 +23,62 @@ void MainWindow::setupMenuBar()
 {
      	fileMenu = menuBar()->addMenu(tr("&File"));
 
-	QAction* importLibrary = new QAction(tr("&Import library file"), this);
+	QAction* importLibrary = new QAction(tr("&Import Library"), this);
      	importLibrary->setStatusTip(tr("Load a saved library of canes"));
      	connect(importLibrary, SIGNAL(triggered()), this, SLOT(importLibraryDialog()));
 	fileMenu->addAction(importLibrary);
 
-	QAction* exportLibrary = new QAction(tr("&Export library file"), this);
+	QAction* exportLibrary = new QAction(tr("&Export Library"), this);
      	exportLibrary->setStatusTip(tr("Save the current library of canes to a file"));
      	connect(exportLibrary, SIGNAL(triggered()), this, SLOT(exportLibraryDialog()));
 	fileMenu->addAction(exportLibrary);
+
+	fileMenu->addSeparator();
 
 	QAction* exportObj = new QAction(tr("&Export to .obj"), this);
      	exportObj->setStatusTip(tr("Save the geometry of the current cane as a .obj file"));
      	connect(exportObj, SIGNAL(triggered()), this, SLOT(saveObjFileDialog()));
 	fileMenu->addAction(exportObj);
 
+
      	viewMenu = menuBar()->addMenu(tr("&View"));
 
-	QAction* toggleAxes = new QAction(tr("&Toggle Axes"), this);
-     	toggleAxes->setStatusTip(tr("Toggle the reference lines on the X, Y, and Z axes."));
+	QAction* toggleAxes = new QAction(tr("&Show Axes"), this);
+     	toggleAxes->setStatusTip(tr("Show the reference lines on the X, Y, and Z axes."));
+	toggleAxes->setCheckable(true);
+	toggleAxes->setChecked(true);
+	openglWidget->setAxes(true);
      	connect(toggleAxes, SIGNAL(triggered()), openglWidget, SLOT(toggleAxes()));
 	viewMenu->addAction(toggleAxes);
 
-	QAction* toggleGrid = new QAction(tr("&Toggle Grid"), this);
-     	toggleGrid->setStatusTip(tr("Toggle the reference grid."));
+	QAction* toggleGrid = new QAction(tr("&Show Grid"), this);
+     	toggleGrid->setStatusTip(tr("Show the reference grid."));
+	toggleGrid->setCheckable(true);
+	toggleGrid->setChecked(false);
+	openglWidget->setGrid(false);
      	connect(toggleGrid, SIGNAL(triggered()), openglWidget, SLOT(toggleGrid()));
 	viewMenu->addAction(toggleGrid);
+
+	viewMenu->addSeparator();
+
+	QMenu* specialViewMenu = viewMenu->addMenu(tr("&Axis View"));
 
 	QAction* topView = new QAction(tr("&Top View"), this);
      	toggleGrid->setStatusTip(tr("View the cane from above."));
      	connect(topView, SIGNAL(triggered()), openglWidget, SLOT(setTopView()));
-	viewMenu->addAction(topView);
+	specialViewMenu->addAction(topView);
 
 	QAction* sideView = new QAction(tr("&Side View"), this);
      	toggleGrid->setStatusTip(tr("View the cane from the side."));
      	connect(sideView, SIGNAL(triggered()), openglWidget, SLOT(setSideView()));
-	viewMenu->addAction(sideView);
+	specialViewMenu->addAction(sideView);
 
 	QAction* frontView = new QAction(tr("&Front View"), this);
      	toggleGrid->setStatusTip(tr("View the cane from the front."));
      	connect(frontView, SIGNAL(triggered()), openglWidget, SLOT(setFrontView()));
-	viewMenu->addAction(frontView);
+	specialViewMenu->addAction(frontView);
+
+	viewMenu->addSeparator();
 
 	QAction* switchProjection = new QAction(tr("&Switch Projection"), this);
      	toggleGrid->setStatusTip(tr("Switch the projection between perspective to orthographic."));
@@ -74,6 +89,8 @@ void MainWindow::setupMenuBar()
      	toggleGrid->setStatusTip(tr("Change the background color of the cane."));
      	connect(backgroundColor, SIGNAL(triggered()), this, SLOT(changeBgColorDialog()));
 	viewMenu->addAction(backgroundColor);
+	
+	viewMenu->addSeparator();
 
 	QAction* zoomIn = new QAction(tr("&Zoom In"), this);
      	zoomIn->setStatusTip(tr("Zoom in the camera."));
