@@ -43,33 +43,6 @@ Controller::Controller()
 
 	// Connect mainwindow buttons to mainwindow
 	connect(mainWindow->save_button, SIGNAL(pressed()), mainWindow, SLOT(saveCaneToLibrary()));
-	connect(mainWindow->exportLibrary_button, SIGNAL(pressed()),
-			mainWindow, SLOT(exportLibraryButtonPressed()));
-	connect(mainWindow->importLibrary_button, SIGNAL(pressed()),
-			mainWindow, SLOT(importLibraryButtonPressed()));
-	connect(mainWindow->colorPicker_button, SIGNAL(pressed()),
-			mainWindow, SLOT(newColorPickerCaneButtonPressed()));
-	connect(mainWindow->bgColorPicker_button, SIGNAL(pressed()),
-			mainWindow, SLOT(changeBgColorButtonPressed()));
-	connect(mainWindow->saveObj_button, SIGNAL(pressed()), mainWindow, SLOT(saveObjButtonPressed()));
-
-	// connect openglwidget to mainwindow buttons
-	connect(mainWindow->toggle_axes_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(toggleAxes()));
-	connect(mainWindow->toggle_grid_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(toggleGrid()));
-	connect(mainWindow->zoom_in_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(zoomIn()));
-	connect(mainWindow->zoom_out_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(zoomOut()));
-	connect(mainWindow->frontView_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(setFrontView()));
-	connect(mainWindow->topView_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(setTopView()));
-	connect(mainWindow->sideView_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(setSideView()));
-	connect(mainWindow->switchView_button, SIGNAL(pressed()),
-			mainWindow->openglWidget, SLOT(switchProjection()));
 }
 
 int Controller::startUp()

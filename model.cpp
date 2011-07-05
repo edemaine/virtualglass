@@ -177,6 +177,7 @@ void Model :: addCane(Cane* c)
 		cane->add(c->deepCopy());
 	geometryOutOfDate();
 	emit caneChanged();
+	setMode(BUNDLE_MODE);	
 }
 
 void Model :: undo()

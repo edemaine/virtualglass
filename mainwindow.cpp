@@ -25,31 +25,72 @@ void MainWindow::setupMenuBar()
 
 	QAction* importLibrary = new QAction(tr("&Import library file"), this);
      	importLibrary->setStatusTip(tr("Load a saved library of canes"));
-     	connect(importLibrary, SIGNAL(triggered()), this, SLOT(importLibraryButtonPressed()));
+     	connect(importLibrary, SIGNAL(triggered()), this, SLOT(importLibraryDialog()));
 	fileMenu->addAction(importLibrary);
 
 	QAction* exportLibrary = new QAction(tr("&Export library file"), this);
      	exportLibrary->setStatusTip(tr("Save the current library of canes to a file"));
-     	connect(exportLibrary, SIGNAL(triggered()), this, SLOT(exportLibraryButtonPressed()));
+     	connect(exportLibrary, SIGNAL(triggered()), this, SLOT(exportLibraryDialog()));
 	fileMenu->addAction(exportLibrary);
 
 	QAction* exportObj = new QAction(tr("&Export to .obj"), this);
      	exportObj->setStatusTip(tr("Save the geometry of the current cane as a .obj file"));
-     	connect(exportObj, SIGNAL(triggered()), this, SLOT(saveObjButtonPressed()));
+     	connect(exportObj, SIGNAL(triggered()), this, SLOT(saveObjFileDialog()));
 	fileMenu->addAction(exportObj);
 
      	viewMenu = menuBar()->addMenu(tr("&View"));
 
 	QAction* toggleAxes = new QAction(tr("&Toggle Axes"), this);
-     	toggleAxes->setStatusTip(tr("Toggle the references lines on the X, Y, and Z axes."));
-     	connect(toggleAxes, SIGNAL(triggered()), openglWidget, SLOT((toggleAxes())));
+     	toggleAxes->setStatusTip(tr("Toggle the reference lines on the X, Y, and Z axes."));
+     	connect(toggleAxes, SIGNAL(triggered()), openglWidget, SLOT(toggleAxes()));
 	viewMenu->addAction(toggleAxes);
 
 	QAction* toggleGrid = new QAction(tr("&Toggle Grid"), this);
-     	toggleGrid->setStatusTip(tr("Toggle the references grid."));
-     	connect(toggleGrid, SIGNAL(triggered()), openglWidget, SLOT((toggleGrid())));
+     	toggleGrid->setStatusTip(tr("Toggle the reference grid."));
+     	connect(toggleGrid, SIGNAL(triggered()), openglWidget, SLOT(toggleGrid()));
 	viewMenu->addAction(toggleGrid);
 
+	QAction* topView = new QAction(tr("&Top View"), this);
+     	toggleGrid->setStatusTip(tr("View the cane from above."));
+     	connect(topView, SIGNAL(triggered()), openglWidget, SLOT(setTopView()));
+	viewMenu->addAction(topView);
+
+	QAction* sideView = new QAction(tr("&Side View"), this);
+     	toggleGrid->setStatusTip(tr("View the cane from the side."));
+     	connect(sideView, SIGNAL(triggered()), openglWidget, SLOT(setSideView()));
+	viewMenu->addAction(sideView);
+
+	QAction* frontView = new QAction(tr("&Front View"), this);
+     	toggleGrid->setStatusTip(tr("View the cane from the front."));
+     	connect(frontView, SIGNAL(triggered()), openglWidget, SLOT(setFrontView()));
+	viewMenu->addAction(frontView);
+
+	QAction* switchProjection = new QAction(tr("&Switch Projection"), this);
+     	toggleGrid->setStatusTip(tr("Switch the projection between perspective to orthographic."));
+     	connect(switchProjection, SIGNAL(triggered()), openglWidget, SLOT(switchProjection()));
+	viewMenu->addAction(switchProjection);
+
+	QAction* backgroundColor = new QAction(tr("&Change Background Color"), this);
+     	toggleGrid->setStatusTip(tr("Change the background color of the cane."));
+     	connect(backgroundColor, SIGNAL(triggered()), this, SLOT(changeBgColorDialog()));
+	viewMenu->addAction(backgroundColor);
+
+	QAction* zoomIn = new QAction(tr("&Zoom In"), this);
+     	zoomIn->setStatusTip(tr("Zoom in the camera."));
+     	connect(zoomIn, SIGNAL(triggered()), openglWidget, SLOT(zoomIn()));
+	viewMenu->addAction(zoomIn);
+
+	QAction* zoomOut = new QAction(tr("&Zoom Out"), this);
+     	zoomOut->setStatusTip(tr("Zoom in the camera."));
+     	connect(zoomOut, SIGNAL(triggered()), openglWidget, SLOT(zoomOut()));
+	viewMenu->addAction(zoomOut);
+
+     	caneMenu = menuBar()->addMenu(tr("&Cane"));
+
+	QAction* newCaneColor = new QAction(tr("&New Cane Color"), this);
+     	zoomOut->setStatusTip(tr("Create a new cane of desired color."));
+     	connect(newCaneColor, SIGNAL(triggered()), this, SLOT(newColorPickerCaneDialog()));
+	caneMenu->addAction(newCaneColor);
 }
 
 void MainWindow::modeChanged(int mode)
@@ -162,7 +203,7 @@ void MainWindow::seedLibrary()
 	displayTextMessage("Default library loaded");
 }
 
-void MainWindow::exportLibraryButtonPressed()
+void MainWindow::exportLibraryDialog()
 {
 	QString fileName =  QFileDialog::getSaveFileName();
 	QList<LibraryCaneWidget*> libraryList = libraryScrollArea->findChildren<LibraryCaneWidget*>();
@@ -242,7 +283,7 @@ void MainWindow::loadLibraryCane(const YAML::Node& node, Cane* cane)
 	}
 }
 
-void MainWindow::importLibraryButtonPressed()
+void MainWindow::importLibraryDialog()
 {
 	QString fileName = QFileDialog::getOpenFileName();
 
@@ -264,17 +305,17 @@ void MainWindow::importLibraryButtonPressed()
 	displayTextMessage("Library loaded from: " + fileName);
 }
 
-void MainWindow::newColorPickerCaneButtonPressed()
+void MainWindow::newColorPickerCaneDialog()
 {
 	colorPickerSelected(QColorDialog::getColor());
 }
 
-void MainWindow::changeBgColorButtonPressed()
+void MainWindow::changeBgColorDialog()
 {
 	openglWidget->setBgColor(QColorDialog::getColor());
 }
 
-void MainWindow::saveObjButtonPressed()
+void MainWindow::saveObjFileDialog()
 {
 	QString file = QFileDialog::getSaveFileName(this, tr("Save obj file"), "", tr("Wavefront obj files (*.obj);;All files (*)"));
 	if (!file.isNull())
@@ -307,29 +348,6 @@ void MainWindow::setupWorkArea()
 {
 	openglWidget = new OpenGLWidget(this, model);
 
-	look_button = new QPushButton("Look");
-	zoom_in_button = new QPushButton("Zoom In");
-	zoom_out_button = new QPushButton("Zoom Out");
-	frontView_button = new QPushButton("Front View");
-	topView_button = new QPushButton("Top View");
-	sideView_button = new QPushButton("Side View");
-	switchView_button = new QPushButton("Switch View");
-	switchView_button->setToolTip("Switch between perspective and orthographic views");
-	toggle_axes_button = new QPushButton("Toggle Axes");
-	toggle_grid_button = new QPushButton("Toggle Grid");
-
-	QVBoxLayout* viewButton_layout = new QVBoxLayout();
-	viewButton_layout->addWidget(frontView_button);
-	viewButton_layout->addWidget(topView_button);
-	viewButton_layout->addWidget(sideView_button);
-	viewButton_layout->addWidget(switchView_button);
-	viewButton_layout->addWidget(zoom_in_button);
-	viewButton_layout->addWidget(zoom_out_button);
-	viewButton_layout->addWidget(toggle_axes_button);
-	viewButton_layout->addWidget(toggle_grid_button);
-	QWidget* viewButtonWidget = new QWidget();
-	viewButtonWidget->setLayout(viewButton_layout);
-
 	pull_button = new QPushButton("Pull");
 	pull_button->setToolTip("Drag Mouse Horizontally to Twist, Vertically to Stretch. Use Shift to twist and stretch independently.");
 	bundle_button = new QPushButton("Bundle");
@@ -339,6 +357,10 @@ void MainWindow::setupWorkArea()
 	wrap_button->setToolTip("Not Implemented - Select must be functional first");
 	undo_button = new QPushButton("Undo");
 	undo_button->setToolTip("Undo the last operation.");
+	save_button = new QPushButton("Save");
+	save_button->setToolTip("Save Current Model to Library");
+	clear_button = new QPushButton("Clear");
+	clear_button->setToolTip("Clear Current Model");
 
 	QVBoxLayout* operButton_layout = new QVBoxLayout();
 	operButton_layout->addWidget(pull_button);
@@ -346,46 +368,11 @@ void MainWindow::setupWorkArea()
 	operButton_layout->addWidget(flatten_button);
 	operButton_layout->addWidget(wrap_button);
 	operButton_layout->addWidget(undo_button);
-
-	QWidget* operButtonWidget = new QWidget();
-	operButtonWidget->setLayout(operButton_layout);
-	save_button = new QPushButton("Save");
-	save_button->setToolTip("Save Current Model to Library");
-	clear_button = new QPushButton("Clear");
-	clear_button->setToolTip("Clear Current Model");
-	exportLibrary_button = new QPushButton("Export Library");
-	exportLibrary_button->setToolTip("Save Library to File");
-	importLibrary_button = new QPushButton("Import Library");
-	importLibrary_button->setToolTip("Load Library from File");
-	colorPicker_button = new QPushButton("New Cane Color");
-	colorPicker_button->setToolTip("Create a New Cane with specified color");
-	bgColorPicker_button = new QPushButton("Change Background Color");
-	saveObj_button = new QPushButton("Save .obj file");
-	saveObj_button->setToolTip("Save an .obj file with the current cane geometry for rendering in an external program.");
-
-	QVBoxLayout* utilButton_layout = new QVBoxLayout();
-	utilButton_layout->addWidget(save_button);
-	utilButton_layout->addWidget(clear_button);
-	utilButton_layout->addWidget(exportLibrary_button);
-	utilButton_layout->addWidget(importLibrary_button);
-	utilButton_layout->addWidget(colorPicker_button);
-	utilButton_layout->addWidget(bgColorPicker_button);
-	utilButton_layout->addWidget(saveObj_button);
-	QWidget* utilButtonWidget = new QWidget();
-	utilButtonWidget->setLayout(utilButton_layout);
-
-	tabWidget = new QTabWidget();
-	tabWidget->setTabPosition(QTabWidget::North);
-	tabWidget->addTab(viewButtonWidget,"View");
-	tabWidget->addTab(operButtonWidget,"Operations");
-	tabWidget->addTab(utilButtonWidget,"Util");
-	//connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(modeSelect(int)));
-
-	QVBoxLayout* button_layout = new QVBoxLayout();
-	button_layout->addWidget(tabWidget);
+	operButton_layout->addWidget(save_button);
+	operButton_layout->addWidget(clear_button);
 
 	QHBoxLayout* workLayout = new QHBoxLayout();
-	workLayout->addLayout(button_layout);
+	workLayout->addLayout(operButton_layout);
 	workLayout->addWidget(openglWidget, 1);
 	windowLayout->addLayout(workLayout, 5);
 }

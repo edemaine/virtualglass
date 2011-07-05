@@ -20,15 +20,6 @@ public:
 	MainWindow(Model* model);
 	void seedLibrary();
 	OpenGLWidget* openglWidget;
-	QPushButton* look_button;
-	QPushButton* zoom_in_button;
-	QPushButton* zoom_out_button;
-	QPushButton* frontView_button;
-	QPushButton* sideView_button;
-	QPushButton* topView_button;
-	QPushButton* switchView_button;
-	QPushButton* toggle_axes_button;
-	QPushButton* toggle_grid_button;
 	QPushButton* pull_button;
 	QPushButton* bundle_button;
 	QPushButton* flatten_button;
@@ -36,11 +27,6 @@ public:
 	QPushButton* undo_button;
 	QPushButton* save_button;
 	QPushButton* clear_button;
-	QPushButton* exportLibrary_button;
-	QPushButton* importLibrary_button;
-	QPushButton* colorPicker_button;
-	QPushButton* bgColorPicker_button;
-	QPushButton* saveObj_button;
 
 signals:
 	void setCaneSig(Cane* c);
@@ -49,11 +35,11 @@ signals:
 public slots:
 	void modeChanged(int mode);
 	void saveCaneToLibrary();
-	void exportLibraryButtonPressed();
-	void importLibraryButtonPressed();
-	void newColorPickerCaneButtonPressed();
-	void changeBgColorButtonPressed();
-	void saveObjButtonPressed();
+	void exportLibraryDialog();
+	void importLibraryDialog();
+	void newColorPickerCaneDialog();
+	void changeBgColorDialog();
+	void saveObjFileDialog();
 	void colorPickerSelected(QColor color);
 	void libraryCaneDestroyed(QObject* obj);
 	void loadLibraryCane(const YAML::Node& node, Cane* cane);
@@ -69,6 +55,7 @@ private:
 	void setupWorkArea();
 	void setupMenuBar();
 
+	QMenu* caneMenu;
 	QMenu* viewMenu;
 	QMenu* fileMenu;
 	QWidget* centralWidget;

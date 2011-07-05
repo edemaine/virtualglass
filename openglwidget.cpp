@@ -157,6 +157,7 @@ void OpenGLWidget :: paintGL()
 void OpenGLWidget :: switchProjection()
 {
 	isOrthographic=!isOrthographic;
+	paintGL();
 }
 
 /*
