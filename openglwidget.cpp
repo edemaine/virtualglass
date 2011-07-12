@@ -159,8 +159,8 @@ void OpenGLWidget :: paintGL()
 void OpenGLWidget :: drawSnapPoints()
 {
 	glBegin(GL_LINES);
-	glColor3f(1-bgColor.redF(),1-bgColor.greenF(),1-bgColor.blueF());
-	float max=1;
+	glColor3f(1,1,1);
+	float max=0.5;
 	for (int i=0;i<model->snap_count();i++)
 	{
 		glVertex3f(model->snapPoint(i).x,model->snapPoint(i).y,-max);
@@ -296,15 +296,17 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 	if (e->button() == Qt::RightButton)
 	{
 		rightMouseDown = true;
-	}
-
-	if (model->getMode() == SNAP_MODE)
+	} else if (model->getMode() == SNAP_MODE)
 	{
 		Point p;
-		p.x=mouseLocX;
-		p.y=mouseLocY;
+		//gluUnProject(p.x,p.y,p.z,)
+		p.x=mouseLocX-width()/2;
+		p.y=-(mouseLocY-height()/2);
+		p.x*=this->rho/400.0;
+		p.y*=this->rho/400.0;
 		p.z=0;
 		model->addSnapPoint(p);
+		emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
 	}
 	// Change as part of dual mode feature
 	updateResolution(LOW_RESOLUTION);
@@ -405,7 +407,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		{
 			model->pullCane(relX * PI, -5.0*relY);
 		}
-		emit operationInfoSig(QString("Twisted %1 Revolutions Per Viewable Length, Pulled %1").arg(model->getCane()->amts[0] / PI / 2,model->getCane()->amts[1]),1000);
+		emit operationInfoSig(QString("Twisted %1 Revolutions Per Viewable Length, Pulled %2").arg(model->getCane()->amts[0] / PI / 2).arg(model->getCane()->amts[1]),1000);
 	}
 	else if (model->getMode() == BUNDLE_MODE)
 	{
@@ -429,12 +431,12 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 			model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
 				relX * sin(theta + PI / 2.0) + relY * sin(theta));
 		}
-		emit operationInfoSig(QString("Moved X Direction %1, Y Direction %1").arg(model->getCane()->subcaneLocations[model->getActiveSubcane()].x, model->getCane()->subcaneLocations[model->getActiveSubcane()].y),1000);
+		emit operationInfoSig(QString("Moved X Direction %1, Y Direction %2").arg(model->getCane()->subcaneLocations[model->getActiveSubcane()].x).arg(model->getCane()->subcaneLocations[model->getActiveSubcane()].y),1000);
 	}
 	else if (model->getMode() == FLATTEN_MODE)
 	{
 		model->flattenCane(relX, theta + PI / 2.0, -relY);
-		emit operationInfoSig(QString("Squished with %1, Flattened into rectangle with %1").arg(model->getCane()->amts[0],model->getCane()->amts[2]),1000);
+		emit operationInfoSig(QString("Squished with %1, Flattened into rectangle with %2").arg(model->getCane()->amts[0]).arg(model->getCane()->amts[2]),1000);
 	}
 }
 
@@ -443,11 +445,11 @@ void OpenGLWidget :: wheelEvent(QWheelEvent *e)
 	if (e->delta() > 0)
 	{
 		zoomIn();
-		emit operationInfoSig(QString("Zoomed In"),1000);
+		emit operationInfoSig(QString("Zoomed In: %1").arg(this->rho),1000);
 	} else if (e->delta() < 0)
 	{
 		zoomOut();
-		emit operationInfoSig(QString("Zoomed Out"),1000);
+		emit operationInfoSig(QString("Zoomed Out: %1").arg(this->rho),1000);
 	}
 }
 

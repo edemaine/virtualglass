@@ -207,6 +207,8 @@ void Model :: saveObjFile(std::string const &filename)
 void Model :: addSnapPoint(Point p){
 	this->snapPoints[snapCount] = p;
 	snapCount++;
+	if (snapCount>=10)
+		snapCount=9;
 }
 
 int Model :: snap_count()
