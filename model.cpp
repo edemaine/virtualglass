@@ -31,7 +31,7 @@ void Model :: setMode(int mode)
 			cane->createBundle();
 		}
 	}
-	
+
 	emit modeChanged(mode);
 }
 
@@ -45,6 +45,11 @@ void Model :: setActiveSubcane(int subcane)
 		geometryOutOfDate();
 		emit caneChanged();
 	}
+}
+
+int Model :: getActiveSubcane()
+{
+	return activeSubcane;
 }
 
 void Model :: setCane(Cane* c)
@@ -111,7 +116,7 @@ Geometry* Model :: getSelectionGeometry()
 {
 	if (!selectGeometryFresh)
 		updateSelectGeometry();
-	return &selectGeometry;	
+	return &selectGeometry;
 }
 
 Geometry* Model :: getGeometry(int resolution)
@@ -177,11 +182,13 @@ void Model :: addCane(Cane* c)
 		cane->add(c->deepCopy());
 	geometryOutOfDate();
 	emit caneChanged();
-	setMode(BUNDLE_MODE);	
+	setMode(BUNDLE_MODE);
 }
 
 void Model :: undo()
 {
+	if (history->isInitial())
+		return;
 	cane = history->getState();
 	history->undo();
 	geometryOutOfDate();
@@ -197,4 +204,17 @@ void Model :: saveObjFile(std::string const &filename)
 	highResGeometry.save_obj_file(filename);
 }
 
+void Model :: addSnapPoint(Point p){
+	this->snapPoints[snapCount] = p;
+	snapCount++;
+}
 
+int Model :: snap_count()
+{
+	return snapCount;
+}
+
+Point Model :: snapPoint(int index)
+{
+	return snapPoints[index];
+}

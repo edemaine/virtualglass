@@ -32,7 +32,7 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* model) : QGLWidget(parent)
 	showGrid = false;
 	resolution = HIGH_RESOLUTION;
 	this->model = model;
-	setMouseTracking(true);	
+	setMouseTracking(true);
 	history = new CaneHistory();
 	updateTriangles();
 }
@@ -83,10 +83,10 @@ void OpenGLWidget :: setBgColor(QColor color)
 	bgColor = color;
 	paintGL();
 }
-		
+
 int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 {
-	geometry = model->getSelectionGeometry();	
+	geometry = model->getSelectionGeometry();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -99,7 +99,7 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	glColorPointer(4, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].color));
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
-	glDrawElements(GL_TRIANGLES, geometry->triangles.size() * 3, 
+	glDrawElements(GL_TRIANGLES, geometry->triangles.size() * 3,
 		GL_UNSIGNED_INT, &(geometry->triangles[0].v1));
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
@@ -113,7 +113,7 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	if (c == 0.0) // background color
 		return -1;
 	return (int) ((c - 0.1) / (0.9 / MAX_SUBCANE_COUNT) + 0.1);
-}	
+}
 
 /*
 Handles the drawing of a triangle mesh.
@@ -131,6 +131,8 @@ void OpenGLWidget :: paintGL()
 	if (showGrid)
 		drawGrid();
 
+	drawSnapPoints();
+
 	if (geometry) {
 		//Check that Vertex and Triangle have proper size:
 		assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3 + 4));
@@ -143,7 +145,7 @@ void OpenGLWidget :: paintGL()
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glEnableClientState(GL_COLOR_ARRAY);
 
-		glDrawElements(GL_TRIANGLES, geometry->triangles.size() * 3, 
+		glDrawElements(GL_TRIANGLES, geometry->triangles.size() * 3,
 			GL_UNSIGNED_INT, &(geometry->triangles[0].v1));
 
 		glDisableClientState(GL_VERTEX_ARRAY);
@@ -152,6 +154,19 @@ void OpenGLWidget :: paintGL()
 	}
 
 	swapBuffers();
+}
+
+void OpenGLWidget :: drawSnapPoints()
+{
+	glBegin(GL_LINES);
+	glColor3f(1-bgColor.redF(),1-bgColor.greenF(),1-bgColor.blueF());
+	float max=1;
+	for (int i=0;i<model->snap_count();i++)
+	{
+		glVertex3f(model->snapPoint(i).x,model->snapPoint(i).y,-max);
+		glVertex3f(model->snapPoint(i).x,model->snapPoint(i).y,max);
+	}
+	glEnd();
 }
 
 void OpenGLWidget :: switchProjection()
@@ -225,6 +240,12 @@ void OpenGLWidget :: setGrid(bool show)
 	paintGL();
 }
 
+void OpenGLWidget :: lockTable()
+{
+	lockView = !lockView;
+	paintGL();
+}
+
 
 /*
 Is called when the resolution of the rendered cane is changed.
@@ -272,10 +293,19 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 	mouseLocX = e->x();
 	mouseLocY = e->y();
 
-	if (e->button() == Qt::RightButton){
+	if (e->button() == Qt::RightButton)
+	{
 		rightMouseDown = true;
 	}
 
+	if (model->getMode() == SNAP_MODE)
+	{
+		Point p;
+		p.x=mouseLocX;
+		p.y=mouseLocY;
+		p.z=0;
+		model->addSnapPoint(p);
+	}
 	// Change as part of dual mode feature
 	updateResolution(LOW_RESOLUTION);
 
@@ -312,7 +342,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	// only admit mouse moves without a button down if in
 	// bundle mode (for illumination upon scrollover of cane)
 	if (model->getMode() != BUNDLE_MODE && e->buttons() == 0)
-		return; 
+		return;
 
 	windowWidth = this->width();
 	windowHeight = this->height();
@@ -335,7 +365,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	i.e. how much twist `feels' reasonable for moving the mouse
 	an inch.
 	*/
-	if (rightMouseDown)
+	if (rightMouseDown && !lockView)
 	{
 		// Rotate camera position around look-at location.
 
@@ -348,7 +378,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		return;
 	}
 
-	if (model->getMode() == LOOK_MODE)
+	if (model->getMode() == LOOK_MODE && !lockView)
 	{
 		// Rotate camera position around look-at location.
 		theta -= (relX * 500.0 * PI / 180.0);
@@ -356,18 +386,26 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		if (newFee > 0.0f && newFee < PI)
 			fee = newFee;
 		updateCamera();
+		paintGL();
 	}
 	else if (model->getMode() == PULL_MODE)
 	{
 		if (shiftButtonDown)
 		{
 			if (abs(relX) > abs(relY))
+			{
 				model->pullCane(relX * PI, 0.0);
+			}
 			else
+			{
 				model->pullCane(0.0, -5.0*relY);
+			}
 		}
 		else
+		{
 			model->pullCane(relX * PI, -5.0*relY);
+		}
+		emit operationInfoSig(QString("Twisted %1 Revolutions Per Viewable Length, Pulled %1").arg(model->getCane()->amts[0] / PI / 2,model->getCane()->amts[1]),1000);
 	}
 	else if (model->getMode() == BUNDLE_MODE)
 	{
@@ -382,7 +420,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		(variables `relX' and `relY') to the amount moved in X and Y
 		according to axes on which the cane lives.
 		*/
-	
+
 		model->setActiveSubcane(getSubcaneUnderMouse(oldMouseLocX, oldMouseLocY));
 		if (e->buttons() & 0x00000001) // if left mouse button is down
 		{
@@ -391,10 +429,12 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 			model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
 				relX * sin(theta + PI / 2.0) + relY * sin(theta));
 		}
+		emit operationInfoSig(QString("Moved X Direction %1, Y Direction %1").arg(model->getCane()->subcaneLocations[model->getActiveSubcane()].x, model->getCane()->subcaneLocations[model->getActiveSubcane()].y),1000);
 	}
 	else if (model->getMode() == FLATTEN_MODE)
 	{
 		model->flattenCane(relX, theta + PI / 2.0, -relY);
+		emit operationInfoSig(QString("Squished with %1, Flattened into rectangle with %1").arg(model->getCane()->amts[0],model->getCane()->amts[2]),1000);
 	}
 }
 
@@ -403,9 +443,11 @@ void OpenGLWidget :: wheelEvent(QWheelEvent *e)
 	if (e->delta() > 0)
 	{
 		zoomIn();
+		emit operationInfoSig(QString("Zoomed In"),1000);
 	} else if (e->delta() < 0)
 	{
 		zoomOut();
+		emit operationInfoSig(QString("Zoomed Out"),1000);
 	}
 }
 
@@ -480,4 +522,58 @@ void OpenGLWidget :: drawAxes()
 	glEnd();
 }
 
+void OpenGLWidget::processPull()
+{
+	model->pullCane(twistInput->value(),stretchInput->value());
+	emit operationInfoSig(QString("Twisted %1 Revolutions Per Viewable Length, Pulled %1").arg(model->getCane()->amts[0] / PI / 2,model->getCane()->amts[1]),1000);
+}
+
+void OpenGLWidget::processFlatten()
+{
+	model->flattenCane(rectangleInput->value(), theta + PI / 2.0, flattenInput->value());
+	emit operationInfoSig(QString("Squished with %1, Flattened into rectangle with %1").arg(model->getCane()->amts[0],model->getCane()->amts[2]),1000);
+}
+
+void OpenGLWidget::exactInput()
+{
+	if (model->getMode() == PULL_MODE)
+	{
+		QDialog* tableBox = new QDialog(NULL);
+		tableForm = new QFormLayout(tableBox->window());
+		stretchInput = new QDoubleSpinBox;//= new QLineEdit;
+		tableForm->addRow("Stretch Factor",stretchInput);
+		twistInput = new QDoubleSpinBox;
+		tableForm->addRow("Twist Factor",twistInput);
+
+		QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+		connect(buttons,SIGNAL(accepted()),tableBox,SLOT(accept()));
+		connect(buttons,SIGNAL(accepted()),this,SLOT(processPull()));
+		connect(buttons,SIGNAL(rejected()),tableBox,SLOT(reject()));
+
+		tableForm->addRow(buttons);
+
+		tableBox->setLayout(tableForm);
+
+		tableBox->exec();
+	} else if (model->getMode() == FLATTEN_MODE)
+	{
+		QDialog* tableBox = new QDialog(NULL);
+		tableForm = new QFormLayout(tableBox->window());
+		rectangleInput = new QDoubleSpinBox;
+		tableForm->addRow("Rectangular Factor",rectangleInput);
+		flattenInput = new QDoubleSpinBox;
+		tableForm->addRow("Flatten Factor",flattenInput);
+
+		QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+		connect(buttons,SIGNAL(accepted()),tableBox,SLOT(accept()));
+		connect(buttons,SIGNAL(accepted()),this,SLOT(processFlatten()));
+		connect(buttons,SIGNAL(rejected()),tableBox,SLOT(reject()));
+
+		tableForm->addRow(buttons);
+
+		tableBox->setLayout(tableForm);
+
+		tableBox->exec();
+	}
+}
 

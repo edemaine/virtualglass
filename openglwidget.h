@@ -32,6 +32,7 @@ class OpenGLWidget : public QGLWidget
 		void setBgColor(QColor color);
 		void setAxes(bool show);
 		void setGrid(bool show);
+		void exactInput();
 
 	private:
 		CaneHistory* history;
@@ -39,11 +40,19 @@ class OpenGLWidget : public QGLWidget
 		bool rightMouseDown;
 		bool isOrthographic;
 		QColor bgColor;
+		QFormLayout* tableForm;
+		QDoubleSpinBox* stretchInput;
+		QDoubleSpinBox* twistInput;
+		//QDialogButtonBox* buttonsPull;
+		QDoubleSpinBox* flattenInput;
+		QDoubleSpinBox* rectangleInput;
+		//QDialogButtonBox* buttonsFlatten;
 		Model* model;
 		Geometry *geometry;
 		int resolution;
 		bool showAxes;
 		bool showGrid;
+		bool lockView;
 
 		float eyeLoc[3];
 		float lookAtLoc[3];
@@ -57,11 +66,13 @@ class OpenGLWidget : public QGLWidget
 		void updateCamera();
 		void drawAxes();
 		void drawGrid();
+		void drawSnapPoints();
 		void drawTriangle(Triangle* t);
 		void updateTriangles();
 
 	signals:
 		void modeChangedSig(int mode);
+		void operationInfoSig(QString str,int msec);
 
 	public slots:
 		void zoomIn();
@@ -73,6 +84,9 @@ class OpenGLWidget : public QGLWidget
 		void switchProjection();
 		void toggleAxes();
 		void toggleGrid();
+		void lockTable();
+		void processPull();
+		void processFlatten();
 
 	protected:
 		void initializeGL();

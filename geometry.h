@@ -17,6 +17,7 @@ public:
 	Point normal;
 	Color color;
 };
+
 class Triangle
 {
 public:

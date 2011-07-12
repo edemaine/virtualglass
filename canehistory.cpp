@@ -44,5 +44,10 @@ void CaneHistory :: doubleSize()
 	past = newPast;
 }
 
+bool CaneHistory :: isInitial()
+{
+	return curPast<=1;
+}
+
 
 

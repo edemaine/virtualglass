@@ -24,9 +24,11 @@ public:
 	QPushButton* bundle_button;
 	QPushButton* flatten_button;
 	QPushButton* wrap_button;
+	QPushButton* snap_button;
 	QPushButton* undo_button;
 	QPushButton* save_button;
 	QPushButton* clear_button;
+	QPushButton* tabletop_button;
 
 signals:
 	void setCaneSig(Cane* c);
@@ -44,6 +46,7 @@ public slots:
 	void libraryCaneDestroyed(QObject* obj);
 	void loadLibraryCane(const YAML::Node& node, Cane* cane);
 	void displayTextMessage(QString message);
+	void displayTextMessage(QString message,int msec);
 
 private:
 	Model* model;

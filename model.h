@@ -25,6 +25,7 @@ class Model : public QObject
 		Cane* getCane();
 		void setCane(Cane* c);
 		void setActiveSubcane(int subcane);
+		int getActiveSubcane();
 		Geometry* getSelectionGeometry();
 		Geometry* getGeometry(int resolution);
 		void pullCane(float twistAmount, float stretchFactor);
@@ -34,6 +35,9 @@ class Model : public QObject
 		void startMoveMode();
 		void saveObjFile(std::string const &filename);
 		int getMode();
+		void addSnapPoint(Point p);
+		int snap_count();
+		Point snapPoint(int index);
 
 	signals:
 		void caneChanged();
@@ -56,6 +60,8 @@ class Model : public QObject
 		int highResGeometryFresh;
 		int selectGeometryFresh;
 		int activeSubcane;
+		Point snapPoints[10];
+		int snapCount;
 
 		void geometryOutOfDate();
 		void updateSelectGeometry();

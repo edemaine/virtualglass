@@ -11,6 +11,7 @@ public:
 	void saveState(Cane* c);
 	Cane* getState();
 	void undo();
+	bool isInitial();
 
 private:
 	Cane** past;
