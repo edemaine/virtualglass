@@ -60,7 +60,8 @@ class Model : public QObject
 		int highResGeometryFresh;
 		int selectGeometryFresh;
 		int activeSubcane;
-		Point snapPoints[10];
+		Point snapPoints[MAX_SNAP];
+		float snapRadii[MAX_SNAP];
 		int snapCount;
 
 		void geometryOutOfDate();

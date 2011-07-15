@@ -24,6 +24,7 @@
 #define MAX_ANCESTORS 20
 #define MAX_NUM_CANES 100
 #define MAX_AMT_TYPES 5
+#define MAX_SNAP 30
 
 #define LOOK_MODE 1
 #define PULL_MODE 2

@@ -45,6 +45,7 @@ public slots:
 	void colorPickerSelected(QColor color);
 	void libraryCaneDestroyed(QObject* obj);
 	void loadLibraryCane(const YAML::Node& node, Cane* cane);
+	void displayTextMessage(QString message,int msec);
 	void displayTextMessage(QString message);
 
 private:
