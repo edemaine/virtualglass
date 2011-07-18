@@ -21,42 +21,41 @@ MainWindow::MainWindow(Model* model)
 
 void MainWindow::setupMenuBar()
 {
-     	fileMenu = menuBar()->addMenu(tr("&File"));
+		fileMenu = menuBar()->addMenu(tr("&File"));
 
 	QAction* importLibrary = new QAction(tr("&Import Library"), this);
-     	importLibrary->setStatusTip(tr("Load a saved library of canes"));
-     	connect(importLibrary, SIGNAL(triggered()), this, SLOT(importLibraryDialog()));
+		importLibrary->setStatusTip(tr("Load a saved library of canes"));
+		connect(importLibrary, SIGNAL(triggered()), this, SLOT(importLibraryDialog()));
 	fileMenu->addAction(importLibrary);
 
 	QAction* exportLibrary = new QAction(tr("&Export Library"), this);
-     	exportLibrary->setStatusTip(tr("Save the current library of canes to a file"));
-     	connect(exportLibrary, SIGNAL(triggered()), this, SLOT(exportLibraryDialog()));
+		exportLibrary->setStatusTip(tr("Save the current library of canes to a file"));
+		connect(exportLibrary, SIGNAL(triggered()), this, SLOT(exportLibraryDialog()));
 	fileMenu->addAction(exportLibrary);
 
 	fileMenu->addSeparator();
 
 	QAction* exportObj = new QAction(tr("&Export to .obj"), this);
-     	exportObj->setStatusTip(tr("Save the geometry of the current cane as a .obj file"));
-     	connect(exportObj, SIGNAL(triggered()), this, SLOT(saveObjFileDialog()));
+		exportObj->setStatusTip(tr("Save the geometry of the current cane as a .obj file"));
+		connect(exportObj, SIGNAL(triggered()), this, SLOT(saveObjFileDialog()));
 	fileMenu->addAction(exportObj);
 
-
-     	viewMenu = menuBar()->addMenu(tr("&View"));
+		viewMenu = menuBar()->addMenu(tr("&View"));
 
 	QAction* toggleAxes = new QAction(tr("&Show Axes"), this);
-     	toggleAxes->setStatusTip(tr("Show the reference lines on the X, Y, and Z axes."));
+		toggleAxes->setStatusTip(tr("Show the reference lines on the X, Y, and Z axes."));
 	toggleAxes->setCheckable(true);
 	toggleAxes->setChecked(true);
 	openglWidget->setAxes(true);
-     	connect(toggleAxes, SIGNAL(triggered()), openglWidget, SLOT(toggleAxes()));
+		connect(toggleAxes, SIGNAL(triggered()), openglWidget, SLOT(toggleAxes()));
 	viewMenu->addAction(toggleAxes);
 
 	QAction* toggleGrid = new QAction(tr("&Show Grid"), this);
-     	toggleGrid->setStatusTip(tr("Show the reference grid."));
+		toggleGrid->setStatusTip(tr("Show the reference grid."));
 	toggleGrid->setCheckable(true);
 	toggleGrid->setChecked(false);
 	openglWidget->setGrid(false);
-     	connect(toggleGrid, SIGNAL(triggered()), openglWidget, SLOT(toggleGrid()));
+		connect(toggleGrid, SIGNAL(triggered()), openglWidget, SLOT(toggleGrid()));
 	viewMenu->addAction(toggleGrid);
 
 	viewMenu->addSeparator();
@@ -64,49 +63,50 @@ void MainWindow::setupMenuBar()
 	QMenu* specialViewMenu = viewMenu->addMenu(tr("&Axis View"));
 
 	QAction* topView = new QAction(tr("&Top View"), this);
-     	toggleGrid->setStatusTip(tr("View the cane from above."));
-     	connect(topView, SIGNAL(triggered()), openglWidget, SLOT(setTopView()));
+		topView->setStatusTip(tr("View the cane from above."));
+		connect(topView, SIGNAL(triggered()), openglWidget, SLOT(setTopView()));
 	specialViewMenu->addAction(topView);
 
 	QAction* sideView = new QAction(tr("&Side View"), this);
-     	toggleGrid->setStatusTip(tr("View the cane from the side."));
-     	connect(sideView, SIGNAL(triggered()), openglWidget, SLOT(setSideView()));
+		sideView->setStatusTip(tr("View the cane from the side."));
+		connect(sideView, SIGNAL(triggered()), openglWidget, SLOT(setSideView()));
 	specialViewMenu->addAction(sideView);
 
 	QAction* frontView = new QAction(tr("&Front View"), this);
-     	toggleGrid->setStatusTip(tr("View the cane from the front."));
-     	connect(frontView, SIGNAL(triggered()), openglWidget, SLOT(setFrontView()));
+		frontView->setStatusTip(tr("View the cane from the front."));
+		connect(frontView, SIGNAL(triggered()), openglWidget, SLOT(setFrontView()));
 	specialViewMenu->addAction(frontView);
 
 	viewMenu->addSeparator();
 
 	QAction* switchProjection = new QAction(tr("&Switch Projection"), this);
-     	toggleGrid->setStatusTip(tr("Switch the projection between perspective to orthographic."));
-     	connect(switchProjection, SIGNAL(triggered()), openglWidget, SLOT(switchProjection()));
+		switchProjection->setStatusTip(tr("Switch the projection between perspective to orthographic."));
+		connect(switchProjection, SIGNAL(triggered()), openglWidget, SLOT(switchProjection()));
+		switchProjection->setToolTip("Not Implemented");
 	viewMenu->addAction(switchProjection);
 
 	QAction* backgroundColor = new QAction(tr("&Change Background Color"), this);
-     	toggleGrid->setStatusTip(tr("Change the background color of the cane."));
-     	connect(backgroundColor, SIGNAL(triggered()), this, SLOT(changeBgColorDialog()));
+		backgroundColor->setStatusTip(tr("Change the background color of the cane."));
+		connect(backgroundColor, SIGNAL(triggered()), this, SLOT(changeBgColorDialog()));
 	viewMenu->addAction(backgroundColor);
-	
+
 	viewMenu->addSeparator();
 
 	QAction* zoomIn = new QAction(tr("&Zoom In"), this);
-     	zoomIn->setStatusTip(tr("Zoom in the camera."));
-     	connect(zoomIn, SIGNAL(triggered()), openglWidget, SLOT(zoomIn()));
+		zoomIn->setStatusTip(tr("Zoom in the camera."));
+		connect(zoomIn, SIGNAL(triggered()), openglWidget, SLOT(zoomIn()));
 	viewMenu->addAction(zoomIn);
 
 	QAction* zoomOut = new QAction(tr("&Zoom Out"), this);
-     	zoomOut->setStatusTip(tr("Zoom in the camera."));
-     	connect(zoomOut, SIGNAL(triggered()), openglWidget, SLOT(zoomOut()));
+		zoomOut->setStatusTip(tr("Zoom in the camera."));
+		connect(zoomOut, SIGNAL(triggered()), openglWidget, SLOT(zoomOut()));
 	viewMenu->addAction(zoomOut);
 
-     	caneMenu = menuBar()->addMenu(tr("&Cane"));
+		caneMenu = menuBar()->addMenu(tr("&Cane"));
 
 	QAction* newCaneColor = new QAction(tr("&New Cane Color"), this);
-     	zoomOut->setStatusTip(tr("Create a new cane of desired color."));
-     	connect(newCaneColor, SIGNAL(triggered()), this, SLOT(newColorPickerCaneDialog()));
+		zoomOut->setStatusTip(tr("Create a new cane of desired color."));
+		connect(newCaneColor, SIGNAL(triggered()), this, SLOT(newColorPickerCaneDialog()));
 	caneMenu->addAction(newCaneColor);
 }
 
@@ -116,21 +116,27 @@ void MainWindow::modeChanged(int mode)
 	{
 		case PULL_MODE:
 			modeLabel->setText("PULL MODE");
+			displayTextMessage("Click and drag mouse up and down to stretch cane, left and right to twist cane",0);
 			break;
 		case BUNDLE_MODE:
 			modeLabel->setText("BUNDLE MODE");
+			displayTextMessage("Click and drag individual canes to move them",0);
 			break;
 		case FLATTEN_MODE:
 			modeLabel->setText("FLATTEN MODE");
+			displayTextMessage("Click and drag mouse up and down to square off cane, left and right to flatten cane",0);
 			break;
 		case LOOK_MODE:
 			modeLabel->setText("LOOK MODE");
+			displayTextMessage("Click and drag mouse to re-orient the camera position",0);
 			break;
 		case WRAP_MODE:
 			modeLabel->setText("WRAP MODE");
+			displayTextMessage("Click on first cane as the base, click and drag second cane to be the wrap",0);
 			break;
 		default:
 			modeLabel->setText("UNKNOWN MODE");
+			displayTextMessage("Unknown mode not specified",0);
 			break;
 	}
 
@@ -145,6 +151,12 @@ void MainWindow::displayTextMessage(QString msg)
 {
 	statusBar->showMessage(msg, 2000);
 }
+
+void MainWindow::displayTextMessage(QString msg, int msec)
+{
+	statusBar->showMessage(msg, msec);
+}
+
 
 void MainWindow::saveCaneToLibrary()
 {
@@ -357,21 +369,22 @@ void MainWindow::colorPickerSelected(QColor color)
 	c->color.g = color.greenF();
 	c->color.b = color.blueF();
 	c->color.a = color.alphaF();
-
+	model->setCane(stch);
+	//saveCaneToLibrary();
 	emit setCaneSig(stch);
 }
 
 void MainWindow::setupWorkArea()
 {
 	openglWidget = new OpenGLWidget(this, model);
-
+	connect(openglWidget,SIGNAL(operationInfoSig(QString,int)),this,SLOT(displayTextMessage(QString,int)));
 	pull_button = new QPushButton("Pull");
 	pull_button->setToolTip("Drag Mouse Horizontally to Twist, Vertically to Stretch. Use Shift to twist and stretch independently.");
 	bundle_button = new QPushButton("Bundle");
 	flatten_button = new QPushButton("Flatten");
 	flatten_button->setToolTip("Drag Mouse Horizontally to Squish, Vertically to Flatten");
 	wrap_button = new QPushButton("Wrap");
-	wrap_button->setToolTip("Not Implemented - Select must be functional first");
+	wrap_button->setToolTip("Not Implemented");
 	undo_button = new QPushButton("Undo");
 	undo_button->setToolTip("Undo the last operation.");
 	save_button = new QPushButton("Save");
