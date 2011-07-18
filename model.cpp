@@ -5,6 +5,12 @@ Model :: Model()
 {
 	history = new CaneHistory();
 	cane = NULL;
+	snapCount=0;
+	for (int i = 0; i < MAX_SNAP; ++i)
+	{
+		snapPoints[i].x=snapPoints[i].y=snapPoints[i].z=0.0;
+		snapRadii[i]=0.0;
+	}
 	geometryOutOfDate();
 }
 
