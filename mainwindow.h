@@ -21,7 +21,8 @@ public:
 	void seedLibrary();
 	OpenGLWidget* openglWidget;
 	QPushButton* pull_button;
-	QPushButton* bundle_button;
+	QPushButton* start_bundle_button;
+	QPushButton* finish_bundle_button;
 	QPushButton* flatten_button;
 	QPushButton* wrap_button;
 	QPushButton* snap_button;

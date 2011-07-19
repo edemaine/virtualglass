@@ -21,7 +21,7 @@ MainWindow::MainWindow(Model* model)
 
 void MainWindow::setupMenuBar()
 {
-		fileMenu = menuBar()->addMenu(tr("&File"));
+	fileMenu = menuBar()->addMenu(tr("&File"));
 
 	QAction* importLibrary = new QAction(tr("&Import Library"), this);
 		importLibrary->setStatusTip(tr("Load a saved library of canes"));
@@ -151,12 +151,10 @@ void MainWindow::displayTextMessage(QString msg)
 {
 	statusBar->showMessage(msg, 2000);
 }
-
 void MainWindow::displayTextMessage(QString msg, int msec)
 {
 	statusBar->showMessage(msg, msec);
 }
-
 
 void MainWindow::saveCaneToLibrary()
 {
@@ -377,10 +375,10 @@ void MainWindow::colorPickerSelected(QColor color)
 void MainWindow::setupWorkArea()
 {
 	openglWidget = new OpenGLWidget(this, model);
-	connect(openglWidget,SIGNAL(operationInfoSig(QString,int)),this,SLOT(displayTextMessage(QString,int)));
 	pull_button = new QPushButton("Pull");
 	pull_button->setToolTip("Drag Mouse Horizontally to Twist, Vertically to Stretch. Use Shift to twist and stretch independently.");
-	bundle_button = new QPushButton("Bundle");
+	start_bundle_button = new QPushButton("Start Bundle");
+	finish_bundle_button = new QPushButton("Finish Bundle");
 	flatten_button = new QPushButton("Flatten");
 	flatten_button->setToolTip("Drag Mouse Horizontally to Squish, Vertically to Flatten");
 	wrap_button = new QPushButton("Wrap");
@@ -394,7 +392,8 @@ void MainWindow::setupWorkArea()
 
 	QVBoxLayout* operButton_layout = new QVBoxLayout();
 	operButton_layout->addWidget(pull_button);
-	operButton_layout->addWidget(bundle_button);
+	operButton_layout->addWidget(start_bundle_button);
+	operButton_layout->addWidget(finish_bundle_button);
 	operButton_layout->addWidget(flatten_button);
 	operButton_layout->addWidget(wrap_button);
 	operButton_layout->addWidget(undo_button);
