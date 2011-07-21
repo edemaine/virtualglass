@@ -1,9 +1,9 @@
 
 #include "controller.h"
 
-int main(int /*argc*/, char** /*argv*/)
+int main(int argc, char** argv)
 {
-	Controller c;
+	Controller c(argc, argv);
 	return c.startUp();
 }
 

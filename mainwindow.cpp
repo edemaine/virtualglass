@@ -383,12 +383,16 @@ void MainWindow::setupWorkArea()
 	flatten_button->setToolTip("Drag Mouse Horizontally to Squish, Vertically to Flatten");
 	wrap_button = new QPushButton("Wrap");
 	wrap_button->setToolTip("Not Implemented");
+	snap_button = new QPushButton("Snap");
+	snap_button->setToolTip("TODO");
 	undo_button = new QPushButton("Undo");
 	undo_button->setToolTip("Undo the last operation.");
 	save_button = new QPushButton("Save");
 	save_button->setToolTip("Save Current Model to Library");
 	clear_button = new QPushButton("Clear");
 	clear_button->setToolTip("Clear Current Model");
+	tabletop_button = new QPushButton("Tabletop");
+	tabletop_button->setToolTip("TODO");
 
 	QVBoxLayout* operButton_layout = new QVBoxLayout();
 	operButton_layout->addWidget(pull_button);
@@ -396,9 +400,11 @@ void MainWindow::setupWorkArea()
 	operButton_layout->addWidget(finish_bundle_button);
 	operButton_layout->addWidget(flatten_button);
 	operButton_layout->addWidget(wrap_button);
+	operButton_layout->addWidget(snap_button);
 	operButton_layout->addWidget(undo_button);
 	operButton_layout->addWidget(save_button);
 	operButton_layout->addWidget(clear_button);
+	operButton_layout->addWidget(tabletop_button);
 
 	QHBoxLayout* workLayout = new QHBoxLayout();
 	workLayout->addLayout(operButton_layout);

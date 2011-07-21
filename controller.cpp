@@ -7,15 +7,9 @@ application.
 
 #include "controller.h"
 
-Controller::Controller()
+Controller::Controller(int argc, char **argv)
 {
-	int one = 1;
-	int& fake_argc = one;
-	char** fake_argv;
-	fake_argv = new char*[1];
-	fake_argv[0] = new char[10];
-	strcpy(fake_argv[0], "virtualglass");
-	app = new QApplication(fake_argc, fake_argv);
+	app = new QApplication(argc, argv);
 	model = new Model();
 	mainWindow = new MainWindow(model);
 

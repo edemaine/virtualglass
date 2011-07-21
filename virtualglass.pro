@@ -8,6 +8,10 @@ DEPENDPATH += .
 INCLUDEPATH += . yaml-cpp/include/ yaml-cpp/util/ yaml-cpp/src/ yaml-cpp/test/
 QT += opengl
 
+QMAKE_CFLAGS_DEBUG += -Wall -Werror -g
+QMAKE_CFLAGS_RELEASE += -Wall -Werror -g
+QMAKE_CXXFLAGS += -Wall -Werror -g
+
 # Input
 HEADERS += mainwindow.h openglwidget.h cane.h primitives.h model.h controller.h librarycanewidget.h \
 	constants.h canehistory.h geometry.h mesh.h Vector.hpp
