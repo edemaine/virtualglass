@@ -26,7 +26,7 @@ void Cane :: reset()
 	for (i = 0; i < MAX_SUBCANE_COUNT; ++i)
 	{
 		subcanes[i] = NULL;
-		subcaneLocations[i].x = subcaneLocations[i].y = subcaneLocations[i].z = 0.0;
+		subcaneLocations[i] = make_vector(0.0f, 0.0f, 0.0f);
 	}
 
 	color.r = color.g = color.b = color.a = 1.0;
@@ -168,8 +168,8 @@ void Cane :: createBundle()
 
 void Cane :: moveCane(int subcane, float delta_x, float delta_y)
 {
-	this->subcaneLocations[subcane].x += delta_x;
-	this->subcaneLocations[subcane].y += delta_y;
+	subcaneLocations[subcane].x += delta_x;
+	subcaneLocations[subcane].y += delta_y;
 }
 
 void Cane :: add(Cane* addl)

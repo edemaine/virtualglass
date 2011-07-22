@@ -54,16 +54,13 @@ class OpenGLWidget : public QGLWidget
 		bool showGrid;
 		bool lockView;
 
-		float eyeLoc[3];
 		float lookAtLoc[3];
 		float theta, fee, rho;
 
 		int mouseLocX, mouseLocY;
 
-		GLfloat lightPosition[4];
-
 		int getSubcaneUnderMouse(int mouseX, int mouseY);
-		void updateCamera();
+		void setGLMatrices();
 		void drawAxes();
 		void drawGrid();
 		void drawSnapPoints();

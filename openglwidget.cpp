@@ -24,16 +24,42 @@ other parts of the GUI.
 
 #include "openglwidget.h"
 
-OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* model) : QGLWidget(parent)
+OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 {
-	rightMouseDown = false;
+	history = new CaneHistory();
+
 	shiftButtonDown = false;
+	rightMouseDown = false;
+	isOrthographic = false;
+
+	bgColor = QColor(0,0,0);
+
+	tableForm = NULL;
+	stretchInput = NULL;
+	twistInput = NULL;
+	flattenInput = NULL;
+	rectangleInput = NULL;
+
+	model = _model;
+	geometry = NULL;
+	resolution = HIGH_RESOLUTION;
+
 	showAxes = true;
 	showGrid = false;
-	resolution = HIGH_RESOLUTION;
-	this->model = model;
+	lockView = false;
+
+	lookAtLoc[0] = 0.0f;
+	lookAtLoc[1] = 0.0f;
+	lookAtLoc[2] = 0.5f;
+
+	theta = -PI/2.0;
+	fee = PI/4.0;
+	rho = 3.0;
+
+	mouseLocX = 0.0f;
+	mouseLocY = 0.0f;
+
 	setMouseTracking(true);
-	history = new CaneHistory();
 	updateTriangles();
 }
 
@@ -45,7 +71,7 @@ Model* OpenGLWidget :: getModel()
 void OpenGLWidget :: caneChanged()
 {
 	updateTriangles();
-	paintGL();
+	update();
 }
 
 void OpenGLWidget :: setShiftButtonDown(bool state)
@@ -55,20 +81,13 @@ void OpenGLWidget :: setShiftButtonDown(bool state)
 
 void OpenGLWidget :: initializeGL()
 {
-	// Camera location
-	theta = -PI/2.0;
-	fee = PI/4.0;
-	rho = 3.0;
-
-	// Camera look-at location
-	lookAtLoc[0] = lookAtLoc[1] = 0;
-	lookAtLoc[2] = 0.5;
-
 	// For shadow/lighting
+	/* these were never passed to the GL...
 	lightPosition[0] = 0.0;
 	lightPosition[1] = 0.0;
 	lightPosition[2] = 1000.0;
 	lightPosition[3] = 0.0;
+	*/
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_COLOR_MATERIAL);
@@ -81,11 +100,14 @@ void OpenGLWidget :: setBgColor(QColor color)
 {
 	this->qglClearColor(color);
 	bgColor = color;
-	paintGL();
+	update();
 }
 
 int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 {
+	makeCurrent();
+	setGLMatrices();
+
 	geometry = model->getGeometry(LOW_RESOLUTION);
 
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -109,8 +131,8 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	glReadPixels(mouseX, this->height() - mouseY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &c);
 
 	glEnable(GL_LIGHTING);
+
 	updateTriangles();
-	paintGL();
 
 	return (int)c;
 }
@@ -123,6 +145,8 @@ receives a pointer to this array.
 */
 void OpenGLWidget :: paintGL()
 {
+
+	setGLMatrices();
 	this->qglClearColor(bgColor);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -150,7 +174,7 @@ void OpenGLWidget :: paintGL()
 		for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
 			assert(g->cane);
 			Color c = g->cane->color;
-			if ((int)g->tag == model->getActiveSubcane()) {
+			if (model && (int)g->tag == model->getActiveSubcane()) {
 				c.xyz += make_vector(0.1f, 0.1f, 0.1f);
 			}
 			glColor3f(c.r, c.g, c.b);
@@ -164,7 +188,7 @@ void OpenGLWidget :: paintGL()
 		glDisable(GL_LIGHTING);
 	}
 
-	swapBuffers();
+	//called automatically: swapBuffers();
 }
 
 void OpenGLWidget :: drawSnapPoints()
@@ -183,7 +207,7 @@ void OpenGLWidget :: drawSnapPoints()
 void OpenGLWidget :: switchProjection()
 {
 	isOrthographic=!isOrthographic;
-	paintGL();
+	update();
 }
 
 /*
@@ -192,26 +216,22 @@ Calls if the OpenGLWidget object is resized (in the GUI sense).
 void OpenGLWidget :: resizeGL(int width, int height)
 {
 	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45.0, (float)width / (float)height, 0.01, 10.0);
-	glMatrixMode(GL_MODELVIEW);
-	updateCamera();
-	paintGL();
+	if (this->width() != width || this->height() != height) {
+		std::cerr << "resizeGL(" << width << ", " << height << ") called while this->width,height are (" << this->width() << ", " << this->height() << "). This may mess up aspect ratio." << std::endl;
+	}
+	//I think paintGL will get called now...
 }
 
 void OpenGLWidget :: zoomIn()
 {
 	rho *= 0.8;
-	updateCamera();
-	paintGL();
+	update();
 }
 
 void OpenGLWidget :: zoomOut()
 {
 	rho *= 1.2;
-	updateCamera();
-	paintGL();
+	update();
 }
 
 void OpenGLWidget :: setTopView()
@@ -242,19 +262,19 @@ void OpenGLWidget :: toggleGrid()
 void OpenGLWidget :: setAxes(bool show)
 {
 	showAxes = show;
-	paintGL();
+	update();
 }
 
 void OpenGLWidget :: setGrid(bool show)
 {
 	showGrid = show;
-	paintGL();
+	update();
 }
 
 void OpenGLWidget :: lockTable()
 {
 	lockView = !lockView;
-	paintGL();
+	update();
 }
 
 
@@ -281,14 +301,33 @@ void OpenGLWidget :: updateTriangles()
 }
 
 /*
-Called after the camera changes location.
+Called to set up projection and modelview matrices
 */
-void OpenGLWidget :: updateCamera()
+void OpenGLWidget :: setGLMatrices()
 {
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	float w = width();
+	float h = height();
+	if (isOrthographic) {
+		if (w > h) {
+			float a = h / w;
+			float s = 1.0f / rho;
+			glScalef(a * s, s,-0.01);
+		} else {
+			float a = w / h;
+			float s = 1.0f / rho;
+			glScalef(s, a * s,-0.01);
+		}
+	} else {
+		gluPerspective(45.0, w / h, 0.01, 100.0);
+	}
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	float eyeLoc[3];
 	eyeLoc[0] = lookAtLoc[0] + rho*sin(fee)*cos(theta);
 	eyeLoc[1] = lookAtLoc[1] + rho*sin(fee)*sin(theta);
 	eyeLoc[2] = lookAtLoc[2] + rho*cos(fee);
-	glLoadIdentity();
 	gluLookAt(eyeLoc[0], eyeLoc[1], eyeLoc[2],
 			  lookAtLoc[0], lookAtLoc[1], lookAtLoc[2],
 			  0.0, 0.0, 1.0);
@@ -322,7 +361,7 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 	// Change as part of dual mode feature
 	updateResolution(LOW_RESOLUTION);
 
-	paintGL();
+	update();
 }
 
 /*
@@ -336,7 +375,7 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 	if (e->button() == Qt::RightButton){
 		rightMouseDown = false;
 	}
-	paintGL();
+	update();
 }
 
 /*
@@ -386,8 +425,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		newFee = fee - (relY * 500.0 * PI / 180.0);
 		if (newFee > 0.0f && newFee < PI)
 			fee = newFee;
-		updateCamera();
-		paintGL();
+		update();
 		return;
 	}
 
@@ -398,8 +436,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		newFee = fee - (relY * 500.0 * PI / 180.0);
 		if (newFee > 0.0f && newFee < PI)
 			fee = newFee;
-		updateCamera();
-		paintGL();
+		update();
 	}
 	else if (model->getMode() == PULL_MODE)
 	{
@@ -471,8 +508,7 @@ void OpenGLWidget :: setCamera(float theta, float fee)
 {
 	this->theta = theta;
 	this->fee = fee;
-	updateCamera();
-	paintGL();
+	update();
 }
 
 Point OpenGLWidget :: getCameraPoint()

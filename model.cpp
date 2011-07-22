@@ -3,19 +3,24 @@
 
 Model :: Model()
 {
-	history = new CaneHistory();
+	mode = 0;
 	cane = NULL;
-	snapCount=0;
+	history = new CaneHistory();
+	lowResGeometryFresh = 0;
+	highResGeometryFresh = 0;
+	activeSubcane = -1;
 	for (int i = 0; i < MAX_SNAP; ++i)
 	{
 		snapPoints[i].x=snapPoints[i].y=snapPoints[i].z=0.0;
 		snapRadii[i]=0.0;
 	}
+	snapCount=0;
 	geometryOutOfDate();
 }
 
 void Model :: clearCurrentCane()
 {
+	mode = 0;
 	setCane(NULL);
 }
 
