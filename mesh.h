@@ -7,9 +7,9 @@
 #include "geometry.h"
 
 void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
-	int resolution, Cane* activeSubcane, bool isActive, bool selectionColoring, int selectionColorIndex);
+	int resolution, int selectionColorIndex = -1);
 void meshCircularBaseCane(Geometry *geometry,
-	Cane** ancestors, int ancestorCount, Color color, int resolution);
+	Cane** ancestors, int ancestorCount, int resolution, Cane *group_cane, uint32_t group_tag);
 float computeTotalStretch(Cane** ancestors, int ancestorCount);
 void applyFlattenTransform(Vertex* v, float rectangleRatio,
 	float rectangleTheta, float flatness);

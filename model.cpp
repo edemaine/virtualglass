@@ -48,6 +48,9 @@ void Model :: setActiveSubcane(int subcane)
 	if (activeSubcane != subcane)
 	{
 		activeSubcane = subcane;
+		if (activeSubcane < 0 || activeSubcane >= cane->subcaneCount) {
+			activeSubcane = -1;
+		}
 		geometryOutOfDate();
 		emit caneChanged();
 	}
@@ -66,19 +69,6 @@ void Model :: setCane(Cane* c)
 	emit caneChanged();
 }
 
-void Model :: updateSelectGeometry()
-{
-	Cane* ancestors[MAX_ANCESTORS];
-	int ancestorCount;
-
-	ancestorCount = 0;
-	selectGeometry.clear();
-	if (cane != NULL) // && cane->type == BUNDLE_CANETYPE) // && mode == BUNDLE_MODE)
-		generateMesh(cane, &selectGeometry, ancestors, &ancestorCount,
-			LOW_RESOLUTION, NULL, false, true, -1);
-	selectGeometryFresh = 1;
-}
-
 void Model :: updateLowResGeometry()
 {
 	Cane* ancestors[MAX_ANCESTORS];
@@ -86,14 +76,8 @@ void Model :: updateLowResGeometry()
 
 	ancestorCount = 0;
 	lowResGeometry.clear();
-	if (cane != NULL && cane->type == BUNDLE_CANETYPE && mode == BUNDLE_MODE && activeSubcane != -1)
-	{
-		generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount,
-			LOW_RESOLUTION, cane->subcanes[activeSubcane], false, false, 0);
-	}
-	else
-		generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount,
-			LOW_RESOLUTION, NULL, false, false, 0);
+	if (cane != NULL)
+		generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION);
 	lowResGeometryFresh = 1;
 }
 
@@ -104,25 +88,14 @@ void Model :: updateHighResGeometry()
 
 	ancestorCount = 0;
 	highResGeometry.clear();
-	if (cane != NULL && cane->type == BUNDLE_CANETYPE && mode == BUNDLE_MODE && activeSubcane != -1)
-		generateMesh(cane, &highResGeometry, ancestors, &ancestorCount,
-			HIGH_RESOLUTION, cane->subcanes[activeSubcane], false, false, 0);
-	else
-		generateMesh(cane, &highResGeometry, ancestors, &ancestorCount,
-			HIGH_RESOLUTION, NULL, false, false, 0);
+	if (cane != NULL)
+		generateMesh(cane, &highResGeometry, ancestors, &ancestorCount, HIGH_RESOLUTION);
 	highResGeometryFresh = 1;
 }
 
 Cane* Model :: getCane()
 {
 	return cane;
-}
-
-Geometry* Model :: getSelectionGeometry()
-{
-	if (!selectGeometryFresh)
-		updateSelectGeometry();
-	return &selectGeometry;
 }
 
 Geometry* Model :: getGeometry(int resolution)
@@ -143,7 +116,6 @@ Geometry* Model :: getGeometry(int resolution)
 
 void Model :: geometryOutOfDate()
 {
-	selectGeometryFresh = 0;
 	lowResGeometryFresh = 0;
 	highResGeometryFresh = 0;
 }

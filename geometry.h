@@ -11,11 +11,10 @@
 class Vertex
 {
 public:
-	Vertex(Point const &_position = make_vector(0.0f, 0.0f, 0.0f), Point const &_normal = make_vector(0.0f, 0.0f, 0.0f), Color const &_color = make_vector(1.0f, 1.0f, 1.0f, 1.0f)) : position(_position), normal(_normal), color(_color) {
+	Vertex(Point const &_position = make_vector(0.0f, 0.0f, 0.0f), Point const &_normal = make_vector(0.0f, 0.0f, 0.0f)) : position(_position), normal(_normal) {
 	}
 	Point position;
 	Point normal;
-	Color color;
 };
 
 class Triangle
@@ -28,20 +27,41 @@ public:
 	uint32_t v3;
 };
 
+class Cane;
+
+//groups are a (hack-y) way of tracking triangles that belong to specific canes
+class Group
+{
+public:
+	Group(uint32_t _begin, uint32_t _size, Cane *_cane, uint32_t _tag) : begin(_begin), size(_size), cane(_cane), tag(_tag) {
+	}
+	uint32_t begin;
+	uint32_t size;
+	Cane * cane;
+	uint32_t tag;
+};
+
 class Geometry
 {
 public:
 	std::vector< Vertex > vertices;
 	std::vector< Triangle > triangles;
+	std::vector< Group > groups;
 	void clear() {
 		vertices.clear();
 		triangles.clear();
+		groups.clear();
 	}
 	bool valid() const {
 		for (std::vector< Triangle >::const_iterator t = triangles.begin(); t != triangles.end(); ++t) {
 			if (t->v1 >= vertices.size()) return false;
 			if (t->v2 >= vertices.size()) return false;
 			if (t->v3 >= vertices.size()) return false;
+		}
+		for (std::vector< Group >::const_iterator g = groups.begin(); g != groups.end(); ++g) {
+			if (g->begin >= triangles.size()) return false;
+			if (g->begin + g->size >= triangles.size()) return false;
+			if (g->cane == NULL) return false;
 		}
 		return true;
 	}

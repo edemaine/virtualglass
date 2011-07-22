@@ -86,33 +86,33 @@ void OpenGLWidget :: setBgColor(QColor color)
 
 int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 {
-	geometry = model->getSelectionGeometry();
+	geometry = model->getGeometry(LOW_RESOLUTION);
 
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Check that Vertex and Triangle have proper size:
-	assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3 + 4));
+	assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3));
 	assert(sizeof(Triangle) == sizeof(GLuint) * 3);
 
 	glDisable(GL_LIGHTING);
+	glDisable(GL_BLEND);
 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].position));
-	glColorPointer(4, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].color));
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-	glDrawElements(GL_TRIANGLES, geometry->triangles.size() * 3,
-		GL_UNSIGNED_INT, &(geometry->triangles[0].v1));
+	for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
+		glColor4ubv(reinterpret_cast< const GLubyte * >(&(g->tag)));
+		glDrawElements(GL_TRIANGLES, g->size * 3,
+			GL_UNSIGNED_INT, &(geometry->triangles[g->begin].v1));
+	}
 	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-	GLfloat c;
-	glReadPixels(mouseX, this->height() - mouseY, 1, 1, GL_RED, GL_FLOAT, &c);
+	uint32_t c;
+	glReadPixels(mouseX, this->height() - mouseY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &c);
 
 	glEnable(GL_LIGHTING);
 	updateTriangles();
 	paintGL();
 
-	if (c == 0.0) // background color
-		return -1;
-	return (int) ((c - 0.1) / (0.9 / MAX_SUBCANE_COUNT) + 0.1);
+	return (int)c;
 }
 
 /*
@@ -123,7 +123,10 @@ receives a pointer to this array.
 */
 void OpenGLWidget :: paintGL()
 {
+	this->qglClearColor(bgColor);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDisable(GL_LIGHTING);
 
 	if (showAxes)
 		drawAxes();
@@ -134,23 +137,31 @@ void OpenGLWidget :: paintGL()
 	drawSnapPoints();
 
 	if (geometry) {
+		glEnable(GL_LIGHTING);
 		//Check that Vertex and Triangle have proper size:
-		assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3 + 4));
+		assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3));
 		assert(sizeof(Triangle) == sizeof(GLuint) * 3);
 
 		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].position));
 		glNormalPointer(GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].normal));
-		glColorPointer(4, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].color));
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_NORMAL_ARRAY);
-		glEnableClientState(GL_COLOR_ARRAY);
 
-		glDrawElements(GL_TRIANGLES, geometry->triangles.size() * 3,
-			GL_UNSIGNED_INT, &(geometry->triangles[0].v1));
+		for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
+			assert(g->cane);
+			Color c = g->cane->color;
+			if ((int)g->tag == model->getActiveSubcane()) {
+				c.xyz += make_vector(0.1f, 0.1f, 0.1f);
+			}
+			glColor3f(c.r, c.g, c.b);
+			glDrawElements(GL_TRIANGLES, g->size * 3,
+				GL_UNSIGNED_INT, &(geometry->triangles[g->begin].v1));
+		}
 
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_NORMAL_ARRAY);
-		glDisableClientState(GL_COLOR_ARRAY);
+
+		glDisable(GL_LIGHTING);
 	}
 
 	swapBuffers();

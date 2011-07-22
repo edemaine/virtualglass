@@ -176,7 +176,7 @@ The resolution refers to the dual resolution modes used by the GUI, and the actu
 triangles for these resolutions are set in constants.h
 */
 void meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
-	int ancestorCount, Color color, int resolution)
+	int ancestorCount, int resolution, Cane *group_cane, uint32_t group_tag)
 {
 	unsigned int angularResolution, axialResolution;
 	float total_stretch;
@@ -200,6 +200,8 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 
 	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
+	//need to remember the first triangle so we can tag it later
+	uint32_t first_triangle = geometry->triangles.size();
 
 	/*
 	Draw the walls of the cylinder. Note that the z location is
@@ -220,7 +222,7 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 			n.x = p.x;
 			n.y = p.y;
 			n.z = 0.0f;
-			geometry->vertices.push_back(Vertex(p,n,color));
+			geometry->vertices.push_back(Vertex(p,n));
 		}
 	}
 	//Generate triangles linking them:
@@ -260,7 +262,7 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 			p.z = z / total_stretch;
 			Point n;
 			n.x = 0.0; n.y = 0.0; n.z = nz;
-			geometry->vertices.push_back(Vertex(p, n, color));
+			geometry->vertices.push_back(Vertex(p, n));
 		}
 		if (side)
 		{
@@ -284,6 +286,7 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount);
 	}
 	geometry->compute_normals_from_triangles();
+	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, group_cane, group_tag));
 }
 
 
@@ -295,60 +298,31 @@ leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
 void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount, 
-	int resolution, Cane* activeSubcane, bool isActive, bool selectionColoring, int coloringIndex)
+	int resolution, int coloringIndex)
 {
 	int i;
 
 	if (c == NULL)
 		return;
 
-	isActive = isActive || (c == activeSubcane);
-
 	// Make recursive calls depending on the type of the current node
 	ancestors[*ancestorCount] = c;
 	*ancestorCount += 1;
 	if (c->type == BASE_CIRCLE_CANETYPE)
 	{
-		if (selectionColoring)
-		{
-			Color selectionColor;
-			selectionColor.a = 1.0;
-			selectionColor.r = selectionColor.g = selectionColor.b = 
-				(0.1 + 0.9 / MAX_SUBCANE_COUNT * coloringIndex);
-			meshCircularBaseCane(geometry, ancestors, *ancestorCount, 
-				selectionColor, resolution);
-		}
-		else
-		{
-			// If we're bundling and this isn't the active cane
-			if (activeSubcane != NULL && isActive)
-			{
-				Color newColor;
-				newColor.a = c->color.a;
-				newColor.r = MIN(1.0, c->color.r + 0.1);
-				newColor.g = MIN(1.0, c->color.g + 0.1);
-				newColor.b = MIN(1.0, c->color.b + 0.1);
-				meshCircularBaseCane(geometry, ancestors, *ancestorCount, 
-					newColor, resolution);
-			} // If this is the active cane or we're not bundling
-			else
-				meshCircularBaseCane(geometry, ancestors, 
-					*ancestorCount, c->color, resolution);
-		}
+		meshCircularBaseCane(geometry, ancestors, *ancestorCount, 
+			resolution, c, coloringIndex);
 	}
 	else
 	{
 		for (i = 0; i < c->subcaneCount; ++i)
 		{
-			if (!selectionColoring)
+			if (coloringIndex == -1)
 				generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
-					resolution, activeSubcane, isActive, false, 0);
-			else if (coloringIndex == -1)
-				generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
-					resolution, NULL, false, true, i);
+					resolution, i);
 			else
 				generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
-					resolution, NULL, false, true, coloringIndex);
+					resolution, coloringIndex);
 		}
 	}
 	*ancestorCount -= 1;
