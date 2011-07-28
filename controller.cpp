@@ -44,8 +44,8 @@ Controller::Controller(int argc, char **argv)
 	connect(mainWindow->save_button, SIGNAL(pressed()), mainWindow, SLOT(saveCaneToLibrary()));
 
 	// Connect openglwidget to mainwindow
-        connect(mainWindow->openglWidget, SIGNAL(operationInfoSig(QString,int)), mainWindow,
-                SLOT(displayTextMessage(QString,int)));
+	connect(mainWindow->openglWidget, SIGNAL(operationInfoSig(QString,int)), mainWindow,
+			SLOT(displayTextMessage(QString,int)));
 
 }
 

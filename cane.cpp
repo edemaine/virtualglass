@@ -95,8 +95,8 @@ void Cane :: pullLinear(float twistFactor, float stretchFactor)
 void Cane :: pullIntuitive(float twistFactor, float stretchFactor)
 {
 	// The amount twist and stretch are changed are functions
-	// of the amount already present. The exact function is 
-	// determined by feel/playing with the tool. 
+	// of the amount already present. The exact function is
+	// determined by feel/playing with the tool.
 	if (this->type != PULL_CANETYPE)
 	{
 		Cane* copy = new Cane(UNASSIGNED_CANETYPE);
@@ -123,6 +123,40 @@ void Cane :: pullIntuitive(float twistFactor, float stretchFactor)
 			this->amts[0] *= (1.0 + twistFactor);
 	}
 	this->amts[1] *= (1.0 + stretchFactor);
+}
+
+void Cane :: pullIntuitive(int subcane, float twistFactor, float stretchFactor)
+{
+	// The amount twist and stretch are changed are functions
+	// of the amount already present. The exact function is
+	// determined by feel/playing with the tool.
+	Cane* workingCane = this->subcanes[subcane];
+	if (workingCane->type != PULL_CANETYPE)
+	{
+		Cane* copy = new Cane(UNASSIGNED_CANETYPE);
+		workingCane->shallowCopy(copy);
+		workingCane->reset();
+		workingCane->type = PULL_CANETYPE;
+		workingCane->subcaneCount = 1;
+		workingCane->subcanes[0] = copy;
+		workingCane->amts[0] = 0.0; // twist amount
+		workingCane->amts[1] = 1.0; // stretch amount
+	}
+	if (workingCane->amts[0] < 0.0)
+	{
+		if (workingCane->amts[0] > -1.0)
+			workingCane->amts[0] -= 8 * -twistFactor;
+		else
+			workingCane->amts[0] *= (1.0 + -twistFactor);
+	}
+	else
+	{
+		if (workingCane->amts[0] < 1.0)
+			workingCane->amts[0] += 8 * twistFactor;
+		else
+			workingCane->amts[0] *= (1.0 + twistFactor);
+	}
+	workingCane->amts[1] *= (1.0 + stretchFactor);
 }
 
 /*
@@ -156,20 +190,55 @@ void Cane :: flatten(float rectangle_ratio, float rectangle_theta, float flatnes
 	this->amts[2] = MIN(1.0, MAX(0.0, amts[2]));
 }
 
+void Cane :: flatten(int subcane, float rectangle_ratio, float rectangle_theta, float flatness)
+{
+	Cane* workingCane = this->subcanes[subcane];
+	if (workingCane->type != FLATTEN_CANETYPE || workingCane->amts[1] != rectangle_theta)
+	{
+		Cane* copy = new Cane(UNASSIGNED_CANETYPE);
+		workingCane->shallowCopy(copy);
+		workingCane->reset();
+		workingCane->type = FLATTEN_CANETYPE;
+		workingCane->subcaneCount = 1;
+		workingCane->subcanes[0] = copy;
+		workingCane->amts[0] = 1.0; // rectangle_ratio
+		workingCane->amts[1] = rectangle_theta;
+		workingCane->amts[2] = 0.0; // flatness
+	}
+	workingCane->amts[0] *= (1.0 + rectangle_ratio);
+	workingCane->amts[2] += flatness;
+	workingCane->amts[2] = MIN(1.0, MAX(0.0, workingCane->amts[2]));
+}
+
 void Cane :: createBundle()
 {
 	Cane* copy = new Cane(UNASSIGNED_CANETYPE);
 	this->shallowCopy(copy);
 	this->reset();
 	this->type = BUNDLE_CANETYPE;
-	this->subcaneCount = 1;
-	this->subcanes[0] = copy;
+	this->subcaneCount = 2;
+	this->subcanes[1] = copy;
+	//
+	Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
+	c->color.r = 1.0;
+	c->color.g = 1.0;
+	c->color.b = 1.0;
+	c->color.a = 0.10;
+	this->amts[0] = 0.0;
+	this->amts[1] = 10.0;
+
+	this->subcanes[0] = c;
 }
 
 void Cane :: moveCane(int subcane, float delta_x, float delta_y)
 {
 	subcaneLocations[subcane].x += delta_x;
 	subcaneLocations[subcane].y += delta_y;
+}
+
+void Cane :: moveCane(int subcane, float delta_z)
+{
+	subcaneLocations[subcane].z += delta_z;
 }
 
 void Cane :: add(Cane* addl)
@@ -182,6 +251,18 @@ void Cane :: add(Cane* addl)
 	subcaneLocations[subcaneCount].x = 0;
 	subcaneLocations[subcaneCount].y = 0;
 	subcaneCount += 1;
+}
+
+void Cane :: deleteCane(int subcane)
+{
+	if (subcane<0 || subcane>=subcaneCount)
+		return;
+	subcaneCount--;
+	for (int i=subcane;i<subcaneCount;i++)
+	{
+		subcanes[i]=subcanes[i+1];
+		subcaneLocations[i]=subcaneLocations[i+1];
+	}
 }
 
 Cane* Cane :: deepCopy()

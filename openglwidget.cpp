@@ -79,15 +79,25 @@ void OpenGLWidget :: setShiftButtonDown(bool state)
 	shiftButtonDown = state;
 }
 
+void OpenGLWidget :: setControlButtonDown(bool state)
+{
+	controlButtonDown = state;
+}
+
+void OpenGLWidget :: setDeleteButtonDown(bool state)
+{
+	deleteButtonDown = state;
+}
+
 void OpenGLWidget :: initializeGL()
 {
 	// For shadow/lighting
 	/* these were never passed to the GL...
-	lightPosition[0] = 0.0;
-	lightPosition[1] = 0.0;
-	lightPosition[2] = 1000.0;
-	lightPosition[3] = 0.0;
-	*/
+ lightPosition[0] = 0.0;
+ lightPosition[1] = 0.0;
+ lightPosition[2] = 1000.0;
+ lightPosition[3] = 0.0;
+ */
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_COLOR_MATERIAL);
@@ -124,7 +134,7 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
 		glColor4ubv(reinterpret_cast< const GLubyte * >(&(g->tag)));
 		glDrawElements(GL_TRIANGLES, g->size * 3,
-			GL_UNSIGNED_INT, &(geometry->triangles[g->begin].v1));
+					   GL_UNSIGNED_INT, &(geometry->triangles[g->begin].v1));
 	}
 	glDisableClientState(GL_VERTEX_ARRAY);
 	uint32_t c;
@@ -135,6 +145,41 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	updateTriangles();
 
 	return (int)c;
+}
+
+Point OpenGLWidget :: getClickedPoint(int mouseLocX, int mouseLocY)
+{
+	GLint viewport[4];
+	GLdouble modelview[16];
+	GLdouble projection[16];
+	GLfloat winX, winY, winZ;
+	GLdouble posX, posY, posZ;
+
+	glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+	glGetDoublev( GL_PROJECTION_MATRIX, projection );
+	glGetIntegerv( GL_VIEWPORT, viewport );
+
+	winX = mouseLocX;
+	winY = viewport[3] - mouseLocY;
+	glReadPixels( mouseLocX, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
+
+	gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+
+	Point result;
+	result.x=posX;
+	result.y=posY;
+	result.z=posZ;
+	return result;
+}
+
+Point OpenGLWidget :: getPointOnPlane(Point clickPoint)
+{
+	return clickPoint;
+}
+
+Point OpenGLWidget :: getPointOnPlane(int mouseLocX, int mouseLocY)
+{
+	return getPointOnPlane(getClickedPoint(mouseLocX,mouseLocY));
 }
 
 /*
@@ -179,7 +224,7 @@ void OpenGLWidget :: paintGL()
 			}
 			glColor3f(c.r, c.g, c.b);
 			glDrawElements(GL_TRIANGLES, g->size * 3,
-				GL_UNSIGNED_INT, &(geometry->triangles[g->begin].v1));
+						   GL_UNSIGNED_INT, &(geometry->triangles[g->begin].v1));
 		}
 
 		glDisableClientState(GL_VERTEX_ARRAY);
@@ -193,15 +238,33 @@ void OpenGLWidget :: paintGL()
 
 void OpenGLWidget :: drawSnapPoints()
 {
-	glBegin(GL_LINES);
-	glColor3f(1,1,1);
-	float max=0.5;
-	for (int i=0;i<model->snap_count();i++)
+
+	float max=0.04;
+	for (int i=0;i<=model->snap_count();i++)
 	{
-		glVertex3f(model->snapPoint(i).x,model->snapPoint(i).y,-max);
-		glVertex3f(model->snapPoint(i).x,model->snapPoint(i).y,max);
+		glPushMatrix();
+		glTranslatef(model->snapPoint(i).x,model->snapPoint(i).y,0);
+		for (int j=1;j<=5;j++)
+		{
+			glColor3f(1.0/j,1.0/j,1.0/j);
+			glBegin(GL_LINES);
+			glVertex3f(0,0,max*(j-1));
+			glVertex3f(0,0,max*j);
+			glEnd();
+
+		}
+		glColor3f(0.75,0.75,0.75);
+
+		glBegin(GL_TRIANGLE_FAN);
+		glVertex3f(0,0,0);
+		for (int angle=0;angle<=360;angle+=10){
+			glVertex3f(model->snapRadius(i)*cos(angle*PI/180.),model->snapRadius(i)*sin(angle*PI/180.),0);
+		}
+		glEnd();
+
+		glPopMatrix();
 	}
-	glEnd();
+
 }
 
 void OpenGLWidget :: switchProjection()
@@ -346,17 +409,27 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 	if (e->button() == Qt::RightButton)
 	{
 		rightMouseDown = true;
-	} else if (model->getMode() == SNAP_MODE)
+	} else
 	{
-		Point p;
-		//gluUnProject(p.x,p.y,p.z,)
-		p.x=mouseLocX-width()/2;
-		p.y=-(mouseLocY-height()/2);
-		p.x*=this->rho/400.0;
-		p.y*=this->rho/400.0;
-		p.z=0;
-		model->addSnapPoint(p);
-		emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
+		model->setActiveSubcane(getSubcaneUnderMouse(mouseLocX, mouseLocY));
+		if (deleteButtonDown)
+		{
+			model->deleteActiveCane();
+		}
+
+		if (model->getMode() == SNAP_MODE)
+		{
+			Point p;
+			//gluUnProject(p.x,p.y,p.z,)
+			p.x=mouseLocX-width()/2;
+			p.y=-(mouseLocY-height()/2);
+			p.x*=this->rho/700.0;
+			p.y*=this->rho/700.0;
+			p.y+=(PI/2-abs(fee-PI/2))/2.5;
+			p.z=0;
+			model->addSnapPoint(p);
+			emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
+		}
 	}
 	// Change as part of dual mode feature
 	updateResolution(LOW_RESOLUTION);
@@ -374,6 +447,10 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 	updateResolution(HIGH_RESOLUTION);
 	if (e->button() == Qt::RightButton){
 		rightMouseDown = false;
+	} else if (model->getMode() == SNAP_MODE)
+	{
+		Point p = model->finalizeSnapPoint();
+		emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
 	}
 	update();
 }
@@ -408,15 +485,15 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	relY = (mouseLocY - oldMouseLocY) / windowHeight;
 
 	/*
-	Do something depending on mode.
-	All modes except LOOK_MODE involve modifying the cane
-	itself, while LOOK_MODE moves the camera.
+ Do something depending on mode.
+ All modes except LOOK_MODE involve modifying the cane
+ itself, while LOOK_MODE moves the camera.
 
-	All of the calls to model->*Cane() are functions of relX/relY,
-	but the constants involved are determined by experiment,
-	i.e. how much twist `feels' reasonable for moving the mouse
-	an inch.
-	*/
+ All of the calls to model->*Cane() are functions of relX/relY,
+ but the constants involved are determined by experiment,
+ i.e. how much twist `feels' reasonable for moving the mouse
+ an inch.
+ */
 	if (rightMouseDown && !lockView)
 	{
 		// Rotate camera position around look-at location.
@@ -453,38 +530,63 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		}
 		else
 		{
-			model->pullCane(relX * PI, -5.0*relY);
+			if (controlButtonDown)
+			{
+				model->pullActiveCane(relX * PI, -5.0*relY);
+			}
+			else
+			{
+				model->pullCane(relX * PI, -5.0*relY);
+			}
 		}
 		emit operationInfoSig(QString("Twisted %1 Revolutions Per Viewable Length, Pulled %2").arg(model->getCane()->amts[0] / PI / 2).arg(model->getCane()->amts[1]),1000);
 	}
 	else if (model->getMode() == BUNDLE_MODE)
 	{
 		/*
-		How the parameters for moveCane() are calculated is not obvious.
-		The idea is to make mouse X/Y correspond to the cane moving
-		left-right/up-down *regardless* of where the camera is. This
-		is why theta (the camera angle relative to the look-at point) is
-		also involved.
+  How the parameters for moveCane() are calculated is not obvious.
+  The idea is to make mouse X/Y correspond to the cane moving
+  left-right/up-down *regardless* of where the camera is. This
+  is why theta (the camera angle relative to the look-at point) is
+  also involved.
 
-		Essentially, the parameters convert the amount moved in X and Y
-		(variables `relX' and `relY') to the amount moved in X and Y
-		according to axes on which the cane lives.
-		*/
+  Essentially, the parameters convert the amount moved in X and Y
+  (variables `relX' and `relY') to the amount moved in X and Y
+  according to axes on which the cane lives.
+  */
 
-		model->setActiveSubcane(getSubcaneUnderMouse(oldMouseLocX, oldMouseLocY));
+		//model->setActiveSubcane(getSubcaneUnderMouse(oldMouseLocX, oldMouseLocY));
 		if (e->buttons() & 0x00000001) // if left mouse button is down
 		{
-			relX *= 5; // tone it down
-			relY *= 5; // tone it down
-			model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
-				relX * sin(theta + PI / 2.0) + relY * sin(theta));
+			if (shiftButtonDown)
+			{
+				relY *=5;
+				model->moveCane(-relY);
+			} else {
+				relX *= 5; // tone it down
+				relY *= 5; // tone it down
+				model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
+								relX * sin(theta + PI / 2.0) + relY * sin(theta));
+			}
 		}
 		emit operationInfoSig(QString("Moved X Direction %1, Y Direction %2").arg(model->getCane()->subcaneLocations[model->getActiveSubcane()].x).arg(model->getCane()->subcaneLocations[model->getActiveSubcane()].y),1000);
 	}
 	else if (model->getMode() == FLATTEN_MODE)
 	{
-		model->flattenCane(relX, theta + PI / 2.0, -relY);
+		if (controlButtonDown)
+		{
+			model->flattenActiveCane(relX, theta + PI / 2.0, -relY);
+		}
+		else
+		{
+			model->flattenCane(relX, theta + PI / 2.0, -relY);
+		}
 		emit operationInfoSig(QString("Squished with %1, Flattened into rectangle with %2").arg(model->getCane()->amts[0]).arg(model->getCane()->amts[2]),1000);
+	} else if (model->getMode() == SNAP_MODE)
+	{
+		model->modifySnapPoint(relX);
+		//emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
+		update();
 	}
 }
 
@@ -562,12 +664,39 @@ void OpenGLWidget :: drawAxes()
 	glColor3f(bgColor.redF(),1-bgColor.greenF(),1-bgColor.blueF());
 	glVertex3f(0,0,0);
 	glVertex3f(1,0,0);
+	glEnd();
+
+	glBegin(GL_TRIANGLE_FAN);
+	glVertex3f(1,0,0);
+	for (int angle=0;angle<=360;angle+=10){
+		glVertex3f(0.95,0.05*cos(angle*PI/180.),0.05*sin(angle*PI/180.));
+	}
+	glEnd();
+
+	glBegin(GL_LINES);
 	glColor3f(1-bgColor.redF(),bgColor.greenF(),1-bgColor.blueF());
 	glVertex3f(0,0,0);
 	glVertex3f(0,-1,0);
+	glEnd();
+
+	glBegin(GL_TRIANGLE_FAN);
+	glVertex3f(0,-1,0);
+	for (int angle=0;angle<=360;angle+=10){
+		glVertex3f(0.05*sin(angle*PI/180.),-0.95,0.05*cos(angle*PI/180.));
+	}
+	glEnd();
+
+	glBegin(GL_LINES);
 	glColor3f(1-bgColor.redF(),1-bgColor.greenF(),bgColor.blueF());
 	glVertex3f(0,0,0);
 	glVertex3f(0,0,1.2);
+	glEnd();
+
+	glBegin(GL_TRIANGLE_FAN);
+	glVertex3f(0,0,1.2);
+	for (int angle=0;angle<=360;angle+=10){
+		glVertex3f(0.05*cos(angle*PI/180.),0.05*sin(angle*PI/180.),1.15);
+	}
 	glEnd();
 }
 

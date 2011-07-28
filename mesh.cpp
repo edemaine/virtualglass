@@ -58,9 +58,9 @@ void applyFlattenTransform(Vertex* v, float rectangleRatio, float rectangleTheta
 	}
 
 	v->position.x = flatness * (cos(rectangleTheta) * p_r.x
-		- sin(rectangleTheta) * p_r.y) + v->position.x * (1-flatness);
+								- sin(rectangleTheta) * p_r.y) + v->position.x * (1-flatness);
 	v->position.y = flatness * (sin(rectangleTheta) * p_r.x
-		+ cos(rectangleTheta) * p_r.y) + v->position.y * (1-flatness);
+								+ cos(rectangleTheta) * p_r.y) + v->position.y * (1-flatness);
 	//TODO: normal transform
 }
 
@@ -68,6 +68,7 @@ void applyBundleTransform(Vertex* v, Point location)
 {
 	v->position.x += location.x;
 	v->position.y += location.y;
+	v->position.z += location.z; //NEW
 }
 
 void applyPullTransform(Vertex* v, float twistAmount, float stretchAmount)
@@ -75,7 +76,7 @@ void applyPullTransform(Vertex* v, float twistAmount, float stretchAmount)
 	// Apply twist first
 	float theta = atan2(v->position.y, v->position.x);
 	float r = length(v->position.xy);
-	theta += stretchAmount * twistAmount * v->position.z; 
+	theta += stretchAmount * twistAmount * v->position.z;
 	v->position.x = r * cos(theta);
 	v->position.y = r * sin(theta);
 
@@ -176,23 +177,23 @@ The resolution refers to the dual resolution modes used by the GUI, and the actu
 triangles for these resolutions are set in constants.h
 */
 void meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
-	int ancestorCount, int resolution, Cane *group_cane, uint32_t group_tag)
+						  int ancestorCount, int resolution, Cane *group_cane, uint32_t group_tag)
 {
 	unsigned int angularResolution, axialResolution;
 	float total_stretch;
 
 	switch (resolution)
 	{
-		case LOW_RESOLUTION:
-			angularResolution = LOW_ANGULAR_RESOLUTION;
-			axialResolution = LOW_AXIAL_RESOLUTION;
-			break;
-		case HIGH_RESOLUTION:
-			angularResolution = HIGH_ANGULAR_RESOLUTION;
-			axialResolution = HIGH_AXIAL_RESOLUTION;
-			break;
-		default:
-			exit(1);
+	case LOW_RESOLUTION:
+		angularResolution = LOW_ANGULAR_RESOLUTION;
+		axialResolution = LOW_AXIAL_RESOLUTION;
+		break;
+	case HIGH_RESOLUTION:
+		angularResolution = HIGH_ANGULAR_RESOLUTION;
+		axialResolution = HIGH_AXIAL_RESOLUTION;
+		break;
+	default:
+		exit(1);
 	}
 
 	//DEBUG: total_stretch shortened... why is the top cap missing?
@@ -204,10 +205,10 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 	uint32_t first_triangle = geometry->triangles.size();
 
 	/*
-	Draw the walls of the cylinder. Note that the z location is
-	adjusted by the total stretch experienced by the cane so that
-	the z values range between 0 and 1.
-	*/
+ Draw the walls of the cylinder. Note that the z location is
+ adjusted by the total stretch experienced by the cane so that
+ the z values range between 0 and 1.
+ */
 	//Generate verts:
 	for (unsigned int i = 0; i < axialResolution; ++i)
 	{
@@ -246,10 +247,10 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 	assert(geometry->valid());
 
 	/*
-	Draw the cylinder bottom, then top.
-	The mesh uses a set of n-2 triangles with a common vertex
-	to draw a regular n-gon.
-	*/
+ Draw the cylinder bottom, then top.
+ The mesh uses a set of n-2 triangles with a common vertex
+ to draw a regular n-gon.
+ */
 	for (int side = 0; side <= 1; ++side) {
 		float z = (side?1.0:0.0);
 		float nz = (side?1.0:-1.0);
@@ -297,8 +298,8 @@ the transforms array is filled with with the transformations encountered at each
 leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
-void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount, 
-	int resolution, int coloringIndex)
+void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
+				  int resolution, int coloringIndex)
 {
 	int i;
 
@@ -310,8 +311,8 @@ void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCo
 	*ancestorCount += 1;
 	if (c->type == BASE_CIRCLE_CANETYPE)
 	{
-		meshCircularBaseCane(geometry, ancestors, *ancestorCount, 
-			resolution, c, coloringIndex);
+		meshCircularBaseCane(geometry, ancestors, *ancestorCount,
+							 resolution, c, coloringIndex);
 	}
 	else
 	{
@@ -319,10 +320,10 @@ void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCo
 		{
 			if (coloringIndex == -1)
 				generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
-					resolution, i);
+							 resolution, i);
 			else
 				generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
-					resolution, coloringIndex);
+							 resolution, coloringIndex);
 		}
 	}
 	*ancestorCount -= 1;

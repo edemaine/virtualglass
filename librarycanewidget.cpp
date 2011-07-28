@@ -1,8 +1,8 @@
 
 #include "librarycanewidget.h"
 
-LibraryCaneWidget :: LibraryCaneWidget(OpenGLWidget* o, Model* m, 
-	QWidget* parent=0): QLabel(parent)
+LibraryCaneWidget :: LibraryCaneWidget(OpenGLWidget* o, Model* m,
+									   QWidget* parent=0): QLabel(parent)
 {
 	model = m;
 	cane = model->getCane()->deepCopy();

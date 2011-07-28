@@ -19,80 +19,87 @@ class OpenGLWidget : public QGLWidget
 {
 	Q_OBJECT
 
-	public:
-		Model* getModel();
-		OpenGLWidget(QWidget* parent, Model* model);
-		void updateResolution(int new_resolution);
-		void setMode(int mode);
-		void setCamera(float theta, float fee);
-		Point getCameraPoint();
-		Vector3f getCameraDirection();
-		void saveObjFile(std::string const &filename);
-		void setShiftButtonDown(bool state);
-		void setBgColor(QColor color);
-		void setAxes(bool show);
-		void setGrid(bool show);
-		void exactInput();
+public:
+	Model* getModel();
+	OpenGLWidget(QWidget* parent, Model* model);
+	void updateResolution(int new_resolution);
+	void setMode(int mode);
+	void setCamera(float theta, float fee);
+	Point getCameraPoint();
+	Vector3f getCameraDirection();
+	void saveObjFile(std::string const &filename);
+	void setShiftButtonDown(bool state);
+	void setControlButtonDown(bool state);
+	void setDeleteButtonDown(bool state);
+	void setBgColor(QColor color);
+	void setAxes(bool show);
+	void setGrid(bool show);
+	void exactInput();
 
-	private:
-		CaneHistory* history;
-		bool shiftButtonDown;
-		bool rightMouseDown;
-		bool isOrthographic;
-		QColor bgColor;
-		QFormLayout* tableForm;
-		QDoubleSpinBox* stretchInput;
-		QDoubleSpinBox* twistInput;
-		//QDialogButtonBox* buttonsPull;
-		QDoubleSpinBox* flattenInput;
-		QDoubleSpinBox* rectangleInput;
-		//QDialogButtonBox* buttonsFlatten;
-		Model* model;
-		Geometry *geometry;
-		int resolution;
-		bool showAxes;
-		bool showGrid;
-		bool lockView;
+private:
+	CaneHistory* history;
+	bool shiftButtonDown;
+	bool rightMouseDown;
+	bool controlButtonDown;
+	bool deleteButtonDown;
+	bool isOrthographic;
+	QColor bgColor;
+	QFormLayout* tableForm;
+	QDoubleSpinBox* stretchInput;
+	QDoubleSpinBox* twistInput;
+	//QDialogButtonBox* buttonsPull;
+	QDoubleSpinBox* flattenInput;
+	QDoubleSpinBox* rectangleInput;
+	//QDialogButtonBox* buttonsFlatten;
+	Model* model;
+	Geometry *geometry;
+	int resolution;
+	bool showAxes;
+	bool showGrid;
+	bool lockView;
 
-		float lookAtLoc[3];
-		float theta, fee, rho;
+	float lookAtLoc[3];
+	float theta, fee, rho;
 
-		int mouseLocX, mouseLocY;
+	int mouseLocX, mouseLocY;
 
-		int getSubcaneUnderMouse(int mouseX, int mouseY);
-		void setGLMatrices();
-		void drawAxes();
-		void drawGrid();
-		void drawSnapPoints();
-		void drawTriangle(Triangle* t);
-		void updateTriangles();
+	int getSubcaneUnderMouse(int mouseX, int mouseY);
+	void setGLMatrices();
+	void drawAxes();
+	void drawGrid();
+	void drawSnapPoints();
+	void drawTriangle(Triangle* t);
+	void updateTriangles();
+	Point getClickedPoint(int mouseLocX, int mouseLocY);
+	Point getPointOnPlane(Point clickPoint);
+	Point getPointOnPlane(int mouseLocX, int mouseLocY);
 
-	signals:
-		void modeChangedSig(int mode);
-		void operationInfoSig(QString str,int msec);
+signals:
+	void modeChangedSig(int mode);
+	void operationInfoSig(QString str,int msec);
 
-	public slots:
-		void zoomIn();
-		void zoomOut();
-		void caneChanged();
-		void setFrontView();
-		void setTopView();
-		void setSideView();
-		void switchProjection();
-		void toggleAxes();
-		void toggleGrid();
-		void lockTable();
-		void processPull();
-		void processFlatten();
+public slots:
+	void zoomIn();
+	void zoomOut();
+	void caneChanged();
+	void setFrontView();
+	void setTopView();
+	void setSideView();
+	void switchProjection();
+	void toggleAxes();
+	void toggleGrid();
+	void lockTable();
+	void processPull();
+	void processFlatten();
 
-	protected:
-		void initializeGL();
-		void paintGL();
-		void resizeGL(int width, int height);
-		void mousePressEvent(QMouseEvent* e);
-		void mouseReleaseEvent(QMouseEvent* e);
-		void mouseMoveEvent(QMouseEvent* e);
-		void wheelEvent(QWheelEvent* e);
+protected:
+	void initializeGL();
+	void paintGL();
+	void resizeGL(int width, int height);
+	void mousePressEvent(QMouseEvent* e);
+	void mouseReleaseEvent(QMouseEvent* e);
+	void mouseMoveEvent(QMouseEvent* e);
+	void wheelEvent(QWheelEvent* e);
 };
 
 #endif

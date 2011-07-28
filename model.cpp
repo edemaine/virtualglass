@@ -50,6 +50,8 @@ void Model :: setActiveSubcane(int subcane)
 {
 	if (cane == NULL)
 		return;
+	//if (subcane<0 || subcane >= cane->subcaneCount)
+	//	return;
 	if (activeSubcane != subcane)
 	{
 		activeSubcane = subcane;
@@ -136,6 +138,17 @@ void Model :: pullCane(float twistAmount, float stretchAmount)
 	emit caneChanged();
 }
 
+void Model :: pullActiveCane(float twistAmount, float stretchAmount)
+{
+	if (cane == NULL || activeSubcane == -1)
+		return;
+	if (cane->subcanes[activeSubcane]->type != PULL_CANETYPE)
+		history->saveState(cane);
+	cane->pullIntuitive(activeSubcane,twistAmount, stretchAmount);
+	geometryOutOfDate();
+	emit caneChanged();
+}
+
 void Model :: flattenCane(float rectangle_ratio, float rectangle_theta, float flatness)
 {
 	if (cane == NULL)
@@ -147,11 +160,41 @@ void Model :: flattenCane(float rectangle_ratio, float rectangle_theta, float fl
 	emit caneChanged();
 }
 
+void Model :: flattenActiveCane(float rectangle_ratio, float rectangle_theta, float flatness)
+{
+	if (cane == NULL || activeSubcane == -1)
+		return;
+	if (cane->subcanes[activeSubcane]->type != FLATTEN_CANETYPE)
+		history->saveState(cane);
+	cane->flatten(activeSubcane, rectangle_ratio, rectangle_theta, flatness);
+	geometryOutOfDate();
+	emit caneChanged();
+}
+
 void Model :: moveCane(float delta_x, float delta_y)
 {
 	if (cane == NULL || activeSubcane == -1)
 		return;
 	cane->moveCane(activeSubcane, delta_x, delta_y);
+	geometryOutOfDate();
+	emit caneChanged();
+}
+
+void Model :: moveCane(float delta_z)
+{
+	if (cane == NULL || activeSubcane == -1)
+		return;
+	cane->moveCane(activeSubcane, delta_z);
+	geometryOutOfDate();
+	emit caneChanged();
+}
+
+void Model :: deleteActiveCane()
+{
+	if (cane == NULL || activeSubcane == -1)
+		return;
+	history->saveState(cane);
+	cane->deleteCane(activeSubcane);
 	geometryOutOfDate();
 	emit caneChanged();
 }
@@ -187,10 +230,34 @@ void Model :: saveObjFile(std::string const &filename)
 	highResGeometry.save_obj_file(filename);
 }
 
-void Model :: addSnapPoint(Point p){
+int Model :: addSnapPoint(Point p)
+{
 	this->snapPoints[snapCount] = p;
-	if (snapCount<MAX_SNAP-1)
+	return snapCount;
+}
+
+void Model :: modifySnapPoint(float radii,int index)
+{
+	this->snapRadii[index] += radii;
+}
+
+Point Model :: finalizeSnapPoint(int index)
+{
+	if (snapRadii[index]<0)
+		snapRadii[index]=-snapRadii[index];
+	if (snapCount<MAX_SNAP-1 && snapRadii[index]!=0)
 		snapCount++;
+	return this->snapPoints[snapCount-1];
+}
+
+void Model :: modifySnapPoint(float radii)
+{
+	modifySnapPoint(radii,snapCount);
+}
+
+Point Model :: finalizeSnapPoint()
+{
+	return finalizeSnapPoint(snapCount);
 }
 
 int Model :: snap_count()
@@ -201,4 +268,9 @@ int Model :: snap_count()
 Point Model :: snapPoint(int index)
 {
 	return snapPoints[index];
+}
+
+float Model :: snapRadius(int index)
+{
+	return snapRadii[index];
 }

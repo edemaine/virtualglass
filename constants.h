@@ -39,6 +39,11 @@
 #define TOP_VIEW 3
 #define SIDE_VIEW 4
 
+#define NO_SNAP 0
+#define SNAP_POINT 1
+#define SNAP_LINE 2
+#define SNAP_CIRCLE 3
+
 #define PI 3.14159265358979323846f
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
