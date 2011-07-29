@@ -247,15 +247,17 @@ void OpenGLWidget :: drawSnapPoints()
 		glTranslatef(model->snapPoint(SNAP_POINT,i).x,model->snapPoint(SNAP_POINT,i).y,0);
 		for (int j=1;j<=5;j++)
 		{
-			glColor3f(1.0/j,1.0/j,1.0/j);
+			glColor3f((1-bgColor.redF())/j,(1-bgColor.greenF())/j,(1-bgColor.blueF())/j);
+			//glColor3f(1.0/j,1.0/j,1.0/j);
 			glBegin(GL_LINES);
 			glVertex3f(0,0,max*(j-1));
 			glVertex3f(0,0,max*j);
 			glEnd();
 
 		}
-		glColor3f(0.75,0.75,0.75);
 
+		glColor3f((1-bgColor.redF())*3/4,(1-bgColor.greenF())*3/4,(1-bgColor.blueF())*3/4);
+		//glColor3f(0.75,0.75,0.75);
 		glBegin(GL_TRIANGLE_FAN);
 		glVertex3f(0,0,0);
 		for (int angle=0;angle<=360;angle+=10){
@@ -278,14 +280,16 @@ void OpenGLWidget :: drawSnapCircles()
 		glTranslatef(model->snapPoint(SNAP_CIRCLE,i).x,model->snapPoint(SNAP_CIRCLE,i).y,0);
 		for (int j=1;j<=5;j++)
 		{
-			glColor3f(1.0/j,1.0/j,1.0/j);
+			glColor3f((1-bgColor.redF())/j,(1-bgColor.greenF())/j,(1-bgColor.blueF())/j);
+			//glColor3f(1.0/j,1.0/j,1.0/j);
 			glBegin(GL_LINES);
 			glVertex3f(0,0,max*(j-1));
 			glVertex3f(0,0,max*j);
 			glEnd();
 
 		}
-		glColor3f(0.75,0.75,0.75);
+		glColor3f((1-bgColor.redF())*3/4,(1-bgColor.greenF())*3/4,(1-bgColor.blueF())*3/4);
+		//glColor3f(0.75,0.75,0.75);
 
 		glBegin(GL_LINE_LOOP);
 		for (int angle=0;angle<=360;angle+=10){
@@ -308,7 +312,8 @@ void OpenGLWidget :: drawSnapLines()
 		glTranslatef(model->snapPoint(SNAP_LINE,i).x,model->snapPoint(SNAP_LINE,i).y,0);
 		for (int j=1;j<=5;j++)
 		{
-			glColor3f(1.0/j,1.0/j,1.0/j);
+			glColor3f((1-bgColor.redF())/j,(1-bgColor.greenF())/j,(1-bgColor.blueF())/j);
+			//glColor3f(1.0/j,1.0/j,1.0/j);
 			glBegin(GL_LINES);
 			glVertex3f(0,0,max*(j-1));
 			glVertex3f(0,0,max*j);
@@ -321,19 +326,22 @@ void OpenGLWidget :: drawSnapLines()
 		glTranslatef(model->snapPoint2(SNAP_LINE,i).x,model->snapPoint2(SNAP_LINE,i).y,0);
 		for (int j=1;j<=5;j++)
 		{
-			glColor3f(1.0/j,1.0/j,1.0/j);
+			glColor3f((1-bgColor.redF())/j,(1-bgColor.greenF())/j,(1-bgColor.blueF())/j);
+			//glColor3f(1.0/j,1.0/j,1.0/j);
 			glBegin(GL_LINES);
 			glVertex3f(0,0,max*(j-1));
 			glVertex3f(0,0,max*j);
 			glEnd();
 
 		}
-		glColor3f(0.75,0.75,0.75);
+		glColor3f((1-bgColor.redF())*3/4,(1-bgColor.greenF())*3/4,(1-bgColor.blueF())*3/4);
+		//glColor3f(0.75,0.75,0.75);
 		glPopMatrix();
 
 		glPushMatrix();
 		glBegin(GL_LINES);
-		glColor3f(0.75,0.75,0.75);
+		glColor3f((1-bgColor.redF())*3/4,(1-bgColor.greenF())*3/4,(1-bgColor.blueF())*3/4);
+		//glColor3f(0.75,0.75,0.75);
 		glVertex3f(model->snapPoint(SNAP_LINE,i).x,model->snapPoint(SNAP_LINE,i).y,0);
 		glVertex3f(model->snapPoint2(SNAP_LINE,i).x,model->snapPoint2(SNAP_LINE,i).y,0);
 		glEnd();

@@ -10,6 +10,7 @@ Model :: Model()
 	lowResGeometryFresh = 0;
 	highResGeometryFresh = 0;
 	activeSubcane = -1;
+
 	activeSnapMode = NO_SNAP;
 	activeSnapIndex = 0;
 	activeSnapPlacementMode = NO_SNAP;
@@ -30,6 +31,19 @@ Model :: Model()
 void Model :: clearCurrentCane()
 {
 	mode = 0;
+	activeSnapMode = NO_SNAP;
+	activeSnapIndex = 0;
+	activeSnapPlacementMode = NO_SNAP;
+	for (int i = 0; i < MAX_SNAP; ++i)
+	{
+		snapPoints[i].x=snapPoints[i].y=snapPoints[i].z=0.0;
+		snapPointRadii[i]=0.0;
+		snapSegments1[i].x=snapSegments1[i].y=snapSegments1[i].z=0.0;
+		snapSegments2[i].x=snapSegments2[i].y=snapSegments2[i].z=0.0;
+		snapCircles[i].x=snapCircles[i].y=snapCircles[i].z=0.0;
+		snapCircleRadii[i]=0.0;
+	}
+	snapPointsCount=snapLinesCount=snapCirclesCount=0;
 	setCane(NULL);
 }
 
