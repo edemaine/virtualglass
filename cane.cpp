@@ -216,18 +216,18 @@ void Cane :: createBundle()
 	this->shallowCopy(copy);
 	this->reset();
 	this->type = BUNDLE_CANETYPE;
-	this->subcaneCount = 2;
-	this->subcanes[1] = copy;
+	this->subcaneCount = 1;
+	this->subcanes[0] = copy;
 	//
-	Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
-	c->color.r = 1.0;
-	c->color.g = 1.0;
-	c->color.b = 1.0;
-	c->color.a = 0.10;
-	this->amts[0] = 0.0;
-	this->amts[1] = 10.0;
+	//Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
+	//c->color.r = 1.0;
+	//c->color.g = 1.0;
+	//c->color.b = 1.0;
+	//c->color.a = 0.95;
+	//this->amts[0] = 0.0;
+	//this->amts[1] = 10.0;
 
-	this->subcanes[0] = c;
+	//this->subcanes[1] = c;
 }
 
 void Cane :: moveCane(int subcane, float delta_x, float delta_y)
