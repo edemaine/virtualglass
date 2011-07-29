@@ -30,6 +30,7 @@ public:
 	void pullCane(float twistAmount, float stretchFactor);
 	void pullActiveCane(float twistAmount, float stretchFactor);
 	void moveCane(float delta_x, float delta_y);
+	void moveCaneTo(float delta_x, float delta_y);
 	void moveCane(float delta_z);
 	void flattenCane(float rectangle_ratio, float rectangle_theta, float flatness);
 	void flattenActiveCane(float rectangle_ratio, float rectangle_theta, float flatness);
@@ -53,7 +54,9 @@ public:
 	Point snapPoint2(int index);
 	float snapPointRadius(int snapMode, int index);
 
-
+	int getActiveSnapMode();
+	int getActiveSnapIndex();
+	void clearActiveSnap();
 
 signals:
 	void caneChanged();
@@ -87,9 +90,9 @@ private:
 	float snapCircleRadii[MAX_SNAP];
 	int snapCirclesCount;
 
-	int activeSnapPlacementMode;
 	int activeSnapMode; // Which snap is being activated, or 0 if not;
 	int activeSnapIndex;
+	int activeSnapPlacementMode;
 
 	void geometryOutOfDate();
 	void updateLowResGeometry();

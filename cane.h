@@ -25,6 +25,7 @@ public:
 	void add(Cane* addl);
 	void deleteCane(int subcane);
 	void moveCane(int subcane, float delta_x, float delta_y);
+	void moveCaneTo(int subcane, float delta_x, float delta_y);
 	void moveCane(int subcane, float delta_z);
 	int leafNodes();
 	Cane* deepCopy();
@@ -37,6 +38,7 @@ public:
 	Point subcaneLocations[MAX_SUBCANE_COUNT]; // z is center displacement
 	Cane* subcanes[MAX_SUBCANE_COUNT];
 	Color color;
+
 };
 
 

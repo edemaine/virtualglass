@@ -31,6 +31,7 @@ Model :: Model()
 void Model :: clearCurrentCane()
 {
 	mode = 0;
+
 	activeSnapMode = NO_SNAP;
 	activeSnapIndex = 0;
 	activeSnapPlacementMode = NO_SNAP;
@@ -216,6 +217,63 @@ void Model :: moveCane(float delta_x, float delta_y)
 	if (cane == NULL || activeSubcane == -1)
 		return;
 	cane->moveCane(activeSubcane, delta_x, delta_y);
+
+	// check if cane hits any snaps
+
+	Point loc = cane->subcaneLocations[activeSubcane];
+	for (int i=0; i<snapPointsCount;i++){
+		if (length(loc-snapPoint(SNAP_POINT,i))<snapPointRadius(SNAP_POINT,i))
+		{
+			activeSnapMode = SNAP_POINT;
+			activeSnapIndex = i;
+			geometryOutOfDate();
+			emit caneChanged();
+			return;
+		}
+	}
+
+	for (int i=0; i<snapCirclesCount;i++){
+		float dist = length(loc-snapPoint(SNAP_CIRCLE,i));
+		float radi = snapPointRadius(SNAP_CIRCLE,i);
+		if (radi*0.7<dist && dist<radi*1.3)
+		{
+			activeSnapMode = SNAP_CIRCLE;
+			activeSnapIndex = i;
+			geometryOutOfDate();
+			emit caneChanged();
+			return;
+		}
+	}
+
+	for (int i=0; i<snapLinesCount;i++){
+		Point p1 = snapPoint(SNAP_LINE,i);
+		Point p2 = snapPoint2(SNAP_LINE,i);
+		Point a = loc-p1;
+		Point b = p2-p1;
+		Point dist = (a*b/(b*b))*b;
+		Point p = dist+p1;
+		Point displacement = loc - p;
+		if (length(displacement)<0.15 && length(dist)<length(b) && length(dist)>0)
+		{
+			activeSnapMode = SNAP_LINE;
+			activeSnapIndex = i;
+			geometryOutOfDate();
+			emit caneChanged();
+			return;
+		}
+	}
+
+	clearActiveSnap();
+	geometryOutOfDate();
+	emit caneChanged();
+}
+
+void Model :: moveCaneTo(float delta_x, float delta_y)
+{
+	if (cane == NULL || activeSubcane == -1)
+		return;
+	cane->moveCaneTo(activeSubcane, delta_x, delta_y);
+
 	geometryOutOfDate();
 	emit caneChanged();
 }
@@ -457,4 +515,20 @@ float Model :: snapPointRadius(int snapMode, int index)
 	default:
 		return -1;
 	}
+}
+
+int Model :: getActiveSnapMode()
+{
+	return activeSnapMode;
+}
+
+int Model :: getActiveSnapIndex()
+{
+	return activeSnapIndex;
+}
+
+void Model :: clearActiveSnap()
+{
+	activeSnapMode = NO_SNAP;
+	activeSnapIndex = -1;
 }

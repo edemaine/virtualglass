@@ -237,6 +237,24 @@ void OpenGLWidget :: paintGL()
 	//called automatically: swapBuffers();
 }
 
+void drawCircle(float radius)
+{
+	glBegin(GL_LINE_LOOP);
+	for (int angle=0;angle<=360;angle+=10){
+		glVertex3f(radius*cos(angle*PI/180.),radius*sin(angle*PI/180.),0);
+	}
+	glEnd();
+}
+
+void drawDottedCircle(float radius)
+{
+	glBegin(GL_LINE_LOOP);
+	for (int angle=0;angle<=360;angle+=10){
+		glVertex3f(radius*cos(angle*PI/180.),radius*sin(angle*PI/180.),0);
+	}
+	glEnd();
+}
+
 void OpenGLWidget :: drawSnapPoints()
 {
 
@@ -258,12 +276,7 @@ void OpenGLWidget :: drawSnapPoints()
 
 		glColor3f((1-bgColor.redF())*3/4,(1-bgColor.greenF())*3/4,(1-bgColor.blueF())*3/4);
 		//glColor3f(0.75,0.75,0.75);
-		glBegin(GL_TRIANGLE_FAN);
-		glVertex3f(0,0,0);
-		for (int angle=0;angle<=360;angle+=10){
-			glVertex3f(model->snapPointRadius(SNAP_POINT,i)*cos(angle*PI/180.),model->snapPointRadius(SNAP_POINT,i)*sin(angle*PI/180.),0);
-		}
-		glEnd();
+		drawCircle(model->snapPointRadius(SNAP_POINT,i));
 
 		glPopMatrix();
 	}
@@ -273,7 +286,7 @@ void OpenGLWidget :: drawSnapPoints()
 void OpenGLWidget :: drawSnapCircles()
 {
 
-	float max=0.02;
+	float max=0.015;
 	for (int i=0;i<=model->snapPointCount(SNAP_CIRCLE);i++)
 	{
 		glPushMatrix();
@@ -291,21 +304,29 @@ void OpenGLWidget :: drawSnapCircles()
 		glColor3f((1-bgColor.redF())*3/4,(1-bgColor.greenF())*3/4,(1-bgColor.blueF())*3/4);
 		//glColor3f(0.75,0.75,0.75);
 
-		glBegin(GL_LINE_LOOP);
-		for (int angle=0;angle<=360;angle+=10){
-			glVertex3f(model->snapPointRadius(SNAP_CIRCLE,i)*cos(angle*PI/180.),model->snapPointRadius(SNAP_CIRCLE,i)*sin(angle*PI/180.),0);
-		}
-		glEnd();
+		drawCircle(model->snapPointRadius(SNAP_CIRCLE,i));
+		drawCircle(model->snapPointRadius(SNAP_CIRCLE,i)*0.7);
+		drawCircle(model->snapPointRadius(SNAP_CIRCLE,i)*1.3);
 
 		glPopMatrix();
 	}
 
 }
 
+void drawSegment(Point p1, Point p2)
+{
+	glPushMatrix();
+	glBegin(GL_LINES);
+	glVertex3f(p1.x,p1.y,0);
+	glVertex3f(p2.x,p2.y,0);
+	glEnd();
+	glPopMatrix();
+}
+
 void OpenGLWidget :: drawSnapLines()
 {
 
-	float max=0.02;
+	float max=0.015;
 	for (int i=0;i<=model->snapPointCount(SNAP_LINE);i++)
 	{
 		glPushMatrix();
@@ -334,19 +355,22 @@ void OpenGLWidget :: drawSnapLines()
 			glEnd();
 
 		}
-		glColor3f((1-bgColor.redF())*3/4,(1-bgColor.greenF())*3/4,(1-bgColor.blueF())*3/4);
-		//glColor3f(0.75,0.75,0.75);
 		glPopMatrix();
 
-		glPushMatrix();
-		glBegin(GL_LINES);
 		glColor3f((1-bgColor.redF())*3/4,(1-bgColor.greenF())*3/4,(1-bgColor.blueF())*3/4);
 		//glColor3f(0.75,0.75,0.75);
-		glVertex3f(model->snapPoint(SNAP_LINE,i).x,model->snapPoint(SNAP_LINE,i).y,0);
-		glVertex3f(model->snapPoint2(SNAP_LINE,i).x,model->snapPoint2(SNAP_LINE,i).y,0);
-		glEnd();
-		glPopMatrix();
-
+		Point p1 = model->snapPoint(SNAP_LINE,i);
+		Point p2 = model->snapPoint2(SNAP_LINE,i);
+		drawSegment(p1,p2);
+		Point v = p2-p1;
+		v = p2-p1;
+		v.z = -v.x;
+		v.x = v.y;
+		v.y = v.z;
+		v.z = 0;
+		Point dist=normalize(v)*0.15;
+		drawSegment(p1+dist,p2+dist);
+		drawSegment(p1-dist,p2-dist);
 	}
 
 }
@@ -539,6 +563,43 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 {
 	// Change as part of dual mode feature
 	updateResolution(HIGH_RESOLUTION);
+
+	//check if cane is in a snap, and finalize it if true
+	if (model->getActiveSubcane()!=-1)
+	{
+		if (model->getActiveSnapMode()!=NO_SNAP)
+		{
+			// do stuff!
+			Point p,loc,p1,p2,dist,a,b;
+			switch(model->getActiveSnapMode())
+			{
+			case SNAP_POINT:
+				p=model->snapPoint(SNAP_POINT,model->getActiveSnapIndex());
+				model->moveCaneTo(p.x,p.y);
+				break;
+			case SNAP_LINE:
+				loc=model->getCane()->subcaneLocations[model->getActiveSubcane()];
+				p1 = model->snapPoint(SNAP_LINE,model->getActiveSnapIndex());
+				p2 = model->snapPoint2(SNAP_LINE,model->getActiveSnapIndex());
+				a = loc-p1;
+				b = p2-p1;
+				p = (a*b/(b*b))*b + p1;
+				model->moveCaneTo(p.x,p.y);
+				break;
+			case SNAP_CIRCLE:
+				loc=model->getCane()->subcaneLocations[model->getActiveSubcane()];
+				p=model->snapPoint(SNAP_CIRCLE,model->getActiveSnapIndex());
+				dist=loc-p;
+				dist = dist*model->snapPointRadius(SNAP_CIRCLE,model->getActiveSnapIndex())/length(dist) + p;
+				model->moveCaneTo(dist.x,dist.y);
+				break;
+			}
+			model->clearActiveSnap();
+		}
+		//check if cane is in a snap, and finalize it if true
+		model->setActiveSubcane(-1);
+	}
+
 	if (e->button() == Qt::RightButton){
 		rightMouseDown = false;
 	} else if (model->getMode() == SNAP_MODE || model->getMode() == SNAP_LINE_MODE || model->getMode() == SNAP_CIRCLE_MODE)

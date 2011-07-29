@@ -30,6 +30,7 @@ void Cane :: reset()
 	}
 
 	color.r = color.g = color.b = color.a = 1.0;
+
 }
 
 // Returns the number of nodes in the cane's DAG
@@ -235,6 +236,12 @@ void Cane :: moveCane(int subcane, float delta_x, float delta_y)
 {
 	subcaneLocations[subcane].x += delta_x;
 	subcaneLocations[subcane].y += delta_y;
+}
+
+void Cane :: moveCaneTo(int subcane, float delta_x, float delta_y)
+{
+	subcaneLocations[subcane].x = delta_x;
+	subcaneLocations[subcane].y = delta_y;
 }
 
 void Cane :: moveCane(int subcane, float delta_z)
