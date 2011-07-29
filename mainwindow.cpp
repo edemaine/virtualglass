@@ -52,6 +52,12 @@ void MainWindow::setupMenuBar()
 	connect(exportObj, SIGNAL(triggered()), this, SLOT(saveObjFileDialog()));
 	fileMenu->addAction(exportObj);
 
+	QAction* exportRaw = new QAction(tr("&Export raw"), this);
+	exportRaw->setStatusTip(tr("Save the geometry of the current cane as a .raw file for the visualizer"));
+	connect(exportRaw, SIGNAL(triggered()), this, SLOT(saveRawFile()));
+	fileMenu->addAction(exportRaw);
+
+
 	viewMenu = menuBar()->addMenu(tr("&View"));
 
 	QAction* toggleAxes = new QAction(tr("&Show Axes"), this);
@@ -404,6 +410,11 @@ void MainWindow::saveObjFileDialog()
 	{
 		openglWidget->saveObjFile(qPrintable(file));
 	}
+}
+
+void MainWindow::saveRawFile()
+{
+	openglWidget->saveRawFile("cane.raw");
 }
 
 void MainWindow::colorPickerSelected(QColor color)

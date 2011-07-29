@@ -321,11 +321,18 @@ void Model :: undo()
 
 void Model :: saveObjFile(std::string const &filename)
 {
-	updateHighResGeometry();
+	if (!highResGeometryFresh) {
+		updateHighResGeometry();
+	}
 	highResGeometry.save_obj_file(filename);
+}
 
-	updateHighResGeometry();
-	highResGeometry.save_obj_file(filename);
+void Model :: saveRawFile(std::string const &filename)
+{
+	if (!highResGeometryFresh) {
+		updateHighResGeometry();
+	}
+	highResGeometry.save_raw_file(filename);
 }
 
 int Model :: addSnapPoint(int snapMode, Point p)

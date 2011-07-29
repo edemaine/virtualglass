@@ -38,6 +38,7 @@ public:
 	void addCane(Cane* c);
 	void startMoveMode();
 	void saveObjFile(std::string const &filename);
+	void saveRawFile(std::string const &filename);
 	int getMode();
 
 	int addSnapPoint(int snapMode,Point p);

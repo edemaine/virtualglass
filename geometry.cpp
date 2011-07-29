@@ -1,6 +1,10 @@
 
 #include "geometry.h"
 
+#include <iostream>
+#include <fstream>
+#include <unistd.h>
+
 //compute normals by using area-weighted normals of adjacent triangles.
 //this may not be the correct approximation, but I just wanted some sort of hack
 //to hold us until proper normal transforms could be written.
@@ -41,4 +45,30 @@ void Geometry::save_obj_file(std::string const &filename) const {
 	}
 }
 
+void Geometry::save_raw_file(std::string const &filename) const {
+	unlink(filename.c_str()); //remove file, if it exists
+	{ //write to temp file:
+		std::ofstream file((filename + ".temp").c_str(), std::ios::binary);
 
+		file.write("RCG0", 4); //magic
+		{ //count of verts:
+			uint32_t size = vertices.size();
+			file.write(reinterpret_cast< const char * >(&size), 4);
+		}
+		//Verts should just be six floats:
+		assert(sizeof(Vertex) == 4 * (3 + 3));
+		//write verts:
+		file.write(reinterpret_cast< const char *>(&(vertices[0])), sizeof(Vertex) * vertices.size());
+		{ //count of triangles:
+			uint32_t size = triangles.size();
+			file.write(reinterpret_cast< const char * >(&size), 4);
+		}
+		//Triangles should be 3 32-bit unsigned integer inds:
+		assert(sizeof(Triangle) == 4 * 3);
+		//write triangles:
+		file.write(reinterpret_cast< const char *>(&(triangles[0])), sizeof(Triangle) * triangles.size());
+
+	}
+	//rename temp file to desired name:
+	rename((filename + ".temp").c_str(), filename.c_str());
+}

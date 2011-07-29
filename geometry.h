@@ -4,7 +4,6 @@
 
 #include <vector>
 #include <string>
-#include <fstream>
 #include "primitives.h"
 
 // Mesh stuff
@@ -67,6 +66,7 @@ public:
 	}
 	void compute_normals_from_triangles();
 	void save_obj_file(std::string const &filename) const;
+	void save_raw_file(std::string const &filename) const;
 };
 
 #endif

@@ -30,6 +30,8 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 
 	shiftButtonDown = false;
 	rightMouseDown = false;
+	controlButtonDown = false;
+	deleteButtonDown = false;
 	isOrthographic = false;
 
 	bgColor = QColor(0,0,0);
@@ -56,8 +58,8 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 	fee = PI/4.0;
 	rho = 3.0;
 
-	mouseLocX = 0.0f;
-	mouseLocY = 0.0f;
+	mouseLocX = 0;
+	mouseLocY = 0;
 
 	setMouseTracking(true);
 	updateTriangles();
@@ -140,7 +142,7 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 					   GL_UNSIGNED_INT, &(geometry->triangles[g->begin].v1));
 	}
 	glDisableClientState(GL_VERTEX_ARRAY);
-	uint32_t c;
+	uint32_t c = 0;
 	glReadPixels(mouseX, this->height() - mouseY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &c);
 
 	glEnable(GL_BLEND);
@@ -732,7 +734,9 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 								relX * sin(theta + PI / 2.0) + relY * sin(theta));
 			}
 		}
-		emit operationInfoSig(QString("Moved X Direction %1, Y Direction %2").arg(model->getCane()->subcaneLocations[model->getActiveSubcane()].x).arg(model->getCane()->subcaneLocations[model->getActiveSubcane()].y),1000);
+		if (model->getActiveSubcane() != -1 && model->getCane()) {
+			emit operationInfoSig(QString("Moved X Direction %1, Y Direction %2").arg(model->getCane()->subcaneLocations[model->getActiveSubcane()].x).arg(model->getCane()->subcaneLocations[model->getActiveSubcane()].y),1000);
+		}
 	}
 	else if (model->getMode() == FLATTEN_MODE)
 	{
@@ -797,6 +801,11 @@ Vector3f OpenGLWidget :: getCameraDirection()
 void OpenGLWidget :: saveObjFile(std::string const &filename)
 {
 	model->saveObjFile(filename);
+}
+
+void OpenGLWidget :: saveRawFile(std::string const &filename)
+{
+	model->saveRawFile(filename);
 }
 
 /*

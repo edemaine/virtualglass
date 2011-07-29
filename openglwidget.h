@@ -28,6 +28,7 @@ public:
 	Point getCameraPoint();
 	Vector3f getCameraDirection();
 	void saveObjFile(std::string const &filename);
+	void saveRawFile(std::string const &filename);
 	void setShiftButtonDown(bool state);
 	void setControlButtonDown(bool state);
 	void setDeleteButtonDown(bool state);

@@ -234,18 +234,30 @@ void Cane :: createBundle()
 
 void Cane :: moveCane(int subcane, float delta_x, float delta_y)
 {
+	if ((unsigned)subcane >= (unsigned)subcaneCount) {
+		std::cerr << "Trying to move non-existent subcane " << subcane << std::endl;
+		return;
+	}
 	subcaneLocations[subcane].x += delta_x;
 	subcaneLocations[subcane].y += delta_y;
 }
 
 void Cane :: moveCaneTo(int subcane, float delta_x, float delta_y)
 {
+	if ((unsigned)subcane >= (unsigned)subcaneCount) {
+		std::cerr << "Trying to move non-existent subcane " << subcane << std::endl;
+		return;
+	}
 	subcaneLocations[subcane].x = delta_x;
 	subcaneLocations[subcane].y = delta_y;
 }
 
 void Cane :: moveCane(int subcane, float delta_z)
 {
+	if ((unsigned)subcane >= (unsigned)subcaneCount) {
+		std::cerr << "Trying to move non-existent subcane " << subcane << std::endl;
+		return;
+	}
 	subcaneLocations[subcane].z += delta_z;
 }
 
@@ -254,6 +266,10 @@ void Cane :: add(Cane* addl)
 	if (this->type != BUNDLE_CANETYPE)
 		createBundle();
 
+	if (subcaneCount == MAX_SUBCANE_COUNT) {
+		std::cerr << "Trying to add another subcane when already maxed out." << std::endl;
+		return;
+	}
 	// Add the new cane to the bundle
 	subcanes[subcaneCount] = addl;
 	subcaneLocations[subcaneCount].x = 0;

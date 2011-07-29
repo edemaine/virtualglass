@@ -45,6 +45,7 @@ public slots:
 	void newColorPickerCaneDialog();
 	void changeBgColorDialog();
 	void saveObjFileDialog();
+	void saveRawFile();
 	void colorPickerSelected(QColor color);
 	void libraryCaneDestroyed(QObject* obj);
 	void loadLibraryCane(const YAML::Node& node, Cane* cane);
