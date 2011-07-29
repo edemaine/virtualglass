@@ -101,8 +101,11 @@ void OpenGLWidget :: initializeGL()
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_COLOR_MATERIAL);
+	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glAlphaFunc (GL_LEQUAL, 0.5);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-
+	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
 }
 
@@ -140,6 +143,7 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	uint32_t c;
 	glReadPixels(mouseX, this->height() - mouseY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &c);
 
+	glEnable(GL_BLEND);
 	glEnable(GL_LIGHTING);
 
 	updateTriangles();
@@ -224,6 +228,7 @@ void OpenGLWidget :: paintGL()
 				c.xyz += make_vector(0.1f, 0.1f, 0.1f);
 			}
 			glColor3f(c.r, c.g, c.b);
+			glColor4f(c.r, c.g, c.b, c.a);
 			glDrawElements(GL_TRIANGLES, g->size * 3,
 						   GL_UNSIGNED_INT, &(geometry->triangles[g->begin].v1));
 		}

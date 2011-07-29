@@ -35,6 +35,18 @@ void MainWindow::setupMenuBar()
 
 	fileMenu->addSeparator();
 
+	QAction* importCane = new QAction(tr("&Import Cane"), this);
+	importCane->setStatusTip(tr("Load a saved cane"));
+	connect(importCane, SIGNAL(triggered()), this, SLOT(importCaneDialog()));
+	fileMenu->addAction(importCane);
+
+	QAction* exportCane = new QAction(tr("&Export Cane"), this);
+	exportCane->setStatusTip(tr("Save the current cane to a file"));
+	connect(exportCane, SIGNAL(triggered()), this, SLOT(exportCaneDialog()));
+	fileMenu->addAction(exportCane);
+
+	fileMenu->addSeparator();
+
 	QAction* exportObj = new QAction(tr("&Export to .obj"), this);
 	exportObj->setStatusTip(tr("Save the geometry of the current cane as a .obj file"));
 	connect(exportObj, SIGNAL(triggered()), this, SLOT(saveObjFileDialog()));
@@ -224,22 +236,53 @@ void MainWindow::seedLibrary()
 	c->color.r = 1.0;
 	c->color.g = 0.5;
 	c->color.b = 0.5;
-	c->color.a = 0.7;
+	c->color.a = 0.8;
 	model->setCane(stretch);
 	saveCaneToLibrary();
 	c->color.r = 0.5;
 	c->color.g = 1.0;
 	c->color.b = 0.5;
+	c->color.a = 0.8;
 	model->setCane(stretch);
 	saveCaneToLibrary();
 	c->color.r = 0.5;
 	c->color.g = 0.5;
 	c->color.b = 1.0;
+	c->color.a = 0.8;
 	model->setCane(stretch);
 	saveCaneToLibrary();
 
 	model->setCane(NULL);
 	displayTextMessage("Default library loaded");
+}
+
+void MainWindow :: exportCaneDialog(){
+	QString fileName =  QFileDialog::getSaveFileName();
+
+	YAML::Emitter out;
+	out << 1;
+	out << YAML::BeginSeq;
+
+	Cane* cane = this->openglWidget->getModel()->getCane();
+	out << YAML::Literal << cane->yamlRepresentation();
+	out << YAML::EndSeq;
+
+	QFile file(fileName);
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+		return;
+
+	file.reset();
+
+	QTextStream outStream(&file);
+	outStream << out.c_str() << "\n";
+	outStream.flush();
+	file.close();
+
+	displayTextMessage("Cane Saved to: " + fileName);
+}
+
+void MainWindow :: importCaneDialog(){
+	importLibraryDialog();
 }
 
 void MainWindow::exportLibraryDialog()
