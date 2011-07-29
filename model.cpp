@@ -1,5 +1,6 @@
 
 #include "model.h"
+#include <QMessageBox>
 
 Model :: Model()
 {
@@ -9,12 +10,20 @@ Model :: Model()
 	lowResGeometryFresh = 0;
 	highResGeometryFresh = 0;
 	activeSubcane = -1;
+	activeSnapMode = NO_SNAP;
+	activeSnapIndex = 0;
+	activeSnapPlacementMode = NO_SNAP;
 	for (int i = 0; i < MAX_SNAP; ++i)
 	{
 		snapPoints[i].x=snapPoints[i].y=snapPoints[i].z=0.0;
-		snapRadii[i]=0.0;
+		snapPointRadii[i]=0.0;
+		snapSegments1[i].x=snapSegments1[i].y=snapSegments1[i].z=0.0;
+		snapSegments2[i].x=snapSegments2[i].y=snapSegments2[i].z=0.0;
+		snapCircles[i].x=snapCircles[i].y=snapCircles[i].z=0.0;
+		snapCircleRadii[i]=0.0;
 	}
-	snapCount=0;
+	snapPointsCount=snapLinesCount=snapCirclesCount=0;
+
 	geometryOutOfDate();
 }
 
@@ -42,8 +51,25 @@ void Model :: setMode(int mode)
 			cane->createBundle();
 		}
 	}
+	if (mode == SNAP_MODE)
+	{
+		switch(prev_mode)
+		{
+		case SNAP_MODE:
+			this->mode = SNAP_LINE_MODE;
+			break;
+		case SNAP_LINE_MODE:
+			this->mode = SNAP_CIRCLE_MODE;
+			break;
+		case SNAP_CIRCLE_MODE:
+			this->mode = SNAP_MODE;
+			break;
+		default:
+			break;
+		}
+	}
 
-	emit modeChanged(mode);
+	emit modeChanged(this->mode);
 }
 
 void Model :: setActiveSubcane(int subcane)
@@ -230,47 +256,191 @@ void Model :: saveObjFile(std::string const &filename)
 	highResGeometry.save_obj_file(filename);
 }
 
-int Model :: addSnapPoint(Point p)
+int Model :: addSnapPoint(int snapMode, Point p)
 {
-	this->snapPoints[snapCount] = p;
-	return snapCount;
+	activeSnapPlacementMode = snapMode;
+	switch(snapMode)
+	{
+	case SNAP_POINT:
+		this->snapPoints[snapPointsCount] = p;
+		return snapPointsCount;
+	case SNAP_LINE:
+		this->snapSegments1[snapLinesCount] = p;
+		this->snapSegments2[snapLinesCount] = p;
+		return snapLinesCount;
+	case SNAP_CIRCLE:
+		this->snapCircles[snapCirclesCount] = p;
+		return snapCirclesCount;
+	default:
+		activeSnapPlacementMode = NO_SNAP;
+		return -1;
+	}
 }
 
 void Model :: modifySnapPoint(float radii,int index)
 {
-	this->snapRadii[index] += radii;
+	switch(activeSnapPlacementMode)
+	{
+	case SNAP_POINT:
+		this->snapPointRadii[index] = radii;
+		break;
+	case SNAP_CIRCLE:
+		this->snapCircleRadii[index] = radii;
+		break;
+	default:
+		break;
+	}
 }
 
 Point Model :: finalizeSnapPoint(int index)
 {
-	if (snapRadii[index]<0)
-		snapRadii[index]=-snapRadii[index];
-	if (snapCount<MAX_SNAP-1 && snapRadii[index]!=0)
-		snapCount++;
-	return this->snapPoints[snapCount-1];
+	switch(activeSnapPlacementMode)
+	{
+	case SNAP_POINT:
+		activeSnapPlacementMode = NO_SNAP;
+		if (snapPointRadii[index]<0)
+			snapPointRadii[index]=-snapPointRadii[index];
+		if (snapPointsCount<MAX_SNAP-1 && snapPointRadii[index]!=0)
+			snapPointsCount++;
+		return this->snapPoints[snapPointsCount-1];
+	case SNAP_LINE:
+		activeSnapPlacementMode = NO_SNAP;
+		if (snapLinesCount<MAX_SNAP-1 && snapSegments2[index]!=snapSegments1[index])
+			snapLinesCount++;
+		return this->snapSegments2[snapLinesCount-1];
+	case SNAP_CIRCLE:
+		activeSnapPlacementMode = NO_SNAP;
+		if (snapCircleRadii[index]<0)
+			snapCircleRadii[index]=-snapCircleRadii[index];
+		if (snapCirclesCount<MAX_SNAP-1 && snapCircleRadii[index]!=0)
+			snapCirclesCount++;
+		return this->snapCircles[snapCirclesCount-1];
+	default:
+		return Point();
+	}
+
 }
 
 void Model :: modifySnapPoint(float radii)
 {
-	modifySnapPoint(radii,snapCount);
+	switch(activeSnapPlacementMode)
+	{
+	case SNAP_POINT:
+		modifySnapPoint(radii,snapPointsCount);
+		break;
+	case SNAP_CIRCLE:
+		modifySnapPoint(radii,snapCirclesCount);
+		break;
+	default:
+		break;
+	}
+}
+
+void Model :: modifySnapPoint(Point p, int index)
+{
+	Point dir;
+	switch(activeSnapPlacementMode)
+	{
+	case SNAP_POINT:
+		dir = p-snapPoints[index];
+		modifySnapPoint(length(dir),index);
+		break;
+	case SNAP_LINE:
+		snapSegments2[index] = p;
+		break;
+	case SNAP_CIRCLE:
+		dir = p-snapCircles[index];
+		modifySnapPoint(length(dir),index);
+		break;
+	default:
+		break;
+	}
+}
+
+void Model :: modifySnapPoint(Point p)
+{
+	switch(activeSnapPlacementMode)
+	{
+	case SNAP_POINT:
+		modifySnapPoint(p,snapPointsCount);
+		break;
+	case SNAP_LINE:
+		modifySnapPoint(p,snapLinesCount);
+		break;
+	case SNAP_CIRCLE:
+		modifySnapPoint(p,snapCirclesCount);
+		break;
+	default:
+		return;
+	}
 }
 
 Point Model :: finalizeSnapPoint()
 {
-	return finalizeSnapPoint(snapCount);
+	switch(activeSnapPlacementMode)
+	{
+	case SNAP_POINT:
+		return finalizeSnapPoint(snapPointsCount);
+	case SNAP_LINE:
+		return finalizeSnapPoint(snapLinesCount);
+	case SNAP_CIRCLE:
+		return finalizeSnapPoint(snapCirclesCount);
+	default:
+		return Point();
+	}
 }
 
-int Model :: snap_count()
+int Model :: snapPointCount(int snapMode)
 {
-	return snapCount;
+	switch(snapMode)
+	{
+	case SNAP_POINT:
+		return snapPointsCount;
+	case SNAP_LINE:
+		return snapLinesCount;
+	case SNAP_CIRCLE:
+		return snapCirclesCount;
+	default:
+		return -1;
+	}
 }
 
-Point Model :: snapPoint(int index)
+Point Model :: snapPoint(int snapMode, int index)
 {
-	return snapPoints[index];
+	switch(snapMode)
+	{
+	case SNAP_POINT:
+		return snapPoints[index];
+	case SNAP_LINE:
+		return snapSegments1[index];
+	case SNAP_CIRCLE:
+		return snapCircles[index];
+	default:
+		return Point();
+	}
 }
 
-float Model :: snapRadius(int index)
+Point Model :: snapPoint2(int snapMode, int index)
 {
-	return snapRadii[index];
+	if (snapMode == SNAP_LINE)
+		return snapSegments2[index];
+	return Point();
+}
+
+Point Model :: snapPoint2(int index)
+{
+	return snapSegments2[index];
+}
+
+float Model :: snapPointRadius(int snapMode, int index)
+{
+	switch(snapMode)
+	{
+	case SNAP_POINT:
+		return snapPointRadii[index];
+	case SNAP_CIRCLE:
+		return snapCircleRadii[index];
+	default:
+		return -1;
+	}
 }

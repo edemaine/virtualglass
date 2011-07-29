@@ -33,6 +33,8 @@
 #define FLATTEN_MODE 5
 #define WRAP_MODE 6
 #define SNAP_MODE 7
+#define SNAP_LINE_MODE 8
+#define SNAP_CIRCLE_MODE 9
 
 #define FREE_VIEW 1
 #define FRONT_VIEW 2

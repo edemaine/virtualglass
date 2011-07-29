@@ -138,6 +138,14 @@ void MainWindow::modeChanged(int mode)
 		modeLabel->setText("SNAP MODE");
 		displayTextMessage("Click to set individual snap points",0);
 		break;
+	case SNAP_LINE_MODE:
+		modeLabel->setText("SNAP LINE MODE");
+		displayTextMessage("Click to set individual snap lines",0);
+		break;
+	case SNAP_CIRCLE_MODE:
+		modeLabel->setText("SNAP CIRCLE MODE");
+		displayTextMessage("Click to set individual snap circles",0);
+		break;
 	default:
 		modeLabel->setText("UNKNOWN MODE");
 		displayTextMessage("Unknown mode not specified",0);

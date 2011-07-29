@@ -67,12 +67,13 @@ private:
 	void setGLMatrices();
 	void drawAxes();
 	void drawGrid();
+	void drawSnaps();
 	void drawSnapPoints();
+	void drawSnapLines();
+	void drawSnapCircles();
 	void drawTriangle(Triangle* t);
 	void updateTriangles();
-	Point getClickedPoint(int mouseLocX, int mouseLocY);
-	Point getPointOnPlane(Point clickPoint);
-	Point getPointOnPlane(int mouseLocX, int mouseLocY);
+	Point getClickedPlanePoint(int mouseLocX, int mouseLocY);
 
 signals:
 	void modeChangedSig(int mode);

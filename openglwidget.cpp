@@ -147,13 +147,14 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	return (int)c;
 }
 
-Point OpenGLWidget :: getClickedPoint(int mouseLocX, int mouseLocY)
+Point OpenGLWidget :: getClickedPlanePoint(int mouseLocX, int mouseLocY)
 {
 	GLint viewport[4];
 	GLdouble modelview[16];
 	GLdouble projection[16];
 	GLfloat winX, winY, winZ;
 	GLdouble posX, posY, posZ;
+	GLdouble posX1, posY1, posZ1;
 
 	glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
 	glGetDoublev( GL_PROJECTION_MATRIX, projection );
@@ -161,25 +162,25 @@ Point OpenGLWidget :: getClickedPoint(int mouseLocX, int mouseLocY)
 
 	winX = mouseLocX;
 	winY = viewport[3] - mouseLocY;
-	glReadPixels( mouseLocX, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
 
-	gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+	glReadPixels( mouseLocX, int(winY), 1.0, 1.0, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
 
-	Point result;
+	//gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+
+	gluUnProject( winX, winY, 0.0f, modelview, projection, viewport, &posX, &posY, &posZ);
+	gluUnProject( winX, winY, 1.0f, modelview, projection, viewport, &posX1, &posY1, &posZ1);
+
+	Point result, result1;
 	result.x=posX;
 	result.y=posY;
 	result.z=posZ;
-	return result;
-}
+	result1.x=posX1;
+	result1.y=posY1;
+	result1.z=posZ1;
+	Point dir = result1-result;
+	return dir*abs(result.z/dir.z)+result;
 
-Point OpenGLWidget :: getPointOnPlane(Point clickPoint)
-{
-	return clickPoint;
-}
-
-Point OpenGLWidget :: getPointOnPlane(int mouseLocX, int mouseLocY)
-{
-	return getPointOnPlane(getClickedPoint(mouseLocX,mouseLocY));
+	//return result;
 }
 
 /*
@@ -203,7 +204,7 @@ void OpenGLWidget :: paintGL()
 	if (showGrid)
 		drawGrid();
 
-	drawSnapPoints();
+	drawSnaps();
 
 	if (geometry) {
 		glEnable(GL_LIGHTING);
@@ -240,10 +241,10 @@ void OpenGLWidget :: drawSnapPoints()
 {
 
 	float max=0.04;
-	for (int i=0;i<=model->snap_count();i++)
+	for (int i=0;i<=model->snapPointCount(SNAP_POINT);i++)
 	{
 		glPushMatrix();
-		glTranslatef(model->snapPoint(i).x,model->snapPoint(i).y,0);
+		glTranslatef(model->snapPoint(SNAP_POINT,i).x,model->snapPoint(SNAP_POINT,i).y,0);
 		for (int j=1;j<=5;j++)
 		{
 			glColor3f(1.0/j,1.0/j,1.0/j);
@@ -258,13 +259,95 @@ void OpenGLWidget :: drawSnapPoints()
 		glBegin(GL_TRIANGLE_FAN);
 		glVertex3f(0,0,0);
 		for (int angle=0;angle<=360;angle+=10){
-			glVertex3f(model->snapRadius(i)*cos(angle*PI/180.),model->snapRadius(i)*sin(angle*PI/180.),0);
+			glVertex3f(model->snapPointRadius(SNAP_POINT,i)*cos(angle*PI/180.),model->snapPointRadius(SNAP_POINT,i)*sin(angle*PI/180.),0);
 		}
 		glEnd();
 
 		glPopMatrix();
 	}
 
+}
+
+void OpenGLWidget :: drawSnapCircles()
+{
+
+	float max=0.02;
+	for (int i=0;i<=model->snapPointCount(SNAP_CIRCLE);i++)
+	{
+		glPushMatrix();
+		glTranslatef(model->snapPoint(SNAP_CIRCLE,i).x,model->snapPoint(SNAP_CIRCLE,i).y,0);
+		for (int j=1;j<=5;j++)
+		{
+			glColor3f(1.0/j,1.0/j,1.0/j);
+			glBegin(GL_LINES);
+			glVertex3f(0,0,max*(j-1));
+			glVertex3f(0,0,max*j);
+			glEnd();
+
+		}
+		glColor3f(0.75,0.75,0.75);
+
+		glBegin(GL_LINE_LOOP);
+		for (int angle=0;angle<=360;angle+=10){
+			glVertex3f(model->snapPointRadius(SNAP_CIRCLE,i)*cos(angle*PI/180.),model->snapPointRadius(SNAP_CIRCLE,i)*sin(angle*PI/180.),0);
+		}
+		glEnd();
+
+		glPopMatrix();
+	}
+
+}
+
+void OpenGLWidget :: drawSnapLines()
+{
+
+	float max=0.02;
+	for (int i=0;i<=model->snapPointCount(SNAP_LINE);i++)
+	{
+		glPushMatrix();
+		glTranslatef(model->snapPoint(SNAP_LINE,i).x,model->snapPoint(SNAP_LINE,i).y,0);
+		for (int j=1;j<=5;j++)
+		{
+			glColor3f(1.0/j,1.0/j,1.0/j);
+			glBegin(GL_LINES);
+			glVertex3f(0,0,max*(j-1));
+			glVertex3f(0,0,max*j);
+			glEnd();
+
+		}
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(model->snapPoint2(SNAP_LINE,i).x,model->snapPoint2(SNAP_LINE,i).y,0);
+		for (int j=1;j<=5;j++)
+		{
+			glColor3f(1.0/j,1.0/j,1.0/j);
+			glBegin(GL_LINES);
+			glVertex3f(0,0,max*(j-1));
+			glVertex3f(0,0,max*j);
+			glEnd();
+
+		}
+		glColor3f(0.75,0.75,0.75);
+		glPopMatrix();
+
+		glPushMatrix();
+		glBegin(GL_LINES);
+		glColor3f(0.75,0.75,0.75);
+		glVertex3f(model->snapPoint(SNAP_LINE,i).x,model->snapPoint(SNAP_LINE,i).y,0);
+		glVertex3f(model->snapPoint2(SNAP_LINE,i).x,model->snapPoint2(SNAP_LINE,i).y,0);
+		glEnd();
+		glPopMatrix();
+
+	}
+
+}
+
+void OpenGLWidget :: drawSnaps()
+{
+	drawSnapPoints();
+	drawSnapLines();
+	drawSnapCircles();
 }
 
 void OpenGLWidget :: switchProjection()
@@ -419,16 +502,19 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 
 		if (model->getMode() == SNAP_MODE)
 		{
-			Point p;
-			//gluUnProject(p.x,p.y,p.z,)
-			p.x=mouseLocX-width()/2;
-			p.y=-(mouseLocY-height()/2);
-			p.x*=this->rho/700.0;
-			p.y*=this->rho/700.0;
-			p.y+=(PI/2-abs(fee-PI/2))/2.5;
-			p.z=0;
-			model->addSnapPoint(p);
+			Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
+			model->addSnapPoint(SNAP_POINT,p);
 			emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
+		} else if (model->getMode() == SNAP_LINE_MODE)
+		{
+			Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
+			model->addSnapPoint(SNAP_LINE,p);
+			emit operationInfoSig(QString("Snap Line: %1, %2").arg(p.x).arg(p.y),2000);
+		} else if (model->getMode() == SNAP_CIRCLE_MODE)
+		{
+			Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
+			model->addSnapPoint(SNAP_CIRCLE,p);
+			emit operationInfoSig(QString("Snap Circle: %1, %2").arg(p.x).arg(p.y),2000);
 		}
 	}
 	// Change as part of dual mode feature
@@ -447,7 +533,7 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 	updateResolution(HIGH_RESOLUTION);
 	if (e->button() == Qt::RightButton){
 		rightMouseDown = false;
-	} else if (model->getMode() == SNAP_MODE)
+	} else if (model->getMode() == SNAP_MODE || model->getMode() == SNAP_LINE_MODE || model->getMode() == SNAP_CIRCLE_MODE)
 	{
 		Point p = model->finalizeSnapPoint();
 		emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
@@ -483,6 +569,9 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	oldMouseLocY = mouseLocY;
 	mouseLocY = e->y();
 	relY = (mouseLocY - oldMouseLocY) / windowHeight;
+
+	//Point planePoint = getClickedPoint(oldMouseLocX,oldMouseLocY);
+	//emit operationInfoSig(QString("Plane Point: %1, %2, %3").arg(planePoint.x).arg(planePoint.y).arg(planePoint.z),2000);
 
 	/*
  Do something depending on mode.
@@ -582,9 +671,10 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 			model->flattenCane(relX, theta + PI / 2.0, -relY);
 		}
 		emit operationInfoSig(QString("Squished with %1, Flattened into rectangle with %2").arg(model->getCane()->amts[0]).arg(model->getCane()->amts[2]),1000);
-	} else if (model->getMode() == SNAP_MODE)
+	} else if (model->getMode() == SNAP_MODE || model->getMode() == SNAP_LINE_MODE || model->getMode() == SNAP_CIRCLE_MODE)
 	{
-		model->modifySnapPoint(relX);
+		Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
+		model->modifySnapPoint(p);
 		//emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
 		update();
 	}

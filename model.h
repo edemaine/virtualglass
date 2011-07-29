@@ -38,14 +38,20 @@ public:
 	void startMoveMode();
 	void saveObjFile(std::string const &filename);
 	int getMode();
-	int addSnapPoint(Point p);
+
+	int addSnapPoint(int snapMode,Point p);
 	void modifySnapPoint(float radii,int index);
 	void modifySnapPoint(float radii);
+	void modifySnapPoint(Point p);
+	void modifySnapPoint(Point p,int index);
 	Point finalizeSnapPoint(int index);
 	Point finalizeSnapPoint();
-	int snap_count();
-	Point snapPoint(int index);
-	float snapRadius(int index);
+
+	int snapPointCount(int snapMode);
+	Point snapPoint(int snapMode, int index);
+	Point snapPoint2(int snapMode, int index);
+	Point snapPoint2(int index);
+	float snapPointRadius(int snapMode, int index);
 
 
 
@@ -68,9 +74,20 @@ private:
 	int lowResGeometryFresh;
 	int highResGeometryFresh;
 	int activeSubcane;
+
 	Point snapPoints[MAX_SNAP];
-	float snapRadii[MAX_SNAP];
-	int snapCount;
+	float snapPointRadii[MAX_SNAP];
+	int snapPointsCount;
+
+	Point snapSegments1[MAX_SNAP];
+	Point snapSegments2[MAX_SNAP];
+	int snapLinesCount;
+
+	Point snapCircles[MAX_SNAP];
+	float snapCircleRadii[MAX_SNAP];
+	int snapCirclesCount;
+
+	int activeSnapPlacementMode;
 	int activeSnapMode; // Which snap is being activated, or 0 if not;
 	int activeSnapIndex;
 

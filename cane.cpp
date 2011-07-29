@@ -68,6 +68,7 @@ void Cane :: shallowCopy(Cane* dest)
 			dest->subcanes[i] = this->subcanes[i]->deepCopy();
 			dest->subcaneLocations[i].x = this->subcaneLocations[i].x;
 			dest->subcaneLocations[i].y = this->subcaneLocations[i].y;
+			dest->subcaneLocations[i].z = this->subcaneLocations[i].z;
 		}
 		else
 			dest->subcanes[i] = NULL;
@@ -250,6 +251,7 @@ void Cane :: add(Cane* addl)
 	subcanes[subcaneCount] = addl;
 	subcaneLocations[subcaneCount].x = 0;
 	subcaneLocations[subcaneCount].y = 0;
+	subcaneLocations[subcaneCount].z = 0;
 	subcaneCount += 1;
 }
 
@@ -285,6 +287,7 @@ Cane* Cane :: deepCopy()
 			copy->subcanes[i] = this->subcanes[i]->deepCopy();
 			copy->subcaneLocations[i].x = this->subcaneLocations[i].x;
 			copy->subcaneLocations[i].y = this->subcaneLocations[i].y;
+			copy->subcaneLocations[i].z = this->subcaneLocations[i].z;
 		}
 		else
 			copy->subcanes[i] = NULL;
