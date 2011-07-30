@@ -28,7 +28,7 @@ Model :: Model()
 	geometryOutOfDate();
 }
 
-void Model :: clearCurrentCane()
+void Model :: resetAuxiliaries()
 {
 	mode = 0;
 
@@ -45,6 +45,11 @@ void Model :: clearCurrentCane()
 		snapCircleRadii[i]=0.0;
 	}
 	snapPointsCount=snapLinesCount=snapCirclesCount=0;
+}
+
+void Model :: clearCurrentCane()
+{
+	resetAuxiliaries();
 	setCane(NULL);
 }
 
@@ -112,6 +117,8 @@ int Model :: getActiveSubcane()
 void Model :: setCane(Cane* c)
 {
 	history->saveState(cane);
+	if (c==NULL)
+		resetAuxiliaries();
 	cane = c;
 	geometryOutOfDate();
 	emit caneChanged();

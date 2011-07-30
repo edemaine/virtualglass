@@ -237,28 +237,33 @@ void MainWindow::seedLibrary()
 	c->color.b = 0.8;
 	c->color.a = 0.3;
 
-	model->setCane(stretch);
+	//model->setCane(stretch);
+	emit setCaneSig(stretch);
 	saveCaneToLibrary();
 	c->color.r = 1.0;
 	c->color.g = 0.5;
 	c->color.b = 0.5;
 	c->color.a = 0.8;
-	model->setCane(stretch);
+	//model->setCane(stretch);
+	emit setCaneSig(stretch);
 	saveCaneToLibrary();
 	c->color.r = 0.5;
 	c->color.g = 1.0;
 	c->color.b = 0.5;
 	c->color.a = 0.8;
-	model->setCane(stretch);
+	//model->setCane(stretch);
+	emit setCaneSig(stretch);
 	saveCaneToLibrary();
 	c->color.r = 0.5;
 	c->color.g = 0.5;
 	c->color.b = 1.0;
 	c->color.a = 0.8;
-	model->setCane(stretch);
+	//model->setCane(stretch);
+	emit setCaneSig(stretch);
 	saveCaneToLibrary();
 
-	model->setCane(NULL);
+	//model->setCane(NULL);
+	emit setCaneSig(NULL);
 	displayTextMessage("Default library loaded");
 }
 
@@ -300,12 +305,12 @@ void MainWindow :: importCaneDialog(){
 	Cane loadCane = Cane(UNASSIGNED_CANETYPE);
 	loadLibraryCane(doc[0],&loadCane);
 
-	model->setCane(&loadCane);
+	//model->setCane(&loadCane);
 	emit setCaneSig(&loadCane);
 
 	saveCaneToLibrary();
 
-	model->clearCurrentCane();
+	//model->clearCurrentCane();
 	emit setCaneSig(NULL);
 	displayTextMessage("Cane loaded from: " + fileName);
 }
@@ -412,13 +417,13 @@ void MainWindow::importLibraryDialog()
 		Cane loadCane = Cane(UNASSIGNED_CANETYPE);
 		loadLibraryCane(doc[i],&loadCane);
 
-		model->setCane(&loadCane);
+		//model->setCane(&loadCane);
 		emit setCaneSig(&loadCane);
 
 		saveCaneToLibrary();
 	}
 
-	model->clearCurrentCane();
+	//model->clearCurrentCane();
 	emit setCaneSig(NULL);
 	displayTextMessage("Library loaded from: " + fileName);
 }
@@ -450,7 +455,7 @@ void MainWindow::saveRawFile()
 void MainWindow::colorPickerSelected(QColor color)
 {
 	saveCaneToLibrary();
-	model->clearCurrentCane();
+	//model->clearCurrentCane();
 	emit setCaneSig(NULL);
 
 	Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
@@ -464,7 +469,7 @@ void MainWindow::colorPickerSelected(QColor color)
 	c->color.g = color.greenF();
 	c->color.b = color.blueF();
 	c->color.a = color.alphaF();
-	model->setCane(stch);
+	//model->setCane(stch);
 	//saveCaneToLibrary();
 	emit setCaneSig(stch);
 }

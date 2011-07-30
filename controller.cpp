@@ -19,6 +19,7 @@ Controller::Controller(int argc, char **argv)
 	// Connect mainwindow to model
 	connect(model, SIGNAL(textMessage(QString)), mainWindow, SLOT(displayTextMessage(QString)));
 	connect(model, SIGNAL(modeChanged(int)), mainWindow, SLOT(modeChanged(int)));
+	connect(mainWindow, SIGNAL(setCaneSig(Cane*)), model, SLOT(setCane(Cane*)));
 
 	// connect mainwindow buttons to model
 	QSignalMapper* modeSignalMapper = new QSignalMapper(model);

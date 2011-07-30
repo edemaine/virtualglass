@@ -23,7 +23,6 @@ class Model : public QObject
 public:
 	Model();
 	Cane* getCane();
-	void setCane(Cane* c);
 	void setActiveSubcane(int subcane);
 	int getActiveSubcane();
 	Geometry* getGeometry(int resolution);
@@ -68,6 +67,7 @@ public slots:
 	void undo();
 	void setMode(int mode);
 	void clearCurrentCane();
+	void setCane(Cane* c);
 
 private:
 	int mode;
@@ -98,6 +98,7 @@ private:
 	void geometryOutOfDate();
 	void updateLowResGeometry();
 	void updateHighResGeometry();
+	void resetAuxiliaries();
 };
 
 #endif
