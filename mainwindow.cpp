@@ -288,7 +288,26 @@ void MainWindow :: exportCaneDialog(){
 }
 
 void MainWindow :: importCaneDialog(){
-	importLibraryDialog();
+	QString fileName = QFileDialog::getOpenFileName();
+
+	std::ifstream fin(fileName.toStdString().c_str());
+	YAML::Parser parser(fin);
+
+	YAML::Node doc;
+	parser.GetNextDocument(doc);
+	parser.GetNextDocument(doc);
+
+	Cane loadCane = Cane(UNASSIGNED_CANETYPE);
+	loadLibraryCane(doc[0],&loadCane);
+
+	model->setCane(&loadCane);
+	emit setCaneSig(&loadCane);
+
+	saveCaneToLibrary();
+
+	model->clearCurrentCane();
+	emit setCaneSig(NULL);
+	displayTextMessage("Cane loaded from: " + fileName);
 }
 
 void MainWindow::exportLibraryDialog()
@@ -335,17 +354,24 @@ void MainWindow::loadLibraryCane(const YAML::Node& node, Cane* cane)
 
 	newNode["Type"] >> cane->type;
 
-	const YAML::Node& caneAmts = newNode["Amounts"];
+	const YAML::Node& caneAmts = newNode["Defined Amounts"];
 
 	int amtsCount=0;
-	for(YAML::Iterator it2=caneAmts.begin();it2!=caneAmts.end();++it2) {
+
+	for(YAML::Iterator it2=caneAmts.begin();it2!=caneAmts.end();++it2)
+	{
+		std::string temp;
+		*it2 >> temp;
+
+		++it2;
+
 		*it2 >> cane->amts[amtsCount];
 		amtsCount++;
 	}
 
-	newNode["SubCaneCount"] >> cane->subcaneCount;
+	newNode["Number of Subcanes"] >> cane->subcaneCount;
 
-	const YAML::Node& subLocations = newNode["SubCaneLocations"];
+	const YAML::Node& subLocations = newNode["Subcane Locations"];
 	int subLocationCount=0;
 	for(YAML::Iterator it3=subLocations.begin();it3!=subLocations.end();++it3) {
 		const YAML::Node& subCaneLocation = *it3;
@@ -355,12 +381,12 @@ void MainWindow::loadLibraryCane(const YAML::Node& node, Cane* cane)
 		subLocationCount++;
 	}
 
-	newNode["Color"][0] >> cane->color.r;
-	newNode["Color"][1] >> cane->color.g;
-	newNode["Color"][2] >> cane->color.b;
-	newNode["Color"][3] >> cane->color.a;
+	newNode["RGBA Color"][0] >> cane->color.r;
+	newNode["RGBA Color"][1] >> cane->color.g;
+	newNode["RGBA Color"][2] >> cane->color.b;
+	newNode["RGBA Color"][3] >> cane->color.a;
 
-	const YAML::Node& subCanes = newNode["SubCanes"];
+	const YAML::Node& subCanes = newNode["Subcanes"];
 	int subCaneCount = 0;
 	for(YAML::Iterator it4=subCanes.begin();it4!=subCanes.end();++it4) {
 		const YAML::Node& subCane = *it4;
@@ -385,10 +411,14 @@ void MainWindow::importLibraryDialog()
 	for(unsigned i=0;i<doc.size();i++) {
 		Cane loadCane = Cane(UNASSIGNED_CANETYPE);
 		loadLibraryCane(doc[i],&loadCane);
+
+		model->setCane(&loadCane);
 		emit setCaneSig(&loadCane);
+
 		saveCaneToLibrary();
 	}
 
+	model->clearCurrentCane();
 	emit setCaneSig(NULL);
 	displayTextMessage("Library loaded from: " + fileName);
 }
@@ -420,6 +450,7 @@ void MainWindow::saveRawFile()
 void MainWindow::colorPickerSelected(QColor color)
 {
 	saveCaneToLibrary();
+	model->clearCurrentCane();
 	emit setCaneSig(NULL);
 
 	Cane* c = new Cane(BASE_CIRCLE_CANETYPE);

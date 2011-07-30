@@ -343,6 +343,64 @@ float zeroIfNaN(float n)
 	return changeIfNaN(n,0);
 }
 
+std::string typeToName(int type)
+{
+	switch(type)
+	{
+	case PULL_CANETYPE:
+		return "Pull Cane";
+	case BUNDLE_CANETYPE:
+		return "Bundle Cane";
+	case CASING_CANETYPE:
+		return "Casing Cane";
+	case FLATTEN_CANETYPE:
+		return "Flatten Cane";
+	case BASE_CIRCLE_CANETYPE:
+		return "Base Circle Cane";
+	case UNASSIGNED_CANETYPE:
+		return "Unassigned Cane";
+	default:
+		return UNDEFINED;
+	}
+}
+
+std::string amtTypeToName(int type,int index)
+{
+	switch(type)
+	{
+	case PULL_CANETYPE:
+		switch(index)
+		{
+		case 0:
+			return "Twist";
+		case 1:
+			return "Stretch";
+		default:
+			return UNDEFINED;
+		}
+	case BUNDLE_CANETYPE:
+		return UNDEFINED;
+	case CASING_CANETYPE:
+		return UNDEFINED;
+	case FLATTEN_CANETYPE:
+		switch(index)
+		{
+		case 0:
+			return "Rectangle Ratio";
+		case 1:
+			return "Rectangle Theta";
+		case 2:
+			return "Flattened Ratio";
+		default:
+			return UNDEFINED;
+		}
+	case BASE_CIRCLE_CANETYPE:
+		return UNDEFINED;
+	default:
+		return UNDEFINED;
+	}
+}
+
 std::string Cane :: yamlRepresentation()
 {
 	YAML::Emitter out;
@@ -350,17 +408,21 @@ std::string Cane :: yamlRepresentation()
 	out << YAML::Key << "Type";
 	out << YAML::Value << type;
 
-	out << YAML::Key << "Amounts";
+	out << YAML::Key << "Description";
+	out << YAML::Value << typeToName(type);
+
+	out << YAML::Key << "Defined Amounts";
 	out << YAML::Value << YAML::BeginSeq;
 	for (unsigned int j=0;j<sizeof(amts);j++){
+		out << amtTypeToName(type,j);
 		out << zeroIfNaN(amts[j]);
 	}
 	out << YAML::EndSeq;
 
-	out << YAML::Key << "SubCaneCount";
+	out << YAML::Key << "Number of Subcanes";
 	out << YAML::Value << subcaneCount;
 
-	out << YAML::Key << "SubCaneLocations";
+	out << YAML::Key << "Subcane Locations";
 	out << YAML::Value << YAML::BeginSeq;
 	for (int j=0;j<subcaneCount;j++)
 	{
@@ -372,12 +434,12 @@ std::string Cane :: yamlRepresentation()
 	}
 	out << YAML::EndSeq;
 
-	out << YAML::Key << "Color";
+	out << YAML::Key << "RGBA Color";
 	out << YAML::Value << YAML::BeginSeq;
 	out << color.r << color.g << color.b << color.a;
 	out << YAML::EndSeq;
 
-	out << YAML::Key << "SubCanes";
+	out << YAML::Key << "Subcanes";
 	out << YAML::Value << YAML::BeginSeq;
 	for (int j=0;j<subcaneCount;j++){
 		Cane* cane = subcanes[j];
