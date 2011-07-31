@@ -82,6 +82,7 @@ private:
 	QDialog* caneDialog;
 	QColorDialog* colorDialog;
 	QFormLayout* caneForm;
+	QComboBox* caneTypeBox;
 
 
 };

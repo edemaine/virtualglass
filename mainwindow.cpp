@@ -433,10 +433,16 @@ void MainWindow::setupNewColorPickerCaneDialog()
 {
 	caneDialog = new QDialog(NULL);
 	caneForm = new QFormLayout(caneDialog->window());
+
 	colorDialog = new QColorDialog(Qt::white,caneForm->widget());
 	colorDialog->setOptions(QColorDialog::ShowAlphaChannel | QColorDialog::NoButtons);
-
 	caneForm->addRow(colorDialog);
+
+	caneTypeBox = new QComboBox(caneForm->widget());
+	caneTypeBox->addItem("Circle Base",QVariant(BASE_CIRCLE_CANETYPE));
+	caneTypeBox->addItem("Square Base",QVariant(FLATTEN_CANETYPE));
+
+	caneForm->addRow("Base Type",caneTypeBox);
 
 	QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	connect(buttons,SIGNAL(accepted()),caneDialog,SLOT(accept()));
@@ -474,6 +480,11 @@ void MainWindow::saveRawFile()
 void MainWindow::colorPickerSelected()
 {
 	QColor color = colorDialog->currentColor();
+	QVariant data = caneTypeBox->itemData(caneTypeBox->currentIndex());
+	bool isOk = false;
+	int caneType = data.toInt(&isOk);
+	if (!isOk)
+		return;
 
 	saveCaneToLibrary();
 	//model->clearCurrentCane();
@@ -492,6 +503,12 @@ void MainWindow::colorPickerSelected()
 	c->color.a = color.alphaF();
 	//model->setCane(stch);
 	//saveCaneToLibrary();
+
+	if (caneType == FLATTEN_CANETYPE)
+	{
+		stch->flatten(0.0,0.0,1.0);
+	}
+
 	emit setCaneSig(stch);
 }
 
