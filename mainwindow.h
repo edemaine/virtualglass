@@ -46,7 +46,7 @@ public slots:
 	void changeBgColorDialog();
 	void saveObjFileDialog();
 	void saveRawFile();
-	void colorPickerSelected(QColor color);
+	void colorPickerSelected();
 	void libraryCaneDestroyed(QObject* obj);
 	void loadLibraryCane(const YAML::Node& node, Cane* cane);
 	void displayTextMessage(QString message,int msec);
@@ -61,6 +61,7 @@ private:
 	void setupStatusBar();
 	void setupWorkArea();
 	void setupMenuBar();
+	void setupNewColorPickerCaneDialog();
 
 	QMenu* caneMenu;
 	QMenu* viewMenu;
@@ -77,6 +78,10 @@ private:
 	QStatusBar* statusBar;
 	QLabel* modeLabel;
 	int librarySize;
+
+	QDialog* caneDialog;
+	QColorDialog* colorDialog;
+	QFormLayout* caneForm;
 
 
 };

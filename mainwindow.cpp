@@ -13,6 +13,7 @@ MainWindow::MainWindow(Model* model)
 	setupLibraryArea();
 	setupStatusBar();
 	setupMenuBar();
+	setupNewColorPickerCaneDialog();
 	setWindowTitle(tr("Virtual Glass"));
 
 	resize(1000, 750);
@@ -428,9 +429,27 @@ void MainWindow::importLibraryDialog()
 	displayTextMessage("Library loaded from: " + fileName);
 }
 
+void MainWindow::setupNewColorPickerCaneDialog()
+{
+	caneDialog = new QDialog(NULL);
+	caneForm = new QFormLayout(caneDialog->window());
+	colorDialog = new QColorDialog(Qt::white,caneForm->widget());
+	colorDialog->setOptions(QColorDialog::ShowAlphaChannel | QColorDialog::NoButtons);
+
+	caneForm->addRow(colorDialog);
+
+	QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+	connect(buttons,SIGNAL(accepted()),caneDialog,SLOT(accept()));
+	connect(buttons,SIGNAL(accepted()),this,SLOT(colorPickerSelected()));
+	connect(buttons,SIGNAL(rejected()),caneDialog,SLOT(reject()));
+
+	caneForm->addRow(buttons);
+	caneDialog->setLayout(caneForm);
+}
+
 void MainWindow::newColorPickerCaneDialog()
 {
-	colorPickerSelected(QColorDialog::getColor());
+	caneDialog->exec();
 }
 
 void MainWindow::changeBgColorDialog()
@@ -452,8 +471,10 @@ void MainWindow::saveRawFile()
 	openglWidget->saveRawFile("cane.raw");
 }
 
-void MainWindow::colorPickerSelected(QColor color)
+void MainWindow::colorPickerSelected()
 {
+	QColor color = colorDialog->currentColor();
+
 	saveCaneToLibrary();
 	//model->clearCurrentCane();
 	emit setCaneSig(NULL);
