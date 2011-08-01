@@ -38,6 +38,7 @@ Controller::Controller(int argc, char **argv)
 	connect(modeSignalMapper, SIGNAL(mapped(int)), model, SLOT(setMode(int)));
 
 	connect(mainWindow->undo_button, SIGNAL(pressed()), model, SLOT(undo()));
+	connect(mainWindow->redo_button, SIGNAL(pressed()), model, SLOT(redo()));
 	connect(mainWindow->clear_button, SIGNAL(pressed()), model, SLOT(clearCurrentCane()));
 	connect(mainWindow->tabletop_button, SIGNAL(pressed()), mainWindow->openglWidget, SLOT(lockTable()));
 

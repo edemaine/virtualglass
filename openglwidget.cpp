@@ -26,7 +26,7 @@ other parts of the GUI.
 
 OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 {
-	history = new CaneHistory();
+	//history = new CaneHistory();
 
 	shiftButtonDown = false;
 	rightMouseDown = false;
@@ -74,6 +74,7 @@ void OpenGLWidget :: caneChanged()
 {
 	updateTriangles();
 	update();
+	model->getHistory()->setBusy(false);
 }
 
 void OpenGLWidget :: setShiftButtonDown(bool state)

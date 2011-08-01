@@ -23,6 +23,7 @@ class Model : public QObject
 public:
 	Model();
 	Cane* getCane();
+	CaneHistory* getHistory();
 	void setActiveSubcane(int subcane);
 	int getActiveSubcane();
 	Geometry* getGeometry(int resolution);
@@ -65,6 +66,7 @@ signals:
 
 public slots:
 	void undo();
+	void redo();
 	void setMode(int mode);
 	void clearCurrentCane();
 	void setCane(Cane* c);

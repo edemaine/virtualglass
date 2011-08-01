@@ -38,7 +38,7 @@ public:
 	void exactInput();
 
 private:
-	CaneHistory* history;
+	//CaneHistory* history;
 	bool shiftButtonDown;
 	bool rightMouseDown;
 	bool controlButtonDown;

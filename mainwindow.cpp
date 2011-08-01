@@ -527,6 +527,8 @@ void MainWindow::setupWorkArea()
 	snap_button->setToolTip("TODO");
 	undo_button = new QPushButton("Undo");
 	undo_button->setToolTip("Undo the last operation.");
+	redo_button = new QPushButton("Redo");
+	redo_button->setToolTip("Redo the last operation.");
 	save_button = new QPushButton("Save");
 	save_button->setToolTip("Save Current Model to Library");
 	clear_button = new QPushButton("Clear");
@@ -542,6 +544,7 @@ void MainWindow::setupWorkArea()
 	operButton_layout->addWidget(wrap_button);
 	operButton_layout->addWidget(snap_button);
 	operButton_layout->addWidget(undo_button);
+	operButton_layout->addWidget(redo_button);
 	operButton_layout->addWidget(save_button);
 	operButton_layout->addWidget(clear_button);
 	operButton_layout->addWidget(tabletop_button);

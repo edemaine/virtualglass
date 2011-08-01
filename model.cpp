@@ -53,6 +53,11 @@ void Model :: clearCurrentCane()
 	setCane(NULL);
 }
 
+CaneHistory* Model::getHistory()
+{
+	return history;
+}
+
 int Model :: getMode()
 {
 	return mode;
@@ -318,10 +323,42 @@ void Model :: addCane(Cane* c)
 
 void Model :: undo()
 {
-	if (history->isInitial())
+	if (history->isAvailable())
+	{
+		history->setBusy(true);
+	}
+	else
+	{
 		return;
-	cane = history->getState();
-	history->undo();
+	}
+	cane = history->undo();
+	if (cane == NULL)
+	{
+		QMessageBox msg;
+		msg.setText("NULL");
+		msg.exec();
+	}
+	geometryOutOfDate();
+	emit caneChanged();
+}
+
+void Model :: redo()
+{
+	if (history->isAvailable())
+	{
+		history->setBusy(true);
+	}
+	else
+	{
+		return;
+	}
+	cane = history->redo();
+	if (cane == NULL)
+	{
+		QMessageBox msg;
+		msg.setText("NULL");
+		msg.exec();
+	}
 	geometryOutOfDate();
 	emit caneChanged();
 }
