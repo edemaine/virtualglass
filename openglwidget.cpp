@@ -537,10 +537,13 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 		model->setActiveSubcane(getSubcaneUnderMouse(mouseLocX, mouseLocY));
 		if (deleteButtonDown)
 		{
-			model->deleteActiveCane();
+			if (!model->deleteActiveCane())
+			{
+				if (model->getMode() == SNAP_MODE || model->getMode() == SNAP_CIRCLE_MODE || model->getMode() == SNAP_LINE_MODE)
+				model->deleteSnapPoint(getClickedPlanePoint(mouseLocX,mouseLocY));
+			}
 		}
-
-		if (model->getMode() == SNAP_MODE)
+		else if (model->getMode() == SNAP_MODE)
 		{
 			Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
 			model->addSnapPoint(SNAP_POINT,p);
@@ -583,7 +586,7 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 			{
 			case SNAP_POINT:
 				p=model->snapPoint(SNAP_POINT,model->getActiveSnapIndex());
-				model->moveCaneTo(p.x,p.y);
+				//model->moveCaneTo(p.x,p.y);
 				break;
 			case SNAP_LINE:
 				loc=model->getCane()->subcaneLocations[model->getActiveSubcane()];
@@ -592,17 +595,17 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 				a = loc-p1;
 				b = p2-p1;
 				p = (a*b/(b*b))*b + p1;
-				model->moveCaneTo(p.x,p.y);
+				//model->moveCaneTo(p.x,p.y);
 				break;
 			case SNAP_CIRCLE:
 				loc=model->getCane()->subcaneLocations[model->getActiveSubcane()];
 				p=model->snapPoint(SNAP_CIRCLE,model->getActiveSnapIndex());
 				dist=loc-p;
 				dist = dist*model->snapPointRadius(SNAP_CIRCLE,model->getActiveSnapIndex())/length(dist) + p;
-				model->moveCaneTo(dist.x,dist.y);
+				//model->moveCaneTo(dist.x,dist.y);
 				break;
 			}
-			model->clearActiveSnap();
+			model->clearActiveSnap(false);
 		}
 		//check if cane is in a snap, and finalize it if true
 		model->setActiveSubcane(-1);

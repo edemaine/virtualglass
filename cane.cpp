@@ -252,6 +252,11 @@ void Cane :: moveCaneTo(int subcane, float delta_x, float delta_y)
 	subcaneLocations[subcane].y = delta_y;
 }
 
+void Cane :: moveCaneTo(int subcane, Point p)
+{
+	moveCaneTo(subcane,p.x,p.y);
+}
+
 void Cane :: moveCane(int subcane, float delta_z)
 {
 	if ((unsigned)subcane >= (unsigned)subcaneCount) {

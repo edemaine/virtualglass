@@ -34,7 +34,7 @@ public:
 	void moveCane(float delta_z);
 	void flattenCane(float rectangle_ratio, float rectangle_theta, float flatness);
 	void flattenActiveCane(float rectangle_ratio, float rectangle_theta, float flatness);
-	void deleteActiveCane();
+	bool deleteActiveCane();
 	void addCane(Cane* c);
 	void startMoveMode();
 	void saveObjFile(std::string const &filename);
@@ -57,7 +57,9 @@ public:
 
 	int getActiveSnapMode();
 	int getActiveSnapIndex();
-	void clearActiveSnap();
+	void clearActiveSnap(bool holdSnap);
+
+	void deleteSnapPoint(Point p);
 
 signals:
 	void caneChanged();
@@ -96,6 +98,8 @@ private:
 	int activeSnapMode; // Which snap is being activated, or 0 if not;
 	int activeSnapIndex;
 	int activeSnapPlacementMode;
+
+	Point snapHoldPoint;
 
 	void geometryOutOfDate();
 	void updateLowResGeometry();

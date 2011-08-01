@@ -24,7 +24,7 @@ Model :: Model()
 		snapCircleRadii[i]=0.0;
 	}
 	snapPointsCount=snapLinesCount=snapCirclesCount=0;
-
+	snapHoldPoint = Point();
 	geometryOutOfDate();
 }
 
@@ -45,6 +45,7 @@ void Model :: resetAuxiliaries()
 		snapCircleRadii[i]=0.0;
 	}
 	snapPointsCount=snapLinesCount=snapCirclesCount=0;
+	snapHoldPoint = Point();
 }
 
 void Model :: clearCurrentCane()
@@ -228,16 +229,25 @@ void Model :: moveCane(float delta_x, float delta_y)
 {
 	if (cane == NULL || activeSubcane == -1)
 		return;
+
+	if (activeSnapMode != NO_SNAP)
+	{
+		cane->moveCaneTo(activeSubcane,snapHoldPoint);
+	}
+
 	cane->moveCane(activeSubcane, delta_x, delta_y);
 
 	// check if cane hits any snaps
+
 
 	Point loc = cane->subcaneLocations[activeSubcane];
 	for (int i=0; i<snapPointsCount;i++){
 		if (length(loc-snapPoint(SNAP_POINT,i))<snapPointRadius(SNAP_POINT,i))
 		{
+			snapHoldPoint = loc;
 			activeSnapMode = SNAP_POINT;
 			activeSnapIndex = i;
+			cane->moveCaneTo(activeSubcane,snapPoint(SNAP_POINT,i));
 			geometryOutOfDate();
 			emit caneChanged();
 			return;
@@ -245,12 +255,17 @@ void Model :: moveCane(float delta_x, float delta_y)
 	}
 
 	for (int i=0; i<snapCirclesCount;i++){
-		float dist = length(loc-snapPoint(SNAP_CIRCLE,i));
+		Point p=snapPoint(SNAP_CIRCLE,i);
+		Point disp = loc-p;
+		float dist = length(disp);
 		float radi = snapPointRadius(SNAP_CIRCLE,i);
 		if (radi*0.7<dist && dist<radi*1.3)
 		{
+			snapHoldPoint = loc;
 			activeSnapMode = SNAP_CIRCLE;
 			activeSnapIndex = i;
+			disp = disp*radi/dist + p;
+			cane->moveCaneTo(activeSubcane,disp);
 			geometryOutOfDate();
 			emit caneChanged();
 			return;
@@ -267,15 +282,17 @@ void Model :: moveCane(float delta_x, float delta_y)
 		Point displacement = loc - p;
 		if (length(displacement)<0.15 && length(dist)<length(b) && length(dist)>0)
 		{
+			snapHoldPoint = loc;
 			activeSnapMode = SNAP_LINE;
 			activeSnapIndex = i;
+			cane->moveCaneTo(activeSubcane,p);
 			geometryOutOfDate();
 			emit caneChanged();
 			return;
 		}
 	}
 
-	clearActiveSnap();
+	clearActiveSnap(true);
 	geometryOutOfDate();
 	emit caneChanged();
 }
@@ -299,14 +316,15 @@ void Model :: moveCane(float delta_z)
 	emit caneChanged();
 }
 
-void Model :: deleteActiveCane()
+bool Model :: deleteActiveCane()
 {
 	if (cane == NULL || activeSubcane == -1)
-		return;
+		return false;
 	history->saveState(cane);
 	cane->deleteCane(activeSubcane);
 	geometryOutOfDate();
 	emit caneChanged();
+	return true;
 }
 
 void Model :: addCane(Cane* c)
@@ -587,8 +605,72 @@ int Model :: getActiveSnapIndex()
 	return activeSnapIndex;
 }
 
-void Model :: clearActiveSnap()
+void Model :: clearActiveSnap(bool holdSnap)
 {
+	if (activeSnapMode != NO_SNAP && holdSnap)
+		cane->moveCaneTo(activeSubcane,snapHoldPoint);
 	activeSnapMode = NO_SNAP;
 	activeSnapIndex = -1;
+	snapHoldPoint = Point();
+}
+
+void Model :: deleteSnapPoint(Point loc)
+{
+	for (int i=0; i<snapPointsCount;i++){
+		if (length(loc-snapPoint(SNAP_POINT,i))<snapPointRadius(SNAP_POINT,i))
+		{
+			for (int j=i;j<snapPointsCount-1;j++)
+			{
+				snapPoints[j]=snapPoints[j+1];
+				snapPointRadii[j]=snapPointRadii[j+1];
+			}
+			snapPoints[snapPointsCount-1]=Point();
+			snapPointRadii[snapPointsCount-1]=0;
+			snapPointsCount--;
+			return;
+		}
+	}
+
+	for (int i=0; i<snapCirclesCount;i++){
+		Point p=snapPoint(SNAP_CIRCLE,i);
+		Point disp = loc-p;
+		float dist = length(disp);
+		float radi = snapPointRadius(SNAP_CIRCLE,i);
+		if (radi*0.7<dist && dist<radi*1.3)
+		{
+			for (int j=i;j<snapCirclesCount-1;j++)
+			{
+				snapCircles[j]=snapCircles[j+1];
+				snapCircleRadii[j]=snapCircleRadii[j+1];
+			}
+			snapCircles[snapCirclesCount-1]=Point();
+			snapCircleRadii[snapCirclesCount-1]=0;
+			snapCirclesCount--;
+			return;
+		}
+	}
+
+	for (int i=0; i<snapLinesCount;i++){
+		Point p1 = snapPoint(SNAP_LINE,i);
+		Point p2 = snapPoint2(SNAP_LINE,i);
+		Point a = loc-p1;
+		Point b = p2-p1;
+		Point dist = (a*b/(b*b))*b;
+		Point p = dist+p1;
+		Point displacement = loc - p;
+		if (length(displacement)<0.15 && length(dist)<length(b) && length(dist)>0)
+		{
+			for (int j=i;j<snapLinesCount-1;j++)
+			{
+				snapSegments1[j]=snapSegments1[j+1];
+				snapSegments2[j]=snapSegments2[j+1];
+			}
+			snapSegments1[snapLinesCount-1]=Point();
+			snapSegments2[snapLinesCount-1]=Point();
+			snapLinesCount--;
+			return;
+		}
+	}
+
+	clearActiveSnap(false);
 }

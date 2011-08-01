@@ -26,6 +26,7 @@ public:
 	void deleteCane(int subcane);
 	void moveCane(int subcane, float delta_x, float delta_y);
 	void moveCaneTo(int subcane, float delta_x, float delta_y);
+	void moveCaneTo(int subcane, Point p);
 	void moveCane(int subcane, float delta_z);
 	int leafNodes();
 	Cane* deepCopy();
