@@ -86,4 +86,7 @@ void CaneHistory :: setBusy(bool isChanging)
 {
 	this->isChanging = isChanging;
 }
-
+bool CaneHistory :: isMostRecent()
+{
+	return curPast == maxCur + 1;
+}

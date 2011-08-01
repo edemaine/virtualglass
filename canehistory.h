@@ -12,6 +12,7 @@ public:
 	Cane* getState();
 	Cane* undo();
 	Cane* redo();
+	bool isMostRecent();
 	bool isAvailable();
 	bool isBusy();
 	void setBusy(bool isChanging);

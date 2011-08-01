@@ -331,15 +331,22 @@ void Model :: undo()
 	{
 		return;
 	}
-	cane = history->undo();
-	if (cane == NULL)
+	if (history->isMostRecent())
 	{
-		QMessageBox msg;
-		msg.setText("NULL");
-		msg.exec();
+		history->saveState(cane);
+		history->undo();
 	}
-	geometryOutOfDate();
-	emit caneChanged();
+	Cane* temp = history->undo();
+	if (temp != NULL)
+	{
+		cane = temp;
+		geometryOutOfDate();
+		emit caneChanged();
+	}
+	else
+	{
+		history->setBusy(false);
+	}
 }
 
 void Model :: redo()
@@ -352,15 +359,17 @@ void Model :: redo()
 	{
 		return;
 	}
-	cane = history->redo();
-	if (cane == NULL)
+	Cane* temp = history->redo();
+	if (temp != NULL)
 	{
-		QMessageBox msg;
-		msg.setText("NULL");
-		msg.exec();
+		cane = temp;
+		geometryOutOfDate();
+		emit caneChanged();
 	}
-	geometryOutOfDate();
-	emit caneChanged();
+	else
+	{
+		history->setBusy(false);
+	}
 }
 
 void Model :: saveObjFile(std::string const &filename)
