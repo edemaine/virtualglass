@@ -523,7 +523,7 @@ void MainWindow::setupWorkArea()
 	flatten_button->setToolTip("Drag Mouse Horizontally to Squish, Vertically to Flatten");
 	wrap_button = new QPushButton("Wrap");
 	wrap_button->setToolTip("Not Implemented");
-	snap_button = new QPushButton("Snap");
+	snap_button = new QPushButton("Alternate Snap Modes");
 	snap_button->setToolTip("TODO");
 	undo_button = new QPushButton("Undo");
 	undo_button->setToolTip("Undo the last operation.");
