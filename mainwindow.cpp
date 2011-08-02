@@ -559,8 +559,6 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
 {
 	switch (e->key())
 	{
-	case 0x58: // X
-		exit(0);
 	case 0x01000020: // Shift
 		openglWidget->setShiftButtonDown(true);
 		break;
