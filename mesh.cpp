@@ -58,17 +58,21 @@ void applyFlattenTransform(Vertex* v, float rectangleRatio, float rectangleTheta
 	}
 
 	v->position.x = flatness * (cos(rectangleTheta) * p_r.x
-								- sin(rectangleTheta) * p_r.y) + v->position.x * (1-flatness);
+		- sin(rectangleTheta) * p_r.y) + v->position.x * (1-flatness);
 	v->position.y = flatness * (sin(rectangleTheta) * p_r.x
-								+ cos(rectangleTheta) * p_r.y) + v->position.y * (1-flatness);
+		+ cos(rectangleTheta) * p_r.y) + v->position.y * (1-flatness);
 	//TODO: normal transform
 }
 
 void applyBundleTransform(Vertex* v, Point location)
 {
+	float theta = atan2(v->position.y, v->position.x);
+	float r = length(v->position.xy);
+	v->position.x = r * cos(theta + location.z);
+	v->position.y = r * sin(theta + location.z);
+
 	v->position.x += location.x;
 	v->position.y += location.y;
-	v->position.z += location.z; //NEW
 }
 
 void applyPullTransform(Vertex* v, float twistAmount, float stretchAmount)
@@ -105,14 +109,14 @@ Vertex applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
 	for (int i = ancestorCount - 1; i >= 0; --i)
 	{
 		/*
-  Each cane node has a type and an amount.
-  Depending upon the type, the amount fields
-  take on different meanings. For instance, a twist transform
-  uses amts[0] to mean the magnitude of the twist.
-  just a single real-valued parameter).
-  The BUNDLE_CANETYPE is an exception, in that it simply uses
-  the location of the subcane to determine how to move the points.
-  */
+		Each cane node has a type and an amount.
+		Depending upon the type, the amount fields
+		take on different meanings. For instance, a twist transform
+		uses amts[0] to mean the magnitude of the twist.
+		just a single real-valued parameter).
+		The BUNDLE_CANETYPE is an exception, in that it simply uses
+		the location of the subcane to determine how to move the points.
+		*/
 		switch (ancestors[i]->type)
 		{
 		case BUNDLE_CANETYPE:
