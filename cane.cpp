@@ -276,7 +276,7 @@ void Cane :: createCasing(float radius)
 	this->type = CASING_CANETYPE;
 	this->subcaneCount = 1;
 	this->subcanes[0] = copy;
-	this->amts[0] = radius; 
+	this->amts[0] = radius;
 	this->color.r = 1.0; // casing coloring
 	this->color.g = 1.0;
 	this->color.b = 1.0;
@@ -412,7 +412,13 @@ std::string amtTypeToName(int type,int index)
 	case BUNDLE_CANETYPE:
 		return UNDEFINED;
 	case CASING_CANETYPE:
-		return UNDEFINED;
+		switch(index)
+		{
+		case 0:
+			return "Radius";
+		default:
+			return UNDEFINED;
+		}
 	case FLATTEN_CANETYPE:
 		switch(index)
 		{
