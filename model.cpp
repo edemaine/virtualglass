@@ -81,17 +81,17 @@ void Model :: setMode(int mode)
 		cane->createBundle();
 		break;
 	case CASING_MODE:
-		{
-			Cane* ancestors[MAX_ANCESTORS];
-			int ancestorCount = 0;
+	{
+		Cane* ancestors[MAX_ANCESTORS];
+		int ancestorCount = 0;
 
-			lowResGeometry.clear();
-			cane->createCasing(generateMesh(cane, &lowResGeometry, ancestors,
-				&ancestorCount, LOW_RESOLUTION, true, true));
-			geometryOutOfDate();
-			emit caneChanged();
-		}
-		break;
+		lowResGeometry.clear();
+		cane->createCasing(generateMesh(cane, &lowResGeometry, ancestors,
+										&ancestorCount, LOW_RESOLUTION, true, true));
+		geometryOutOfDate();
+		emit caneChanged();
+	}
+	break;
 	case SNAP_MODE:
 		switch(prev_mode)
 		{
@@ -380,7 +380,7 @@ void Model :: addCane(Cane* c)
 	}
 	else
 	{
-		if (mode != BUNDLE_MODE) 
+		if (mode != BUNDLE_MODE)
 			setMode(BUNDLE_MODE);
 		cane->add(c->deepCopy());
 	}

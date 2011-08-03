@@ -58,9 +58,9 @@ void applyFlattenTransform(Vertex* v, float rectangleRatio, float rectangleTheta
 	}
 
 	v->position.x = flatness * (cos(rectangleTheta) * p_r.x
-		- sin(rectangleTheta) * p_r.y) + v->position.x * (1-flatness);
+								- sin(rectangleTheta) * p_r.y) + v->position.x * (1-flatness);
 	v->position.y = flatness * (sin(rectangleTheta) * p_r.x
-		+ cos(rectangleTheta) * p_r.y) + v->position.y * (1-flatness);
+								+ cos(rectangleTheta) * p_r.y) + v->position.y * (1-flatness);
 	//TODO: normal transform
 }
 
@@ -73,6 +73,7 @@ void applyBundleTransform(Vertex* v, Point location)
 
 	v->position.x += location.x;
 	v->position.y += location.y;
+	//v->position.z += location.z;
 }
 
 void applyPullTransform(Vertex* v, float twistAmount, float stretchAmount)
@@ -109,14 +110,14 @@ Vertex applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
 	for (int i = ancestorCount - 1; i >= 0; --i)
 	{
 		/*
-		Each cane node has a type and an amount.
-		Depending upon the type, the amount fields
-		take on different meanings. For instance, a twist transform
-		uses amts[0] to mean the magnitude of the twist.
-		just a single real-valued parameter).
-		The BUNDLE_CANETYPE is an exception, in that it simply uses
-		the location of the subcane to determine how to move the points.
-		*/
+  Each cane node has a type and an amount.
+  Depending upon the type, the amount fields
+  take on different meanings. For instance, a twist transform
+  uses amts[0] to mean the magnitude of the twist.
+  just a single real-valued parameter).
+  The BUNDLE_CANETYPE is an exception, in that it simply uses
+  the location of the subcane to determine how to move the points.
+  */
 		switch (ancestors[i]->type)
 		{
 		case BUNDLE_CANETYPE:
@@ -181,7 +182,7 @@ The resolution refers to the dual resolution modes used by the GUI, and the actu
 triangles for these resolutions are set in constants.h
 */
 float meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
-	int ancestorCount, int resolution, Cane *group_cane, uint32_t group_tag, float radius, bool computeRadius)
+						   int ancestorCount, int resolution, Cane *group_cane, uint32_t group_tag, float radius, bool computeRadius)
 {
 	unsigned int angularResolution, axialResolution;
 	float total_stretch, transformedRadius;
@@ -209,10 +210,10 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 	uint32_t first_triangle = geometry->triangles.size();
 
 	/*
-	Draw the walls of the cylinder. Note that the z location is
-	adjusted by the total stretch experienced by the cane so that
-	the z values range between 0 and 1.
-	*/
+ Draw the walls of the cylinder. Note that the z location is
+ adjusted by the total stretch experienced by the cane so that
+ the z values range between 0 and 1.
+ */
 	//Generate verts:
 	for (unsigned int i = 0; i < axialResolution; ++i)
 	{
@@ -251,10 +252,10 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 	assert(geometry->valid());
 
 	/*
-	Draw the cylinder bottom, then top.
-	The mesh uses a set of n-2 triangles with a common vertex
-	to draw a regular n-gon.
-	*/
+ Draw the cylinder bottom, then top.
+ The mesh uses a set of n-2 triangles with a common vertex
+ to draw a regular n-gon.
+ */
 	for (int side = 0; side <= 1; ++side) {
 		float z = (side?1.0:0.0);
 		float nz = (side?1.0:-1.0);
@@ -291,8 +292,8 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount);
 	}
 	geometry->compute_normals_from_triangles();
-	geometry->groups.push_back(Group(first_triangle, 
-		geometry->triangles.size() - first_triangle, group_cane, group_tag));
+	geometry->groups.push_back(Group(first_triangle,
+									 geometry->triangles.size() - first_triangle, group_cane, group_tag));
 
 	if (!computeRadius)
 		return 0.0;
@@ -301,7 +302,7 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 	transformedRadius = 0;
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
-		transformedRadius = MAX(transformedRadius, geometry->vertices[v].position.x * geometry->vertices[v].position.x + geometry->vertices[v].position.y * geometry->vertices[v].position.y); 
+		transformedRadius = MAX(transformedRadius, geometry->vertices[v].position.x * geometry->vertices[v].position.x + geometry->vertices[v].position.y * geometry->vertices[v].position.y);
 	}
 	transformedRadius = sqrt(transformedRadius);
 
@@ -317,7 +318,7 @@ leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
 float generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
-	int resolution, bool casing, bool computeRadius, int coloringIndex)
+				   int resolution, bool casing, bool computeRadius, int coloringIndex)
 {
 	int i, passCasing, passColoringIndex;
 	float radius;
@@ -331,7 +332,7 @@ float generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorC
 	if (c->type == BASE_CIRCLE_CANETYPE)
 	{
 		radius = meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-			resolution, c, coloringIndex, 1.0, computeRadius);
+									  resolution, c, coloringIndex, 1.0, computeRadius);
 	}
 	else
 	{
@@ -340,16 +341,16 @@ float generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorC
 		{
 			if (coloringIndex == -1)
 				passColoringIndex = i;
-			else 
+			else
 				passColoringIndex = coloringIndex;
 
 			radius = MAX(generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
-				resolution, passCasing, computeRadius, passColoringIndex), radius);
+									  resolution, passCasing, computeRadius, passColoringIndex), radius);
 		}
 		if (casing && c->type == CASING_CANETYPE)
 		{
 			radius = MAX(meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-				resolution, c, coloringIndex, c->amts[0], computeRadius), radius);
+											  resolution, c, coloringIndex, c->amts[0], computeRadius), radius);
 		}
 	}
 	*ancestorCount -= 1;
