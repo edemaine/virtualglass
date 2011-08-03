@@ -77,6 +77,14 @@ void MainWindow::setupMenuBar()
 	connect(toggleGrid, SIGNAL(triggered()), openglWidget, SLOT(toggleGrid()));
 	viewMenu->addAction(toggleGrid);
 
+	QAction* toggleSnaps = new QAction(tr("&Show Snaps"), this);
+	toggleSnaps->setStatusTip(tr("Show and activate the reference snaps."));
+	toggleSnaps->setCheckable(true);
+	toggleSnaps->setChecked(false);
+	openglWidget->setSnaps(false);
+	connect(toggleSnaps, SIGNAL(triggered()), openglWidget, SLOT(toggleSnaps()));
+	viewMenu->addAction(toggleSnaps);
+
 	viewMenu->addSeparator();
 
 	QMenu* specialViewMenu = viewMenu->addMenu(tr("&Axis View"));

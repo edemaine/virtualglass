@@ -35,6 +35,7 @@ public:
 	void setBgColor(QColor color);
 	void setAxes(bool show);
 	void setGrid(bool show);
+	void setSnaps(bool show);
 	void exactInput();
 
 private:
@@ -57,6 +58,7 @@ private:
 	int resolution;
 	bool showAxes;
 	bool showGrid;
+	bool showSnaps;
 	bool lockView;
 
 	float lookAtLoc[3];
@@ -92,6 +94,7 @@ public slots:
 	void switchProjection();
 	void toggleAxes();
 	void toggleGrid();
+	void toggleSnaps();
 	void lockTable();
 	void processPull();
 	void processFlatten();

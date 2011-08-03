@@ -89,7 +89,7 @@ void Model :: setMode(int mode)
 			int ancestorCount = 0;
 
 			lowResGeometry.clear();
-			cane->createCasing(generateMesh(cane, &lowResGeometry, ancestors, 
+			cane->createCasing(generateMesh(cane, &lowResGeometry, ancestors,
 				&ancestorCount, LOW_RESOLUTION, true, true));
 			geometryOutOfDate();
 			emit caneChanged();
@@ -309,6 +309,26 @@ void Model :: moveCane(float delta_x, float delta_y)
 			return;
 		}
 	}
+
+	clearActiveSnap(true);
+	geometryOutOfDate();
+	emit caneChanged();
+}
+
+void Model :: moveCane(float delta_x, float delta_y, bool snaps)
+{
+	if (snaps)
+	{
+		moveCane(delta_x,delta_y);
+		return;
+	}
+
+	if (cane == NULL || activeSubcane == -1)
+		return;
+
+	cane->moveCane(activeSubcane, delta_x, delta_y);
+
+	// check if cane hits any snaps
 
 	clearActiveSnap(true);
 	geometryOutOfDate();

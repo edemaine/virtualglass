@@ -30,6 +30,7 @@ public:
 	void pullCane(float twistAmount, float stretchFactor);
 	void pullActiveCane(float twistAmount, float stretchFactor);
 	void moveCane(float delta_x, float delta_y);
+	void moveCane(float delta_x, float delta_y, bool snaps);
 	void moveCaneTo(float delta_x, float delta_y);
 	void moveCane(float delta_z);
 	void changeCaneCasing(float delta_x);

@@ -48,6 +48,7 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 
 	showAxes = true;
 	showGrid = false;
+	showSnaps = false;
 	lockView = false;
 
 	lookAtLoc[0] = 0.0f;
@@ -280,7 +281,8 @@ void OpenGLWidget :: paintGL()
 	if (showGrid)
 		drawGrid();
 
-	drawSnaps();
+	if (showSnaps)
+		drawSnaps();
 
 	if (geometry) {
 		glEnable(GL_LIGHTING);
@@ -514,6 +516,11 @@ void OpenGLWidget :: toggleGrid()
 	setGrid(!showGrid);
 }
 
+void OpenGLWidget :: toggleSnaps()
+{
+	setSnaps(!showSnaps);
+}
+
 void OpenGLWidget :: setAxes(bool show)
 {
 	showAxes = show;
@@ -523,6 +530,12 @@ void OpenGLWidget :: setAxes(bool show)
 void OpenGLWidget :: setGrid(bool show)
 {
 	showGrid = show;
+	update();
+}
+
+void OpenGLWidget :: setSnaps(bool show)
+{
+	showSnaps = show;
 	update();
 }
 
@@ -608,25 +621,32 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 		{
 			if (!model->deleteActiveCane())
 			{
-				if (model->getMode() == SNAP_MODE || model->getMode() == SNAP_CIRCLE_MODE || model->getMode() == SNAP_LINE_MODE)
-				model->deleteSnapPoint(getClickedPlanePoint(mouseLocX,mouseLocY));
+				if (showSnaps) {
+					if (model->getMode() == SNAP_MODE || model->getMode() == SNAP_CIRCLE_MODE || model->getMode() == SNAP_LINE_MODE)
+					{
+						model->deleteSnapPoint(getClickedPlanePoint(mouseLocX,mouseLocY));
+					}
+				}
 			}
 		}
-		else if (model->getMode() == SNAP_MODE)
+		else if (showSnaps)
 		{
-			Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
-			model->addSnapPoint(SNAP_POINT,p);
-			emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
-		} else if (model->getMode() == SNAP_LINE_MODE)
-		{
-			Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
-			model->addSnapPoint(SNAP_LINE,p);
-			emit operationInfoSig(QString("Snap Line: %1, %2").arg(p.x).arg(p.y),2000);
-		} else if (model->getMode() == SNAP_CIRCLE_MODE)
-		{
-			Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
-			model->addSnapPoint(SNAP_CIRCLE,p);
-			emit operationInfoSig(QString("Snap Circle: %1, %2").arg(p.x).arg(p.y),2000);
+			if (model->getMode() == SNAP_MODE)
+			{
+				Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
+				model->addSnapPoint(SNAP_POINT,p);
+				emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
+			} else if (model->getMode() == SNAP_LINE_MODE)
+			{
+				Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
+				model->addSnapPoint(SNAP_LINE,p);
+				emit operationInfoSig(QString("Snap Line: %1, %2").arg(p.x).arg(p.y),2000);
+			} else if (model->getMode() == SNAP_CIRCLE_MODE)
+			{
+				Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
+				model->addSnapPoint(SNAP_CIRCLE,p);
+				emit operationInfoSig(QString("Snap Circle: %1, %2").arg(p.x).arg(p.y),2000);
+			}
 		}
 	}
 	// Change as part of dual mode feature
@@ -647,7 +667,7 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 	//check if cane is in a snap, and finalize it if true
 	if (model->getActiveSubcane()!=-1)
 	{
-		if (model->getActiveSnapMode()!=NO_SNAP)
+		if (model->getActiveSnapMode()!=NO_SNAP && showSnaps)
 		{
 			// do stuff!
 			Point p,loc,p1,p2,dist,a,b;
@@ -682,10 +702,13 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 
 	if (e->button() == Qt::RightButton){
 		rightMouseDown = false;
-	} else if (model->getMode() == SNAP_MODE || model->getMode() == SNAP_LINE_MODE || model->getMode() == SNAP_CIRCLE_MODE)
+	} else if (showSnaps)
 	{
-		Point p = model->finalizeSnapPoint();
-		emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
+		if (model->getMode() == SNAP_MODE || model->getMode() == SNAP_LINE_MODE || model->getMode() == SNAP_CIRCLE_MODE)
+		{
+			Point p = model->finalizeSnapPoint();
+			emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
+		}
 	}
 	update();
 }
@@ -723,15 +746,15 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	//emit operationInfoSig(QString("Plane Point: %1, %2, %3").arg(planePoint.x).arg(planePoint.y).arg(planePoint.z),2000);
 
 	/*
-	Do something depending on mode.
-	All modes except LOOK_MODE involve modifying the cane
-	itself, while LOOK_MODE moves the camera.
+ Do something depending on mode.
+ All modes except LOOK_MODE involve modifying the cane
+ itself, while LOOK_MODE moves the camera.
 
-	All of the calls to model->*Cane() are functions of relX/relY,
-	but the constants involved are determined by experiment,
-	i.e. how much twist `feels' reasonable for moving the mouse
-	an inch.
-	*/
+ All of the calls to model->*Cane() are functions of relX/relY,
+ but the constants involved are determined by experiment,
+ i.e. how much twist `feels' reasonable for moving the mouse
+ an inch.
+ */
 	if (rightMouseDown && !lockView)
 	{
 		// Rotate camera position around look-at location.
@@ -785,16 +808,16 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		break;
 	case BUNDLE_MODE:
 		/*
-		How the parameters for moveCane() are calculated is not obvious.
-		The idea is to make mouse X/Y correspond to the cane moving
-		left-right/up-down *regardless* of where the camera is. This
-		is why theta (the camera angle relative to the look-at point) is
-		also involved.
+  How the parameters for moveCane() are calculated is not obvious.
+  The idea is to make mouse X/Y correspond to the cane moving
+  left-right/up-down *regardless* of where the camera is. This
+  is why theta (the camera angle relative to the look-at point) is
+  also involved.
 
-		Essentially, the parameters convert the amount moved in X and Y
-		(variables `relX' and `relY') to the amount moved in X and Y
-		according to axes on which the cane lives.
-		*/
+  Essentially, the parameters convert the amount moved in X and Y
+  (variables `relX' and `relY') to the amount moved in X and Y
+  according to axes on which the cane lives.
+  */
 
 		//model->setActiveSubcane(getSubcaneUnderMouse(oldMouseLocX, oldMouseLocY));
 		if (e->buttons() & 0x00000001) // if left mouse button is down
@@ -807,7 +830,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 				relX *= 5; // tone it down
 				relY *= 5; // tone it down
 				model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
-								relX * sin(theta + PI / 2.0) + relY * sin(theta));
+								relX * sin(theta + PI / 2.0) + relY * sin(theta),showSnaps);
 			}
 		}
 		if (model->getActiveSubcane() != -1 && model->getCane()) {
@@ -831,13 +854,16 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	case SNAP_MODE:
 	case SNAP_LINE_MODE:
 	case SNAP_CIRCLE_MODE:
+	{
+		if (showSnaps)
 		{
 			Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
 			model->modifySnapPoint(p);
 			//emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
 			update();
-			break;
 		}
+		break;
+	}
 	default:
 		break;
 	}
