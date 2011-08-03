@@ -266,6 +266,32 @@ void Cane :: moveCane(int subcane, float delta_z)
 	subcaneLocations[subcane].z += delta_z;
 }
 
+void Cane :: createCasing(float radius)
+{
+	if (this->type == CASING_CANETYPE)
+		return;
+	Cane* copy = new Cane(UNASSIGNED_CANETYPE);
+	this->shallowCopy(copy);
+	this->reset();
+	this->type = CASING_CANETYPE;
+	this->subcaneCount = 1;
+	this->subcanes[0] = copy;
+	this->amts[0] = radius; 
+	this->color.r = 1.0; // casing coloring
+	this->color.g = 1.0;
+	this->color.b = 1.0;
+	this->color.a = 0.2;
+}
+
+void Cane :: adjustCasing(float delta_x)
+{
+	if (this->type != CASING_CANETYPE)
+	{
+		return;
+	}
+	this->amts[0] += delta_x;
+}
+
 void Cane :: add(Cane* addl)
 {
 	if (this->type != BUNDLE_CANETYPE)

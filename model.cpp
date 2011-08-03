@@ -68,17 +68,34 @@ void Model :: setMode(int mode)
 {
 	int prev_mode = this->mode;
 	this->mode = mode;
-	if (cane != NULL)
+
+	if (cane == NULL)
+		return;
+
+	switch(this->mode)
 	{
-		if (prev_mode != BUNDLE_MODE && this->mode == BUNDLE_MODE)
+	case BUNDLE_MODE:
+		if (prev_mode != BUNDLE_MODE)
 		{
 			history->saveState(cane);
 			activeSubcane = -1;
 			cane->createBundle();
 		}
-	}
-	if (mode == SNAP_MODE)
-	{
+		break;
+	case CASING_MODE:
+		if (cane != NULL)
+		{
+			Cane* ancestors[MAX_ANCESTORS];
+			int ancestorCount = 0;
+
+			lowResGeometry.clear();
+			cane->createCasing(generateMesh(cane, &lowResGeometry, ancestors, 
+				&ancestorCount, LOW_RESOLUTION, true, true));
+			geometryOutOfDate();
+			emit caneChanged();
+		}
+		break;
+	case SNAP_MODE:
 		switch(prev_mode)
 		{
 		case SNAP_MODE:
@@ -93,6 +110,9 @@ void Model :: setMode(int mode)
 		default:
 			break;
 		}
+		break;
+	default:
+		break;
 	}
 
 	emit modeChanged(this->mode);
@@ -102,8 +122,6 @@ void Model :: setActiveSubcane(int subcane)
 {
 	if (cane == NULL)
 		return;
-	//if (subcane<0 || subcane >= cane->subcaneCount)
-	//	return;
 	if (activeSubcane != subcane)
 	{
 		activeSubcane = subcane;
@@ -138,7 +156,7 @@ void Model :: updateLowResGeometry()
 	ancestorCount = 0;
 	lowResGeometry.clear();
 	if (cane != NULL)
-		generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION);
+		generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION, true);
 	lowResGeometryFresh = 1;
 }
 
@@ -150,7 +168,7 @@ void Model :: updateHighResGeometry()
 	ancestorCount = 0;
 	highResGeometry.clear();
 	if (cane != NULL)
-		generateMesh(cane, &highResGeometry, ancestors, &ancestorCount, HIGH_RESOLUTION);
+		generateMesh(cane, &highResGeometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
 	highResGeometryFresh = 1;
 }
 
@@ -312,6 +330,15 @@ void Model :: moveCane(float delta_z)
 	if (cane == NULL || activeSubcane == -1)
 		return;
 	cane->moveCane(activeSubcane, delta_z);
+	geometryOutOfDate();
+	emit caneChanged();
+}
+
+void Model :: changeCaneCasing(float delta_x)
+{
+	if (cane == NULL)
+		return;
+	cane->adjustCasing(delta_x);
 	geometryOutOfDate();
 	emit caneChanged();
 }

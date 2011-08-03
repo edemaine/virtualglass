@@ -23,6 +23,7 @@ public:
 	QPushButton* pull_button;
 	QPushButton* start_bundle_button;
 	QPushButton* finish_bundle_button;
+	QPushButton* case_button;
 	QPushButton* flatten_button;
 	QPushButton* wrap_button;
 	QPushButton* snap_button;

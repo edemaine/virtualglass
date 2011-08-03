@@ -141,6 +141,9 @@ void MainWindow::modeChanged(int mode)
 		modeLabel->setText("BUNDLE MODE");
 		displayTextMessage("Click and drag individual canes to move them",0);
 		break;
+	case CASING_MODE:
+		modeLabel->setText("CASING MODE");
+		break;
 	case FLATTEN_MODE:
 		modeLabel->setText("FLATTEN MODE");
 		displayTextMessage("Click and drag mouse up and down to square off cane, left and right to flatten cane",0);
@@ -434,13 +437,13 @@ void MainWindow::setupNewColorPickerCaneDialog()
 	caneDialog = new QDialog(NULL);
 	caneForm = new QFormLayout(caneDialog->window());
 
-	colorDialog = new QColorDialog(Qt::white,caneForm->widget());
+	colorDialog = new QColorDialog(Qt::white, caneForm->widget());
 	colorDialog->setOptions(QColorDialog::ShowAlphaChannel | QColorDialog::NoButtons);
 	caneForm->addRow(colorDialog);
 
 	caneTypeBox = new QComboBox(caneForm->widget());
-	caneTypeBox->addItem("Circle Base",QVariant(BASE_CIRCLE_CANETYPE));
-	caneTypeBox->addItem("Square Base",QVariant(FLATTEN_CANETYPE));
+	caneTypeBox->addItem("Circle Base", QVariant(BASE_CIRCLE_CANETYPE));
+	caneTypeBox->addItem("Square Base", QVariant(FLATTEN_CANETYPE));
 
 	caneForm->addRow("Base Type",caneTypeBox);
 
@@ -519,6 +522,8 @@ void MainWindow::setupWorkArea()
 	pull_button->setToolTip("Drag Mouse Horizontally to Twist, Vertically to Stretch. Use Shift to twist and stretch independently.");
 	start_bundle_button = new QPushButton("Start Bundle");
 	finish_bundle_button = new QPushButton("Finish Bundle");
+	case_button = new QPushButton("Case");
+	case_button->setToolTip("Create a clear casing around the glass.");
 	flatten_button = new QPushButton("Flatten");
 	flatten_button->setToolTip("Drag Mouse Horizontally to Squish, Vertically to Flatten");
 	wrap_button = new QPushButton("Wrap");
@@ -540,6 +545,7 @@ void MainWindow::setupWorkArea()
 	operButton_layout->addWidget(pull_button);
 	operButton_layout->addWidget(start_bundle_button);
 	operButton_layout->addWidget(finish_bundle_button);
+	operButton_layout->addWidget(case_button);
 	operButton_layout->addWidget(flatten_button);
 	operButton_layout->addWidget(wrap_button);
 	operButton_layout->addWidget(snap_button);

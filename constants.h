@@ -35,6 +35,7 @@
 #define SNAP_MODE 7
 #define SNAP_LINE_MODE 8
 #define SNAP_CIRCLE_MODE 9
+#define CASING_MODE 10
 
 #define FREE_VIEW 1
 #define FRONT_VIEW 2

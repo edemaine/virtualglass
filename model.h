@@ -32,6 +32,7 @@ public:
 	void moveCane(float delta_x, float delta_y);
 	void moveCaneTo(float delta_x, float delta_y);
 	void moveCane(float delta_z);
+	void changeCaneCasing(float delta_x);
 	void flattenCane(float rectangle_ratio, float rectangle_theta, float flatness);
 	void flattenActiveCane(float rectangle_ratio, float rectangle_theta, float flatness);
 	bool deleteActiveCane();
