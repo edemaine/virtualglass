@@ -68,10 +68,9 @@ void Model :: setMode(int mode)
 {
 	int prev_mode = this->mode;
 	this->mode = mode;
-	emit modeChanged(this->mode);
 
-	if (cane == NULL)
-		return;
+	//if (cane == NULL)
+	//	return;
 
 	switch(this->mode)
 	{
@@ -111,7 +110,7 @@ void Model :: setMode(int mode)
 	default:
 		break;
 	}
-
+	emit modeChanged(this->mode);
 }
 
 void Model :: setActiveSubcane(int subcane)

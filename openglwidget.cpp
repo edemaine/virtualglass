@@ -953,7 +953,7 @@ void OpenGLWidget :: drawAxes()
 	glBegin(GL_TRIANGLE_FAN);
 	glVertex3f(1,0,0);
 	for (int angle=0;angle<=360;angle+=10){
-		glVertex3f(0.95,0.05*cos(angle*PI/180.),0.05*sin(angle*PI/180.));
+		glVertex3f(0.95,0.02*cos(angle*PI/180.),0.02*sin(angle*PI/180.));
 	}
 	glEnd();
 
@@ -966,7 +966,7 @@ void OpenGLWidget :: drawAxes()
 	glBegin(GL_TRIANGLE_FAN);
 	glVertex3f(0,-1,0);
 	for (int angle=0;angle<=360;angle+=10){
-		glVertex3f(0.05*sin(angle*PI/180.),-0.95,0.05*cos(angle*PI/180.));
+		glVertex3f(0.02*sin(angle*PI/180.),-0.95,0.02*cos(angle*PI/180.));
 	}
 	glEnd();
 
@@ -979,7 +979,7 @@ void OpenGLWidget :: drawAxes()
 	glBegin(GL_TRIANGLE_FAN);
 	glVertex3f(0,0,1.2);
 	for (int angle=0;angle<=360;angle+=10){
-		glVertex3f(0.05*cos(angle*PI/180.),0.05*sin(angle*PI/180.),1.15);
+		glVertex3f(0.02*cos(angle*PI/180.),0.02*sin(angle*PI/180.),1.15);
 	}
 	glEnd();
 }

@@ -81,7 +81,7 @@ void MainWindow::setupMenuBar()
 	toggleSnaps->setStatusTip(tr("Show and activate the reference snaps."));
 	toggleSnaps->setCheckable(true);
 	toggleSnaps->setChecked(false);
-	openglWidget->setSnaps(false);
+	openglWidget->setSnaps(true);
 	connect(toggleSnaps, SIGNAL(triggered()), openglWidget, SLOT(toggleSnaps()));
 	viewMenu->addAction(toggleSnaps);
 
