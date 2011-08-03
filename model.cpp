@@ -23,6 +23,8 @@ Model :: Model()
 		snapCircles[i].x=snapCircles[i].y=snapCircles[i].z=0.0;
 		snapCircleRadii[i]=0.0;
 	}
+	snapLineParam = 0.1;
+	snapCircleParam = 0.2;
 	snapPointsCount=snapLinesCount=snapCirclesCount=0;
 	snapHoldPoint = Point();
 	geometryOutOfDate();
@@ -272,7 +274,7 @@ void Model :: moveCane(float delta_x, float delta_y)
 		Point disp = loc-p;
 		float dist = length(disp);
 		float radi = snapPointRadius(SNAP_CIRCLE,i);
-		if (radi*0.7<dist && dist<radi*1.3)
+		if (radi*(1-snapCircleParam)<dist && dist<radi*(1+snapCircleParam))
 		{
 			snapHoldPoint = loc;
 			activeSnapMode = SNAP_CIRCLE;
@@ -293,7 +295,7 @@ void Model :: moveCane(float delta_x, float delta_y)
 		Point dist = (a*b/(b*b))*b;
 		Point p = dist+p1;
 		Point displacement = loc - p;
-		if (length(displacement)<0.15 && length(dist)<length(b) && length(dist)>0)
+		if (length(displacement)<snapLineParam && length(dist)<length(b) && length(dist)>0)
 		{
 			snapHoldPoint = loc;
 			activeSnapMode = SNAP_LINE;
@@ -356,6 +358,20 @@ void Model :: changeCaneCasing(float delta_x)
 	cane->adjustCasing(delta_x);
 	geometryOutOfDate();
 	emit caneChanged();
+}
+
+void Model :: changeCaneCasingTo(float radi)
+{
+	if (cane == NULL)
+		return;
+	cane->adjustCasingTo(radi);
+	geometryOutOfDate();
+	emit caneChanged();
+}
+
+void Model :: changeCaneCasingTo(Point radi)
+{
+	changeCaneCasingTo(length(radi));
 }
 
 bool Model :: deleteActiveCane()
@@ -684,7 +700,7 @@ void Model :: deleteSnapPoint(Point loc)
 		Point disp = loc-p;
 		float dist = length(disp);
 		float radi = snapPointRadius(SNAP_CIRCLE,i);
-		if (radi*0.7<dist && dist<radi*1.3)
+		if (radi*(1-snapCircleParam)<dist && dist<radi*(1+snapCircleParam))
 		{
 			for (int j=i;j<snapCirclesCount-1;j++)
 			{
@@ -706,7 +722,7 @@ void Model :: deleteSnapPoint(Point loc)
 		Point dist = (a*b/(b*b))*b;
 		Point p = dist+p1;
 		Point displacement = loc - p;
-		if (length(displacement)<0.15 && length(dist)<length(b) && length(dist)>0)
+		if (length(displacement)<snapLineParam && length(dist)<length(b) && length(dist)>0)
 		{
 			for (int j=i;j<snapLinesCount-1;j++)
 			{

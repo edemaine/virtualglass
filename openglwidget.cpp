@@ -384,8 +384,8 @@ void OpenGLWidget :: drawSnapCircles()
 		//glColor3f(0.75,0.75,0.75);
 
 		drawCircle(model->snapPointRadius(SNAP_CIRCLE,i));
-		drawCircle(model->snapPointRadius(SNAP_CIRCLE,i)*0.7);
-		drawCircle(model->snapPointRadius(SNAP_CIRCLE,i)*1.3);
+		drawCircle(model->snapPointRadius(SNAP_CIRCLE,i)*(1-model->snapCircleParam));
+		drawCircle(model->snapPointRadius(SNAP_CIRCLE,i)*(1+model->snapCircleParam));
 
 		glPopMatrix();
 	}
@@ -447,7 +447,7 @@ void OpenGLWidget :: drawSnapLines()
 		v.x = v.y;
 		v.y = v.z;
 		v.z = 0;
-		Point dist=normalize(v)*0.15;
+		Point dist=normalize(v)*(model->snapLineParam);
 		drawSegment(p1+dist,p2+dist);
 		drawSegment(p1-dist,p2-dist);
 	}
@@ -670,7 +670,7 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 		if (model->getActiveSnapMode()!=NO_SNAP && showSnaps)
 		{
 			// do stuff!
-			Point p,loc,p1,p2,dist,a,b;
+			/*Point p,loc,p1,p2,dist,a,b;
 			switch(model->getActiveSnapMode())
 			{
 			case SNAP_POINT:
@@ -693,7 +693,7 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 				dist = dist*model->snapPointRadius(SNAP_CIRCLE,model->getActiveSnapIndex())/length(dist) + p;
 				//model->moveCaneTo(dist.x,dist.y);
 				break;
-			}
+			}*/
 			model->clearActiveSnap(false);
 		}
 		//check if cane is in a snap, and finalize it if true
@@ -838,7 +838,8 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		}
 		break;
 	case CASING_MODE:
-		model->changeCaneCasing(-relX);
+		//model->changeCaneCasing(-relX);
+		model->changeCaneCasingTo(getClickedPlanePoint(mouseLocX,mouseLocY));
 		break;
 	case FLATTEN_MODE:
 		if (controlButtonDown)

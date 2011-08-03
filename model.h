@@ -34,6 +34,8 @@ public:
 	void moveCaneTo(float delta_x, float delta_y);
 	void moveCane(float delta_z);
 	void changeCaneCasing(float delta_x);
+	void changeCaneCasingTo(float radi);
+	void changeCaneCasingTo(Point radi);
 	void flattenCane(float rectangle_ratio, float rectangle_theta, float flatness);
 	void flattenActiveCane(float rectangle_ratio, float rectangle_theta, float flatness);
 	bool deleteActiveCane();
@@ -62,6 +64,9 @@ public:
 	void clearActiveSnap(bool holdSnap);
 
 	void deleteSnapPoint(Point p);
+
+	float snapLineParam;
+	float snapCircleParam;
 
 signals:
 	void caneChanged();

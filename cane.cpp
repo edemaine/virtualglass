@@ -282,6 +282,15 @@ void Cane :: adjustCasing(float delta_x)
 	this->amts[0] += delta_x;
 }
 
+void Cane :: adjustCasingTo(float radius)
+{
+	if (this->type != CASING_CANETYPE)
+	{
+		return;
+	}
+	this->amts[0] = radius;
+}
+
 void Cane :: add(Cane* addl)
 {
 	if (this->type != BUNDLE_CANETYPE)

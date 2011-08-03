@@ -30,6 +30,7 @@ public:
 	void moveCane(int subcane, float delta_z);
 	void createCasing(float radius);
 	void adjustCasing(float delta_x);
+	void adjustCasingTo(float radius);
 	int leafNodes();
 	Cane* deepCopy();
 	void setColor(Color color);
