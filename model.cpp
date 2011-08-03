@@ -68,6 +68,7 @@ void Model :: setMode(int mode)
 {
 	int prev_mode = this->mode;
 	this->mode = mode;
+	emit modeChanged(this->mode);
 
 	if (cane == NULL)
 		return;
@@ -75,15 +76,11 @@ void Model :: setMode(int mode)
 	switch(this->mode)
 	{
 	case BUNDLE_MODE:
-		if (prev_mode != BUNDLE_MODE)
-		{
-			history->saveState(cane);
-			activeSubcane = -1;
-			cane->createBundle();
-		}
+		history->saveState(cane);
+		activeSubcane = -1;
+		cane->createBundle();
 		break;
 	case CASING_MODE:
-		if (cane != NULL)
 		{
 			Cane* ancestors[MAX_ANCESTORS];
 			int ancestorCount = 0;
@@ -115,7 +112,6 @@ void Model :: setMode(int mode)
 		break;
 	}
 
-	emit modeChanged(this->mode);
 }
 
 void Model :: setActiveSubcane(int subcane)
@@ -378,12 +374,18 @@ void Model :: addCane(Cane* c)
 {
 	history->saveState(cane);
 	if (cane == NULL)
+	{
 		cane = c->deepCopy();
+		setMode(BUNDLE_MODE);
+	}
 	else
+	{
+		if (mode != BUNDLE_MODE) 
+			setMode(BUNDLE_MODE);
 		cane->add(c->deepCopy());
+	}
 	geometryOutOfDate();
 	emit caneChanged();
-	setMode(BUNDLE_MODE);
 }
 
 void Model :: undo()
