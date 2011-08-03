@@ -180,8 +180,83 @@ Point OpenGLWidget :: getClickedPlanePoint(int mouseLocX, int mouseLocY)
 	result1.z=posZ1;
 	Point dir = result1-result;
 	return dir*abs(result.z/dir.z)+result;
+}
 
-	//return result;
+Point OpenGLWidget :: getClickedPlanePoint(int mouseLocX, int mouseLocY, float zHeight)
+{
+	GLint viewport[4];
+	GLdouble modelview[16];
+	GLdouble projection[16];
+	GLfloat winX, winY, winZ;
+	GLdouble posX, posY, posZ;
+	GLdouble posX1, posY1, posZ1;
+
+	glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+	glGetDoublev( GL_PROJECTION_MATRIX, projection );
+	glGetIntegerv( GL_VIEWPORT, viewport );
+
+	winX = mouseLocX;
+	winY = viewport[3] - mouseLocY;
+
+	glReadPixels( mouseLocX, int(winY), 1.0, 1.0, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
+
+	//gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+
+	gluUnProject( winX, winY, 0.0f, modelview, projection, viewport, &posX, &posY, &posZ);
+	gluUnProject( winX, winY, 1.0f, modelview, projection, viewport, &posX1, &posY1, &posZ1);
+
+	Point result, result1;
+	result.x=posX;
+	result.y=posY;
+	result.z=posZ;
+	result1.x=posX1;
+	result1.y=posY1;
+	result1.z=posZ1;
+	Point dir = result1-result;
+	if (0<=zHeight && zHeight<result.z)
+		return dir*abs((result.z-zHeight)/dir.z)+result;
+	else
+		return dir*abs((result.z)/dir.z)+result;
+}
+
+Point OpenGLWidget :: getClickedCanePoint(int activeSubcane, int mouseLocX, int mouseLocY)
+{
+	GLint viewport[4];
+	GLdouble modelview[16];
+	GLdouble projection[16];
+	GLfloat winX, winY, winZ;
+	GLdouble posX, posY, posZ;
+	GLdouble posX1, posY1, posZ1;
+
+	glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+	glGetDoublev( GL_PROJECTION_MATRIX, projection );
+	glGetIntegerv( GL_VIEWPORT, viewport );
+
+	winX = mouseLocX;
+	winY = viewport[3] - mouseLocY;
+
+	glReadPixels( mouseLocX, int(winY), 1.0, 1.0, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
+
+	//gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+
+	gluUnProject( winX, winY, 0.0f, modelview, projection, viewport, &posX, &posY, &posZ);
+	gluUnProject( winX, winY, 1.0f, modelview, projection, viewport, &posX1, &posY1, &posZ1);
+
+	Point result, result1;
+	result.x=posX;
+	result.y=posY;
+	result.z=posZ;
+	result1.x=posX1;
+	result1.y=posY1;
+	result1.z=posZ1;
+	Point dir = result1-result;
+	dir =  dir*abs(result.z/dir.z)+result; // x-y plane point
+	Point xy = getModel()->getCane()->subcaneLocations[activeSubcane];
+	xy.z = 0; //
+	Point resultSansZ = result;
+	resultSansZ.z = 0;
+	xy.z = length(xy-dir)*result.z/length(result-dir);
+	return xy;
 }
 
 /*

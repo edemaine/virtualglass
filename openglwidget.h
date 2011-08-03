@@ -75,6 +75,8 @@ private:
 	void drawTriangle(Triangle* t);
 	void updateTriangles();
 	Point getClickedPlanePoint(int mouseLocX, int mouseLocY);
+	Point getClickedPlanePoint(int mouseLocX, int mouseLocY, float zHeight);
+	Point getClickedCanePoint(int activeSubcane,int mouseLocX, int mouseLocY);
 
 signals:
 	void modeChangedSig(int mode);
