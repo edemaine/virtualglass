@@ -49,6 +49,7 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 	showAxes = true;
 	showGrid = false;
 	showSnaps = false;
+	show2D = false;
 	lockView = false;
 
 	lookAtLoc[0] = 0.0f;
@@ -184,7 +185,7 @@ Point OpenGLWidget :: getClickedPlanePoint(int mouseLocX, int mouseLocY)
 }
 
 Point OpenGLWidget :: getClickedPlanePoint(int mouseLocX, int mouseLocY, float zHeight)
-{
+{ // given mouse window coordinates and a z-plane, return the point of intersection
 	GLint viewport[4];
 	GLdouble modelview[16];
 	GLdouble projection[16];
@@ -221,7 +222,7 @@ Point OpenGLWidget :: getClickedPlanePoint(int mouseLocX, int mouseLocY, float z
 }
 
 Point OpenGLWidget :: getClickedCanePoint(int activeSubcane, int mouseLocX, int mouseLocY)
-{
+{ // given mouse window coordinates, and an active subcane, returns an approximate point of click on cane
 	GLint viewport[4];
 	GLdouble modelview[16];
 	GLdouble projection[16];
@@ -256,7 +257,7 @@ Point OpenGLWidget :: getClickedCanePoint(int activeSubcane, int mouseLocX, int 
 	xy.z = 0; //
 	Point resultSansZ = result;
 	resultSansZ.z = 0;
-	xy.z = length(xy-dir)*result.z/length(result-dir);
+	xy.z = (length(xy-dir)+.25)*result.z/length(result-dir);
 	return xy;
 }
 
@@ -463,6 +464,16 @@ void OpenGLWidget :: drawSnaps()
 
 void OpenGLWidget :: switchProjection()
 {
+	if (show2D)
+	{
+		if (!isOrthographic)
+		{
+			isOrthographic = true;
+			update();
+		}
+		return;
+	}
+
 	isOrthographic=!isOrthographic;
 	update();
 }
@@ -760,9 +771,12 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		// Rotate camera position around look-at location.
 
 		theta -= (relX * 500.0 * PI / 180.0);
-		newFee = fee - (relY * 500.0 * PI / 180.0);
-		if (newFee > 0.0f && newFee < PI)
-			fee = newFee;
+		if (!show2D)
+		{
+			newFee = fee - (relY * 500.0 * PI / 180.0);
+			if (newFee > 0.0f && newFee < PI)
+				fee = newFee;
+		}
 		update();
 		return;
 	}
@@ -775,9 +789,12 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		{
 			// Rotate camera position around look-at location.
 			theta -= (relX * 500.0 * PI / 180.0);
-			newFee = fee - (relY * 500.0 * PI / 180.0);
-			if (newFee > 0.0f && newFee < PI)
-				fee = newFee;
+			if (!show2D)
+			{
+				newFee = fee - (relY * 500.0 * PI / 180.0);
+				if (newFee > 0.0f && newFee < PI)
+					fee = newFee;
+			}
 			update();
 		}
 		break;
@@ -827,10 +844,13 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 				relY *=5;
 				model->moveCane(-relY);
 			} else {
-				relX *= 5; // tone it down
-				relY *= 5; // tone it down
-				model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
-								relX * sin(theta + PI / 2.0) + relY * sin(theta),showSnaps);
+				Point oldCanePoint = getClickedCanePoint(model->getActiveSubcane(),oldMouseLocX,oldMouseLocY);
+				Point newCanePoint = getClickedPlanePoint(mouseLocX,mouseLocY,oldCanePoint.z);
+				model->moveCaneTo(newCanePoint);
+				//relX *= 5; // tone it down
+				//relY *= 5; // tone it down
+				//model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
+				//				relX * sin(theta + PI / 2.0) + relY * sin(theta),showSnaps);
 			}
 		}
 		if (model->getActiveSubcane() != -1 && model->getCane()) {
@@ -888,6 +908,13 @@ void OpenGLWidget :: wheelEvent(QWheelEvent *e)
 */
 void OpenGLWidget :: setCamera(float theta, float fee)
 {
+	if (show2D)
+	{
+		this->theta = theta;
+		this->fee = 0.01;
+		update();
+		return;
+	}
 	this->theta = theta;
 	this->fee = fee;
 	update();
@@ -971,18 +998,21 @@ void OpenGLWidget :: drawAxes()
 	}
 	glEnd();
 
-	glBegin(GL_LINES);
-	glColor3f(1-bgColor.redF(),1-bgColor.greenF(),bgColor.blueF());
-	glVertex3f(0,0,0);
-	glVertex3f(0,0,1.2);
-	glEnd();
+	if (!show2D)
+	{
+		glBegin(GL_LINES);
+		glColor3f(1-bgColor.redF(),1-bgColor.greenF(),bgColor.blueF());
+		glVertex3f(0,0,0);
+		glVertex3f(0,0,1.2);
+		glEnd();
 
-	glBegin(GL_TRIANGLE_FAN);
-	glVertex3f(0,0,1.2);
-	for (int angle=0;angle<=360;angle+=10){
-		glVertex3f(0.02*cos(angle*PI/180.),0.02*sin(angle*PI/180.),1.15);
+		glBegin(GL_TRIANGLE_FAN);
+		glVertex3f(0,0,1.2);
+		for (int angle=0;angle<=360;angle+=10){
+			glVertex3f(0.02*cos(angle*PI/180.),0.02*sin(angle*PI/180.),1.15);
+		}
+		glEnd();
 	}
-	glEnd();
 }
 
 void OpenGLWidget::processPull()
@@ -1038,5 +1068,15 @@ void OpenGLWidget::exactInput()
 
 		tableBox->exec();
 	}
+}
+
+void OpenGLWidget :: toggle2D(){
+	show2D = !show2D;
+	if (show2D)
+	{
+		switchProjection();
+		setTopView();
+	}
+	model->toggle2D();
 }
 

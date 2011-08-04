@@ -32,6 +32,7 @@ public:
 	void moveCane(float delta_x, float delta_y);
 	void moveCane(float delta_x, float delta_y, bool snaps);
 	void moveCaneTo(float delta_x, float delta_y);
+	void moveCaneTo(Point p);
 	void moveCane(float delta_z);
 	void changeCaneCasing(float delta_x);
 	void changeCaneCasingTo(float radi);
@@ -64,6 +65,8 @@ public:
 	void clearActiveSnap(bool holdSnap);
 
 	void deleteSnapPoint(Point p);
+
+	void toggle2D();
 
 	float snapLineParam;
 	float snapCircleParam;
@@ -107,6 +110,8 @@ private:
 	int activeSnapPlacementMode;
 
 	Point snapHoldPoint;
+
+	bool show2D;
 
 	void geometryOutOfDate();
 	void updateLowResGeometry();

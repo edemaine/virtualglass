@@ -332,6 +332,11 @@ void Model :: moveCane(float delta_x, float delta_y, bool snaps)
 	emit caneChanged();
 }
 
+void Model :: moveCaneTo(Point p)
+{
+	moveCaneTo(p.x,p.y);
+}
+
 void Model :: moveCaneTo(float delta_x, float delta_y)
 {
 	if (cane == NULL || activeSubcane == -1)
@@ -737,4 +742,9 @@ void Model :: deleteSnapPoint(Point loc)
 	}
 
 	clearActiveSnap(false);
+}
+
+void Model :: toggle2D()
+{
+	show2D = !show2D;
 }

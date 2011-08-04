@@ -80,7 +80,7 @@ void MainWindow::setupMenuBar()
 	QAction* toggleSnaps = new QAction(tr("&Show Snaps"), this);
 	toggleSnaps->setStatusTip(tr("Show and activate the reference snaps."));
 	toggleSnaps->setCheckable(true);
-	toggleSnaps->setChecked(false);
+	toggleSnaps->setChecked(true);
 	openglWidget->setSnaps(true);
 	connect(toggleSnaps, SIGNAL(triggered()), openglWidget, SLOT(toggleSnaps()));
 	viewMenu->addAction(toggleSnaps);
@@ -111,6 +111,14 @@ void MainWindow::setupMenuBar()
 	connect(switchProjection, SIGNAL(triggered()), openglWidget, SLOT(switchProjection()));
 	switchProjection->setToolTip("Not Implemented");
 	viewMenu->addAction(switchProjection);
+
+	QAction* toggle2D = new QAction(tr("&Toggle 2D View"), this);
+	toggle2D->setStatusTip(tr("Switch between 2D and 3D view."));
+	toggle2D->setCheckable(true);
+	toggle2D->setChecked(false);
+	connect(toggle2D, SIGNAL(triggered()), openglWidget, SLOT(toggle2D()));
+	toggle2D->setToolTip("Not Implemented");
+	viewMenu->addAction(toggle2D);
 
 	QAction* backgroundColor = new QAction(tr("&Change Background Color"), this);
 	backgroundColor->setStatusTip(tr("Change the background color of the cane."));

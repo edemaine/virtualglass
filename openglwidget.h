@@ -60,6 +60,7 @@ private:
 	bool showGrid;
 	bool showSnaps;
 	bool lockView;
+	bool show2D;
 
 	float lookAtLoc[3];
 	float theta, fee, rho;
@@ -98,6 +99,7 @@ public slots:
 	void lockTable();
 	void processPull();
 	void processFlatten();
+	void toggle2D();
 
 protected:
 	void initializeGL();
