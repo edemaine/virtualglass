@@ -315,24 +315,27 @@ float meshCircularBaseCane(bool show2D, Geometry *geometry, Cane** ancestors,
 	if (!show2D)
 		return meshCircularBaseCane(geometry, ancestors, ancestorCount, resolution, group_cane, group_tag, radius, computeRadius);
 	unsigned int angularResolution, axialResolution;
-	float total_stretch, transformedRadius;
+	//float total_stretch;
+	float transformedRadius;
 
 	switch (resolution)
 	{
 	case LOW_RESOLUTION:
 		angularResolution = LOW_ANGULAR_RESOLUTION;
 		axialResolution = LOW_AXIAL_RESOLUTION;
+		axialResolution = 5;
 		break;
 	case HIGH_RESOLUTION:
 		angularResolution = HIGH_ANGULAR_RESOLUTION;
 		axialResolution = HIGH_AXIAL_RESOLUTION;
+		axialResolution = 15;
 		break;
 	default:
 		exit(1);
 	}
 
 	//DEBUG: total_stretch shortened... why is the top cap missing?
-	total_stretch = computeTotalStretch(ancestors, ancestorCount);
+	// total_stretch = computeTotalStretch(ancestors, ancestorCount);
 
 	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
@@ -345,8 +348,9 @@ float meshCircularBaseCane(bool show2D, Geometry *geometry, Cane** ancestors,
  the z values range between 0 and 1.
  */
 	//Generate verts:
-	for (unsigned int i = 0; i <= 1; ++i)
+	for (unsigned int i = 0; i <= 0; ++i)
 	{
+		float z = (i?0.01:0.0);
 		for (unsigned int j = 0; j < angularResolution; ++j)
 		{
 			Point p;
@@ -354,7 +358,8 @@ float meshCircularBaseCane(bool show2D, Geometry *geometry, Cane** ancestors,
 
 			p.x = radius * cos(2 * PI * ((float) j) / angularResolution);
 			p.y = radius * sin(2 * PI * ((float) j) / angularResolution);
-			p.z = (i+ 0.0f) / total_stretch;
+			//p.z = (i+ 0.0f) / total_stretch;
+			p.z = z;
 			n.x = p.x;
 			n.y = p.y;
 			n.z = 0.0f;
@@ -365,9 +370,9 @@ float meshCircularBaseCane(bool show2D, Geometry *geometry, Cane** ancestors,
 	for (unsigned int j = 0; j < angularResolution; ++j)
 	{
 		uint32_t p1 = first_vert + 0 * angularResolution + j;
-		uint32_t p2 = first_vert + (0+1) * angularResolution + j;
+		uint32_t p2 = first_vert + (0+0) * angularResolution + j;
 		uint32_t p3 = first_vert + 0 * angularResolution + (j+1) % angularResolution;
-		uint32_t p4 = first_vert + (0+1) * angularResolution + (j+1) % angularResolution;
+		uint32_t p4 = first_vert + (0+0) * angularResolution + (j+1) % angularResolution;
 		// Four points that define a (non-flat) quad are used
 		// to create two triangles.
 		geometry->triangles.push_back(Triangle(p2, p1, p4));
@@ -383,8 +388,8 @@ float meshCircularBaseCane(bool show2D, Geometry *geometry, Cane** ancestors,
  The mesh uses a set of n-2 triangles with a common vertex
  to draw a regular n-gon.
  */
-	for (int side = 0; side <= 1; ++side) {
-		float z = (side?1.0:0.0);
+	for (int side = 1; side <= 1; ++side) {
+		float z = (side?0.01:0.0);
 		float nz = (side?1.0:-1.0);
 		uint32_t base = geometry->vertices.size();
 		for (unsigned int j = 0; j < angularResolution; ++j)
@@ -392,7 +397,8 @@ float meshCircularBaseCane(bool show2D, Geometry *geometry, Cane** ancestors,
 			Point p;
 			p.x = radius * cos(2 * PI * ((float) j) / angularResolution);
 			p.y = radius * sin(2 * PI * ((float) j) / angularResolution);
-			p.z = z / total_stretch;
+			//p.z = z / total_stretch;
+			p.z = z;
 			Point n;
 			n.x = 0.0; n.y = 0.0; n.z = nz;
 			geometry->vertices.push_back(Vertex(p, n));

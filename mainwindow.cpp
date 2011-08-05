@@ -78,12 +78,20 @@ void MainWindow::setupMenuBar()
 	viewMenu->addAction(toggleGrid);
 
 	QAction* toggleSnaps = new QAction(tr("&Show Snaps"), this);
-	toggleSnaps->setStatusTip(tr("Show and activate the reference snaps."));
+	toggleSnaps->setStatusTip(tr("Show and activate the snaps."));
 	toggleSnaps->setCheckable(true);
 	toggleSnaps->setChecked(true);
 	openglWidget->setSnaps(true);
 	connect(toggleSnaps, SIGNAL(triggered()), openglWidget, SLOT(toggleSnaps()));
 	viewMenu->addAction(toggleSnaps);
+
+	QAction* toggleRefSnaps = new QAction(tr("&Show Auxiliary Snaps"), this);
+	toggleRefSnaps->setStatusTip(tr("Show auxiliary snaps."));
+	toggleRefSnaps->setCheckable(true);
+	toggleRefSnaps->setChecked(true);
+	openglWidget->setRefSnaps(true);
+	connect(toggleRefSnaps, SIGNAL(triggered()), openglWidget, SLOT(toggleRefSnaps()));
+	viewMenu->addAction(toggleRefSnaps);
 
 	viewMenu->addSeparator();
 

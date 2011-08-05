@@ -49,6 +49,7 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 	showAxes = true;
 	showGrid = false;
 	showSnaps = false;
+	showRefSnaps = false;
 	show2D = false;
 	lockView = false;
 
@@ -356,7 +357,8 @@ void OpenGLWidget :: drawSnapPoints()
 
 		glColor3f((1-bgColor.redF())*3/4,(1-bgColor.greenF())*3/4,(1-bgColor.blueF())*3/4);
 		//glColor3f(0.75,0.75,0.75);
-		drawCircle(model->snapPointRadius(SNAP_POINT,i));
+		if (showRefSnaps)
+			drawCircle(model->snapPointRadius(SNAP_POINT,i));
 
 		glPopMatrix();
 	}
@@ -385,8 +387,11 @@ void OpenGLWidget :: drawSnapCircles()
 		//glColor3f(0.75,0.75,0.75);
 
 		drawCircle(model->snapPointRadius(SNAP_CIRCLE,i));
-		drawCircle(model->snapPointRadius(SNAP_CIRCLE,i)*(1-model->snapCircleParam));
-		drawCircle(model->snapPointRadius(SNAP_CIRCLE,i)*(1+model->snapCircleParam));
+		if (showRefSnaps)
+		{
+			drawCircle(model->snapPointRadius(SNAP_CIRCLE,i)*(1-model->snapCircleParam));
+			drawCircle(model->snapPointRadius(SNAP_CIRCLE,i)*(1+model->snapCircleParam));
+		}
 
 		glPopMatrix();
 	}
@@ -442,15 +447,18 @@ void OpenGLWidget :: drawSnapLines()
 		Point p1 = model->snapPoint(SNAP_LINE,i);
 		Point p2 = model->snapPoint2(SNAP_LINE,i);
 		drawSegment(p1,p2);
-		Point v = p2-p1;
-		v = p2-p1;
-		v.z = -v.x;
-		v.x = v.y;
-		v.y = v.z;
-		v.z = 0;
-		Point dist=normalize(v)*(model->snapLineParam);
-		drawSegment(p1+dist,p2+dist);
-		drawSegment(p1-dist,p2-dist);
+		if (showRefSnaps)
+		{
+			Point v = p2-p1;
+			v = p2-p1;
+			v.z = -v.x;
+			v.x = v.y;
+			v.y = v.z;
+			v.z = 0;
+			Point dist=normalize(v)*(model->snapLineParam);
+			drawSegment(p1+dist,p2+dist);
+			drawSegment(p1-dist,p2-dist);
+		}
 	}
 
 }
@@ -529,6 +537,11 @@ void OpenGLWidget :: toggleSnaps()
 	setSnaps(!showSnaps);
 }
 
+void OpenGLWidget :: toggleRefSnaps()
+{
+	setRefSnaps(!showRefSnaps);
+}
+
 void OpenGLWidget :: setAxes(bool show)
 {
 	showAxes = show;
@@ -544,6 +557,12 @@ void OpenGLWidget :: setGrid(bool show)
 void OpenGLWidget :: setSnaps(bool show)
 {
 	showSnaps = show;
+	update();
+}
+
+void OpenGLWidget :: setRefSnaps(bool show)
+{
+	showRefSnaps = show;
 	update();
 }
 
@@ -682,25 +701,25 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
    switch(model->getActiveSnapMode())
    {
    case SNAP_POINT:
-	p=model->snapPoint(SNAP_POINT,model->getActiveSnapIndex());
-	//model->moveCaneTo(p.x,p.y);
-	break;
+ p=model->snapPoint(SNAP_POINT,model->getActiveSnapIndex());
+ //model->moveCaneTo(p.x,p.y);
+ break;
    case SNAP_LINE:
-	loc=model->getCane()->subcaneLocations[model->getActiveSubcane()];
-	p1 = model->snapPoint(SNAP_LINE,model->getActiveSnapIndex());
-	p2 = model->snapPoint2(SNAP_LINE,model->getActiveSnapIndex());
-	a = loc-p1;
-	b = p2-p1;
-	p = (a*b/(b*b))*b + p1;
-	//model->moveCaneTo(p.x,p.y);
-	break;
+ loc=model->getCane()->subcaneLocations[model->getActiveSubcane()];
+ p1 = model->snapPoint(SNAP_LINE,model->getActiveSnapIndex());
+ p2 = model->snapPoint2(SNAP_LINE,model->getActiveSnapIndex());
+ a = loc-p1;
+ b = p2-p1;
+ p = (a*b/(b*b))*b + p1;
+ //model->moveCaneTo(p.x,p.y);
+ break;
    case SNAP_CIRCLE:
-	loc=model->getCane()->subcaneLocations[model->getActiveSubcane()];
-	p=model->snapPoint(SNAP_CIRCLE,model->getActiveSnapIndex());
-	dist=loc-p;
-	dist = dist*model->snapPointRadius(SNAP_CIRCLE,model->getActiveSnapIndex())/length(dist) + p;
-	//model->moveCaneTo(dist.x,dist.y);
-	break;
+ loc=model->getCane()->subcaneLocations[model->getActiveSubcane()];
+ p=model->snapPoint(SNAP_CIRCLE,model->getActiveSnapIndex());
+ dist=loc-p;
+ dist = dist*model->snapPointRadius(SNAP_CIRCLE,model->getActiveSnapIndex())/length(dist) + p;
+ //model->moveCaneTo(dist.x,dist.y);
+ break;
    }*/
 			model->clearActiveSnap(false);
 		}
@@ -854,7 +873,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 					relX *= 1.75 * rho; // tone it down
 					relY *= 1.5 * rho; // tone it down
 					model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
-								relX * sin(theta + PI / 2.0) + relY * sin(theta),showSnaps);
+									relX * sin(theta + PI / 2.0) + relY * sin(theta),showSnaps);
 				}
 			}
 		}

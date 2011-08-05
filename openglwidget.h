@@ -36,6 +36,7 @@ public:
 	void setAxes(bool show);
 	void setGrid(bool show);
 	void setSnaps(bool show);
+	void setRefSnaps(bool show);
 	void exactInput();
 
 private:
@@ -59,6 +60,7 @@ private:
 	bool showAxes;
 	bool showGrid;
 	bool showSnaps;
+	bool showRefSnaps;
 	bool lockView;
 	bool show2D;
 
@@ -96,6 +98,7 @@ public slots:
 	void toggleAxes();
 	void toggleGrid();
 	void toggleSnaps();
+	void toggleRefSnaps();
 	void lockTable();
 	void processPull();
 	void processFlatten();
