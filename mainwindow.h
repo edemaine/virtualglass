@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include "openglwidget.h"
+#include "recipewidget.h"
 #include "constants.h"
 #include "primitives.h"
 #include "librarycanewidget.h"
@@ -20,6 +21,7 @@ public:
 	MainWindow(Model* model);
 	void seedLibrary();
 	OpenGLWidget* openglWidget;
+	RecipeWidget* recipeWidget;
 	QPushButton* pull_button;
 	QPushButton* bundle_button;
 	QPushButton* case_button;
@@ -52,6 +54,7 @@ public slots:
 	void loadLibraryCane(const YAML::Node& node, Cane* cane);
 	void displayTextMessage(QString message,int msec);
 	void displayTextMessage(QString message);
+	void toggleRecipe();
 
 private:
 	Model* model;
@@ -59,6 +62,7 @@ private:
 	void keyPressEvent(QKeyEvent* e);
 	void keyReleaseEvent(QKeyEvent* e);
 	void setupLibraryArea();
+	void setupRecipeArea();
 	void setupStatusBar();
 	void setupWorkArea();
 	void setupMenuBar();
@@ -74,6 +78,7 @@ private:
 	QScrollArea* scrollArea;
 	QScrollArea* libraryScrollArea;
 	QHBoxLayout* stockLayout;
+	QHBoxLayout* workLayout;
 	QTabWidget* tabWidget;
 	QLabel* imageLabel;
 	QStatusBar* statusBar;
@@ -84,6 +89,8 @@ private:
 	QColorDialog* colorDialog;
 	QFormLayout* caneForm;
 	QComboBox* caneTypeBox;
+
+	bool isRecipe;
 
 
 };

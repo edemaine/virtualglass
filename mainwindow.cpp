@@ -11,6 +11,7 @@ MainWindow::MainWindow(Model* model)
 	windowLayout = new QVBoxLayout(centralWidget);
 	setupWorkArea();
 	setupLibraryArea();
+	setupRecipeArea();
 	setupStatusBar();
 	setupMenuBar();
 	setupNewColorPickerCaneDialog();
@@ -60,6 +61,17 @@ void MainWindow::setupMenuBar()
 
 
 	viewMenu = menuBar()->addMenu(tr("&View"));
+
+	QAction* toggleRecipe = new QAction(tr("&Recipe View"), this);
+	toggleRecipe->setStatusTip(tr("Switch between 3D view and recipe view"));
+	toggleRecipe->setCheckable(true);
+	toggleRecipe->setChecked(false);
+	//connect(toggleRecipe, SIGNAL(triggered()), openglWidget, SLOT(toggleClickable()));
+	connect(toggleRecipe, SIGNAL(triggered()), this, SLOT(toggleRecipe()));
+	isRecipe = false;
+	viewMenu->addAction(toggleRecipe);
+
+	viewMenu->addSeparator();
 
 	QAction* toggleAxes = new QAction(tr("&Show Axes"), this);
 	toggleAxes->setStatusTip(tr("Show the reference lines on the X, Y, and Z axes."));
@@ -577,7 +589,7 @@ void MainWindow::setupWorkArea()
 	operButton_layout->addWidget(clear_button);
 	operButton_layout->addWidget(tabletop_button);
 
-	QHBoxLayout* workLayout = new QHBoxLayout();
+	workLayout = new QHBoxLayout();
 	workLayout->addLayout(operButton_layout);
 	workLayout->addWidget(openglWidget, 1);
 	windowLayout->addLayout(workLayout, 5);
@@ -619,3 +631,23 @@ void MainWindow::keyReleaseEvent(QKeyEvent* e)
 	}
 }
 
+void MainWindow::setupRecipeArea()
+{
+	recipeWidget = new RecipeWidget(this);
+}
+
+void MainWindow::toggleRecipe()
+{
+	isRecipe = !isRecipe;
+	if (isRecipe)
+	{
+		openglWidget->setClickable(false);
+		workLayout->insertWidget(1,recipeWidget,1);
+		//workLayout->removeWidget(openglWidget);
+	} else
+	{
+		openglWidget->setClickable(true);
+		workLayout->insertWidget(1,openglWidget,1);
+		//workLayout->removeWidget(recipeWidget);
+	}
+}

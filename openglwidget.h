@@ -38,6 +38,8 @@ public:
 	void setSnaps(bool show);
 	void setRefSnaps(bool show);
 	void exactInput();
+	void setClickable(bool set);
+	bool isClickable();
 
 private:
 	//CaneHistory* history;
@@ -63,6 +65,7 @@ private:
 	bool showRefSnaps;
 	bool lockView;
 	bool show2D;
+	bool clickable;
 
 	float lookAtLoc[3];
 	float theta, fee, rho;

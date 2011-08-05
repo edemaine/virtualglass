@@ -52,6 +52,7 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 	showRefSnaps = false;
 	show2D = false;
 	lockView = false;
+	clickable = false;
 
 	lookAtLoc[0] = 0.0f;
 	lookAtLoc[1] = 0.0f;
@@ -634,6 +635,9 @@ Currently catches all mouse press events
 */
 void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 {
+	if (!isClickable())
+		return;
+
 	// Update instance variables for mouse location
 	mouseLocX = e->x();
 	mouseLocY = e->y();
@@ -688,6 +692,8 @@ Currently catches all mouse release events
 */
 void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 {
+	if (!isClickable())
+		return;
 	// Change as part of dual mode feature
 	updateResolution(HIGH_RESOLUTION);
 
@@ -696,31 +702,6 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 	{
 		if (model->getActiveSnapMode()!=NO_SNAP && showSnaps)
 		{
-			// do stuff!
-			/*Point p,loc,p1,p2,dist,a,b;
-   switch(model->getActiveSnapMode())
-   {
-   case SNAP_POINT:
- p=model->snapPoint(SNAP_POINT,model->getActiveSnapIndex());
- //model->moveCaneTo(p.x,p.y);
- break;
-   case SNAP_LINE:
- loc=model->getCane()->subcaneLocations[model->getActiveSubcane()];
- p1 = model->snapPoint(SNAP_LINE,model->getActiveSnapIndex());
- p2 = model->snapPoint2(SNAP_LINE,model->getActiveSnapIndex());
- a = loc-p1;
- b = p2-p1;
- p = (a*b/(b*b))*b + p1;
- //model->moveCaneTo(p.x,p.y);
- break;
-   case SNAP_CIRCLE:
- loc=model->getCane()->subcaneLocations[model->getActiveSubcane()];
- p=model->snapPoint(SNAP_CIRCLE,model->getActiveSnapIndex());
- dist=loc-p;
- dist = dist*model->snapPointRadius(SNAP_CIRCLE,model->getActiveSnapIndex())/length(dist) + p;
- //model->moveCaneTo(dist.x,dist.y);
- break;
-   }*/
 			model->clearActiveSnap(false);
 		}
 		//check if cane is in a snap, and finalize it if true
@@ -748,6 +729,9 @@ part of the mode feature.
 */
 void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 {
+	if (!isClickable())
+		return;
+
 	float relX, relY;
 	float newFee;
 	float windowWidth, windowHeight;
@@ -1106,3 +1090,12 @@ void OpenGLWidget :: toggle2D(){
 	update();
 }
 
+bool OpenGLWidget :: isClickable()
+{
+	return clickable;
+}
+
+void OpenGLWidget :: setClickable(bool set)
+{
+	this->clickable = set;
+}
