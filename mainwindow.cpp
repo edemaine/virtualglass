@@ -11,7 +11,6 @@ MainWindow::MainWindow(Model* model)
 	windowLayout = new QVBoxLayout(centralWidget);
 	setupWorkArea();
 	setupLibraryArea();
-	setupRecipeArea();
 	setupStatusBar();
 	setupMenuBar();
 	setupNewColorPickerCaneDialog();
@@ -553,7 +552,7 @@ void MainWindow::colorPickerSelected()
 
 void MainWindow::setupWorkArea()
 {
-	openglWidget = new OpenGLWidget(this, model);
+
 	pull_button = new QPushButton("Pull");
 	pull_button->setToolTip("Drag Mouse Horizontally to Twist, Vertically to Stretch. Use Shift to twist and stretch independently.");
 	bundle_button = new QPushButton("Bundle");
@@ -589,9 +588,20 @@ void MainWindow::setupWorkArea()
 	operButton_layout->addWidget(clear_button);
 	operButton_layout->addWidget(tabletop_button);
 
-	workLayout = new QHBoxLayout();
+	QHBoxLayout* workLayout = new QHBoxLayout(windowLayout->widget());
 	workLayout->addLayout(operButton_layout);
-	workLayout->addWidget(openglWidget, 1);
+
+	stackLayout = new QStackedLayout(workLayout->widget());
+
+	openglWidget = new OpenGLWidget(stackLayout->widget(), model);
+	setupRecipeArea();
+
+	stackLayout->addWidget(openglWidget);
+	stackLayout->addWidget(recipeWidget);
+	stackLayout->setCurrentWidget(openglWidget);
+
+	workLayout->addLayout(stackLayout,1);
+	//workLayout->addWidget(recipeWidget,1);
 	windowLayout->addLayout(workLayout, 5);
 }
 
@@ -633,7 +643,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent* e)
 
 void MainWindow::setupRecipeArea()
 {
-	recipeWidget = new RecipeWidget(this);
+	recipeWidget = new RecipeWidget(stackLayout->widget());
 }
 
 void MainWindow::toggleRecipe()
@@ -642,12 +652,10 @@ void MainWindow::toggleRecipe()
 	if (isRecipe)
 	{
 		openglWidget->setClickable(false);
-		workLayout->insertWidget(1,recipeWidget,1);
-		//workLayout->removeWidget(openglWidget);
+		stackLayout->setCurrentIndex(1);
 	} else
 	{
 		openglWidget->setClickable(true);
-		workLayout->insertWidget(1,openglWidget,1);
-		//workLayout->removeWidget(recipeWidget);
+		stackLayout->setCurrentIndex(0);
 	}
 }

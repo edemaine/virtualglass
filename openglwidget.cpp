@@ -52,7 +52,7 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 	showRefSnaps = false;
 	show2D = false;
 	lockView = false;
-	clickable = false;
+	clickable = true;
 
 	lookAtLoc[0] = 0.0f;
 	lookAtLoc[1] = 0.0f;

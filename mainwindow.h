@@ -78,7 +78,7 @@ private:
 	QScrollArea* scrollArea;
 	QScrollArea* libraryScrollArea;
 	QHBoxLayout* stockLayout;
-	QHBoxLayout* workLayout;
+	QStackedLayout* stackLayout;
 	QTabWidget* tabWidget;
 	QLabel* imageLabel;
 	QStatusBar* statusBar;
