@@ -33,3 +33,13 @@ void LibraryCaneWidget :: mouseReleaseEvent(QMouseEvent* event)
 		this->deleteLater();
 	}
 }
+
+void LibraryCaneWidget :: mouseMoveEvent(QMouseEvent* event)
+{
+	//emit mouseOver(this);
+}
+
+void LibraryCaneWidget :: enterEvent(QEvent *event)
+{
+	emit mouseOver(this);
+}

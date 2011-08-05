@@ -55,6 +55,7 @@ public slots:
 	void displayTextMessage(QString message,int msec);
 	void displayTextMessage(QString message);
 	void toggleRecipe();
+	void updateLibraryToolTip(LibraryCaneWidget* lc);
 
 private:
 	Model* model;
