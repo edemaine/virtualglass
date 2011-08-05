@@ -466,11 +466,8 @@ void OpenGLWidget :: switchProjection()
 {
 	if (show2D)
 	{
-		if (!isOrthographic)
-		{
-			isOrthographic = true;
-			update();
-		}
+		isOrthographic = true;
+		update();
 		return;
 	}
 
@@ -682,29 +679,29 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 		{
 			// do stuff!
 			/*Point p,loc,p1,p2,dist,a,b;
-			switch(model->getActiveSnapMode())
-			{
-			case SNAP_POINT:
-				p=model->snapPoint(SNAP_POINT,model->getActiveSnapIndex());
-				//model->moveCaneTo(p.x,p.y);
-				break;
-			case SNAP_LINE:
-				loc=model->getCane()->subcaneLocations[model->getActiveSubcane()];
-				p1 = model->snapPoint(SNAP_LINE,model->getActiveSnapIndex());
-				p2 = model->snapPoint2(SNAP_LINE,model->getActiveSnapIndex());
-				a = loc-p1;
-				b = p2-p1;
-				p = (a*b/(b*b))*b + p1;
-				//model->moveCaneTo(p.x,p.y);
-				break;
-			case SNAP_CIRCLE:
-				loc=model->getCane()->subcaneLocations[model->getActiveSubcane()];
-				p=model->snapPoint(SNAP_CIRCLE,model->getActiveSnapIndex());
-				dist=loc-p;
-				dist = dist*model->snapPointRadius(SNAP_CIRCLE,model->getActiveSnapIndex())/length(dist) + p;
-				//model->moveCaneTo(dist.x,dist.y);
-				break;
-			}*/
+   switch(model->getActiveSnapMode())
+   {
+   case SNAP_POINT:
+	p=model->snapPoint(SNAP_POINT,model->getActiveSnapIndex());
+	//model->moveCaneTo(p.x,p.y);
+	break;
+   case SNAP_LINE:
+	loc=model->getCane()->subcaneLocations[model->getActiveSubcane()];
+	p1 = model->snapPoint(SNAP_LINE,model->getActiveSnapIndex());
+	p2 = model->snapPoint2(SNAP_LINE,model->getActiveSnapIndex());
+	a = loc-p1;
+	b = p2-p1;
+	p = (a*b/(b*b))*b + p1;
+	//model->moveCaneTo(p.x,p.y);
+	break;
+   case SNAP_CIRCLE:
+	loc=model->getCane()->subcaneLocations[model->getActiveSubcane()];
+	p=model->snapPoint(SNAP_CIRCLE,model->getActiveSnapIndex());
+	dist=loc-p;
+	dist = dist*model->snapPointRadius(SNAP_CIRCLE,model->getActiveSnapIndex())/length(dist) + p;
+	//model->moveCaneTo(dist.x,dist.y);
+	break;
+   }*/
 			model->clearActiveSnap(false);
 		}
 		//check if cane is in a snap, and finalize it if true
@@ -844,13 +841,21 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 				relY *=5;
 				model->moveCane(-relY);
 			} else {
-				Point oldCanePoint = getClickedCanePoint(model->getActiveSubcane(),oldMouseLocX,oldMouseLocY);
-				Point newCanePoint = getClickedPlanePoint(mouseLocX,mouseLocY,oldCanePoint.z);
-				model->moveCaneTo(newCanePoint);
-				//relX *= 5; // tone it down
-				//relY *= 5; // tone it down
-				//model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
-				//				relX * sin(theta + PI / 2.0) + relY * sin(theta),showSnaps);
+				if (show2D)
+				{
+					//Point oldCanePoint = getClickedCanePoint(model->getActiveSubcane(),oldMouseLocX,oldMouseLocY);
+					//Point newCanePoint = getClickedPlanePoint(mouseLocX,mouseLocY,oldCanePoint.z);
+					Point newCanePoint = getClickedPlanePoint(mouseLocX,mouseLocY);
+					Point oldCanePoint = getClickedPlanePoint(oldMouseLocX,oldMouseLocY);
+					model->moveCaneTo(newCanePoint,oldCanePoint,showSnaps);
+				}
+				else
+				{
+					relX *= 1.75 * rho; // tone it down
+					relY *= 1.5 * rho; // tone it down
+					model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
+								relX * sin(theta + PI / 2.0) + relY * sin(theta),showSnaps);
+				}
 			}
 		}
 		if (model->getActiveSubcane() != -1 && model->getCane()) {
@@ -998,14 +1003,15 @@ void OpenGLWidget :: drawAxes()
 	}
 	glEnd();
 
+
+	glBegin(GL_LINES);
+	glColor3f(1-bgColor.redF(),1-bgColor.greenF(),bgColor.blueF());
+	glVertex3f(0,0,0);
+	glVertex3f(0,0,1.2);
+	glEnd();
+
 	if (!show2D)
 	{
-		glBegin(GL_LINES);
-		glColor3f(1-bgColor.redF(),1-bgColor.greenF(),bgColor.blueF());
-		glVertex3f(0,0,0);
-		glVertex3f(0,0,1.2);
-		glEnd();
-
 		glBegin(GL_TRIANGLE_FAN);
 		glVertex3f(0,0,1.2);
 		for (int angle=0;angle<=360;angle+=10){
@@ -1072,11 +1078,12 @@ void OpenGLWidget::exactInput()
 
 void OpenGLWidget :: toggle2D(){
 	show2D = !show2D;
+	switchProjection();
 	if (show2D)
 	{
-		switchProjection();
 		setTopView();
 	}
 	model->toggle2D();
+	update();
 }
 

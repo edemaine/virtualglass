@@ -87,7 +87,7 @@ void Model :: setMode(int mode)
 		int ancestorCount = 0;
 
 		lowResGeometry.clear();
-		cane->createCasing(generateMesh(cane, &lowResGeometry, ancestors,
+		cane->createCasing(generateMesh(show2D, cane, &lowResGeometry, ancestors,
 										&ancestorCount, LOW_RESOLUTION, true, true));
 		geometryOutOfDate();
 		emit caneChanged();
@@ -153,7 +153,7 @@ void Model :: updateLowResGeometry()
 	ancestorCount = 0;
 	lowResGeometry.clear();
 	if (cane != NULL)
-		generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION, true);
+		generateMesh(show2D, cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION, true);
 	lowResGeometryFresh = 1;
 }
 
@@ -165,7 +165,7 @@ void Model :: updateHighResGeometry()
 	ancestorCount = 0;
 	highResGeometry.clear();
 	if (cane != NULL)
-		generateMesh(cane, &highResGeometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
+		generateMesh(show2D, cane, &highResGeometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
 	highResGeometryFresh = 1;
 }
 
@@ -240,6 +240,11 @@ void Model :: flattenActiveCane(float rectangle_ratio, float rectangle_theta, fl
 	emit caneChanged();
 }
 
+void Model :: moveCane(Point p)
+{
+	moveCane(p.x,p.y);
+}
+
 void Model :: moveCane(float delta_x, float delta_y)
 {
 	if (cane == NULL || activeSubcane == -1)
@@ -249,7 +254,6 @@ void Model :: moveCane(float delta_x, float delta_y)
 	{
 		cane->moveCaneTo(activeSubcane,snapHoldPoint);
 	}
-
 	cane->moveCane(activeSubcane, delta_x, delta_y);
 
 	// check if cane hits any snaps
@@ -327,14 +331,25 @@ void Model :: moveCane(float delta_x, float delta_y, bool snaps)
 
 	// check if cane hits any snaps
 
-	clearActiveSnap(true);
+	clearActiveSnap(false);
 	geometryOutOfDate();
 	emit caneChanged();
 }
 
-void Model :: moveCaneTo(Point p)
+void Model :: moveCaneTo(Point p,Point oldP,bool snaps)
 {
-	moveCaneTo(p.x,p.y);
+	if (cane == NULL || activeSubcane == -1)
+		return;
+	if (snaps)
+	{
+		//Point loc = cane->subcaneLocations[activeSubcane];
+		//moveCane(p.x-loc.x,p.y-loc.y);
+		moveCane(p-oldP);
+	}
+	else
+	{
+		moveCaneTo(p.x,p.y);
+	}
 }
 
 void Model :: moveCaneTo(float delta_x, float delta_y)
@@ -747,4 +762,6 @@ void Model :: deleteSnapPoint(Point loc)
 void Model :: toggle2D()
 {
 	show2D = !show2D;
+	geometryOutOfDate();
+	emit caneChanged();
 }
