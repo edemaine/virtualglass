@@ -214,6 +214,7 @@ void MainWindow::modeChanged(int mode)
 void MainWindow::libraryCaneDestroyed(QObject* obj)
 {
 	stockLayout->removeWidget((QWidget*) obj);
+	updateLibraryToolTip((LibraryCaneWidget*) obj);
 }
 
 void MainWindow::displayTextMessage(QString msg)
@@ -240,6 +241,7 @@ void MainWindow::saveCaneToLibrary()
 void MainWindow::updateLibraryToolTip(LibraryCaneWidget *lc)
 {
 	lc->setToolTip(QString("Cane #%1").arg(stockLayout->indexOf(lc)));
+	lc->setAccessibleName(QString("Cane #%1").arg(stockLayout->indexOf(lc)));
 }
 
 void MainWindow::setupStatusBar()
