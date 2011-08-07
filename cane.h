@@ -3,6 +3,7 @@
 #ifndef CANE_H
 #define CANE_H
 
+#include <QMetaType>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -13,6 +14,7 @@
 class Cane
 {
 public:
+	Cane();
 	Cane(int type);
 	void reset();
 	void shallowCopy(Cane* dest);
@@ -45,7 +47,8 @@ public:
 
 };
 
-
+Q_DECLARE_METATYPE(Cane)
+Q_DECLARE_METATYPE(Cane*)
 
 #endif
 

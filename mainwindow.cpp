@@ -652,7 +652,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent* e)
 
 void MainWindow::setupRecipeArea()
 {
-	recipeWidget = new RecipeWidget(stackLayout->widget());
+	recipeWidget = new RecipeWidget(stackLayout->widget(),openglWidget);
 }
 
 void MainWindow::toggleRecipe()
@@ -661,10 +661,11 @@ void MainWindow::toggleRecipe()
 	if (isRecipe)
 	{
 		openglWidget->setClickable(false);
-		stackLayout->setCurrentIndex(1);
+		recipeWidget->updateRecipe(true);
+		stackLayout->setCurrentWidget(recipeWidget);
 	} else
 	{
 		openglWidget->setClickable(true);
-		stackLayout->setCurrentIndex(0);
+		stackLayout->setCurrentWidget(openglWidget);
 	}
 }

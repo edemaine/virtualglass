@@ -5,6 +5,12 @@ definition of a cane).
 
 #include "cane.h"
 
+Cane :: Cane()
+{
+	reset();
+	this->type = UNASSIGNED_CANETYPE;
+}
+
 Cane :: Cane(int type)
 {
 	reset();
