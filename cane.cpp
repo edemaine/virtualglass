@@ -494,3 +494,10 @@ std::string Cane :: yamlRepresentation()
 
 	return out.c_str();
 }
+
+QColor Cane :: qcolor()
+{
+	QColor result;
+	result.setRgbF(color.r, color.g, color.b, color.a);
+	return result;
+}

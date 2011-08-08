@@ -10,6 +10,7 @@
 #include "primitives.h"
 #include "constants.h"
 #include "yaml-cpp/yaml.h"
+#include <QColor>
 
 class Cane
 {
@@ -37,6 +38,7 @@ public:
 	Cane* deepCopy();
 	void setColor(Color color);
 	std::string yamlRepresentation();
+	QColor qcolor();
 
 	int type;
 	float amts[MAX_AMT_TYPES];
