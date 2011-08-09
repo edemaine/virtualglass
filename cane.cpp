@@ -36,7 +36,7 @@ void Cane :: reset()
 	}
 
 	color.r = color.g = color.b = color.a = 1.0;
-
+	libraryIndex=-1;
 }
 
 // Returns the number of nodes in the cane's DAG
@@ -81,6 +81,7 @@ void Cane :: shallowCopy(Cane* dest)
 			dest->subcanes[i] = NULL;
 	}
 	dest->color = this->color;
+	dest->libraryIndex = this->libraryIndex;
 }
 
 void Cane :: pullLinear(float twistFactor, float stretchFactor)
@@ -352,6 +353,7 @@ Cane* Cane :: deepCopy()
 			copy->subcanes[i] = NULL;
 	}
 	copy->color = this->color;
+	copy->libraryIndex = this->libraryIndex;
 
 	return copy;
 }
@@ -400,6 +402,32 @@ std::string typeToName(int type)
 	}
 }
 
+std::string typeToType(int type)
+{
+	switch(type)
+	{
+	case PULL_CANETYPE:
+		return "Pull";
+	case BUNDLE_CANETYPE:
+		return "Bundle";
+	case CASING_CANETYPE:
+		return "Casing";
+	case FLATTEN_CANETYPE:
+		return "Flatten";
+	case BASE_CIRCLE_CANETYPE:
+		return "Base Circle";
+	case UNASSIGNED_CANETYPE:
+		return "Unassigned";
+	default:
+		return UNDEFINED;
+	}
+}
+
+QString Cane :: typeName()
+{
+	return QString(typeToType(type).c_str());
+}
+
 std::string amtTypeToName(int type,int index)
 {
 	switch(type)
@@ -441,6 +469,11 @@ std::string amtTypeToName(int type,int index)
 	default:
 		return UNDEFINED;
 	}
+}
+
+QString Cane :: typeAmt(int type, int index)
+{
+	return QString(amtTypeToName(type,index).c_str());
 }
 
 std::string Cane :: yamlRepresentation()
@@ -500,4 +533,9 @@ QColor Cane :: qcolor()
 	QColor result;
 	result.setRgbF(color.r, color.g, color.b, color.a);
 	return result;
+}
+
+void Cane :: changeLibraryIndex(int index)
+{
+	libraryIndex = index;
 }

@@ -43,3 +43,9 @@ void LibraryCaneWidget :: enterEvent(QEvent *event)
 {
 	emit mouseOver(this);
 }
+
+void LibraryCaneWidget :: newLibraryIndex(int index)
+{
+	emit newIndex(index);
+	cane->changeLibraryIndex(index);
+}

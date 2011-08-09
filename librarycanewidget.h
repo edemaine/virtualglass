@@ -18,10 +18,12 @@ public:
 	void mouseMoveEvent(QMouseEvent* event);
 	void enterEvent(QEvent* event);
 	Cane* getCane();
+	void newLibraryIndex(int index);
 
 signals:
 	void modeChangedSig(int mode);
 	void mouseOver(LibraryCaneWidget*);
+	void newIndex(int index);
 
 private:
 	Cane* cane;

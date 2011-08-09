@@ -39,6 +39,8 @@ public:
 	void setColor(Color color);
 	std::string yamlRepresentation();
 	QColor qcolor();
+	QString typeName();
+	QString typeAmt(int type, int index);
 
 	int type;
 	float amts[MAX_AMT_TYPES];
@@ -46,6 +48,10 @@ public:
 	Point subcaneLocations[MAX_SUBCANE_COUNT]; // z is center displacement
 	Cane* subcanes[MAX_SUBCANE_COUNT];
 	Color color;
+	int libraryIndex;
+
+public slots:
+	void changeLibraryIndex(int index);
 
 };
 

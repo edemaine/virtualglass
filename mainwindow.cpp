@@ -232,16 +232,20 @@ void MainWindow::saveCaneToLibrary()
 		return;
 
 	LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->openglWidget, this->model, 0);
+	//connect(lc, SIGNAL(newIndex(int)), model->getCane(), SLOT(changeLibraryIndex(int)));
 	//lc->setMouseTracking(true);
 	stockLayout->addWidget(lc);
+	updateLibraryToolTip(lc);
 	connect(lc, SIGNAL(mouseOver(LibraryCaneWidget*)), this, SLOT(updateLibraryToolTip(LibraryCaneWidget*)));
 	connect(stockLayout, SIGNAL(destroyed(QObject*)), this, SLOT(libraryCaneDestroyed(QObject*)));
 }
 
 void MainWindow::updateLibraryToolTip(LibraryCaneWidget *lc)
 {
-	lc->setToolTip(QString("Cane #%1").arg(stockLayout->indexOf(lc)));
-	lc->setAccessibleName(QString("Cane #%1").arg(stockLayout->indexOf(lc)));
+	int result=stockLayout->indexOf(lc);
+	lc->setToolTip(QString("Cane #%1").arg(result));
+	lc->setAccessibleName(QString("Cane #%1").arg(result));
+	lc->newLibraryIndex(result);
 }
 
 void MainWindow::setupStatusBar()
