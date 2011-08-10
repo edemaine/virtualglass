@@ -17,6 +17,7 @@ RecipeWidget::RecipeWidget(QWidget *parent, OpenGLWidget* openglWidget) :
 	connect(this,SIGNAL(itemChanged(QTreeWidgetItem*,int)),this,SLOT(changeData(QTreeWidgetItem*,int)));
 	connect(this,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(colorPicker(QTreeWidgetItem*,int)));
 	connect(this,SIGNAL(recipeCaneChanged()),openglWidget->getModel(),SLOT(exactChange()));
+	connect(openglWidget->getModel(), SIGNAL(caneChanged()), this, SLOT(updateRecipe()));
 }
 
 void RecipeWidget :: colorPicker(QTreeWidgetItem* item,int column)
@@ -171,6 +172,8 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 void RecipeWidget :: updateRecipe()
 {
 	clear();
+	if (openglWidget->getModel()->getCane() == NULL)
+		return;
 	updateRecipe(openglWidget->getModel()->getCane(), this->invisibleRootItem());
 }
 
@@ -183,6 +186,8 @@ void RecipeWidget :: updateRecipe(bool recurse)
 
 void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode)
 {
+	if (rootCane == NULL)
+		return;
 	int numCane = rootCane->subcaneCount;
 	for (int i=0;i<numCane;i++)
 	{

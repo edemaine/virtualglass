@@ -36,12 +36,6 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 
 	bgColor = QColor(0,0,0);
 
-	tableForm = NULL;
-	stretchInput = NULL;
-	twistInput = NULL;
-	flattenInput = NULL;
-	rectangleInput = NULL;
-
 	model = _model;
 	geometry = NULL;
 	resolution = HIGH_RESOLUTION;
@@ -1021,61 +1015,6 @@ void OpenGLWidget :: drawAxes()
 			glVertex3f(0.02*cos(angle*PI/180.),0.02*sin(angle*PI/180.),1.15);
 		}
 		glEnd();
-	}
-}
-
-void OpenGLWidget::processPull()
-{
-	model->pullCane(twistInput->value(),stretchInput->value());
-	emit operationInfoSig(QString("Twisted %1 Revolutions Per Viewable Length, Pulled %1").arg(model->getCane()->amts[0] / PI / 2,model->getCane()->amts[1]),1000);
-}
-
-void OpenGLWidget::processFlatten()
-{
-	model->flattenCane(rectangleInput->value(), theta + PI / 2.0, flattenInput->value());
-	emit operationInfoSig(QString("Squished with %1, Flattened into rectangle with %1").arg(model->getCane()->amts[0],model->getCane()->amts[2]),1000);
-}
-
-void OpenGLWidget::exactInput()
-{
-	if (model->getMode() == PULL_MODE)
-	{
-		QDialog* tableBox = new QDialog(NULL);
-		tableForm = new QFormLayout(tableBox->window());
-		stretchInput = new QDoubleSpinBox;//= new QLineEdit;
-		tableForm->addRow("Stretch Factor",stretchInput);
-		twistInput = new QDoubleSpinBox;
-		tableForm->addRow("Twist Factor",twistInput);
-
-		QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-		connect(buttons,SIGNAL(accepted()),tableBox,SLOT(accept()));
-		connect(buttons,SIGNAL(accepted()),this,SLOT(processPull()));
-		connect(buttons,SIGNAL(rejected()),tableBox,SLOT(reject()));
-
-		tableForm->addRow(buttons);
-
-		tableBox->setLayout(tableForm);
-
-		tableBox->exec();
-	} else if (model->getMode() == FLATTEN_MODE)
-	{
-		QDialog* tableBox = new QDialog(NULL);
-		tableForm = new QFormLayout(tableBox->window());
-		rectangleInput = new QDoubleSpinBox;
-		tableForm->addRow("Rectangular Factor",rectangleInput);
-		flattenInput = new QDoubleSpinBox;
-		tableForm->addRow("Flatten Factor",flattenInput);
-
-		QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-		connect(buttons,SIGNAL(accepted()),tableBox,SLOT(accept()));
-		connect(buttons,SIGNAL(accepted()),this,SLOT(processFlatten()));
-		connect(buttons,SIGNAL(rejected()),tableBox,SLOT(reject()));
-
-		tableForm->addRow(buttons);
-
-		tableBox->setLayout(tableForm);
-
-		tableBox->exec();
 	}
 }
 

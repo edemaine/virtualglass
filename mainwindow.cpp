@@ -605,6 +605,7 @@ void MainWindow::setupWorkArea()
 	operButton_layout->addWidget(clear_button);
 	operButton_layout->addWidget(tabletop_button);
 	operButton_layout->addWidget(previewLabel,1, Qt::AlignHCenter);
+	previewLabel->setHidden(true);
 
 	QHBoxLayout* workLayout = new QHBoxLayout(windowLayout->widget());
 	workLayout->addLayout(operButton_layout);
@@ -672,10 +673,12 @@ void MainWindow::toggleRecipe()
 		openglWidget->setClickable(false);
 		recipeWidget->updateRecipe(true);
 		stackLayout->setCurrentWidget(recipeWidget);
+		previewLabel->setHidden(false);
 	} else
 	{
 		openglWidget->setClickable(true);
 		stackLayout->setCurrentWidget(openglWidget);
+		previewLabel->setHidden(true);
 	}
 }
 

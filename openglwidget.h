@@ -37,25 +37,16 @@ public:
 	void setGrid(bool show);
 	void setSnaps(bool show);
 	void setRefSnaps(bool show);
-	void exactInput();
 	void setClickable(bool set);
 	bool isClickable();
 
 private:
-	//CaneHistory* history;
 	bool shiftButtonDown;
 	bool rightMouseDown;
 	bool controlButtonDown;
 	bool deleteButtonDown;
 	bool isOrthographic;
 	QColor bgColor;
-	QFormLayout* tableForm;
-	QDoubleSpinBox* stretchInput;
-	QDoubleSpinBox* twistInput;
-	//QDialogButtonBox* buttonsPull;
-	QDoubleSpinBox* flattenInput;
-	QDoubleSpinBox* rectangleInput;
-	//QDialogButtonBox* buttonsFlatten;
 	Model* model;
 	Geometry *geometry;
 	int resolution;
@@ -104,8 +95,6 @@ public slots:
 	void toggleSnaps();
 	void toggleRefSnaps();
 	void lockTable();
-	void processPull();
-	void processFlatten();
 	void toggle2D();
 
 protected:
