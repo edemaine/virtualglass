@@ -79,7 +79,8 @@ void Model :: setMode(int mode)
 	case BUNDLE_MODE:
 		history->saveState(cane);
 		activeSubcane = -1;
-		cane->createBundle();
+		if (prev_mode!=this->mode)
+			cane->createBundle();
 		break;
 	case CASING_MODE:
 	{
@@ -762,6 +763,12 @@ void Model :: deleteSnapPoint(Point loc)
 void Model :: toggle2D()
 {
 	show2D = !show2D;
+	geometryOutOfDate();
+	emit caneChanged();
+}
+
+void Model::exactChange()
+{
 	geometryOutOfDate();
 	emit caneChanged();
 }

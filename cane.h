@@ -37,6 +37,7 @@ public:
 	int leafNodes();
 	Cane* deepCopy();
 	void setColor(Color color);
+	void setColor(QColor color);
 	std::string yamlRepresentation();
 	QColor qcolor();
 	QString typeName();

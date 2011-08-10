@@ -535,6 +535,16 @@ QColor Cane :: qcolor()
 	return result;
 }
 
+void Cane :: setColor(QColor color)
+{
+	Color newColor;
+	newColor.r = color.redF();
+	newColor.g = color.greenF();
+	newColor.b = color.blueF();
+	newColor.a = color.alphaF();
+	setColor(newColor);
+}
+
 void Cane :: changeLibraryIndex(int index)
 {
 	libraryIndex = index;

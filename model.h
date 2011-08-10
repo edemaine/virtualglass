@@ -83,6 +83,7 @@ public slots:
 	void setMode(int mode);
 	void clearCurrentCane();
 	void setCane(Cane* c);
+	void exactChange();
 
 private:
 	int mode;

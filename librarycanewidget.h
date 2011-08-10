@@ -15,7 +15,6 @@ public:
 	LibraryCaneWidget(OpenGLWidget* o, Model* m, QWidget* parent);
 	void mousePressEvent(QMouseEvent* event);
 	void mouseReleaseEvent(QMouseEvent* event);
-	void mouseMoveEvent(QMouseEvent* event);
 	void enterEvent(QEvent* event);
 	Cane* getCane();
 	void newLibraryIndex(int index);

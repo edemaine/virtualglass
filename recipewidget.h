@@ -16,11 +16,15 @@ public:
 	RecipeWidget(QWidget* parent, OpenGLWidget* openglWidget);
 
 signals:
+	void recipeCaneChanged();
 
 public slots:
 	void updateRecipe();
 	void updateRecipe(bool recurse);
 	void updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode);
+	void updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, bool recurse);
+	void changeData(QTreeWidgetItem* item,int column);
+	void colorPicker(QTreeWidgetItem* item,int column);
 
 private:
 	OpenGLWidget* openglWidget;
