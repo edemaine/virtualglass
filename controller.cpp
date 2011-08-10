@@ -21,6 +21,8 @@ Controller::Controller(int argc, char **argv)
 	connect(model, SIGNAL(modeChanged(int)), mainWindow, SLOT(modeChanged(int)));
 	connect(mainWindow, SIGNAL(setCaneSig(Cane*)), model, SLOT(setCane(Cane*)));
 
+	connect(model, SIGNAL(caneChanged()),mainWindow,SLOT(updatePreview()));
+
 	// connect mainwindow buttons to model
 	QSignalMapper* modeSignalMapper = new QSignalMapper(model);
 	modeSignalMapper->setMapping(mainWindow->pull_button, PULL_MODE);

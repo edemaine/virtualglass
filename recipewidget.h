@@ -23,6 +23,7 @@ public slots:
 	void updateRecipe(bool recurse);
 	void updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode);
 	void updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, bool recurse);
+	void updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, int column);
 	void changeData(QTreeWidgetItem* item,int column);
 	void colorPicker(QTreeWidgetItem* item,int column);
 

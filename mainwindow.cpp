@@ -588,6 +588,10 @@ void MainWindow::setupWorkArea()
 	tabletop_button = new QPushButton("Tabletop");
 	tabletop_button->setToolTip("TODO");
 
+	previewLabel = new QLabel();
+	previewLabel->setFixedSize(100,100);
+	previewLabel->setScaledContents(true);
+
 	QVBoxLayout* operButton_layout = new QVBoxLayout();
 	operButton_layout->addWidget(pull_button);
 	operButton_layout->addWidget(bundle_button);
@@ -600,6 +604,7 @@ void MainWindow::setupWorkArea()
 	operButton_layout->addWidget(save_button);
 	operButton_layout->addWidget(clear_button);
 	operButton_layout->addWidget(tabletop_button);
+	operButton_layout->addWidget(previewLabel,1, Qt::AlignHCenter);
 
 	QHBoxLayout* workLayout = new QHBoxLayout(windowLayout->widget());
 	workLayout->addLayout(operButton_layout);
@@ -672,4 +677,9 @@ void MainWindow::toggleRecipe()
 		openglWidget->setClickable(true);
 		stackLayout->setCurrentWidget(openglWidget);
 	}
+}
+
+void MainWindow::updatePreview()
+{
+	previewLabel->setPixmap(QPixmap::grabWidget(openglWidget));
 }

@@ -56,6 +56,7 @@ public slots:
 	void displayTextMessage(QString message);
 	void toggleRecipe();
 	void updateLibraryToolTip(LibraryCaneWidget* lc);
+	void updatePreview();
 
 private:
 	Model* model;
@@ -86,6 +87,7 @@ private:
 	QLabel* modeLabel;
 	int librarySize;
 
+	QLabel* previewLabel;
 	QDialog* caneDialog;
 	QColorDialog* colorDialog;
 	QFormLayout* caneForm;

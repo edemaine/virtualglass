@@ -89,6 +89,7 @@ private:
 signals:
 	void modeChangedSig(int mode);
 	void operationInfoSig(QString str,int msec);
+	void updatePreview();
 
 public slots:
 	void zoomIn();
