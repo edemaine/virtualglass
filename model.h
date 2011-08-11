@@ -76,6 +76,7 @@ signals:
 	void caneChanged();
 	void textMessage(QString msg);
 	void modeChanged(int mode);
+	void updateRecipe();
 
 public slots:
 	void undo();

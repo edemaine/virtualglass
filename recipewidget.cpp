@@ -17,7 +17,7 @@ RecipeWidget::RecipeWidget(QWidget *parent, OpenGLWidget* openglWidget) :
 	connect(this,SIGNAL(itemChanged(QTreeWidgetItem*,int)),this,SLOT(changeData(QTreeWidgetItem*,int)));
 	connect(this,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(colorPicker(QTreeWidgetItem*,int)));
 	connect(this,SIGNAL(recipeCaneChanged()),openglWidget->getModel(),SLOT(exactChange()));
-	connect(openglWidget->getModel(), SIGNAL(caneChanged()), this, SLOT(updateRecipe()));
+	connect(openglWidget->getModel(), SIGNAL(updateRecipe()), this, SLOT(updateRecipe()));
 }
 
 void RecipeWidget :: colorPicker(QTreeWidgetItem* item,int column)
@@ -188,6 +188,7 @@ void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode)
 {
 	if (rootCane == NULL)
 		return;
+
 	int numCane = rootCane->subcaneCount;
 	for (int i=0;i<numCane;i++)
 	{
@@ -201,18 +202,21 @@ void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode)
 			nextLevelCaneWidget->setText(1,QString("%1").arg(subCane->libraryIndex));
 		else
 			nextLevelCaneWidget->setText(1,"");
-		//nextLevelCaneWidget->setText(2,QString("%1").arg(subCane->type));
+
 		nextLevelCaneWidget->setText(2,QString("%1").arg(subCane->typeName()));
 		nextLevelCaneWidget->setBackgroundColor(3,subCane->qcolor());
+
 		nextLevelCaneWidget->setText(4,QString("%1").arg(rootCane->subcaneLocations[i].x));
-		nextLevelCaneWidget->setText(5,QString("%2").arg(rootCane->subcaneLocations[i].y));
-		nextLevelCaneWidget->setText(6,QString("%3").arg(rootCane->subcaneLocations[i].z));
+		nextLevelCaneWidget->setText(5,QString("%1").arg(rootCane->subcaneLocations[i].y));
+		nextLevelCaneWidget->setText(6,QString("%1").arg(rootCane->subcaneLocations[i].z));
+
 		for (int j=0;j<MAX_AMT_TYPES;j++)
 		{
 			nextLevelCaneWidget->setText(7+j,QString("%1").arg(subCane->amts[j]));
 			nextLevelCaneWidget->setToolTip(7+j, QString("%1").arg(subCane->typeAmt(subCane->type,j)));
 			nextLevelCaneWidget->setStatusTip(7+j, QString("%1").arg(subCane->typeAmt(subCane->type,j)));
 		}
+
 		updateRecipe(subCane,nextLevelCaneWidget);
 		rootNode->addChild(nextLevelCaneWidget);
 	}
