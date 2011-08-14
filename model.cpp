@@ -114,6 +114,24 @@ void Model :: setMode(int mode)
 		break;
 	}
 	emit modeChanged(this->mode);
+	if (this->mode != mode)
+	{
+		switch(this->mode)
+		{
+		case PULL_MODE:
+			if (getCane()->type!=PULL_CANETYPE)
+			{
+				this->pullCane(0,0);
+			}
+			break;
+		case FLATTEN_MODE:
+			if (getCane()->type!=FLATTEN_CANETYPE)
+			{
+				this->flattenCane(0,0,0);
+			}
+			break;
+		}
+	}
 }
 
 void Model :: setActiveSubcane(int subcane)

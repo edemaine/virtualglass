@@ -29,6 +29,8 @@ public slots:
 
 private:
 	OpenGLWidget* openglWidget;
+	void newClear();
+	QTreeWidgetItem* visibleRootItem();
 
 };
 

@@ -18,6 +18,12 @@ RecipeWidget::RecipeWidget(QWidget *parent, OpenGLWidget* openglWidget) :
 	connect(this,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(colorPicker(QTreeWidgetItem*,int)));
 	connect(this,SIGNAL(recipeCaneChanged()),openglWidget->getModel(),SLOT(exactChange()));
 	connect(openglWidget->getModel(), SIGNAL(updateRecipe()), this, SLOT(updateRecipe()));
+	newClear();
+	//this->setDragEnabled(true);
+	//this->viewport()->setAcceptDrops(true);
+	//this->setDropIndicatorShown(true);
+	//this->setDragDropMode(QAbstractItemView::InternalMove);
+
 }
 
 void RecipeWidget :: colorPicker(QTreeWidgetItem* item,int column)
@@ -53,8 +59,8 @@ void RecipeWidget::updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, b
 	Point p = parentCane->subcaneLocations[rootIndex];
 
 	rootNode->setText(4,QString("%1").arg(p.x));
-	rootNode->setText(5,QString("%2").arg(p.y));
-	rootNode->setText(6,QString("%3").arg(p.z));
+	rootNode->setText(5,QString("%1").arg(p.y));
+	rootNode->setText(6,QString("%1").arg(p.z));
 
 	for (int j=0;j<MAX_AMT_TYPES;j++)
 	{
@@ -112,8 +118,8 @@ void RecipeWidget::updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, i
 		p = parentCane->subcaneLocations[rootIndex];
 
 		rootNode->setText(4,QString("%1").arg(p.x));
-		rootNode->setText(5,QString("%2").arg(p.y));
-		rootNode->setText(6,QString("%3").arg(p.z));
+		rootNode->setText(5,QString("%1").arg(p.y));
+		rootNode->setText(6,QString("%1").arg(p.z));
 		break;
 	default:
 		for (int j=0;j<MAX_AMT_TYPES;j++)
@@ -171,10 +177,10 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 
 void RecipeWidget :: updateRecipe()
 {
-	clear();
+	newClear();
 	if (openglWidget->getModel()->getCane() == NULL)
 		return;
-	updateRecipe(openglWidget->getModel()->getCane(), this->invisibleRootItem());
+	updateRecipe(openglWidget->getModel()->getCane(), visibleRootItem());
 }
 
 void RecipeWidget :: updateRecipe(bool recurse)
@@ -188,6 +194,29 @@ void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode)
 {
 	if (rootCane == NULL)
 		return;
+	else if (rootNode == visibleRootItem())
+	{
+		rootNode->setData(0, Qt::UserRole, QVariant::fromValue(rootCane));
+		if (rootCane->libraryIndex!=-1)
+			rootNode->setText(1,QString("%1").arg(rootCane->libraryIndex));
+		else
+			rootNode->setText(1,"");
+
+		rootNode->setText(2,QString("%1").arg(rootCane->typeName()));
+		rootNode->setBackgroundColor(3,rootCane->qcolor());
+
+		rootNode->setText(4,QString("%1").arg(0));
+		rootNode->setText(5,QString("%1").arg(0));
+		rootNode->setText(6,QString("%1").arg(0));
+
+		for (int j=0;j<MAX_AMT_TYPES;j++)
+		{
+			rootNode->setText(7+j,QString("%1").arg(rootCane->amts[j]));
+			rootNode->setToolTip(7+j, QString("%1").arg(rootCane->typeAmt(rootCane->type,j)));
+			rootNode->setStatusTip(7+j, QString("%1").arg(rootCane->typeAmt(rootCane->type,j)));
+		}
+	}
+
 
 	int numCane = rootCane->subcaneCount;
 	for (int i=0;i<numCane;i++)
@@ -221,4 +250,15 @@ void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode)
 		rootNode->addChild(nextLevelCaneWidget);
 	}
 	rootNode->setExpanded(false);
+}
+
+void RecipeWidget :: newClear()
+{
+	clear();
+	invisibleRootItem()->addChild(new QTreeWidgetItem());
+}
+
+QTreeWidgetItem* RecipeWidget ::visibleRootItem()
+{
+	return invisibleRootItem()->child(0);
 }
