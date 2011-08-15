@@ -261,7 +261,9 @@ void Model :: flattenActiveCane(float rectangle_ratio, float rectangle_theta, fl
 
 void Model :: moveCane(Point p)
 {
-	moveCane(p.x,p.y);
+        moveCane(p.x,p.y);
+        geometryOutOfDate();
+        emit caneChanged();
 }
 
 void Model :: moveCane(float delta_x, float delta_y)
@@ -361,14 +363,15 @@ void Model :: moveCaneTo(Point p,Point oldP,bool snaps)
 		return;
 	if (snaps)
 	{
-		//Point loc = cane->subcaneLocations[activeSubcane];
-		//moveCane(p.x-loc.x,p.y-loc.y);
 		moveCane(p-oldP);
 	}
 	else
 	{
 		moveCaneTo(p.x,p.y);
 	}
+
+        geometryOutOfDate();
+        emit caneChanged();
 }
 
 void Model :: moveCaneTo(float delta_x, float delta_y)

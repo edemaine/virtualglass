@@ -71,8 +71,8 @@ Model* OpenGLWidget :: getModel()
 void OpenGLWidget :: caneChanged()
 {
 	updateTriangles();
-	update();
-	model->getHistory()->setBusy(false);
+        repaint();
+        model->getHistory()->setBusy(false);
 }
 
 void OpenGLWidget :: setShiftButtonDown(bool state)
@@ -750,16 +750,16 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	//Point planePoint = getClickedPoint(oldMouseLocX,oldMouseLocY);
 	//emit operationInfoSig(QString("Plane Point: %1, %2, %3").arg(planePoint.x).arg(planePoint.y).arg(planePoint.z),2000);
 
-	/*
- Do something depending on mode.
- All modes except LOOK_MODE involve modifying the cane
- itself, while LOOK_MODE moves the camera.
+        /*
+        Do something depending on mode.
+        All modes except LOOK_MODE involve modifying the cane
+        itself, while LOOK_MODE moves the camera.
 
- All of the calls to model->*Cane() are functions of relX/relY,
- but the constants involved are determined by experiment,
- i.e. how much twist `feels' reasonable for moving the mouse
- an inch.
- */
+        All of the calls to model->*Cane() are functions of relX/relY,
+        but the constants involved are determined by experiment,
+        i.e. how much twist `feels' reasonable for moving the mouse
+        an inch.
+        */
 	if (rightMouseDown && !lockView)
 	{
 		// Rotate camera position around look-at location.
@@ -789,7 +789,6 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 				if (newFee > 0.0f && newFee < PI)
 					fee = newFee;
 			}
-			update();
 		}
 		break;
 	case PULL_MODE:
@@ -819,16 +818,16 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		break;
 	case BUNDLE_MODE:
 		/*
-  How the parameters for moveCane() are calculated is not obvious.
-  The idea is to make mouse X/Y correspond to the cane moving
-  left-right/up-down *regardless* of where the camera is. This
-  is why theta (the camera angle relative to the look-at point) is
-  also involved.
+                How the parameters for moveCane() are calculated is not obvious.
+                The idea is to make mouse X/Y correspond to the cane moving
+                left-right/up-down *regardless* of where the camera is. This
+                is why theta (the camera angle relative to the look-at point) is
+                also involved.
 
-  Essentially, the parameters convert the amount moved in X and Y
-  (variables `relX' and `relY') to the amount moved in X and Y
-  according to axes on which the cane lives.
-  */
+                Essentially, the parameters convert the amount moved in X and Y
+                (variables `relX' and `relY') to the amount moved in X and Y
+                according to axes on which the cane lives.
+                */
 
 		//model->setActiveSubcane(getSubcaneUnderMouse(oldMouseLocX, oldMouseLocY));
 		if (e->buttons() & 0x00000001) // if left mouse button is down
@@ -840,8 +839,6 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 			} else {
 				if (show2D)
 				{
-					//Point oldCanePoint = getClickedCanePoint(model->getActiveSubcane(),oldMouseLocX,oldMouseLocY);
-					//Point newCanePoint = getClickedPlanePoint(mouseLocX,mouseLocY,oldCanePoint.z);
 					Point newCanePoint = getClickedPlanePoint(mouseLocX,mouseLocY);
 					Point oldCanePoint = getClickedPlanePoint(oldMouseLocX,oldMouseLocY);
 					model->moveCaneTo(newCanePoint,oldCanePoint,showSnaps);
@@ -860,7 +857,6 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		}
 		break;
 	case CASING_MODE:
-		//model->changeCaneCasing(-relX);
 		model->changeCaneCasingTo(getClickedPlanePoint(mouseLocX,mouseLocY));
 		break;
 	case FLATTEN_MODE:
@@ -882,14 +878,13 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		{
 			Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
 			model->modifySnapPoint(p);
-			//emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
-			update();
 		}
 		break;
 	}
 	default:
 		break;
 	}
+
 }
 
 void OpenGLWidget :: wheelEvent(QWheelEvent *e)
