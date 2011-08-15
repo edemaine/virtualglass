@@ -829,7 +829,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
                 according to axes on which the cane lives.
                 */
 
-		//model->setActiveSubcane(getSubcaneUnderMouse(oldMouseLocX, oldMouseLocY));
+                model->setActiveSubcane(getSubcaneUnderMouse(oldMouseLocX, oldMouseLocY));
 		if (e->buttons() & 0x00000001) // if left mouse button is down
 		{
 			if (shiftButtonDown)

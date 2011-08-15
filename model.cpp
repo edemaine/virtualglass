@@ -88,9 +88,17 @@ void Model :: setMode(int mode)
 		int ancestorCount = 0;
 
 		lowResGeometry.clear();
-		cane->createCasing(generateMesh(show2D, cane, &lowResGeometry, ancestors,
-										&ancestorCount, LOW_RESOLUTION, true, true));
-		geometryOutOfDate();
+                if (show2D)
+                {
+                        cane->createCasing(generate2DMesh(cane, &lowResGeometry, ancestors,
+                                &ancestorCount, LOW_RESOLUTION, true, true));
+                }
+                else
+                {
+                        cane->createCasing(generateMesh(cane, &lowResGeometry, ancestors,
+                                &ancestorCount, LOW_RESOLUTION, true, true));
+                }
+                geometryOutOfDate();
 		emit caneChanged();
 	}
 	break;
@@ -172,7 +180,16 @@ void Model :: updateLowResGeometry()
 	ancestorCount = 0;
 	lowResGeometry.clear();
 	if (cane != NULL)
-		generateMesh(show2D, cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION, true);
+        {
+                if (show2D)
+                {
+                        generate2DMesh(cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION, true);
+                }
+                else
+                {
+                        generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION, true);
+                }
+        }
 	lowResGeometryFresh = 1;
 }
 
@@ -183,9 +200,18 @@ void Model :: updateHighResGeometry()
 
 	ancestorCount = 0;
 	highResGeometry.clear();
-	if (cane != NULL)
-		generateMesh(show2D, cane, &highResGeometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
-	highResGeometryFresh = 1;
+        if (cane != NULL)
+        {
+                if (show2D)
+                {
+                        generate2DMesh(cane, &highResGeometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
+                }
+                else
+                {
+                        generateMesh(cane, &highResGeometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
+                }
+        }
+        highResGeometryFresh = 1;
 }
 
 Cane* Model :: getCane()

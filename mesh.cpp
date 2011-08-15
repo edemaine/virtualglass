@@ -181,8 +181,8 @@ with this leaf base cane). The triangles are added to the end of the array passe
 The resolution refers to the dual resolution modes used by the GUI, and the actual number of
 triangles for these resolutions are set in constants.h
 */
-float meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
-						   int ancestorCount, int resolution, Cane *group_cane, uint32_t group_tag, float radius, bool computeRadius)
+float meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCount,
+        int resolution, Cane *group_cane, uint32_t group_tag, float radius, bool computeRadius)
 {
 	unsigned int angularResolution, axialResolution;
 	float total_stretch, transformedRadius;
@@ -210,10 +210,10 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 	uint32_t first_triangle = geometry->triangles.size();
 
 	/*
- Draw the walls of the cylinder. Note that the z location is
- adjusted by the total stretch experienced by the cane so that
- the z values range between 0 and 1.
- */
+        Draw the walls of the cylinder. Note that the z location is
+        adjusted by the total stretch experienced by the cane so that
+        the z values range between 0 and 1.
+        */
 	//Generate verts:
 	for (unsigned int i = 0; i < axialResolution; ++i)
 	{
@@ -252,10 +252,10 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 	assert(geometry->valid());
 
 	/*
- Draw the cylinder bottom, then top.
- The mesh uses a set of n-2 triangles with a common vertex
- to draw a regular n-gon.
- */
+        Draw the cylinder bottom, then top.
+        The mesh uses a set of n-2 triangles with a common vertex
+        to draw a regular n-gon.
+        */
 	for (int side = 0; side <= 1; ++side) {
 		float z = (side?1.0:0.0);
 		float nz = (side?1.0:-1.0);
@@ -293,7 +293,7 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 	}
 	geometry->compute_normals_from_triangles();
 	geometry->groups.push_back(Group(first_triangle,
-									 geometry->triangles.size() - first_triangle, group_cane, group_tag));
+                geometry->triangles.size() - first_triangle, group_cane, group_tag));
 
 	if (!computeRadius)
 		return 0.0;
@@ -309,11 +309,10 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors,
 	return transformedRadius;
 }
 
-float meshCircularBaseCane(bool show2D, Geometry *geometry, Cane** ancestors,
-						   int ancestorCount, int resolution, Cane *group_cane, uint32_t group_tag, float radius, bool computeRadius)
+float mesh2DCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCount, int resolution,
+        Cane *group_cane, uint32_t group_tag, float radius, bool computeRadius)
 {
-	if (!show2D)
-		return meshCircularBaseCane(geometry, ancestors, ancestorCount, resolution, group_cane, group_tag, radius, computeRadius);
+
 	unsigned int angularResolution, axialResolution;
 	//float total_stretch;
 	float transformedRadius;
@@ -323,12 +322,10 @@ float meshCircularBaseCane(bool show2D, Geometry *geometry, Cane** ancestors,
 	case LOW_RESOLUTION:
 		angularResolution = LOW_ANGULAR_RESOLUTION;
 		axialResolution = LOW_AXIAL_RESOLUTION;
-		axialResolution = 5;
 		break;
 	case HIGH_RESOLUTION:
 		angularResolution = HIGH_ANGULAR_RESOLUTION;
 		axialResolution = HIGH_AXIAL_RESOLUTION;
-		axialResolution = 15;
 		break;
 	default:
 		exit(1);
@@ -343,82 +340,27 @@ float meshCircularBaseCane(bool show2D, Geometry *geometry, Cane** ancestors,
 	uint32_t first_triangle = geometry->triangles.size();
 
 	/*
- Draw the walls of the cylinder. Note that the z location is
- adjusted by the total stretch experienced by the cane so that
- the z values range between 0 and 1.
- */
-	//Generate verts:
-	for (unsigned int i = 0; i <= 0; ++i)
-	{
-		float z = (i?0.01:0.0);
-		for (unsigned int j = 0; j < angularResolution; ++j)
-		{
-			Point p;
-			Point n;
+        Draw the cylinder top only.
+        The mesh uses a set of n-2 triangles with a common vertex
+        to draw a regular n-gon.
+        */
+        uint32_t base = geometry->vertices.size();
+        for (unsigned int j = 0; j < angularResolution; ++j)
+        {
+                Point p;
+                p.x = radius * cos(2 * PI * ((float) j) / angularResolution);
+                p.y = radius * sin(2 * PI * ((float) j) / angularResolution);
+                p.z = 1.0;
+                Point n;
+                n.x = 0.0; n.y = 0.0; n.z = 1.0;
+                geometry->vertices.push_back(Vertex(p, n));
+        }
+        for (unsigned int j = 1; j + 1 < angularResolution; ++j)
+        {
+                geometry->triangles.push_back(Triangle(base, base + j, base + j + 1));
+        }
 
-			p.x = radius * cos(2 * PI * ((float) j) / angularResolution);
-			p.y = radius * sin(2 * PI * ((float) j) / angularResolution);
-			//p.z = (i+ 0.0f) / total_stretch;
-			p.z = z;
-			n.x = p.x;
-			n.y = p.y;
-			n.z = 0.0f;
-			geometry->vertices.push_back(Vertex(p,n));
-		}
-	}
-	//Generate triangles linking them:
-	for (unsigned int j = 0; j < angularResolution; ++j)
-	{
-		uint32_t p1 = first_vert + 0 * angularResolution + j;
-		uint32_t p2 = first_vert + (0+0) * angularResolution + j;
-		uint32_t p3 = first_vert + 0 * angularResolution + (j+1) % angularResolution;
-		uint32_t p4 = first_vert + (0+0) * angularResolution + (j+1) % angularResolution;
-		// Four points that define a (non-flat) quad are used
-		// to create two triangles.
-		geometry->triangles.push_back(Triangle(p2, p1, p4));
-		//was: tmp_t.v1 = p2; tmp_t.v2 = p1; tmp_t.v3 = p4;
-
-		geometry->triangles.push_back(Triangle(p1, p3, p4));
-		//was: tmp_t.v1 = p1; tmp_t.v2 = p3; tmp_t.v3 = p4;
-	}
-	assert(geometry->valid());
-
-	/*
- Draw the cylinder bottom, then top.
- The mesh uses a set of n-2 triangles with a common vertex
- to draw a regular n-gon.
- */
-	for (int side = 1; side <= 1; ++side) {
-		float z = (side?0.01:0.0);
-		float nz = (side?1.0:-1.0);
-		uint32_t base = geometry->vertices.size();
-		for (unsigned int j = 0; j < angularResolution; ++j)
-		{
-			Point p;
-			p.x = radius * cos(2 * PI * ((float) j) / angularResolution);
-			p.y = radius * sin(2 * PI * ((float) j) / angularResolution);
-			//p.z = z / total_stretch;
-			p.z = z;
-			Point n;
-			n.x = 0.0; n.y = 0.0; n.z = nz;
-			geometry->vertices.push_back(Vertex(p, n));
-		}
-		if (side)
-		{
-			for (unsigned int j = 1; j + 1 < angularResolution; ++j)
-			{
-				geometry->triangles.push_back(Triangle(base, base + j, base + j + 1));
-			}
-		}
-		else
-		{
-			for (unsigned int j = 1; j + 1 < angularResolution; ++j)
-			{
-				geometry->triangles.push_back(Triangle(base, base + j + 1, base + j));
-			}
-		}
-	}
-	assert(geometry->valid());
+        assert(geometry->valid());
 
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
@@ -426,7 +368,7 @@ float meshCircularBaseCane(bool show2D, Geometry *geometry, Cane** ancestors,
 	}
 	geometry->compute_normals_from_triangles();
 	geometry->groups.push_back(Group(first_triangle,
-									 geometry->triangles.size() - first_triangle, group_cane, group_tag));
+                geometry->triangles.size() - first_triangle, group_cane, group_tag));
 
 	if (!computeRadius)
 		return 0.0;
@@ -451,9 +393,9 @@ leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
 float generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
-				   int resolution, bool casing, bool computeRadius, int coloringIndex)
+                                   int resolution, bool casing, bool computeRadius, int groupIndex)
 {
-	int i, passCasing, passColoringIndex;
+        int i, passCasing, passGroupIndex;
 	float radius;
 
 	if (c == NULL)
@@ -465,25 +407,25 @@ float generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorC
 	if (c->type == BASE_CIRCLE_CANETYPE)
 	{
 		radius = meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-									  resolution, c, coloringIndex, 1.0, computeRadius);
+                        resolution, c, groupIndex, 1.0, computeRadius);
 	}
 	else
 	{
 		passCasing = (casing && c->type != CASING_CANETYPE);
 		for (i = 0; i < c->subcaneCount; ++i)
 		{
-			if (coloringIndex == -1)
-				passColoringIndex = i;
+                        if (groupIndex == -1)
+                                passGroupIndex = i;
 			else
-				passColoringIndex = coloringIndex;
+                                passGroupIndex = groupIndex;
 
 			radius = MAX(generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
-									  resolution, passCasing, computeRadius, passColoringIndex), radius);
+                                                                          resolution, passCasing, computeRadius, passGroupIndex), radius);
 		}
 		if (casing && c->type == CASING_CANETYPE)
 		{
 			radius = MAX(meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-											  resolution, c, coloringIndex, c->amts[0], computeRadius), radius);
+                                                                                          resolution, c, groupIndex, c->amts[0], computeRadius), radius);
 		}
 	}
 	*ancestorCount -= 1;
@@ -491,12 +433,10 @@ float generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorC
 	return radius;
 }
 
-float generateMesh(bool show2D, Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
-				   int resolution, bool casing, bool computeRadius, int coloringIndex)
+float generate2DMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
+                                   int resolution, bool casing, bool computeRadius, int groupIndex)
 {
-	if (!show2D)
-		return generateMesh(c, geometry, ancestors, ancestorCount, resolution, casing, computeRadius, coloringIndex);
-	int i, passCasing, passColoringIndex;
+        int i, passCasing, passGroupIndex;
 	float radius;
 
 	if (c == NULL)
@@ -507,26 +447,26 @@ float generateMesh(bool show2D, Cane* c, Geometry *geometry, Cane** ancestors, i
 	*ancestorCount += 1;
 	if (c->type == BASE_CIRCLE_CANETYPE)
 	{
-		radius = meshCircularBaseCane(show2D, geometry, ancestors, *ancestorCount,
-									  resolution, c, coloringIndex, 1.0, computeRadius);
+                radius = mesh2DCircularBaseCane(geometry, ancestors, *ancestorCount,
+                          resolution, c, groupIndex, 1.0, computeRadius);
 	}
 	else
 	{
 		passCasing = (casing && c->type != CASING_CANETYPE);
 		for (i = 0; i < c->subcaneCount; ++i)
 		{
-			if (coloringIndex == -1)
-				passColoringIndex = i;
+                        if (groupIndex == -1)
+                                passGroupIndex = i;
 			else
-				passColoringIndex = coloringIndex;
+                                passGroupIndex = groupIndex;
 
-			radius = MAX(generateMesh(show2D, c->subcanes[i], geometry, ancestors, ancestorCount,
-									  resolution, passCasing, computeRadius, passColoringIndex), radius);
+                        radius = MAX(generate2DMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
+                                  resolution, passCasing, computeRadius, passGroupIndex), radius);
 		}
 		if (casing && c->type == CASING_CANETYPE)
 		{
-			radius = MAX(meshCircularBaseCane(show2D, geometry, ancestors, *ancestorCount,
-											  resolution, c, coloringIndex, c->amts[0], computeRadius), radius);
+                        radius = MAX(mesh2DCircularBaseCane(geometry, ancestors, *ancestorCount,
+                                  resolution, c, groupIndex, c->amts[0], computeRadius), radius);
 		}
 	}
 	*ancestorCount -= 1;
