@@ -88,17 +88,17 @@ void Model :: setMode(int mode)
 		int ancestorCount = 0;
 
 		lowResGeometry.clear();
-                if (show2D)
-                {
-                        cane->createCasing(generate2DMesh(cane, &lowResGeometry, ancestors,
-                                &ancestorCount, LOW_RESOLUTION, true, true));
-                }
-                else
-                {
-                        cane->createCasing(generateMesh(cane, &lowResGeometry, ancestors,
-                                &ancestorCount, LOW_RESOLUTION, true, true));
-                }
-                geometryOutOfDate();
+		if (show2D)
+		{
+			cane->createCasing(generate2DMesh(cane, &lowResGeometry, ancestors,
+											  &ancestorCount, LOW_RESOLUTION, true, true));
+		}
+		else
+		{
+			cane->createCasing(generateMesh(cane, &lowResGeometry, ancestors,
+											&ancestorCount, LOW_RESOLUTION, true, true));
+		}
+		geometryOutOfDate();
 		emit caneChanged();
 	}
 	break;
@@ -180,16 +180,16 @@ void Model :: updateLowResGeometry()
 	ancestorCount = 0;
 	lowResGeometry.clear();
 	if (cane != NULL)
-        {
-                if (show2D)
-                {
-                        generate2DMesh(cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION, true);
-                }
-                else
-                {
-                        generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION, true);
-                }
-        }
+	{
+		if (show2D)
+		{
+			generate2DMesh(cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION, true);
+		}
+		else
+		{
+			generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION, true);
+		}
+	}
 	lowResGeometryFresh = 1;
 }
 
@@ -200,18 +200,18 @@ void Model :: updateHighResGeometry()
 
 	ancestorCount = 0;
 	highResGeometry.clear();
-        if (cane != NULL)
-        {
-                if (show2D)
-                {
-                        generate2DMesh(cane, &highResGeometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
-                }
-                else
-                {
-                        generateMesh(cane, &highResGeometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
-                }
-        }
-        highResGeometryFresh = 1;
+	if (cane != NULL)
+	{
+		if (show2D)
+		{
+			generate2DMesh(cane, &highResGeometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
+		}
+		else
+		{
+			generateMesh(cane, &highResGeometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
+		}
+	}
+	highResGeometryFresh = 1;
 }
 
 Cane* Model :: getCane()
@@ -287,9 +287,9 @@ void Model :: flattenActiveCane(float rectangle_ratio, float rectangle_theta, fl
 
 void Model :: moveCane(Point p)
 {
-        moveCane(p.x,p.y);
-        geometryOutOfDate();
-        emit caneChanged();
+	moveCane(p.x,p.y);
+	geometryOutOfDate();
+	emit caneChanged();
 }
 
 void Model :: moveCane(float delta_x, float delta_y)
@@ -396,8 +396,8 @@ void Model :: moveCaneTo(Point p,Point oldP,bool snaps)
 		moveCaneTo(p.x,p.y);
 	}
 
-        geometryOutOfDate();
-        emit caneChanged();
+	geometryOutOfDate();
+	emit caneChanged();
 }
 
 void Model :: moveCaneTo(float delta_x, float delta_y)

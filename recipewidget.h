@@ -31,6 +31,8 @@ private:
 	OpenGLWidget* openglWidget;
 	void newClear();
 	QTreeWidgetItem* visibleRootItem();
+	Cane* getCane(QTreeWidgetItem* node);
+	void updateLibraryColumn(Cane* cane,QTreeWidgetItem* node);
 
 };
 

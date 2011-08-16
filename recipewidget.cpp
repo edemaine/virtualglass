@@ -40,27 +40,36 @@ void RecipeWidget :: colorPicker(QTreeWidgetItem* item,int column)
 	updateBaseRecipe(cane,item,column);
 }
 
+Cane* RecipeWidget::getCane(QTreeWidgetItem* node)
+{
+	if (node == this->visibleRootItem())
+		return NULL;
+	else
+		return node->data(0,Qt::UserRole).value<Cane*>();
+}
+
 void RecipeWidget::updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, bool recurse)
 {
 	if (rootCane==NULL)
 		return;
 	rootNode->setData(0, Qt::UserRole, QVariant::fromValue(rootCane));
-	if (rootCane->libraryIndex!=-1)
-		rootNode->setText(1,QString("%1").arg(rootCane->libraryIndex));
-	else
-		rootNode->setText(1,"");
+	updateLibraryColumn(rootCane,rootNode);
 
 	rootNode->setText(2,QString("%1").arg(rootCane->typeName()));
 	rootNode->setBackgroundColor(3,rootCane->qcolor());
 
 	QTreeWidgetItem* parentNode = rootNode->parent();
-	int rootIndex = parentNode->indexOfChild(rootNode);
-	Cane* parentCane = parentNode->data(0,Qt::UserRole).value<Cane*>();
-	Point p = parentCane->subcaneLocations[rootIndex];
+	Cane* parentCane = getCane(parentNode);
 
-	rootNode->setText(4,QString("%1").arg(p.x));
-	rootNode->setText(5,QString("%1").arg(p.y));
-	rootNode->setText(6,QString("%1").arg(p.z));
+	int rootIndex = parentNode->indexOfChild(rootNode);
+
+	if (rootNode == visibleRootItem() && parentCane!=NULL)
+	{
+		Point p = parentCane->subcaneLocations[rootIndex];
+		rootNode->setText(4,QString("%1").arg(p.x));
+		rootNode->setText(5,QString("%1").arg(p.y));
+		rootNode->setText(6,QString("%1").arg(p.z));
+	}
 
 	for (int j=0;j<MAX_AMT_TYPES;j++)
 	{
@@ -98,10 +107,7 @@ void RecipeWidget::updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, i
 		rootNode->setData(0, Qt::UserRole, QVariant::fromValue(rootCane));
 		break;
 	case 1:
-		if (rootCane->libraryIndex!=-1)
-			rootNode->setText(1,QString("%1").arg(rootCane->libraryIndex));
-		else
-			rootNode->setText(1,"");
+		updateLibraryColumn(rootCane,rootNode);
 		break;
 	case 2:
 		rootNode->setText(2,QString("%1").arg(rootCane->typeName()));
@@ -114,12 +120,15 @@ void RecipeWidget::updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, i
 	case 6:
 		parentNode = rootNode->parent();
 		rootIndex = parentNode->indexOfChild(rootNode);
-		parentCane = parentNode->data(0,Qt::UserRole).value<Cane*>();
-		p = parentCane->subcaneLocations[rootIndex];
+		parentCane = getCane(parentNode);
 
-		rootNode->setText(4,QString("%1").arg(p.x));
-		rootNode->setText(5,QString("%1").arg(p.y));
-		rootNode->setText(6,QString("%1").arg(p.z));
+		if (rootNode == visibleRootItem() && parentCane!=NULL)
+		{
+			p = parentCane->subcaneLocations[rootIndex];
+			rootNode->setText(4,QString("%1").arg(p.x));
+			rootNode->setText(5,QString("%1").arg(p.y));
+			rootNode->setText(6,QString("%1").arg(p.z));
+		}
 		break;
 	default:
 		for (int j=0;j<MAX_AMT_TYPES;j++)
@@ -136,7 +145,7 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 {
 	if (!this->isVisible())
 		return;
-	Cane* cane = item->data(0,Qt::UserRole).value<Cane*>();
+	Cane* cane = getCane(item);
 	if (column<=2 || column==3)
 	{
 		updateBaseRecipe(cane,item,column);
@@ -155,10 +164,11 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 			return;
 		}
 
-		QTreeWidgetItem* itemParent = item->parent();
+		QTreeWidgetItem* itemParent=item->parent();
 		int itemIndex = itemParent->indexOfChild(item);
-		Cane* caneParent = itemParent->data(0,Qt::UserRole).value<Cane*>();
-		caneParent->subcaneLocations[itemIndex] = p;
+		Cane* caneParent=getCane(itemParent);
+		if (caneParent!=NULL)
+			caneParent->subcaneLocations[itemIndex] = p;
 	}
 	else if (column>=7)
 	{
@@ -190,6 +200,18 @@ void RecipeWidget :: updateRecipe(bool recurse)
 
 //column 0
 
+//column 1
+void RecipeWidget :: updateLibraryColumn(Cane* cane,QTreeWidgetItem* node)
+{
+	if (cane->libraryIndex!=-1)
+	{
+		node->setText(1,QString("%1").arg(cane->libraryIndex));
+		node->setDisabled(true);
+	}
+	else
+		node->setText(1,"");
+}
+
 void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode)
 {
 	if (rootCane == NULL)
@@ -197,10 +219,7 @@ void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode)
 	else if (rootNode == visibleRootItem())
 	{
 		rootNode->setData(0, Qt::UserRole, QVariant::fromValue(rootCane));
-		if (rootCane->libraryIndex!=-1)
-			rootNode->setText(1,QString("%1").arg(rootCane->libraryIndex));
-		else
-			rootNode->setText(1,"");
+		updateLibraryColumn(rootCane,rootNode);
 
 		rootNode->setText(2,QString("%1").arg(rootCane->typeName()));
 		rootNode->setBackgroundColor(3,rootCane->qcolor());
@@ -227,10 +246,8 @@ void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode)
 		nextLevelCaneWidget->setFlags(nextLevelCaneWidget->flags() | Qt::ItemIsEditable);
 
 		nextLevelCaneWidget->setData(0, Qt::UserRole, QVariant::fromValue(subCane));
-		if (subCane->libraryIndex!=-1)
-			nextLevelCaneWidget->setText(1,QString("%1").arg(subCane->libraryIndex));
-		else
-			nextLevelCaneWidget->setText(1,"");
+
+		updateLibraryColumn(subCane,nextLevelCaneWidget);
 
 		nextLevelCaneWidget->setText(2,QString("%1").arg(subCane->typeName()));
 		nextLevelCaneWidget->setBackgroundColor(3,subCane->qcolor());
