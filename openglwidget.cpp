@@ -136,15 +136,15 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	}
 	glDisableClientState(GL_VERTEX_ARRAY);
 
-        uint32_t c = 0;
-        glReadPixels(mouseX, this->height() - mouseY, 1, 1, GL_RGBA, GL_UNSIGNED_INT, &c);
+        GLubyte c[4] = {0, 0, 0, 0};
+        glReadPixels(mouseX, this->height() - mouseY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &c);
 
         glEnable(GL_BLEND);
         glEnable(GL_LIGHTING);
 
         updateTriangles();
 
-        return (int) c;
+        return (int) c[0];
 }
 
 Point OpenGLWidget :: getClickedPlanePoint(int mouseLocX, int mouseLocY)
@@ -643,7 +643,8 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 	} else
 	{
 		model->setActiveSubcane(getSubcaneUnderMouse(mouseLocX, mouseLocY));
-		if (deleteButtonDown)
+                emit operationInfoSig(QString("Active subcane: %1").arg((uint32_t) getSubcaneUnderMouse(mouseLocX, mouseLocY)), 1000);
+                if (deleteButtonDown)
 		{
 			if (!model->deleteActiveCane())
 			{
