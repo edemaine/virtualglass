@@ -70,7 +70,9 @@ Model* OpenGLWidget :: getModel()
 
 void OpenGLWidget :: caneChanged()
 {
-	updateTriangles();
+        if (model->getCane() != NULL)
+                emit operationInfoSig(QString("Cane height: %1").arg(model->getCane()->height()), 3000);
+        updateTriangles();
         repaint();
         model->getHistory()->setBusy(false);
 }
@@ -643,7 +645,6 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 	} else
 	{
 		model->setActiveSubcane(getSubcaneUnderMouse(mouseLocX, mouseLocY));
-                emit operationInfoSig(QString("Active subcane: %1").arg((uint32_t) getSubcaneUnderMouse(mouseLocX, mouseLocY)), 1000);
                 if (deleteButtonDown)
 		{
 			if (!model->deleteActiveCane())

@@ -101,6 +101,18 @@ void Cane :: pullLinear(float twistFactor, float stretchFactor)
 	this->amts[0] += stretchFactor;
 }
 
+/*
+Returns the height of the cane DAG, i.e. the length of
+the longest path.
+*/
+int Cane :: height()
+{
+        int max = 0;
+        for (int i = 0; i < this->subcaneCount; ++i)
+                max = MAX(max, this->subcanes[i]->height());
+        return (max + 1);
+}
+
 void Cane :: pullIntuitive(float twistFactor, float stretchFactor)
 {
 	// The amount twist and stretch are changed are functions

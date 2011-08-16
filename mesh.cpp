@@ -58,9 +58,9 @@ void applyFlattenTransform(Vertex* v, float rectangleRatio, float rectangleTheta
 	}
 
 	v->position.x = flatness * (cos(rectangleTheta) * p_r.x
-								- sin(rectangleTheta) * p_r.y) + v->position.x * (1-flatness);
+                - sin(rectangleTheta) * p_r.y) + v->position.x * (1-flatness);
 	v->position.y = flatness * (sin(rectangleTheta) * p_r.x
-								+ cos(rectangleTheta) * p_r.y) + v->position.y * (1-flatness);
+                + cos(rectangleTheta) * p_r.y) + v->position.y * (1-flatness);
 	//TODO: normal transform
 }
 
@@ -100,24 +100,24 @@ by its ancestors in the cane DAG.
 Vertex applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
 {
 	/*
- The transformations are applied back to front to match how they
- are loaded into the array. Because the transform array is created by
- a depth-first traversal of the cane DAG, transforms lower in the DAG
- (i.e. closer to the leaves) are added later. However, they
- represent the first operations done on the cane, so need to be applied
- first.
- */
+        The transformations are applied back to front to match how they
+        are loaded into the array. Because the transform array is created by
+        a depth-first traversal of the cane DAG, transforms lower in the DAG
+        (i.e. closer to the leaves) are added later. However, they
+        represent the first operations done on the cane, so need to be applied
+        first.
+        */
 	for (int i = ancestorCount - 1; i >= 0; --i)
 	{
 		/*
-  Each cane node has a type and an amount.
-  Depending upon the type, the amount fields
-  take on different meanings. For instance, a twist transform
-  uses amts[0] to mean the magnitude of the twist.
-  just a single real-valued parameter).
-  The BUNDLE_CANETYPE is an exception, in that it simply uses
-  the location of the subcane to determine how to move the points.
-  */
+                Each cane node has a type and an amount.
+                Depending upon the type, the amount fields
+                take on different meanings. For instance, a twist transform
+                uses amts[0] to mean the magnitude of the twist.
+                just a single real-valued parameter).
+                The BUNDLE_CANETYPE is an exception, in that it simply uses
+                the location of the subcane to determine how to move the points.
+                */
 		switch (ancestors[i]->type)
 		{
 		case BUNDLE_CANETYPE:
@@ -203,6 +203,8 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCou
 
 	//DEBUG: total_stretch shortened... why is the top cap missing?
 	total_stretch = computeTotalStretch(ancestors, ancestorCount);
+        float stretchResParam = 1.0 / (1.0 + total_stretch / 20.0);
+        angularResolution = (int) (angularResolution * stretchResParam + 8 * (1 - stretchResParam)); // hack adaptive meshing
 
 	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
@@ -217,7 +219,7 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCou
 	//Generate verts:
 	for (unsigned int i = 0; i < axialResolution; ++i)
 	{
-		for (unsigned int j = 0; j < angularResolution; ++j)
+                for (unsigned int j = 0; j < angularResolution; ++j)
 		{
 			Point p;
 			Point n;

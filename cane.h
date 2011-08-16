@@ -17,7 +17,8 @@ class Cane
 public:
 	Cane();
 	Cane(int type);
-	void reset();
+        int height();
+        void reset();
 	void shallowCopy(Cane* dest);
 	void pullIntuitive(float twistFactor, float stretchFactor);
 	void pullIntuitive(int subcane, float twistFactor, float stretchFactor);
