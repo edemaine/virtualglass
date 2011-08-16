@@ -302,7 +302,8 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCou
 	transformedRadius = 0;
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
-		transformedRadius = MAX(transformedRadius, geometry->vertices[v].position.x * geometry->vertices[v].position.x + geometry->vertices[v].position.y * geometry->vertices[v].position.y);
+                transformedRadius = MAX(transformedRadius, geometry->vertices[v].position.x * geometry->vertices[v].position.x
+                        + geometry->vertices[v].position.y * geometry->vertices[v].position.y);
 	}
 	transformedRadius = sqrt(transformedRadius);
 
@@ -425,7 +426,7 @@ float generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorC
 		if (casing && c->type == CASING_CANETYPE)
 		{
 			radius = MAX(meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-                                                                                          resolution, c, groupIndex, c->amts[0], computeRadius), radius);
+                                resolution, c, groupIndex, c->amts[0], computeRadius), radius);
 		}
 	}
 	*ancestorCount -= 1;

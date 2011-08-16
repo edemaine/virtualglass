@@ -118,7 +118,7 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 
 	geometry = model->getGeometry(LOW_RESOLUTION);
 
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Check that Vertex and Triangle have proper size:
@@ -130,20 +130,21 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].position));
 	glEnableClientState(GL_VERTEX_ARRAY);
 	for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
-		glColor4ubv(reinterpret_cast< const GLubyte * >(&(g->tag)));
-		glDrawElements(GL_TRIANGLES, g->size * 3,
-					   GL_UNSIGNED_INT, &(geometry->triangles[g->begin].v1));
+                glColor4ubv(reinterpret_cast< const GLubyte * >(&(g->tag)));
+                glDrawElements(GL_TRIANGLES, g->size * 3,
+                        GL_UNSIGNED_INT, &(geometry->triangles[g->begin].v1));
 	}
 	glDisableClientState(GL_VERTEX_ARRAY);
-	uint32_t c = 0;
-	glReadPixels(mouseX, this->height() - mouseY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &c);
 
-	glEnable(GL_BLEND);
-	glEnable(GL_LIGHTING);
+        uint32_t c = 0;
+        glReadPixels(mouseX, this->height() - mouseY, 1, 1, GL_RGBA, GL_UNSIGNED_INT, &c);
 
-	updateTriangles();
+        glEnable(GL_BLEND);
+        glEnable(GL_LIGHTING);
 
-	return (int)c;
+        updateTriangles();
+
+        return (int) c;
 }
 
 Point OpenGLWidget :: getClickedPlanePoint(int mouseLocX, int mouseLocY)
@@ -747,9 +748,6 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	mouseLocY = e->y();
 	relY = (mouseLocY - oldMouseLocY) / windowHeight;
 
-	//Point planePoint = getClickedPoint(oldMouseLocX,oldMouseLocY);
-	//emit operationInfoSig(QString("Plane Point: %1, %2, %3").arg(planePoint.x).arg(planePoint.y).arg(planePoint.z),2000);
-
         /*
         Do something depending on mode.
         All modes except LOOK_MODE involve modifying the cane
@@ -830,7 +828,8 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
                 */
 
                 model->setActiveSubcane(getSubcaneUnderMouse(oldMouseLocX, oldMouseLocY));
-		if (e->buttons() & 0x00000001) // if left mouse button is down
+                emit operationInfoSig(QString("Active subcane: %1").arg(getSubcaneUnderMouse(oldMouseLocX, oldMouseLocY)), 1000);
+                if (e->buttons() & 0x00000001) // if left mouse button is down
 		{
 			if (shiftButtonDown)
 			{
@@ -853,7 +852,9 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 			}
 		}
 		if (model->getActiveSubcane() != -1 && model->getCane()) {
-			emit operationInfoSig(QString("Moved X Direction %1, Y Direction %2").arg(model->getCane()->subcaneLocations[model->getActiveSubcane()].x).arg(model->getCane()->subcaneLocations[model->getActiveSubcane()].y),1000);
+                        emit operationInfoSig(QString("Moved X Direction %1, Y Direction %2").arg(
+                                model->getCane()->subcaneLocations[model->getActiveSubcane()].x).arg(
+                                        model->getCane()->subcaneLocations[model->getActiveSubcane()].y),1000);
 		}
 		break;
 	case CASING_MODE:
