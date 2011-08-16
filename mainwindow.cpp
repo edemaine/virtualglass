@@ -14,6 +14,7 @@ MainWindow::MainWindow(Model* model)
 	setupStatusBar();
 	setupMenuBar();
 	setupNewColorPickerCaneDialog();
+        setupNewBrandCaneDialog();
 	setWindowTitle(tr("Virtual Glass"));
 
 	resize(1000, 750);
@@ -162,6 +163,11 @@ void MainWindow::setupMenuBar()
 	zoomOut->setStatusTip(tr("Create a new cane of desired color."));
 	connect(newCaneColor, SIGNAL(triggered()), this, SLOT(newColorPickerCaneDialog()));
 	caneMenu->addAction(newCaneColor);
+
+        QAction* newBrandColor = new QAction(tr("&New Cane Color From Brand"), this);
+        zoomOut->setStatusTip(tr("Create a new cane using standard colors."));
+        connect(newBrandColor, SIGNAL(triggered()), this, SLOT(newBrandCaneDialog()));
+        caneMenu->addAction(newBrandColor);
 }
 
 void MainWindow::modeChanged(int mode)
@@ -483,7 +489,7 @@ void MainWindow::importLibraryDialog()
 void MainWindow::setupNewColorPickerCaneDialog()
 {
 	caneDialog = new QDialog(NULL);
-	caneForm = new QFormLayout(caneDialog->window());
+        caneForm = new QFormLayout(caneDialog->window());
 
 	colorDialog = new QColorDialog(Qt::white, caneForm->widget());
 	colorDialog->setOptions(QColorDialog::ShowAlphaChannel | QColorDialog::NoButtons);
@@ -500,8 +506,201 @@ void MainWindow::setupNewColorPickerCaneDialog()
 	connect(buttons,SIGNAL(accepted()),this,SLOT(colorPickerSelected()));
 	connect(buttons,SIGNAL(rejected()),caneDialog,SLOT(reject()));
 
-	caneForm->addRow(buttons);
-	caneDialog->setLayout(caneForm);
+        caneForm->addRow(buttons);
+
+        caneDialog->setLayout(caneForm);
+}
+
+void MainWindow::setupNewBrandCaneDialog()
+{
+    brandDialog = new QDialog(NULL);
+
+    caneForm = new QFormLayout(brandDialog->window());
+
+    loadOfficialCanes();
+
+    caneSplitter = new QSplitter(caneForm->widget());
+
+    caneTypeListModel = new QStringListModel();
+    caneTypeListModel->setStringList(*caneTypeList);
+    caneTypeListBox = new QListView();
+    caneTypeListBox->setModel(caneTypeListModel);
+
+    dummyList = new QStringList("Please select a cane type.");
+    dummyModel = new QStringListModel();
+    dummyModel->setStringList(*dummyList);
+    caneColorListBox = new QListView();//new QTreeView();
+    caneColorListBox->setModel(dummyModel);
+
+    caneSplitter->addWidget(caneTypeListBox);
+    caneSplitter->addWidget(caneColorListBox);
+
+    caneForm->addRow(caneSplitter);
+
+//        connect(caneTypeListBox, SIGNAL(activated(QModelIndex)),this,SLOT(updateSublist(int)));
+
+    caneTypeBox = new QComboBox(caneForm->widget());
+    caneTypeBox->addItem("Circle Base",QVariant(BASE_CIRCLE_CANETYPE));
+    caneTypeBox->addItem("Square Base",QVariant(FLATTEN_CANETYPE));
+
+    caneForm->addRow("Base Type",caneTypeBox);
+
+    QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    connect(buttons,SIGNAL(accepted()),brandDialog,SLOT(accept()));
+    connect(buttons,SIGNAL(accepted()),this,SLOT(colorPickerSelected()));
+    connect(buttons,SIGNAL(rejected()),brandDialog,SLOT(reject()));
+
+    caneForm->addRow(buttons);
+
+    brandDialog->setLayout(caneForm);
+}
+
+void MainWindow::updateSublist(int index)
+{
+//        QItemSelectionModel *m = caneColorListBox->selectionModel();
+        if (index < 0 || index >= caneColorListList->size())
+        {
+                caneColorListBox->setModel(dummyModel);
+        }
+        else
+        {
+                caneColorListBox->setModel(new QStringListModel(caneNameListList->at(index)));
+/*                for (int i = 0; i < caneNameListList[index].size(); i++)
+                {
+                        caneColorListBox->drawRow(&makePainter(index,i), *(new QStyleOptionViewItem()), i);
+                }*/
+        }
+//        if (m != dummyModel)
+//                delete m;
+}
+
+QPainter* MainWindow::makePainter(int caneType, int caneIndex)
+{
+        QPainter* painter = new QPainter();
+        if (caneColorListList->size() <= caneType || caneColorListList->at(caneType).size() <= caneIndex)
+        {
+            painter->setPen(Qt::black);
+            return painter;
+        }
+        painter->setBackgroundMode(Qt::OpaqueMode);
+        painter->setBackground(*(new QBrush(caneColorListList->at(caneType).at(caneIndex))));
+        painter->setPen(Qt::black);
+        if (caneColorListList->at(caneType).at(caneIndex).red() +
+            caneColorListList->at(caneType).at(caneIndex).green() +
+            caneColorListList->at(caneType).at(caneIndex).blue() < 381)
+                painter->setPen(Qt::white);
+        return painter;
+}
+
+void MainWindow::loadOfficialCanes()
+{
+        caneTypeList = new QStringList;
+        caneNameListList = new QList<QStringList>;
+        caneColorListList = new QList<QList<QColor> >;
+        QStringList* caneNameList = new QStringList();
+        QList<QColor>* caneColorList = new QList<QColor>();
+        int currentCane = -1;
+        bool onColor = false;
+        QFile file("../src/Colors1.txt");
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+                caneTypeList->append("File Misread");
+                return;
+        }
+        while (!file.atEnd()) {
+                QByteArray line = file.readLine();
+//                process_line(line);
+                line = line.trimmed();
+                if (line.isEmpty())
+                {
+                        if (onColor)
+                        {
+                                caneTypeList->append("Empty on color");
+                                return; //throw error? Not sure on this one
+                        }
+                }
+                else if (line.at(0) == '[')
+                {
+                        if (onColor)
+                        {
+                                caneTypeList->append("Color mismatch A");
+                                return; //throw error
+                        }
+                        if (currentCane == -1)
+                        {
+                                caneTypeList->append("Cane mismatch A");
+                                return; //throw error
+                        }
+                        line.remove(0,1);
+                        if (line.lastIndexOf(']') == -1)
+                        {
+                                caneTypeList->append("Bracket mismatch");
+                                return; //throw error
+                        }
+                        line.remove(line.lastIndexOf(']'),1);
+                        line = line.trimmed();
+                        caneNameList->append(line);
+                        onColor = true;
+                }
+                else if (line.at(0) == '-')
+                {
+                        if (!onColor)
+                        {
+                                caneTypeList->append("Color mismatch B");
+                                return; //throw error
+                        }
+                        if (currentCane == -1)
+                        {
+                                caneTypeList->append("Cane mismatch B");
+                                return; //throw error
+                        }
+                        line.remove(0,1);
+                        line = line.trimmed();
+                        QList<QByteArray> color = line.split(',');
+                        if (color.length() > 3)
+                        {
+                                caneColorList->append(*(new QColor(color[0].toInt(),color[1].toInt(),
+                                                                   color[2].toInt(),color[3].toInt())));
+                        }
+                        else
+                        {
+                                caneTypeList->append("Not enough color fields");
+                                return; //throw error
+                        }
+                        onColor = false;
+                }
+                else
+                {
+                        if (onColor)
+                        {
+                                caneTypeList->append("Colot mismatch C");
+                                return; //throw error
+                        }
+                        currentCane++;
+                        caneTypeList->append(line);
+                        if (currentCane > 0)
+                        {
+                                caneNameListList->append(*caneNameList);
+                                caneColorListList->append(*caneColorList);
+                        }
+                        caneNameList->clear();
+                        caneColorList->clear();
+                }
+        }
+        caneNameListList->append(*caneNameList);
+        caneColorListList->append(*caneColorList);
+        delete caneNameList;
+        delete caneColorList;
+        if (onColor)
+        {
+                caneTypeList->append("Color mismatch D");
+                return; //throw error
+        }
+}
+
+void MainWindow::newBrandCaneDialog()
+{
+        brandDialog->exec();
 }
 
 void MainWindow::newColorPickerCaneDialog()

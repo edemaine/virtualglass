@@ -45,6 +45,7 @@ public slots:
 	void importLibraryDialog();
 	void exportCaneDialog();
 	void importCaneDialog();
+        void newBrandCaneDialog();
 	void newColorPickerCaneDialog();
 	void changeBgColorDialog();
 	void saveObjFileDialog();
@@ -52,8 +53,9 @@ public slots:
 	void colorPickerSelected();
 	void libraryCaneDestroyed(QObject* obj);
 	void loadLibraryCane(const YAML::Node& node, Cane* cane);
-	void displayTextMessage(QString message,int msec);
+        void displayTextMessage(QString message,int msec);
 	void displayTextMessage(QString message);
+        void updateSublist(int index);
 	void toggleRecipe();
 	void updateLibraryToolTip(LibraryCaneWidget* lc);
 	void updatePreview();
@@ -69,6 +71,10 @@ private:
 	void setupWorkArea();
 	void setupMenuBar();
 	void setupNewColorPickerCaneDialog();
+        void setupNewBrandCaneDialog();
+
+        QPainter* makePainter(int caneType, int caneIndex);
+        void loadOfficialCanes();
 
 	QMenu* caneMenu;
 	QMenu* viewMenu;
@@ -89,11 +95,22 @@ private:
 
 	QLabel* previewLabel;
 	QDialog* caneDialog;
-	QColorDialog* colorDialog;
+        QColorDialog* colorDialog;
 	QFormLayout* caneForm;
 	QComboBox* caneTypeBox;
 
 	bool isRecipe;
+        QDialog* brandDialog;
+        QSplitter* caneSplitter;
+        QStringListModel* caneTypeListModel;
+        QListView* caneTypeListBox;
+        QStringList* dummyList;
+        QStringListModel* dummyModel;
+        QStringList* caneTypeList;
+        //QTreeView* caneColorListBox;
+        QListView* caneColorListBox;
+        QList<QStringList>* caneNameListList;
+        QList<QList<QColor> >* caneColorListList;
 
 
 };
