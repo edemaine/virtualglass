@@ -15,22 +15,35 @@ RecipeWidget::RecipeWidget(QWidget *parent, OpenGLWidget* openglWidget) :
 	this->openglWidget = openglWidget;
 	this->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	connect(this,SIGNAL(itemChanged(QTreeWidgetItem*,int)),this,SLOT(changeData(QTreeWidgetItem*,int)));
-	connect(this,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(colorPicker(QTreeWidgetItem*,int)));
+	connect(this,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(doubleClickEvent(QTreeWidgetItem*,int)));
 	connect(this,SIGNAL(recipeCaneChanged()),openglWidget->getModel(),SLOT(exactChange()));
 	connect(openglWidget->getModel(), SIGNAL(updateRecipe()), this, SLOT(updateRecipe()));
 	newClear();
-	//this->setDragEnabled(true);
-	//this->viewport()->setAcceptDrops(true);
-	//this->setDropIndicatorShown(true);
-	//this->setDragDropMode(QAbstractItemView::InternalMove);
+}
 
+bool RecipeWidget :: isLibraryCane(QTreeWidgetItem* item)
+{
+	Cane* cane = getCane(item);
+	if (cane==NULL)
+		return false;
+	return cane->libraryIndex != -1;
+}
+
+void RecipeWidget :: doubleClickEvent(QTreeWidgetItem* item,int column)
+{
+	if (!isLibraryCane(item))
+	{
+		colorPicker(item,column);
+	}
 }
 
 void RecipeWidget :: colorPicker(QTreeWidgetItem* item,int column)
 {
 	if (column!=3)
 		return;
-	Cane* cane = item->data(0,Qt::UserRole).value<Cane*>();
+	Cane* cane = getCane(item);
+	if (cane==NULL)
+		return;
 	QColor selectedColor = QColorDialog::getColor(cane->qcolor(),NULL,"Select New Color",QColorDialog::ShowAlphaChannel);
 	if (selectedColor.isValid())
 	{
@@ -63,7 +76,7 @@ void RecipeWidget::updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, b
 
 	int rootIndex = parentNode->indexOfChild(rootNode);
 
-	if (rootNode == visibleRootItem() && parentCane!=NULL)
+	if (parentCane != NULL)
 	{
 		Point p = parentCane->subcaneLocations[rootIndex];
 		rootNode->setText(4,QString("%1").arg(p.x));
@@ -122,7 +135,7 @@ void RecipeWidget::updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, i
 		rootIndex = parentNode->indexOfChild(rootNode);
 		parentCane = getCane(parentNode);
 
-		if (rootNode == visibleRootItem() && parentCane!=NULL)
+		if (parentCane != NULL)
 		{
 			p = parentCane->subcaneLocations[rootIndex];
 			rootNode->setText(4,QString("%1").arg(p.x));
@@ -206,6 +219,7 @@ void RecipeWidget :: updateLibraryColumn(Cane* cane,QTreeWidgetItem* node)
 	if (cane->libraryIndex!=-1)
 	{
 		node->setText(1,QString("%1").arg(cane->libraryIndex));
+
 		node->setDisabled(true);
 	}
 	else

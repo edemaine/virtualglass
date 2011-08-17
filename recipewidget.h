@@ -25,7 +25,7 @@ public slots:
 	void updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, bool recurse);
 	void updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, int column);
 	void changeData(QTreeWidgetItem* item,int column);
-	void colorPicker(QTreeWidgetItem* item,int column);
+	void doubleClickEvent(QTreeWidgetItem* item,int column);
 
 private:
 	OpenGLWidget* openglWidget;
@@ -33,6 +33,11 @@ private:
 	QTreeWidgetItem* visibleRootItem();
 	Cane* getCane(QTreeWidgetItem* node);
 	void updateLibraryColumn(Cane* cane,QTreeWidgetItem* node);
+	void colorPicker(QTreeWidgetItem* item,int column);
+	bool isLibraryCane(QTreeWidgetItem* item);
+	Point getCoordinate(Point p);
+	Point getPoint(QTreeWidgetItem* item);
+	void setPoint(QTreeWidgetItem* item, Point p);
 
 };
 
