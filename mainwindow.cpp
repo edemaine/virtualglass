@@ -772,8 +772,6 @@ void MainWindow::setupWorkArea()
 	case_button->setToolTip("Create a clear casing around the glass.");
 	flatten_button = new QPushButton("Flatten");
 	flatten_button->setToolTip("Drag Mouse Horizontally to Squish, Vertically to Flatten");
-	wrap_button = new QPushButton("Wrap");
-	wrap_button->setToolTip("Not Implemented");
 	snap_button = new QPushButton("Alternate Snap Modes");
 	snap_button->setToolTip("TODO");
 	undo_button = new QPushButton("Undo");
@@ -784,8 +782,6 @@ void MainWindow::setupWorkArea()
 	save_button->setToolTip("Save Current Model to Library");
 	clear_button = new QPushButton("Clear");
 	clear_button->setToolTip("Clear Current Model");
-	tabletop_button = new QPushButton("Tabletop");
-	tabletop_button->setToolTip("TODO");
 
 	previewLabel = new QLabel();
 	previewLabel->setFixedSize(100,100);
@@ -796,13 +792,11 @@ void MainWindow::setupWorkArea()
 	operButton_layout->addWidget(bundle_button);
 	operButton_layout->addWidget(case_button);
 	operButton_layout->addWidget(flatten_button);
-	operButton_layout->addWidget(wrap_button);
 	operButton_layout->addWidget(snap_button);
 	operButton_layout->addWidget(undo_button);
 	operButton_layout->addWidget(redo_button);
 	operButton_layout->addWidget(save_button);
 	operButton_layout->addWidget(clear_button);
-	operButton_layout->addWidget(tabletop_button);
 	operButton_layout->addWidget(previewLabel,1, Qt::AlignHCenter);
 	previewLabel->setHidden(true);
 

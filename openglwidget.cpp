@@ -749,15 +749,15 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	relY = (mouseLocY - oldMouseLocY) / windowHeight;
 
 	/*
-  Do something depending on mode.
-  All modes except LOOK_MODE involve modifying the cane
-  itself, while LOOK_MODE moves the camera.
+        Do something depending on mode.
+        All modes except LOOK_MODE involve modifying the cane
+        itself, while LOOK_MODE moves the camera.
 
-  All of the calls to model->*Cane() are functions of relX/relY,
-  but the constants involved are determined by experiment,
-  i.e. how much twist `feels' reasonable for moving the mouse
-  an inch.
-  */
+        All of the calls to model->*Cane() are functions of relX/relY,
+        but the constants involved are determined by experiment,
+        i.e. how much twist `feels' reasonable for moving the mouse
+        an inch.
+        */
 	if (rightMouseDown && !lockView)
 	{
 		// Rotate camera position around look-at location.
@@ -816,16 +816,16 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		break;
 	case BUNDLE_MODE:
 		/*
-	How the parameters for moveCane() are calculated is not obvious.
-	The idea is to make mouse X/Y correspond to the cane moving
-	left-right/up-down *regardless* of where the camera is. This
-	is why theta (the camera angle relative to the look-at point) is
-	also involved.
+                How the parameters for moveCane() are calculated is not obvious.
+                The idea is to make mouse X/Y correspond to the cane moving
+                left-right/up-down *regardless* of where the camera is. This
+                is why theta (the camera angle relative to the look-at point) is
+                also involved.
 
-	Essentially, the parameters convert the amount moved in X and Y
-	(variables `relX' and `relY') to the amount moved in X and Y
-	according to axes on which the cane lives.
-	*/
+                Essentially, the parameters convert the amount moved in X and Y
+                (variables `relX' and `relY') to the amount moved in X and Y
+                according to axes on which the cane lives.
+                */
 
 		if (e->buttons() & 0x00000001) // if left mouse button is down
 		{

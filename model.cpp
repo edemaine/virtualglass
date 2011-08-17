@@ -27,7 +27,8 @@ Model :: Model()
 	snapCircleParam = 0.2;
 	snapPointsCount=snapLinesCount=snapCirclesCount=0;
 	snapHoldPoint = Point();
-	geometryOutOfDate();
+
+        geometryOutOfDate();
 }
 
 void Model :: resetAuxiliaries()
@@ -66,67 +67,86 @@ int Model :: getMode()
 	return mode;
 }
 
+void Model :: cacheLowResGeometry()
+{
+        cachedLowResGeometry.clear();
+        cachedLowResGeometry.vertices.assign(lowResGeometry.vertices.begin(), lowResGeometry.vertices.end());
+        cachedLowResGeometry.triangles.assign(lowResGeometry.triangles.begin(), lowResGeometry.triangles.end());
+        cachedLowResGeometry.groups.assign(lowResGeometry.groups.begin(), lowResGeometry.groups.end());
+}
+
+void Model :: revertToCachedLowResGeometry()
+{
+        lowResGeometry.clear();
+        lowResGeometry.vertices.assign(cachedLowResGeometry.vertices.begin(), cachedLowResGeometry.vertices.end());
+        lowResGeometry.triangles.assign(cachedLowResGeometry.triangles.begin(), cachedLowResGeometry.triangles.end());
+        lowResGeometry.groups.assign(cachedLowResGeometry.groups.begin(), cachedLowResGeometry.groups.end());
+}
+
 void Model :: setMode(int mode)
 {
 	int prev_mode = this->mode;
 	this->mode = mode;
 
-	if (cane == NULL)
-		return;
+        if (cane == NULL)
+                return;
 
 	switch(this->mode)
 	{
-	case FLATTEN_MODE:
-		history->saveState(cane);
-		cane->createFlatten();
-		break;
-	case PULL_MODE:
-		history->saveState(cane);
-		cane->createPull();
-		break;
-	case BUNDLE_MODE:
-		history->saveState(cane);
-		cane->createBundle();
-		activeSubcane = -1;
-		break;
-	case CASING_MODE:
-	{
-		Cane* ancestors[MAX_ANCESTORS];
-		int ancestorCount = 0;
+                case FLATTEN_MODE:
+                        history->saveState(cane);
+                        cane->createFlatten();
+                        cacheLowResGeometry();
+                        break;
+                case PULL_MODE:
+                        history->saveState(cane);
+                        cane->createPull();
+                        cacheLowResGeometry();
+                        break;
+                case BUNDLE_MODE:
+                        history->saveState(cane);
+                        cane->createBundle();
+                        cacheLowResGeometry();
+                        activeSubcane = -1;
+                        break;
+                case CASING_MODE:
+                {
+                        Cane* ancestors[MAX_ANCESTORS];
+                        int ancestorCount = 0;
 
-		lowResGeometry.clear();
-		if (show2D)
-		{
-			cane->createCasing(generate2DMesh(cane, &lowResGeometry, ancestors,
-											  &ancestorCount, LOW_RESOLUTION, true, true));
-		}
-		else
-		{
-			cane->createCasing(generateMesh(cane, &lowResGeometry, ancestors,
-											&ancestorCount, LOW_RESOLUTION, true, true));
-		}
-		geometryOutOfDate();
-		emit caneChanged();
-	}
-	break;
-	case SNAP_MODE:
-		switch(prev_mode)
-		{
-		case SNAP_MODE:
-			this->mode = SNAP_LINE_MODE;
-			break;
-		case SNAP_LINE_MODE:
-			this->mode = SNAP_CIRCLE_MODE;
-			break;
-		case SNAP_CIRCLE_MODE:
-			this->mode = SNAP_MODE;
-			break;
-		default:
-			break;
-		}
-		break;
-	default:
-		break;
+                        lowResGeometry.clear();
+                        if (show2D)
+                        {
+                                cane->createCasing(generate2DMesh(cane, &lowResGeometry, ancestors,
+                                        &ancestorCount, LOW_RESOLUTION, true, true));
+                        }
+                        else
+                        {
+                                cane->createCasing(generateMesh(cane, &lowResGeometry, ancestors,
+                                        &ancestorCount, LOW_RESOLUTION, true, true));
+                        }
+                        geometryOutOfDate();
+                        emit caneChanged();
+                }
+                        break;
+                case SNAP_MODE:
+                        switch(prev_mode)
+                        {
+                        case SNAP_MODE:
+                                this->mode = SNAP_LINE_MODE;
+                                break;
+                        case SNAP_LINE_MODE:
+                                this->mode = SNAP_CIRCLE_MODE;
+                                break;
+                        case SNAP_CIRCLE_MODE:
+                                this->mode = SNAP_MODE;
+                                break;
+                        default:
+                                break;
+                        }
+                        break;
+                default:
+                        break;
 	}
 	emit modeChanged(this->mode);
 }
@@ -154,7 +174,7 @@ int Model :: getActiveSubcane()
 void Model :: setCane(Cane* c)
 {
 	history->saveState(cane);
-	if (c==NULL)
+        if (c == NULL)
 		resetAuxiliaries();
 	cane = c;
 	geometryOutOfDate();
@@ -176,7 +196,7 @@ void Model :: updateLowResGeometry()
 		}
 		else
 		{
-			generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION, true);
+                        generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION, true);
 		}
 	}
 	lowResGeometryFresh = 1;
@@ -219,8 +239,11 @@ Geometry* Model :: getGeometry(int resolution)
 	else
 	{
 		if (!highResGeometryFresh)
-			updateHighResGeometry();
-		return &highResGeometry;
+                {
+                        updateHighResGeometry();
+                        updateLowResGeometry();
+                }
+                return &highResGeometry;
 	}
 }
 
@@ -232,13 +255,13 @@ void Model :: geometryOutOfDate()
 
 void Model :: pullCane(float twistAmount, float stretchAmount)
 {
-	unapplyPullTransform(&lowResGeometry, cane);
-	cane->pullIntuitive(twistAmount, stretchAmount);
-	applyPullTransform(&lowResGeometry, cane);
+        revertToCachedLowResGeometry();
+        cane->pullIntuitive(twistAmount, stretchAmount);
+        applyPullTransform(&lowResGeometry, cane);
 
-	geometryOutOfDate();
-	lowResGeometryFresh = 1;
-	emit caneChanged();
+        lowResGeometryFresh = 1;
+        highResGeometryFresh = 0;
+        emit caneChanged();
 }
 
 void Model :: pullActiveCane(float twistAmount, float stretchAmount)
@@ -247,19 +270,24 @@ void Model :: pullActiveCane(float twistAmount, float stretchAmount)
 		return;
 	if (cane->subcanes[activeSubcane]->type != PULL_CANETYPE)
 		history->saveState(cane);
-	cane->pullIntuitive(activeSubcane,twistAmount, stretchAmount);
-	geometryOutOfDate();
+
+        revertToCachedLowResGeometry();
+        cane->pullIntuitive(activeSubcane,twistAmount, stretchAmount);
+        applyPullTransform(&lowResGeometry, cane);
+
+        lowResGeometryFresh = 1;
+        highResGeometryFresh = 0;
 	emit caneChanged();
 }
 
 void Model :: flattenCane(float rectangle_ratio, float rectangle_theta, float flatness)
 {
-	if (cane == NULL)
-		return;
-	if (cane->type != FLATTEN_CANETYPE)
-		history->saveState(cane);
-	cane->flatten(rectangle_ratio, rectangle_theta, flatness);
-	geometryOutOfDate();
+        revertToCachedLowResGeometry();
+        cane->flatten(rectangle_ratio, rectangle_theta, flatness);
+        applyPullTransform(&lowResGeometry, cane);
+
+        lowResGeometryFresh = 1;
+        highResGeometryFresh = 0;
 	emit caneChanged();
 }
 
@@ -269,8 +297,13 @@ void Model :: flattenActiveCane(float rectangle_ratio, float rectangle_theta, fl
 		return;
 	if (cane->subcanes[activeSubcane]->type != FLATTEN_CANETYPE)
 		history->saveState(cane);
-	cane->flatten(activeSubcane, rectangle_ratio, rectangle_theta, flatness);
-	geometryOutOfDate();
+
+        revertToCachedLowResGeometry();
+        cane->flatten(activeSubcane, rectangle_ratio, rectangle_theta, flatness);
+        applyFlattenTransform(&lowResGeometry, cane);
+
+        lowResGeometryFresh = 1;
+        highResGeometryFresh = 0;
 	emit caneChanged();
 }
 
@@ -447,7 +480,6 @@ void Model :: addCane(Cane* c)
 	history->saveState(cane);
 	if (cane == NULL)
 	{
-		c->createBundle();
 		cane = c->deepCopy();
 		setMode(BUNDLE_MODE);
 	}
@@ -455,7 +487,6 @@ void Model :: addCane(Cane* c)
 	{
 		if (mode != BUNDLE_MODE)
 			setMode(BUNDLE_MODE);
-		c->createBundle();
 		cane->add(c->deepCopy());
 	}
 	geometryOutOfDate();

@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <vector>
+#include <algorithm>
 #include <string>
 #include <QObject>
 #include "canehistory.h"
@@ -90,7 +91,8 @@ private:
 	int mode;
 	Cane *cane;
 	CaneHistory *history;
-	Geometry lowResGeometry;
+        Geometry cachedLowResGeometry;
+        Geometry lowResGeometry;
 	Geometry highResGeometry;
 	int lowResGeometryFresh;
 	int highResGeometryFresh;
@@ -119,6 +121,8 @@ private:
 	void geometryOutOfDate();
 	void updateLowResGeometry();
 	void updateHighResGeometry();
+        void cacheLowResGeometry();
+        void revertToCachedLowResGeometry();
 	void resetAuxiliaries();
 };
 

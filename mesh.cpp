@@ -1,104 +1,92 @@
 
 #include "mesh.h"
 
+
+Point rotate(Point pre, float theta)
+{
+        Point post;
+
+        post.x = cos(theta) * pre.x - sin(theta) * pre.y;
+        post.y = sin(theta) * pre.x + cos(theta) * pre.y;
+
+        return post;
+}
+
 void applyFlattenTransform(Vertex* v, Cane* transformNode)
 {
-	float rectangleRatio = transformNode->amts[0];
+        float rectangleRatio = transformNode->amts[0];
 	float rectangleTheta = transformNode->amts[1];
 	float flatness = transformNode->amts[2];
 
-	Point p_r;
-	p_r.x = cos(-rectangleTheta) * v->position.x - sin(-rectangleTheta) * v->position.y;
-	p_r.y = sin(-rectangleTheta) * v->position.x + cos(-rectangleTheta) * v->position.y;
+        Point vert;
+        vert.x = v->position.x;
+        vert.y = v->position.y;
+        Point vertRectCoords = rotate(vert, -rectangleTheta);
 
-	float pt_radius = length(p_r.xy);
-	float pt_theta = atan2(p_r.y, p_r.x);
-	if (pt_theta < 0)
-		pt_theta += 2*PI;
-	float arc_length = pt_radius * pt_theta;
+        float radius = length(vertRectCoords.xy);
+        float theta = atan2(vertRectCoords.y, vertRectCoords.x);
+        if (theta < 0)
+                theta += 2*PI;
+        float arc_length = radius * theta;
 
-	// We use a boundary-preserving circle to rectangle transformation
-	float rect_y = PI * pt_radius / (1.0 + rectangleRatio);
-	float rect_x = rect_y * rectangleRatio;
-	rect_y /= 2.0;
-	rect_x /= 2.0;
-	if (arc_length < rect_y)
+        /*
+        The vertex lies on a circle that is mapped to a rectangle
+        with equal perimeter. The rectangleRatio is width/height.
+        */
+        float rectY = PI * radius / (1.0 + rectangleRatio);
+        float rectX = rectY * rectangleRatio;
+
+        // Use half width/height
+        rectY /= 2.0;
+        rectX /= 2.0;
+
+        Point goalRectangle;
+        if (arc_length < rectY)
 	{
-		p_r.x = rect_x;
-		p_r.y = arc_length;
+                goalRectangle.x = rectX;
+                goalRectangle.y = arc_length;
 	}
-	else
+        else if ((arc_length - rectY) < 2 * rectX)
 	{
-		arc_length -= rect_y;
-		if (arc_length < 2 * rect_x)
-		{
-			p_r.x = rect_x - arc_length;
-			p_r.y = rect_y;
-		}
-		else
-		{
-			arc_length -= 2 * rect_x;
-			if (arc_length < 2 * rect_y)
-			{
-				p_r.x = -rect_x;
-				p_r.y = rect_y - arc_length;
-			}
-			else
-			{
-				arc_length -= 2 * rect_y;
-				if (arc_length < 2 * rect_x)
-				{
-					p_r.x = -rect_x + arc_length;
-					p_r.y = -rect_y;
-				}
-				else
-				{
-					arc_length -= 2 * rect_x;
-					p_r.x = rect_x;
-					p_r.y = -rect_y + arc_length;
-				}
-			}
-		}
-	}
+                goalRectangle.x = rectX - (arc_length - rectY);
+                goalRectangle.y = rectY;
+        }
+        else if ((arc_length - rectY - 2 * rectX) < 2 * rectY)
+        {
+                goalRectangle.x = -rectX;
+                goalRectangle.y = rectY - (arc_length - rectY - 2 * rectX);
+        }
+        else if ((arc_length - rectY - 2 * rectX - 2 * rectY) < 2 * rectX)
+        {
+                goalRectangle.x = -rectX + (arc_length - rectY - 2 * rectX - 2 * rectY);
+                goalRectangle.y = -rectY;
+        }
+        else
+        {
+                goalRectangle.x = rectX;
+                goalRectangle.y = -rectY + (arc_length - rectY - 2 * rectX - 2 * rectY - 2 * rectX);
+        }
 
-	v->position.x = flatness * (cos(rectangleTheta) * p_r.x
-								- sin(rectangleTheta) * p_r.y) + v->position.x * (1-flatness);
-	v->position.y = flatness * (sin(rectangleTheta) * p_r.x
-								+ cos(rectangleTheta) * p_r.y) + v->position.y * (1-flatness);
-	//TODO: normal transform
-}
-
-// TODO: Fix
-void unapplyFlattenTransform(Vertex* v, Cane* transformNode)
-{
-
+        // Transform back to normal coordinates from rectangle coordinates.
+        goalRectangle = rotate(goalRectangle, rectangleTheta);
+        v->position.x = flatness * goalRectangle.x + vert.x * (1 - flatness);
+        v->position.y = flatness * goalRectangle.y + vert.y * (1 - flatness);
 }
 
 void applyBundleTransform(Vertex* v, Cane* parentNode, int subcane)
 {
-	Point location = parentNode->subcaneLocations[subcane];
+        Point locationInParent = parentNode->subcaneLocations[subcane];
 
-	float theta = atan2(v->position.y, v->position.x);
-	float r = length(v->position.xy);
-	v->position.x = r * cos(theta + location.z);
-	v->position.y = r * sin(theta + location.z);
+        // Z location
+        float preTheta = atan2(v->position.y, v->position.x);
+        float postTheta = preTheta + locationInParent.z;
+        float r = length(v->position.xy);
+        v->position.x = r * cos(postTheta);
+        v->position.y = r * sin(postTheta);
 
-	v->position.x += location.x;
-	v->position.y += location.y;
-}
-
-// TODO: Fix
-void unapplyBundleTransform(Vertex* v, Cane* parentNode, int subcane)
-{
-	Point location = parentNode->subcaneLocations[subcane];
-
-	float theta = atan2(v->position.y, v->position.x);
-	float r = length(v->position.xy);
-	v->position.x = r * cos(theta + location.z);
-	v->position.y = r * sin(theta + location.z);
-
-	v->position.x += location.x;
-	v->position.y += location.y;
+        // XY location
+        v->position.x += locationInParent.x;
+        v->position.y += locationInParent.y;
 }
 
 void applyPullTransform(Geometry* geometry, Cane* transformNode)
@@ -178,25 +166,25 @@ by its ancestors in the cane DAG.
 Vertex applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
 {
 	/*
-  The transformations are applied back to front to match how they
-  are loaded into the array. Because the transform array is created by
-  a depth-first traversal of the cane DAG, transforms lower in the DAG
-  (i.e. closer to the leaves) are added later. However, they
-  represent the first operations done on the cane, so need to be applied
-  first.
-  */
+        The transformations are applied back to front to match how they
+        are loaded into the array. Because the transform array is created by
+        a depth-first traversal of the cane DAG, transforms lower in the DAG
+        (i.e. closer to the leaves) are added later. However, they
+        represent the first operations done on the cane, so need to be applied
+        first.
+        */
 	for (int i = ancestorCount - 1; i >= 0; --i)
 	{
 		/*
- Each cane node has a type and an amount.
- Depending upon the type, the amount fields
- take on different meanings. For instance, a twist transform
- uses amts[0] to mean the magnitude of the twist.
- just a single real-valued parameter).
- The BUNDLE_CANETYPE is an exception, in that it simply uses
- the location of the subcane to determine how to move the points.
- */
-		int subcaneIndex=-1;
+                Each cane node has a type and an amount.
+                Depending upon the type, the amount fields
+                take on different meanings. For instance, a twist transform
+                uses amts[0] to mean the magnitude of the twist.
+                just a single real-valued parameter).
+                The BUNDLE_CANETYPE is an exception, in that it simply uses
+                the location of the subcane to determine how to move the points.
+                */
+                int subcaneIndex=-1;
 		switch (ancestors[i]->type)
 		{
 		case BUNDLE_CANETYPE:

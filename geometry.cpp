@@ -8,6 +8,7 @@
 
 using std::vector;
 
+
 //compute normals by using area-weighted normals of adjacent triangles.
 //this may not be the correct approximation, but I just wanted some sort of hack
 //to hold us until proper normal transforms could be written.

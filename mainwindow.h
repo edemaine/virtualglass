@@ -26,13 +26,11 @@ public:
 	QPushButton* bundle_button;
 	QPushButton* case_button;
 	QPushButton* flatten_button;
-	QPushButton* wrap_button;
 	QPushButton* snap_button;
 	QPushButton* undo_button;
 	QPushButton* redo_button;
 	QPushButton* save_button;
 	QPushButton* clear_button;
-	QPushButton* tabletop_button;
 
 signals:
 	void setCaneSig(Cane* c);

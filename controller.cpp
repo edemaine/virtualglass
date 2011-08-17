@@ -29,20 +29,17 @@ Controller::Controller(int argc, char **argv)
 	modeSignalMapper->setMapping(mainWindow->bundle_button, BUNDLE_MODE);
 	modeSignalMapper->setMapping(mainWindow->case_button, CASING_MODE);
 	modeSignalMapper->setMapping(mainWindow->flatten_button, FLATTEN_MODE);
-	modeSignalMapper->setMapping(mainWindow->wrap_button, WRAP_MODE);
 	modeSignalMapper->setMapping(mainWindow->snap_button, SNAP_MODE);
 	connect(mainWindow->pull_button, SIGNAL(clicked()), modeSignalMapper, SLOT(map()));
 	connect(mainWindow->bundle_button, SIGNAL(clicked()), modeSignalMapper, SLOT(map()));
 	connect(mainWindow->case_button, SIGNAL(clicked()), modeSignalMapper, SLOT(map()));
 	connect(mainWindow->flatten_button, SIGNAL(clicked()), modeSignalMapper, SLOT(map()));
-	connect(mainWindow->wrap_button, SIGNAL(clicked()), modeSignalMapper, SLOT(map()));
 	connect(mainWindow->snap_button, SIGNAL(clicked()), modeSignalMapper, SLOT(map()));
 	connect(modeSignalMapper, SIGNAL(mapped(int)), model, SLOT(setMode(int)));
 
 	connect(mainWindow->undo_button, SIGNAL(pressed()), model, SLOT(undo()));
 	connect(mainWindow->redo_button, SIGNAL(pressed()), model, SLOT(redo()));
 	connect(mainWindow->clear_button, SIGNAL(pressed()), model, SLOT(clearCurrentCane()));
-	connect(mainWindow->tabletop_button, SIGNAL(pressed()), mainWindow->openglWidget, SLOT(lockTable()));
 
 	// Connect mainwindow buttons to mainwindow
 	connect(mainWindow->save_button, SIGNAL(pressed()), mainWindow, SLOT(saveCaneToLibrary()));
