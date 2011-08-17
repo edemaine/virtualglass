@@ -30,18 +30,11 @@ public:
 	Geometry* getGeometry(int resolution);
 	void pullCane(float twistAmount, float stretchFactor);
 	void pullActiveCane(float twistAmount, float stretchFactor);
-	void moveCane(Point p);
-	void moveCane(float delta_x, float delta_y);
-	void moveCane(float delta_x, float delta_y, bool snaps);
-	void moveCaneTo(float delta_x, float delta_y);
-	void moveCaneTo(Point p,Point oldP, bool snaps);
-	void moveCane(float delta_z);
-	void changeCaneCasing(float delta_x);
-	void changeCaneCasingTo(float radi);
-	void changeCaneCasingTo(Point radi);
-	void flattenCane(float rectangle_ratio, float rectangle_theta, float flatness);
-	void flattenActiveCane(float rectangle_ratio, float rectangle_theta, float flatness);
-	bool deleteActiveCane();
+        void flattenCane(float rectangle_ratio, float rectangle_theta, float flatness);
+        void flattenActiveCane(float rectangle_ratio, float rectangle_theta, float flatness);
+        void moveCane(float delta_x, float delta_y, float delta_z);
+        void adjustCaneCasing(float delta_x);
+        bool deleteActiveCane();
 	void addCane(Cane* c);
 	void startMoveMode();
 	void saveObjFile(std::string const &filename);
@@ -85,7 +78,7 @@ public slots:
 	void setMode(int mode);
 	void clearCurrentCane();
 	void setCane(Cane* c);
-	void exactChange();
+        void exactChange();
 
 private:
 	int mode;

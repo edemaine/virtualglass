@@ -30,13 +30,9 @@ public:
 	void createBundle();
 	void add(Cane* addl);
 	void deleteCane(int subcane);
-	void moveCane(int subcane, float delta_x, float delta_y);
-	void moveCaneTo(int subcane, float delta_x, float delta_y);
-	void moveCaneTo(int subcane, Point p);
-	void moveCane(int subcane, float delta_z);
-	void createCasing(float radius);
-	void adjustCasing(float delta_x);
-	void adjustCasingTo(float radius);
+        void moveCane(int subcane, float delta_x, float delta_y, float delta_z);
+        void createCasing(float radius);
+        void adjustCasing(float radius);
 	int leafNodes();
 	Cane* deepCopy();
 	void setColor(Color color);

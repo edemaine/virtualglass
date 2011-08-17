@@ -19,18 +19,13 @@ float mesh2DCircularBaseCane(Geometry *geometry,
 float computeTotalStretch(Cane** ancestors, int ancestorCount);
 
 void applyFlattenTransform(Vertex* v, Cane* transformNode);
-void applyBundleTransform(Vertex* v, Cane* parentNode, int subcane);
+void applyFlattenTransform(Geometry* geometry, Cane* transformNode);
+void applyMoveTransform(Vertex* v, Cane* parentNode, int subcane);
+void applyMoveTransform(Geometry* geometry, Cane* parentNode, int subcane);
 void applyPullTransform(Vertex* v, Cane* transformNode);
 void applyPullTransform(Geometry* geometry, Cane* transformNode);
 Vertex applyTransforms(Vertex p, Cane** ancestors, int ancestorCount);
 
-void unapplyFlattenTransform(Vertex* v, Cane* transformNode);
-void unapplyBundleTransform(Vertex* v, Cane* parentNode, int subcane);
-void unapplyPullTransform(Vertex* v, Cane* transformNode);
-
-void unapplyFlattenTransform(Geometry* geometry, Cane* transformNode);
-void unapplyBundleTransform(Geometry* geometry, Cane* parentNode, int subcane);
-void unapplyPullTransform(Geometry* geometry, Cane* transformNode);
 
 #endif
 

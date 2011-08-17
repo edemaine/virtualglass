@@ -244,38 +244,15 @@ void Cane :: createBundle()
 	this->subcanes[0] = copy;
 }
 
-void Cane :: moveCane(int subcane, float delta_x, float delta_y)
+void Cane :: moveCane(int subcane, float delta_x, float delta_y, float delta_z)
 {
 	if ((unsigned)subcane >= (unsigned)subcaneCount) {
 		std::cerr << "Trying to move non-existent subcane " << subcane << std::endl;
 		return;
 	}
 	subcaneLocations[subcane].x += delta_x;
-	subcaneLocations[subcane].y += delta_y;
-}
-
-void Cane :: moveCaneTo(int subcane, float delta_x, float delta_y)
-{
-	if ((unsigned)subcane >= (unsigned)subcaneCount) {
-		std::cerr << "Trying to move non-existent subcane " << subcane << std::endl;
-		return;
-	}
-	subcaneLocations[subcane].x = delta_x;
-	subcaneLocations[subcane].y = delta_y;
-}
-
-void Cane :: moveCaneTo(int subcane, Point p)
-{
-	moveCaneTo(subcane,p.x,p.y);
-}
-
-void Cane :: moveCane(int subcane, float delta_z)
-{
-	if ((unsigned)subcane >= (unsigned)subcaneCount) {
-		std::cerr << "Trying to move non-existent subcane " << subcane << std::endl;
-		return;
-	}
-	subcaneLocations[subcane].z += delta_z;
+        subcaneLocations[subcane].y += delta_y;
+        subcaneLocations[subcane].z += delta_z;
 }
 
 void Cane :: createCasing(float radius)
@@ -295,22 +272,9 @@ void Cane :: createCasing(float radius)
 	this->color.a = 0.2;
 }
 
-void Cane :: adjustCasing(float delta_x)
+void Cane :: adjustCasing(float delta)
 {
-	if (this->type != CASING_CANETYPE)
-	{
-		return;
-	}
-	this->amts[0] += delta_x;
-}
-
-void Cane :: adjustCasingTo(float radius)
-{
-	if (this->type != CASING_CANETYPE)
-	{
-		return;
-	}
-	this->amts[0] = radius;
+        this->amts[0] += delta;
 }
 
 void Cane :: add(Cane* addl)

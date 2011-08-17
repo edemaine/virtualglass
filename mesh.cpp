@@ -12,6 +12,14 @@ Point rotate(Point pre, float theta)
         return post;
 }
 
+void applyFlattenTransform(Geometry* geometry, Cane* transformNode)
+{
+        for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
+        {
+                applyFlattenTransform(&(geometry->vertices[v]), transformNode);
+        }
+}
+
 void applyFlattenTransform(Vertex* v, Cane* transformNode)
 {
         float rectangleRatio = transformNode->amts[0];
@@ -73,7 +81,25 @@ void applyFlattenTransform(Vertex* v, Cane* transformNode)
         v->position.y = flatness * goalRectangle.y + vert.y * (1 - flatness);
 }
 
-void applyBundleTransform(Vertex* v, Cane* parentNode, int subcane)
+void applyMoveTransform(Geometry* geometry, Cane* parentNode, int subcane)
+{
+        // Find group for subcane
+        Group* subcaneGroup;
+        for (uint32_t g = 0; g < geometry->groups.size(); ++g)
+                if (geometry->groups[g].tag == (uint32_t) subcane)
+                {
+                        subcaneGroup = &(geometry->groups[g]);
+                        break;
+                }
+
+        // Apply transformation to only these vertices
+        for (uint32_t v = subcaneGroup->vertex_begin; v < subcaneGroup->vertex_begin + subcaneGroup->vertex_size; ++v)
+        {
+                applyMoveTransform(&(geometry->vertices[v]), parentNode, subcane);
+        }
+}
+
+void applyMoveTransform(Vertex* v, Cane* parentNode, int subcane)
 {
         Point locationInParent = parentNode->subcaneLocations[subcane];
 
@@ -96,6 +122,7 @@ void applyPullTransform(Geometry* geometry, Cane* transformNode)
 		applyPullTransform(&(geometry->vertices[v]), transformNode);
 	}
 }
+
 
 /*
 In applyPullTransform() and unapplyPullTransform(), the
@@ -126,35 +153,6 @@ void applyPullTransform(Vertex* v, Cane* transformNode)
 	v->position.x /= sqrt(stretch);
 	v->position.y /= sqrt(stretch);
 	v->position.z *= stretch;
-}
-
-void unapplyPullTransform(Vertex* v, Cane* transformNode)
-{
-	float twist = transformNode->amts[0];
-	float stretch = transformNode->amts[1];
-
-	// Undo things in reverse order
-
-	// Unapply stretch
-	v->position.x *= sqrt(stretch);
-	v->position.y *= sqrt(stretch);
-	v->position.z /= stretch;
-
-	// Then unapply twist
-	float r = length(v->position.xy);
-	float postTheta = atan2(v->position.y, v->position.x);
-	float transformTheta = stretch * twist * v->position.z;
-	float preTheta = postTheta - transformTheta;
-	v->position.x = r * cos(preTheta);
-	v->position.y = r * sin(preTheta);
-}
-
-void unapplyPullTransform(Geometry* geometry, Cane* transformNode)
-{
-	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
-	{
-		unapplyPullTransform(&(geometry->vertices[v]), transformNode);
-	}
 }
 
 /*
@@ -198,7 +196,7 @@ Vertex applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
 					break;
 				}
 			}
-			applyBundleTransform(&v, ancestors[i], subcaneIndex);
+                        applyMoveTransform(&v, ancestors[i], subcaneIndex);
 			break;
 			// amts[0] is twist, amts[1] is stretch
 		case PULL_CANETYPE:
@@ -276,10 +274,10 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCou
 	uint32_t first_triangle = geometry->triangles.size();
 
 	/*
-  Draw the walls of the cylinder. Note that the z location is
-  adjusted by the total stretch experienced by the cane so that
-  the z values range between 0 and 1.
-  */
+        Draw the walls of the cylinder. Note that the z location is
+        adjusted by the total stretch experienced by the cane so that
+        the z values range between 0 and 1.
+        */
 	//Generate verts:
 	for (unsigned int i = 0; i < axialResolution; ++i)
 	{
@@ -315,10 +313,10 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCou
 	assert(geometry->valid());
 
 	/*
-  Draw the cylinder bottom, then top.
-  The mesh uses a set of n-2 triangles with a common vertex
-  to draw a regular n-gon.
-  */
+        Draw the cylinder bottom, then top.
+        The mesh uses a set of n-2 triangles with a common vertex
+        to draw a regular n-gon.
+        */
 	for (int side = 0; side <= 1; ++side) {
 		float z = (side?1.0:0.0);
 		float nz = (side?1.0:-1.0);
@@ -356,7 +354,7 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCou
 	}
 	geometry->compute_normals_from_triangles();
 	geometry->groups.push_back(Group(first_triangle,
-									 geometry->triangles.size() - first_triangle, group_cane, group_tag));
+                geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
 
 	if (!computeRadius)
 		return 0.0;
@@ -401,10 +399,10 @@ float mesh2DCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorC
 	uint32_t first_triangle = geometry->triangles.size();
 
 	/*
-  Draw the cylinder top only.
-  The mesh uses a set of n-2 triangles with a common vertex
-  to draw a regular n-gon.
-  */
+        Draw the cylinder top only.
+        The mesh uses a set of n-2 triangles with a common vertex
+        to draw a regular n-gon.
+        */
 	uint32_t base = geometry->vertices.size();
 	for (unsigned int j = 0; j < angularResolution; ++j)
 	{
@@ -428,7 +426,7 @@ float mesh2DCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorC
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount);
 	}
 	geometry->groups.push_back(Group(first_triangle,
-									 geometry->triangles.size() - first_triangle, group_cane, group_tag));
+                geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
 
 	if (!computeRadius)
 		return 0.0;
@@ -453,7 +451,7 @@ leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
 float generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
-				   int resolution, bool casing, bool computeRadius, int groupIndex)
+        int resolution, bool casing, bool computeRadius, int groupIndex)
 {
 	int i, passCasing, passGroupIndex;
 	float radius=0.0;
@@ -467,7 +465,7 @@ float generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorC
 	if (c->type == BASE_CIRCLE_CANETYPE)
 	{
 		radius = meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-									  resolution, c, groupIndex, 1.0, computeRadius);
+                        resolution, c, groupIndex, 1.0, computeRadius);
 	}
 	else
 	{

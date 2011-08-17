@@ -111,19 +111,14 @@ void Model :: setMode(int mode)
                         break;
                 case CASING_MODE:
                 {
-                        Cane* ancestors[MAX_ANCESTORS];
-                        int ancestorCount = 0;
-
                         lowResGeometry.clear();
                         if (show2D)
                         {
-                                cane->createCasing(generate2DMesh(cane, &lowResGeometry, ancestors,
-                                        &ancestorCount, LOW_RESOLUTION, true, true));
+                                cane->createCasing(1.0);
                         }
                         else
                         {
-                                cane->createCasing(generateMesh(cane, &lowResGeometry, ancestors,
-                                        &ancestorCount, LOW_RESOLUTION, true, true));
+                                cane->createCasing(1.0);
                         }
                         geometryOutOfDate();
                         emit caneChanged();
@@ -307,27 +302,28 @@ void Model :: flattenActiveCane(float rectangle_ratio, float rectangle_theta, fl
 	emit caneChanged();
 }
 
-void Model :: moveCane(Point p)
-{
-	moveCane(p.x,p.y);
-	geometryOutOfDate();
-	emit caneChanged();
-}
 
-void Model :: moveCane(float delta_x, float delta_y)
+void Model :: moveCane(float delta_x, float delta_y, float delta_z)
 {
 	if (cane == NULL || activeSubcane == -1)
 		return;
 
-	if (activeSnapMode != NO_SNAP)
-	{
-		cane->moveCaneTo(activeSubcane,snapHoldPoint);
-	}
-	cane->moveCane(activeSubcane, delta_x, delta_y);
+        revertToCachedLowResGeometry();
+        cane->moveCane(activeSubcane, delta_x, delta_y, delta_z);
+        applyMoveTransform(&lowResGeometry, cane, activeSubcane);
 
+        lowResGeometryFresh = 1;
+        highResGeometryFresh = 0;
+        emit caneChanged();
+
+
+
+/*
+The snapping functionality is commented out until it has a reasonable, intuitive
+interface and works. -Andrew
+*/
+#ifdef UNDEF
 	// check if cane hits any snaps
-
-
 	Point loc = cane->subcaneLocations[activeSubcane];
 	for (int i=0; i<snapPointsCount;i++){
 		if (length(loc-snapPoint(SNAP_POINT,i))<snapPointRadius(SNAP_POINT,i))
@@ -383,85 +379,16 @@ void Model :: moveCane(float delta_x, float delta_y)
 	clearActiveSnap(true);
 	geometryOutOfDate();
 	emit caneChanged();
+#endif
 }
 
-void Model :: moveCane(float delta_x, float delta_y, bool snaps)
-{
-	if (snaps)
-	{
-		moveCane(delta_x,delta_y);
-		return;
-	}
-
-	if (cane == NULL || activeSubcane == -1)
-		return;
-
-	cane->moveCane(activeSubcane, delta_x, delta_y);
-
-	// check if cane hits any snaps
-
-	clearActiveSnap(false);
-	geometryOutOfDate();
-	emit caneChanged();
-}
-
-void Model :: moveCaneTo(Point p,Point oldP,bool snaps)
-{
-	if (cane == NULL || activeSubcane == -1)
-		return;
-	if (snaps)
-	{
-		moveCane(p-oldP);
-	}
-	else
-	{
-		moveCaneTo(p.x,p.y);
-	}
-
-	geometryOutOfDate();
-	emit caneChanged();
-}
-
-void Model :: moveCaneTo(float delta_x, float delta_y)
-{
-	if (cane == NULL || activeSubcane == -1)
-		return;
-	cane->moveCaneTo(activeSubcane, delta_x, delta_y);
-
-	geometryOutOfDate();
-	emit caneChanged();
-}
-
-void Model :: moveCane(float delta_z)
-{
-	if (cane == NULL || activeSubcane == -1)
-		return;
-	cane->moveCane(activeSubcane, delta_z);
-	geometryOutOfDate();
-	emit caneChanged();
-}
-
-void Model :: changeCaneCasing(float delta_x)
+void Model :: adjustCaneCasing(float delta)
 {
 	if (cane == NULL)
 		return;
-	cane->adjustCasing(delta_x);
+        cane->adjustCasing(delta);
 	geometryOutOfDate();
 	emit caneChanged();
-}
-
-void Model :: changeCaneCasingTo(float radi)
-{
-	if (cane == NULL)
-		return;
-	cane->adjustCasingTo(radi);
-	geometryOutOfDate();
-	emit caneChanged();
-}
-
-void Model :: changeCaneCasingTo(Point radi)
-{
-	changeCaneCasingTo(length(radi));
 }
 
 bool Model :: deleteActiveCane()
@@ -481,16 +408,20 @@ void Model :: addCane(Cane* c)
 	if (cane == NULL)
 	{
 		cane = c->deepCopy();
-		setMode(BUNDLE_MODE);
-	}
+                geometryOutOfDate();
+                emit caneChanged();
+                setMode(BUNDLE_MODE);
+        }
 	else
 	{
-		if (mode != BUNDLE_MODE)
-			setMode(BUNDLE_MODE);
-		cane->add(c->deepCopy());
-	}
-	geometryOutOfDate();
-	emit caneChanged();
+                cane->add(c->deepCopy());
+                geometryOutOfDate();
+                emit caneChanged();
+                if (mode != BUNDLE_MODE)
+                        setMode(BUNDLE_MODE);
+                else
+                        cacheLowResGeometry();
+        }
 }
 
 void Model :: undo()
@@ -762,7 +693,7 @@ int Model :: getActiveSnapIndex()
 void Model :: clearActiveSnap(bool holdSnap)
 {
 	if (activeSnapMode != NO_SNAP && holdSnap)
-		cane->moveCaneTo(activeSubcane,snapHoldPoint);
+                cane->moveCane(activeSubcane, 0, 0, 0); // To(activeSubcane,snapHoldPoint);
 	activeSnapMode = NO_SNAP;
 	activeSnapIndex = -1;
 	snapHoldPoint = Point();
@@ -838,6 +769,6 @@ void Model :: toggle2D()
 
 void Model::exactChange()
 {
-	geometryOutOfDate();
-	emit caneChanged();
+        geometryOutOfDate();
+        emit caneChanged();
 }

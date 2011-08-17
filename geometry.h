@@ -32,10 +32,13 @@ class Cane;
 class Group
 {
 public:
-	Group(uint32_t _begin, uint32_t _size, Cane *_cane, uint32_t _tag) : begin(_begin), size(_size), cane(_cane), tag(_tag) {
+        Group(uint32_t _triangle_begin, uint32_t _triangle_size, uint32_t _vertex_begin, uint32_t _vertex_size, Cane *_cane, uint32_t _tag)
+                : triangle_begin(_triangle_begin), triangle_size(_triangle_size), vertex_begin(_vertex_begin), vertex_size(_vertex_size), cane(_cane), tag(_tag) {
 	}
-	uint32_t begin;
-	uint32_t size;
+        uint32_t triangle_begin;
+        uint32_t triangle_size;
+        uint32_t vertex_begin;
+        uint32_t vertex_size;
 	Cane * cane;
 	uint32_t tag;
 };
@@ -58,9 +61,11 @@ public:
 			if (t->v3 >= vertices.size()) return false;
 		}
 		for (std::vector< Group >::const_iterator g = groups.begin(); g != groups.end(); ++g) {
-			if (g->begin >= triangles.size()) return false;
-			if (g->begin + g->size >= triangles.size()) return false;
-			if (g->cane == NULL) return false;
+                        if (g->triangle_begin >= triangles.size()) return false;
+                        if (g->triangle_begin + g->triangle_size >= triangles.size()) return false;
+                        if (g->cane == NULL) return false;
+                        if (g->vertex_begin >= vertices.size()) return false;
+                        if (g->vertex_begin + g->vertex_size >= vertices.size()) return false;
 		}
 		return true;
 	}

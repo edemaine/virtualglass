@@ -131,8 +131,8 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	glEnableClientState(GL_VERTEX_ARRAY);
 	for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
 		glColor4ubv(reinterpret_cast< const GLubyte * >(&(g->tag)));
-		glDrawElements(GL_TRIANGLES, g->size * 3,
-					   GL_UNSIGNED_INT, &(geometry->triangles[g->begin].v1));
+                glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
+                                           GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
 	}
 	glDisableClientState(GL_VERTEX_ARRAY);
 
@@ -301,8 +301,8 @@ void OpenGLWidget :: paintGL()
 			}
 			glColor3f(c.r, c.g, c.b);
 			glColor4f(c.r, c.g, c.b, c.a);
-			glDrawElements(GL_TRIANGLES, g->size * 3,
-						   GL_UNSIGNED_INT, &(geometry->triangles[g->begin].v1));
+                        glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
+                                                   GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
 		}
 
 		glDisableClientState(GL_VERTEX_ARRAY);
@@ -832,31 +832,33 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 			if (shiftButtonDown)
 			{
 				relY *=5;
-				model->moveCane(-relY);
-			} else {
+                                model->moveCane(0, 0, -relY);
+                        }
+                        else
+                        {
 				if (show2D)
 				{
 					Point newCanePoint = getClickedPlanePoint(mouseLocX,mouseLocY);
 					Point oldCanePoint = getClickedPlanePoint(oldMouseLocX,oldMouseLocY);
-					model->moveCaneTo(newCanePoint,oldCanePoint,showSnaps);
+                                        model->moveCane(-relX, -relY, 0);
 				}
 				else
 				{
 					relX *= 1.75 * rho; // tone it down
 					relY *= 1.5 * rho; // tone it down
 					model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
-									relX * sin(theta + PI / 2.0) + relY * sin(theta),showSnaps);
+                                                relX * sin(theta + PI / 2.0) + relY * sin(theta), 0);
 				}
 			}
 		}
 		if (model->getActiveSubcane() != -1 && model->getCane()) {
 			emit operationInfoSig(QString("Moved X Direction %1, Y Direction %2").arg(
-									  model->getCane()->subcaneLocations[model->getActiveSubcane()].x).arg(
-									  model->getCane()->subcaneLocations[model->getActiveSubcane()].y),1000);
+                                  model->getCane()->subcaneLocations[model->getActiveSubcane()].x).arg(
+                                  model->getCane()->subcaneLocations[model->getActiveSubcane()].y),1000);
 		}
 		break;
 	case CASING_MODE:
-		model->changeCaneCasingTo(getClickedPlanePoint(mouseLocX,mouseLocY));
+                model->adjustCaneCasing(-relX);
 		break;
 	case FLATTEN_MODE:
 		if (controlButtonDown)
