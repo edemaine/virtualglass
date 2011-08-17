@@ -1,8 +1,12 @@
 
 #include "mesh.h"
 
-void applyFlattenTransform(Vertex* v, float rectangleRatio, float rectangleTheta, float flatness)
+void applyFlattenTransform(Vertex* v, Cane* transformNode)
 {
+        float rectangleRatio = transformNode->amts[0];
+        float rectangleTheta = transformNode->amts[1];
+        float flatness = transformNode->amts[2];
+
 	Point p_r;
 	p_r.x = cos(-rectangleTheta) * v->position.x - sin(-rectangleTheta) * v->position.y;
 	p_r.y = sin(-rectangleTheta) * v->position.x + cos(-rectangleTheta) * v->position.y;
@@ -64,8 +68,30 @@ void applyFlattenTransform(Vertex* v, float rectangleRatio, float rectangleTheta
 	//TODO: normal transform
 }
 
-void applyBundleTransform(Vertex* v, Point location)
+// TODO: Fix
+void unapplyFlattenTransform(Vertex* v, Cane* transformNode)
 {
+
+}
+
+void applyBundleTransform(Vertex* v, Cane* parentNode, int subcane)
+{
+        Point location = parentNode->subcaneLocations[subcane];
+
+        float theta = atan2(v->position.y, v->position.x);
+        float r = length(v->position.xy);
+        v->position.x = r * cos(theta + location.z);
+        v->position.y = r * sin(theta + location.z);
+
+        v->position.x += location.x;
+        v->position.y += location.y;
+}
+
+// TODO: Fix
+void unapplyBundleTransform(Vertex* v, Cane* parentNode, int subcane)
+{
+        Point location = parentNode->subcaneLocations[subcane];
+
 	float theta = atan2(v->position.y, v->position.x);
 	float r = length(v->position.xy);
 	v->position.x = r * cos(theta + location.z);
@@ -73,22 +99,74 @@ void applyBundleTransform(Vertex* v, Point location)
 
 	v->position.x += location.x;
 	v->position.y += location.y;
-	//v->position.z += location.z;
 }
 
-void applyPullTransform(Vertex* v, float twistAmount, float stretchAmount)
+void applyPullTransform(Geometry* geometry, Cane* transformNode)
 {
-	// Apply twist first
-	float theta = atan2(v->position.y, v->position.x);
-	float r = length(v->position.xy);
-	theta += stretchAmount * twistAmount * v->position.z;
-	v->position.x = r * cos(theta);
-	v->position.y = r * sin(theta);
+        for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
+        {
+                applyPullTransform(&(geometry->vertices[v]), transformNode);
+        }
+}
 
-	// Then apply stretch
-	v->position.x /= sqrt(stretchAmount);
-	v->position.y /= sqrt(stretchAmount);
-	v->position.z *= stretchAmount;
+/*
+In applyPullTransform() and unapplyPullTransform(), the
+twist component is applied by computing the current location
+of the vertex in polar coordinates, the amount that the angle
+this location changes according to the transformation and
+the location of the point along the z axis, and the resulting
+location of the point in polar coordinates.
+
+These angles are called preTheta, transformTheta, and postTheta,
+respectively. They are called the same thing in both apply*()
+and unapply*().
+*/
+void applyPullTransform(Vertex* v, Cane* transformNode)
+{
+        float twist = transformNode->amts[0];
+        float stretch = transformNode->amts[1];
+
+        // Apply twist first
+        float preTheta = atan2(v->position.y, v->position.x);
+        float r = length(v->position.xy);
+        float transformTheta = stretch * twist * v->position.z;
+        float postTheta = preTheta + transformTheta;
+        v->position.x = r * cos(postTheta);
+        v->position.y = r * sin(postTheta);
+
+        // Then apply stretch
+        v->position.x /= sqrt(stretch);
+        v->position.y /= sqrt(stretch);
+        v->position.z *= stretch;
+}
+
+void unapplyPullTransform(Vertex* v, Cane* transformNode)
+{
+        float twist = transformNode->amts[0];
+        float stretch = transformNode->amts[1];
+
+        // Undo things in reverse order
+
+        // Unapply stretch
+        v->position.x *= sqrt(stretch);
+        v->position.y *= sqrt(stretch);
+        v->position.z /= stretch;
+
+        // Then unapply twist
+	float r = length(v->position.xy);
+        float postTheta = atan2(v->position.y, v->position.x);
+        float transformTheta = stretch * twist * v->position.z;
+        float preTheta = postTheta - transformTheta;
+        v->position.x = r * cos(preTheta);
+        v->position.y = r * sin(preTheta);
+}
+
+void unapplyPullTransform(Geometry* geometry, Cane* transformNode)
+{
+        for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
+        {
+                unapplyPullTransform(&(geometry->vertices[v]), transformNode);
+        }
 }
 
 /*
@@ -132,19 +210,18 @@ Vertex applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
 					break;
 				}
 			}
-			applyBundleTransform(&v, ancestors[i]->subcaneLocations[subcaneIndex]);
+                        applyBundleTransform(&v, ancestors[i], subcaneIndex);
 			break;
 			// amts[0] is twist, amts[1] is stretch
 		case PULL_CANETYPE:
-			applyPullTransform(&v, ancestors[i]->amts[0], ancestors[i]->amts[1]);
+                        applyPullTransform(&v, ancestors[i]);
 			//TODO: normal transform
 			break;
 			// amts[0] describes the width-to-height ratio of the goal rectangle
 			// amts[1] describes the orientation w.r.t global XY
 			// amts[2] describes how close of an approximation to the rectangle is achieved
 		case FLATTEN_CANETYPE:
-			applyFlattenTransform(&v, ancestors[i]->amts[0], ancestors[i]->amts[1],
-								  ancestors[i]->amts[2]);
+                        applyFlattenTransform(&v, ancestors[i]);
 			break;
 		default: // BASE_CIRCLE_CANETYPE
 			break;
@@ -201,7 +278,6 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCou
 		exit(1);
 	}
 
-	//DEBUG: total_stretch shortened... why is the top cap missing?
 	total_stretch = computeTotalStretch(ancestors, ancestorCount);
 	float stretchResParam = 1.0 / (1.0 + total_stretch / 20.0);
 	angularResolution = (int) (angularResolution * stretchResParam + 8 * (1 - stretchResParam)); // hack adaptive meshing
@@ -234,7 +310,7 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCou
 		}
 	}
 	//Generate triangles linking them:
-	for (unsigned int i = 0; i + 1 < axialResolution; ++i)
+        for (unsigned int i = 0; i + 1 < axialResolution; ++i)
 	{
 		for (unsigned int j = 0; j < angularResolution; ++j)
 		{
@@ -245,10 +321,7 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCou
 			// Four points that define a (non-flat) quad are used
 			// to create two triangles.
 			geometry->triangles.push_back(Triangle(p2, p1, p4));
-			//was: tmp_t.v1 = p2; tmp_t.v2 = p1; tmp_t.v3 = p4;
-
 			geometry->triangles.push_back(Triangle(p1, p3, p4));
-			//was: tmp_t.v1 = p1; tmp_t.v2 = p3; tmp_t.v3 = p4;
 		}
 	}
 	assert(geometry->valid());
@@ -334,9 +407,6 @@ float mesh2DCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorC
 		exit(1);
 	}
 
-	//DEBUG: total_stretch shortened... why is the top cap missing?
-	// total_stretch = computeTotalStretch(ancestors, ancestorCount);
-
 	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
 	//need to remember the first triangle so we can tag it later
@@ -369,7 +439,6 @@ float mesh2DCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorC
 	{
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount);
 	}
-	geometry->compute_normals_from_triangles();
 	geometry->groups.push_back(Group(first_triangle,
 									 geometry->triangles.size() - first_triangle, group_cane, group_tag));
 
