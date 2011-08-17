@@ -70,11 +70,9 @@ Model* OpenGLWidget :: getModel()
 
 void OpenGLWidget :: caneChanged()
 {
-	if (model->getCane() != NULL)
-		emit operationInfoSig(QString("Cane height: %1").arg(model->getCane()->height()), 3000);
-	updateTriangles();
-	repaint();
-	model->getHistory()->setBusy(false);
+        updateTriangles();
+        repaint();
+        model->getHistory()->setBusy(false);
 }
 
 void OpenGLWidget :: setShiftButtonDown(bool state)
