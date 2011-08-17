@@ -25,7 +25,7 @@ public slots:
 	void updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, bool recurse);
 	void updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, int column);
 	void changeData(QTreeWidgetItem* item,int column);
-	void doubleClickEvent(QTreeWidgetItem* item,int column);
+	void singleClickEvent(QTreeWidgetItem* item,int column);
 
 private:
 	OpenGLWidget* openglWidget;
@@ -38,6 +38,7 @@ private:
 	Point getCoordinate(Point p);
 	Point getPoint(QTreeWidgetItem* item);
 	void setPoint(QTreeWidgetItem* item, Point p);
+	int childIndex(QTreeWidgetItem* item, QTreeWidgetItem* itemParent);
 
 };
 
