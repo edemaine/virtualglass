@@ -16,6 +16,7 @@ RecipeWidget::RecipeWidget(QWidget *parent, OpenGLWidget* openglWidget) :
 	this->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	connect(this,SIGNAL(itemChanged(QTreeWidgetItem*,int)),this,SLOT(changeData(QTreeWidgetItem*,int)));
 	connect(this,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(doubleClickEvent(QTreeWidgetItem*,int)));
+	//connect(this,SIGNAL(itemActivated(QTreeWidgetItem*,int)),this,SLOT(doubleClickEvent(QTreeWidgetItem*,int)));
 	connect(this,SIGNAL(recipeCaneChanged()),openglWidget->getModel(),SLOT(exactChange()));
 	connect(openglWidget->getModel(), SIGNAL(updateRecipe()), this, SLOT(updateRecipe()));
 	newClear();
@@ -31,6 +32,7 @@ bool RecipeWidget :: isLibraryCane(QTreeWidgetItem* item)
 
 void RecipeWidget :: doubleClickEvent(QTreeWidgetItem* item,int column)
 {
+	this->closePersistentEditor(item,column);
 	if (!isLibraryCane(item))
 	{
 		colorPicker(item,column);
@@ -55,7 +57,7 @@ void RecipeWidget :: colorPicker(QTreeWidgetItem* item,int column)
 
 Cane* RecipeWidget::getCane(QTreeWidgetItem* node)
 {
-	if (node == this->visibleRootItem())
+	if (node == this->invisibleRootItem())
 		return NULL;
 	else
 		return node->data(0,Qt::UserRole).value<Cane*>();
@@ -132,6 +134,8 @@ void RecipeWidget::updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, i
 	case 5:
 	case 6:
 		parentNode = rootNode->parent();
+		if (parentNode == this->invisibleRootItem())
+			return;
 		rootIndex = parentNode->indexOfChild(rootNode);
 		parentCane = getCane(parentNode);
 
@@ -176,12 +180,13 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 			updateBaseRecipe(cane,item,column);
 			return;
 		}
-
 		QTreeWidgetItem* itemParent=item->parent();
 		int itemIndex = itemParent->indexOfChild(item);
 		Cane* caneParent=getCane(itemParent);
-		if (caneParent!=NULL)
+		if (caneParent!=NULL && caneParent->type == BUNDLE_CANETYPE)
+		{
 			caneParent->subcaneLocations[itemIndex] = p;
+		}
 	}
 	else if (column>=7)
 	{
@@ -195,6 +200,7 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 		}
 		cane->amts[amtIndex] = item->text(column).toFloat();
 	}
+	updateBaseRecipe(cane,item,false);
 	emit recipeCaneChanged();
 }
 

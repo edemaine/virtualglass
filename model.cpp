@@ -71,62 +71,62 @@ void Model :: setMode(int mode)
 	int prev_mode = this->mode;
 	this->mode = mode;
 
-        if (cane == NULL)
-                return;
+	if (cane == NULL)
+		return;
 
 	switch(this->mode)
 	{
-                case FLATTEN_MODE:
-                        history->saveState(cane);
-                        cane->createFlatten();
-                        break;
-                case PULL_MODE:
-                        history->saveState(cane);
-                        cane->createPull();
-                        break;
-                case BUNDLE_MODE:
-                        history->saveState(cane);
-                        cane->createBundle();
-                        activeSubcane = -1;
-                        break;
-                case CASING_MODE:
-                {
-                        Cane* ancestors[MAX_ANCESTORS];
-                        int ancestorCount = 0;
+	case FLATTEN_MODE:
+		history->saveState(cane);
+		cane->createFlatten();
+		break;
+	case PULL_MODE:
+		history->saveState(cane);
+		cane->createPull();
+		break;
+	case BUNDLE_MODE:
+		history->saveState(cane);
+		cane->createBundle();
+		activeSubcane = -1;
+		break;
+	case CASING_MODE:
+	{
+		Cane* ancestors[MAX_ANCESTORS];
+		int ancestorCount = 0;
 
-                        lowResGeometry.clear();
-                        if (show2D)
-                        {
-                                cane->createCasing(generate2DMesh(cane, &lowResGeometry, ancestors,
-                                        &ancestorCount, LOW_RESOLUTION, true, true));
-                        }
-                        else
-                        {
-                                cane->createCasing(generateMesh(cane, &lowResGeometry, ancestors,
-                                        &ancestorCount, LOW_RESOLUTION, true, true));
-                        }
-                        geometryOutOfDate();
-                        emit caneChanged();
-                }
-                        break;
-                case SNAP_MODE:
-                        switch(prev_mode)
-                        {
-                        case SNAP_MODE:
-                                this->mode = SNAP_LINE_MODE;
-                                break;
-                        case SNAP_LINE_MODE:
-                                this->mode = SNAP_CIRCLE_MODE;
-                                break;
-                        case SNAP_CIRCLE_MODE:
-                                this->mode = SNAP_MODE;
-                                break;
-                        default:
-                                break;
-                        }
-                        break;
-                default:
-                        break;
+		lowResGeometry.clear();
+		if (show2D)
+		{
+			cane->createCasing(generate2DMesh(cane, &lowResGeometry, ancestors,
+											  &ancestorCount, LOW_RESOLUTION, true, true));
+		}
+		else
+		{
+			cane->createCasing(generateMesh(cane, &lowResGeometry, ancestors,
+											&ancestorCount, LOW_RESOLUTION, true, true));
+		}
+		geometryOutOfDate();
+		emit caneChanged();
+	}
+	break;
+	case SNAP_MODE:
+		switch(prev_mode)
+		{
+		case SNAP_MODE:
+			this->mode = SNAP_LINE_MODE;
+			break;
+		case SNAP_LINE_MODE:
+			this->mode = SNAP_CIRCLE_MODE;
+			break;
+		case SNAP_CIRCLE_MODE:
+			this->mode = SNAP_MODE;
+			break;
+		default:
+			break;
+		}
+		break;
+	default:
+		break;
 	}
 	emit modeChanged(this->mode);
 }
@@ -232,13 +232,13 @@ void Model :: geometryOutOfDate()
 
 void Model :: pullCane(float twistAmount, float stretchAmount)
 {
-        unapplyPullTransform(&lowResGeometry, cane);
-        cane->pullIntuitive(twistAmount, stretchAmount);
-        applyPullTransform(&lowResGeometry, cane);
+	unapplyPullTransform(&lowResGeometry, cane);
+	cane->pullIntuitive(twistAmount, stretchAmount);
+	applyPullTransform(&lowResGeometry, cane);
 
-        geometryOutOfDate();
-        lowResGeometryFresh = 1;
-        emit caneChanged();
+	geometryOutOfDate();
+	lowResGeometryFresh = 1;
+	emit caneChanged();
 }
 
 void Model :: pullActiveCane(float twistAmount, float stretchAmount)
@@ -447,6 +447,7 @@ void Model :: addCane(Cane* c)
 	history->saveState(cane);
 	if (cane == NULL)
 	{
+		c->createBundle();
 		cane = c->deepCopy();
 		setMode(BUNDLE_MODE);
 	}
@@ -454,6 +455,7 @@ void Model :: addCane(Cane* c)
 	{
 		if (mode != BUNDLE_MODE)
 			setMode(BUNDLE_MODE);
+		c->createBundle();
 		cane->add(c->deepCopy());
 	}
 	geometryOutOfDate();
