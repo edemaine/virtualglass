@@ -36,8 +36,8 @@ public:
         void adjustCaneCasing(float delta_x);
         bool deleteActiveCane();
 	void addCane(Cane* c);
-	void startMoveMode();
-	void saveObjFile(std::string const &filename);
+        void slowGeometryUpdate();
+        void saveObjFile(std::string const &filename);
 	void saveRawFile(std::string const &filename);
 	int getMode();
 
@@ -88,7 +88,6 @@ private:
         Geometry lowResGeometry;
 	Geometry highResGeometry;
 	int lowResGeometryFresh;
-	int highResGeometryFresh;
 	int activeSubcane;
 
 	Point snapPoints[MAX_SNAP];
@@ -111,9 +110,7 @@ private:
 
 	bool show2D;
 
-	void geometryOutOfDate();
-	void updateLowResGeometry();
-	void updateHighResGeometry();
+        void computeHighResGeometry();
         void cacheLowResGeometry();
         void revertToCachedLowResGeometry();
 	void resetAuxiliaries();

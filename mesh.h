@@ -6,25 +6,25 @@
 #include "cane.h"
 #include "geometry.h"
 
-float generate2DMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
-        int resolution, bool casing, bool computeRadius = false, int selectionColorIndex = -1);
-float generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
-        int resolution, bool casing, bool computeRadius = false, int selectionColorIndex = -1);
-float meshCircularBaseCane(Geometry *geometry,
+void generate2DMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
+        int resolution, bool casing, bool fullTransforms, int selectionColorIndex = -1);
+void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
+        int resolution, bool casing, bool fullTransforms, int selectionColorIndex = -1);
+void meshCircularBaseCane(Geometry *geometry,
         Cane** ancestors, int ancestorCount, int resolution, Cane *group_cane,
-        uint32_t group_tag, float radius, bool computeRadius);
-float mesh2DCircularBaseCane(Geometry *geometry,
+        uint32_t group_tag, bool fullTransforms, float radius);
+void mesh2DCircularBaseCane(Geometry *geometry,
         Cane** ancestors, int ancestorCount, int resolution, Cane *group_cane,
-        uint32_t group_tag, float radius, bool computeRadius);
+        uint32_t group_tag, bool fullTransforms, float radius);
 float computeTotalStretch(Cane** ancestors, int ancestorCount);
 
 void applyFlattenTransform(Vertex* v, Cane* transformNode);
 void applyFlattenTransform(Geometry* geometry, Cane* transformNode);
 void applyMoveTransform(Vertex* v, Cane* parentNode, int subcane);
-void applyMoveTransform(Geometry* geometry, Cane* parentNode, int subcane);
+void applyPartialMoveTransform(Geometry* geometry, Cane* parentNode, int subcane, float deltaX, float deltaY, float deltaZ);
 void applyPullTransform(Vertex* v, Cane* transformNode);
 void applyPullTransform(Geometry* geometry, Cane* transformNode);
-Vertex applyTransforms(Vertex p, Cane** ancestors, int ancestorCount);
+Vertex applyTransforms(Vertex p, Cane** ancestors, int ancestorCount, bool full);
 
 
 #endif

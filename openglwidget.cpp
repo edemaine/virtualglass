@@ -689,8 +689,6 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 {
 	if (!isClickable())
 		return;
-	// Change as part of dual mode feature
-	updateResolution(HIGH_RESOLUTION);
 
 	//check if cane is in a snap, and finalize it if true
 	if (model->getActiveSubcane()!=-1)
@@ -705,15 +703,19 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 
 	if (e->button() == Qt::RightButton){
 		rightMouseDown = false;
-	} else if (showSnaps)
+        }
+        else
 	{
-		if (model->getMode() == SNAP_MODE || model->getMode() == SNAP_LINE_MODE || model->getMode() == SNAP_CIRCLE_MODE)
-		{
-			Point p = model->finalizeSnapPoint();
-			emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
-		}
-	}
-	update();
+                if (showSnaps)
+                {
+                        if (model->getMode() == SNAP_MODE || model->getMode() == SNAP_LINE_MODE || model->getMode() == SNAP_CIRCLE_MODE)
+                        {
+                                Point p = model->finalizeSnapPoint();
+                                emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
+                        }
+                }
+                model->slowGeometryUpdate();
+        }
 }
 
 /*

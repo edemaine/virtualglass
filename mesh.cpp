@@ -81,24 +81,6 @@ void applyFlattenTransform(Vertex* v, Cane* transformNode)
         v->position.y = flatness * goalRectangle.y + vert.y * (1 - flatness);
 }
 
-void applyMoveTransform(Geometry* geometry, Cane* parentNode, int subcane)
-{
-        // Find group for subcane
-        Group* subcaneGroup;
-        for (uint32_t g = 0; g < geometry->groups.size(); ++g)
-                if (geometry->groups[g].tag == (uint32_t) subcane)
-                {
-                        subcaneGroup = &(geometry->groups[g]);
-                        break;
-                }
-
-        // Apply transformation to only these vertices
-        for (uint32_t v = subcaneGroup->vertex_begin; v < subcaneGroup->vertex_begin + subcaneGroup->vertex_size; ++v)
-        {
-                applyMoveTransform(&(geometry->vertices[v]), parentNode, subcane);
-        }
-}
-
 void applyMoveTransform(Vertex* v, Cane* parentNode, int subcane)
 {
         Point locationInParent = parentNode->subcaneLocations[subcane];
@@ -113,6 +95,32 @@ void applyMoveTransform(Vertex* v, Cane* parentNode, int subcane)
         // XY location
         v->position.x += locationInParent.x;
         v->position.y += locationInParent.y;
+}
+
+void applyPartialMoveTransform(Geometry* geometry, Cane* parentNode, int subcane, float deltaX, float deltaY, float deltaZ)
+{
+        // Find group for subcane
+        Group* subcaneGroup;
+        for (uint32_t g = 0; g < geometry->groups.size(); ++g)
+                if (geometry->groups[g].tag == (uint32_t) subcane)
+                {
+                        subcaneGroup = &(geometry->groups[g]);
+
+                        // Apply transformation to only these vertices
+                        for (uint32_t v = subcaneGroup->vertex_begin; v < subcaneGroup->vertex_begin + subcaneGroup->vertex_size; ++v)
+                        {
+                                // Z location
+                                float preTheta = atan2(geometry->vertices[v].position.y, geometry->vertices[v].position.x);
+                                float postTheta = preTheta + deltaZ;
+                                float r = length(geometry->vertices[v].position.xy);
+                                geometry->vertices[v].position.x = r * cos(postTheta);
+                                geometry->vertices[v].position.y = r * sin(postTheta);
+
+                                // XY location
+                                geometry->vertices[v].position.x += deltaX;
+                                geometry->vertices[v].position.y += deltaY;
+                        }
+                }
 }
 
 void applyPullTransform(Geometry* geometry, Cane* transformNode)
@@ -161,7 +169,7 @@ This is used during the meshing process to determine the location of
 a vertex after it has been moved via the transformations described
 by its ancestors in the cane DAG.
 */
-Vertex applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
+Vertex applyTransforms(Vertex v, Cane** ancestors, int ancestorCount, bool fullTransforms)
 {
 	/*
         The transformations are applied back to front to match how they
@@ -171,7 +179,7 @@ Vertex applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
         represent the first operations done on the cane, so need to be applied
         first.
         */
-	for (int i = ancestorCount - 1; i >= 0; --i)
+        for (int i = ancestorCount - 1; i >= 0; --i)
 	{
 		/*
                 Each cane node has a type and an amount.
@@ -182,35 +190,38 @@ Vertex applyTransforms(Vertex v, Cane** ancestors, int ancestorCount)
                 The BUNDLE_CANETYPE is an exception, in that it simply uses
                 the location of the subcane to determine how to move the points.
                 */
-                int subcaneIndex=-1;
 		switch (ancestors[i]->type)
 		{
-		case BUNDLE_CANETYPE:
-			// Find where subcane lives and apply translation
-			// to move it to this location
-			for (int j = 0; j < ancestors[i]->subcaneCount; ++j)
-			{
-				if (ancestors[i]->subcanes[j] == ancestors[i+1])
-				{
-					subcaneIndex = j;
-					break;
-				}
-			}
-                        applyMoveTransform(&v, ancestors[i], subcaneIndex);
-			break;
-			// amts[0] is twist, amts[1] is stretch
-		case PULL_CANETYPE:
-			applyPullTransform(&v, ancestors[i]);
-			//TODO: normal transform
-			break;
-			// amts[0] describes the width-to-height ratio of the goal rectangle
-			// amts[1] describes the orientation w.r.t global XY
-			// amts[2] describes how close of an approximation to the rectangle is achieved
-		case FLATTEN_CANETYPE:
-			applyFlattenTransform(&v, ancestors[i]);
-			break;
-		default: // BASE_CIRCLE_CANETYPE
-			break;
+                        case BUNDLE_CANETYPE:
+                        {
+                                // Find where subcane lives and apply translation
+                                // to move it to this location
+                                int subcaneIndex = -1;
+                                for (int j = 0; j < ancestors[i]->subcaneCount; ++j)
+                                {
+                                        if (ancestors[i]->subcanes[j] == ancestors[i+1])
+                                        {
+                                                subcaneIndex = j;
+                                                break;
+                                        }
+                                }
+                                applyMoveTransform(&v, ancestors[i], subcaneIndex);
+                                break;
+                        }
+                        case PULL_CANETYPE:
+                                // amts[0] describes the width-to-height ratio of the goal rectangle
+                                // amts[1] describes the orientation w.r.t global XY
+                                // amts[2] describes how close of an approximation to the rectangle is achieved
+                                if (fullTransforms || i > 0)
+                                        applyPullTransform(&v, ancestors[i]);
+                                //TODO: normal transform
+                                break;
+                        case FLATTEN_CANETYPE:
+                                if (fullTransforms || i > 0)
+                                        applyFlattenTransform(&v, ancestors[i]);
+                                break;
+                        default: // BASE_CIRCLE_CANETYPE
+                                break;
 		}
 	}
 	return v;
@@ -244,11 +255,10 @@ with this leaf base cane). The triangles are added to the end of the array passe
 The resolution refers to the dual resolution modes used by the GUI, and the actual number of
 triangles for these resolutions are set in constants.h
 */
-float meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCount,
-						   int resolution, Cane *group_cane, uint32_t group_tag, float radius, bool computeRadius)
+void meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCount,
+        int resolution, Cane *group_cane, uint32_t group_tag, bool fullTransforms, float radius)
 {
 	unsigned int angularResolution, axialResolution;
-	float total_stretch, transformedRadius;
 
 	switch (resolution)
 	{
@@ -264,7 +274,7 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCou
 		exit(1);
 	}
 
-	total_stretch = computeTotalStretch(ancestors, ancestorCount);
+        float total_stretch = computeTotalStretch(ancestors, ancestorCount);
 	float stretchResParam = 1.0 / (1.0 + total_stretch / 20.0);
 	angularResolution = (int) (angularResolution * stretchResParam + 8 * (1 - stretchResParam)); // hack adaptive meshing
 
@@ -350,34 +360,18 @@ float meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCou
 
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
-		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount);
+                geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount, fullTransforms);
 	}
 	geometry->compute_normals_from_triangles();
 	geometry->groups.push_back(Group(first_triangle,
                 geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
-
-	if (!computeRadius)
-		return 0.0;
-
-	// Compute radius of resulting cane
-	transformedRadius = 0;
-	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
-	{
-		transformedRadius = MAX(transformedRadius, geometry->vertices[v].position.x * geometry->vertices[v].position.x
-								+ geometry->vertices[v].position.y * geometry->vertices[v].position.y);
-	}
-	transformedRadius = sqrt(transformedRadius);
-
-	return transformedRadius;
 }
 
-float mesh2DCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCount, int resolution,
-							 Cane *group_cane, uint32_t group_tag, float radius, bool computeRadius)
-{
 
+void mesh2DCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCount, int resolution,
+        Cane *group_cane, uint32_t group_tag, bool fullTransforms, float radius)
+{
 	unsigned int angularResolution, axialResolution;
-	//float total_stretch;
-	float transformedRadius;
 
 	switch (resolution)
 	{
@@ -423,23 +417,11 @@ float mesh2DCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorC
 
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
-		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount);
+                geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount, fullTransforms);
 	}
 	geometry->groups.push_back(Group(first_triangle,
                 geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
 
-	if (!computeRadius)
-		return 0.0;
-
-	// Compute radius of resulting cane
-	transformedRadius = 0;
-	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
-	{
-		transformedRadius = MAX(transformedRadius, geometry->vertices[v].position.x * geometry->vertices[v].position.x + geometry->vertices[v].position.y * geometry->vertices[v].position.y);
-	}
-	transformedRadius = sqrt(transformedRadius);
-
-	return transformedRadius;
 }
 
 
@@ -450,22 +432,21 @@ the transforms array is filled with with the transformations encountered at each
 leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
-float generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
-        int resolution, bool casing, bool computeRadius, int groupIndex)
+void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
+        int resolution, bool casing, bool fullTransforms, int groupIndex)
 {
 	int i, passCasing, passGroupIndex;
-	float radius=0.0;
 
 	if (c == NULL)
-		return 0.0;
+                return;
 
 	// Make recursive calls depending on the type of the current node
 	ancestors[*ancestorCount] = c;
 	*ancestorCount += 1;
 	if (c->type == BASE_CIRCLE_CANETYPE)
 	{
-		radius = meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-                        resolution, c, groupIndex, 1.0, computeRadius);
+                meshCircularBaseCane(geometry, ancestors, *ancestorCount,
+                        resolution, c, groupIndex, fullTransforms, 1.0);
 	}
 	else
 	{
@@ -477,36 +458,33 @@ float generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorC
 			else
 				passGroupIndex = groupIndex;
 
-			radius = MAX(generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
-									  resolution, passCasing, computeRadius, passGroupIndex), radius);
+                        generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
+                                resolution, passCasing, fullTransforms, passGroupIndex);
 		}
 		if (casing && c->type == CASING_CANETYPE)
 		{
-			radius = MAX(meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-											  resolution, c, groupIndex, c->amts[0], computeRadius), radius);
+                        meshCircularBaseCane(geometry, ancestors, *ancestorCount,
+                                resolution, c, groupIndex, fullTransforms, c->amts[0]);
 		}
 	}
 	*ancestorCount -= 1;
-
-	return radius;
 }
 
-float generate2DMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
-					 int resolution, bool casing, bool computeRadius, int groupIndex)
+void generate2DMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
+                                         int resolution, bool casing, bool fullTransforms, int groupIndex)
 {
 	int i, passCasing, passGroupIndex;
-	float radius=0.0;
 
 	if (c == NULL)
-		return 0.0;
+                return;
 
 	// Make recursive calls depending on the type of the current node
 	ancestors[*ancestorCount] = c;
 	*ancestorCount += 1;
 	if (c->type == BASE_CIRCLE_CANETYPE)
 	{
-		radius = mesh2DCircularBaseCane(geometry, ancestors, *ancestorCount,
-										resolution, c, groupIndex, 1.0, computeRadius);
+                mesh2DCircularBaseCane(geometry, ancestors, *ancestorCount,
+                        resolution, c, groupIndex, fullTransforms, 1.0);
 	}
 	else
 	{
@@ -518,18 +496,16 @@ float generate2DMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancesto
 			else
 				passGroupIndex = groupIndex;
 
-			radius = MAX(generate2DMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
-										resolution, passCasing, computeRadius, passGroupIndex), radius);
+                        generate2DMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
+                                resolution, passCasing, fullTransforms, passGroupIndex);
 		}
 		if (casing && c->type == CASING_CANETYPE)
 		{
-			radius = MAX(mesh2DCircularBaseCane(geometry, ancestors, *ancestorCount,
-												resolution, c, groupIndex, c->amts[0], computeRadius), radius);
+                        mesh2DCircularBaseCane(geometry, ancestors, *ancestorCount,
+                                resolution, c, groupIndex, fullTransforms, c->amts[0]);
 		}
 	}
 	*ancestorCount -= 1;
-
-	return radius;
 }
 
 

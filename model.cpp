@@ -5,10 +5,10 @@
 Model :: Model()
 {
 	mode = 0;
-	cane = NULL;
+        show2D = false;
+        cane = NULL;
 	history = new CaneHistory();
 	lowResGeometryFresh = 0;
-	highResGeometryFresh = 0;
 	activeSubcane = -1;
 
 	activeSnapMode = NO_SNAP;
@@ -28,7 +28,7 @@ Model :: Model()
 	snapPointsCount=snapLinesCount=snapCirclesCount=0;
 	snapHoldPoint = Point();
 
-        geometryOutOfDate();
+        lowResGeometryFresh = 0;
 }
 
 void Model :: resetAuxiliaries()
@@ -96,16 +96,19 @@ void Model :: setMode(int mode)
                 case FLATTEN_MODE:
                         history->saveState(cane);
                         cane->createFlatten();
+                        slowGeometryUpdate();
                         cacheLowResGeometry();
                         break;
                 case PULL_MODE:
                         history->saveState(cane);
                         cane->createPull();
+                        slowGeometryUpdate();
                         cacheLowResGeometry();
                         break;
                 case BUNDLE_MODE:
                         history->saveState(cane);
                         cane->createBundle();
+                        slowGeometryUpdate();
                         cacheLowResGeometry();
                         activeSubcane = -1;
                         break;
@@ -120,10 +123,10 @@ void Model :: setMode(int mode)
                         {
                                 cane->createCasing(1.0);
                         }
-                        geometryOutOfDate();
+                        lowResGeometryFresh = 0;
                         emit caneChanged();
-                }
                         break;
+                }
                 case SNAP_MODE:
                         switch(prev_mode)
                         {
@@ -156,8 +159,8 @@ void Model :: setActiveSubcane(int subcane)
 		if (activeSubcane < 0 || activeSubcane >= cane->subcaneCount) {
 			activeSubcane = -1;
 		}
-		geometryOutOfDate();
-		emit caneChanged();
+                lowResGeometryFresh = 0;
+                emit caneChanged();
 	}
 }
 
@@ -172,11 +175,11 @@ void Model :: setCane(Cane* c)
         if (c == NULL)
 		resetAuxiliaries();
 	cane = c;
-	geometryOutOfDate();
+        lowResGeometryFresh = 0;
 	emit caneChanged();
 }
 
-void Model :: updateLowResGeometry()
+void Model :: slowGeometryUpdate()
 {
 	Cane* ancestors[MAX_ANCESTORS];
 	int ancestorCount;
@@ -187,17 +190,34 @@ void Model :: updateLowResGeometry()
 	{
 		if (show2D)
 		{
-			generate2DMesh(cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION, true);
+                        generate2DMesh(cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION, true, false);
 		}
 		else
 		{
-                        generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION, true);
+                        generateMesh(cane, &lowResGeometry, ancestors, &ancestorCount, LOW_RESOLUTION, true, false);
 		}
 	}
-	lowResGeometryFresh = 1;
+        else
+                return;
+
+        cacheLowResGeometry();
+        switch (cane->type)
+        {
+                case PULL_CANETYPE:
+                        applyPullTransform(&lowResGeometry, cane);
+                        break;
+                case FLATTEN_CANETYPE:
+                        applyFlattenTransform(&lowResGeometry, cane);
+                        break;
+                default:
+                        break;
+        }
+        lowResGeometryFresh = 1;
+
+        emit caneChanged();
 }
 
-void Model :: updateHighResGeometry()
+void Model :: computeHighResGeometry()
 {
 	Cane* ancestors[MAX_ANCESTORS];
 	int ancestorCount;
@@ -208,14 +228,13 @@ void Model :: updateHighResGeometry()
 	{
 		if (show2D)
 		{
-			generate2DMesh(cane, &highResGeometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
+                        generate2DMesh(cane, &highResGeometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true, true);
 		}
 		else
 		{
-			generateMesh(cane, &highResGeometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
+                        generateMesh(cane, &highResGeometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true, true);
 		}
 	}
-	highResGeometryFresh = 1;
 }
 
 Cane* Model :: getCane()
@@ -225,27 +244,9 @@ Cane* Model :: getCane()
 
 Geometry* Model :: getGeometry(int resolution)
 {
-	if (resolution == LOW_RESOLUTION)
-	{
-		if (!lowResGeometryFresh)
-			updateLowResGeometry();
-		return &lowResGeometry;
-	}
-	else
-	{
-		if (!highResGeometryFresh)
-                {
-                        updateHighResGeometry();
-                        updateLowResGeometry();
-                }
-                return &highResGeometry;
-	}
-}
-
-void Model :: geometryOutOfDate()
-{
-	lowResGeometryFresh = 0;
-	highResGeometryFresh = 0;
+        if (!lowResGeometryFresh)
+                slowGeometryUpdate();
+        return &lowResGeometry;
 }
 
 void Model :: pullCane(float twistAmount, float stretchAmount)
@@ -255,7 +256,6 @@ void Model :: pullCane(float twistAmount, float stretchAmount)
         applyPullTransform(&lowResGeometry, cane);
 
         lowResGeometryFresh = 1;
-        highResGeometryFresh = 0;
         emit caneChanged();
 }
 
@@ -271,7 +271,6 @@ void Model :: pullActiveCane(float twistAmount, float stretchAmount)
         applyPullTransform(&lowResGeometry, cane);
 
         lowResGeometryFresh = 1;
-        highResGeometryFresh = 0;
 	emit caneChanged();
 }
 
@@ -279,10 +278,9 @@ void Model :: flattenCane(float rectangle_ratio, float rectangle_theta, float fl
 {
         revertToCachedLowResGeometry();
         cane->flatten(rectangle_ratio, rectangle_theta, flatness);
-        applyPullTransform(&lowResGeometry, cane);
+        applyFlattenTransform(&lowResGeometry, cane);
 
         lowResGeometryFresh = 1;
-        highResGeometryFresh = 0;
 	emit caneChanged();
 }
 
@@ -298,7 +296,6 @@ void Model :: flattenActiveCane(float rectangle_ratio, float rectangle_theta, fl
         applyFlattenTransform(&lowResGeometry, cane);
 
         lowResGeometryFresh = 1;
-        highResGeometryFresh = 0;
 	emit caneChanged();
 }
 
@@ -308,12 +305,11 @@ void Model :: moveCane(float delta_x, float delta_y, float delta_z)
 	if (cane == NULL || activeSubcane == -1)
 		return;
 
-        revertToCachedLowResGeometry();
         cane->moveCane(activeSubcane, delta_x, delta_y, delta_z);
-        applyMoveTransform(&lowResGeometry, cane, activeSubcane);
+        applyPartialMoveTransform(&lowResGeometry, cane, activeSubcane, delta_x, delta_y, delta_z);
+        cacheLowResGeometry();
 
         lowResGeometryFresh = 1;
-        highResGeometryFresh = 0;
         emit caneChanged();
 
 
@@ -387,7 +383,7 @@ void Model :: adjustCaneCasing(float delta)
 	if (cane == NULL)
 		return;
         cane->adjustCasing(delta);
-	geometryOutOfDate();
+        lowResGeometryFresh = 0;
 	emit caneChanged();
 }
 
@@ -397,7 +393,7 @@ bool Model :: deleteActiveCane()
 		return false;
 	history->saveState(cane);
 	cane->deleteCane(activeSubcane);
-	geometryOutOfDate();
+        lowResGeometryFresh = 0;
 	emit caneChanged();
 	return true;
 }
@@ -408,19 +404,22 @@ void Model :: addCane(Cane* c)
 	if (cane == NULL)
 	{
 		cane = c->deepCopy();
-                geometryOutOfDate();
+                lowResGeometryFresh = 0;
                 emit caneChanged();
                 setMode(BUNDLE_MODE);
         }
 	else
 	{
                 cane->add(c->deepCopy());
-                geometryOutOfDate();
+                lowResGeometryFresh = 0;
                 emit caneChanged();
                 if (mode != BUNDLE_MODE)
                         setMode(BUNDLE_MODE);
                 else
+                {
+                        slowGeometryUpdate();
                         cacheLowResGeometry();
+                }
         }
 }
 
@@ -443,8 +442,8 @@ void Model :: undo()
 	if (temp != NULL)
 	{
 		cane = temp;
-		geometryOutOfDate();
-		emit caneChanged();
+                lowResGeometryFresh = 0;
+                emit caneChanged();
 	}
 	else
 	{
@@ -466,8 +465,8 @@ void Model :: redo()
 	if (temp != NULL)
 	{
 		cane = temp;
-		geometryOutOfDate();
-		emit caneChanged();
+                lowResGeometryFresh = 0;
+                emit caneChanged();
 	}
 	else
 	{
@@ -477,17 +476,13 @@ void Model :: redo()
 
 void Model :: saveObjFile(std::string const &filename)
 {
-	if (!highResGeometryFresh) {
-		updateHighResGeometry();
-	}
+        computeHighResGeometry();
 	highResGeometry.save_obj_file(filename);
 }
 
 void Model :: saveRawFile(std::string const &filename)
 {
-	if (!highResGeometryFresh) {
-		updateHighResGeometry();
-	}
+        computeHighResGeometry();
 	highResGeometry.save_raw_file(filename);
 }
 
@@ -763,12 +758,12 @@ void Model :: deleteSnapPoint(Point loc)
 void Model :: toggle2D()
 {
 	show2D = !show2D;
-	geometryOutOfDate();
-	emit caneChanged();
+        lowResGeometryFresh = 0;
+        emit caneChanged();
 }
 
 void Model::exactChange()
 {
-        geometryOutOfDate();
+        lowResGeometryFresh = 0;
         emit caneChanged();
 }
