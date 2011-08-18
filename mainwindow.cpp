@@ -525,19 +525,21 @@ void MainWindow::setupNewBrandCaneDialog()
 	caneTypeListModel->setStringList(*caneTypeList);
 	caneTypeListBox = new QListView();
 	caneTypeListBox->setModel(caneTypeListModel);
+        caneTypeListBox->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 	dummyList = new QStringList("Please select a cane type.");
 	dummyModel = new QStringListModel();
 	dummyModel->setStringList(*dummyList);
 	caneColorListBox = new QListView();//new QTreeView();
 	caneColorListBox->setModel(dummyModel);
+        caneColorListBox->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 	caneSplitter->addWidget(caneTypeListBox);
 	caneSplitter->addWidget(caneColorListBox);
 
-	caneForm->addRow(caneSplitter);
+        caneForm->addRow(caneSplitter);
 
-	//        connect(caneTypeListBox, SIGNAL(activated(QModelIndex)),this,SLOT(updateSublist(int)));
+        connect(caneTypeListBox, SIGNAL(activated(QModelIndex)),this,SLOT(updateSublist(QModelIndex)));
 
 	caneTypeBox = new QComboBox(caneForm->widget());
 	caneTypeBox->addItem("Circle Base",QVariant(BASE_CIRCLE_CANETYPE));
@@ -555,9 +557,10 @@ void MainWindow::setupNewBrandCaneDialog()
 	brandDialog->setLayout(caneForm);
 }
 
-void MainWindow::updateSublist(int index)
+void MainWindow::updateSublist(QModelIndex i)
 {
-	//        QItemSelectionModel *m = caneColorListBox->selectionModel();
+        int index = i.row();
+        //        QItemSelectionModel *m = caneColorListBox->selectionModel();
 	if (index < 0 || index >= caneColorListList->size())
 	{
 		caneColorListBox->setModel(dummyModel);
@@ -570,8 +573,8 @@ void MainWindow::updateSublist(int index)
    caneColorListBox->drawRow(&makePainter(index,i), *(new QStyleOptionViewItem()), i);
  }*/
 	}
-	//        if (m != dummyModel)
-	//                delete m;
+        //        if (m != dummyModel)
+        //                delete m;
 }
 
 QPainter* MainWindow::makePainter(int caneType, int caneIndex)

@@ -53,7 +53,7 @@ public slots:
 	void loadLibraryCane(const YAML::Node& node, Cane* cane);
 	void displayTextMessage(QString message,int msec);
 	void displayTextMessage(QString message);
-	void updateSublist(int index);
+        void updateSublist(QModelIndex i);
 	void toggleRecipe();
 	void updateLibraryToolTip(LibraryCaneWidget* lc);
 	void updatePreview();
