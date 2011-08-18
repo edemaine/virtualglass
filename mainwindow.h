@@ -47,13 +47,15 @@ public slots:
 	void newColorPickerCaneDialog();
 	void changeBgColorDialog();
 	void saveObjFileDialog();
-	void saveRawFile();
-	void colorPickerSelected();
+        void saveRawFile();
+        void colorPickerSelected();
+        void colorBrandPickerSelected();
 	void libraryCaneDestroyed(QObject* obj);
 	void loadLibraryCane(const YAML::Node& node, Cane* cane);
 	void displayTextMessage(QString message,int msec);
-	void displayTextMessage(QString message);
+        void displayTextMessage(QString message);
         void updateSublist(QModelIndex i);
+        void updateColor(QModelIndex i);
 	void toggleRecipe();
 	void updateLibraryToolTip(LibraryCaneWidget* lc);
 	void updatePreview();
@@ -104,6 +106,9 @@ private:
 	QListView* caneTypeListBox;
 	QStringList* dummyList;
 	QStringListModel* dummyModel;
+        bool dummyInUse;
+        int selectedBrand;
+        int selectedColor;
 	QStringList* caneTypeList;
 	//QTreeView* caneColorListBox;
 	QListView* caneColorListBox;

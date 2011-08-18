@@ -532,6 +532,9 @@ void MainWindow::setupNewBrandCaneDialog()
 	dummyModel->setStringList(*dummyList);
 	caneColorListBox = new QListView();//new QTreeView();
 	caneColorListBox->setModel(dummyModel);
+        dummyInUse = true;
+        selectedBrand = -1;
+        selectedColor = -1;
         caneColorListBox->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 	caneSplitter->addWidget(caneTypeListBox);
@@ -539,7 +542,8 @@ void MainWindow::setupNewBrandCaneDialog()
 
         caneForm->addRow(caneSplitter);
 
-        connect(caneTypeListBox, SIGNAL(activated(QModelIndex)),this,SLOT(updateSublist(QModelIndex)));
+        connect(caneTypeListBox, SIGNAL(clicked(QModelIndex)),this,SLOT(updateSublist(QModelIndex)));
+        connect(caneColorListBox, SIGNAL(clicked(QModelIndex)),this,SLOT(updateColor(QModelIndex)));
 
 	caneTypeBox = new QComboBox(caneForm->widget());
 	caneTypeBox->addItem("Circle Base",QVariant(BASE_CIRCLE_CANETYPE));
@@ -549,7 +553,7 @@ void MainWindow::setupNewBrandCaneDialog()
 
 	QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	connect(buttons,SIGNAL(accepted()),brandDialog,SLOT(accept()));
-	connect(buttons,SIGNAL(accepted()),this,SLOT(colorPickerSelected()));
+        connect(buttons,SIGNAL(accepted()),this,SLOT(colorBrandPickerSelected()));
 	connect(buttons,SIGNAL(rejected()),brandDialog,SLOT(reject()));
 
 	caneForm->addRow(buttons);
@@ -557,24 +561,52 @@ void MainWindow::setupNewBrandCaneDialog()
 	brandDialog->setLayout(caneForm);
 }
 
+void MainWindow::updateColor(QModelIndex i)
+{
+        selectedColor = i.row();
+}
+
 void MainWindow::updateSublist(QModelIndex i)
 {
         int index = i.row();
-        //        QItemSelectionModel *m = caneColorListBox->selectionModel();
-	if (index < 0 || index >= caneColorListList->size())
-	{
-		caneColorListBox->setModel(dummyModel);
+        if (index < 0 || index >= caneColorListList->size())
+        {
+                if (!dummyInUse)
+                {
+                        QItemSelectionModel *m = caneColorListBox->selectionModel();
+                        caneColorListBox->setModel(dummyModel);
+                        delete m;
+                        dummyInUse = true;
+                        selectedBrand = -1;
+                        selectedColor = -1;
+                }
 	}
 	else
 	{
-		caneColorListBox->setModel(new QStringListModel(caneNameListList->at(index)));
+                if (!dummyInUse)
+                {
+                        QItemSelectionModel *m = caneColorListBox->selectionModel();
+                        caneColorListBox->setModel(new QStringListModel(caneNameListList->at(index)));
 		/*                for (int i = 0; i < caneNameListList[index].size(); i++)
  {
    caneColorListBox->drawRow(&makePainter(index,i), *(new QStyleOptionViewItem()), i);
  }*/
-	}
-        //        if (m != dummyModel)
-        //                delete m;
+                        delete m;
+                        selectedBrand = index;
+                        selectedColor = -1;
+                }
+                else
+                {
+                        caneColorListBox->setModel(new QStringListModel(caneNameListList->at(index)));
+            /*                for (int i = 0; i < caneNameListList[index].size(); i++)
+{
+caneColorListBox->drawRow(&makePainter(index,i), *(new QStyleOptionViewItem()), i);
+}*/
+                }
+                dummyInUse = false;
+                selectedBrand = index;
+                selectedColor = -1;
+        }
 }
 
 QPainter* MainWindow::makePainter(int caneType, int caneIndex)
@@ -703,6 +735,15 @@ void MainWindow::loadOfficialCanes()
 
 void MainWindow::newBrandCaneDialog()
 {
+        if (!dummyInUse)
+        {
+                QItemSelectionModel *m = caneColorListBox->selectionModel();
+                caneColorListBox->setModel(dummyModel);
+                delete m;
+                dummyInUse = true;
+                selectedBrand = -1;
+                selectedColor = -1;
+        }
 	brandDialog->exec();
 }
 
@@ -728,6 +769,44 @@ void MainWindow::saveObjFileDialog()
 void MainWindow::saveRawFile()
 {
 	openglWidget->saveRawFile("cane.raw");
+}
+
+void MainWindow::colorBrandPickerSelected()
+{
+        if (selectedBrand == -1 || selectedColor == -1 || selectedBrand >= caneColorListList->size() ||
+                selectedColor >= caneColorListList->at(selectedBrand).size())
+                return;
+        QColor color = caneColorListList->at(selectedBrand).at(selectedColor);
+        QVariant data = caneTypeBox->itemData(caneTypeBox->currentIndex());
+        bool isOk = false;
+        int caneType = data.toInt(&isOk);
+        if (!isOk)
+                return;
+
+        saveCaneToLibrary();
+        //model->clearCurrentCane();
+        emit setCaneSig(NULL);
+
+        Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
+        Cane* stch = new Cane(PULL_CANETYPE);
+
+        stch->subcaneCount = 1;
+        stch->subcanes[0] = c;
+        stch->amts[1] = 100.0;
+
+        c->color.r = color.redF();
+        c->color.g = color.greenF();
+        c->color.b = color.blueF();
+        c->color.a = color.alphaF();
+        //model->setCane(stch);
+        //saveCaneToLibrary();
+
+        if (caneType == FLATTEN_CANETYPE)
+        {
+                stch->flatten(0.0,0.0,1.0);
+        }
+
+        emit setCaneSig(stch);
 }
 
 void MainWindow::colorPickerSelected()
