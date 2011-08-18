@@ -131,19 +131,6 @@ void applyPullTransform(Geometry* geometry, Cane* transformNode)
 	}
 }
 
-
-/*
-In applyPullTransform() and unapplyPullTransform(), the
-twist component is applied by computing the current location
-of the vertex in polar coordinates, the amount that the angle
-this location changes according to the transformation and
-the location of the point along the z axis, and the resulting
-location of the point in polar coordinates.
-
-These angles are called preTheta, transformTheta, and postTheta,
-respectively. They are called the same thing in both apply*()
-and unapply*().
-*/
 void applyPullTransform(Vertex* v, Cane* transformNode)
 {
 	float twist = transformNode->amts[0];
@@ -256,7 +243,7 @@ The resolution refers to the dual resolution modes used by the GUI, and the actu
 triangles for these resolutions are set in constants.h
 */
 void meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCount,
-        int resolution, Cane *group_cane, uint32_t group_tag, bool fullTransforms, float radius)
+        int resolution, Cane *group_cane, uint32_t group_tag, bool fullTransforms)
 {
 	unsigned int angularResolution, axialResolution;
 
@@ -296,8 +283,8 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCoun
 			Point p;
 			Point n;
 
-			p.x = radius * cos(2 * PI * ((float) j) / angularResolution);
-			p.y = radius * sin(2 * PI * ((float) j) / angularResolution);
+                        p.x = cos(2 * PI * ((float) j) / angularResolution);
+                        p.y = sin(2 * PI * ((float) j) / angularResolution);
 			p.z = ((float) i) / ((axialResolution-1) * total_stretch);
 			n.x = p.x;
 			n.y = p.y;
@@ -334,8 +321,8 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCoun
 		for (unsigned int j = 0; j < angularResolution; ++j)
 		{
 			Point p;
-			p.x = radius * cos(2 * PI * ((float) j) / angularResolution);
-			p.y = radius * sin(2 * PI * ((float) j) / angularResolution);
+                        p.x = cos(2 * PI * ((float) j) / angularResolution);
+                        p.y = sin(2 * PI * ((float) j) / angularResolution);
 			p.z = z / total_stretch;
 			Point n;
 			n.x = 0.0; n.y = 0.0; n.z = nz;
@@ -369,7 +356,7 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCoun
 
 
 void mesh2DCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCount, int resolution,
-        Cane *group_cane, uint32_t group_tag, bool fullTransforms, float radius)
+        Cane *group_cane, uint32_t group_tag, bool fullTransforms)
 {
 	unsigned int angularResolution, axialResolution;
 
@@ -401,8 +388,8 @@ void mesh2DCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCo
 	for (unsigned int j = 0; j < angularResolution; ++j)
 	{
 		Point p;
-		p.x = radius * cos(2 * PI * ((float) j) / angularResolution);
-		p.y = radius * sin(2 * PI * ((float) j) / angularResolution);
+                p.x = cos(2 * PI * ((float) j) / angularResolution);
+                p.y = sin(2 * PI * ((float) j) / angularResolution);
 		p.z = 0.0;
 		Point n;
 		n.x = 0.0; n.y = 0.0; n.z = 1.0;
@@ -433,9 +420,9 @@ leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
 void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
-        int resolution, bool casing, bool fullTransforms, int groupIndex)
+        int resolution, bool fullTransforms, int groupIndex)
 {
-	int i, passCasing, passGroupIndex;
+        int i, passGroupIndex;
 
 	if (c == NULL)
                 return;
@@ -446,11 +433,10 @@ void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCo
 	if (c->type == BASE_CIRCLE_CANETYPE)
 	{
                 meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-                        resolution, c, groupIndex, fullTransforms, 1.0);
+                        resolution, c, groupIndex, fullTransforms);
 	}
 	else
 	{
-		passCasing = (casing && c->type != CASING_CANETYPE);
 		for (i = 0; i < c->subcaneCount; ++i)
 		{
 			if (groupIndex == -1)
@@ -459,21 +445,16 @@ void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCo
 				passGroupIndex = groupIndex;
 
                         generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
-                                resolution, passCasing, fullTransforms, passGroupIndex);
-		}
-		if (casing && c->type == CASING_CANETYPE)
-		{
-                        meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-                                resolution, c, groupIndex, fullTransforms, c->amts[0]);
+                                resolution, fullTransforms, passGroupIndex);
 		}
 	}
 	*ancestorCount -= 1;
 }
 
 void generate2DMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
-                                         int resolution, bool casing, bool fullTransforms, int groupIndex)
+        int resolution, bool fullTransforms, int groupIndex)
 {
-	int i, passCasing, passGroupIndex;
+        int i, passGroupIndex;
 
 	if (c == NULL)
                 return;
@@ -484,11 +465,10 @@ void generate2DMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestor
 	if (c->type == BASE_CIRCLE_CANETYPE)
 	{
                 mesh2DCircularBaseCane(geometry, ancestors, *ancestorCount,
-                        resolution, c, groupIndex, fullTransforms, 1.0);
+                        resolution, c, groupIndex, fullTransforms);
 	}
 	else
 	{
-		passCasing = (casing && c->type != CASING_CANETYPE);
 		for (i = 0; i < c->subcaneCount; ++i)
 		{
 			if (groupIndex == -1)
@@ -497,12 +477,7 @@ void generate2DMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestor
 				passGroupIndex = groupIndex;
 
                         generate2DMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
-                                resolution, passCasing, fullTransforms, passGroupIndex);
-		}
-		if (casing && c->type == CASING_CANETYPE)
-		{
-                        mesh2DCircularBaseCane(geometry, ancestors, *ancestorCount,
-                                resolution, c, groupIndex, fullTransforms, c->amts[0]);
+                                resolution, fullTransforms, passGroupIndex);
 		}
 	}
 	*ancestorCount -= 1;

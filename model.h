@@ -84,10 +84,9 @@ private:
 	int mode;
 	Cane *cane;
 	CaneHistory *history;
-        Geometry cachedLowResGeometry;
-        Geometry lowResGeometry;
-	Geometry highResGeometry;
-	int lowResGeometryFresh;
+        Geometry cachedGeometry;
+        Geometry geometry;
+        int geometryFresh;
 	int activeSubcane;
 
 	Point snapPoints[MAX_SNAP];
@@ -110,9 +109,9 @@ private:
 
 	bool show2D;
 
-        void computeHighResGeometry();
-        void cacheLowResGeometry();
-        void revertToCachedLowResGeometry();
+        void computeHighResGeometry(Geometry* highResGeometry);
+        void cacheGeometry();
+        void revertToCachedGeometry();
 	void resetAuxiliaries();
 };
 
