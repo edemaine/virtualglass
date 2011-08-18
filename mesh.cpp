@@ -234,6 +234,162 @@ float computeTotalStretch(Cane** ancestors, int ancestorCount)
 	return totalStretch;
 }
 
+
+void meshSquareBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCount,
+        int resolution, Cane *group_cane, uint32_t group_tag, bool fullTransforms)
+{
+	unsigned int angularResolution, axialResolution;
+
+	switch (resolution)
+	{
+	case LOW_RESOLUTION:
+		angularResolution = LOW_ANGULAR_RESOLUTION;
+		axialResolution = LOW_AXIAL_RESOLUTION;
+		break;
+	case HIGH_RESOLUTION:
+		angularResolution = HIGH_ANGULAR_RESOLUTION;
+		axialResolution = HIGH_AXIAL_RESOLUTION;
+		break;
+	default:
+		exit(1);
+	}
+
+        float total_stretch = computeTotalStretch(ancestors, ancestorCount);
+	float stretchResParam = 1.0 / (1.0 + total_stretch / 20.0);
+	// hack adaptive meshing
+	angularResolution = (int) (angularResolution * stretchResParam + 8 * (1 - stretchResParam)); 
+
+	//need to know first vertex position so we can transform 'em all later
+	uint32_t first_vert = geometry->vertices.size();
+	//need to remember the first triangle so we can tag it later
+	uint32_t first_triangle = geometry->triangles.size();
+
+	/*
+        Draw the walls of the cylinder. Note that the z location is
+        adjusted by the total stretch experienced by the cane so that
+        the z values range between 0 and 1.
+        */
+	//Generate verts:
+	for (unsigned int i = 0; i < axialResolution; ++i)
+	{
+		for (unsigned int j = 0; j < angularResolution; ++j)
+		{
+			Point p;
+			Point n;
+
+			if (j < angularResolution / 4)
+			{
+				p.x = 0.5;
+				p.y = -0.5 + j / (angularResolution / 4.0);	
+			}
+			else if (j < angularResolution / 2)
+			{
+				p.x = 0.5 - (j - angularResolution / 4) / (angularResolution / 4.0);
+				p.y = 0.5;	
+			}
+			else if (j < 3 * angularResolution / 4)
+			{
+				p.x = -0.5;
+				p.y = 0.5 - (j - angularResolution / 2) / (angularResolution / 4.0);	
+			}
+			else
+			{
+				p.x = -0.5 + (j - 3 * angularResolution / 4) / (angularResolution / 4.0);
+				p.y = -0.5;	
+			}
+
+			p.z = ((float) i) / ((axialResolution-1) * total_stretch);
+			n.x = p.x;
+			n.y = p.y;
+			n.z = 0.0f;
+			geometry->vertices.push_back(Vertex(p,n));
+		}
+	}
+	//Generate triangles linking them:
+	for (unsigned int i = 0; i + 1 < axialResolution; ++i)
+	{
+		for (unsigned int j = 0; j < angularResolution; ++j)
+		{
+			uint32_t p1 = first_vert + i * angularResolution + j;
+			uint32_t p2 = first_vert + (i+1) * angularResolution + j;
+			uint32_t p3 = first_vert + i * angularResolution + (j+1) % angularResolution;
+			uint32_t p4 = first_vert + (i+1) * angularResolution + (j+1) % angularResolution;
+			// Four points that define a (non-flat) quad are used
+			// to create two triangles.
+			geometry->triangles.push_back(Triangle(p2, p1, p4));
+			geometry->triangles.push_back(Triangle(p1, p3, p4));
+		}
+	}
+	assert(geometry->valid());
+
+
+	/*
+        Draw the equare bottom, then top.
+        The mesh uses a set of n-2 triangles with a common vertex
+        to draw a regular n-gon.
+        */
+	for (int side = 0; side <= 1; ++side) {
+		float z = (side?1.0:0.0);
+		float nz = (side?1.0:-1.0);
+		uint32_t base = geometry->vertices.size();
+		for (unsigned int j = 0; j < angularResolution; ++j)
+		{
+			Point p;
+
+			if (j < angularResolution / 4)
+			{
+				p.x = 0.5;
+				p.y = -0.5 + j / (angularResolution / 4.0);	
+			}
+			else if (j < angularResolution / 2)
+			{
+				p.x = 0.5 - (j - angularResolution / 4) / (angularResolution / 4.0);
+				p.y = 0.5;	
+			}
+			else if (j < 3 * angularResolution / 4)
+			{
+				p.x = -0.5;
+				p.y = 0.5 - (j - angularResolution / 2) / (angularResolution / 4.0);	
+			}
+			else
+			{
+				p.x = -0.5 + (j - 3 * angularResolution / 4) / (angularResolution / 4.0);
+				p.y = -0.5;	
+			}
+
+			p.z = z / total_stretch;
+			Point n;
+			n.x = 0.0; n.y = 0.0; n.z = nz;
+			geometry->vertices.push_back(Vertex(p, n));
+		}
+		if (side)
+		{
+			for (unsigned int j = 1; j + 1 < angularResolution; ++j)
+			{
+				geometry->triangles.push_back(Triangle(base, base + j, base + j + 1));
+			}
+		}
+		else
+		{
+			for (unsigned int j = 1; j + 1 < angularResolution; ++j)
+			{
+				geometry->triangles.push_back(Triangle(base, base + j + 1, base + j));
+			}
+		}
+	}
+	assert(geometry->valid());
+
+	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
+	{
+                geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, 
+			ancestorCount, fullTransforms);
+	}
+	geometry->compute_normals_from_triangles();
+	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
+		first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
+
+}
+
 /*
 meshCircularBaseCane() creates a mesh for a radius 1, length 1 cylindrical piece of cane,
 and applies a sequences of transforms (coming from a depth-first traversal of the cane ending
@@ -350,8 +506,8 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCoun
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount, fullTransforms);
 	}
 	geometry->compute_normals_from_triangles();
-	geometry->groups.push_back(Group(first_triangle,
-									 geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
+	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
+		first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
 }
 
 
@@ -434,6 +590,11 @@ void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCo
 	{
 		meshCircularBaseCane(geometry, ancestors, *ancestorCount,
 							 resolution, c, groupIndex, fullTransforms);
+	}
+	else if (c->type == BASE_SQUARE_CANETYPE)
+	{
+                meshSquareBaseCane(geometry, ancestors, *ancestorCount,
+                        resolution, c, groupIndex, fullTransforms);
 	}
 	else
 	{

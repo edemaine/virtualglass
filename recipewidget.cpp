@@ -58,7 +58,7 @@ void RecipeWidget :: singleClickEvent(QTreeWidgetItem* item,int column)
 	}
 }
 
-void RecipeWidget :: doubleClickEvent(QTreeWidgetItem* item,int column)
+void RecipeWidget :: doubleClickEvent(QTreeWidgetItem*, int)
 {
 
 }

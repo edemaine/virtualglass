@@ -89,7 +89,9 @@ public slots:
 	void setFrontView();
 	void setTopView();
 	void setSideView();
-	void switchProjection();
+	void setOrthographicProjection();
+	void setPerspectiveProjection();
+	void setProjection(int projection);
 	void toggleAxes();
 	void toggleGrid();
 	void toggleSnaps();

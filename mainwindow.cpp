@@ -126,12 +126,18 @@ void MainWindow::setupMenuBar()
 
 	viewMenu->addSeparator();
 
-	QAction* switchProjection = new QAction(tr("&Switch Projection"), this);
-	switchProjection->setStatusTip(tr("Switch the projection between perspective to orthographic."));
-	connect(switchProjection, SIGNAL(triggered()), openglWidget, SLOT(switchProjection()));
-	switchProjection->setToolTip("Not Implemented");
-	viewMenu->addAction(switchProjection);
+	QMenu* projectionMenu = viewMenu->addMenu(tr("&Projection"));
 
+	QAction* orthographicProjection = new QAction(tr("&Orthographic Projection"), this);
+	orthographicProjection->setStatusTip(tr("Set the camera projection to orthographic (parallelism preserving)."));
+	connect(orthographicProjection, SIGNAL(triggered()), openglWidget, SLOT(setOrthographicProjection()));
+	projectionMenu->addAction(orthographicProjection);
+
+	QAction* perspectiveProjection = new QAction(tr("&Perspective Projection"), this);
+	perspectiveProjection->setStatusTip(tr("Set the camera projection to perspective (realistic)."));
+	connect(perspectiveProjection, SIGNAL(triggered()), openglWidget, SLOT(setPerspectiveProjection()));
+	projectionMenu->addAction(perspectiveProjection);
+	
 	QAction* toggle2D = new QAction(tr("&Toggle 2D View"), this);
 	toggle2D->setStatusTip(tr("Switch between 2D and 3D view."));
 	toggle2D->setCheckable(true);
@@ -290,37 +296,38 @@ void MainWindow::seedLibrary()
 	stretch->amts[0] = 0.0;
 	stretch->amts[1] = 100.0; // amts[0] = twist, amts[1] = stretch
 
-	c->color.r = 0.8;
-	c->color.g = 0.8;
-	c->color.b = 0.8;
-	c->color.a = 0.3;
-
-	//model->setCane(stretch);
-	emit setCaneSig(stretch);
-	saveCaneToLibrary();
 	c->color.r = 1.0;
 	c->color.g = 0.5;
 	c->color.b = 0.5;
 	c->color.a = 0.8;
-	//model->setCane(stretch);
 	emit setCaneSig(stretch);
 	saveCaneToLibrary();
+	c->type = BASE_SQUARE_CANETYPE;
+	emit setCaneSig(stretch);
+	saveCaneToLibrary();
+
 	c->color.r = 0.5;
 	c->color.g = 1.0;
 	c->color.b = 0.5;
 	c->color.a = 0.8;
-	//model->setCane(stretch);
+	c->type = BASE_CIRCLE_CANETYPE;
 	emit setCaneSig(stretch);
 	saveCaneToLibrary();
+	c->type = BASE_SQUARE_CANETYPE;
+	emit setCaneSig(stretch);
+	saveCaneToLibrary();
+
 	c->color.r = 0.5;
 	c->color.g = 0.5;
 	c->color.b = 1.0;
 	c->color.a = 0.8;
-	//model->setCane(stretch);
+	c->type = BASE_CIRCLE_CANETYPE;
+	emit setCaneSig(stretch);
+	saveCaneToLibrary();
+	c->type = BASE_SQUARE_CANETYPE;
 	emit setCaneSig(stretch);
 	saveCaneToLibrary();
 
-	//model->setCane(NULL);
 	emit setCaneSig(NULL);
 	displayTextMessage("Default library loaded");
 }

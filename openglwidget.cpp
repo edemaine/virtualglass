@@ -26,8 +26,6 @@ other parts of the GUI.
 
 OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 {
-	//history = new CaneHistory();
-
 	shiftButtonDown = false;
 	rightMouseDown = false;
 	controlButtonDown = false;
@@ -466,7 +464,17 @@ void OpenGLWidget :: drawSnaps()
 	drawSnapCircles();
 }
 
-void OpenGLWidget :: switchProjection()
+void OpenGLWidget :: setOrthographicProjection()
+{
+	setProjection(ORTHOGRAPHIC_PROJECTION);
+}
+
+void OpenGLWidget :: setPerspectiveProjection()
+{
+	setProjection(PERSPECTIVE_PROJECTION);
+}
+
+void OpenGLWidget :: setProjection(int projection)
 {
 	if (show2D)
 	{
@@ -475,7 +483,11 @@ void OpenGLWidget :: switchProjection()
 		return;
 	}
 
-	isOrthographic=!isOrthographic;
+	if (projection == ORTHOGRAPHIC_PROJECTION)
+		isOrthographic = true;
+	else
+		isOrthographic = false;
+
 	update();
 }
 
@@ -751,15 +763,15 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	relY = (mouseLocY - oldMouseLocY) / windowHeight;
 
 	/*
-  Do something depending on mode.
-  All modes except LOOK_MODE involve modifying the cane
-  itself, while LOOK_MODE moves the camera.
+	Do something depending on mode.
+	All modes except LOOK_MODE involve modifying the cane
+	itself, while LOOK_MODE moves the camera.
 
-  All of the calls to model->*Cane() are functions of relX/relY,
-  but the constants involved are determined by experiment,
-  i.e. how much twist `feels' reasonable for moving the mouse
-  an inch.
-  */
+	All of the calls to model->*Cane() are functions of relX/relY,
+	but the constants involved are determined by experiment,
+	i.e. how much twist `feels' reasonable for moving the mouse
+	an inch.
+	*/
 	if (rightMouseDown && !lockView)
 	{
 		// Rotate camera position around look-at location.
@@ -1020,7 +1032,7 @@ void OpenGLWidget :: drawAxes()
 
 void OpenGLWidget :: toggle2D(){
 	show2D = !show2D;
-	switchProjection();
+	setProjection(ORTHOGRAPHIC_PROJECTION);
 	if (show2D)
 	{
 		setTopView();
