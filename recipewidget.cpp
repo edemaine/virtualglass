@@ -16,7 +16,7 @@ RecipeWidget::RecipeWidget(QWidget *parent, OpenGLWidget* openglWidget) :
 	this->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	connect(this,SIGNAL(itemChanged(QTreeWidgetItem*,int)),this,SLOT(changeData(QTreeWidgetItem*,int)));
 	connect(this,SIGNAL(itemClicked(QTreeWidgetItem*,int)),this,SLOT(singleClickEvent(QTreeWidgetItem*,int)));
-
+	connect(this,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(doubleClickEvent(QTreeWidgetItem*,int)));
 	connect(this,SIGNAL(recipeCaneChanged()),openglWidget->getModel(),SLOT(exactChange()));
 	connect(openglWidget->getModel(), SIGNAL(updateRecipe()), this, SLOT(updateRecipe()));
 	newClear();
@@ -27,6 +27,18 @@ bool RecipeWidget :: isLibraryCane(QTreeWidgetItem* item)
 	Cane* cane = getCane(item);
 	if (cane==NULL)
 		return false;
+	if (item->text(1) == " ")
+		return true;
+	return cane->libraryIndex != -1;
+}
+
+bool RecipeWidget :: isTopLibraryCane(QTreeWidgetItem* item)
+{
+	Cane* cane = getCane(item);
+	if (cane==NULL)
+		return false;
+	if (item->text(1) == " ")
+		return false;
 	return cane->libraryIndex != -1;
 }
 
@@ -36,6 +48,19 @@ void RecipeWidget :: singleClickEvent(QTreeWidgetItem* item,int column)
 	{
 		colorPicker(item,column);
 	}
+	else if (column>=4 && column<=6)
+	{
+		//item->setFlags(item->flags() | Qt::ItemIsEditable);
+	}
+	else
+	{
+		item->setSelected(false);
+	}
+}
+
+void RecipeWidget :: doubleClickEvent(QTreeWidgetItem* item,int column)
+{
+
 }
 
 void RecipeWidget :: colorPicker(QTreeWidgetItem* item,int column)
@@ -191,17 +216,7 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 	if (!this->isVisible())
 		return;
 	Cane* cane = getCane(item);
-	if (isLibraryCane(item))
-	{
-		updateBaseRecipe(cane,item,column);
-		return;
-	}
-	if (column<=2 || column==3)
-	{
-		updateBaseRecipe(cane,item,column);
-		return;
-	}
-	if (column>=4 && column<=6)
+	if ((column>=4 && column<=6) && (!isLibraryCane(item) || isTopLibraryCane(item)))
 	{
 		Point p;
 		bool fC1,fC2,fC3;
@@ -224,8 +239,18 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 		{
 			caneParent->subcaneLocations[itemIndex] = p;
 		}
+		emit recipeCaneChanged();
 	}
-	else if (column>=7)
+	if (isLibraryCane(item))
+	{
+		updateBaseRecipe(cane,item,column);
+		return;
+	}
+	if (column<=2 || column==3)
+	{
+		updateBaseRecipe(cane,item,column);
+		return;
+	} else if (column>=7)
 	{
 		int amtIndex = column-7;
 		QString amtType = cane->typeAmt(cane->type,amtIndex);
@@ -255,30 +280,39 @@ void RecipeWidget :: updateRecipe(bool)
 }
 
 //column 1
-void RecipeWidget :: updateLibraryColumn(Cane* cane,QTreeWidgetItem* node)
+bool RecipeWidget :: updateLibraryColumn(Cane* cane,QTreeWidgetItem* node, bool isInLibrary)
 {
-	if (cane->libraryIndex!=-1)
+	node->setFlags(node->flags() | Qt::ItemIsEditable);
+	if (cane->libraryIndex!=-1 || isInLibrary)
 	{
-		node->setText(1,QString("%1").arg(cane->libraryIndex));
+		if (cane->libraryIndex!=-1)
+			node->setText(1,QString("%1").arg(cane->libraryIndex));
+		else
+			node->setText(1," ");
 		for (int i=0;i<this->columnCount();i++)
 		{
-			node->setTextColor(i, Qt::lightGray);
+			if (isInLibrary || (i<4 || i>6))
+				node->setTextColor(i, Qt::lightGray);
 		}
-		node->setDisabled(true);
+		return true;
 	}
 	else
+	{
 		node->setText(1,"");
+		return false;
+	}
 }
 
-void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode)
+void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, bool isInLibrary)
 {
+
 	if (rootCane == NULL)
 		return;
-	else if (rootNode == visibleRootItem())
+	if (rootNode == visibleRootItem())
 	{
-		rootNode->setFlags(rootNode->flags() | Qt::ItemIsEditable);
+		//rootNode->setFlags(rootNode->flags() | Qt::ItemIsEditable);
 		rootNode->setData(0, Qt::UserRole, QVariant::fromValue(rootCane));
-		updateLibraryColumn(rootCane,rootNode);
+		isInLibrary = isInLibrary || updateLibraryColumn(rootCane,rootNode,isInLibrary);
 
 		rootNode->setText(2,QString("%1").arg(rootCane->typeName()));
 		rootNode->setBackgroundColor(3,rootCane->qcolor());
@@ -300,14 +334,15 @@ void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode)
 	int numCane = rootCane->subcaneCount;
 	for (int i=0;i<numCane;i++)
 	{
+		bool tempLibrary = isInLibrary;
 		Cane* subCane = rootCane->subcanes[i];
 		QTreeWidgetItem* nextLevelCaneWidget = new QTreeWidgetItem(rootNode);
 
-		nextLevelCaneWidget->setFlags(nextLevelCaneWidget->flags() | Qt::ItemIsEditable);
+		//nextLevelCaneWidget->setFlags(nextLevelCaneWidget->flags() | Qt::ItemIsEditable);
 
 		nextLevelCaneWidget->setData(0, Qt::UserRole, QVariant::fromValue(subCane));
 
-		updateLibraryColumn(subCane,nextLevelCaneWidget);
+		tempLibrary = updateLibraryColumn(subCane,nextLevelCaneWidget,tempLibrary);
 
 		nextLevelCaneWidget->setText(2,QString("%1").arg(subCane->typeName()));
 		nextLevelCaneWidget->setBackgroundColor(3,subCane->qcolor());
@@ -324,7 +359,7 @@ void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode)
 			nextLevelCaneWidget->setStatusTip(7+j, QString("%1").arg(subCane->typeAmt(subCane->type,j)));
 		}
 
-		updateRecipe(subCane,nextLevelCaneWidget);
+		updateRecipe(subCane,nextLevelCaneWidget,tempLibrary);
 		rootNode->addChild(nextLevelCaneWidget);
 	}
 	rootNode->setExpanded(false);
