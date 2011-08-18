@@ -972,8 +972,8 @@ void MainWindow::toggleRecipe()
 	if (isRecipe)
 	{
 		openglWidget->setClickable(false);
-		recipeWidget->updateRecipe(true);
 		stackLayout->setCurrentWidget(recipeWidget);
+		recipeWidget->updateRecipe(true);
 		previewLabel->setHidden(false);
 	} else
 	{

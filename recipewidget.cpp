@@ -273,7 +273,12 @@ void RecipeWidget :: updateRecipe()
 {
 	newClear();
 	if (openglWidget->getModel()->getCane() == NULL)
+	{
+		QMessageBox box;
+		box.setText("hi");
+		box.exec();
 		return;
+	}
 	updateRecipe(openglWidget->getModel()->getCane(), visibleRootItem());
 }
 
