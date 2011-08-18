@@ -86,10 +86,10 @@ void Cane :: shallowCopy(Cane* dest)
 
 void Cane :: pullLinear(float twistFactor, float stretchFactor)
 {
-        if (this->type != PULL_CANETYPE)
-                return;
+	if (this->type != PULL_CANETYPE)
+		return;
 
-        this->amts[0] += twistFactor;
+	this->amts[0] += twistFactor;
 	this->amts[0] += stretchFactor;
 }
 
@@ -110,8 +110,8 @@ void Cane :: pullIntuitive(float twistFactor, float stretchFactor)
 	// The amount twist and stretch are changed are functions
 	// of the amount already present. The exact function is
 	// determined by feel/playing with the tool.
-        if (this->type != PULL_CANETYPE)
-                return;
+	if (this->type != PULL_CANETYPE)
+		return;
 
 	if (this->amts[0] < 0.0)
 	{
@@ -135,9 +135,9 @@ void Cane :: pullIntuitive(int subcane, float twistFactor, float stretchFactor)
 	// The amount twist and stretch are changed are functions
 	// of the amount already present. The exact function is
 	// determined by feel/playing with the tool.
-        if (subcane < 0 || subcane >= this->subcaneCount
-                || this->subcanes[subcane]->type != PULL_CANETYPE)
-                return;
+	if (subcane < 0 || subcane >= this->subcaneCount
+			|| this->subcanes[subcane]->type != PULL_CANETYPE)
+		return;
 
 	Cane* workingCane = this->subcanes[subcane];
 
@@ -211,27 +211,27 @@ void Cane :: flatten(int subcane, float rectangle_ratio, float rectangle_theta, 
 
 void Cane :: createFlatten()
 {
-        Cane* copy = new Cane(UNASSIGNED_CANETYPE);
-        this->shallowCopy(copy);
-        this->reset();
-        this->type = FLATTEN_CANETYPE;
-        this->amts[0] = 0.0;
-        this->amts[1] = 0.0;
-        this->amts[2] = 0.0;
-        this->subcaneCount = 1;
-        this->subcanes[0] = copy;
+	Cane* copy = new Cane(UNASSIGNED_CANETYPE);
+	this->shallowCopy(copy);
+	this->reset();
+	this->type = FLATTEN_CANETYPE;
+	this->amts[0] = 0.0;
+	this->amts[1] = 0.0;
+	this->amts[2] = 0.0;
+	this->subcaneCount = 1;
+	this->subcanes[0] = copy;
 }
 
 void Cane :: createPull()
 {
-        Cane* copy = new Cane(UNASSIGNED_CANETYPE);
-        this->shallowCopy(copy);
-        this->reset();
-        this->type = PULL_CANETYPE;
-        this->amts[0] = 0.0;
-        this->amts[1] = 1.0;
-        this->subcaneCount = 1;
-        this->subcanes[0] = copy;
+	Cane* copy = new Cane(UNASSIGNED_CANETYPE);
+	this->shallowCopy(copy);
+	this->reset();
+	this->type = PULL_CANETYPE;
+	this->amts[0] = 0.0;
+	this->amts[1] = 1.0;
+	this->subcaneCount = 1;
+	this->subcanes[0] = copy;
 }
 
 void Cane :: createBundle()
@@ -251,8 +251,8 @@ void Cane :: moveCane(int subcane, float delta_x, float delta_y, float delta_z)
 		return;
 	}
 	subcaneLocations[subcane].x += delta_x;
-        subcaneLocations[subcane].y += delta_y;
-        subcaneLocations[subcane].z += delta_z;
+	subcaneLocations[subcane].y += delta_y;
+	subcaneLocations[subcane].z += delta_z;
 }
 
 void Cane :: createCasing(float radius)
@@ -274,7 +274,7 @@ void Cane :: createCasing(float radius)
 
 void Cane :: adjustCasing(float delta)
 {
-        this->amts[0] += delta;
+	this->amts[0] += delta;
 }
 
 void Cane :: add(Cane* addl)

@@ -5,10 +5,10 @@
 Model :: Model()
 {
 	mode = 0;
-        show2D = false;
-        cane = NULL;
+	show2D = false;
+	cane = NULL;
 	history = new CaneHistory();
-        geometryFresh = 0;
+	geometryFresh = 0;
 	activeSubcane = -1;
 
 	activeSnapMode = NO_SNAP;
@@ -28,7 +28,7 @@ Model :: Model()
 	snapPointsCount=snapLinesCount=snapCirclesCount=0;
 	snapHoldPoint = Point();
 
-        geometryFresh = 0;
+	geometryFresh = 0;
 }
 
 void Model :: resetAuxiliaries()
@@ -69,82 +69,83 @@ int Model :: getMode()
 
 void Model :: cacheGeometry()
 {
-        cachedGeometry.clear();
-        cachedGeometry.vertices.assign(geometry.vertices.begin(), geometry.vertices.end());
-        cachedGeometry.triangles.assign(geometry.triangles.begin(), geometry.triangles.end());
-        cachedGeometry.groups.assign(geometry.groups.begin(), geometry.groups.end());
+	cachedGeometry.clear();
+	cachedGeometry.vertices.assign(geometry.vertices.begin(), geometry.vertices.end());
+	cachedGeometry.triangles.assign(geometry.triangles.begin(), geometry.triangles.end());
+	cachedGeometry.groups.assign(geometry.groups.begin(), geometry.groups.end());
 }
 
 void Model :: revertToCachedGeometry()
 {
-        geometry.clear();
-        geometry.vertices.assign(cachedGeometry.vertices.begin(), cachedGeometry.vertices.end());
-        geometry.triangles.assign(cachedGeometry.triangles.begin(), cachedGeometry.triangles.end());
-        geometry.groups.assign(cachedGeometry.groups.begin(), cachedGeometry.groups.end());
+	geometry.clear();
+	geometry.vertices.assign(cachedGeometry.vertices.begin(), cachedGeometry.vertices.end());
+	geometry.triangles.assign(cachedGeometry.triangles.begin(), cachedGeometry.triangles.end());
+	geometry.groups.assign(cachedGeometry.groups.begin(), cachedGeometry.groups.end());
 }
 
 void Model :: setMode(int mode)
 {
+	if (cane == NULL)
+		return;
+
 	int prev_mode = this->mode;
 	this->mode = mode;
 
-        if (cane == NULL)
-                return;
-
 	switch(this->mode)
 	{
-                case FLATTEN_MODE:
-                        history->saveState(cane);
-                        cane->createFlatten();
-                        slowGeometryUpdate();
-                        cacheGeometry();
-                        break;
-                case PULL_MODE:
-                        history->saveState(cane);
-                        cane->createPull();
-                        slowGeometryUpdate();
-                        cacheGeometry();
-                        break;
-                case BUNDLE_MODE:
-                        history->saveState(cane);
-                        cane->createBundle();
-                        slowGeometryUpdate();
-                        cacheGeometry();
-                        activeSubcane = -1;
-                        break;
-                case CASING_MODE:
-                {
-                        geometry.clear();
-                        if (show2D)
-                        {
-                                cane->createCasing(1.0);
-                        }
-                        else
-                        {
-                                cane->createCasing(1.0);
-                        }
-                        geometryFresh = 0;
-                        emit caneChanged();
-                        break;
-                }
-                case SNAP_MODE:
-                        switch(prev_mode)
-                        {
-                        case SNAP_MODE:
-                                this->mode = SNAP_LINE_MODE;
-                                break;
-                        case SNAP_LINE_MODE:
-                                this->mode = SNAP_CIRCLE_MODE;
-                                break;
-                        case SNAP_CIRCLE_MODE:
-                                this->mode = SNAP_MODE;
-                                break;
-                        default:
-                                break;
-                        }
-                        break;
-                default:
-                        break;
+	case FLATTEN_MODE:
+		history->saveState(cane);
+		cane->createFlatten();
+		slowGeometryUpdate();
+		cacheGeometry();
+		break;
+	case PULL_MODE:
+		history->saveState(cane);
+		cane->createPull();
+		slowGeometryUpdate();
+		cacheGeometry();
+		break;
+	case BUNDLE_MODE:
+		history->saveState(cane);
+		cane->createBundle();
+		slowGeometryUpdate();
+		cacheGeometry();
+		activeSubcane = -1;
+		break;
+	case CASING_MODE:
+	{
+		geometry.clear();
+		if (show2D)
+		{
+			cane->createCasing(1.0);
+		}
+		else
+		{
+			cane->createCasing(1.0);
+		}
+		geometryFresh = 0;
+		emit caneChanged();
+		break;
+	}
+	case SNAP_MODE:
+		switch(prev_mode)
+		{
+		case SNAP_MODE:
+			this->mode = SNAP_LINE_MODE;
+			break;
+		case SNAP_LINE_MODE:
+			this->mode = SNAP_CIRCLE_MODE;
+			break;
+		case SNAP_CIRCLE_MODE:
+			this->mode = SNAP_MODE;
+			break;
+		default:
+			this->mode = SNAP_MODE;
+			break;
+		}
+		break;
+	default:
+		break;
 	}
 	emit modeChanged(this->mode);
 }
@@ -159,8 +160,8 @@ void Model :: setActiveSubcane(int subcane)
 		if (activeSubcane < 0 || activeSubcane >= cane->subcaneCount) {
 			activeSubcane = -1;
 		}
-                geometryFresh = 0;
-                emit caneChanged();
+		geometryFresh = 0;
+		emit caneChanged();
 	}
 }
 
@@ -172,65 +173,65 @@ int Model :: getActiveSubcane()
 void Model :: setCane(Cane* c)
 {
 	history->saveState(cane);
-        if (c == NULL)
+	if (c == NULL)
 		resetAuxiliaries();
 	cane = c;
-        geometryFresh = 0;
+	geometryFresh = 0;
 	emit caneChanged();
 }
 
 void Model :: slowGeometryUpdate()
 {
 	Cane* ancestors[MAX_ANCESTORS];
-        int ancestorCount = 0;
+	int ancestorCount = 0;
 
-        geometry.clear();
+	geometry.clear();
 	if (cane != NULL)
 	{
 		if (show2D)
 		{
-                        generate2DMesh(cane, &geometry, ancestors, &ancestorCount, LOW_RESOLUTION, false);
+			generate2DMesh(cane, &geometry, ancestors, &ancestorCount, LOW_RESOLUTION, false);
 		}
 		else
 		{
-                        generateMesh(cane, &geometry, ancestors, &ancestorCount, LOW_RESOLUTION, false);
+			generateMesh(cane, &geometry, ancestors, &ancestorCount, LOW_RESOLUTION, false);
 		}
 	}
-        else
-                return;
+	else
+		return;
 
-        cacheGeometry();
-        switch (cane->type)
-        {
-                case PULL_CANETYPE:
-                        applyPullTransform(&geometry, cane);
-                        break;
-                case FLATTEN_CANETYPE:
-                        applyFlattenTransform(&geometry, cane);
-                        break;
-                default:
-                        break;
-        }
-        geometryFresh = 1;
+	cacheGeometry();
+	switch (cane->type)
+	{
+	case PULL_CANETYPE:
+		applyPullTransform(&geometry, cane);
+		break;
+	case FLATTEN_CANETYPE:
+		applyFlattenTransform(&geometry, cane);
+		break;
+	default:
+		break;
+	}
+	geometryFresh = 1;
 
-        emit caneChanged();
+	emit caneChanged();
 }
 
 void Model :: computeHighResGeometry(Geometry* geometry)
 {
 	Cane* ancestors[MAX_ANCESTORS];
-        int ancestorCount = 0;
+	int ancestorCount = 0;
 
-        geometry->clear();
+	geometry->clear();
 	if (cane != NULL)
 	{
 		if (show2D)
 		{
-                        generate2DMesh(cane, geometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
+			generate2DMesh(cane, geometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
 		}
 		else
 		{
-                        generateMesh(cane, geometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
+			generateMesh(cane, geometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
 		}
 	}
 }
@@ -242,19 +243,19 @@ Cane* Model :: getCane()
 
 Geometry* Model :: getGeometry()
 {
-        if (!geometryFresh)
-                slowGeometryUpdate();
-        return &geometry;
+	if (!geometryFresh)
+		slowGeometryUpdate();
+	return &geometry;
 }
 
 void Model :: pullCane(float twistAmount, float stretchAmount)
 {
-        revertToCachedGeometry();
-        cane->pullIntuitive(twistAmount, stretchAmount);
-        applyPullTransform(&geometry, cane);
+	revertToCachedGeometry();
+	cane->pullIntuitive(twistAmount, stretchAmount);
+	applyPullTransform(&geometry, cane);
 
-        geometryFresh = 1;
-        emit caneChanged();
+	geometryFresh = 1;
+	emit caneChanged();
 }
 
 void Model :: pullActiveCane(float twistAmount, float stretchAmount)
@@ -264,21 +265,21 @@ void Model :: pullActiveCane(float twistAmount, float stretchAmount)
 	if (cane->subcanes[activeSubcane]->type != PULL_CANETYPE)
 		history->saveState(cane);
 
-        revertToCachedGeometry();
-        cane->pullIntuitive(activeSubcane,twistAmount, stretchAmount);
-        applyPullTransform(&geometry, cane);
+	revertToCachedGeometry();
+	cane->pullIntuitive(activeSubcane,twistAmount, stretchAmount);
+	applyPullTransform(&geometry, cane);
 
-        geometryFresh = 1;
+	geometryFresh = 1;
 	emit caneChanged();
 }
 
 void Model :: flattenCane(float rectangle_ratio, float rectangle_theta, float flatness)
 {
-        revertToCachedGeometry();
-        cane->flatten(rectangle_ratio, rectangle_theta, flatness);
-        applyFlattenTransform(&geometry, cane);
+	revertToCachedGeometry();
+	cane->flatten(rectangle_ratio, rectangle_theta, flatness);
+	applyFlattenTransform(&geometry, cane);
 
-        geometryFresh = 1;
+	geometryFresh = 1;
 	emit caneChanged();
 }
 
@@ -289,11 +290,11 @@ void Model :: flattenActiveCane(float rectangle_ratio, float rectangle_theta, fl
 	if (cane->subcanes[activeSubcane]->type != FLATTEN_CANETYPE)
 		history->saveState(cane);
 
-        revertToCachedGeometry();
-        cane->flatten(activeSubcane, rectangle_ratio, rectangle_theta, flatness);
-        applyFlattenTransform(&geometry, cane);
+	revertToCachedGeometry();
+	cane->flatten(activeSubcane, rectangle_ratio, rectangle_theta, flatness);
+	applyFlattenTransform(&geometry, cane);
 
-        geometryFresh = 1;
+	geometryFresh = 1;
 	emit caneChanged();
 }
 
@@ -303,16 +304,16 @@ void Model :: moveCane(float delta_x, float delta_y, float delta_z)
 	if (cane == NULL || activeSubcane == -1)
 		return;
 
-        cane->moveCane(activeSubcane, delta_x, delta_y, delta_z);
-        applyPartialMoveTransform(&geometry, activeSubcane, delta_x, delta_y, delta_z);
-        cacheGeometry();
+	cane->moveCane(activeSubcane, delta_x, delta_y, delta_z);
+	applyPartialMoveTransform(&geometry, activeSubcane, delta_x, delta_y, delta_z);
+	cacheGeometry();
 
-        geometryFresh = 1;
-        emit caneChanged();
+	geometryFresh = 1;
+	emit caneChanged();
 
 
 
-/*
+	/*
 The snapping functionality is commented out until it has a reasonable, intuitive
 interface and works. -Andrew
 */
@@ -380,8 +381,8 @@ void Model :: adjustCaneCasing(float delta)
 {
 	if (cane == NULL)
 		return;
-        cane->adjustCasing(delta);
-        geometryFresh = 0;
+	cane->adjustCasing(delta);
+	geometryFresh = 0;
 	emit caneChanged();
 }
 
@@ -391,7 +392,7 @@ bool Model :: deleteActiveCane()
 		return false;
 	history->saveState(cane);
 	cane->deleteCane(activeSubcane);
-        slowGeometryUpdate();
+	slowGeometryUpdate();
 	emit caneChanged();
 	return true;
 }
@@ -402,23 +403,23 @@ void Model :: addCane(Cane* c)
 	if (cane == NULL)
 	{
 		cane = c->deepCopy();
-                geometryFresh = 0;
-                emit caneChanged();
-                setMode(BUNDLE_MODE);
-        }
+		geometryFresh = 0;
+		emit caneChanged();
+		setMode(BUNDLE_MODE);
+	}
 	else
 	{
-                cane->add(c->deepCopy());
-                geometryFresh = 0;
-                emit caneChanged();
-                if (mode != BUNDLE_MODE)
-                        setMode(BUNDLE_MODE);
-                else
-                {
-                        slowGeometryUpdate();
-                        cacheGeometry();
-                }
-        }
+		cane->add(c->deepCopy());
+		geometryFresh = 0;
+		emit caneChanged();
+		if (mode != BUNDLE_MODE)
+			setMode(BUNDLE_MODE);
+		else
+		{
+			slowGeometryUpdate();
+			cacheGeometry();
+		}
+	}
 }
 
 void Model :: undo()
@@ -440,8 +441,8 @@ void Model :: undo()
 	if (temp != NULL)
 	{
 		cane = temp;
-                geometryFresh = 0;
-                emit caneChanged();
+		geometryFresh = 0;
+		emit caneChanged();
 	}
 	else
 	{
@@ -463,8 +464,8 @@ void Model :: redo()
 	if (temp != NULL)
 	{
 		cane = temp;
-                geometryFresh = 0;
-                emit caneChanged();
+		geometryFresh = 0;
+		emit caneChanged();
 	}
 	else
 	{
@@ -474,15 +475,15 @@ void Model :: redo()
 
 void Model :: saveObjFile(std::string const &filename)
 {
-        Geometry highResGeometry;
-        computeHighResGeometry(&highResGeometry);
+	Geometry highResGeometry;
+	computeHighResGeometry(&highResGeometry);
 	highResGeometry.save_obj_file(filename);
 }
 
 void Model :: saveRawFile(std::string const &filename)
 {
-        Geometry highResGeometry;
-        computeHighResGeometry(&highResGeometry);
+	Geometry highResGeometry;
+	computeHighResGeometry(&highResGeometry);
 	highResGeometry.save_raw_file(filename);
 }
 
@@ -688,7 +689,7 @@ int Model :: getActiveSnapIndex()
 void Model :: clearActiveSnap(bool holdSnap)
 {
 	if (activeSnapMode != NO_SNAP && holdSnap)
-                cane->moveCane(activeSubcane, 0, 0, 0); // To(activeSubcane,snapHoldPoint);
+		cane->moveCane(activeSubcane, 0, 0, 0); // To(activeSubcane,snapHoldPoint);
 	activeSnapMode = NO_SNAP;
 	activeSnapIndex = -1;
 	snapHoldPoint = Point();
@@ -758,12 +759,12 @@ void Model :: deleteSnapPoint(Point loc)
 void Model :: toggle2D()
 {
 	show2D = !show2D;
-        geometryFresh = 0;
-        emit caneChanged();
+	geometryFresh = 0;
+	emit caneChanged();
 }
 
 void Model::exactChange()
 {
-        geometryFresh = 0;
-        emit caneChanged();
+	geometryFresh = 0;
+	emit caneChanged();
 }

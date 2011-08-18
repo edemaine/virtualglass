@@ -191,6 +191,11 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 	if (!this->isVisible())
 		return;
 	Cane* cane = getCane(item);
+	if (isLibraryCane(item))
+	{
+		updateBaseRecipe(cane,item,column);
+		return;
+	}
 	if (column<=2 || column==3)
 	{
 		updateBaseRecipe(cane,item,column);
@@ -255,7 +260,10 @@ void RecipeWidget :: updateLibraryColumn(Cane* cane,QTreeWidgetItem* node)
 	if (cane->libraryIndex!=-1)
 	{
 		node->setText(1,QString("%1").arg(cane->libraryIndex));
-
+		for (int i=0;i<this->columnCount();i++)
+		{
+			node->setTextColor(i, Qt::lightGray);
+		}
 		node->setDisabled(true);
 	}
 	else

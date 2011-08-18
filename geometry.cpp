@@ -63,9 +63,9 @@ void Geometry::save_raw_file(std::string const &filename) const {
 		for (vector< Group >::const_iterator g = groups.begin(); g != groups.end(); ++g) {
 			vector< Vertex > group_verts;
 			vector< uint32_t > vert_to_group(vertices.size(), -1U);
-                        assert(g->triangle_begin + g->triangle_size <= triangles.size());
-                        vector< Triangle > group_tris(triangles.begin() + g->triangle_begin, triangles.begin() + g->triangle_begin + g->triangle_size);
-                        assert(group_tris.size() == g->triangle_size);
+			assert(g->triangle_begin + g->triangle_size <= triangles.size());
+			vector< Triangle > group_tris(triangles.begin() + g->triangle_begin, triangles.begin() + g->triangle_begin + g->triangle_size);
+			assert(group_tris.size() == g->triangle_size);
 			//Translate group_triangles indices:
 			for (vector< Triangle >::iterator t = group_tris.begin(); t != group_tris.end(); ++t) {
 				assert(t->v1 < vertices.size());

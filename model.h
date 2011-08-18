@@ -30,14 +30,14 @@ public:
 	Geometry* getGeometry();
 	void pullCane(float twistAmount, float stretchFactor);
 	void pullActiveCane(float twistAmount, float stretchFactor);
-        void flattenCane(float rectangle_ratio, float rectangle_theta, float flatness);
-        void flattenActiveCane(float rectangle_ratio, float rectangle_theta, float flatness);
-        void moveCane(float delta_x, float delta_y, float delta_z);
-        void adjustCaneCasing(float delta_x);
-        bool deleteActiveCane();
+	void flattenCane(float rectangle_ratio, float rectangle_theta, float flatness);
+	void flattenActiveCane(float rectangle_ratio, float rectangle_theta, float flatness);
+	void moveCane(float delta_x, float delta_y, float delta_z);
+	void adjustCaneCasing(float delta_x);
+	bool deleteActiveCane();
 	void addCane(Cane* c);
-        void slowGeometryUpdate();
-        void saveObjFile(std::string const &filename);
+	void slowGeometryUpdate();
+	void saveObjFile(std::string const &filename);
 	void saveRawFile(std::string const &filename);
 	int getMode();
 
@@ -78,15 +78,15 @@ public slots:
 	void setMode(int mode);
 	void clearCurrentCane();
 	void setCane(Cane* c);
-        void exactChange();
+	void exactChange();
 
 private:
 	int mode;
 	Cane *cane;
 	CaneHistory *history;
-        Geometry cachedGeometry;
-        Geometry geometry;
-        int geometryFresh;
+	Geometry cachedGeometry;
+	Geometry geometry;
+	int geometryFresh;
 	int activeSubcane;
 
 	Point snapPoints[MAX_SNAP];
@@ -109,9 +109,9 @@ private:
 
 	bool show2D;
 
-        void computeHighResGeometry(Geometry* highResGeometry);
-        void cacheGeometry();
-        void revertToCachedGeometry();
+	void computeHighResGeometry(Geometry* highResGeometry);
+	void cacheGeometry();
+	void revertToCachedGeometry();
 	void resetAuxiliaries();
 };
 
