@@ -41,6 +41,7 @@ private:
 	Point getPoint(QTreeWidgetItem* item);
 	void setPoint(QTreeWidgetItem* item, Point p);
 	int childIndex(QTreeWidgetItem* item, QTreeWidgetItem* itemParent);
+	bool caneOutdated;
 
 };
 

@@ -11,15 +11,17 @@ RecipeWidget::RecipeWidget(QWidget *parent, OpenGLWidget* openglWidget) :
 		headers << QString("Amt %1").arg(i);
 	}
 	setHeaderLabels(headers);
-
+	caneOutdated = true;
 	this->openglWidget = openglWidget;
 	this->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	connect(this,SIGNAL(itemChanged(QTreeWidgetItem*,int)),this,SLOT(changeData(QTreeWidgetItem*,int)));
 	connect(this,SIGNAL(itemClicked(QTreeWidgetItem*,int)),this,SLOT(singleClickEvent(QTreeWidgetItem*,int)));
-	connect(this,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(doubleClickEvent(QTreeWidgetItem*,int)));
+	//connect(this,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(doubleClickEvent(QTreeWidgetItem*,int)));
 	connect(this,SIGNAL(recipeCaneChanged()),openglWidget->getModel(),SLOT(exactChange()));
-	connect(openglWidget->getModel(), SIGNAL(updateRecipe()), this, SLOT(updateRecipe()));
+	connect(openglWidget->getModel(), SIGNAL(caneChanged()), this, SLOT(updateRecipe()));
+	//connect(openglWidget->getModel(), SIGNAL(updateRecipe()), this, SLOT(updateRecipe()));
 	newClear();
+	//this->setEditTriggers(QTreeWidget::SelectedClicked);
 }
 
 bool RecipeWidget :: isLibraryCane(QTreeWidgetItem* item)
@@ -44,6 +46,7 @@ bool RecipeWidget :: isTopLibraryCane(QTreeWidgetItem* item)
 
 void RecipeWidget :: singleClickEvent(QTreeWidgetItem* item,int column)
 {
+	caneOutdated = true;
 	if (!isLibraryCane(item))
 	{
 		colorPicker(item,column);
@@ -213,7 +216,7 @@ void RecipeWidget::updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, i
 
 void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 {
-	if (!this->isVisible())
+	if (!this->isVisible() || !caneOutdated)
 		return;
 	Cane* cane = getCane(item);
 	if ((column>=4 && column<=6) && (!isLibraryCane(item) || isTopLibraryCane(item)))
@@ -305,19 +308,25 @@ bool RecipeWidget :: updateLibraryColumn(Cane* cane,QTreeWidgetItem* node, bool 
 
 void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, bool isInLibrary)
 {
-
+	if (!this->isVisible())
+		return;
 	if (rootCane == NULL)
 		return;
+	QMessageBox box;
+	box.setText("moo");
+	//box.exec();
 	if (rootNode == visibleRootItem())
 	{
 		//rootNode->setFlags(rootNode->flags() | Qt::ItemIsEditable);
 		rootNode->setData(0, Qt::UserRole, QVariant::fromValue(rootCane));
 		isInLibrary = isInLibrary || updateLibraryColumn(rootCane,rootNode,isInLibrary);
-
+		box.setText("moomoo");
+		//box.exec();
 		rootNode->setText(2,QString("%1").arg(rootCane->typeName()));
 		rootNode->setBackgroundColor(3,rootCane->qcolor());
 		rootNode->setText(3,"");
-
+		box.setText("moomoomoo");
+		//box.exec();
 		rootNode->setText(4,QString("%1").arg(0));
 		rootNode->setText(5,QString("%1").arg(0));
 		rootNode->setText(6,QString("%1").arg(0));
@@ -330,7 +339,8 @@ void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, boo
 		}
 	}
 
-
+	box.setText("hi");
+	//box.exec();
 	int numCane = rootCane->subcaneCount;
 	for (int i=0;i<numCane;i++)
 	{
@@ -347,7 +357,8 @@ void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, boo
 		nextLevelCaneWidget->setText(2,QString("%1").arg(subCane->typeName()));
 		nextLevelCaneWidget->setBackgroundColor(3,subCane->qcolor());
 		nextLevelCaneWidget->setText(3,"");
-
+		box.setText("hihi");
+		//box.exec();
 		nextLevelCaneWidget->setText(4,QString("%1").arg(rootCane->subcaneLocations[i].x));
 		nextLevelCaneWidget->setText(5,QString("%1").arg(rootCane->subcaneLocations[i].y));
 		nextLevelCaneWidget->setText(6,QString("%1").arg(rootCane->subcaneLocations[i].z));
@@ -358,7 +369,8 @@ void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, boo
 			nextLevelCaneWidget->setToolTip(7+j, QString("%1").arg(subCane->typeAmt(subCane->type,j)));
 			nextLevelCaneWidget->setStatusTip(7+j, QString("%1").arg(subCane->typeAmt(subCane->type,j)));
 		}
-
+		box.setText("hihihi");
+		//box.exec();
 		updateRecipe(subCane,nextLevelCaneWidget,tempLibrary);
 		rootNode->addChild(nextLevelCaneWidget);
 	}
@@ -369,6 +381,7 @@ void RecipeWidget :: newClear()
 {
 	clear();
 	invisibleRootItem()->addChild(new QTreeWidgetItem());
+	caneOutdated = false;
 }
 
 QTreeWidgetItem* RecipeWidget ::visibleRootItem()
