@@ -22,7 +22,6 @@ class OpenGLWidget : public QGLWidget
 public:
 	Model* getModel();
 	OpenGLWidget(QWidget* parent, Model* model);
-	void updateResolution(int new_resolution);
 	void setMode(int mode);
 	void setCamera(float theta, float fee);
 	Point getCameraPoint();
@@ -45,7 +44,6 @@ private:
 	bool rightMouseDown;
 	bool controlButtonDown;
 	bool deleteButtonDown;
-	bool isOrthographic;
 	QColor bgColor;
 	Model* model;
 	Geometry *geometry;
@@ -89,9 +87,7 @@ public slots:
 	void setFrontView();
 	void setTopView();
 	void setSideView();
-	void setOrthographicProjection();
-	void setPerspectiveProjection();
-	void setProjection(int projection);
+	void projectionChanged();
 	void toggleAxes();
 	void toggleGrid();
 	void toggleSnaps();

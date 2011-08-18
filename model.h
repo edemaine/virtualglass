@@ -39,6 +39,9 @@ public:
 	void slowGeometryUpdate();
 	void saveObjFile(std::string const &filename);
 	void saveRawFile(std::string const &filename);
+	void setProjection(int p);
+
+	int getProjection();
 	int getMode();
 
 	int addSnapPoint(int snapMode,Point p);
@@ -70,6 +73,7 @@ signals:
 	void caneChanged();
 	void textMessage(QString msg);
 	void modeChanged(int mode);
+	void projectionChanged();
 	void updateRecipe();
 
 public slots:
@@ -79,9 +83,12 @@ public slots:
 	void clearCurrentCane();
 	void setCane(Cane* c);
 	void exactChange();
+	void setOrthographicProjection();
+	void setPerspectiveProjection();
 
 private:
 	int mode;
+	int projection;
 	Cane *cane;
 	CaneHistory *history;
 	Geometry cachedGeometry;

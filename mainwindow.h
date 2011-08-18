@@ -38,6 +38,7 @@ signals:
 
 public slots:
 	void modeChanged(int mode);
+	void projectionChanged(); 
 	void saveCaneToLibrary();
 	void exportLibraryDialog();
 	void importLibraryDialog();
@@ -79,6 +80,9 @@ private:
 	QMenu* caneMenu;
 	QMenu* viewMenu;
 	QMenu* fileMenu;
+	QAction* perspectiveProjection;
+	QAction* orthographicProjection;
+
 	QWidget* centralWidget;
 	QVBoxLayout* windowLayout;
 	QGraphicsView* workview;

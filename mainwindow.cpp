@@ -128,16 +128,21 @@ void MainWindow::setupMenuBar()
 
 	QMenu* projectionMenu = viewMenu->addMenu(tr("&Projection"));
 
-	QAction* orthographicProjection = new QAction(tr("&Orthographic Projection"), this);
+	orthographicProjection = new QAction(tr("&Orthographic Projection"), this);
+	orthographicProjection->setCheckable(true);
 	orthographicProjection->setStatusTip(tr("Set the camera projection to orthographic (parallelism preserving)."));
-	connect(orthographicProjection, SIGNAL(triggered()), openglWidget, SLOT(setOrthographicProjection()));
+	connect(orthographicProjection, SIGNAL(triggered()), model, SLOT(setOrthographicProjection()));
 	projectionMenu->addAction(orthographicProjection);
 
-	QAction* perspectiveProjection = new QAction(tr("&Perspective Projection"), this);
+	perspectiveProjection = new QAction(tr("&Perspective Projection"), this);
+	perspectiveProjection->setCheckable(true);
 	perspectiveProjection->setStatusTip(tr("Set the camera projection to perspective (realistic)."));
-	connect(perspectiveProjection, SIGNAL(triggered()), openglWidget, SLOT(setPerspectiveProjection()));
+	connect(perspectiveProjection, SIGNAL(triggered()), model, SLOT(setPerspectiveProjection()));
 	projectionMenu->addAction(perspectiveProjection);
-	
+
+	projectionChanged(); // Initialize projection menu
+
+
 	QAction* toggle2D = new QAction(tr("&Toggle 2D View"), this);
 	toggle2D->setStatusTip(tr("Switch between 2D and 3D view."));
 	toggle2D->setCheckable(true);
@@ -174,6 +179,20 @@ void MainWindow::setupMenuBar()
 	zoomOut->setStatusTip(tr("Create a new cane using standard colors."));
 	connect(newBrandColor, SIGNAL(triggered()), this, SLOT(newBrandCaneDialog()));
 	caneMenu->addAction(newBrandColor);
+}
+
+void MainWindow::projectionChanged()
+{
+	if (model->getProjection() == ORTHOGRAPHIC_PROJECTION)
+	{
+		this->orthographicProjection->setChecked(true);
+		this->perspectiveProjection->setChecked(false);
+	}
+	else if (model->getProjection() == PERSPECTIVE_PROJECTION)
+	{
+		this->orthographicProjection->setChecked(false);
+		this->perspectiveProjection->setChecked(true);
+	}
 }
 
 void MainWindow::modeChanged(int mode)

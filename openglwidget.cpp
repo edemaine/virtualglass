@@ -30,7 +30,6 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 	rightMouseDown = false;
 	controlButtonDown = false;
 	deleteButtonDown = false;
-	isOrthographic = false;
 
 	bgColor = QColor(0,0,0);
 
@@ -81,6 +80,11 @@ void OpenGLWidget :: setShiftButtonDown(bool state)
 void OpenGLWidget :: setControlButtonDown(bool state)
 {
 	controlButtonDown = state;
+}
+
+void OpenGLWidget :: projectionChanged()
+{
+	update();
 }
 
 void OpenGLWidget :: setDeleteButtonDown(bool state)
@@ -464,33 +468,6 @@ void OpenGLWidget :: drawSnaps()
 	drawSnapCircles();
 }
 
-void OpenGLWidget :: setOrthographicProjection()
-{
-	setProjection(ORTHOGRAPHIC_PROJECTION);
-}
-
-void OpenGLWidget :: setPerspectiveProjection()
-{
-	setProjection(PERSPECTIVE_PROJECTION);
-}
-
-void OpenGLWidget :: setProjection(int projection)
-{
-	if (show2D)
-	{
-		isOrthographic = true;
-		update();
-		return;
-	}
-
-	if (projection == ORTHOGRAPHIC_PROJECTION)
-		isOrthographic = true;
-	else
-		isOrthographic = false;
-
-	update();
-}
-
 /*
 Calls if the OpenGLWidget object is resized (in the GUI sense).
 */
@@ -582,19 +559,6 @@ void OpenGLWidget :: lockTable()
 
 
 /*
-Is called when the resolution of the rendered cane is changed.
-Two resolution modes are available: LOW_RESOLUTION and HIGH_RESOLUTION.
-The method simply updates the `resolution' instance variable and
-requests the (possibly new) resolution of the cane from the Mesh
-object, updating its Triangle array pointer.
-*/
-void OpenGLWidget :: updateResolution(int new_resolution)
-{
-	resolution = new_resolution;
-	updateTriangles();
-}
-
-/*
 Should be called any time the Mesh object is changed by
 modifying the cane it contains.
 */
@@ -612,7 +576,7 @@ void OpenGLWidget :: setGLMatrices()
 	glLoadIdentity();
 	float w = width();
 	float h = height();
-	if (isOrthographic) {
+	if (model->getProjection() == ORTHOGRAPHIC_PROJECTION) {
 		if (w > h) {
 			float a = h / w;
 			float s = 1.0f / rho;
@@ -687,8 +651,6 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 			}
 		}
 	}
-	// Change as part of dual mode feature
-	updateResolution(LOW_RESOLUTION);
 
 	update();
 }
@@ -1030,9 +992,10 @@ void OpenGLWidget :: drawAxes()
 	}
 }
 
-void OpenGLWidget :: toggle2D(){
+void OpenGLWidget :: toggle2D()
+{
 	show2D = !show2D;
-	setProjection(ORTHOGRAPHIC_PROJECTION);
+	model->setProjection(ORTHOGRAPHIC_PROJECTION);
 	if (show2D)
 	{
 		setTopView();

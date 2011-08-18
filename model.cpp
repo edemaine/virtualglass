@@ -5,6 +5,7 @@
 Model :: Model()
 {
 	mode = 0;
+	projection = PERSPECTIVE_PROJECTION;
 	show2D = false;
 	cane = NULL;
 	history = new CaneHistory();
@@ -29,6 +30,35 @@ Model :: Model()
 	snapHoldPoint = Point();
 
 	geometryFresh = 0;
+}
+
+void Model :: setOrthographicProjection()
+{
+        setProjection(ORTHOGRAPHIC_PROJECTION);
+}
+
+void Model :: setPerspectiveProjection()
+{
+       	setProjection(PERSPECTIVE_PROJECTION);
+}
+
+void Model :: setProjection(int p)
+{
+        if (p == ORTHOGRAPHIC_PROJECTION)
+	{
+                projection = p;
+		emit projectionChanged();
+	}
+        else if (p == PERSPECTIVE_PROJECTION)
+	{
+                projection = p;
+		emit projectionChanged();
+	}
+}
+
+int Model :: getProjection()
+{
+	return projection;
 }
 
 void Model :: resetAuxiliaries()

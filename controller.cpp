@@ -13,17 +13,14 @@ Controller::Controller(int argc, char **argv)
 	model = new Model();
 	mainWindow = new MainWindow(model);
 
-	// connect openglwidget to model
-	connect(model, SIGNAL(caneChanged()), mainWindow->openglWidget, SLOT(caneChanged()));
-
-	// Connect mainwindow to model
 	connect(model, SIGNAL(textMessage(QString)), mainWindow, SLOT(displayTextMessage(QString)));
 	connect(model, SIGNAL(modeChanged(int)), mainWindow, SLOT(modeChanged(int)));
-	connect(mainWindow, SIGNAL(setCaneSig(Cane*)), model, SLOT(setCane(Cane*)));
+	connect(model, SIGNAL(caneChanged()), mainWindow, SLOT(updatePreview()));
+	connect(model, SIGNAL(projectionChanged()), mainWindow, SLOT(projectionChanged()));
 
-	connect(model, SIGNAL(caneChanged()),mainWindow,SLOT(updatePreview()));
-
-	// connect mainwindow buttons to model
+	connect(model, SIGNAL(caneChanged()), mainWindow->openglWidget, SLOT(caneChanged()));
+	connect(model, SIGNAL(projectionChanged()), mainWindow->openglWidget, SLOT(projectionChanged()));
+	
 	QSignalMapper* modeSignalMapper = new QSignalMapper(model);
 	modeSignalMapper->setMapping(mainWindow->pull_button, PULL_MODE);
 	modeSignalMapper->setMapping(mainWindow->bundle_button, BUNDLE_MODE);
@@ -40,6 +37,8 @@ Controller::Controller(int argc, char **argv)
 	connect(mainWindow->undo_button, SIGNAL(pressed()), model, SLOT(undo()));
 	connect(mainWindow->redo_button, SIGNAL(pressed()), model, SLOT(redo()));
 	connect(mainWindow->clear_button, SIGNAL(pressed()), model, SLOT(clearCurrentCane()));
+
+	connect(mainWindow, SIGNAL(setCaneSig(Cane*)), model, SLOT(setCane(Cane*)));
 
 	// Connect mainwindow buttons to mainwindow
 	connect(mainWindow->save_button, SIGNAL(pressed()), mainWindow, SLOT(saveCaneToLibrary()));
