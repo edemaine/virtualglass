@@ -97,7 +97,7 @@ void applyMoveTransform(Vertex* v, Cane* parentNode, int subcane)
         v->position.y += locationInParent.y;
 }
 
-void applyPartialMoveTransform(Geometry* geometry, Cane* parentNode, int subcane, float deltaX, float deltaY, float deltaZ)
+void applyPartialMoveTransform(Geometry* geometry, int subcane, float deltaX, float deltaY, float deltaZ)
 {
         // Find group for subcane
         Group* subcaneGroup;

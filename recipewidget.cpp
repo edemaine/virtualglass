@@ -67,7 +67,7 @@ Cane* RecipeWidget::getCane(QTreeWidgetItem* node)
 	else
 	{
 		QVariant data = node->data(0,Qt::UserRole);
-		if (data==NULL || data.isNull() || !data.isValid())
+		if (data.isNull() || !data.isValid())
 			return NULL;
 		return data.value<Cane*>();
 	}
@@ -244,7 +244,7 @@ void RecipeWidget :: updateRecipe()
 	updateRecipe(openglWidget->getModel()->getCane(), visibleRootItem());
 }
 
-void RecipeWidget :: updateRecipe(bool recurse)
+void RecipeWidget :: updateRecipe(bool)
 {
 	updateRecipe();
 }

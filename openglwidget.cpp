@@ -116,7 +116,7 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	makeCurrent();
 	setGLMatrices();
 
-	geometry = model->getGeometry(LOW_RESOLUTION);
+	geometry = model->getGeometry();
 
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -588,7 +588,7 @@ modifying the cane it contains.
 */
 void OpenGLWidget :: updateTriangles()
 {
-	geometry = model->getGeometry(resolution);
+	geometry = model->getGeometry();
 }
 
 /*

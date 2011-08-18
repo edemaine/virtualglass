@@ -27,7 +27,7 @@ public:
 	CaneHistory* getHistory();
 	void setActiveSubcane(int subcane);
 	int getActiveSubcane();
-	Geometry* getGeometry(int resolution);
+	Geometry* getGeometry();
 	void pullCane(float twistAmount, float stretchFactor);
 	void pullActiveCane(float twistAmount, float stretchFactor);
         void flattenCane(float rectangle_ratio, float rectangle_theta, float flatness);

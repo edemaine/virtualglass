@@ -34,7 +34,7 @@ void LibraryCaneWidget :: mouseReleaseEvent(QMouseEvent* event)
 	}
 }
 
-void LibraryCaneWidget :: enterEvent(QEvent *event)
+void LibraryCaneWidget :: enterEvent(QEvent*)
 {
 	emit mouseOver(this);
 }

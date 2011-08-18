@@ -240,7 +240,7 @@ Cane* Model :: getCane()
 	return cane;
 }
 
-Geometry* Model :: getGeometry(int resolution)
+Geometry* Model :: getGeometry()
 {
         if (!geometryFresh)
                 slowGeometryUpdate();
@@ -304,7 +304,7 @@ void Model :: moveCane(float delta_x, float delta_y, float delta_z)
 		return;
 
         cane->moveCane(activeSubcane, delta_x, delta_y, delta_z);
-        applyPartialMoveTransform(&geometry, cane, activeSubcane, delta_x, delta_y, delta_z);
+        applyPartialMoveTransform(&geometry, activeSubcane, delta_x, delta_y, delta_z);
         cacheGeometry();
 
         geometryFresh = 1;
