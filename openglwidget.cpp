@@ -721,13 +721,13 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		}
 		else
 		{
-		theta -= (relX * 500.0 * PI / 180.0);
-		if (!show2D)
-		{
-			newFee = fee - (relY * 500.0 * PI / 180.0);
-			if (newFee > 0.0f && newFee < PI)
-				fee = newFee;
-		}
+			theta -= (relX * 500.0 * PI / 180.0);
+			if (!show2D)
+			{
+				newFee = fee - (relY * 500.0 * PI / 180.0);
+				if (newFee > 0.0f && newFee < PI)
+					fee = newFee;
+			}
 		}
 		update();
 		return;
@@ -773,16 +773,16 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		break;
 	case BUNDLE_MODE:
 		/*
-	How the parameters for moveCane() are calculated is not obvious.
-	The idea is to make mouse X/Y correspond to the cane moving
-	left-right/up-down *regardless* of where the camera is. This
-	is why theta (the camera angle relative to the look-at point) is
-	also involved.
+ How the parameters for moveCane() are calculated is not obvious.
+ The idea is to make mouse X/Y correspond to the cane moving
+ left-right/up-down *regardless* of where the camera is. This
+ is why theta (the camera angle relative to the look-at point) is
+ also involved.
 
-	Essentially, the parameters convert the amount moved in X and Y
-	(variables `relX' and `relY') to the amount moved in X and Y
-	according to axes on which the cane lives.
-	*/
+ Essentially, the parameters convert the amount moved in X and Y
+ (variables `relX' and `relY') to the amount moved in X and Y
+ according to axes on which the cane lives.
+ */
 
 		if (e->buttons() & 0x00000001) // if left mouse button is down
 		{

@@ -54,8 +54,8 @@ public:
 		triangles.clear();
 		groups.clear();
 	}
-        bool valid() const
-        {
+	bool valid() const
+	{
 		for (std::vector< Triangle >::const_iterator t = triangles.begin(); t != triangles.end(); ++t) {
 			if (t->v1 >= vertices.size()) return false;
 			if (t->v2 >= vertices.size()) return false;
@@ -63,10 +63,10 @@ public:
 		}
 		for (std::vector< Group >::const_iterator g = groups.begin(); g != groups.end(); ++g) {
 			if (g->triangle_begin >= triangles.size()) return false;
-                        if (g->triangle_begin + g->triangle_size > triangles.size()) return false;
+			if (g->triangle_begin + g->triangle_size > triangles.size()) return false;
 			if (g->cane == NULL) return false;
 			if (g->vertex_begin >= vertices.size()) return false;
-                        if (g->vertex_begin + g->vertex_size > vertices.size()) return false;
+			if (g->vertex_begin + g->vertex_size > vertices.size()) return false;
 		}
 		return true;
 	}

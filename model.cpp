@@ -34,24 +34,24 @@ Model :: Model()
 
 void Model :: setOrthographicProjection()
 {
-		setProjection(ORTHOGRAPHIC_PROJECTION);
+	setProjection(ORTHOGRAPHIC_PROJECTION);
 }
 
 void Model :: setPerspectiveProjection()
 {
-		setProjection(PERSPECTIVE_PROJECTION);
+	setProjection(PERSPECTIVE_PROJECTION);
 }
 
 void Model :: setProjection(int p)
 {
-		if (p == ORTHOGRAPHIC_PROJECTION)
+	if (p == ORTHOGRAPHIC_PROJECTION)
 	{
-				projection = p;
+		projection = p;
 		emit projectionChanged();
 	}
-		else if (p == PERSPECTIVE_PROJECTION)
+	else if (p == PERSPECTIVE_PROJECTION)
 	{
-				projection = p;
+		projection = p;
 		emit projectionChanged();
 	}
 }
@@ -128,15 +128,15 @@ void Model :: setMode(int mode)
 		cane->createFlatten();
 		slowGeometryUpdate();
 		cacheGeometry();
-				activeSubcane = -1;
-				break;
+		activeSubcane = -1;
+		break;
 	case PULL_MODE:
 		history->saveState(cane);
 		cane->createPull();
 		slowGeometryUpdate();
 		cacheGeometry();
-				activeSubcane = -1;
-				break;
+		activeSubcane = -1;
+		break;
 	case BUNDLE_MODE:
 		history->saveState(cane);
 		cane->createBundle();
@@ -245,7 +245,7 @@ void Model :: slowGeometryUpdate()
 		}
 		else
 		{
-						generateMesh(cane, &geometry, ancestors, &ancestorCount, LOW_RESOLUTION, false);
+			generateMesh(cane, &geometry, ancestors, &ancestorCount, LOW_RESOLUTION, false);
 		}
 	}
 	else
@@ -282,7 +282,7 @@ void Model :: computeHighResGeometry(Geometry* geometry)
 		}
 		else
 		{
-						generateMesh(cane, geometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
+			generateMesh(cane, geometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
 		}
 	}
 }
@@ -356,7 +356,7 @@ void Model :: moveCane(float delta_x, float delta_y, float delta_z)
 		return;
 
 	cane->moveCane(activeSubcane, delta_x, delta_y, delta_z);
-		applyPartialMoveTransform(&geometry, cane, activeSubcane, delta_x, delta_y, delta_z);
+	applyPartialMoveTransform(&geometry, cane, activeSubcane, delta_x, delta_y, delta_z);
 	cacheGeometry();
 
 	geometryFresh = 1;

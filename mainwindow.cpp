@@ -151,14 +151,14 @@ void MainWindow::setupMenuBar()
 	connect(zoomOut, SIGNAL(triggered()), openglWidget, SLOT(zoomOut()));
 	viewMenu->addAction(zoomOut);
 
-		caneMenu = menuBar()->addMenu(tr("&New Cane"));
+	caneMenu = menuBar()->addMenu(tr("&New Cane"));
 
-		QAction* newCaneColor = new QAction(tr("&New Cane (Custom Color)"), this);
+	QAction* newCaneColor = new QAction(tr("&New Cane (Custom Color)"), this);
 	zoomOut->setStatusTip(tr("Create a new cane of desired color."));
 	connect(newCaneColor, SIGNAL(triggered()), this, SLOT(newColorPickerCaneDialog()));
 	caneMenu->addAction(newCaneColor);
 
-		QAction* newBrandColor = new QAction(tr("&New Cane (Brand Color)"), this);
+	QAction* newBrandColor = new QAction(tr("&New Cane (Brand Color)"), this);
 	zoomOut->setStatusTip(tr("Create a new cane using standard colors."));
 	connect(newBrandColor, SIGNAL(triggered()), this, SLOT(newBrandCaneDialog()));
 	caneMenu->addAction(newBrandColor);
@@ -288,77 +288,77 @@ void MainWindow::setupLibraryArea()
 void MainWindow::seedLibrary()
 {
 	// Now seed the library with some basic canes
-		Cane* circle = new Cane(BASE_CIRCLE_CANETYPE);
-		Cane* square = new Cane(BASE_SQUARE_CANETYPE);
-		Cane* hexagon = new Cane(BASE_POLYGONAL_CANETYPE);
+	Cane* circle = new Cane(BASE_CIRCLE_CANETYPE);
+	Cane* square = new Cane(BASE_SQUARE_CANETYPE);
+	Cane* hexagon = new Cane(BASE_POLYGONAL_CANETYPE);
 	Cane* stretch = new Cane(PULL_CANETYPE);
 
-		hexagon->vertices.clear();
-		Point p;
-		p.x = cos(0);
-		p.y = sin(0);
-		hexagon->vertices.push_back(p);
-		p.x = cos(PI/3);
-		p.y = sin(PI/3);
-		hexagon->vertices.push_back(p);
-		p.x = cos(2*PI/3);
-		p.y = sin(2*PI/3);
-		hexagon->vertices.push_back(p);
-		p.x = cos(PI);
-		p.y = sin(PI);
-		hexagon->vertices.push_back(p);
-		p.x = cos(4*PI/3);
-		p.y = sin(4*PI/3);
-		hexagon->vertices.push_back(p);
-		p.x = cos(5*PI/3);
-		p.y = sin(5*PI/3);
-		hexagon->vertices.push_back(p);
+	hexagon->vertices.clear();
+	Point p;
+	p.x = cos(0);
+	p.y = sin(0);
+	hexagon->vertices.push_back(p);
+	p.x = cos(PI/3);
+	p.y = sin(PI/3);
+	hexagon->vertices.push_back(p);
+	p.x = cos(2*PI/3);
+	p.y = sin(2*PI/3);
+	hexagon->vertices.push_back(p);
+	p.x = cos(PI);
+	p.y = sin(PI);
+	hexagon->vertices.push_back(p);
+	p.x = cos(4*PI/3);
+	p.y = sin(4*PI/3);
+	hexagon->vertices.push_back(p);
+	p.x = cos(5*PI/3);
+	p.y = sin(5*PI/3);
+	hexagon->vertices.push_back(p);
 
 	stretch->subcaneCount = 1;
 	stretch->amts[0] = 0.0;
 	stretch->amts[1] = 100.0; // amts[0] = twist, amts[1] = stretch
 
-		circle->color.r = square->color.r = hexagon->color.r = 1.0;
-		circle->color.g = square->color.g = hexagon->color.g = 0.5;
-		circle->color.b = square->color.b = hexagon->color.b = 0.5;
-		circle->color.a = square->color.a = hexagon->color.a = 0.8;
-		stretch->subcanes[0] = circle;
-		emit setCaneSig(stretch);
+	circle->color.r = square->color.r = hexagon->color.r = 1.0;
+	circle->color.g = square->color.g = hexagon->color.g = 0.5;
+	circle->color.b = square->color.b = hexagon->color.b = 0.5;
+	circle->color.a = square->color.a = hexagon->color.a = 0.8;
+	stretch->subcanes[0] = circle;
+	emit setCaneSig(stretch);
 	saveCaneToLibrary();
-		stretch->subcanes[0] = square;
-		emit setCaneSig(stretch);
-		saveCaneToLibrary();
-		stretch->subcanes[0] = hexagon;
+	stretch->subcanes[0] = square;
+	emit setCaneSig(stretch);
+	saveCaneToLibrary();
+	stretch->subcanes[0] = hexagon;
 	emit setCaneSig(stretch);
 	saveCaneToLibrary();
 
-		circle->color.r = square->color.r = hexagon->color.r = 0.5;
-		circle->color.g = square->color.g = hexagon->color.g = 1.0;
-		circle->color.b = square->color.b = hexagon->color.b = 0.5;
-		circle->color.a = square->color.a = hexagon->color.a = 0.8;
-		stretch->subcanes[0] = circle;
-		emit setCaneSig(stretch);
-		saveCaneToLibrary();
-		stretch->subcanes[0] = square;
-		emit setCaneSig(stretch);
-		saveCaneToLibrary();
-		stretch->subcanes[0] = hexagon;
-		emit setCaneSig(stretch);
-		saveCaneToLibrary();
+	circle->color.r = square->color.r = hexagon->color.r = 0.5;
+	circle->color.g = square->color.g = hexagon->color.g = 1.0;
+	circle->color.b = square->color.b = hexagon->color.b = 0.5;
+	circle->color.a = square->color.a = hexagon->color.a = 0.8;
+	stretch->subcanes[0] = circle;
+	emit setCaneSig(stretch);
+	saveCaneToLibrary();
+	stretch->subcanes[0] = square;
+	emit setCaneSig(stretch);
+	saveCaneToLibrary();
+	stretch->subcanes[0] = hexagon;
+	emit setCaneSig(stretch);
+	saveCaneToLibrary();
 
-		circle->color.r = square->color.r = hexagon->color.r = 0.5;
-		circle->color.g = square->color.g = hexagon->color.g = 0.5;
-		circle->color.b = square->color.b = hexagon->color.b = 1.0;
-		circle->color.a = square->color.a = hexagon->color.a = 0.8;
-		stretch->subcanes[0] = circle;
-		emit setCaneSig(stretch);
-		saveCaneToLibrary();
-		stretch->subcanes[0] = square;
-		emit setCaneSig(stretch);
-		saveCaneToLibrary();
-		stretch->subcanes[0] = hexagon;
-		emit setCaneSig(stretch);
-		saveCaneToLibrary();
+	circle->color.r = square->color.r = hexagon->color.r = 0.5;
+	circle->color.g = square->color.g = hexagon->color.g = 0.5;
+	circle->color.b = square->color.b = hexagon->color.b = 1.0;
+	circle->color.a = square->color.a = hexagon->color.a = 0.8;
+	stretch->subcanes[0] = circle;
+	emit setCaneSig(stretch);
+	saveCaneToLibrary();
+	stretch->subcanes[0] = square;
+	emit setCaneSig(stretch);
+	saveCaneToLibrary();
+	stretch->subcanes[0] = hexagon;
+	emit setCaneSig(stretch);
+	saveCaneToLibrary();
 
 	emit setCaneSig(NULL);
 	displayTextMessage("Default library loaded");
@@ -548,23 +548,23 @@ void MainWindow::setupNewColorPickerCaneDialog()
 
 	caneTypeBox = new QComboBox(caneForm->widget());
 	caneTypeBox->addItem("Circle Base", QVariant(BASE_CIRCLE_CANETYPE));
-		caneTypeBox->addItem("Square Base", QVariant(BASE_SQUARE_CANETYPE));
-		caneTypeBox->addItem("Polygonal Base", QVariant(BASE_POLYGONAL_CANETYPE));
+	caneTypeBox->addItem("Square Base", QVariant(BASE_SQUARE_CANETYPE));
+	caneTypeBox->addItem("Polygonal Base", QVariant(BASE_POLYGONAL_CANETYPE));
 
-		caneForm->addRow("Base Type", caneTypeBox);
+	caneForm->addRow("Base Type", caneTypeBox);
 
-		verticesBox = new QSpinBox(caneForm->widget());
-		caneForm->addRow("Number of Vertices", verticesBox);
+	verticesBox = new QSpinBox(caneForm->widget());
+	caneForm->addRow("Number of Vertices", verticesBox);
 
-		caneRadiusBox = new QDoubleSpinBox(caneForm->widget());
-		caneRadiusBox->setSingleStep(0.1);
+	caneRadiusBox = new QDoubleSpinBox(caneForm->widget());
+	caneRadiusBox->setSingleStep(0.1);
 
-		caneForm->addRow("Cane Radius", caneRadiusBox);
+	caneForm->addRow("Cane Radius", caneRadiusBox);
 
 	QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-		connect(buttons,SIGNAL(accepted()), caneDialog, SLOT(accept()));
-		connect(buttons,SIGNAL(accepted()), this, SLOT(colorPickerSelected()));
-		connect(buttons,SIGNAL(rejected()), caneDialog, SLOT(reject()));
+	connect(buttons,SIGNAL(accepted()), caneDialog, SLOT(accept()));
+	connect(buttons,SIGNAL(accepted()), this, SLOT(colorPickerSelected()));
+	connect(buttons,SIGNAL(rejected()), caneDialog, SLOT(reject()));
 
 	caneForm->addRow(buttons);
 
@@ -590,8 +590,8 @@ void MainWindow::setupNewBrandCaneDialog()
 	dummyList = new QStringList("Please select a cane type.");
 	dummyModel = new QStringListModel();
 	dummyModel->setStringList(*dummyList);
-		caneColorListBox = new QListView();//QTreeView();
-		caneColorListBox->setModel(dummyModel);
+	caneColorListBox = new QListView();//QTreeView();
+	caneColorListBox->setModel(dummyModel);
 	dummyInUse = true;
 	selectedBrand = -1;
 	selectedColor = -1;
@@ -652,32 +652,32 @@ void MainWindow::updateSublist(QModelIndex i)
 	}
 	else
 	{
-				if (!dummyInUse)
-				{
-						QItemSelectionModel *m = caneColorListBox->selectionModel();
-						caneColorListBox->setModel(new QStandardItemModel(caneNameListList->at(index).size(),1));
-						for (int i = 0; i < caneNameListList->at(index).size(); i++)
-						{
-								caneColorListBox->model()->setData(caneColorListBox->model()->index(i,0),caneNameListList->at(index).at(i),Qt::DisplayRole);
-								QColor c = caneColorListList->at(index).at(i);
-								c.setAlpha(255);
-								caneColorListBox->model()->setData(caneColorListBox->model()->index(i,0),c,Qt::DecorationRole);
-						}
+		if (!dummyInUse)
+		{
+			QItemSelectionModel *m = caneColorListBox->selectionModel();
+			caneColorListBox->setModel(new QStandardItemModel(caneNameListList->at(index).size(),1));
+			for (int i = 0; i < caneNameListList->at(index).size(); i++)
+			{
+				caneColorListBox->model()->setData(caneColorListBox->model()->index(i,0),caneNameListList->at(index).at(i),Qt::DisplayRole);
+				QColor c = caneColorListList->at(index).at(i);
+				c.setAlpha(255);
+				caneColorListBox->model()->setData(caneColorListBox->model()->index(i,0),c,Qt::DecorationRole);
+			}
 
-						delete m;
-						selectedBrand = index;
-						selectedColor = -1;
-				}
-				else
-				{
-						caneColorListBox->setModel(new QStandardItemModel(caneNameListList->at(index).size(),1));
-						for (int i = 0; i < caneNameListList->at(index).size(); i++)
-						{
-								caneColorListBox->model()->setData(caneColorListBox->model()->index(i,0),caneNameListList->at(index).at(i),Qt::DisplayRole);
-								QColor c = caneColorListList->at(index).at(i);
-								c.setAlpha(255);
-								caneColorListBox->model()->setData(caneColorListBox->model()->index(i,0),c,Qt::DecorationRole);
-						}
+			delete m;
+			selectedBrand = index;
+			selectedColor = -1;
+		}
+		else
+		{
+			caneColorListBox->setModel(new QStandardItemModel(caneNameListList->at(index).size(),1));
+			for (int i = 0; i < caneNameListList->at(index).size(); i++)
+			{
+				caneColorListBox->model()->setData(caneColorListBox->model()->index(i,0),caneNameListList->at(index).at(i),Qt::DisplayRole);
+				QColor c = caneColorListList->at(index).at(i);
+				c.setAlpha(255);
+				caneColorListBox->model()->setData(caneColorListBox->model()->index(i,0),c,Qt::DecorationRole);
+			}
 		}
 		dummyInUse = false;
 		selectedBrand = index;
@@ -771,7 +771,7 @@ void MainWindow::loadOfficialCanes()
 			if (color.length() > 3)
 			{
 				caneColorList->append(*(new QColor(color[0].toInt(),color[1].toInt(),
-																   color[2].toInt(),color[3].toInt())));
+												   color[2].toInt(),color[3].toInt())));
 			}
 			else
 			{
@@ -784,7 +784,7 @@ void MainWindow::loadOfficialCanes()
 		{
 			if (onColor)
 			{
-								caneTypeList->append("Color mismatch C");
+				caneTypeList->append("Color mismatch C");
 				return; //throw error
 			}
 			currentCane++;
@@ -906,7 +906,7 @@ void MainWindow::colorPickerSelected()
 	c->color.b = color.blueF();
 	c->color.a = color.alphaF();
 
-		model->addCane(stch);
+	model->addCane(stch);
 }
 
 void MainWindow::setupWorkArea()
@@ -940,8 +940,8 @@ void MainWindow::setupWorkArea()
 	operButton_layout->addWidget(flatten_button);
 	operButton_layout->addWidget(toggle2D_button);
 	operButton_layout->addWidget(snap_button);
-		operButton_layout->addWidget(redo_button);
-		operButton_layout->addWidget(undo_button);
+	operButton_layout->addWidget(redo_button);
+	operButton_layout->addWidget(undo_button);
 	operButton_layout->addWidget(save_button);
 	operButton_layout->addWidget(clear_button);
 	operButton_layout->addWidget(previewLabel,1, Qt::AlignHCenter);

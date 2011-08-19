@@ -41,8 +41,8 @@ public:
 	QString typeAmt(int type, int index);
 
 	int type;
-        std::vector<Point> vertices;
-        float amts[MAX_AMT_TYPES];
+	std::vector<Point> vertices;
+	float amts[MAX_AMT_TYPES];
 	int subcaneCount;
 	Point subcaneLocations[MAX_SUBCANE_COUNT]; // z is center displacement
 	Cane* subcanes[MAX_SUBCANE_COUNT];
@@ -53,7 +53,7 @@ public slots:
 	void changeLibraryIndex(int index);
 
 private:
-        Cane* getTopBundleNode();
+	Cane* getTopBundleNode();
 
 };
 

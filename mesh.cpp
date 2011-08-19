@@ -18,7 +18,7 @@ void applyFlattenTransform(Geometry* geometry, Cane* transformNode)
 	{
 		applyFlattenTransform(&(geometry->vertices[v]), transformNode);
 	}
-        geometry->compute_normals_from_triangles();
+	geometry->compute_normals_from_triangles();
 }
 
 void applyFlattenTransform(Vertex* v, Cane* transformNode)
@@ -39,9 +39,9 @@ void applyFlattenTransform(Vertex* v, Cane* transformNode)
 	float arc_length = radius * theta;
 
 	/*
-        The vertex lies on a circle that is mapped to a rectangle
-        with equal perimeter. The rectangleRatio is width/height.
-        */
+  The vertex lies on a circle that is mapped to a rectangle
+  with equal perimeter. The rectangleRatio is width/height.
+  */
 	float rectY = PI * radius / (1.0 + rectangleRatio);
 	float rectX = rectY * rectangleRatio;
 
@@ -103,31 +103,31 @@ void applyPartialMoveTransform(Geometry* geometry, Cane* parentNode, int subcane
 	// Find group for subcane
 	Group* subcaneGroup;
 	for (uint32_t g = 0; g < geometry->groups.size(); ++g)
-                if (geometry->groups[g].tag == (uint32_t) subcane)
+		if (geometry->groups[g].tag == (uint32_t) subcane)
 		{
 			subcaneGroup = &(geometry->groups[g]);
 
 			// Apply transformation to only these vertices
 			for (uint32_t v = subcaneGroup->vertex_begin; v < subcaneGroup->vertex_begin + subcaneGroup->vertex_size; ++v)
 			{
-                                // Z location
-                                Point subcaneCenter;
-                                subcaneCenter.x = parentNode->subcaneLocations[subcane].x - deltaX;
-                                subcaneCenter.y = parentNode->subcaneLocations[subcane].y - deltaY;
-                                float preTheta = atan2(geometry->vertices[v].position.y - subcaneCenter.y,
-                                        geometry->vertices[v].position.x - subcaneCenter.x);
+				// Z location
+				Point subcaneCenter;
+				subcaneCenter.x = parentNode->subcaneLocations[subcane].x - deltaX;
+				subcaneCenter.y = parentNode->subcaneLocations[subcane].y - deltaY;
+				float preTheta = atan2(geometry->vertices[v].position.y - subcaneCenter.y,
+									   geometry->vertices[v].position.x - subcaneCenter.x);
 				float postTheta = preTheta + deltaZ;
-                                float r = sqrt((geometry->vertices[v].position.x - subcaneCenter.x) * (geometry->vertices[v].position.x - subcaneCenter.x)
-                                        + (geometry->vertices[v].position.y - subcaneCenter.y) * (geometry->vertices[v].position.y - subcaneCenter.y));
-                                geometry->vertices[v].position.x = r * cos(postTheta) + subcaneCenter.x;
-                                geometry->vertices[v].position.y = r * sin(postTheta) + subcaneCenter.y;
+				float r = sqrt((geometry->vertices[v].position.x - subcaneCenter.x) * (geometry->vertices[v].position.x - subcaneCenter.x)
+							   + (geometry->vertices[v].position.y - subcaneCenter.y) * (geometry->vertices[v].position.y - subcaneCenter.y));
+				geometry->vertices[v].position.x = r * cos(postTheta) + subcaneCenter.x;
+				geometry->vertices[v].position.y = r * sin(postTheta) + subcaneCenter.y;
 
 				// XY location
 				geometry->vertices[v].position.x += deltaX;
 				geometry->vertices[v].position.y += deltaY;
 			}
 		}
-        geometry->compute_normals_from_triangles();
+	geometry->compute_normals_from_triangles();
 }
 
 void applyPullTransform(Geometry* geometry, Cane* transformNode)
@@ -136,7 +136,7 @@ void applyPullTransform(Geometry* geometry, Cane* transformNode)
 	{
 		applyPullTransform(&(geometry->vertices[v]), transformNode);
 	}
-        geometry->compute_normals_from_triangles();
+	geometry->compute_normals_from_triangles();
 }
 
 void applyPullTransform(Vertex* v, Cane* transformNode)
@@ -167,24 +167,24 @@ by its ancestors in the cane DAG.
 Vertex applyTransforms(Vertex v, Cane** ancestors, int ancestorCount, bool fullTransforms)
 {
 	/*
-        The transformations are applied back to front to match how they
-        are loaded into the array. Because the transform array is created by
-        a depth-first traversal of the cane DAG, transforms lower in the DAG
-        (i.e. closer to the leaves) are added later. However, they
-        represent the first operations done on the cane, so need to be applied
-        first.
-        */
-        for (int i = ancestorCount - 1; i >= 0; --i)
+  The transformations are applied back to front to match how they
+  are loaded into the array. Because the transform array is created by
+  a depth-first traversal of the cane DAG, transforms lower in the DAG
+  (i.e. closer to the leaves) are added later. However, they
+  represent the first operations done on the cane, so need to be applied
+  first.
+  */
+	for (int i = ancestorCount - 1; i >= 0; --i)
 	{
 		/*
-	Each cane node has a type and an amount.
-	Depending upon the type, the amount fields
-	take on different meanings. For instance, a twist transform
-	uses amts[0] to mean the magnitude of the twist.
-	just a single real-valued parameter).
-	The BUNDLE_CANETYPE is an exception, in that it simply uses
-	the location of the subcane to determine how to move the points.
-	*/
+ Each cane node has a type and an amount.
+ Depending upon the type, the amount fields
+ take on different meanings. For instance, a twist transform
+ uses amts[0] to mean the magnitude of the twist.
+ just a single real-valued parameter).
+ The BUNDLE_CANETYPE is an exception, in that it simply uses
+ the location of the subcane to determine how to move the points.
+ */
 		switch (ancestors[i]->type)
 		{
 		case BUNDLE_CANETYPE:
@@ -244,7 +244,7 @@ float computeTotalStretch(Cane** ancestors, int ancestorCount)
 
 
 void meshSquareBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCount,
-        int resolution, Cane *group_cane, uint32_t group_tag, bool fullTransforms)
+						int resolution, Cane *group_cane, uint32_t group_tag, bool fullTransforms)
 {
 	unsigned int angularResolution, axialResolution;
 
@@ -262,10 +262,10 @@ void meshSquareBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCount,
 		exit(1);
 	}
 
-        float total_stretch = computeTotalStretch(ancestors, ancestorCount);
+	float total_stretch = computeTotalStretch(ancestors, ancestorCount);
 	float stretchResParam = 1.0 / (1.0 + total_stretch / 20.0);
 	// hack adaptive meshing
-	angularResolution = (int) (angularResolution * stretchResParam + 8 * (1 - stretchResParam)); 
+	angularResolution = (int) (angularResolution * stretchResParam + 8 * (1 - stretchResParam));
 
 	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
@@ -273,10 +273,10 @@ void meshSquareBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCount,
 	uint32_t first_triangle = geometry->triangles.size();
 
 	/*
-        Draw the walls of the cylinder. Note that the z location is
-        adjusted by the total stretch experienced by the cane so that
-        the z values range between 0 and 1.
-        */
+  Draw the walls of the cylinder. Note that the z location is
+  adjusted by the total stretch experienced by the cane so that
+  the z values range between 0 and 1.
+  */
 	//Generate verts:
 	for (unsigned int i = 0; i < axialResolution; ++i)
 	{
@@ -288,22 +288,22 @@ void meshSquareBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCount,
 			if (j < angularResolution / 4)
 			{
 				p.x = 0.5;
-				p.y = -0.5 + j / (angularResolution / 4.0);	
+				p.y = -0.5 + j / (angularResolution / 4.0);
 			}
 			else if (j < angularResolution / 2)
 			{
 				p.x = 0.5 - (j - angularResolution / 4) / (angularResolution / 4.0);
-				p.y = 0.5;	
+				p.y = 0.5;
 			}
 			else if (j < 3 * angularResolution / 4)
 			{
 				p.x = -0.5;
-				p.y = 0.5 - (j - angularResolution / 2) / (angularResolution / 4.0);	
+				p.y = 0.5 - (j - angularResolution / 2) / (angularResolution / 4.0);
 			}
 			else
 			{
 				p.x = -0.5 + (j - 3 * angularResolution / 4) / (angularResolution / 4.0);
-				p.y = -0.5;	
+				p.y = -0.5;
 			}
 
 			p.z = ((float) i) / ((axialResolution-1) * total_stretch);
@@ -332,10 +332,10 @@ void meshSquareBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCount,
 
 
 	/*
-        Draw the equare bottom, then top.
-        The mesh uses a set of n-2 triangles with a common vertex
-        to draw a regular n-gon.
-        */
+  Draw the equare bottom, then top.
+  The mesh uses a set of n-2 triangles with a common vertex
+  to draw a regular n-gon.
+  */
 	for (int side = 0; side <= 1; ++side) {
 		float z = (side?1.0:0.0);
 		float nz = (side?1.0:-1.0);
@@ -347,22 +347,22 @@ void meshSquareBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCount,
 			if (j < angularResolution / 4)
 			{
 				p.x = 0.5;
-				p.y = -0.5 + j / (angularResolution / 4.0);	
+				p.y = -0.5 + j / (angularResolution / 4.0);
 			}
 			else if (j < angularResolution / 2)
 			{
 				p.x = 0.5 - (j - angularResolution / 4) / (angularResolution / 4.0);
-				p.y = 0.5;	
+				p.y = 0.5;
 			}
 			else if (j < 3 * angularResolution / 4)
 			{
 				p.x = -0.5;
-				p.y = 0.5 - (j - angularResolution / 2) / (angularResolution / 4.0);	
+				p.y = 0.5 - (j - angularResolution / 2) / (angularResolution / 4.0);
 			}
 			else
 			{
 				p.x = -0.5 + (j - 3 * angularResolution / 4) / (angularResolution / 4.0);
-				p.y = -0.5;	
+				p.y = -0.5;
 			}
 
 			p.z = z / total_stretch;
@@ -389,117 +389,117 @@ void meshSquareBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCount,
 
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
-                geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, 
-			ancestorCount, fullTransforms);
+		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors,
+												ancestorCount, fullTransforms);
 	}
 	geometry->compute_normals_from_triangles();
-	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
+	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle,
+									 first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
 
 }
 
 
 void meshPolygonalBaseCane(Geometry* geometry, Cane** ancestors, int ancestorCount,
-        int resolution, Cane* group_cane, uint32_t group_tag, bool fullTransforms)
+						   int resolution, Cane* group_cane, uint32_t group_tag, bool fullTransforms)
 {
-        unsigned int axialResolution;
-        float total_stretch = computeTotalStretch(ancestors, ancestorCount);
+	unsigned int axialResolution;
+	float total_stretch = computeTotalStretch(ancestors, ancestorCount);
 
-        switch (resolution)
-        {
-                case LOW_RESOLUTION:
-                        axialResolution = LOW_AXIAL_RESOLUTION;
-                        break;
-                case HIGH_RESOLUTION:
-                        axialResolution = HIGH_AXIAL_RESOLUTION;
-                        break;
-        }
+	switch (resolution)
+	{
+	case LOW_RESOLUTION:
+		axialResolution = LOW_AXIAL_RESOLUTION;
+		break;
+	case HIGH_RESOLUTION:
+		axialResolution = HIGH_AXIAL_RESOLUTION;
+		break;
+	}
 
-        //need to know first vertex position so we can transform 'em all later
-        uint32_t first_vert = geometry->vertices.size();
-        //need to remember the first triangle so we can tag it later
-        uint32_t first_triangle = geometry->triangles.size();
+	//need to know first vertex position so we can transform 'em all later
+	uint32_t first_vert = geometry->vertices.size();
+	//need to remember the first triangle so we can tag it later
+	uint32_t first_triangle = geometry->triangles.size();
 
-        /*
-        Draw the walls of the polygon. Note that the z location is
-        adjusted by the total stretch experienced by the cane so that
-        the z values range between 0 and 1.
-        */
+	/*
+  Draw the walls of the polygon. Note that the z location is
+  adjusted by the total stretch experienced by the cane so that
+  the z values range between 0 and 1.
+  */
 
-        //Generate verts:
-        for (unsigned int i = 0; i < axialResolution; ++i)
-        {
-                for (unsigned int j = 0; j < group_cane->vertices.size(); ++j)
-                {
-                        Point p;
-                        p = group_cane->vertices[j];
-                        p.z = ((float) i) / ((axialResolution-1) * total_stretch);
-                        Point n;
-                        n.x = p.x;
-                        n.y = p.y;
-                        n.z = 0.0f;
-                        geometry->vertices.push_back(Vertex(p,n));
-                }
-        }
-        //Generate triangles linking them:
-        for (unsigned int i = 0; i + 1 < axialResolution; ++i)
-        {
-                for (unsigned int j = 0; j < group_cane->vertices.size(); ++j)
-                {
-                        uint32_t p1 = first_vert + i * group_cane->vertices.size() + j;
-                        uint32_t p2 = first_vert + (i+1) * group_cane->vertices.size() + j;
-                        uint32_t p3 = first_vert + i * group_cane->vertices.size() + (j+1) % group_cane->vertices.size();
-                        uint32_t p4 = first_vert + (i+1) * group_cane->vertices.size() + (j+1) % group_cane->vertices.size();
-                        // Four points that define a (non-flat) quad are used
-                        // to create two triangles.
-                        geometry->triangles.push_back(Triangle(p2, p1, p4));
-                        geometry->triangles.push_back(Triangle(p1, p3, p4));
-                }
-        }
-        assert(geometry->valid());
+	//Generate verts:
+	for (unsigned int i = 0; i < axialResolution; ++i)
+	{
+		for (unsigned int j = 0; j < group_cane->vertices.size(); ++j)
+		{
+			Point p;
+			p = group_cane->vertices[j];
+			p.z = ((float) i) / ((axialResolution-1) * total_stretch);
+			Point n;
+			n.x = p.x;
+			n.y = p.y;
+			n.z = 0.0f;
+			geometry->vertices.push_back(Vertex(p,n));
+		}
+	}
+	//Generate triangles linking them:
+	for (unsigned int i = 0; i + 1 < axialResolution; ++i)
+	{
+		for (unsigned int j = 0; j < group_cane->vertices.size(); ++j)
+		{
+			uint32_t p1 = first_vert + i * group_cane->vertices.size() + j;
+			uint32_t p2 = first_vert + (i+1) * group_cane->vertices.size() + j;
+			uint32_t p3 = first_vert + i * group_cane->vertices.size() + (j+1) % group_cane->vertices.size();
+			uint32_t p4 = first_vert + (i+1) * group_cane->vertices.size() + (j+1) % group_cane->vertices.size();
+			// Four points that define a (non-flat) quad are used
+			// to create two triangles.
+			geometry->triangles.push_back(Triangle(p2, p1, p4));
+			geometry->triangles.push_back(Triangle(p1, p3, p4));
+		}
+	}
+	assert(geometry->valid());
 
-        /*
-        Draw the polygon bottom, then top.
-        The mesh uses a set of n-2 triangles with a common vertex
-        to draw a regular n-gon.
-        */
-        for (int side = 0; side <= 1; ++side) {
-                float z = (side?1.0:0.0);
-                float nz = (side?1.0:-1.0);
-                uint32_t base = geometry->vertices.size();
-                for (unsigned int j = 0; j < group_cane->vertices.size(); ++j)
-                {
-                        Point p;
-                        p = group_cane->vertices[j];
-                        p.z = z / total_stretch;
-                        Point n;
-                        n.x = 0.0; n.y = 0.0; n.z = nz;
-                        geometry->vertices.push_back(Vertex(p, n));
-                }
-                if (side)
-                {
-                        for (unsigned int j = 1; j + 1 < group_cane->vertices.size(); ++j)
-                        {
-                                geometry->triangles.push_back(Triangle(base, base + j, base + j + 1));
-                        }
-                }
-                else
-                {
-                        for (unsigned int j = 1; j + 1 < group_cane->vertices.size(); ++j)
-                        {
-                                geometry->triangles.push_back(Triangle(base, base + j + 1, base + j));
-                        }
-                }
-        }
-        assert(geometry->valid());
+	/*
+  Draw the polygon bottom, then top.
+  The mesh uses a set of n-2 triangles with a common vertex
+  to draw a regular n-gon.
+  */
+	for (int side = 0; side <= 1; ++side) {
+		float z = (side?1.0:0.0);
+		float nz = (side?1.0:-1.0);
+		uint32_t base = geometry->vertices.size();
+		for (unsigned int j = 0; j < group_cane->vertices.size(); ++j)
+		{
+			Point p;
+			p = group_cane->vertices[j];
+			p.z = z / total_stretch;
+			Point n;
+			n.x = 0.0; n.y = 0.0; n.z = nz;
+			geometry->vertices.push_back(Vertex(p, n));
+		}
+		if (side)
+		{
+			for (unsigned int j = 1; j + 1 < group_cane->vertices.size(); ++j)
+			{
+				geometry->triangles.push_back(Triangle(base, base + j, base + j + 1));
+			}
+		}
+		else
+		{
+			for (unsigned int j = 1; j + 1 < group_cane->vertices.size(); ++j)
+			{
+				geometry->triangles.push_back(Triangle(base, base + j + 1, base + j));
+			}
+		}
+	}
+	assert(geometry->valid());
 
-        for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
-        {
-                geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount, fullTransforms);
-        }
-        geometry->compute_normals_from_triangles();
-        geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle,
-                first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
+	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
+	{
+		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount, fullTransforms);
+	}
+	geometry->compute_normals_from_triangles();
+	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle,
+									 first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
 }
 
 /*
@@ -539,10 +539,10 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCoun
 	uint32_t first_triangle = geometry->triangles.size();
 
 	/*
-        Draw the walls of the cylinder. Note that the z location is
-        adjusted by the total stretch experienced by the cane so that
-        the z values range between 0 and 1.
-        */
+  Draw the walls of the cylinder. Note that the z location is
+  adjusted by the total stretch experienced by the cane so that
+  the z values range between 0 and 1.
+  */
 	//Generate verts:
 	for (unsigned int i = 0; i < axialResolution; ++i)
 	{
@@ -578,10 +578,10 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCoun
 	assert(geometry->valid());
 
 	/*
-        Draw the cylinder bottom, then top.
-        The mesh uses a set of n-2 triangles with a common vertex
-        to draw a regular n-gon.
-        */
+  Draw the cylinder bottom, then top.
+  The mesh uses a set of n-2 triangles with a common vertex
+  to draw a regular n-gon.
+  */
 	for (int side = 0; side <= 1; ++side) {
 		float z = (side?1.0:0.0);
 		float nz = (side?1.0:-1.0);
@@ -618,8 +618,8 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCoun
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount, fullTransforms);
 	}
 	geometry->compute_normals_from_triangles();
-	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
+	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle,
+									 first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
 }
 
 
@@ -648,10 +648,10 @@ void mesh2DCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCo
 	uint32_t first_triangle = geometry->triangles.size();
 
 	/*
-        Draw the cylinder top only.
-        The mesh uses a set of n-2 triangles with a common vertex
-        to draw a regular n-gon.
-        */
+  Draw the cylinder top only.
+  The mesh uses a set of n-2 triangles with a common vertex
+  to draw a regular n-gon.
+  */
 	uint32_t base = geometry->vertices.size();
 	for (unsigned int j = 0; j < angularResolution; ++j)
 	{
@@ -675,7 +675,7 @@ void mesh2DCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCo
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount, fullTransforms);
 	}
 	geometry->groups.push_back(Group(first_triangle,
-                geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
+									 geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
 
 }
 
@@ -688,61 +688,61 @@ leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
 void generateMesh(Cane* c, Geometry *geometry,  Cane** ancestors, int* ancestorCount,
-                                  int resolution, bool fullTransforms, int groupIndex)
+				  int resolution, bool fullTransforms, int groupIndex)
 {
-        int i, passGroupIndex;
+	int i, passGroupIndex;
 
 	if (c == NULL)
 		return;
 
 	// Make recursive calls depending on the type of the current node
 	ancestors[*ancestorCount] = c;
-        *ancestorCount += 1;
+	*ancestorCount += 1;
 
-        if (c->type == BASE_CIRCLE_CANETYPE || c->type == BASE_SQUARE_CANETYPE || c->type == BASE_POLYGONAL_CANETYPE)
-        {
-                if (groupIndex == -1)
-                        passGroupIndex = 0;
-                else
-                        passGroupIndex = groupIndex;
+	if (c->type == BASE_CIRCLE_CANETYPE || c->type == BASE_SQUARE_CANETYPE || c->type == BASE_POLYGONAL_CANETYPE)
+	{
+		if (groupIndex == -1)
+			passGroupIndex = 0;
+		else
+			passGroupIndex = groupIndex;
 
-                switch (c->type)
-                {
-                        case BASE_CIRCLE_CANETYPE:
-                                meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-                                        resolution, c, passGroupIndex, fullTransforms);
-                                break;
-                        case BASE_SQUARE_CANETYPE:
-                                meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-                                        resolution, c, passGroupIndex, fullTransforms);
-                                break;
-                        case BASE_POLYGONAL_CANETYPE:
-                                meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-                                        resolution, c, passGroupIndex, fullTransforms);
-                                break;
-                }
+		switch (c->type)
+		{
+		case BASE_CIRCLE_CANETYPE:
+			meshCircularBaseCane(geometry, ancestors, *ancestorCount,
+								 resolution, c, passGroupIndex, fullTransforms);
+			break;
+		case BASE_SQUARE_CANETYPE:
+			meshCircularBaseCane(geometry, ancestors, *ancestorCount,
+								 resolution, c, passGroupIndex, fullTransforms);
+			break;
+		case BASE_POLYGONAL_CANETYPE:
+			meshCircularBaseCane(geometry, ancestors, *ancestorCount,
+								 resolution, c, passGroupIndex, fullTransforms);
+			break;
+		}
 	}
-        else if (c->type == BUNDLE_CANETYPE)
+	else if (c->type == BUNDLE_CANETYPE)
 	{
 
 		for (i = 0; i < c->subcaneCount; ++i)
 		{
 			if (groupIndex == -1)
-                                passGroupIndex = i;
+				passGroupIndex = i;
 			else
 				passGroupIndex = groupIndex;
-                        generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
-                                                 resolution, fullTransforms, passGroupIndex);
+			generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
+						 resolution, fullTransforms, passGroupIndex);
 		}
-        }
-        else
-        {
-                for (i = 0; i < c->subcaneCount; ++i)
-                {
-                        generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
-                                                 resolution, fullTransforms, groupIndex);
-                }
-        }
+	}
+	else
+	{
+		for (i = 0; i < c->subcaneCount; ++i)
+		{
+			generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
+						 resolution, fullTransforms, groupIndex);
+		}
+	}
 	*ancestorCount -= 1;
 }
 
