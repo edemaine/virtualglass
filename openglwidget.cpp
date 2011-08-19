@@ -132,8 +132,6 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].position));
 	glEnableClientState(GL_VERTEX_ARRAY);
 	for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
-                if (g->tag == 0) // skip the casing group
-                        continue;
                 glColor4ubv(reinterpret_cast< const GLubyte * >(&(g->tag)));
 		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 					   GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
@@ -148,7 +146,7 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 
 	updateTriangles();
 
-        return ((int) c[0]) - 1;
+        return ((int) c[0]);
 }
 
 Point OpenGLWidget :: getClickedPlanePoint(int mouseLocX, int mouseLocY)
@@ -300,7 +298,7 @@ void OpenGLWidget :: paintGL()
 		for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
 			assert(g->cane);
 			Color c = g->cane->color;
-                        if (model && (int)g->tag == (model->getActiveSubcane() + 1)) {
+                        if (model && (int)g->tag == model->getActiveSubcane()) {
 				c.xyz += make_vector(0.1f, 0.1f, 0.1f);
 			}
 			glColor3f(c.r, c.g, c.b);
@@ -836,9 +834,6 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 									  model->getCane()->subcaneLocations[model->getActiveSubcane()].x).arg(
 									  model->getCane()->subcaneLocations[model->getActiveSubcane()].y),1000);
 		}
-		break;
-	case CASING_MODE:
-                model->adjustCaneCasing(0.5);
 		break;
 	case FLATTEN_MODE:
 		if (controlButtonDown)

@@ -207,9 +207,6 @@ void MainWindow::modeChanged(int mode)
 		modeLabel->setText("BUNDLE MODE");
 		displayTextMessage("Click and drag individual canes to move them",0);
 		break;
-	case CASING_MODE:
-		modeLabel->setText("CASING MODE");
-		break;
 	case FLATTEN_MODE:
 		modeLabel->setText("FLATTEN MODE");
 		displayTextMessage("Click and drag mouse up and down to square off cane, left and right to flatten cane",0);
@@ -917,8 +914,6 @@ void MainWindow::setupWorkArea()
 	pull_button = new QPushButton("Pull");
 	pull_button->setToolTip("Drag Mouse Horizontally to Twist, Vertically to Stretch. Use Shift to twist and stretch independently.");
 	bundle_button = new QPushButton("Bundle");
-	case_button = new QPushButton("Case");
-	case_button->setToolTip("Create a clear casing around the glass.");
 	flatten_button = new QPushButton("Flatten");
 	flatten_button->setToolTip("Drag Mouse Horizontally to Squish, Vertically to Flatten");
 	snap_button = new QPushButton("Alternate Snap Modes");
@@ -939,11 +934,10 @@ void MainWindow::setupWorkArea()
 	QVBoxLayout* operButton_layout = new QVBoxLayout();
 	operButton_layout->addWidget(pull_button);
 	operButton_layout->addWidget(bundle_button);
-	operButton_layout->addWidget(case_button);
 	operButton_layout->addWidget(flatten_button);
 	operButton_layout->addWidget(snap_button);
-	operButton_layout->addWidget(undo_button);
-	operButton_layout->addWidget(redo_button);
+        operButton_layout->addWidget(redo_button);
+        operButton_layout->addWidget(undo_button);
 	operButton_layout->addWidget(save_button);
 	operButton_layout->addWidget(clear_button);
 	operButton_layout->addWidget(previewLabel,1, Qt::AlignHCenter);

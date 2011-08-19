@@ -33,7 +33,6 @@ public:
 	void flattenCane(float rectangle_ratio, float rectangle_theta, float flatness);
 	void flattenActiveCane(float rectangle_ratio, float rectangle_theta, float flatness);
 	void moveCane(float delta_x, float delta_y, float delta_z);
-	void adjustCaneCasing(float delta_x);
 	bool deleteActiveCane();
 	void addCane(Cane* c);
 	void slowGeometryUpdate();
@@ -91,7 +90,6 @@ private:
 	int mode;
 	int projection;
 	Cane *cane;
-        Cane casingCane;
         CaneHistory *history;
 	Geometry cachedGeometry;
 	Geometry geometry;

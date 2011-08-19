@@ -23,7 +23,6 @@ void Cane :: reset()
 	int i;
 
 	type = UNASSIGNED_CANETYPE;
-        casing = -1.0;
         vertices.clear();
         for (i = 0; i < MAX_AMT_TYPES; ++i)
 	{
@@ -64,7 +63,6 @@ void Cane :: shallowCopy(Cane* dest)
 	int i;
 
         dest->type = this->type;
-        dest->casing = this->casing;
         for (unsigned int v = 0; v < this->vertices.size(); ++v)
         {
                 dest->vertices.push_back(this->vertices[v]);
@@ -262,16 +260,6 @@ void Cane :: moveCane(int subcane, float delta_x, float delta_y, float delta_z)
 	subcaneLocations[subcane].z += delta_z;
 }
 
-void Cane :: createCasing(float radius)
-{
-        this->casing = radius;
-}
-
-void Cane :: adjustCasing(float delta)
-{
-	this->amts[0] += delta;
-}
-
 void Cane :: add(Cane* addl)
 {
 	if (this->type != BUNDLE_CANETYPE)
@@ -307,7 +295,6 @@ Cane* Cane :: deepCopy()
 	Cane* copy;
 
 	copy = new Cane(this->type);
-        copy->casing = this->casing;
         for (unsigned int v = 0; v < this->vertices.size(); ++v)
         {
                 copy->vertices.push_back(this->vertices[v]);
@@ -368,8 +355,6 @@ std::string typeToName(int type)
 		return "Pull Cane";
 	case BUNDLE_CANETYPE:
 		return "Bundle Cane";
-	case CASING_CANETYPE:
-		return "Casing Cane";
 	case FLATTEN_CANETYPE:
 		return "Flatten Cane";
         case BASE_CIRCLE_CANETYPE:
@@ -393,8 +378,6 @@ std::string typeToType(int type)
 		return "Pull";
 	case BUNDLE_CANETYPE:
 		return "Bundle";
-	case CASING_CANETYPE:
-		return "Casing";
 	case FLATTEN_CANETYPE:
 		return "Flatten";
         case BASE_CIRCLE_CANETYPE:
@@ -431,14 +414,6 @@ std::string amtTypeToName(int type,int index)
 		}
 	case BUNDLE_CANETYPE:
 		return UNDEFINED;
-	case CASING_CANETYPE:
-		switch(index)
-		{
-		case 0:
-			return "Radius";
-		default:
-			return UNDEFINED;
-		}
 	case FLATTEN_CANETYPE:
 		switch(index)
 		{

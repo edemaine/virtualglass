@@ -142,21 +142,6 @@ void Model :: setMode(int mode)
 		cacheGeometry();
 		activeSubcane = -1;
 		break;
-	case CASING_MODE:
-	{
-		if (show2D)
-		{
-			cane->createCasing(1.0);
-		}
-		else
-		{
-			cane->createCasing(1.0);
-		}
-                slowGeometryUpdate();
-                cacheGeometry();
-		emit caneChanged();
-		break;
-	}
 	case SNAP_MODE:
 		switch(prev_mode)
 		{
@@ -214,19 +199,6 @@ void Model :: insertMode(Cane* c, int mode)
 		cacheGeometry();
 		activeSubcane = -1;
 		break;
-	case CASING_MODE:
-		if (show2D)
-		{
-			c->createCasing(1.0);
-		}
-		else
-		{
-			c->createCasing(1.0);
-		}
-                slowGeometryUpdate();
-                cacheGeometry();
-		emit caneChanged();
-                break;
 	}
 }
 
@@ -274,7 +246,7 @@ void Model :: slowGeometryUpdate()
 		}
 		else
 		{
-                        generateMesh(cane, &geometry, &casingCane, ancestors, &ancestorCount, LOW_RESOLUTION, false, true);
+                        generateMesh(cane, &geometry, ancestors, &ancestorCount, LOW_RESOLUTION, false);
 		}
 	}
 	else
@@ -311,7 +283,7 @@ void Model :: computeHighResGeometry(Geometry* geometry)
 		}
 		else
 		{
-                        generateMesh(cane, geometry, &casingCane, ancestors, &ancestorCount, HIGH_RESOLUTION, true, true);
+                        generateMesh(cane, geometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
 		}
 	}
 }
@@ -455,16 +427,6 @@ interface and works. -Andrew
 	geometryOutOfDate();
 	emit caneChanged();
 #endif
-}
-
-
-void Model :: adjustCaneCasing(float delta)
-{
-        revertToCachedGeometry();
-        cane->adjustCasing(delta);
-        applyCasingTransform(&geometry, cane->casing);
-        geometryFresh = 1;
-	emit caneChanged();
 }
 
 bool Model :: deleteActiveCane()

@@ -18,6 +18,7 @@ void applyFlattenTransform(Geometry* geometry, Cane* transformNode)
 	{
 		applyFlattenTransform(&(geometry->vertices[v]), transformNode);
 	}
+        geometry->compute_normals_from_triangles();
 }
 
 void applyFlattenTransform(Vertex* v, Cane* transformNode)
@@ -102,7 +103,7 @@ void applyPartialMoveTransform(Geometry* geometry, int subcane, float deltaX, fl
 	// Find group for subcane
 	Group* subcaneGroup;
 	for (uint32_t g = 0; g < geometry->groups.size(); ++g)
-                if (geometry->groups[g].tag == (uint32_t) (subcane + 1))
+                if (geometry->groups[g].tag == (uint32_t) subcane)
 		{
 			subcaneGroup = &(geometry->groups[g]);
 
@@ -121,25 +122,7 @@ void applyPartialMoveTransform(Geometry* geometry, int subcane, float deltaX, fl
 				geometry->vertices[v].position.y += deltaY;
 			}
 		}
-}
-
-void applyCasingTransform(Geometry* geometry, float casingRadius)
-{
-        for (uint32_t g = 0; g < geometry->groups.size(); ++g)
-                if (geometry->groups[g].tag == (uint32_t) 0)
-                {
-                        for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
-                        {
-                                applyCasingTransform(&(geometry->vertices[v]), casingRadius);
-                        }
-                }
-}
-
-void applyCasingTransform(Vertex* v, float casingRadius)
-{
-        // Just shrink it
-        v->position.x /= casingRadius;
-        v->position.y /= casingRadius;
+        geometry->compute_normals_from_triangles();
 }
 
 void applyPullTransform(Geometry* geometry, Cane* transformNode)
@@ -148,6 +131,7 @@ void applyPullTransform(Geometry* geometry, Cane* transformNode)
 	{
 		applyPullTransform(&(geometry->vertices[v]), transformNode);
 	}
+        geometry->compute_normals_from_triangles();
 }
 
 void applyPullTransform(Vertex* v, Cane* transformNode)
@@ -686,7 +670,7 @@ void mesh2DCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCo
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount, fullTransforms);
 	}
 	geometry->groups.push_back(Group(first_triangle,
-									 geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
+                geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, group_cane, group_tag));
 
 }
 
@@ -698,10 +682,10 @@ the transforms array is filled with with the transformations encountered at each
 leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
-void generateMesh(Cane* c, Geometry *geometry, Cane* casingCane, Cane** ancestors, int* ancestorCount,
-                                  int resolution, bool fullTransforms, bool casing, int groupIndex)
+void generateMesh(Cane* c, Geometry *geometry,  Cane** ancestors, int* ancestorCount,
+                                  int resolution, bool fullTransforms, int groupIndex)
 {
-        int i, passGroupIndex, passCasing;
+        int i, passGroupIndex;
 
 	if (c == NULL)
 		return;
@@ -709,29 +693,6 @@ void generateMesh(Cane* c, Geometry *geometry, Cane* casingCane, Cane** ancestor
 	// Make recursive calls depending on the type of the current node
 	ancestors[*ancestorCount] = c;
         *ancestorCount += 1;
-
-        // First deal with casing
-        if (casing)
-        {
-                if (c->casing > 0)
-                {
-                        passCasing = false;
-                        casingCane->type = BASE_CIRCLE_CANETYPE;
-                        casingCane->color.r = casingCane->color.g = casingCane->color.b = 1.0;
-                        casingCane->color.a = 0.2;
-                        // group index 0 is special casing group for now
-                        meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-                                resolution, casingCane, 0, fullTransforms);
-                }
-                else
-                {
-                        passCasing = true;
-                }
-        }
-        else
-        {
-                passCasing = false;
-        }
 
         // Now do regular recursion on node
         if (c->type == BASE_CIRCLE_CANETYPE)
@@ -754,12 +715,12 @@ void generateMesh(Cane* c, Geometry *geometry, Cane* casingCane, Cane** ancestor
 		for (i = 0; i < c->subcaneCount; ++i)
 		{
 			if (groupIndex == -1)
-                                passGroupIndex = i+1; // 0 is reserved for casing
+                                passGroupIndex = i;
 			else
 				passGroupIndex = groupIndex;
 
-                        generateMesh(c->subcanes[i], geometry, casingCane, ancestors, ancestorCount,
-                                                 resolution, fullTransforms, passCasing, passGroupIndex);
+                        generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
+                                                 resolution, fullTransforms, passGroupIndex);
 		}
 	}
 	*ancestorCount -= 1;

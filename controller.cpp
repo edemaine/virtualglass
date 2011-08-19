@@ -24,12 +24,10 @@ Controller::Controller(int argc, char **argv)
 	QSignalMapper* modeSignalMapper = new QSignalMapper(model);
 	modeSignalMapper->setMapping(mainWindow->pull_button, PULL_MODE);
 	modeSignalMapper->setMapping(mainWindow->bundle_button, BUNDLE_MODE);
-	modeSignalMapper->setMapping(mainWindow->case_button, CASING_MODE);
 	modeSignalMapper->setMapping(mainWindow->flatten_button, FLATTEN_MODE);
 	modeSignalMapper->setMapping(mainWindow->snap_button, SNAP_MODE);
 	connect(mainWindow->pull_button, SIGNAL(clicked()), modeSignalMapper, SLOT(map()));
 	connect(mainWindow->bundle_button, SIGNAL(clicked()), modeSignalMapper, SLOT(map()));
-	connect(mainWindow->case_button, SIGNAL(clicked()), modeSignalMapper, SLOT(map()));
 	connect(mainWindow->flatten_button, SIGNAL(clicked()), modeSignalMapper, SLOT(map()));
 	connect(mainWindow->snap_button, SIGNAL(clicked()), modeSignalMapper, SLOT(map()));
 	connect(modeSignalMapper, SIGNAL(mapped(int)), mainWindow, SLOT(newMode(int)));
