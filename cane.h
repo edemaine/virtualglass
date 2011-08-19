@@ -52,6 +52,9 @@ public:
 public slots:
 	void changeLibraryIndex(int index);
 
+private:
+        Cane* getTopBundleNode();
+
 };
 
 Q_DECLARE_METATYPE(Cane)

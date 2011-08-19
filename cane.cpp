@@ -277,15 +277,27 @@ void Cane :: add(Cane* addl)
 	subcaneCount += 1;
 }
 
+Cane* Cane :: getTopBundleNode()
+{
+        if (this->type == BUNDLE_CANETYPE)
+                return this;
+        else if (this->subcaneCount == 0)
+        {
+                return NULL;
+        }
+
+        return this->subcanes[0]->getTopBundleNode();
+}
+
 void Cane :: deleteCane(int subcane)
 {
-	if (subcane<0 || subcane>=subcaneCount)
-		return;
-	subcaneCount--;
-	for (int i=subcane;i<subcaneCount;i++)
+        Cane* b = this->getTopBundleNode();
+
+        b->subcaneCount--;
+        for (int i = subcane; i < b->subcaneCount; i++)
 	{
-		subcanes[i]=subcanes[i+1];
-		subcaneLocations[i]=subcaneLocations[i+1];
+                b->subcanes[i] = b->subcanes[i+1];
+                b->subcaneLocations[i] = b->subcaneLocations[i+1];
 	}
 }
 

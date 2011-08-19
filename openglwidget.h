@@ -51,7 +51,6 @@ private:
 	bool showAxes;
 	bool showSnaps;
 	bool showRefSnaps;
-	bool lockView;
 	bool show2D;
 	bool clickable;
 
@@ -90,7 +89,6 @@ public slots:
 	void toggleAxes();
 	void toggleSnaps();
 	void toggleRefSnaps();
-	void lockTable();
 	void toggle2D();
 
 protected:

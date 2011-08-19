@@ -128,13 +128,15 @@ void Model :: setMode(int mode)
 		cane->createFlatten();
 		slowGeometryUpdate();
 		cacheGeometry();
-		break;
+                activeSubcane = -1;
+                break;
 	case PULL_MODE:
 		history->saveState(cane);
 		cane->createPull();
 		slowGeometryUpdate();
 		cacheGeometry();
-		break;
+                activeSubcane = -1;
+                break;
 	case BUNDLE_MODE:
 		history->saveState(cane);
 		cane->createBundle();
@@ -209,9 +211,6 @@ void Model :: setActiveSubcane(int subcane)
 	if (activeSubcane != subcane)
 	{
 		activeSubcane = subcane;
-		if (activeSubcane < 0 || activeSubcane >= cane->subcaneCount) {
-			activeSubcane = -1;
-		}
 		geometryFresh = 0;
 		emit caneChanged();
 	}

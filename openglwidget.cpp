@@ -41,7 +41,6 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 	showSnaps = false;
 	showRefSnaps = false;
 	show2D = false;
-	lockView = false;
 	clickable = true;
 
 	lookAtLoc[0] = 0.0f;
@@ -536,13 +535,6 @@ void OpenGLWidget :: setRefSnaps(bool show)
 	update();
 }
 
-void OpenGLWidget :: lockTable()
-{
-	lockView = !lockView;
-	update();
-}
-
-
 /*
 Should be called any time the Mesh object is changed by
 modifying the cane it contains.
@@ -601,7 +593,8 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 	if (e->button() == Qt::RightButton)
 	{
 		rightMouseDown = true;
-	} else
+        }
+        else
 	{
 		model->setActiveSubcane(getSubcaneUnderMouse(mouseLocX, mouseLocY));
 		if (deleteButtonDown)
@@ -719,7 +712,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	i.e. how much twist `feels' reasonable for moving the mouse
 	an inch.
 	*/
-	if (rightMouseDown && !lockView)
+        if (rightMouseDown)
 	{
 		// Rotate camera position around look-at location.
 
@@ -738,17 +731,14 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	switch (model->getMode())
 	{
 	case LOOK_MODE:
-		if (!lockView)
-		{
-			// Rotate camera position around look-at location.
-			theta -= (relX * 500.0 * PI / 180.0);
-			if (!show2D)
-			{
-				newFee = fee - (relY * 500.0 * PI / 180.0);
-				if (newFee > 0.0f && newFee < PI)
-					fee = newFee;
-			}
-		}
+                // Rotate camera position around look-at location.
+                theta -= (relX * 500.0 * PI / 180.0);
+                if (!show2D)
+                {
+                        newFee = fee - (relY * 500.0 * PI / 180.0);
+                        if (newFee > 0.0f && newFee < PI)
+                                fee = newFee;
+                }
 		break;
 	case PULL_MODE:
 		if (shiftButtonDown)
@@ -823,11 +813,11 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	case FLATTEN_MODE:
 		if (controlButtonDown)
 		{
-			model->flattenActiveCane(relX, theta + PI / 2.0, -relY);
+                        model->flattenActiveCane(-relX, PI / 2, -relY);
 		}
 		else
 		{
-			model->flattenCane(relX, theta + PI / 2.0, -relY);
+                        model->flattenCane(-relX, PI / 2, -relY);
 		}
 		emit operationInfoSig(QString("Squished with %1, Flattened into rectangle with %2").arg(model->getCane()->amts[0]).arg(model->getCane()->amts[2]),1000);
 		break;

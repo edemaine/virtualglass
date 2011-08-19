@@ -699,35 +699,50 @@ void generateMesh(Cane* c, Geometry *geometry,  Cane** ancestors, int* ancestorC
 	ancestors[*ancestorCount] = c;
         *ancestorCount += 1;
 
-        // Now do regular recursion on node
-        if (c->type == BASE_CIRCLE_CANETYPE)
-	{
-		meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-                        resolution, c, groupIndex, fullTransforms);
-	}
-        else if (c->type == BASE_SQUARE_CANETYPE)
+        if (c->type == BASE_CIRCLE_CANETYPE || c->type == BASE_SQUARE_CANETYPE || c->type == BASE_POLYGONAL_CANETYPE)
         {
-                meshSquareBaseCane(geometry, ancestors, *ancestorCount,
-                        resolution, c, groupIndex, fullTransforms);
-        }
-        else if (c->type == BASE_POLYGONAL_CANETYPE)
-	{
-                meshPolygonalBaseCane(geometry, ancestors, *ancestorCount,
-                        resolution, c, groupIndex, fullTransforms);
+                if (groupIndex == -1)
+                        passGroupIndex = 0;
+                else
+                        passGroupIndex = groupIndex;
+
+                switch (c->type)
+                {
+                        case BASE_CIRCLE_CANETYPE:
+                                meshCircularBaseCane(geometry, ancestors, *ancestorCount,
+                                        resolution, c, passGroupIndex, fullTransforms);
+                                break;
+                        case BASE_SQUARE_CANETYPE:
+                                meshCircularBaseCane(geometry, ancestors, *ancestorCount,
+                                        resolution, c, passGroupIndex, fullTransforms);
+                                break;
+                        case BASE_POLYGONAL_CANETYPE:
+                                meshCircularBaseCane(geometry, ancestors, *ancestorCount,
+                                        resolution, c, passGroupIndex, fullTransforms);
+                                break;
+                }
 	}
-	else
+        else if (c->type == BUNDLE_CANETYPE)
 	{
+
 		for (i = 0; i < c->subcaneCount; ++i)
 		{
 			if (groupIndex == -1)
                                 passGroupIndex = i;
 			else
 				passGroupIndex = groupIndex;
-
                         generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
                                                  resolution, fullTransforms, passGroupIndex);
 		}
-	}
+        }
+        else
+        {
+                for (i = 0; i < c->subcaneCount; ++i)
+                {
+                        generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
+                                                 resolution, fullTransforms, groupIndex);
+                }
+        }
 	*ancestorCount -= 1;
 }
 
