@@ -468,6 +468,14 @@ std::string Cane :: yamlRepresentation()
 	}
 	out << YAML::EndSeq;
 
+	out << YAML::Key << "Vertices";
+	out << YAML::Value << YAML::BeginSeq;
+	for (unsigned int j=0;j<sizeof(this->vertices);j++){
+		out << zeroIfNaN(vertices[j].x);
+		out << zeroIfNaN(vertices[j].y);
+	}
+	out << YAML::EndSeq;
+
 	out << YAML::Key << "Number of Subcanes";
 	out << YAML::Value << subcaneCount;
 

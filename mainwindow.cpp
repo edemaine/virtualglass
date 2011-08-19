@@ -471,6 +471,18 @@ void MainWindow::loadLibraryCane(const YAML::Node& node, Cane* cane)
 		amtsCount++;
 	}
 
+	const YAML::Node& caneVertices = newNode["Vertices"];
+	int verticesCount=0;
+
+	for(YAML::Iterator it2=caneVertices.begin();it2!=caneVertices.end();++it2)
+	{
+		*it2 >> cane->vertices[verticesCount].x;
+
+		++it2;
+		*it2 >> cane->vertices[verticesCount].y;
+		verticesCount++;
+	}
+
 	newNode["Number of Subcanes"] >> cane->subcaneCount;
 
 	const YAML::Node& subLocations = newNode["Subcane Locations"];
