@@ -98,7 +98,7 @@ void applyMoveTransform(Vertex* v, Cane* parentNode, int subcane)
 	v->position.y += locationInParent.y;
 }
 
-void applyPartialMoveTransform(Geometry* geometry, int subcane, float deltaX, float deltaY, float deltaZ)
+void applyPartialMoveTransform(Geometry* geometry, Cane* parentNode, int subcane, float deltaX, float deltaY, float deltaZ)
 {
 	// Find group for subcane
 	Group* subcaneGroup;
@@ -110,12 +110,17 @@ void applyPartialMoveTransform(Geometry* geometry, int subcane, float deltaX, fl
 			// Apply transformation to only these vertices
 			for (uint32_t v = subcaneGroup->vertex_begin; v < subcaneGroup->vertex_begin + subcaneGroup->vertex_size; ++v)
 			{
-				// Z location
-				float preTheta = atan2(geometry->vertices[v].position.y, geometry->vertices[v].position.x);
+                                // Z location
+                                Point subcaneCenter;
+                                subcaneCenter.x = parentNode->subcaneLocations[subcane].x - deltaX;
+                                subcaneCenter.y = parentNode->subcaneLocations[subcane].y - deltaY;
+                                float preTheta = atan2(geometry->vertices[v].position.y - subcaneCenter.y,
+                                        geometry->vertices[v].position.x - subcaneCenter.x);
 				float postTheta = preTheta + deltaZ;
-				float r = length(geometry->vertices[v].position.xy);
-				geometry->vertices[v].position.x = r * cos(postTheta);
-				geometry->vertices[v].position.y = r * sin(postTheta);
+                                float r = sqrt((geometry->vertices[v].position.x - subcaneCenter.x) * (geometry->vertices[v].position.x - subcaneCenter.x)
+                                        + (geometry->vertices[v].position.y - subcaneCenter.y) * (geometry->vertices[v].position.y - subcaneCenter.y));
+                                geometry->vertices[v].position.x = r * cos(postTheta) + subcaneCenter.x;
+                                geometry->vertices[v].position.y = r * sin(postTheta) + subcaneCenter.y;
 
 				// XY location
 				geometry->vertices[v].position.x += deltaX;

@@ -357,7 +357,7 @@ void Model :: moveCane(float delta_x, float delta_y, float delta_z)
 		return;
 
 	cane->moveCane(activeSubcane, delta_x, delta_y, delta_z);
-	applyPartialMoveTransform(&geometry, activeSubcane, delta_x, delta_y, delta_z);
+        applyPartialMoveTransform(&geometry, cane, activeSubcane, delta_x, delta_y, delta_z);
 	cacheGeometry();
 
 	geometryFresh = 1;

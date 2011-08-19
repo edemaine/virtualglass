@@ -27,7 +27,7 @@ float computeTotalStretch(Cane** ancestors, int ancestorCount);
 void applyFlattenTransform(Vertex* v, Cane* transformNode);
 void applyFlattenTransform(Geometry* geometry, Cane* transformNode);
 void applyMoveTransform(Vertex* v, Cane* parentNode, int subcane);
-void applyPartialMoveTransform(Geometry* geometry, int subcane, float deltaX, float deltaY, float deltaZ);
+void applyPartialMoveTransform(Geometry* geometry, Cane* parentNode, int subcane, float deltaX, float deltaY, float deltaZ);
 void applyPullTransform(Vertex* v, Cane* transformNode);
 void applyPullTransform(Geometry* geometry, Cane* transformNode);
 void applyCasingTransform(Vertex* v, float casingRadius);
