@@ -128,15 +128,15 @@ void Model :: setMode(int mode)
 		cane->createFlatten();
 		slowGeometryUpdate();
 		cacheGeometry();
-                activeSubcane = -1;
-                break;
+				activeSubcane = -1;
+				break;
 	case PULL_MODE:
 		history->saveState(cane);
 		cane->createPull();
 		slowGeometryUpdate();
 		cacheGeometry();
-                activeSubcane = -1;
-                break;
+				activeSubcane = -1;
+				break;
 	case BUNDLE_MODE:
 		history->saveState(cane);
 		cane->createBundle();
@@ -245,7 +245,7 @@ void Model :: slowGeometryUpdate()
 		}
 		else
 		{
-                        generateMesh(cane, &geometry, ancestors, &ancestorCount, LOW_RESOLUTION, false);
+						generateMesh(cane, &geometry, ancestors, &ancestorCount, LOW_RESOLUTION, false);
 		}
 	}
 	else
@@ -282,7 +282,7 @@ void Model :: computeHighResGeometry(Geometry* geometry)
 		}
 		else
 		{
-                        generateMesh(cane, geometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
+						generateMesh(cane, geometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
 		}
 	}
 }
@@ -356,7 +356,7 @@ void Model :: moveCane(float delta_x, float delta_y, float delta_z)
 		return;
 
 	cane->moveCane(activeSubcane, delta_x, delta_y, delta_z);
-        applyPartialMoveTransform(&geometry, cane, activeSubcane, delta_x, delta_y, delta_z);
+		applyPartialMoveTransform(&geometry, cane, activeSubcane, delta_x, delta_y, delta_z);
 	cacheGeometry();
 
 	geometryFresh = 1;
@@ -452,6 +452,24 @@ void Model :: addCane(Cane* c)
 	else
 	{
 		cane->add(c->deepCopy());
+		geometryFresh = 0;
+		emit caneChanged();
+		if (mode != BUNDLE_MODE)
+			setMode(BUNDLE_MODE);
+		else
+		{
+			slowGeometryUpdate();
+			cacheGeometry();
+		}
+	}
+}
+
+void Model :: addCane(Cane* c, Cane* d)
+{
+	history->saveState(cane);
+	if (c != NULL)
+	{
+		c->add(d->deepCopy());
 		geometryFresh = 0;
 		emit caneChanged();
 		if (mode != BUNDLE_MODE)

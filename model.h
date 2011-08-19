@@ -35,6 +35,7 @@ public:
 	void moveCane(float delta_x, float delta_y, float delta_z);
 	bool deleteActiveCane();
 	void addCane(Cane* c);
+	void addCane(Cane* c, Cane* d);
 	void slowGeometryUpdate();
 	void saveObjFile(std::string const &filename);
 	void saveRawFile(std::string const &filename);
@@ -90,7 +91,7 @@ private:
 	int mode;
 	int projection;
 	Cane *cane;
-        CaneHistory *history;
+		CaneHistory *history;
 	Geometry cachedGeometry;
 	Geometry geometry;
 	int geometryFresh;

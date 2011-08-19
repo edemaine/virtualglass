@@ -130,7 +130,7 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].position));
 	glEnableClientState(GL_VERTEX_ARRAY);
 	for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
-                glColor4ubv(reinterpret_cast< const GLubyte * >(&(g->tag)));
+		glColor4ubv(reinterpret_cast< const GLubyte * >(&(g->tag)));
 		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 					   GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
 	}
@@ -144,7 +144,7 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 
 	updateTriangles();
 
-        return ((int) c[0]);
+	return ((int) c[0]);
 }
 
 Point OpenGLWidget :: getClickedPlanePoint(int mouseLocX, int mouseLocY)
@@ -293,7 +293,7 @@ void OpenGLWidget :: paintGL()
 		for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
 			assert(g->cane);
 			Color c = g->cane->color;
-                        if (model && (int)g->tag == model->getActiveSubcane()) {
+			if (model && (int)g->tag == model->getActiveSubcane()) {
 				c.xyz += make_vector(0.1f, 0.1f, 0.1f);
 			}
 			glColor3f(c.r, c.g, c.b);
@@ -593,8 +593,8 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 	if (e->button() == Qt::RightButton)
 	{
 		rightMouseDown = true;
-        }
-        else
+	}
+	else
 	{
 		model->setActiveSubcane(getSubcaneUnderMouse(mouseLocX, mouseLocY));
 		if (deleteButtonDown)
@@ -703,25 +703,31 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	relY = (mouseLocY - oldMouseLocY) / windowHeight;
 
 	/*
-	Do something depending on mode.
-	All modes except LOOK_MODE involve modifying the cane
-	itself, while LOOK_MODE moves the camera.
+ Do something depending on mode.
+ All modes except LOOK_MODE involve modifying the cane
+ itself, while LOOK_MODE moves the camera.
 
-	All of the calls to model->*Cane() are functions of relX/relY,
-	but the constants involved are determined by experiment,
-	i.e. how much twist `feels' reasonable for moving the mouse
-	an inch.
-	*/
-        if (rightMouseDown)
+ All of the calls to model->*Cane() are functions of relX/relY,
+ but the constants involved are determined by experiment,
+ i.e. how much twist `feels' reasonable for moving the mouse
+ an inch.
+ */
+	if (rightMouseDown)
 	{
 		// Rotate camera position around look-at location.
-
+		if (this->controlButtonDown)
+		{
+			this->zoom(relY*2.0);
+		}
+		else
+		{
 		theta -= (relX * 500.0 * PI / 180.0);
 		if (!show2D)
 		{
 			newFee = fee - (relY * 500.0 * PI / 180.0);
 			if (newFee > 0.0f && newFee < PI)
 				fee = newFee;
+		}
 		}
 		update();
 		return;
@@ -731,14 +737,14 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	switch (model->getMode())
 	{
 	case LOOK_MODE:
-                // Rotate camera position around look-at location.
-                theta -= (relX * 500.0 * PI / 180.0);
-                if (!show2D)
-                {
-                        newFee = fee - (relY * 500.0 * PI / 180.0);
-                        if (newFee > 0.0f && newFee < PI)
-                                fee = newFee;
-                }
+		// Rotate camera position around look-at location.
+		theta -= (relX * 500.0 * PI / 180.0);
+		if (!show2D)
+		{
+			newFee = fee - (relY * 500.0 * PI / 180.0);
+			if (newFee > 0.0f && newFee < PI)
+				fee = newFee;
+		}
 		break;
 	case PULL_MODE:
 		if (shiftButtonDown)
@@ -767,16 +773,16 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		break;
 	case BUNDLE_MODE:
 		/*
-                How the parameters for moveCane() are calculated is not obvious.
-                The idea is to make mouse X/Y correspond to the cane moving
-                left-right/up-down *regardless* of where the camera is. This
-                is why theta (the camera angle relative to the look-at point) is
-                also involved.
+	How the parameters for moveCane() are calculated is not obvious.
+	The idea is to make mouse X/Y correspond to the cane moving
+	left-right/up-down *regardless* of where the camera is. This
+	is why theta (the camera angle relative to the look-at point) is
+	also involved.
 
-                Essentially, the parameters convert the amount moved in X and Y
-                (variables `relX' and `relY') to the amount moved in X and Y
-                according to axes on which the cane lives.
-                */
+	Essentially, the parameters convert the amount moved in X and Y
+	(variables `relX' and `relY') to the amount moved in X and Y
+	according to axes on which the cane lives.
+	*/
 
 		if (e->buttons() & 0x00000001) // if left mouse button is down
 		{
@@ -813,11 +819,11 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	case FLATTEN_MODE:
 		if (controlButtonDown)
 		{
-                        model->flattenActiveCane(-relX, PI / 2, -relY);
+			model->flattenActiveCane(-relX, PI / 2, -relY);
 		}
 		else
 		{
-                        model->flattenCane(-relX, PI / 2, -relY);
+			model->flattenCane(-relX, PI / 2, -relY);
 		}
 		emit operationInfoSig(QString("Squished with %1, Flattened into rectangle with %2").arg(model->getCane()->amts[0]).arg(model->getCane()->amts[2]),1000);
 		break;
@@ -836,6 +842,12 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		break;
 	}
 
+}
+
+void OpenGLWidget ::zoom(float z)
+{
+	this->rho+=z;
+	update();
 }
 
 void OpenGLWidget :: wheelEvent(QWheelEvent *e)

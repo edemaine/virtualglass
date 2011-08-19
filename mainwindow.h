@@ -62,6 +62,7 @@ public slots:
 	void updateLibraryToolTip(LibraryCaneWidget* lc);
 	void updatePreview();
 	void newMode(int i);
+	void insertLibraryCane(Cane* c);
 
 private:
 	Model* model;
@@ -104,6 +105,8 @@ private:
 	QColorDialog* colorDialog;
 	QFormLayout* caneForm;
 	QComboBox* caneTypeBox;
+	QSpinBox* verticesBox;
+	QDoubleSpinBox* caneRadiusBox;
 
 	bool isRecipe;
 	QDialog* brandDialog;

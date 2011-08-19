@@ -23,8 +23,8 @@ void Cane :: reset()
 	int i;
 
 	type = UNASSIGNED_CANETYPE;
-        vertices.clear();
-        for (i = 0; i < MAX_AMT_TYPES; ++i)
+	vertices.clear();
+	for (i = 0; i < MAX_AMT_TYPES; ++i)
 	{
 		amts[i] = 0.0;
 	}
@@ -62,12 +62,12 @@ void Cane :: shallowCopy(Cane* dest)
 {
 	int i;
 
-        dest->type = this->type;
-        for (unsigned int v = 0; v < this->vertices.size(); ++v)
-        {
-                dest->vertices.push_back(this->vertices[v]);
-        }
-        for (i = 0; i < MAX_AMT_TYPES; ++i)
+	dest->type = this->type;
+	for (unsigned int v = 0; v < this->vertices.size(); ++v)
+	{
+		dest->vertices.push_back(this->vertices[v]);
+	}
+	for (i = 0; i < MAX_AMT_TYPES; ++i)
 	{
 		dest->amts[i] = this->amts[i];
 	}
@@ -279,25 +279,25 @@ void Cane :: add(Cane* addl)
 
 Cane* Cane :: getTopBundleNode()
 {
-        if (this->type == BUNDLE_CANETYPE)
-                return this;
-        else if (this->subcaneCount == 0)
-        {
-                return NULL;
-        }
+	if (this->type == BUNDLE_CANETYPE)
+		return this;
+	else if (this->subcaneCount == 0)
+	{
+		return NULL;
+	}
 
-        return this->subcanes[0]->getTopBundleNode();
+	return this->subcanes[0]->getTopBundleNode();
 }
 
 void Cane :: deleteCane(int subcane)
 {
-        Cane* b = this->getTopBundleNode();
+	Cane* b = this->getTopBundleNode();
 
-        b->subcaneCount--;
-        for (int i = subcane; i < b->subcaneCount; i++)
+	b->subcaneCount--;
+	for (int i = subcane; i < b->subcaneCount; i++)
 	{
-                b->subcanes[i] = b->subcanes[i+1];
-                b->subcaneLocations[i] = b->subcaneLocations[i+1];
+		b->subcanes[i] = b->subcanes[i+1];
+		b->subcaneLocations[i] = b->subcaneLocations[i+1];
 	}
 }
 
@@ -307,10 +307,10 @@ Cane* Cane :: deepCopy()
 	Cane* copy;
 
 	copy = new Cane(this->type);
-        for (unsigned int v = 0; v < this->vertices.size(); ++v)
-        {
-                copy->vertices.push_back(this->vertices[v]);
-        }
+	for (unsigned int v = 0; v < this->vertices.size(); ++v)
+	{
+		copy->vertices.push_back(this->vertices[v]);
+	}
 
 	for (i = 0; i < MAX_AMT_TYPES; ++i)
 	{
@@ -369,12 +369,12 @@ std::string typeToName(int type)
 		return "Bundle Cane";
 	case FLATTEN_CANETYPE:
 		return "Flatten Cane";
-        case BASE_CIRCLE_CANETYPE:
-                return "Base Circle Cane";
-        case BASE_SQUARE_CANETYPE:
-                return "Base Square Cane";
-        case BASE_POLYGONAL_CANETYPE:
-                return "Base Polygonal Cane";
+	case BASE_CIRCLE_CANETYPE:
+		return "Base Circle Cane";
+	case BASE_SQUARE_CANETYPE:
+		return "Base Square Cane";
+	case BASE_POLYGONAL_CANETYPE:
+		return "Base Polygonal Cane";
 	case UNASSIGNED_CANETYPE:
 		return "Unassigned Cane";
 	default:
@@ -392,12 +392,12 @@ std::string typeToType(int type)
 		return "Bundle";
 	case FLATTEN_CANETYPE:
 		return "Flatten";
-        case BASE_CIRCLE_CANETYPE:
-                return "Base Circle";
-        case BASE_SQUARE_CANETYPE:
-                return "Base Circle";
-        case BASE_POLYGONAL_CANETYPE:
+	case BASE_CIRCLE_CANETYPE:
 		return "Base Circle";
+	case BASE_SQUARE_CANETYPE:
+		return "Base Square";
+	case BASE_POLYGONAL_CANETYPE:
+		return "Base Polygon";
 	case UNASSIGNED_CANETYPE:
 		return "Unassigned";
 	default:

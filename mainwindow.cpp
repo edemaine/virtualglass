@@ -249,6 +249,7 @@ void MainWindow::saveCaneToLibrary()
 	updateLibraryToolTip(lc);
 	connect(lc, SIGNAL(mouseOver(LibraryCaneWidget*)), this, SLOT(updateLibraryToolTip(LibraryCaneWidget*)));
 	connect(stockLayout, SIGNAL(destroyed(QObject*)), this, SLOT(libraryCaneDestroyed(QObject*)));
+	connect(lc,SIGNAL(addCane(Cane*)),this,SLOT(insertLibraryCane(Cane*)));
 }
 
 void MainWindow::updateLibraryToolTip(LibraryCaneWidget *lc)
@@ -536,8 +537,17 @@ void MainWindow::setupNewColorPickerCaneDialog()
 	caneTypeBox = new QComboBox(caneForm->widget());
 	caneTypeBox->addItem("Circle Base", QVariant(BASE_CIRCLE_CANETYPE));
 		caneTypeBox->addItem("Square Base", QVariant(BASE_SQUARE_CANETYPE));
+		caneTypeBox->addItem("Polygonal Base", QVariant(BASE_POLYGONAL_CANETYPE));
 
 		caneForm->addRow("Base Type", caneTypeBox);
+
+		verticesBox = new QSpinBox(caneForm->widget());
+		caneForm->addRow("Number of Vertices", verticesBox);
+
+		caneRadiusBox = new QDoubleSpinBox(caneForm->widget());
+		caneRadiusBox->setSingleStep(0.1);
+
+		caneForm->addRow("Cane Radius", caneRadiusBox);
 
 	QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 		connect(buttons,SIGNAL(accepted()), caneDialog, SLOT(accept()));
@@ -586,8 +596,17 @@ void MainWindow::setupNewBrandCaneDialog()
 	caneTypeBox = new QComboBox(caneForm->widget());
 	caneTypeBox->addItem("Circle Base",QVariant(BASE_CIRCLE_CANETYPE));
 	caneTypeBox->addItem("Square Base",QVariant(FLATTEN_CANETYPE));
+	caneTypeBox->addItem("Polygonal Base", QVariant(BASE_POLYGONAL_CANETYPE));
 
-	caneForm->addRow("Base Type",caneTypeBox);
+	caneForm->addRow("Base Type", caneTypeBox);
+
+	verticesBox = new QSpinBox(caneForm->widget());
+	caneForm->addRow("Number of Vertices", verticesBox);
+
+	caneRadiusBox = new QDoubleSpinBox(caneForm->widget());
+	caneRadiusBox->setSingleStep(0.1);
+
+	caneForm->addRow("Cane Radius", caneRadiusBox);
 
 	QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	connect(buttons,SIGNAL(accepted()),brandDialog,SLOT(accept()));
@@ -863,8 +882,7 @@ void MainWindow::colorPickerSelected()
 	int caneType = data.toInt(&isOk);
 	if (!isOk)
 		return;
-
-		Cane* c = new Cane(caneType);
+	Cane* c = new Cane(caneType);
 	Cane* stch = new Cane(PULL_CANETYPE);
 
 	stch->subcaneCount = 1;
@@ -947,6 +965,12 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
 	case 0x01000007: // Delete
 		openglWidget->setDeleteButtonDown(true);
 		break;
+	case 0x2b: // +
+		openglWidget->zoomIn();
+		break;
+	case 0x2d: // -
+		openglWidget->zoomOut();
+		break;
 	default:
 		break;
 	}
@@ -999,6 +1023,16 @@ void MainWindow :: newMode(int i)
 	else
 	{
 		emit setNewMode(i,isRecipe, recipeWidget->getCane(recipeWidget->selectedItems().at(0)));
+	}
+}
+
+void MainWindow :: insertLibraryCane(Cane* c)
+{
+	if (recipeWidget->selectedItems().isEmpty())
+		model->addCane(c);
+	else
+	{
+		model->addCane(recipeWidget->getCane(recipeWidget->selectedItems().at(0)),c);
 	}
 }
 

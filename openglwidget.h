@@ -81,6 +81,7 @@ signals:
 public slots:
 	void zoomIn();
 	void zoomOut();
+	void zoom(float z);
 	void caneChanged();
 	void setFrontView();
 	void setTopView();

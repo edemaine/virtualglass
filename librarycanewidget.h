@@ -23,6 +23,7 @@ signals:
 	void modeChangedSig(int mode);
 	void mouseOver(LibraryCaneWidget*);
 	void newIndex(int index);
+	void addCane(Cane* c);
 
 private:
 	Cane* cane;

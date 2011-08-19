@@ -20,6 +20,7 @@ RecipeWidget::RecipeWidget(QWidget *parent, OpenGLWidget* openglWidget) :
 	connect(this,SIGNAL(recipeCaneChanged()),openglWidget->getModel(),SLOT(exactChange()));
 	connect(openglWidget->getModel(), SIGNAL(caneChanged()), this, SLOT(updateRecipe()));
 	connect(this, SIGNAL(addOperation(Cane*,int)), openglWidget->getModel(), SLOT(insertMode(Cane*,int)));
+
 	newClear();
 }
 
