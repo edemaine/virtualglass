@@ -116,7 +116,7 @@ Reichenbach Opaques
 - 163,65,50,255
 [R-147 Fire Red] 
 - 204,17,21,255
-[R-148 Ferrari Red -strikes] 	
+[R-148 Ferrari Red (strikes)] 	
 - 220,29,26,255
 [R-149 Rose Red] 
 - 120,28,33,255
@@ -519,3 +519,243 @@ Reichenbach Transparents
 - 89,82,47,126
 [R-8904 Sea Green (reduces)] 	
 - 55,78,116,126
+
+Gaffer Opals
+
+[G100 Enamel white]
+- 254,254,254,255
+[G101 Opal White]
+- 252,252,252,255
+[G102 Ivory]
+- 252,247,236,255
+[G103 Latte]
+- 250,242,230,255
+[G104 Light Tabacco]
+- 167,120,51,255
+[G105 Duck Egg White]
+- 245,246,241,255
+[G106 Cream]
+- 250,250,249,255
+[G107 Weimaraner Brown]
+- 208,196,192,255
+[G108 Pigeon Grey]
+- 174,181,187,255
+[G109 Chalcedony]
+- 200,210,183,255
+[G1095 Blue Chalcedony]
+- 128,189,187,255
+[G110 Gold Pink Extra]
+- 196,116,147,255
+[G111 Salmon]
+- 252,150,119,255
+[G112 Pale Rose]
+- 229,197,210,255
+[G113 Heliotrope]
+- 195,153,199,255
+[G114 Purpur]
+- 146,119,183,255
+[G115 Violet]
+- 107,94,150,255
+[G116 Lavender]
+- 203,175,198,255
+[G120 Lapis Blue Extra]
+- 94,79,222,255
+[G121 Pale Blue]
+- 150,156,203,255
+[G122 Turquoise]
+- 18,181,185,255
+[G123 Steel Blue]
+- 14,77,130,255
+[G124 Robin’s Egg Blue]
+- 159,222,201,255
+[G125 Denim Blue]
+- 47,145,183,255
+[G126 Stratus Blue]
+- 106,139,191,255
+[G127 Pale Turquoise]
+- 155,200,199,255
+[G128 Azure]
+- 107,194,189,255
+[G129 Navy Blue]
+- 23,27,66,255
+[G130 Jade Green]
+- 55,162,133,255
+[G131 Olive Green]
+- 144,161,76,255
+[G132 Granny Smith Green]
+- 117,178,78,255
+[G133 Lime Green]
+- 181,196,77,255
+[G134 Forest Green]
+- 59,110,47,255
+[G135 Celadon]
+- 177,216,193,255
+[G136 Chartreuse]
+- 227,228,94,255
+[G137 Light Apple Green]
+- 200,226,148,255
+[G138 Chameleon]
+- 190,213,204,255
+[G139 British Racing Green]
+- 38,61,30,255
+[G140 Pistachio Green]
+- 110,127,50,255
+[G150 Opalo Duro (Stiff White)]
+- 252,252,252,255
+[G151 Blue Duro]
+- 92,76,221,255
+[G152 Verde Duro]
+- 117,178,78,255
+[G153 Oro Duro]
+- 245,180,19,255
+[G170 Carmine]
+- 208,23,24,255
+[G171 Russet]
+- 89,36,19,255
+[G172 Mushroom]
+- 238,200,165,255
+[G173 Chocolate]
+- 43,30,17,255
+[G174 Mustard]
+- 245,181,24,255
+[G175 Cinnamon]
+- 117,64,25,255
+[G176 Vermillion]
+- 224,49,29,255
+[G177 Burnt Sienna]
+- 171,42,41,255
+[G178 Crimson]
+- 200,50,46,255
+[G179 Diablo Red]
+- 246,71,70,255
+[G180 Ferrari Red]
+- 239,59,86,255
+[G181 Chilli Red]
+- 251,74,59,255
+[G182 Orange]
+- 252,102,63,255
+[G183 Taxi Cab Yellow]
+- 253,197,92,255
+[G184 Canary Yellow]
+- 253,218,90,255
+[G185 Corn Yellow]
+- 253,202,87,255
+[G186 Tangerine]
+- 252,149,77,255
+[G187 Lemon Yellow]
+- 253,238,95,255
+[G188 Pale Primrose]
+- 254,243,152,255
+[G189 French Vanilla]
+- 251,241,129,255
+[G190 Alabaster]
+- 253,253,253,255
+[G194 Phil's Grey]
+- 206,206,202,255
+
+Gaffer Transparents
+
+[G000 Clear Lead Crystal]
+- 249,249,249,126
+[G010 Gold Ruby Extra]
+- 152,20,57,126
+[G011 Gold Amethyst]
+- 152,32,91,126
+[G012 Brilliant Gold]
+- 253,146,65,126
+[G013 Apricot]
+- 232,58,59,126
+[G014 Gold Ruby]
+- 202,69,119,126
+[G015 Hyacinth]
+- 140,62,139,126
+[G016 Wine Red]
+- 175,40,79,126
+[G019 Gold Topaz]
+- 240,143,30,126
+[G020 Cobalt Blue Extra]
+- 1,58,186,126
+[G021 Midnight Blue]
+- 40,45,83,126
+[G022 Aquamarine Blue]
+- 1,147,180,126
+[G023 Copper Blue]
+- 3,185,187,126
+[G024 Steel Blue]
+- 2,87,145,126
+[G025 Steel Grey]
+- 7,70,99,126
+[G026 Cerulean Blue]
+- 2,72,207,126
+[G030 Jade Green]
+- 1,71,68,126
+[G031 Olive Green]
+- 84,113,40,126
+[G032 Emerald Green]
+- 2,101,35,126
+[G033 Teal Green]
+- 2,119,140,126
+[G034 Fluoro Green]
+- 146,203,70,126
+[G035 Forest Green]
+- 1,86,62,126
+[G036 Lime Green]
+- 217,214,77,126
+[G037 Sargasso Green]
+- 135,131,48,126
+[G038 Uranium Green]
+- 206,251,69,126
+[G040 Purple]
+- 147,37,109,126
+[G045 Indigo]
+- 40,40,73,126
+[G049 Nero Duro (Stiff Black)]
+- 0,0,0,126
+[G050 Black]
+- 0,0,0,126
+[G051 Aubergine]
+- 137,25,56,126
+[G052 Tea]
+- 133,13,13,126
+[G054 Bronze]
+- 112,87,45,126
+[G055 Grey]
+- 74,71,65,126
+[G059 Eel Green]
+- 99,114,54,126
+[G060 Silver Blue Lustre]
+- 1,63,184,126
+[G061 Gold Lustre]
+- 153,38,25,126
+[G062 Black Lustre]
+- 2,2,2,126
+[G063 Iris Yellow Lustre]
+- 182,47,33,126
+[G065 Purple Lustre]
+- 189,89,173,126
+[G066 Red Lustre Extra]
+- 119,17,6,126
+[G067 Green Lustre]
+- 2,181,178,126
+[G068 Clear Lustre]
+- 246,246,246,126
+[G070 Saffron]
+- 253,122,56,126
+[G071 Orange]
+- 254,95,50,126
+[G072 Scarlet]
+- 169,2,23,126
+[G073 Citron]
+- 254,224,86,126
+[G074 Cherry Red]
+- 238,10,42,126
+[G075 Copper Ruby]
+- 146,7,21,126
+[G076 Yellow]
+- 254,191,83,126
+[G077 Daffodil]
+- 253,199,75,126
+[G080 Photosensitive Ruby]
+- 245,245,245,126
+[G090 Lime Aventurine]
+- 102,161,72,126
