@@ -74,12 +74,13 @@ signals:
 	void textMessage(QString msg);
 	void modeChanged(int mode);
 	void projectionChanged();
-	void updateRecipe();
 
 public slots:
 	void undo();
 	void redo();
 	void setMode(int mode);
+	void setMode(int mode, bool viewRecipe, Cane* c);
+	void insertMode(Cane* c, int mode);
 	void clearCurrentCane();
 	void setCane(Cane* c);
 	void exactChange();

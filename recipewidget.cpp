@@ -13,15 +13,14 @@ RecipeWidget::RecipeWidget(QWidget *parent, OpenGLWidget* openglWidget) :
 	setHeaderLabels(headers);
 	caneOutdated = true;
 	this->openglWidget = openglWidget;
-	this->setSelectionMode(QAbstractItemView::ExtendedSelection);
+	this->setSelectionMode(QAbstractItemView::SingleSelection);
 	connect(this,SIGNAL(itemChanged(QTreeWidgetItem*,int)),this,SLOT(changeData(QTreeWidgetItem*,int)));
 	connect(this,SIGNAL(itemClicked(QTreeWidgetItem*,int)),this,SLOT(singleClickEvent(QTreeWidgetItem*,int)));
 	//connect(this,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(doubleClickEvent(QTreeWidgetItem*,int)));
 	connect(this,SIGNAL(recipeCaneChanged()),openglWidget->getModel(),SLOT(exactChange()));
 	connect(openglWidget->getModel(), SIGNAL(caneChanged()), this, SLOT(updateRecipe()));
-	//connect(openglWidget->getModel(), SIGNAL(updateRecipe()), this, SLOT(updateRecipe()));
+	connect(this, SIGNAL(addOperation(Cane*,int)), openglWidget->getModel(), SLOT(insertMode(Cane*,int)));
 	newClear();
-	//this->setEditTriggers(QTreeWidget::SelectedClicked);
 }
 
 bool RecipeWidget :: isLibraryCane(QTreeWidgetItem* item)
@@ -274,9 +273,6 @@ void RecipeWidget :: updateRecipe()
 	newClear();
 	if (openglWidget->getModel()->getCane() == NULL)
 	{
-		QMessageBox box;
-		box.setText("hi");
-		box.exec();
 		return;
 	}
 	updateRecipe(openglWidget->getModel()->getCane(), visibleRootItem());

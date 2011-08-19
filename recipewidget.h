@@ -14,9 +14,11 @@ class RecipeWidget : public QTreeWidget
 	Q_OBJECT
 public:
 	RecipeWidget(QWidget* parent, OpenGLWidget* openglWidget);
+	Cane* getCane(QTreeWidgetItem* node);
 
 signals:
 	void recipeCaneChanged();
+	void addOperation(Cane*,int);
 
 public slots:
 	void updateRecipe();
@@ -32,7 +34,6 @@ private:
 	OpenGLWidget* openglWidget;
 	void newClear();
 	QTreeWidgetItem* visibleRootItem();
-	Cane* getCane(QTreeWidgetItem* node);
 	bool updateLibraryColumn(Cane* cane,QTreeWidgetItem* node, bool isInLibrary = false);
 	void colorPicker(QTreeWidgetItem* item,int column);
 	bool isLibraryCane(QTreeWidgetItem* item);

@@ -20,7 +20,7 @@ Controller::Controller(int argc, char **argv)
 
 	connect(model, SIGNAL(caneChanged()), mainWindow->openglWidget, SLOT(caneChanged()));
 	connect(model, SIGNAL(projectionChanged()), mainWindow->openglWidget, SLOT(projectionChanged()));
-	
+
 	QSignalMapper* modeSignalMapper = new QSignalMapper(model);
 	modeSignalMapper->setMapping(mainWindow->pull_button, PULL_MODE);
 	modeSignalMapper->setMapping(mainWindow->bundle_button, BUNDLE_MODE);
@@ -32,7 +32,8 @@ Controller::Controller(int argc, char **argv)
 	connect(mainWindow->case_button, SIGNAL(clicked()), modeSignalMapper, SLOT(map()));
 	connect(mainWindow->flatten_button, SIGNAL(clicked()), modeSignalMapper, SLOT(map()));
 	connect(mainWindow->snap_button, SIGNAL(clicked()), modeSignalMapper, SLOT(map()));
-	connect(modeSignalMapper, SIGNAL(mapped(int)), model, SLOT(setMode(int)));
+	connect(modeSignalMapper, SIGNAL(mapped(int)), mainWindow, SLOT(newMode(int)));
+	connect(mainWindow, SIGNAL(setNewMode(int,bool,Cane*)), model, SLOT(setMode(int,bool,Cane*)));
 
 	connect(mainWindow->undo_button, SIGNAL(pressed()), model, SLOT(undo()));
 	connect(mainWindow->redo_button, SIGNAL(pressed()), model, SLOT(redo()));

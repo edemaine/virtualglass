@@ -983,6 +983,16 @@ void MainWindow::toggleRecipe()
 	}
 }
 
+void MainWindow :: newMode(int i)
+{
+	if (recipeWidget->selectedItems().isEmpty())
+		emit setNewMode(i,isRecipe, model->getCane());
+	else
+	{
+		emit setNewMode(i,isRecipe, recipeWidget->getCane(recipeWidget->selectedItems().at(0)));
+	}
+}
+
 void MainWindow::updatePreview()
 {
 	previewLabel->setPixmap(QPixmap::grabWidget(openglWidget));

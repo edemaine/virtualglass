@@ -35,10 +35,11 @@ public:
 signals:
 	void setCaneSig(Cane* c);
 	void clearCommandSig();
+	void setNewMode(int i, bool viewRecipe,Cane* c);
 
 public slots:
 	void modeChanged(int mode);
-	void projectionChanged(); 
+	void projectionChanged();
 	void saveCaneToLibrary();
 	void exportLibraryDialog();
 	void importLibraryDialog();
@@ -60,6 +61,7 @@ public slots:
 	void toggleRecipe();
 	void updateLibraryToolTip(LibraryCaneWidget* lc);
 	void updatePreview();
+	void newMode(int i);
 
 private:
 	Model* model;

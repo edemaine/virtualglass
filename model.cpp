@@ -34,24 +34,24 @@ Model :: Model()
 
 void Model :: setOrthographicProjection()
 {
-        setProjection(ORTHOGRAPHIC_PROJECTION);
+		setProjection(ORTHOGRAPHIC_PROJECTION);
 }
 
 void Model :: setPerspectiveProjection()
 {
-       	setProjection(PERSPECTIVE_PROJECTION);
+		setProjection(PERSPECTIVE_PROJECTION);
 }
 
 void Model :: setProjection(int p)
 {
-        if (p == ORTHOGRAPHIC_PROJECTION)
+		if (p == ORTHOGRAPHIC_PROJECTION)
 	{
-                projection = p;
+				projection = p;
 		emit projectionChanged();
 	}
-        else if (p == PERSPECTIVE_PROJECTION)
+		else if (p == PERSPECTIVE_PROJECTION)
 	{
-                projection = p;
+				projection = p;
 		emit projectionChanged();
 	}
 }
@@ -178,6 +178,56 @@ void Model :: setMode(int mode)
 		break;
 	}
 	emit modeChanged(this->mode);
+}
+
+void Model :: setMode (int mode, bool viewRecipe, Cane* c)
+{
+	if (viewRecipe && c!=NULL)
+		insertMode(c, mode);
+	else
+		setMode(mode);
+}
+
+void Model :: insertMode(Cane* c, int mode)
+{
+	if (c == NULL)
+		return;
+
+	switch(mode)
+	{
+	case FLATTEN_MODE:
+		history->saveState(cane);
+		c->createFlatten();
+		slowGeometryUpdate();
+		cacheGeometry();
+		break;
+	case PULL_MODE:
+		history->saveState(cane);
+		c->createPull();
+		slowGeometryUpdate();
+		cacheGeometry();
+		break;
+	case BUNDLE_MODE:
+		history->saveState(cane);
+		c->createBundle();
+		slowGeometryUpdate();
+		cacheGeometry();
+		activeSubcane = -1;
+		break;
+	case CASING_MODE:
+		geometry.clear();
+		if (show2D)
+		{
+			c->createCasing(1.0);
+		}
+		else
+		{
+			c->createCasing(1.0);
+		}
+		geometryFresh = 0;
+		emit caneChanged();
+		break;
+	}
 }
 
 void Model :: setActiveSubcane(int subcane)
