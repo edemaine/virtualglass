@@ -33,6 +33,8 @@ Controller::Controller(int argc, char **argv)
 	connect(modeSignalMapper, SIGNAL(mapped(int)), mainWindow, SLOT(newMode(int)));
 	connect(mainWindow, SIGNAL(setNewMode(int,bool,Cane*)), model, SLOT(setMode(int,bool,Cane*)));
 
+	connect(mainWindow->toggle2D_button, SIGNAL(pressed()), mainWindow->openglWidget, SLOT(toggle2D()));
+
 	connect(mainWindow->undo_button, SIGNAL(pressed()), model, SLOT(undo()));
 	connect(mainWindow->redo_button, SIGNAL(pressed()), model, SLOT(redo()));
 	connect(mainWindow->clear_button, SIGNAL(pressed()), model, SLOT(clearCurrentCane()));

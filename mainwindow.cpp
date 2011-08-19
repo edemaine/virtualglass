@@ -134,15 +134,6 @@ void MainWindow::setupMenuBar()
 
 	projectionChanged(); // Initialize projection menu
 
-
-	QAction* toggle2D = new QAction(tr("&Toggle 2D View"), this);
-	toggle2D->setStatusTip(tr("Switch between 2D and 3D view."));
-	toggle2D->setCheckable(true);
-	toggle2D->setChecked(false);
-	connect(toggle2D, SIGNAL(triggered()), openglWidget, SLOT(toggle2D()));
-	toggle2D->setToolTip("Not Implemented");
-	viewMenu->addAction(toggle2D);
-
 	QAction* backgroundColor = new QAction(tr("&Change Background Color"), this);
 	backgroundColor->setStatusTip(tr("Change the background color of the cane."));
 	connect(backgroundColor, SIGNAL(triggered()), this, SLOT(changeBgColorDialog()));
@@ -160,14 +151,14 @@ void MainWindow::setupMenuBar()
 	connect(zoomOut, SIGNAL(triggered()), openglWidget, SLOT(zoomOut()));
 	viewMenu->addAction(zoomOut);
 
-        caneMenu = menuBar()->addMenu(tr("&New Cane"));
+		caneMenu = menuBar()->addMenu(tr("&New Cane"));
 
-        QAction* newCaneColor = new QAction(tr("&New Cane (Custom Color)"), this);
+		QAction* newCaneColor = new QAction(tr("&New Cane (Custom Color)"), this);
 	zoomOut->setStatusTip(tr("Create a new cane of desired color."));
 	connect(newCaneColor, SIGNAL(triggered()), this, SLOT(newColorPickerCaneDialog()));
 	caneMenu->addAction(newCaneColor);
 
-        QAction* newBrandColor = new QAction(tr("&New Cane (Brand Color)"), this);
+		QAction* newBrandColor = new QAction(tr("&New Cane (Brand Color)"), this);
 	zoomOut->setStatusTip(tr("Create a new cane using standard colors."));
 	connect(newBrandColor, SIGNAL(triggered()), this, SLOT(newBrandCaneDialog()));
 	caneMenu->addAction(newBrandColor);
@@ -296,77 +287,77 @@ void MainWindow::setupLibraryArea()
 void MainWindow::seedLibrary()
 {
 	// Now seed the library with some basic canes
-        Cane* circle = new Cane(BASE_CIRCLE_CANETYPE);
-        Cane* square = new Cane(BASE_SQUARE_CANETYPE);
-        Cane* hexagon = new Cane(BASE_POLYGONAL_CANETYPE);
+		Cane* circle = new Cane(BASE_CIRCLE_CANETYPE);
+		Cane* square = new Cane(BASE_SQUARE_CANETYPE);
+		Cane* hexagon = new Cane(BASE_POLYGONAL_CANETYPE);
 	Cane* stretch = new Cane(PULL_CANETYPE);
 
-        hexagon->vertices.clear();
-        Point p;
-        p.x = cos(0);
-        p.y = sin(0);
-        hexagon->vertices.push_back(p);
-        p.x = cos(PI/3);
-        p.y = sin(PI/3);
-        hexagon->vertices.push_back(p);
-        p.x = cos(2*PI/3);
-        p.y = sin(2*PI/3);
-        hexagon->vertices.push_back(p);
-        p.x = cos(PI);
-        p.y = sin(PI);
-        hexagon->vertices.push_back(p);
-        p.x = cos(4*PI/3);
-        p.y = sin(4*PI/3);
-        hexagon->vertices.push_back(p);
-        p.x = cos(5*PI/3);
-        p.y = sin(5*PI/3);
-        hexagon->vertices.push_back(p);
+		hexagon->vertices.clear();
+		Point p;
+		p.x = cos(0);
+		p.y = sin(0);
+		hexagon->vertices.push_back(p);
+		p.x = cos(PI/3);
+		p.y = sin(PI/3);
+		hexagon->vertices.push_back(p);
+		p.x = cos(2*PI/3);
+		p.y = sin(2*PI/3);
+		hexagon->vertices.push_back(p);
+		p.x = cos(PI);
+		p.y = sin(PI);
+		hexagon->vertices.push_back(p);
+		p.x = cos(4*PI/3);
+		p.y = sin(4*PI/3);
+		hexagon->vertices.push_back(p);
+		p.x = cos(5*PI/3);
+		p.y = sin(5*PI/3);
+		hexagon->vertices.push_back(p);
 
 	stretch->subcaneCount = 1;
 	stretch->amts[0] = 0.0;
 	stretch->amts[1] = 100.0; // amts[0] = twist, amts[1] = stretch
 
-        circle->color.r = square->color.r = hexagon->color.r = 1.0;
-        circle->color.g = square->color.g = hexagon->color.g = 0.5;
-        circle->color.b = square->color.b = hexagon->color.b = 0.5;
-        circle->color.a = square->color.a = hexagon->color.a = 0.8;
-        stretch->subcanes[0] = circle;
-        emit setCaneSig(stretch);
+		circle->color.r = square->color.r = hexagon->color.r = 1.0;
+		circle->color.g = square->color.g = hexagon->color.g = 0.5;
+		circle->color.b = square->color.b = hexagon->color.b = 0.5;
+		circle->color.a = square->color.a = hexagon->color.a = 0.8;
+		stretch->subcanes[0] = circle;
+		emit setCaneSig(stretch);
 	saveCaneToLibrary();
-        stretch->subcanes[0] = square;
-        emit setCaneSig(stretch);
-        saveCaneToLibrary();
-        stretch->subcanes[0] = hexagon;
+		stretch->subcanes[0] = square;
+		emit setCaneSig(stretch);
+		saveCaneToLibrary();
+		stretch->subcanes[0] = hexagon;
 	emit setCaneSig(stretch);
 	saveCaneToLibrary();
 
-        circle->color.r = square->color.r = hexagon->color.r = 0.5;
-        circle->color.g = square->color.g = hexagon->color.g = 1.0;
-        circle->color.b = square->color.b = hexagon->color.b = 0.5;
-        circle->color.a = square->color.a = hexagon->color.a = 0.8;
-        stretch->subcanes[0] = circle;
-        emit setCaneSig(stretch);
-        saveCaneToLibrary();
-        stretch->subcanes[0] = square;
-        emit setCaneSig(stretch);
-        saveCaneToLibrary();
-        stretch->subcanes[0] = hexagon;
-        emit setCaneSig(stretch);
-        saveCaneToLibrary();
+		circle->color.r = square->color.r = hexagon->color.r = 0.5;
+		circle->color.g = square->color.g = hexagon->color.g = 1.0;
+		circle->color.b = square->color.b = hexagon->color.b = 0.5;
+		circle->color.a = square->color.a = hexagon->color.a = 0.8;
+		stretch->subcanes[0] = circle;
+		emit setCaneSig(stretch);
+		saveCaneToLibrary();
+		stretch->subcanes[0] = square;
+		emit setCaneSig(stretch);
+		saveCaneToLibrary();
+		stretch->subcanes[0] = hexagon;
+		emit setCaneSig(stretch);
+		saveCaneToLibrary();
 
-        circle->color.r = square->color.r = hexagon->color.r = 0.5;
-        circle->color.g = square->color.g = hexagon->color.g = 0.5;
-        circle->color.b = square->color.b = hexagon->color.b = 1.0;
-        circle->color.a = square->color.a = hexagon->color.a = 0.8;
-        stretch->subcanes[0] = circle;
-        emit setCaneSig(stretch);
-        saveCaneToLibrary();
-        stretch->subcanes[0] = square;
-        emit setCaneSig(stretch);
-        saveCaneToLibrary();
-        stretch->subcanes[0] = hexagon;
-        emit setCaneSig(stretch);
-        saveCaneToLibrary();
+		circle->color.r = square->color.r = hexagon->color.r = 0.5;
+		circle->color.g = square->color.g = hexagon->color.g = 0.5;
+		circle->color.b = square->color.b = hexagon->color.b = 1.0;
+		circle->color.a = square->color.a = hexagon->color.a = 0.8;
+		stretch->subcanes[0] = circle;
+		emit setCaneSig(stretch);
+		saveCaneToLibrary();
+		stretch->subcanes[0] = square;
+		emit setCaneSig(stretch);
+		saveCaneToLibrary();
+		stretch->subcanes[0] = hexagon;
+		emit setCaneSig(stretch);
+		saveCaneToLibrary();
 
 	emit setCaneSig(NULL);
 	displayTextMessage("Default library loaded");
@@ -544,14 +535,14 @@ void MainWindow::setupNewColorPickerCaneDialog()
 
 	caneTypeBox = new QComboBox(caneForm->widget());
 	caneTypeBox->addItem("Circle Base", QVariant(BASE_CIRCLE_CANETYPE));
-        caneTypeBox->addItem("Square Base", QVariant(BASE_SQUARE_CANETYPE));
+		caneTypeBox->addItem("Square Base", QVariant(BASE_SQUARE_CANETYPE));
 
-        caneForm->addRow("Base Type", caneTypeBox);
+		caneForm->addRow("Base Type", caneTypeBox);
 
 	QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-        connect(buttons,SIGNAL(accepted()), caneDialog, SLOT(accept()));
-        connect(buttons,SIGNAL(accepted()), this, SLOT(colorPickerSelected()));
-        connect(buttons,SIGNAL(rejected()), caneDialog, SLOT(reject()));
+		connect(buttons,SIGNAL(accepted()), caneDialog, SLOT(accept()));
+		connect(buttons,SIGNAL(accepted()), this, SLOT(colorPickerSelected()));
+		connect(buttons,SIGNAL(rejected()), caneDialog, SLOT(reject()));
 
 	caneForm->addRow(buttons);
 
@@ -873,7 +864,7 @@ void MainWindow::colorPickerSelected()
 	if (!isOk)
 		return;
 
-        Cane* c = new Cane(caneType);
+		Cane* c = new Cane(caneType);
 	Cane* stch = new Cane(PULL_CANETYPE);
 
 	stch->subcaneCount = 1;
@@ -885,7 +876,7 @@ void MainWindow::colorPickerSelected()
 	c->color.b = color.blueF();
 	c->color.a = color.alphaF();
 
-        model->addCane(stch);
+		model->addCane(stch);
 }
 
 void MainWindow::setupWorkArea()
@@ -896,6 +887,8 @@ void MainWindow::setupWorkArea()
 	bundle_button = new QPushButton("Bundle");
 	flatten_button = new QPushButton("Flatten");
 	flatten_button->setToolTip("Drag Mouse Horizontally to Squish, Vertically to Flatten");
+	toggle2D_button = new QPushButton("2D View");
+	toggle2D_button->setToolTip(tr("Switch between 2D and 3D view."));
 	snap_button = new QPushButton("Alternate Snap Modes");
 	snap_button->setToolTip("TODO");
 	undo_button = new QPushButton("Undo");
@@ -915,9 +908,10 @@ void MainWindow::setupWorkArea()
 	operButton_layout->addWidget(pull_button);
 	operButton_layout->addWidget(bundle_button);
 	operButton_layout->addWidget(flatten_button);
+	operButton_layout->addWidget(toggle2D_button);
 	operButton_layout->addWidget(snap_button);
-        operButton_layout->addWidget(redo_button);
-        operButton_layout->addWidget(undo_button);
+		operButton_layout->addWidget(redo_button);
+		operButton_layout->addWidget(undo_button);
 	operButton_layout->addWidget(save_button);
 	operButton_layout->addWidget(clear_button);
 	operButton_layout->addWidget(previewLabel,1, Qt::AlignHCenter);

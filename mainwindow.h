@@ -30,6 +30,7 @@ public:
 	QPushButton* redo_button;
 	QPushButton* save_button;
 	QPushButton* clear_button;
+	QPushButton* toggle2D_button;
 
 signals:
 	void setCaneSig(Cane* c);
@@ -115,8 +116,8 @@ private:
 	int selectedBrand;
 	int selectedColor;
 	QStringList* caneTypeList;
-        //QTreeView* caneColorListBox;
-        QListView* caneColorListBox;
+		//QTreeView* caneColorListBox;
+		QListView* caneColorListBox;
 	QList<QStringList>* caneNameListList;
 	QList<QList<QColor> >* caneColorListList;
 
