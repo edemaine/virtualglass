@@ -102,7 +102,7 @@ void applyPartialMoveTransform(Geometry* geometry, int subcane, float deltaX, fl
 	// Find group for subcane
 	Group* subcaneGroup;
 	for (uint32_t g = 0; g < geometry->groups.size(); ++g)
-		if (geometry->groups[g].tag == (uint32_t) subcane)
+                if (geometry->groups[g].tag == (uint32_t) (subcane + 1))
 		{
 			subcaneGroup = &(geometry->groups[g]);
 
@@ -121,6 +121,25 @@ void applyPartialMoveTransform(Geometry* geometry, int subcane, float deltaX, fl
 				geometry->vertices[v].position.y += deltaY;
 			}
 		}
+}
+
+void applyCasingTransform(Geometry* geometry, float casingRadius)
+{
+        for (uint32_t g = 0; g < geometry->groups.size(); ++g)
+                if (geometry->groups[g].tag == (uint32_t) 0)
+                {
+                        for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
+                        {
+                                applyCasingTransform(&(geometry->vertices[v]), casingRadius);
+                        }
+                }
+}
+
+void applyCasingTransform(Vertex* v, float casingRadius)
+{
+        // Just shrink it
+        v->position.x /= casingRadius;
+        v->position.y /= casingRadius;
 }
 
 void applyPullTransform(Geometry* geometry, Cane* transformNode)
@@ -159,14 +178,14 @@ by its ancestors in the cane DAG.
 Vertex applyTransforms(Vertex v, Cane** ancestors, int ancestorCount, bool fullTransforms)
 {
 	/*
-  The transformations are applied back to front to match how they
-  are loaded into the array. Because the transform array is created by
-  a depth-first traversal of the cane DAG, transforms lower in the DAG
-  (i.e. closer to the leaves) are added later. However, they
-  represent the first operations done on the cane, so need to be applied
-  first.
-  */
-	for (int i = ancestorCount - 1; i >= 0; --i)
+        The transformations are applied back to front to match how they
+        are loaded into the array. Because the transform array is created by
+        a depth-first traversal of the cane DAG, transforms lower in the DAG
+        (i.e. closer to the leaves) are added later. However, they
+        represent the first operations done on the cane, so need to be applied
+        first.
+        */
+        for (int i = ancestorCount - 1; i >= 0; --i)
 	{
 		/*
 	Each cane node has a type and an amount.
@@ -427,10 +446,10 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCoun
 	uint32_t first_triangle = geometry->triangles.size();
 
 	/*
-  Draw the walls of the cylinder. Note that the z location is
-  adjusted by the total stretch experienced by the cane so that
-  the z values range between 0 and 1.
-  */
+        Draw the walls of the cylinder. Note that the z location is
+        adjusted by the total stretch experienced by the cane so that
+        the z values range between 0 and 1.
+        */
 	//Generate verts:
 	for (unsigned int i = 0; i < axialResolution; ++i)
 	{
@@ -466,10 +485,10 @@ void meshCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCoun
 	assert(geometry->valid());
 
 	/*
-  Draw the cylinder bottom, then top.
-  The mesh uses a set of n-2 triangles with a common vertex
-  to draw a regular n-gon.
-  */
+        Draw the cylinder bottom, then top.
+        The mesh uses a set of n-2 triangles with a common vertex
+        to draw a regular n-gon.
+        */
 	for (int side = 0; side <= 1; ++side) {
 		float z = (side?1.0:0.0);
 		float nz = (side?1.0:-1.0);
@@ -536,10 +555,10 @@ void mesh2DCircularBaseCane(Geometry *geometry, Cane** ancestors, int ancestorCo
 	uint32_t first_triangle = geometry->triangles.size();
 
 	/*
-  Draw the cylinder top only.
-  The mesh uses a set of n-2 triangles with a common vertex
-  to draw a regular n-gon.
-  */
+        Draw the cylinder top only.
+        The mesh uses a set of n-2 triangles with a common vertex
+        to draw a regular n-gon.
+        */
 	uint32_t base = geometry->vertices.size();
 	for (unsigned int j = 0; j < angularResolution; ++j)
 	{
@@ -575,21 +594,46 @@ the transforms array is filled with with the transformations encountered at each
 leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
-void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
-				  int resolution, bool fullTransforms, int groupIndex)
+void generateMesh(Cane* c, Geometry *geometry, Cane* casingCane, Cane** ancestors, int* ancestorCount,
+                                  int resolution, bool fullTransforms, bool casing, int groupIndex)
 {
-	int i, passGroupIndex;
+        int i, passGroupIndex, passCasing;
 
 	if (c == NULL)
 		return;
 
 	// Make recursive calls depending on the type of the current node
 	ancestors[*ancestorCount] = c;
-	*ancestorCount += 1;
-	if (c->type == BASE_CIRCLE_CANETYPE)
+        *ancestorCount += 1;
+
+        // First deal with casing
+        if (casing)
+        {
+                if (c->casing > 0)
+                {
+                        passCasing = false;
+                        casingCane->type = BASE_CIRCLE_CANETYPE;
+                        casingCane->color.r = casingCane->color.g = casingCane->color.b = 1.0;
+                        casingCane->color.a = 0.2;
+                        // group index 0 is special casing group for now
+                        meshCircularBaseCane(geometry, ancestors, *ancestorCount,
+                                resolution, casingCane, 0, fullTransforms);
+                }
+                else
+                {
+                        passCasing = true;
+                }
+        }
+        else
+        {
+                passCasing = false;
+        }
+
+        // Now do regular recursion on node
+        if (c->type == BASE_CIRCLE_CANETYPE)
 	{
 		meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-							 resolution, c, groupIndex, fullTransforms);
+                        resolution, c, groupIndex, fullTransforms);
 	}
 	else if (c->type == BASE_SQUARE_CANETYPE)
 	{
@@ -601,12 +645,12 @@ void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCo
 		for (i = 0; i < c->subcaneCount; ++i)
 		{
 			if (groupIndex == -1)
-				passGroupIndex = i;
+                                passGroupIndex = i+1; // 0 is reserved for casing
 			else
 				passGroupIndex = groupIndex;
 
-			generateMesh(c->subcanes[i], geometry, ancestors, ancestorCount,
-						 resolution, fullTransforms, passGroupIndex);
+                        generateMesh(c->subcanes[i], geometry, casingCane, ancestors, ancestorCount,
+                                                 resolution, fullTransforms, passCasing, passGroupIndex);
 		}
 	}
 	*ancestorCount -= 1;

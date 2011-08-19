@@ -132,7 +132,9 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].position));
 	glEnableClientState(GL_VERTEX_ARRAY);
 	for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
-		glColor4ubv(reinterpret_cast< const GLubyte * >(&(g->tag)));
+                if (g->tag == 0) // skip the casing group
+                        continue;
+                glColor4ubv(reinterpret_cast< const GLubyte * >(&(g->tag)));
 		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 					   GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
 	}
@@ -146,7 +148,7 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 
 	updateTriangles();
 
-	return (int) c[0];
+        return ((int) c[0]) - 1;
 }
 
 Point OpenGLWidget :: getClickedPlanePoint(int mouseLocX, int mouseLocY)
@@ -298,7 +300,7 @@ void OpenGLWidget :: paintGL()
 		for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
 			assert(g->cane);
 			Color c = g->cane->color;
-			if (model && (int)g->tag == model->getActiveSubcane()) {
+                        if (model && (int)g->tag == (model->getActiveSubcane() + 1)) {
 				c.xyz += make_vector(0.1f, 0.1f, 0.1f);
 			}
 			glColor3f(c.r, c.g, c.b);
@@ -792,16 +794,16 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		break;
 	case BUNDLE_MODE:
 		/*
- How the parameters for moveCane() are calculated is not obvious.
- The idea is to make mouse X/Y correspond to the cane moving
- left-right/up-down *regardless* of where the camera is. This
- is why theta (the camera angle relative to the look-at point) is
- also involved.
+                How the parameters for moveCane() are calculated is not obvious.
+                The idea is to make mouse X/Y correspond to the cane moving
+                left-right/up-down *regardless* of where the camera is. This
+                is why theta (the camera angle relative to the look-at point) is
+                also involved.
 
- Essentially, the parameters convert the amount moved in X and Y
- (variables `relX' and `relY') to the amount moved in X and Y
- according to axes on which the cane lives.
- */
+                Essentially, the parameters convert the amount moved in X and Y
+                (variables `relX' and `relY') to the amount moved in X and Y
+                according to axes on which the cane lives.
+                */
 
 		if (e->buttons() & 0x00000001) // if left mouse button is down
 		{
@@ -836,7 +838,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		}
 		break;
 	case CASING_MODE:
-		model->adjustCaneCasing(-relX);
+                model->adjustCaneCasing(0.5);
 		break;
 	case FLATTEN_MODE:
 		if (controlButtonDown)

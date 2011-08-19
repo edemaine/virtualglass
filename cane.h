@@ -31,8 +31,8 @@ public:
 	void add(Cane* addl);
 	void deleteCane(int subcane);
 	void moveCane(int subcane, float delta_x, float delta_y, float delta_z);
-	void createCasing(float radius);
-	void adjustCasing(float radius);
+        void createCasing(float radius);
+        void adjustCasing(float delta);
 	int leafNodes();
 	Cane* deepCopy();
 	void setColor(Color color);
@@ -43,7 +43,8 @@ public:
 	QString typeAmt(int type, int index);
 
 	int type;
-	float amts[MAX_AMT_TYPES];
+        float casing;
+        float amts[MAX_AMT_TYPES];
 	int subcaneCount;
 	Point subcaneLocations[MAX_SUBCANE_COUNT]; // z is center displacement
 	Cane* subcanes[MAX_SUBCANE_COUNT];

@@ -23,7 +23,8 @@ void Cane :: reset()
 	int i;
 
 	type = UNASSIGNED_CANETYPE;
-	for (i = 0; i < MAX_AMT_TYPES; ++i)
+        casing = -1.0;
+        for (i = 0; i < MAX_AMT_TYPES; ++i)
 	{
 		amts[i] = 0.0;
 	}
@@ -61,7 +62,8 @@ void Cane :: shallowCopy(Cane* dest)
 {
 	int i;
 
-	dest->type = this->type;
+        dest->type = this->type;
+        dest->casing = this->casing;
 	for (i = 0; i < MAX_AMT_TYPES; ++i)
 	{
 		dest->amts[i] = this->amts[i];
@@ -257,19 +259,7 @@ void Cane :: moveCane(int subcane, float delta_x, float delta_y, float delta_z)
 
 void Cane :: createCasing(float radius)
 {
-	if (this->type == CASING_CANETYPE)
-		return;
-	Cane* copy = new Cane(UNASSIGNED_CANETYPE);
-	this->shallowCopy(copy);
-	this->reset();
-	this->type = CASING_CANETYPE;
-	this->subcaneCount = 1;
-	this->subcanes[0] = copy;
-	this->amts[0] = radius;
-	this->color.r = 1.0; // casing coloring
-	this->color.g = 1.0;
-	this->color.b = 1.0;
-	this->color.a = 0.2;
+        this->casing = radius;
 }
 
 void Cane :: adjustCasing(float delta)

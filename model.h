@@ -91,7 +91,8 @@ private:
 	int mode;
 	int projection;
 	Cane *cane;
-	CaneHistory *history;
+        Cane casingCane;
+        CaneHistory *history;
 	Geometry cachedGeometry;
 	Geometry geometry;
 	int geometryFresh;
