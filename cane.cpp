@@ -24,6 +24,7 @@ void Cane :: reset()
 
 	type = UNASSIGNED_CANETYPE;
         casing = -1.0;
+        vertices.clear();
         for (i = 0; i < MAX_AMT_TYPES; ++i)
 	{
 		amts[i] = 0.0;
@@ -64,7 +65,11 @@ void Cane :: shallowCopy(Cane* dest)
 
         dest->type = this->type;
         dest->casing = this->casing;
-	for (i = 0; i < MAX_AMT_TYPES; ++i)
+        for (unsigned int v = 0; v < this->vertices.size(); ++v)
+        {
+                dest->vertices.push_back(this->vertices[v]);
+        }
+        for (i = 0; i < MAX_AMT_TYPES; ++i)
 	{
 		dest->amts[i] = this->amts[i];
 	}
@@ -302,6 +307,11 @@ Cane* Cane :: deepCopy()
 	Cane* copy;
 
 	copy = new Cane(this->type);
+        copy->casing = this->casing;
+        for (unsigned int v = 0; v < this->vertices.size(); ++v)
+        {
+                copy->vertices.push_back(this->vertices[v]);
+        }
 
 	for (i = 0; i < MAX_AMT_TYPES; ++i)
 	{
@@ -362,8 +372,12 @@ std::string typeToName(int type)
 		return "Casing Cane";
 	case FLATTEN_CANETYPE:
 		return "Flatten Cane";
-	case BASE_CIRCLE_CANETYPE:
-		return "Base Circle Cane";
+        case BASE_CIRCLE_CANETYPE:
+                return "Base Circle Cane";
+        case BASE_SQUARE_CANETYPE:
+                return "Base Square Cane";
+        case BASE_POLYGONAL_CANETYPE:
+                return "Base Polygonal Cane";
 	case UNASSIGNED_CANETYPE:
 		return "Unassigned Cane";
 	default:
@@ -383,7 +397,11 @@ std::string typeToType(int type)
 		return "Casing";
 	case FLATTEN_CANETYPE:
 		return "Flatten";
-	case BASE_CIRCLE_CANETYPE:
+        case BASE_CIRCLE_CANETYPE:
+                return "Base Circle";
+        case BASE_SQUARE_CANETYPE:
+                return "Base Circle";
+        case BASE_POLYGONAL_CANETYPE:
 		return "Base Circle";
 	case UNASSIGNED_CANETYPE:
 		return "Unassigned";

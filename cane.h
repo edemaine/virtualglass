@@ -44,6 +44,7 @@ public:
 
 	int type;
         float casing;
+        std::vector<Point> vertices;
         float amts[MAX_AMT_TYPES];
 	int subcaneCount;
 	Point subcaneLocations[MAX_SUBCANE_COUNT]; // z is center displacement

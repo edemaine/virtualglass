@@ -307,45 +307,77 @@ void MainWindow::setupLibraryArea()
 void MainWindow::seedLibrary()
 {
 	// Now seed the library with some basic canes
-	Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
+        Cane* circle = new Cane(BASE_CIRCLE_CANETYPE);
+        Cane* square = new Cane(BASE_SQUARE_CANETYPE);
+        Cane* hexagon = new Cane(BASE_POLYGONAL_CANETYPE);
 	Cane* stretch = new Cane(PULL_CANETYPE);
 
+        hexagon->vertices.clear();
+        Point p;
+        p.x = cos(0);
+        p.y = sin(0);
+        hexagon->vertices.push_back(p);
+        p.x = cos(PI/3);
+        p.y = sin(PI/3);
+        hexagon->vertices.push_back(p);
+        p.x = cos(2*PI/3);
+        p.y = sin(2*PI/3);
+        hexagon->vertices.push_back(p);
+        p.x = cos(PI);
+        p.y = sin(PI);
+        hexagon->vertices.push_back(p);
+        p.x = cos(4*PI/3);
+        p.y = sin(4*PI/3);
+        hexagon->vertices.push_back(p);
+        p.x = cos(5*PI/3);
+        p.y = sin(5*PI/3);
+        hexagon->vertices.push_back(p);
+
 	stretch->subcaneCount = 1;
-	stretch->subcanes[0] = c;
 	stretch->amts[0] = 0.0;
 	stretch->amts[1] = 100.0; // amts[0] = twist, amts[1] = stretch
 
-	c->color.r = 1.0;
-	c->color.g = 0.5;
-	c->color.b = 0.5;
-	c->color.a = 0.8;
-	emit setCaneSig(stretch);
+        circle->color.r = square->color.r = hexagon->color.r = 1.0;
+        circle->color.g = square->color.g = hexagon->color.g = 0.5;
+        circle->color.b = square->color.b = hexagon->color.b = 0.5;
+        circle->color.a = square->color.a = hexagon->color.a = 0.8;
+        stretch->subcanes[0] = circle;
+        emit setCaneSig(stretch);
 	saveCaneToLibrary();
-	c->type = BASE_SQUARE_CANETYPE;
-	emit setCaneSig(stretch);
-	saveCaneToLibrary();
-
-	c->color.r = 0.5;
-	c->color.g = 1.0;
-	c->color.b = 0.5;
-	c->color.a = 0.8;
-	c->type = BASE_CIRCLE_CANETYPE;
-	emit setCaneSig(stretch);
-	saveCaneToLibrary();
-	c->type = BASE_SQUARE_CANETYPE;
+        stretch->subcanes[0] = square;
+        emit setCaneSig(stretch);
+        saveCaneToLibrary();
+        stretch->subcanes[0] = hexagon;
 	emit setCaneSig(stretch);
 	saveCaneToLibrary();
 
-	c->color.r = 0.5;
-	c->color.g = 0.5;
-	c->color.b = 1.0;
-	c->color.a = 0.8;
-	c->type = BASE_CIRCLE_CANETYPE;
-	emit setCaneSig(stretch);
-	saveCaneToLibrary();
-	c->type = BASE_SQUARE_CANETYPE;
-	emit setCaneSig(stretch);
-	saveCaneToLibrary();
+        circle->color.r = square->color.r = hexagon->color.r = 0.5;
+        circle->color.g = square->color.g = hexagon->color.g = 1.0;
+        circle->color.b = square->color.b = hexagon->color.b = 0.5;
+        circle->color.a = square->color.a = hexagon->color.a = 0.8;
+        stretch->subcanes[0] = circle;
+        emit setCaneSig(stretch);
+        saveCaneToLibrary();
+        stretch->subcanes[0] = square;
+        emit setCaneSig(stretch);
+        saveCaneToLibrary();
+        stretch->subcanes[0] = hexagon;
+        emit setCaneSig(stretch);
+        saveCaneToLibrary();
+
+        circle->color.r = square->color.r = hexagon->color.r = 0.5;
+        circle->color.g = square->color.g = hexagon->color.g = 0.5;
+        circle->color.b = square->color.b = hexagon->color.b = 1.0;
+        circle->color.a = square->color.a = hexagon->color.a = 0.8;
+        stretch->subcanes[0] = circle;
+        emit setCaneSig(stretch);
+        saveCaneToLibrary();
+        stretch->subcanes[0] = square;
+        emit setCaneSig(stretch);
+        saveCaneToLibrary();
+        stretch->subcanes[0] = hexagon;
+        emit setCaneSig(stretch);
+        saveCaneToLibrary();
 
 	emit setCaneSig(NULL);
 	displayTextMessage("Default library loaded");
