@@ -160,14 +160,14 @@ void MainWindow::setupMenuBar()
 	connect(zoomOut, SIGNAL(triggered()), openglWidget, SLOT(zoomOut()));
 	viewMenu->addAction(zoomOut);
 
-	caneMenu = menuBar()->addMenu(tr("&Cane"));
+        caneMenu = menuBar()->addMenu(tr("&New Cane"));
 
-	QAction* newCaneColor = new QAction(tr("&New Cane Color"), this);
+        QAction* newCaneColor = new QAction(tr("&New Cane (Custom Color)"), this);
 	zoomOut->setStatusTip(tr("Create a new cane of desired color."));
 	connect(newCaneColor, SIGNAL(triggered()), this, SLOT(newColorPickerCaneDialog()));
 	caneMenu->addAction(newCaneColor);
 
-	QAction* newBrandColor = new QAction(tr("&New Cane Color From Brand"), this);
+        QAction* newBrandColor = new QAction(tr("&New Cane (Brand Color)"), this);
 	zoomOut->setStatusTip(tr("Create a new cane using standard colors."));
 	connect(newBrandColor, SIGNAL(triggered()), this, SLOT(newBrandCaneDialog()));
 	caneMenu->addAction(newBrandColor);
@@ -544,14 +544,14 @@ void MainWindow::setupNewColorPickerCaneDialog()
 
 	caneTypeBox = new QComboBox(caneForm->widget());
 	caneTypeBox->addItem("Circle Base", QVariant(BASE_CIRCLE_CANETYPE));
-	caneTypeBox->addItem("Square Base", QVariant(FLATTEN_CANETYPE));
+        caneTypeBox->addItem("Square Base", QVariant(BASE_SQUARE_CANETYPE));
 
-	caneForm->addRow("Base Type",caneTypeBox);
+        caneForm->addRow("Base Type", caneTypeBox);
 
 	QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-	connect(buttons,SIGNAL(accepted()),caneDialog,SLOT(accept()));
-	connect(buttons,SIGNAL(accepted()),this,SLOT(colorPickerSelected()));
-	connect(buttons,SIGNAL(rejected()),caneDialog,SLOT(reject()));
+        connect(buttons,SIGNAL(accepted()), caneDialog, SLOT(accept()));
+        connect(buttons,SIGNAL(accepted()), this, SLOT(colorPickerSelected()));
+        connect(buttons,SIGNAL(rejected()), caneDialog, SLOT(reject()));
 
 	caneForm->addRow(buttons);
 
@@ -873,11 +873,7 @@ void MainWindow::colorPickerSelected()
 	if (!isOk)
 		return;
 
-	saveCaneToLibrary();
-	//model->clearCurrentCane();
-	emit setCaneSig(NULL);
-
-	Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
+        Cane* c = new Cane(caneType);
 	Cane* stch = new Cane(PULL_CANETYPE);
 
 	stch->subcaneCount = 1;
@@ -888,16 +884,8 @@ void MainWindow::colorPickerSelected()
 	c->color.g = color.greenF();
 	c->color.b = color.blueF();
 	c->color.a = color.alphaF();
-	//model->setCane(stch);
-	//saveCaneToLibrary();
 
-	if (caneType == FLATTEN_CANETYPE)
-	{
-		stch->flatten(0.0,0.0,1.0);
-	}
-
-	//emit setCaneSig(stch);
-	model->addCane(stch);
+        model->addCane(stch);
 }
 
 void MainWindow::setupWorkArea()
