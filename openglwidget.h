@@ -49,7 +49,6 @@ private:
 	Geometry *geometry;
 	int resolution;
 	bool showAxes;
-	bool showGrid;
 	bool showSnaps;
 	bool showRefSnaps;
 	bool lockView;
@@ -89,7 +88,6 @@ public slots:
 	void setSideView();
 	void projectionChanged();
 	void toggleAxes();
-	void toggleGrid();
 	void toggleSnaps();
 	void toggleRefSnaps();
 	void lockTable();

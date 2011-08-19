@@ -38,7 +38,6 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 	resolution = HIGH_RESOLUTION;
 
 	showAxes = true;
-	showGrid = false;
 	showSnaps = false;
 	showRefSnaps = false;
 	show2D = false;
@@ -278,9 +277,6 @@ void OpenGLWidget :: paintGL()
 	if (showAxes)
 		drawAxes();
 
-	if (showGrid)
-		drawGrid();
-
 	if (showSnaps)
 		drawSnaps();
 
@@ -512,11 +508,6 @@ void OpenGLWidget :: toggleAxes()
 	setAxes(!showAxes);
 }
 
-void OpenGLWidget :: toggleGrid()
-{
-	setGrid(!showGrid);
-}
-
 void OpenGLWidget :: toggleSnaps()
 {
 	setSnaps(!showSnaps);
@@ -530,12 +521,6 @@ void OpenGLWidget :: toggleRefSnaps()
 void OpenGLWidget :: setAxes(bool show)
 {
 	showAxes = show;
-	update();
-}
-
-void OpenGLWidget :: setGrid(bool show)
-{
-	showGrid = show;
 	update();
 }
 
