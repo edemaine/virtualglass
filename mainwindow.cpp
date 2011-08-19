@@ -556,8 +556,8 @@ void MainWindow::setupNewBrandCaneDialog()
 	dummyList = new QStringList("Please select a cane type.");
 	dummyModel = new QStringListModel();
 	dummyModel->setStringList(*dummyList);
-	caneColorListBox = new QListView();//new QTreeView();
-	caneColorListBox->setModel(dummyModel);
+        caneColorListBox = new QListView();//QTreeView();
+        caneColorListBox->setModel(dummyModel);
 	dummyInUse = true;
 	selectedBrand = -1;
 	selectedColor = -1;
@@ -609,25 +609,32 @@ void MainWindow::updateSublist(QModelIndex i)
 	}
 	else
 	{
-		if (!dummyInUse)
-		{
-			QItemSelectionModel *m = caneColorListBox->selectionModel();
-			caneColorListBox->setModel(new QStringListModel(caneNameListList->at(index)));
-			/*                for (int i = 0; i < caneNameListList[index].size(); i++)
- {
-   caneColorListBox->drawRow(&makePainter(index,i), *(new QStyleOptionViewItem()), i);
- }*/
-			delete m;
-			selectedBrand = index;
-			selectedColor = -1;
-		}
-		else
-		{
-			caneColorListBox->setModel(new QStringListModel(caneNameListList->at(index)));
-			/*                for (int i = 0; i < caneNameListList[index].size(); i++)
-{
-caneColorListBox->drawRow(&makePainter(index,i), *(new QStyleOptionViewItem()), i);
-}*/
+                if (!dummyInUse)
+                {
+                        QItemSelectionModel *m = caneColorListBox->selectionModel();
+                        caneColorListBox->setModel(new QStandardItemModel(caneNameListList->at(index).size(),1));
+                        for (int i = 0; i < caneNameListList->at(index).size(); i++)
+                        {
+                                caneColorListBox->model()->setData(caneColorListBox->model()->index(i,0),caneNameListList->at(index).at(i),Qt::DisplayRole);
+                                QColor c = caneColorListList->at(index).at(i);
+                                c.setAlpha(255);
+                                caneColorListBox->model()->setData(caneColorListBox->model()->index(i,0),c,Qt::DecorationRole);
+                        }
+
+                        delete m;
+                        selectedBrand = index;
+                        selectedColor = -1;
+                }
+                else
+                {
+                        caneColorListBox->setModel(new QStandardItemModel(caneNameListList->at(index).size(),1));
+                        for (int i = 0; i < caneNameListList->at(index).size(); i++)
+                        {
+                                caneColorListBox->model()->setData(caneColorListBox->model()->index(i,0),caneNameListList->at(index).at(i),Qt::DisplayRole);
+                                QColor c = caneColorListList->at(index).at(i);
+                                c.setAlpha(255);
+                                caneColorListBox->model()->setData(caneColorListBox->model()->index(i,0),c,Qt::DecorationRole);
+                        }
 		}
 		dummyInUse = false;
 		selectedBrand = index;
@@ -721,7 +728,7 @@ void MainWindow::loadOfficialCanes()
 			if (color.length() > 3)
 			{
 				caneColorList->append(*(new QColor(color[0].toInt(),color[1].toInt(),
-												   color[2].toInt(),color[3].toInt())));
+                                                                   color[2].toInt(),color[3].toInt())));
 			}
 			else
 			{
@@ -734,7 +741,7 @@ void MainWindow::loadOfficialCanes()
 		{
 			if (onColor)
 			{
-				caneTypeList->append("Colot mismatch C");
+                                caneTypeList->append("Color mismatch C");
 				return; //throw error
 			}
 			currentCane++;
