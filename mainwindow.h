@@ -108,6 +108,11 @@ private:
 	QSpinBox* verticesBox;
 	QDoubleSpinBox* caneRadiusBox;
 
+	QFormLayout* caneBrandForm;
+	QComboBox* caneTypeBoxBrand;
+	QSpinBox* verticesBoxBrand;
+	QDoubleSpinBox* caneRadiusBoxBrand;
+
 	bool isRecipe;
 	QDialog* brandDialog;
 	QSplitter* caneSplitter;

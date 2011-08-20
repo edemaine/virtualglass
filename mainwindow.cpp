@@ -13,8 +13,9 @@ MainWindow::MainWindow(Model* model)
 	setupLibraryArea();
 	setupStatusBar();
 	setupMenuBar();
-	setupNewColorPickerCaneDialog();
 	setupNewBrandCaneDialog();
+	setupNewColorPickerCaneDialog();
+
 	setWindowTitle(tr("Virtual Glass"));
 
 	resize(1000, 750);
@@ -268,6 +269,14 @@ void MainWindow::setupStatusBar()
 	setStatusBar(statusBar);
 }
 
+Point polygonalBasePoint(int total,int index)
+{
+	Point p;
+	p.x = cos(2*PI*index/total);
+	p.y = sin(2*PI*index/total);
+	return p;
+}
+
 void MainWindow::setupLibraryArea()
 {
 	QWidget* stockWidget = new QWidget;
@@ -294,25 +303,11 @@ void MainWindow::seedLibrary()
 	Cane* stretch = new Cane(PULL_CANETYPE);
 
 	hexagon->vertices.clear();
-	Point p;
-	p.x = cos(0);
-	p.y = sin(0);
-	hexagon->vertices.push_back(p);
-	p.x = cos(PI/3);
-	p.y = sin(PI/3);
-	hexagon->vertices.push_back(p);
-	p.x = cos(2*PI/3);
-	p.y = sin(2*PI/3);
-	hexagon->vertices.push_back(p);
-	p.x = cos(PI);
-	p.y = sin(PI);
-	hexagon->vertices.push_back(p);
-	p.x = cos(4*PI/3);
-	p.y = sin(4*PI/3);
-	hexagon->vertices.push_back(p);
-	p.x = cos(5*PI/3);
-	p.y = sin(5*PI/3);
-	hexagon->vertices.push_back(p);
+	for (int i=0;i<6;i++)
+	{
+		Point p = polygonalBasePoint(6,i);
+		hexagon->vertices.push_back(p);
+	}
 
 	stretch->subcaneCount = 1;
 	stretch->amts[0] = 0.0;
@@ -554,9 +549,12 @@ void MainWindow::setupNewColorPickerCaneDialog()
 	caneForm->addRow("Base Type", caneTypeBox);
 
 	verticesBox = new QSpinBox(caneForm->widget());
+	verticesBox->setMinimum(3);
+	verticesBox->setValue(6);
 	caneForm->addRow("Number of Vertices", verticesBox);
 
 	caneRadiusBox = new QDoubleSpinBox(caneForm->widget());
+	caneRadiusBox->setMaximum(200);
 	caneRadiusBox->setValue(100.0);
 	caneRadiusBox->setSingleStep(0.1);
 
@@ -576,11 +574,11 @@ void MainWindow::setupNewBrandCaneDialog()
 {
 	brandDialog = new QDialog(NULL);
 
-	caneForm = new QFormLayout(brandDialog->window());
+	caneBrandForm = new QFormLayout(brandDialog->window());
 
 	loadOfficialCanes();
 
-	caneSplitter = new QSplitter(caneForm->widget());
+	caneSplitter = new QSplitter(caneBrandForm->widget());
 
 	caneTypeListModel = new QStringListModel();
 	caneTypeListModel->setStringList(*caneTypeList);
@@ -601,35 +599,38 @@ void MainWindow::setupNewBrandCaneDialog()
 	caneSplitter->addWidget(caneTypeListBox);
 	caneSplitter->addWidget(caneColorListBox);
 
-	caneForm->addRow(caneSplitter);
+	caneBrandForm->addRow(caneSplitter);
 
 	connect(caneTypeListBox, SIGNAL(clicked(QModelIndex)),this,SLOT(updateSublist(QModelIndex)));
 	connect(caneColorListBox, SIGNAL(clicked(QModelIndex)),this,SLOT(updateColor(QModelIndex)));
 
-	caneTypeBox = new QComboBox(caneForm->widget());
-	caneTypeBox->addItem("Circle Base",QVariant(BASE_CIRCLE_CANETYPE));
-	caneTypeBox->addItem("Square Base",QVariant(FLATTEN_CANETYPE));
-	caneTypeBox->addItem("Polygonal Base", QVariant(BASE_POLYGONAL_CANETYPE));
+	caneTypeBoxBrand = new QComboBox(caneBrandForm->widget());
+	caneTypeBoxBrand->addItem("Circle Base",QVariant(BASE_CIRCLE_CANETYPE));
+	caneTypeBoxBrand->addItem("Square Base",QVariant(BASE_SQUARE_CANETYPE));
+	caneTypeBoxBrand->addItem("Polygonal Base", QVariant(BASE_POLYGONAL_CANETYPE));
 
-	caneForm->addRow("Base Type", caneTypeBox);
+	caneBrandForm->addRow("Base Type", caneTypeBoxBrand);
 
-	verticesBox = new QSpinBox(caneForm->widget());
-	caneForm->addRow("Number of Vertices", verticesBox);
+	verticesBoxBrand = new QSpinBox(caneBrandForm->widget());
+	verticesBoxBrand->setMinimum(3);
+	verticesBoxBrand->setValue(6);
+	caneBrandForm->addRow("Number of Vertices", verticesBoxBrand);
 
-	caneRadiusBox = new QDoubleSpinBox(caneForm->widget());
-	caneRadiusBox->setValue(100.0);
-	caneRadiusBox->setSingleStep(0.1);
+	caneRadiusBoxBrand = new QDoubleSpinBox(caneBrandForm->widget());
+	caneRadiusBoxBrand->setMaximum(200);
+	caneRadiusBoxBrand->setValue(100.0);
+	caneRadiusBoxBrand->setSingleStep(0.1);
 
-	caneForm->addRow("Cane Stretch", caneRadiusBox);
+	caneBrandForm->addRow("Cane Stretch", caneRadiusBoxBrand);
 
 	QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	connect(buttons,SIGNAL(accepted()),brandDialog,SLOT(accept()));
 	connect(buttons,SIGNAL(accepted()),this,SLOT(colorBrandPickerSelected()));
 	connect(buttons,SIGNAL(rejected()),brandDialog,SLOT(reject()));
 
-	caneForm->addRow(buttons);
+	caneBrandForm->addRow(buttons);
 
-	brandDialog->setLayout(caneForm);
+	brandDialog->setLayout(caneBrandForm);
 }
 
 void MainWindow::updateColor(QModelIndex i)
@@ -855,7 +856,7 @@ void MainWindow::colorBrandPickerSelected()
 			selectedColor >= caneColorListList->at(selectedBrand).size())
 		return;
 	QColor color = caneColorListList->at(selectedBrand).at(selectedColor);
-	QVariant data = caneTypeBox->itemData(caneTypeBox->currentIndex());
+	QVariant data = caneTypeBoxBrand->itemData(caneTypeBoxBrand->currentIndex());
 	bool isOk = false;
 	int caneType = data.toInt(&isOk);
 	if (!isOk)
@@ -865,12 +866,21 @@ void MainWindow::colorBrandPickerSelected()
 	//model->clearCurrentCane();
 	//emit setCaneSig(NULL);
 
-	Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
+	Cane* c = new Cane(caneType);
+	if (caneType == BASE_POLYGONAL_CANETYPE)
+	{
+		int j=verticesBoxBrand->value();
+		for (int i=0;i<j;i++)
+		{
+			Point p = polygonalBasePoint(j,i);
+			c->vertices.push_back(p);
+		}
+	}
 	Cane* stch = new Cane(PULL_CANETYPE);
 
 	stch->subcaneCount = 1;
 	stch->subcanes[0] = c;
-	stch->amts[1] = caneRadiusBox->value();
+	stch->amts[1] = caneRadiusBoxBrand->value();
 
 	c->color.r = color.redF();
 	c->color.g = color.greenF();
@@ -894,9 +904,20 @@ void MainWindow::colorPickerSelected()
 	QVariant data = caneTypeBox->itemData(caneTypeBox->currentIndex());
 	bool isOk = false;
 	int caneType = data.toInt(&isOk);
+
 	if (!isOk)
 		return;
 	Cane* c = new Cane(caneType);
+	if (caneType == BASE_POLYGONAL_CANETYPE)
+	{
+		int j=verticesBox->value();
+		for (int i=0;i<j;i++)
+		{
+			Point p = polygonalBasePoint(j,i);
+			c->vertices.push_back(p);
+		}
+	}
+
 	Cane* stch = new Cane(PULL_CANETYPE);
 
 	stch->subcaneCount = 1;
