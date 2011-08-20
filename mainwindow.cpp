@@ -557,9 +557,10 @@ void MainWindow::setupNewColorPickerCaneDialog()
 	caneForm->addRow("Number of Vertices", verticesBox);
 
 	caneRadiusBox = new QDoubleSpinBox(caneForm->widget());
+	caneRadiusBox->setValue(100.0);
 	caneRadiusBox->setSingleStep(0.1);
 
-	caneForm->addRow("Cane Radius", caneRadiusBox);
+	caneForm->addRow("Cane Stretch", caneRadiusBox);
 
 	QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	connect(buttons,SIGNAL(accepted()), caneDialog, SLOT(accept()));
@@ -616,9 +617,10 @@ void MainWindow::setupNewBrandCaneDialog()
 	caneForm->addRow("Number of Vertices", verticesBox);
 
 	caneRadiusBox = new QDoubleSpinBox(caneForm->widget());
+	caneRadiusBox->setValue(100.0);
 	caneRadiusBox->setSingleStep(0.1);
 
-	caneForm->addRow("Cane Radius", caneRadiusBox);
+	caneForm->addRow("Cane Stretch", caneRadiusBox);
 
 	QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	connect(buttons,SIGNAL(accepted()),brandDialog,SLOT(accept()));
@@ -859,16 +861,16 @@ void MainWindow::colorBrandPickerSelected()
 	if (!isOk)
 		return;
 
-	saveCaneToLibrary();
+	//saveCaneToLibrary();
 	//model->clearCurrentCane();
-	emit setCaneSig(NULL);
+	//emit setCaneSig(NULL);
 
 	Cane* c = new Cane(BASE_CIRCLE_CANETYPE);
 	Cane* stch = new Cane(PULL_CANETYPE);
 
 	stch->subcaneCount = 1;
 	stch->subcanes[0] = c;
-	stch->amts[1] = 100.0;
+	stch->amts[1] = caneRadiusBox->value();
 
 	c->color.r = color.redF();
 	c->color.g = color.greenF();
@@ -899,7 +901,7 @@ void MainWindow::colorPickerSelected()
 
 	stch->subcaneCount = 1;
 	stch->subcanes[0] = c;
-	stch->amts[1] = 100.0;
+	stch->amts[1] = caneRadiusBox->value();
 
 	c->color.r = color.redF();
 	c->color.g = color.greenF();
@@ -978,9 +980,11 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
 		openglWidget->setDeleteButtonDown(true);
 		break;
 	case 0x2b: // +
+	case 0x3d:
 		openglWidget->zoomIn();
 		break;
 	case 0x2d: // -
+	case 0x5f:
 		openglWidget->zoomOut();
 		break;
 	default:
