@@ -25,8 +25,10 @@ public:
 	void pullLinear(float twistFactor, float stretchFactor);
 	void flatten(float rectangle_ratio, float rectangle_theta, float flatness);
 	void flatten(int subcane, float rectangle_ratio, float rectangle_theta, float flatness);
-	void createFlatten();
-	void createPull();
+        void createFlatten(int subcane);
+        void createFlatten();
+        void createPull(int subcane);
+        void createPull();
 	void createBundle();
 	void add(Cane* addl);
 	void deleteCane(int subcane);

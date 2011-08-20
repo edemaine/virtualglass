@@ -206,14 +206,29 @@ void Model :: insertMode(Cane* c, int mode)
 
 void Model :: setActiveSubcane(int subcane)
 {
-	if (cane == NULL)
+        if (cane == NULL)
 		return;
-	if (activeSubcane != subcane)
+        if (activeSubcane != subcane)
 	{
 		activeSubcane = subcane;
 		geometryFresh = 0;
 		emit caneChanged();
-	}
+        }
+
+        if (activeSubcane != -1)
+        {
+                switch (mode)
+                {
+                        case PULL_MODE:
+                                cane->createPull(subcane);
+                                break;
+                        case FLATTEN_MODE:
+                                cane->createFlatten(subcane);
+                                break;
+                }
+                slowGeometryUpdate();
+                cacheGeometry();
+        }
 }
 
 int Model :: getActiveSubcane()
@@ -313,12 +328,10 @@ void Model :: pullActiveCane(float twistAmount, float stretchAmount)
 {
 	if (cane == NULL || activeSubcane == -1)
 		return;
-	if (cane->subcanes[activeSubcane]->type != PULL_CANETYPE)
-		history->saveState(cane);
 
 	revertToCachedGeometry();
-	cane->pullIntuitive(activeSubcane,twistAmount, stretchAmount);
-	applyPullTransform(&geometry, cane);
+        cane->pullIntuitive(activeSubcane, twistAmount, stretchAmount);
+        applyPullSubcaneTransform(&geometry, activeSubcane, cane);
 
 	geometryFresh = 1;
 	emit caneChanged();
@@ -338,12 +351,10 @@ void Model :: flattenActiveCane(float rectangle_ratio, float rectangle_theta, fl
 {
 	if (cane == NULL || activeSubcane == -1)
 		return;
-	if (cane->subcanes[activeSubcane]->type != FLATTEN_CANETYPE)
-		history->saveState(cane);
 
-	revertToCachedGeometry();
+        revertToCachedGeometry();
 	cane->flatten(activeSubcane, rectangle_ratio, rectangle_theta, flatness);
-	applyFlattenTransform(&geometry, cane);
+        applyFlattenSubcaneTransform(&geometry, activeSubcane, cane);
 
 	geometryFresh = 1;
 	emit caneChanged();
@@ -355,7 +366,8 @@ void Model :: moveCane(float delta_x, float delta_y, float delta_z)
 	if (cane == NULL || activeSubcane == -1)
 		return;
 
-	cane->moveCane(activeSubcane, delta_x, delta_y, delta_z);
+        revertToCachedGeometry();
+        cane->moveCane(activeSubcane, delta_x, delta_y, delta_z);
 	applyPartialMoveTransform(&geometry, cane, activeSubcane, delta_x, delta_y, delta_z);
 	cacheGeometry();
 
