@@ -48,7 +48,6 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 	showSnaps = false;
 	showRefSnaps = false;
 	show2D = false;
-	clickable = true;
 
 	lookAtLoc[0] = 0.0f;
 	lookAtLoc[1] = 0.0f;
@@ -593,9 +592,6 @@ Currently catches all mouse press events
 */
 void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 {
-	if (!isClickable())
-		return;
-
 	// Update instance variables for mouse location
 	mouseLocX = e->x();
 	mouseLocY = e->y();
@@ -659,9 +655,6 @@ Currently catches all mouse release events
 */
 void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 {
-	if (!isClickable())
-		return;
-
 	if (ignoreMouseRelease)
 	{
 		ignoreMouseRelease = false;
@@ -705,9 +698,6 @@ part of the mode feature.
 */
 void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 {
-	if (!isClickable())
-		return;
-
 	float relX, relY;
 	float newFee;
 	float windowWidth, windowHeight;
@@ -994,12 +984,3 @@ void OpenGLWidget :: toggle2D()
 	update();
 }
 
-bool OpenGLWidget :: isClickable()
-{
-	return clickable;
-}
-
-void OpenGLWidget :: setClickable(bool set)
-{
-	this->clickable = set;
-}

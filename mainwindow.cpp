@@ -69,7 +69,6 @@ void MainWindow::setupMenuBar()
 	toggleRecipe->setStatusTip(tr("Switch between 3D view and recipe view"));
 	toggleRecipe->setCheckable(true);
 	toggleRecipe->setChecked(false);
-	//connect(toggleRecipe, SIGNAL(triggered()), openglWidget, SLOT(toggleClickable()));
 	connect(toggleRecipe, SIGNAL(triggered()), this, SLOT(toggleRecipe()));
 	isRecipe = false;
 	viewMenu->addAction(toggleRecipe);
@@ -1068,13 +1067,13 @@ void MainWindow::toggleRecipe()
 	isRecipe = !isRecipe;
 	if (isRecipe)
 	{
-		openglWidget->setClickable(false);
+		openglWidget->setVisible(false);
 		stackLayout->setCurrentWidget(recipeWidget);
 		recipeWidget->updateRecipe(true);
 		previewLabel->setHidden(false);
 	} else
 	{
-		openglWidget->setClickable(true);
+		openglWidget->setVisible(true);
 		stackLayout->setCurrentWidget(openglWidget);
 		previewLabel->setHidden(true);
 	}

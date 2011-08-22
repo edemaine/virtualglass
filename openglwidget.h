@@ -36,8 +36,6 @@ public:
 	void setGrid(bool show);
 	void setSnaps(bool show);
 	void setRefSnaps(bool show);
-	void setClickable(bool set);
-	bool isClickable();
 
 private:
 	QMenu caneChangeMenu;
@@ -54,7 +52,6 @@ private:
 	bool showSnaps;
 	bool showRefSnaps;
 	bool show2D;
-	bool clickable;
 
 	float lookAtLoc[3];
 	float theta, fee, rho;
