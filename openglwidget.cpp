@@ -31,12 +31,15 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 	controlButtonDown = false;
 	deleteButtonDown = false;
 
-
 	bgColor = QColor(0,0,0);
 
-	QAction* changeColorAction = new QAction(tr("&Change Color"), &caneChangeMenu);
+	QAction* changeColorCustomAction = new QAction(tr("&Change Color (Custom)"), &caneChangeMenu);
+	QAction* changeColorBrandAction = new QAction(tr("&Change Color (Brand)"), &caneChangeMenu);
 	QAction* changeShapeAction = new QAction(tr("&Change Shape"), &caneChangeMenu);
-	caneChangeMenu.addAction(changeColorAction);
+	connect(changeColorCustomAction, SIGNAL(triggered()), this, SLOT(changeColorCustomEvent()));	
+	connect(changeColorBrandAction, SIGNAL(triggered()), this, SLOT(changeColorBrandEvent()));	
+	caneChangeMenu.addAction(changeColorCustomAction);
+	caneChangeMenu.addAction(changeColorBrandAction);
 	caneChangeMenu.addAction(changeShapeAction);
 
 	model = _model;
@@ -593,6 +596,16 @@ void OpenGLWidget :: setGLMatrices()
 }
 
 
+void OpenGLWidget :: changeColorCustomEvent()
+{
+	emit colorChangeCustomRequest(getSubcaneUnderMouse(mouseLocX, mouseLocY));
+}
+
+void OpenGLWidget :: changeColorBrandEvent()
+{
+	emit colorChangeBrandRequest(getSubcaneUnderMouse(mouseLocX, mouseLocY));
+}
+
 /*
 Currently catches all mouse press events
 (left and right buttons, etc.).
@@ -610,7 +623,8 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 	{
 		if (controlButtonDown)
 		{
-			emit colorChangeRequest(getSubcaneUnderMouse(mouseLocX, mouseLocY));
+			if (getSubcaneUnderMouse(mouseLocX, mouseLocY) != -1)
+				caneChangeMenu.exec(QCursor::pos());
 		}
 		else
 			rightMouseDown = true;

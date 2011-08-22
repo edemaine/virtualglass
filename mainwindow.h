@@ -38,7 +38,8 @@ signals:
 	void setNewMode(int i, bool viewRecipe,Cane* c);
 
 public slots:
-	void colorChangeRequest(int subcane);
+	void colorChangeCustomRequest(int subcane);
+	void colorChangeBrandRequest(int subcane);
 	void setSubcaneColorFromPicker(QColor);
 	void caneChanged();
 	void modeChanged(int mode);
@@ -49,18 +50,15 @@ public slots:
 	void exportCaneDialog();
 	void importCaneDialog();
 	void newBrandCaneDialog();
-	void newColorPickerCaneDialog();
 	void changeBgColorDialog();
 	void saveObjFileDialog();
 	void saveRawFile();
-	void colorPickerSelected();
-	void colorBrandPickerSelected();
 	void libraryCaneDestroyed(QObject* obj);
 	void loadLibraryCane(const YAML::Node& node, Cane* cane);
 	void displayTextMessage(QString message,int msec);
 	void displayTextMessage(QString message);
-	void updateSublist(QModelIndex i);
-	void updateColor(QModelIndex i);
+	void updateBrandColorPickerSublist(QModelIndex i);
+	void updateBrandColorPickerColor(QModelIndex i);
 	void toggleRecipe();
 	void updateLibraryToolTip(LibraryCaneWidget* lc);
 	void newMode(int i);
@@ -78,10 +76,10 @@ private:
 	void setupStatusBar();
 	void setupWorkArea();
 	void setupMenuBar();
-	void setupCaneColorChangeDialog();
-	void setupNewColorPickerCaneDialog();
-	void setupNewBrandCaneDialog();
+	void setupCustomColorChangeDialog();
+	void setupBrandColorChangeDialog();
 
+	QStringListModel* dummyModel;
 	QPainter* makePainter(int caneType, int caneIndex);
 	void loadOfficialCanes();
 
@@ -106,28 +104,11 @@ private:
 	int librarySize;
 
 	QLabel* previewLabel;
-	QDialog* caneColorChangeDialog;
 	QColorDialog* caneColorChangeColorPicker;
 	int caneChangeSubcane;
-	QDialog* caneDialog;
-	QColorDialog* colorDialog;
-	QFormLayout* caneForm;
-	QComboBox* caneTypeBox;
-	QSpinBox* verticesBox;
-	QDoubleSpinBox* caneRadiusBox;
-
-	QFormLayout* caneBrandForm;
-	QComboBox* caneTypeBoxBrand;
-	QSpinBox* verticesBoxBrand;
-	QDoubleSpinBox* caneRadiusBoxBrand;
+	QDialog* brandDialog;
 
 	bool isRecipe;
-	QDialog* brandDialog;
-	QSplitter* caneSplitter;
-	QStringListModel* caneTypeListModel;
-	QListView* caneTypeListBox;
-	QStringList* dummyList;
-	QStringListModel* dummyModel;
 	bool dummyInUse;
 	int selectedBrand;
 	int selectedColor;

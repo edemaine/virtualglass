@@ -13,9 +13,8 @@ MainWindow::MainWindow(Model* model)
 	setupLibraryArea();
 	setupStatusBar();
 	setupMenuBar();
-	setupCaneColorChangeDialog();
-	setupNewBrandCaneDialog();
-	setupNewColorPickerCaneDialog();
+	setupCustomColorChangeDialog();
+	setupBrandColorChangeDialog();
 	updateModeButtonsEnabled();
 
 	setWindowTitle(tr("Virtual Glass"));
@@ -154,26 +153,17 @@ void MainWindow::setupMenuBar()
 	viewMenu->addAction(zoomOut);
 
 	caneMenu = menuBar()->addMenu(tr("&New Cane"));
-
-	QAction* newCaneColor = new QAction(tr("&New Cane (Custom Color)"), this);
-	zoomOut->setStatusTip(tr("Create a new cane of desired color."));
-	connect(newCaneColor, SIGNAL(triggered()), this, SLOT(newColorPickerCaneDialog()));
-	caneMenu->addAction(newCaneColor);
-
-	QAction* newBrandColor = new QAction(tr("&New Cane (Brand Color)"), this);
-	zoomOut->setStatusTip(tr("Create a new cane using standard colors."));
-	connect(newBrandColor, SIGNAL(triggered()), this, SLOT(newBrandCaneDialog()));
-	caneMenu->addAction(newBrandColor);
 }
 
-void MainWindow :: setupCaneColorChangeDialog()
+void MainWindow :: setupCustomColorChangeDialog()
 {
         caneColorChangeColorPicker = new QColorDialog(Qt::white); 
         caneColorChangeColorPicker->setOptions(QColorDialog::ShowAlphaChannel | QColorDialog::NoButtons);
 	connect(caneColorChangeColorPicker, SIGNAL(currentColorChanged(QColor)), this, SLOT(setSubcaneColorFromPicker(QColor))); 
 }
 
-void MainWindow::colorChangeRequest(int subcane)
+
+void MainWindow::colorChangeCustomRequest(int subcane)
 {
 	// If the subcane isn't a simple type that we can change easily
 	// Goal is to support finding the base cane selected no matter what
@@ -182,6 +172,15 @@ void MainWindow::colorChangeRequest(int subcane)
 	if (model->subcaneHasColor(subcane))
 	{
 		caneColorChangeColorPicker->show();
+	}
+}
+
+void MainWindow::colorChangeBrandRequest(int subcane)
+{
+	caneChangeSubcane = subcane;
+	if (model->subcaneHasColor(subcane))
+	{
+		brandDialog->show();
 	}
 }
 
@@ -559,61 +558,24 @@ void MainWindow::importLibraryDialog()
 	displayTextMessage("Library loaded from: " + fileName);
 }
 
-void MainWindow::setupNewColorPickerCaneDialog()
+void MainWindow::setupBrandColorChangeDialog()
 {
-	caneDialog = new QDialog(NULL);
-	caneForm = new QFormLayout(caneDialog->window());
+	// ZZZ
 
-	colorDialog = new QColorDialog(Qt::white, caneForm->widget());
-	colorDialog->setOptions(QColorDialog::ShowAlphaChannel | QColorDialog::NoButtons);
-	caneForm->addRow(colorDialog);
-
-	caneTypeBox = new QComboBox(caneForm->widget());
-	caneTypeBox->addItem("Circle Base", QVariant(BASE_CIRCLE_CANETYPE));
-	caneTypeBox->addItem("Square Base", QVariant(BASE_SQUARE_CANETYPE));
-	caneTypeBox->addItem("Polygonal Base", QVariant(BASE_POLYGONAL_CANETYPE));
-
-	caneForm->addRow("Base Type", caneTypeBox);
-
-	verticesBox = new QSpinBox(caneForm->widget());
-	verticesBox->setMinimum(3);
-	verticesBox->setValue(6);
-	caneForm->addRow("Number of Vertices", verticesBox);
-
-	caneRadiusBox = new QDoubleSpinBox(caneForm->widget());
-	caneRadiusBox->setMaximum(200);
-	caneRadiusBox->setValue(100.0);
-	caneRadiusBox->setSingleStep(0.1);
-
-	caneForm->addRow("Cane Stretch", caneRadiusBox);
-
-	QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-	connect(buttons,SIGNAL(accepted()), caneDialog, SLOT(accept()));
-	connect(buttons,SIGNAL(accepted()), this, SLOT(colorPickerSelected()));
-	connect(buttons,SIGNAL(rejected()), caneDialog, SLOT(reject()));
-
-	caneForm->addRow(buttons);
-
-	caneDialog->setLayout(caneForm);
-}
-
-void MainWindow::setupNewBrandCaneDialog()
-{
 	brandDialog = new QDialog(NULL);
-
-	caneBrandForm = new QFormLayout(brandDialog->window());
+	QFormLayout* caneBrandForm = new QFormLayout(brandDialog->window());
 
 	loadOfficialCanes();
 
-	caneSplitter = new QSplitter(caneBrandForm->widget());
+	QSplitter* caneSplitter = new QSplitter(caneBrandForm->widget());
 
-	caneTypeListModel = new QStringListModel();
+	QStringListModel* caneTypeListModel = new QStringListModel();
 	caneTypeListModel->setStringList(*caneTypeList);
-	caneTypeListBox = new QListView();
+	QListView* caneTypeListBox = new QListView();
 	caneTypeListBox->setModel(caneTypeListModel);
 	caneTypeListBox->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-	dummyList = new QStringList("Please select a cane type.");
+	QStringList* dummyList = new QStringList("Please select a cane type.");
 	dummyModel = new QStringListModel();
 	dummyModel->setStringList(*dummyList);
 	caneColorListBox = new QListView();//QTreeView();
@@ -628,44 +590,23 @@ void MainWindow::setupNewBrandCaneDialog()
 
 	caneBrandForm->addRow(caneSplitter);
 
-	connect(caneTypeListBox, SIGNAL(clicked(QModelIndex)),this,SLOT(updateSublist(QModelIndex)));
-	connect(caneColorListBox, SIGNAL(clicked(QModelIndex)),this,SLOT(updateColor(QModelIndex)));
-
-	caneTypeBoxBrand = new QComboBox(caneBrandForm->widget());
-	caneTypeBoxBrand->addItem("Circle Base",QVariant(BASE_CIRCLE_CANETYPE));
-	caneTypeBoxBrand->addItem("Square Base",QVariant(BASE_SQUARE_CANETYPE));
-	caneTypeBoxBrand->addItem("Polygonal Base", QVariant(BASE_POLYGONAL_CANETYPE));
-
-	caneBrandForm->addRow("Base Type", caneTypeBoxBrand);
-
-	verticesBoxBrand = new QSpinBox(caneBrandForm->widget());
-	verticesBoxBrand->setMinimum(3);
-	verticesBoxBrand->setValue(6);
-	caneBrandForm->addRow("Number of Vertices", verticesBoxBrand);
-
-	caneRadiusBoxBrand = new QDoubleSpinBox(caneBrandForm->widget());
-	caneRadiusBoxBrand->setMaximum(200);
-	caneRadiusBoxBrand->setValue(100.0);
-	caneRadiusBoxBrand->setSingleStep(0.1);
-
-	caneBrandForm->addRow("Cane Stretch", caneRadiusBoxBrand);
-
-	QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-	connect(buttons,SIGNAL(accepted()),brandDialog,SLOT(accept()));
-	connect(buttons,SIGNAL(accepted()),this,SLOT(colorBrandPickerSelected()));
-	connect(buttons,SIGNAL(rejected()),brandDialog,SLOT(reject()));
-
-	caneBrandForm->addRow(buttons);
-
-	brandDialog->setLayout(caneBrandForm);
+	connect(caneTypeListBox, SIGNAL(clicked(QModelIndex)), this, 
+		SLOT(updateBrandColorPickerSublist(QModelIndex)));
+	connect(caneColorListBox, SIGNAL(clicked(QModelIndex)), this,
+		SLOT(updateBrandColorPickerColor(QModelIndex)));
 }
 
-void MainWindow::updateColor(QModelIndex i)
+void MainWindow::updateBrandColorPickerColor(QModelIndex i)
 {
 	selectedColor = i.row();
+	if (selectedBrand == -1 || selectedColor == -1 || selectedBrand >= caneColorListList->size() ||
+			selectedColor >= caneColorListList->at(selectedBrand).size())
+		return;
+	QColor color = caneColorListList->at(selectedBrand).at(selectedColor);
+	model->setSubcaneColor(caneChangeSubcane, color.redF(), color.greenF(), color.blueF(), color.alphaF());
 }
 
-void MainWindow::updateSublist(QModelIndex i)
+void MainWindow::updateBrandColorPickerSublist(QModelIndex i)
 {
 	int index = i.row();
 	if (index < 0 || index >= caneColorListList->size())
@@ -853,11 +794,6 @@ void MainWindow::newBrandCaneDialog()
 	brandDialog->exec();
 }
 
-void MainWindow::newColorPickerCaneDialog()
-{
-	caneDialog->exec();
-}
-
 void MainWindow::changeBgColorDialog()
 {
 	openglWidget->setBgColor(QColorDialog::getColor());
@@ -875,85 +811,6 @@ void MainWindow::saveObjFileDialog()
 void MainWindow::saveRawFile()
 {
 	openglWidget->saveRawFile("cane.raw");
-}
-
-void MainWindow::colorBrandPickerSelected()
-{
-	if (selectedBrand == -1 || selectedColor == -1 || selectedBrand >= caneColorListList->size() ||
-			selectedColor >= caneColorListList->at(selectedBrand).size())
-		return;
-	QColor color = caneColorListList->at(selectedBrand).at(selectedColor);
-	QVariant data = caneTypeBoxBrand->itemData(caneTypeBoxBrand->currentIndex());
-	bool isOk = false;
-	int caneType = data.toInt(&isOk);
-	if (!isOk)
-		return;
-
-	//saveCaneToLibrary();
-	//model->clearCurrentCane();
-	//emit setCaneSig(NULL);
-
-	Cane* c = new Cane(caneType);
-	if (caneType == BASE_POLYGONAL_CANETYPE)
-	{
-		int j=verticesBoxBrand->value();
-		for (int i=0;i<j;i++)
-		{
-			Point p = polygonalBasePoint(j,i);
-			c->vertices.push_back(p);
-		}
-	}
-	Cane* stch = new Cane(PULL_CANETYPE);
-
-	stch->subcaneCount = 1;
-	stch->subcanes[0] = c;
-	stch->amts[1] = caneRadiusBoxBrand->value();
-
-	c->color.r = color.redF();
-	c->color.g = color.greenF();
-	c->color.b = color.blueF();
-	c->color.a = color.alphaF();
-
-	if (caneType == FLATTEN_CANETYPE)
-	{
-		stch->flatten(0.0,0.0,1.0);
-	}
-
-	model->addCane(stch);
-}
-
-void MainWindow::colorPickerSelected()
-{
-	QColor color = colorDialog->currentColor();
-	QVariant data = caneTypeBox->itemData(caneTypeBox->currentIndex());
-	bool isOk = false;
-	int caneType = data.toInt(&isOk);
-
-	if (!isOk)
-		return;
-	Cane* c = new Cane(caneType);
-	if (caneType == BASE_POLYGONAL_CANETYPE)
-	{
-		int j=verticesBox->value();
-		for (int i=0;i<j;i++)
-		{
-			Point p = polygonalBasePoint(j,i);
-			c->vertices.push_back(p);
-		}
-	}
-
-	Cane* stch = new Cane(PULL_CANETYPE);
-
-	stch->subcaneCount = 1;
-	stch->subcanes[0] = c;
-	stch->amts[1] = caneRadiusBox->value();
-
-	c->color.r = color.redF();
-	c->color.g = color.greenF();
-	c->color.b = color.blueF();
-	c->color.a = color.alphaF();
-
-	model->addCane(stch);
 }
 
 void MainWindow::setupWorkArea()

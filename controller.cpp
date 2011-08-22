@@ -41,8 +41,10 @@ Controller::Controller(int argc, char **argv)
 	connect(mainWindow->openglWidget, SIGNAL(operationInfoSig(QString,int)), mainWindow,
 			SLOT(displayTextMessage(QString,int)));
 
-	connect(mainWindow->openglWidget, SIGNAL(colorChangeRequest(int)), 
-		mainWindow, SLOT(colorChangeRequest(int))); 
+	connect(mainWindow->openglWidget, SIGNAL(colorChangeCustomRequest(int)), 
+		mainWindow, SLOT(colorChangeCustomRequest(int))); 
+	connect(mainWindow->openglWidget, SIGNAL(colorChangeBrandRequest(int)), 
+		mainWindow, SLOT(colorChangeBrandRequest(int))); 
 }
 
 int Controller::startUp()

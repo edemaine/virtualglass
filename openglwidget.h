@@ -72,12 +72,15 @@ private:
 	Point getClickedCanePoint(int activeSubcane,int mouseLocX, int mouseLocY);
 
 signals:
-	void colorChangeRequest(int subcane);
+	void colorChangeCustomRequest(int subcane);
+	void colorChangeBrandRequest(int subcane);
 	void modeChangedSig(int mode);
 	void operationInfoSig(QString str,int msec);
 	void updatePreview();
 
 public slots:
+	void changeColorCustomEvent();
+	void changeColorBrandEvent();
 	void zoomIn();
 	void zoomOut();
 	void zoom(float z);
