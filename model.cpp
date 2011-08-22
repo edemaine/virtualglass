@@ -32,6 +32,14 @@ Model :: Model()
 	geometryFresh = 0;
 }
 
+Cane* Model :: getSubcane(int subcane)
+{
+	if (cane == NULL || subcane < 0 || subcane >= cane->subcaneCount)
+		return NULL;
+	
+	return cane->subcanes[subcane];
+}
+
 void Model :: setOrthographicProjection()
 {
 	setProjection(ORTHOGRAPHIC_PROJECTION);
@@ -202,6 +210,34 @@ void Model :: insertMode(Cane* c, int mode)
 		activeSubcane = -1;
 		break;
 	}
+}
+
+bool Model :: activeSubcaneHasColor()
+{
+	if (cane == NULL || activeSubcane < 0 || activeSubcane >= cane->subcaneCount)
+		return false;
+
+	if (cane->subcanes[activeSubcane]->getTopBundleNode() != NULL)
+		return false;
+
+	Cane* baseCane = cane->subcanes[activeSubcane]->getBaseCane();
+	
+	if (baseCane == NULL)
+		return false; 
+
+	return true;
+}
+
+void Model :: setActiveSubcaneColor(float r, float g, float b, float a)
+{
+	Cane* ac = cane->subcanes[activeSubcane]->getBaseCane();
+	ac->color.r = r;
+	ac->color.g = g;
+	ac->color.b = b;
+	ac->color.a = a;
+	
+	slowGeometryUpdate();
+	emit caneChanged();
 }
 
 void Model :: setActiveSubcane(int subcane)

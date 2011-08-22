@@ -27,6 +27,9 @@ public:
 	CaneHistory* getHistory();
 	void setActiveSubcane(int subcane);
 	int getActiveSubcane();
+	bool activeSubcaneHasColor();
+	void setActiveSubcaneColor(float r, float g, float b, float a);
+	Cane* getSubcane(int subcane);
 	Geometry* getGeometry();
 	void pullCane(float twistAmount, float stretchFactor);
 	void pullActiveCane(float twistAmount, float stretchFactor);

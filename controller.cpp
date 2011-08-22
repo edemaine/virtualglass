@@ -32,22 +32,17 @@ Controller::Controller(int argc, char **argv)
 	connect(mainWindow->snap_button, SIGNAL(clicked()), modeSignalMapper, SLOT(map()));
 	connect(modeSignalMapper, SIGNAL(mapped(int)), mainWindow, SLOT(newMode(int)));
 	connect(mainWindow, SIGNAL(setNewMode(int,bool,Cane*)), model, SLOT(setMode(int,bool,Cane*)));
-
 	connect(mainWindow->toggle2D_button, SIGNAL(pressed()), mainWindow->openglWidget, SLOT(toggle2D()));
-
 	connect(mainWindow->undo_button, SIGNAL(pressed()), model, SLOT(undo()));
 	connect(mainWindow->redo_button, SIGNAL(pressed()), model, SLOT(redo()));
 	connect(mainWindow->clear_button, SIGNAL(pressed()), model, SLOT(clearCurrentCane()));
-
 	connect(mainWindow, SIGNAL(setCaneSig(Cane*)), model, SLOT(setCane(Cane*)));
-
-	// Connect mainwindow buttons to mainwindow
 	connect(mainWindow->save_button, SIGNAL(pressed()), mainWindow, SLOT(saveCaneToLibrary()));
-
-	// Connect openglwidget to mainwindow
 	connect(mainWindow->openglWidget, SIGNAL(operationInfoSig(QString,int)), mainWindow,
 			SLOT(displayTextMessage(QString,int)));
 
+	connect(mainWindow->openglWidget, SIGNAL(colorChangeRequest()), 
+		mainWindow, SLOT(colorChangeRequest())); 
 }
 
 int Controller::startUp()

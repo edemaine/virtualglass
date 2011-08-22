@@ -33,6 +33,8 @@ public:
 	Cane* deepCopy();
 	void setColor(Color color);
 	void setColor(QColor color);
+	Cane* getBaseCane();
+	Cane* getTopBundleNode();
 	std::string yamlRepresentation();
 	QColor qcolor();
 	QString typeName();
@@ -49,9 +51,6 @@ public:
 
 public slots:
 	void changeLibraryIndex(int index);
-
-private:
-	Cane* getTopBundleNode();
 
 };
 

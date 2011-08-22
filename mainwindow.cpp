@@ -13,6 +13,7 @@ MainWindow::MainWindow(Model* model)
 	setupLibraryArea();
 	setupStatusBar();
 	setupMenuBar();
+	setupCaneColorChangeDialog();
 	setupNewBrandCaneDialog();
 	setupNewColorPickerCaneDialog();
 	updateModeButtonsEnabled();
@@ -165,6 +166,32 @@ void MainWindow::setupMenuBar()
 	connect(newBrandColor, SIGNAL(triggered()), this, SLOT(newBrandCaneDialog()));
 	caneMenu->addAction(newBrandColor);
 }
+
+void MainWindow :: setupCaneColorChangeDialog()
+{
+        caneColorChangeColorPicker = new QColorDialog(Qt::white); 
+        caneColorChangeColorPicker->setOptions(QColorDialog::ShowAlphaChannel | QColorDialog::NoButtons);
+	connect(caneColorChangeColorPicker, SIGNAL(currentColorChanged(QColor)), this, SLOT(setSubcaneColorFromPicker(QColor))); 
+}
+
+void MainWindow::colorChangeRequest()
+{
+	// If the subcane isn't a simple type that we can change easily
+	// Goal is to support finding the base cane selected no matter what
+	// but selection is hard
+	if (model->activeSubcaneHasColor())
+	{
+		caneColorChangeColorPicker->show();
+	}
+}
+
+void MainWindow :: setSubcaneColorFromPicker(QColor)
+{
+	QColor color = caneColorChangeColorPicker->currentColor();
+	model->setActiveSubcaneColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
+	model->setActiveSubcane(-1);
+}
+
 
 void MainWindow::projectionChanged()
 {

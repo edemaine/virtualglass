@@ -31,7 +31,14 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 	controlButtonDown = false;
 	deleteButtonDown = false;
 
+	ignoreMouseRelease = false;
+
 	bgColor = QColor(0,0,0);
+
+	QAction* changeColorAction = new QAction(tr("&Change Color"), &caneChangeMenu);
+	QAction* changeShapeAction = new QAction(tr("&Change Shape"), &caneChangeMenu);
+	caneChangeMenu.addAction(changeColorAction);
+	caneChangeMenu.addAction(changeShapeAction);
 
 	model = _model;
 	geometry = NULL;
@@ -579,6 +586,7 @@ void OpenGLWidget :: setGLMatrices()
 			  0.0, 0.0, 1.0);
 }
 
+
 /*
 Currently catches all mouse press events
 (left and right buttons, etc.).
@@ -592,21 +600,29 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 	mouseLocX = e->x();
 	mouseLocY = e->y();
 
+	// Only set a new active subcane if you're going to do something with it
+	if (model->getMode() == BUNDLE_MODE || deleteButtonDown || controlButtonDown)
+		model->setActiveSubcane(getSubcaneUnderMouse(mouseLocX, mouseLocY));
 	if (e->button() == Qt::RightButton)
 	{
-		rightMouseDown = true;
+		if (controlButtonDown)
+		{
+			ignoreMouseRelease = true;
+			emit colorChangeRequest();
+		}
+		else
+			rightMouseDown = true;
 	}
 	else
 	{
-		// Only set a new active subcane if you're going to do something with it
-		if (model->getMode() == BUNDLE_MODE || deleteButtonDown)
-				model->setActiveSubcane(getSubcaneUnderMouse(mouseLocX, mouseLocY));
 		if (deleteButtonDown)
 		{
 			if (!model->deleteActiveCane())
 			{
 				if (showSnaps) {
-					if (model->getMode() == SNAP_MODE || model->getMode() == SNAP_CIRCLE_MODE || model->getMode() == SNAP_LINE_MODE)
+					if (model->getMode() == SNAP_MODE 
+						|| model->getMode() == SNAP_CIRCLE_MODE 
+						|| model->getMode() == SNAP_LINE_MODE)
 					{
 						model->deleteSnapPoint(getClickedPlanePoint(mouseLocX,mouseLocY));
 					}
@@ -646,6 +662,12 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 	if (!isClickable())
 		return;
 
+	if (ignoreMouseRelease)
+	{
+		ignoreMouseRelease = false;
+		return;
+	}
+
 	//check if cane is in a snap, and finalize it if true
 	if (model->getActiveSubcane() != -1)
 	{
@@ -654,6 +676,7 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 			model->clearActiveSnap(false);
 		}
 		//check if cane is in a snap, and finalize it if true
+
 		model->setActiveSubcane(-1);
 	}
 

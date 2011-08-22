@@ -231,6 +231,19 @@ void Cane :: add(Cane* addl)
 	subcaneCount += 1;
 }
 
+Cane* Cane :: getBaseCane()
+{
+	if (this->type == BASE_CIRCLE_CANETYPE 
+		|| this->type == BASE_SQUARE_CANETYPE
+		|| this->type == BASE_POLYGONAL_CANETYPE)
+		return this;
+
+	if (this->type == BUNDLE_CANETYPE)
+		return NULL;
+
+	return this->subcanes[0]->getBaseCane();
+}
+
 Cane* Cane :: getTopBundleNode()
 {
 	if (this->type == BUNDLE_CANETYPE)

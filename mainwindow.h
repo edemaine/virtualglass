@@ -38,6 +38,8 @@ signals:
 	void setNewMode(int i, bool viewRecipe,Cane* c);
 
 public slots:
+	void colorChangeRequest();
+	void setSubcaneColorFromPicker(QColor);
 	void caneChanged();
 	void modeChanged(int mode);
 	void projectionChanged();
@@ -76,6 +78,7 @@ private:
 	void setupStatusBar();
 	void setupWorkArea();
 	void setupMenuBar();
+	void setupCaneColorChangeDialog();
 	void setupNewColorPickerCaneDialog();
 	void setupNewBrandCaneDialog();
 
@@ -103,6 +106,8 @@ private:
 	int librarySize;
 
 	QLabel* previewLabel;
+	QDialog* caneColorChangeDialog;
+	QColorDialog* caneColorChangeColorPicker;
 	QDialog* caneDialog;
 	QColorDialog* colorDialog;
 	QFormLayout* caneForm;
