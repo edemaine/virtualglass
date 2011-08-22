@@ -760,7 +760,6 @@ void generateMesh(Cane* c, Geometry *geometry,  Cane** ancestors, int* ancestorC
 	}
         else if (c->type == BUNDLE_CANETYPE)
 	{
-
 		for (i = 0; i < c->subcaneCount; ++i)
 		{
 			if (groupIndex == -1)

@@ -281,6 +281,13 @@ void OpenGLWidget :: paintGL()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_LIGHTING);
 
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
+	glDisable(GL_DEPTH_TEST);	
+	glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	if (showAxes)
 		drawAxes();
 
@@ -304,11 +311,12 @@ void OpenGLWidget :: paintGL()
 						if (model && (int)g->tag == model->getActiveSubcane()) {
 				c.xyz += make_vector(0.1f, 0.1f, 0.1f);
 			}
-			glColor3f(c.r, c.g, c.b);
 			glColor4f(c.r, c.g, c.b, c.a);
 			glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 						   GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
 		}
+
+		
 
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_NORMAL_ARRAY);

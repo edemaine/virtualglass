@@ -260,6 +260,9 @@ void Cane :: deleteCane(int subcane)
 {
 	Cane* b = this->getTopBundleNode();
 
+	// The deletion is subcane-order-preserving intentionally
+	// This is an invariant used by 3D rendering code
+	// to ensure things are sorted back to front
 	b->subcaneCount--;
 	for (int i = subcane; i < b->subcaneCount; i++)
 	{
