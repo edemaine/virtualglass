@@ -39,7 +39,6 @@ public:
 
 private:
 	QMenu caneChangeMenu;
-	bool ignoreMouseRelease;	
 	bool shiftButtonDown;
 	bool rightMouseDown;
 	bool controlButtonDown;
@@ -73,7 +72,7 @@ private:
 	Point getClickedCanePoint(int activeSubcane,int mouseLocX, int mouseLocY);
 
 signals:
-	void colorChangeRequest();
+	void colorChangeRequest(int subcane);
 	void modeChangedSig(int mode);
 	void operationInfoSig(QString str,int msec);
 	void updatePreview();

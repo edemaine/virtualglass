@@ -31,7 +31,6 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 	controlButtonDown = false;
 	deleteButtonDown = false;
 
-	ignoreMouseRelease = false;
 
 	bgColor = QColor(0,0,0);
 
@@ -605,14 +604,13 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 	mouseLocY = e->y();
 
 	// Only set a new active subcane if you're going to do something with it
-	if (model->getMode() == BUNDLE_MODE || deleteButtonDown || controlButtonDown)
+	if (model->getMode() == BUNDLE_MODE || deleteButtonDown)
 		model->setActiveSubcane(getSubcaneUnderMouse(mouseLocX, mouseLocY));
 	if (e->button() == Qt::RightButton)
 	{
 		if (controlButtonDown)
 		{
-			ignoreMouseRelease = true;
-			emit colorChangeRequest();
+			emit colorChangeRequest(getSubcaneUnderMouse(mouseLocX, mouseLocY));
 		}
 		else
 			rightMouseDown = true;
@@ -663,12 +661,6 @@ Currently catches all mouse release events
 */
 void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 {
-	if (ignoreMouseRelease)
-	{
-		ignoreMouseRelease = false;
-		return;
-	}
-
 	//check if cane is in a snap, and finalize it if true
 	if (model->getActiveSubcane() != -1)
 	{

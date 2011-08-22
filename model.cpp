@@ -212,15 +212,15 @@ void Model :: insertMode(Cane* c, int mode)
 	}
 }
 
-bool Model :: activeSubcaneHasColor()
+bool Model :: subcaneHasColor(int subcane)
 {
-	if (cane == NULL || activeSubcane < 0 || activeSubcane >= cane->subcaneCount)
+	if (cane == NULL || subcane < 0 || subcane >= cane->subcaneCount)
 		return false;
 
-	if (cane->subcanes[activeSubcane]->getTopBundleNode() != NULL)
+	if (cane->subcanes[subcane]->getTopBundleNode() != NULL)
 		return false;
 
-	Cane* baseCane = cane->subcanes[activeSubcane]->getBaseCane();
+	Cane* baseCane = cane->subcanes[subcane]->getBaseCane();
 	
 	if (baseCane == NULL)
 		return false; 
@@ -228,9 +228,12 @@ bool Model :: activeSubcaneHasColor()
 	return true;
 }
 
-void Model :: setActiveSubcaneColor(float r, float g, float b, float a)
+void Model :: setSubcaneColor(int subcane, float r, float g, float b, float a)
 {
-	Cane* ac = cane->subcanes[activeSubcane]->getBaseCane();
+	if (!subcaneHasColor(subcane))
+		return;
+
+	Cane* ac = cane->subcanes[subcane]->getBaseCane();
 	ac->color.r = r;
 	ac->color.g = g;
 	ac->color.b = b;

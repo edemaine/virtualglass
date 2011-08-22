@@ -38,7 +38,7 @@ signals:
 	void setNewMode(int i, bool viewRecipe,Cane* c);
 
 public slots:
-	void colorChangeRequest();
+	void colorChangeRequest(int subcane);
 	void setSubcaneColorFromPicker(QColor);
 	void caneChanged();
 	void modeChanged(int mode);
@@ -108,6 +108,7 @@ private:
 	QLabel* previewLabel;
 	QDialog* caneColorChangeDialog;
 	QColorDialog* caneColorChangeColorPicker;
+	int caneChangeSubcane;
 	QDialog* caneDialog;
 	QColorDialog* colorDialog;
 	QFormLayout* caneForm;

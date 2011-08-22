@@ -173,12 +173,13 @@ void MainWindow :: setupCaneColorChangeDialog()
 	connect(caneColorChangeColorPicker, SIGNAL(currentColorChanged(QColor)), this, SLOT(setSubcaneColorFromPicker(QColor))); 
 }
 
-void MainWindow::colorChangeRequest()
+void MainWindow::colorChangeRequest(int subcane)
 {
 	// If the subcane isn't a simple type that we can change easily
 	// Goal is to support finding the base cane selected no matter what
 	// but selection is hard
-	if (model->activeSubcaneHasColor())
+	caneChangeSubcane = subcane;
+	if (model->subcaneHasColor(subcane))
 	{
 		caneColorChangeColorPicker->show();
 	}
@@ -187,8 +188,7 @@ void MainWindow::colorChangeRequest()
 void MainWindow :: setSubcaneColorFromPicker(QColor)
 {
 	QColor color = caneColorChangeColorPicker->currentColor();
-	model->setActiveSubcaneColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
-	model->setActiveSubcane(-1);
+	model->setSubcaneColor(caneChangeSubcane, color.redF(), color.greenF(), color.blueF(), color.alphaF());
 }
 
 
