@@ -38,6 +38,7 @@ signals:
 	void setNewMode(int i, bool viewRecipe,Cane* c);
 
 public slots:
+	void caneChanged();
 	void modeChanged(int mode);
 	void projectionChanged();
 	void saveCaneToLibrary();
@@ -60,7 +61,6 @@ public slots:
 	void updateColor(QModelIndex i);
 	void toggleRecipe();
 	void updateLibraryToolTip(LibraryCaneWidget* lc);
-	void caneChanged();
 	void newMode(int i);
 	void insertLibraryCane(Cane* c);
 

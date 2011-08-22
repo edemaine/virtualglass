@@ -887,15 +887,12 @@ void MainWindow::colorBrandPickerSelected()
 	c->color.g = color.greenF();
 	c->color.b = color.blueF();
 	c->color.a = color.alphaF();
-	//model->setCane(stch);
-	//saveCaneToLibrary();
 
 	if (caneType == FLATTEN_CANETYPE)
 	{
 		stch->flatten(0.0,0.0,1.0);
 	}
 
-	//emit setCaneSig(stch);
 	model->addCane(stch);
 }
 
@@ -1092,9 +1089,9 @@ void MainWindow :: updateModeButtonsEnabled()
 	}
 	else
 	{
-		pull_button->setEnabled(false);	
-		flatten_button->setEnabled(false);	
-		bundle_button->setEnabled(false);	
+		pull_button->setEnabled(true);	
+		flatten_button->setEnabled(true);	
+		bundle_button->setEnabled(true);	
 	}
 }
 
