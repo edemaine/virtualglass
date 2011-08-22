@@ -26,6 +26,9 @@
 #define BASE_SQUARE_CANETYPE 6
 #define BASE_POLYGONAL_CANETYPE 7
 
+#define CIRCLE 1
+#define SQUARE 2
+
 #define MAX_ANCESTORS 20
 #define MAX_AMT_TYPES 5
 #define MAX_SNAP 30

@@ -212,7 +212,7 @@ void Model :: insertMode(Cane* c, int mode)
 	}
 }
 
-bool Model :: subcaneHasColor(int subcane)
+bool Model :: subcaneHasColorAndShape(int subcane)
 {
 	if (cane == NULL || subcane < 0 || subcane >= cane->subcaneCount)
 		return false;
@@ -228,9 +228,61 @@ bool Model :: subcaneHasColor(int subcane)
 	return true;
 }
 
+void Model :: setSubcaneShape(int subcane, int shape)
+{
+	if (!subcaneHasColorAndShape(subcane))
+		return;
+
+	Cane* ac = cane->subcanes[subcane]->getBaseCane();
+	ac->vertices.clear();
+	
+	Point p;
+	switch (shape)
+	{
+		case CIRCLE:
+			for (int i = 0; i < LOW_ANGULAR_RESOLUTION; ++i)
+			{
+				p.x = 0.5 * cos(2 * PI * i / LOW_ANGULAR_RESOLUTION);
+				p.y = 0.5 * sin(2 * PI * i / LOW_ANGULAR_RESOLUTION);
+				ac->vertices.push_back(p);
+			}
+			break;
+		case SQUARE:
+			for (int i = 0; i < LOW_ANGULAR_RESOLUTION / 4; ++i)
+			{
+				p.x = 0.5;
+				p.y = -0.5 + 1.0 * 4 * i / LOW_ANGULAR_RESOLUTION;
+				ac->vertices.push_back(p);
+			}
+			for (int i = 0; i < LOW_ANGULAR_RESOLUTION / 4; ++i)
+			{
+				p.x = 0.5 - 1.0 * 4 * i / LOW_ANGULAR_RESOLUTION;
+				p.y = 0.5;
+				ac->vertices.push_back(p);
+			}
+			for (int i = 0; i < LOW_ANGULAR_RESOLUTION / 4; ++i)
+			{
+				p.x = -0.5;
+				p.y = 0.5 - 1.0 * 4 * i / LOW_ANGULAR_RESOLUTION;
+				ac->vertices.push_back(p);
+			}
+			for (int i = 0; i < LOW_ANGULAR_RESOLUTION / 4; ++i)
+			{
+				p.x = -0.5 + 1.0 * 4 * i / LOW_ANGULAR_RESOLUTION;
+				p.y = -0.5;
+				ac->vertices.push_back(p);
+			}
+			break;
+	}
+	ac->type = BASE_POLYGONAL_CANETYPE;
+
+	slowGeometryUpdate();
+	emit caneChanged();
+}
+
 void Model :: setSubcaneColor(int subcane, float r, float g, float b, float a)
 {
-	if (!subcaneHasColor(subcane))
+	if (!subcaneHasColorAndShape(subcane))
 		return;
 
 	Cane* ac = cane->subcanes[subcane]->getBaseCane();

@@ -38,6 +38,7 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 	QAction* changeShapeAction = new QAction(tr("&Change Shape"), &caneChangeMenu);
 	connect(changeColorCustomAction, SIGNAL(triggered()), this, SLOT(changeColorCustomEvent()));	
 	connect(changeColorBrandAction, SIGNAL(triggered()), this, SLOT(changeColorBrandEvent()));	
+	connect(changeShapeAction, SIGNAL(triggered()), this, SLOT(changeShapeEvent()));	
 	caneChangeMenu.addAction(changeColorCustomAction);
 	caneChangeMenu.addAction(changeColorBrandAction);
 	caneChangeMenu.addAction(changeShapeAction);
@@ -595,6 +596,11 @@ void OpenGLWidget :: setGLMatrices()
 			  0.0, 0.0, 1.0);
 }
 
+
+void OpenGLWidget :: changeShapeEvent()
+{
+	emit shapeChangeRequest(getSubcaneUnderMouse(mouseLocX, mouseLocY));
+}
 
 void OpenGLWidget :: changeColorCustomEvent()
 {

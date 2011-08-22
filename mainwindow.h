@@ -38,9 +38,11 @@ signals:
 	void setNewMode(int i, bool viewRecipe,Cane* c);
 
 public slots:
+	void shapeChangeRequest(int subcane);
 	void colorChangeCustomRequest(int subcane);
 	void colorChangeBrandRequest(int subcane);
 	void setSubcaneColorFromPicker(QColor);
+	void setSubcaneShapeFromPicker(QString s);
 	void caneChanged();
 	void modeChanged(int mode);
 	void projectionChanged();
@@ -76,6 +78,7 @@ private:
 	void setupStatusBar();
 	void setupWorkArea();
 	void setupMenuBar();
+	void setupShapeChangeDialog();
 	void setupCustomColorChangeDialog();
 	void setupBrandColorChangeDialog();
 
@@ -107,16 +110,17 @@ private:
 	QColorDialog* caneColorChangeColorPicker;
 	int caneChangeSubcane;
 	QDialog* brandDialog;
-
-	bool isRecipe;
-	bool dummyInUse;
 	int selectedBrand;
 	int selectedColor;
+	bool dummyInUse;
 	QStringList* caneTypeList;
 	//QTreeView* caneColorListBox;
 	QListView* caneColorListBox;
 	QList<QStringList>* caneNameListList;
 	QList<QList<QColor> >* caneColorListList;
+	QDialog* shapeDialog;
+
+	bool isRecipe;
 
 
 };

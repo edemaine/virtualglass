@@ -13,6 +13,7 @@ MainWindow::MainWindow(Model* model)
 	setupLibraryArea();
 	setupStatusBar();
 	setupMenuBar();
+	setupShapeChangeDialog();
 	setupCustomColorChangeDialog();
 	setupBrandColorChangeDialog();
 	updateModeButtonsEnabled();
@@ -152,7 +153,26 @@ void MainWindow::setupMenuBar()
 	connect(zoomOut, SIGNAL(triggered()), openglWidget, SLOT(zoomOut()));
 	viewMenu->addAction(zoomOut);
 
-	caneMenu = menuBar()->addMenu(tr("&New Cane"));
+}
+
+void MainWindow :: setupShapeChangeDialog()
+{
+	shapeDialog = new QDialog(NULL);
+	QFormLayout* form = new QFormLayout(shapeDialog->window());	
+
+	QComboBox* caneShapeBox = new QComboBox(form->widget());
+	caneShapeBox->addItem("Circle");
+	caneShapeBox->addItem("Square");
+	connect(caneShapeBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(setSubcaneShapeFromPicker(QString)));
+        form->addRow("Base Type", caneShapeBox);
+}
+
+void MainWindow :: setSubcaneShapeFromPicker(QString s)
+{
+	if (s == "Circle")
+		model->setSubcaneShape(caneChangeSubcane, CIRCLE);
+	else if (s == "Square")
+		model->setSubcaneShape(caneChangeSubcane, SQUARE);	
 }
 
 void MainWindow :: setupCustomColorChangeDialog()
@@ -162,6 +182,14 @@ void MainWindow :: setupCustomColorChangeDialog()
 	connect(caneColorChangeColorPicker, SIGNAL(currentColorChanged(QColor)), this, SLOT(setSubcaneColorFromPicker(QColor))); 
 }
 
+void MainWindow::shapeChangeRequest(int subcane)
+{
+	caneChangeSubcane = subcane;
+	if (model->subcaneHasColorAndShape(subcane))
+	{
+		shapeDialog->show();
+	}
+}
 
 void MainWindow::colorChangeCustomRequest(int subcane)
 {
@@ -169,7 +197,7 @@ void MainWindow::colorChangeCustomRequest(int subcane)
 	// Goal is to support finding the base cane selected no matter what
 	// but selection is hard
 	caneChangeSubcane = subcane;
-	if (model->subcaneHasColor(subcane))
+	if (model->subcaneHasColorAndShape(subcane))
 	{
 		caneColorChangeColorPicker->show();
 	}
@@ -178,7 +206,7 @@ void MainWindow::colorChangeCustomRequest(int subcane)
 void MainWindow::colorChangeBrandRequest(int subcane)
 {
 	caneChangeSubcane = subcane;
-	if (model->subcaneHasColor(subcane))
+	if (model->subcaneHasColorAndShape(subcane))
 	{
 		brandDialog->show();
 	}
