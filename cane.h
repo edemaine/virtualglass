@@ -21,13 +21,9 @@ public:
 	void reset();
 	void shallowCopy(Cane* dest);
 	void pullIntuitive(float twistFactor, float stretchFactor);
-	void pullIntuitive(int subcane, float twistFactor, float stretchFactor);
 	void pullLinear(float twistFactor, float stretchFactor);
 	void flatten(float rectangle_ratio, float rectangle_theta, float flatness);
-	void flatten(int subcane, float rectangle_ratio, float rectangle_theta, float flatness);
-        void createFlatten(int subcane);
         void createFlatten();
-        void createPull(int subcane);
         void createPull();
 	void createBundle();
 	void add(Cane* addl);

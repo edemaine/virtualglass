@@ -15,6 +15,7 @@ MainWindow::MainWindow(Model* model)
 	setupMenuBar();
 	setupNewBrandCaneDialog();
 	setupNewColorPickerCaneDialog();
+	updateModeButtonsEnabled();
 
 	setWindowTitle(tr("Virtual Glass"));
 
@@ -997,6 +998,7 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
 	case 0x01000021: // Control
 		openglWidget->setControlButtonDown(true);
 		break;
+	case 0x01000003: // Backspace
 	case 0x01000007: // Delete
 		openglWidget->setDeleteButtonDown(true);
 		break;
@@ -1023,6 +1025,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent* e)
 	case 0x01000021: // Control
 		openglWidget->setControlButtonDown(false);
 		break;
+	case 0x01000003: // Backspace
 	case 0x01000007: // Delete
 		openglWidget->setDeleteButtonDown(false);
 		break;
@@ -1070,6 +1073,28 @@ void MainWindow :: insertLibraryCane(Cane* c)
 	else
 	{
 		model->addCane(recipeWidget->getCane(recipeWidget->selectedItems().at(0)),c);
+	}
+}
+
+void MainWindow::caneChanged()
+{
+	updatePreview();
+	updateModeButtonsEnabled();
+}
+
+void MainWindow :: updateModeButtonsEnabled()
+{
+	if (model->getCane() == NULL)
+	{
+		pull_button->setEnabled(false);	
+		flatten_button->setEnabled(false);	
+		bundle_button->setEnabled(false);	
+	}
+	else
+	{
+		pull_button->setEnabled(false);	
+		flatten_button->setEnabled(false);	
+		bundle_button->setEnabled(false);	
 	}
 }
 

@@ -168,18 +168,6 @@ void Cane :: flatten(float rectangle_ratio, float rectangle_theta, float flatnes
 	this->amts[2] = MIN(1.0, MAX(0.0, amts[2]));
 }
 
-void Cane :: flatten(int subcane, float rectangle_ratio, float rectangle_theta, float flatness)
-{
-        Cane* workingCane = this->getTopBundleNode()->subcanes[subcane];
-        workingCane->flatten(rectangle_ratio, rectangle_theta, flatness);
-}
-
-void Cane :: createFlatten(int subcane)
-{
-        Cane* workingCane = this->getTopBundleNode()->subcanes[subcane];
-        workingCane->createFlatten();
-}
-
 void Cane :: createFlatten()
 {
 	Cane* copy = new Cane(UNASSIGNED_CANETYPE);
@@ -191,18 +179,6 @@ void Cane :: createFlatten()
 	this->amts[2] = 0.0;
 	this->subcaneCount = 1;
 	this->subcanes[0] = copy;
-}
-
-void Cane :: pullIntuitive(int subcane, float twistFactor, float stretchFactor)
-{
-        Cane* workingCane = this->getTopBundleNode()->subcanes[subcane];
-        workingCane->pullIntuitive(twistFactor, stretchFactor);
-}
-
-void Cane :: createPull(int subcane)
-{
-        Cane* workingCane = this->getTopBundleNode()->subcanes[subcane];
-        workingCane->createPull();
 }
 
 void Cane :: createPull()

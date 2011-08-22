@@ -60,13 +60,15 @@ public slots:
 	void updateColor(QModelIndex i);
 	void toggleRecipe();
 	void updateLibraryToolTip(LibraryCaneWidget* lc);
-	void updatePreview();
+	void caneChanged();
 	void newMode(int i);
 	void insertLibraryCane(Cane* c);
 
 private:
 	Model* model;
 
+	void updateModeButtonsEnabled();
+	void updatePreview();
 	void keyPressEvent(QKeyEvent* e);
 	void keyReleaseEvent(QKeyEvent* e);
 	void setupLibraryArea();

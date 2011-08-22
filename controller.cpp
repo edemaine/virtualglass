@@ -15,7 +15,7 @@ Controller::Controller(int argc, char **argv)
 
 	connect(model, SIGNAL(textMessage(QString)), mainWindow, SLOT(displayTextMessage(QString)));
 	connect(model, SIGNAL(modeChanged(int)), mainWindow, SLOT(modeChanged(int)));
-	connect(model, SIGNAL(caneChanged()), mainWindow, SLOT(updatePreview()));
+	connect(model, SIGNAL(caneChanged()), mainWindow, SLOT(caneChanged()));
 	connect(model, SIGNAL(projectionChanged()), mainWindow, SLOT(projectionChanged()));
 
 	connect(model, SIGNAL(caneChanged()), mainWindow->openglWidget, SLOT(caneChanged()));

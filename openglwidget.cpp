@@ -595,12 +595,12 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 	if (e->button() == Qt::RightButton)
 	{
 		rightMouseDown = true;
-		}
-		else
-		{
-				// Only set a new active subcane if you're going to do something with it
-				if (model->getMode() == BUNDLE_MODE || controlButtonDown || deleteButtonDown)
-						model->setActiveSubcane(getSubcaneUnderMouse(mouseLocX, mouseLocY));
+	}
+	else
+	{
+		// Only set a new active subcane if you're going to do something with it
+		if (model->getMode() == BUNDLE_MODE || deleteButtonDown)
+				model->setActiveSubcane(getSubcaneUnderMouse(mouseLocX, mouseLocY));
 		if (deleteButtonDown)
 		{
 			if (!model->deleteActiveCane())
@@ -612,8 +612,8 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 					}
 				}
 			}
-				}
-				else if (showSnaps)
+		}
+		else if (showSnaps)
 		{
 			if (model->getMode() == SNAP_MODE)
 			{
@@ -647,7 +647,7 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 		return;
 
 	//check if cane is in a snap, and finalize it if true
-		if (model->getActiveSubcane() != -1)
+	if (model->getActiveSubcane() != -1)
 	{
 		if (model->getActiveSnapMode()!=NO_SNAP && showSnaps)
 		{
@@ -716,7 +716,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	i.e. how much twist `feels' reasonable for moving the mouse
 	an inch.
 	*/
-		if (rightMouseDown)
+	if (rightMouseDown)
 	{
 		// Rotate camera position around look-at location.
 		if (this->controlButtonDown)
@@ -765,35 +765,28 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		}
 		else
 		{
-			if (controlButtonDown)
-			{
-				model->pullActiveCane(relX * PI, -5.0*relY);
-			}
-			else
-			{
-				model->pullCane(relX * PI, -5.0*relY);
-			}
+			model->pullCane(relX * PI, -5.0*relY);
 		}
 		emit operationInfoSig(QString("Twisted %1 Revolutions Per Viewable Length, Pulled %2").arg(model->getCane()->amts[0] / PI / 2).arg(model->getCane()->amts[1]),1000);
 		break;
 	case BUNDLE_MODE:
 		/*
-				How the parameters for moveCane() are calculated is not obvious.
-				The idea is to make mouse X/Y correspond to the cane moving
-				left-right/up-down *regardless* of where the camera is. This
-				is why theta (the camera angle relative to the look-at point) is
-				also involved.
+		How the parameters for moveCane() are calculated is not obvious.
+		The idea is to make mouse X/Y correspond to the cane moving
+		left-right/up-down *regardless* of where the camera is. This
+		is why theta (the camera angle relative to the look-at point) is
+		also involved.
 
-				Essentially, the parameters convert the amount moved in X and Y
-				(variables `relX' and `relY') to the amount moved in X and Y
-				according to axes on which the cane lives.
-				*/
+		Essentially, the parameters convert the amount moved in X and Y
+		(variables `relX' and `relY') to the amount moved in X and Y
+		according to axes on which the cane lives.
+		*/
 
 		if (e->buttons() & 0x00000001) // if left mouse button is down
 		{
 			if (shiftButtonDown)
 			{
-				relY *=5;
+				relY *= 5;
 				model->moveCane(0, 0, -relY);
 			}
 			else
@@ -811,26 +804,20 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 					relX *= 1.75 * rho; // tone it down
 					relY *= 1.5 * rho; // tone it down
 					model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
-									relX * sin(theta + PI / 2.0) + relY * sin(theta), 0);
+						relX * sin(theta + PI / 2.0) + relY * sin(theta), 0);
 				}
 			}
 		}
 		if (model->getActiveSubcane() != -1 && model->getCane()) {
 			emit operationInfoSig(QString("Moved X Direction %1, Y Direction %2").arg(
-									  model->getCane()->subcaneLocations[model->getActiveSubcane()].x).arg(
-									  model->getCane()->subcaneLocations[model->getActiveSubcane()].y),1000);
+				model->getCane()->subcaneLocations[model->getActiveSubcane()].x).arg(
+				model->getCane()->subcaneLocations[model->getActiveSubcane()].y),1000);
 		}
 		break;
 	case FLATTEN_MODE:
-		if (controlButtonDown)
-		{
-						model->flattenActiveCane(-relX, PI / 2, -relY);
-		}
-		else
-		{
-						model->flattenCane(-relX, PI / 2, -relY);
-		}
-		emit operationInfoSig(QString("Squished with %1, Flattened into rectangle with %2").arg(model->getCane()->amts[0]).arg(model->getCane()->amts[2]),1000);
+		model->flattenCane(-relX, PI / 2, -relY);
+		emit operationInfoSig(QString("Squished with %1, Flattened into rectangle with %2").arg(
+			model->getCane()->amts[0]).arg(model->getCane()->amts[2]),1000);
 		break;
 	case SNAP_MODE:
 	case SNAP_LINE_MODE:
@@ -868,9 +855,6 @@ void OpenGLWidget :: zoom(float z)
 	update();
 }
 
-/*
-
-*/
 void OpenGLWidget :: setCamera(float theta, float fee)
 {
 	if (show2D)
@@ -912,9 +896,6 @@ void OpenGLWidget :: saveRawFile(std::string const &filename)
 	model->saveRawFile(filename);
 }
 
-/*
-
-*/
 void OpenGLWidget :: drawGrid()
 {
 	//return;
@@ -932,9 +913,6 @@ void OpenGLWidget :: drawGrid()
 	glEnd();
 }
 
-/*
-
-*/
 void OpenGLWidget :: drawAxes()
 {
 	glBegin(GL_LINES);

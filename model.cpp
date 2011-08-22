@@ -214,21 +214,6 @@ void Model :: setActiveSubcane(int subcane)
 		geometryFresh = 0;
 		emit caneChanged();
         }
-
-        if (activeSubcane != -1)
-        {
-                switch (mode)
-                {
-                        case PULL_MODE:
-                                cane->createPull(subcane);
-                                break;
-                        case FLATTEN_MODE:
-                                cane->createFlatten(subcane);
-                                break;
-                }
-                slowGeometryUpdate();
-                cacheGeometry();
-        }
 }
 
 int Model :: getActiveSubcane()
@@ -324,19 +309,6 @@ void Model :: pullCane(float twistAmount, float stretchAmount)
 	emit caneChanged();
 }
 
-void Model :: pullActiveCane(float twistAmount, float stretchAmount)
-{
-	if (cane == NULL || activeSubcane == -1)
-		return;
-
-	revertToCachedGeometry();
-        cane->pullIntuitive(activeSubcane, twistAmount, stretchAmount);
-        applyPullSubcaneTransform(&geometry, activeSubcane, cane);
-
-	geometryFresh = 1;
-	emit caneChanged();
-}
-
 void Model :: flattenCane(float rectangle_ratio, float rectangle_theta, float flatness)
 {
 	revertToCachedGeometry();
@@ -346,20 +318,6 @@ void Model :: flattenCane(float rectangle_ratio, float rectangle_theta, float fl
 	geometryFresh = 1;
 	emit caneChanged();
 }
-
-void Model :: flattenActiveCane(float rectangle_ratio, float rectangle_theta, float flatness)
-{
-	if (cane == NULL || activeSubcane == -1)
-		return;
-
-        revertToCachedGeometry();
-	cane->flatten(activeSubcane, rectangle_ratio, rectangle_theta, flatness);
-        applyFlattenSubcaneTransform(&geometry, activeSubcane, cane);
-
-	geometryFresh = 1;
-	emit caneChanged();
-}
-
 
 void Model :: moveCane(float delta_x, float delta_y, float delta_z)
 {
@@ -377,9 +335,9 @@ void Model :: moveCane(float delta_x, float delta_y, float delta_z)
 
 
 	/*
-The snapping functionality is commented out until it has a reasonable, intuitive
-interface and works. -Andrew
-*/
+	The snapping functionality is commented out until it has a reasonable, intuitive
+	interface and works. -Andrew
+	*/
 #ifdef UNDEF
 	// check if cane hits any snaps
 	Point loc = cane->subcaneLocations[activeSubcane];
