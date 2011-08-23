@@ -13,6 +13,24 @@
 
 class View;
 
+class KeyQListView : public QListView
+{
+public:
+        KeyQListView(QWidget * parent) : QListView(parent) {}
+        KeyQListView() : QListView() {}
+protected:
+        void keyPressEvent(QKeyEvent *event)
+        {
+                QModelIndex oldIdx = currentIndex();
+                QListView::keyPressEvent(event);
+                QModelIndex newIdx = currentIndex();
+                if(oldIdx.row() != newIdx.row())
+                {
+                        emit clicked(newIdx);
+                }
+        }
+};
+
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -82,8 +100,7 @@ private:
 	void setupCustomColorChangeDialog();
 	void setupBrandColorChangeDialog();
 
-	QStringListModel* dummyModel;
-	QPainter* makePainter(int caneType, int caneIndex);
+//	QStringListModel* dummyModel;
 	void loadOfficialCanes();
 
 	QMenu* caneMenu;
@@ -110,12 +127,17 @@ private:
 	QColorDialog* caneColorChangeColorPicker;
 	int caneChangeSubcane;
 	QDialog* brandDialog;
+	QSplitter* caneSplitter;
+	QStringListModel* caneTypeListModel;
+        KeyQListView* caneTypeListBox;
+	QStringList* dummyList;
+	QStringListModel* dummyModel;
+	bool dummyInUse;
 	int selectedBrand;
 	int selectedColor;
-	bool dummyInUse;
 	QStringList* caneTypeList;
-	//QTreeView* caneColorListBox;
-	QListView* caneColorListBox;
+        //QTreeView* caneColorListBox;
+        KeyQListView* caneColorListBox;
 	QList<QStringList>* caneNameListList;
 	QList<QList<QColor> >* caneColorListList;
 	QDialog* shapeDialog;

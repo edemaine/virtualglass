@@ -759,3 +759,355 @@ Gaffer Transparents
 - 245,245,245,126
 [G090 Lime Aventurine]
 - 102,161,72,126
+
+Kugler Opaques
+
+[K077A Crown Yellow]
+- 249,205,2,255
+[K078A Canary Yellow]
+- 249,219,6,255
+[K120A Mandarin]
+- 254,155,7,255
+[K160A Ivory]
+- 250,236,216,255
+[K163A Saffron]
+- 225,213,200,255
+[K067A Opal Orange Yellowish]
+- 247,129,72,255
+[K068A Opal Red Yellowish]
+- 255,72,72,255
+[K069A Coral Red]
+- 196,61,57,255
+[K121A Opal Orange Reddish]
+- 226,108,37,255
+[K122A Chilli Red]
+- 239,69,61,255
+[K123A Red Roses]
+- 236,38,28,255
+[K124A Poppy-Red]
+- 225,30,19,255
+[K125A Imperial Red]
+- 234,19,40,255
+[K126A Lava Red]
+- 210,57,53,255
+[K167A Ocher Red]
+- 231,173,135,255
+[K216A Antique Red]
+- 177,72,37,255
+[K063A Flamingo]
+- 244,190,176,255
+[K065A Opal Raspberry]
+- 203,160,190,255
+[K066A Opal Dense Rose]
+- 241,184,204,255
+[K088A Opal Violet]
+- 137,134,187,255
+[K096A Purple]
+- 137,46,94,255
+[K097A Lilac Red]
+- 174,155,208,255
+[K098 Opal Lilac]
+- 124,131,186,255
+[K150A Old Rose]
+- 221,179,179,255
+[K151A Soft Rose]
+- 252,220,234,255
+[K152A Soft Violet]
+- 168,145,181,255
+[K165A Opal Pink]
+- 221,155,191,255
+[K166A Pink Opalin]
+- 193,147,184,255
+[K080 Opal Sky Blue]
+- 136,168,221,255
+[K081 Opal Light Blue]
+- 193,210,238,255
+[K082 Pastel Blue]
+- 173,196,233,255
+[K083 Lavender]
+- 170,176,223,255
+[K084 Delft Blue]
+- 0,141,217,255
+[K085 Cornflower Blue]
+- 36,70,187,255
+[K086 Turquoise]
+- 121,190,196,255
+[K087 Apia Blue]
+- 0,111,164,255
+[K089 Navy Blue]
+- 0,0,128,255
+[K090 Opal Pigeon Green]
+- 58,116,116,255
+[K091 Lapis Blue]
+- 9,124,187,255
+[K092 Night Blue]
+- 6,54,142,255
+[K099 Opal Plum Blue]
+- 68,0,130,255
+[K153 Bahia Blue]
+- 117,185,249,255
+[K154 Delicate Light Blue]
+- 213,225,255,255
+[K171 New Blue]
+- 32,140,159,255
+[K172 Opal Blue Grey]
+- 214,231,248,255
+[K190 Light Turquoise]
+- 0,145,181,255
+[K242 Dense Blue]
+- 34,117,200,255
+[K245 Isar Blue]
+- 166,200,202,255
+[K070 Opal Green]
+- 0,140,0,255
+[K071 Hop Green]
+- 190,193,55,255
+[K072 Seladon Green]
+- 194,217,218,255
+[K073 Apple Yellow]
+- 216,211,33,255
+[K074 Seed Green]
+- 145,199,18,255
+[K075 Dense Green]
+- 7,137,40,255
+[K076 Opal Light Green]
+- 159,194,95,255
+[K079 Pea Green]
+- 151,155,77,255
+[K157 Pistachio Green]
+- 113,138,66,255
+[K158 Lime Green]
+- 215,234,215,255
+[K159 Opal Olive Brown]
+- 124,119,101,255
+[K178 Opal Nile Green]
+- 164,181,111,255
+[K179 Blue Jade]
+- 188,228,219,255
+[K227 Jade Green]
+- 84,171,158,255
+[K241 Opal Dark Green]
+- 1,154,123,255
+[K243 Isar Green]
+- 139,174,163,255
+[K060 Opalin]
+- 255,255,255,255
+[K061 Enamel White]
+- 255,255,255,255
+[K061LA Enamel White]
+- 255,255,255,255
+[K1061L Enamel White Light]
+- 255,255,255,255
+[K061STS Enamel White Special]
+- 255,255,255,255
+[K400 Enamel Soft White]
+- 255,255,255,255
+[K062 Opal White]
+- 255,255,255,255
+[K225 Alabaster]
+- 255,255,255,255
+[K095 Opal Black]
+- 0,0,0,255
+[K173 Rich Grey]
+- 174,174,174,255
+[K174 Opal Grey]
+- 94,115,140,255
+[K175 Light Grey]
+- 197,205,216,255
+[K130A Opal Brown]
+- 181,118,81,255
+[K134A Carmine Brown]
+- 115,73,49,255
+[K161 Light Beige]
+- 239,230,230,255
+[K162A Sahara]
+- 202,166,40,255
+[K164A Ochre Yellow]
+- 222,196,133,255
+[K168A Apricot]
+- 199,156,118,255
+[K180A Silver Petrol]
+- 182,154,130,255
+[K181A Silver Brown]
+- 135,120,87,255
+[K182A Iris Savanne]
+- 131,125,111,255
+[K222 Tabac Light]
+- 221,211,191,255
+[K223 Siena Brown]
+- 123,105,70,255
+[K224 Mocha]
+- 143,126,120,255
+[K226 Mustard Yellow]
+- 243,234,177,255
+[K246 Tabac Dark]
+- 80,65,52,255
+
+Kugler Transparents
+
+[K017 Champagne]
+- 254,236,165,126
+[K019A Gold Topaz]
+- 254,226,114,126
+[K020A Brilliant Yellow]
+- 254,237,114,126
+[K212A Brilliant Gold]
+- 254,220,29,126
+[K218A Iris Yellow]
+- 243,226,156,126
+[K219A Delicate Old Gold]
+- 252,233,158,126
+[K220A Old Gold]
+- 252,172,1,126
+[K229 Amber Yellow]
+- 224,174,1,126
+[K240 Medium Amber]
+- 211,164,1,126
+[K002A Gold Ruby]
+- 255,210,233,126
+[K003A Dark Pink (Extra Dense)]
+- 213,0,106,126
+[K004A Sunset]
+- 147,30,30,126
+[K005A Gold Ruby Extra]
+- 230,172,218,126
+[K006A Aurora Reddish]
+- 153,26,48,126
+[K007A Sunrise]
+- 214,139,188,126
+[K008A Aurora Yellowish]
+- 253,190,2,126
+[K015A Copper Ruby]
+- 162,54,23,126
+[K016A Copper Ruby Light]
+- 181,61,26,126
+[K140A Orange]
+- 245,150,5,126
+[K141A Cherry Red]
+- 204,0,0,126
+[K142A New Red]
+- 206,41,0,126
+[K143A Garnet]
+- 176,35,0,126
+[K230A Fuchsia]
+- 182,1,105,126
+[K231A Brilliant Ruby (Extra Dense)]
+- 223,98,154,126
+[K232A Wine Red]
+- 193,162,196,126
+[K010A Violet Blue]
+- 182,137,181,126
+[K011A Heliotrope]
+- 172,172,215,126
+[K050 Dark Violet Reddish]
+- 106,27,106,126
+[K055 Dark Violet Bluish]
+- 67,43,136,126
+[K056A Light Violet]
+- 218,178,230,126
+[K057 Aubergine]
+- 113,0,113,126
+[K064 Opal Magenta]
+- 204,89,142,126
+[K107A Silver Amethyst]
+- 205,196,223,126
+[K228 Dark Heliotrope]
+- 164,116,184,126
+[K012A Amethyst Reddish]
+- 185,169,211,126
+[K013A Amethyst Blueish]
+- 64,108,191,126
+[K014A Hyacinth Blue]
+- 162,183,223,126
+[K040 Aqua Light]
+- 92,214,245,126
+[K041 Dark Blue]
+- 49,121,202,126
+[K042 Iron Blue]
+- 38,74,159,126
+[K043 Steel Blue]
+- 26,133,198,126
+[K044A Silver Dark Blue]
+- 13,53,98,126
+[K045 Medium Blue]
+- 0,164,242,126
+[K046 Capri Blue]
+- 23,118,174,126
+[K047 Aquamarine Blue]
+- 0,175,234,126
+[K048 Ocean Blue]
+- 0,101,119,126
+[K049 Turquoise Blue]
+- 27,182,194,126
+[K104 Sky-Blue]
+- 65,192,254,126
+[K210 Sari Blue]
+- 0,112,179,126
+[K221 Light Blue]
+- 23,174,255,126
+[K054 Black]
+- 0,0,0,126
+[K054SP Black Special]
+- 0,0,0,126
+[K233 Smokey Grey]
+- 133,175,151,126
+[K235 Smokey Blue]
+- 98,142,134,126
+[K419 K 419 Black]
+- 0,0,0,126
+[K009 Carribean Flash]
+- 209,203,167,126
+[K021 Lime Yellow]
+- 207,211,20,126
+[K022 Fjord Green]
+- 187,213,189,126
+[K024 Reseda Green]
+- 140,192,18,126
+[K026 Emerald Green]
+- 106,166,158,126
+[K027 Anna Green]
+- 33,160,145,126
+[K028 New Green]
+- 9,155,46,126
+[K029 Blue Green]
+- 11,128,122,126
+[K030 Tourmaline]
+- 56,154,145,126
+[K031 Olive]
+- 166,166,83,126
+[K032 Bristol Green]
+- 43,146,7,126
+[K033 Dark Green]
+- 0,128,64,126
+[K034A Silver Dark Green]
+- 0,102,102,126
+[K035 Fir Green]
+- 0,128,64,126
+[K036 Moss Green]
+- 114,185,49,126
+[K037 Sargasso Green]
+- 204,204,102,126
+[K039 Ocean Green]
+- 0,164,164,126
+[K053 Olive Green]
+- 165,160,84,126
+[K059 Aventurin Green]
+- 40,81,56,126
+[K103A Silver Green]
+- 34,183,180,126
+[K213 Brilliant Green]
+- 153,204,51,126
+[K100 Lead Crystal]
+- 247,247,247,126
+[K101 Silver Crystal]
+- 247,247,247,126
+[K018 Smokey Topaz]
+- 135,135,67,126
+[K051 Brown]
+- 134,96,57,126
+[K052 Brown Olive]
+- 122,105,71,126
+[K215A Gold Brown]
+- 163,118,58,126
+[K234 Dark Amber]
+- 165,148,78,126

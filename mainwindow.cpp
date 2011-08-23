@@ -581,15 +581,15 @@ void MainWindow::setupBrandColorChangeDialog()
 
 	QStringListModel* caneTypeListModel = new QStringListModel();
 	caneTypeListModel->setStringList(*caneTypeList);
-	QListView* caneTypeListBox = new QListView();
+        caneTypeListBox = new KeyQListView();
 	caneTypeListBox->setModel(caneTypeListModel);
 	caneTypeListBox->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 	QStringList* dummyList = new QStringList("Please select a cane type.");
 	dummyModel = new QStringListModel();
 	dummyModel->setStringList(*dummyList);
-	caneColorListBox = new QListView();//QTreeView();
-	caneColorListBox->setModel(dummyModel);
+        caneColorListBox = new KeyQListView();//QListView();
+        caneColorListBox->setModel(dummyModel);
 	dummyInUse = true;
 	selectedBrand = -1;
 	selectedColor = -1;
@@ -664,24 +664,6 @@ void MainWindow::updateBrandColorPickerSublist(QModelIndex i)
 		selectedBrand = index;
 		selectedColor = -1;
 	}
-}
-
-QPainter* MainWindow::makePainter(int caneType, int caneIndex)
-{
-	QPainter* painter = new QPainter();
-	if (caneColorListList->size() <= caneType || caneColorListList->at(caneType).size() <= caneIndex)
-	{
-		painter->setPen(Qt::black);
-		return painter;
-	}
-	painter->setBackgroundMode(Qt::OpaqueMode);
-	painter->setBackground(*(new QBrush(caneColorListList->at(caneType).at(caneIndex))));
-	painter->setPen(Qt::black);
-	if (caneColorListList->at(caneType).at(caneIndex).red() +
-			caneColorListList->at(caneType).at(caneIndex).green() +
-			caneColorListList->at(caneType).at(caneIndex).blue() < 381)
-		painter->setPen(Qt::white);
-	return painter;
 }
 
 void MainWindow::loadOfficialCanes()
