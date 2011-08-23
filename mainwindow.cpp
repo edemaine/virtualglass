@@ -163,7 +163,10 @@ void MainWindow :: setupShapeChangeDialog()
 	QComboBox* caneShapeBox = new QComboBox(form->widget());
 	caneShapeBox->addItem("Circle");
 	caneShapeBox->addItem("Square");
+	caneShapeBox->addItem("Rectangle");
+	caneShapeBox->addItem("Triangle");
 	caneShapeBox->addItem("Half Circle");
+	caneShapeBox->addItem("Third Circle");
 	connect(caneShapeBox, SIGNAL(currentIndexChanged(QString)), 
 		this, SLOT(setSubcaneShapeFromPicker(QString)));
         form->addRow("Shape", caneShapeBox);
@@ -175,8 +178,14 @@ void MainWindow :: setSubcaneShapeFromPicker(QString s)
 		model->setSubcaneShape(caneChangeSubcane, CIRCLE);
 	else if (s == "Square")
 		model->setSubcaneShape(caneChangeSubcane, SQUARE);	
+	else if (s == "Rectangle")
+		model->setSubcaneShape(caneChangeSubcane, RECTANGLE);	
+	else if (s == "Triangle")
+		model->setSubcaneShape(caneChangeSubcane, TRIANGLE);	
 	else if (s == "Half Circle")
 		model->setSubcaneShape(caneChangeSubcane, HALF_CIRCLE);	
+	else if (s == "Third Circle")
+		model->setSubcaneShape(caneChangeSubcane, THIRD_CIRCLE);	
 }
 
 void MainWindow :: setupCustomColorChangeDialog()
@@ -356,10 +365,7 @@ void MainWindow::seedLibrary()
 	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION);
 	emit setCaneSig(base);
 	saveCaneToLibrary();
-	base->setShape(SQUARE, LOW_ANGULAR_RESOLUTION);
-	emit setCaneSig(base);
-	saveCaneToLibrary();
-	base->setShape(HALF_CIRCLE, LOW_ANGULAR_RESOLUTION);
+	base->setShape(TRIANGLE, LOW_ANGULAR_RESOLUTION);
 	emit setCaneSig(base);
 	saveCaneToLibrary();
 
@@ -367,13 +373,10 @@ void MainWindow::seedLibrary()
 	base->color.g = 1.0;
 	base->color.b = 0.5;
 	base->color.a = 0.8;
-	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION);
-	emit setCaneSig(base);
-	saveCaneToLibrary();
 	base->setShape(SQUARE, LOW_ANGULAR_RESOLUTION);
 	emit setCaneSig(base);
 	saveCaneToLibrary();
-	base->setShape(HALF_CIRCLE, LOW_ANGULAR_RESOLUTION);
+	base->setShape(RECTANGLE, LOW_ANGULAR_RESOLUTION);
 	emit setCaneSig(base);
 	saveCaneToLibrary();
 
@@ -381,13 +384,10 @@ void MainWindow::seedLibrary()
 	base->color.g = 0.5;
 	base->color.b = 1.0;
 	base->color.a = 0.8;
-	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION);
-	emit setCaneSig(base);
-	saveCaneToLibrary();
-	base->setShape(SQUARE, LOW_ANGULAR_RESOLUTION);
-	emit setCaneSig(base);
-	saveCaneToLibrary();
 	base->setShape(HALF_CIRCLE, LOW_ANGULAR_RESOLUTION);
+	emit setCaneSig(base);
+	saveCaneToLibrary();
+	base->setShape(THIRD_CIRCLE, LOW_ANGULAR_RESOLUTION);
 	emit setCaneSig(base);
 	saveCaneToLibrary();
 

@@ -44,6 +44,7 @@ void Cane :: setShape(int shape, int resolution)
 {
 	this->vertices.clear();
 	Point p;
+	float t;
 	switch (shape)
 	{
 		case CIRCLE:
@@ -80,6 +81,75 @@ void Cane :: setShape(int shape, int resolution)
                                 this->vertices.push_back(p);
                         }
 			break;
+		case RECTANGLE:
+                        for (int i = 0; i < resolution / 4; ++i)
+                        {
+                                p.x = 0.5;
+                                p.y = -0.25 + 0.5 * 4 * i / resolution;
+                                this->vertices.push_back(p);
+                        }
+                        for (int i = 0; i < resolution / 4; ++i)
+                        {
+                                p.x = 0.5 - 1.0 * 4 * i / resolution;
+                                p.y = 0.25;
+                                this->vertices.push_back(p);
+                        }
+                        for (int i = 0; i < resolution / 4; ++i)
+                        {
+                                p.x = -0.5;
+                                p.y = 0.25 - 0.5 * 4 * i / resolution;
+                                this->vertices.push_back(p);
+                        }
+                        for (int i = 0; i < resolution / 4; ++i)
+                        {
+                                p.x = -0.5 + 1.0 * 4 * i / resolution;
+                                p.y = -0.25;
+                                this->vertices.push_back(p);
+                        }
+			break;
+		case TRIANGLE:
+                        for (int i = 0; i < resolution / 3; ++i)
+                        {
+				t = 3.0 * i / resolution;
+				p.x = 1 * (1 - t) + cos(2 * PI / 3) * t; 
+				p.y = 0 * (1 - t) + sin(2 * PI / 3) * t; 
+                                this->vertices.push_back(p);
+			}
+                        for (int i = 0; i < resolution / 3; ++i)
+                        {
+				t = 3.0 * i / resolution;
+				p.x = cos(2 * PI / 3) * (1 - t) + cos(4 * PI / 3) * t; 
+				p.y = sin(2 * PI / 3) * (1 - t) + sin(4 * PI / 3) * t; 
+                                this->vertices.push_back(p);
+			}
+                        for (int i = 0; i < resolution / 3; ++i)
+                        {
+				t = 3.0 * i / resolution;
+				p.x = cos(4 * PI / 3) * (1 - t) + 1 * t; 
+				p.y = sin(4 * PI / 3) * (1 - t) + 0 * t; 
+                                this->vertices.push_back(p);
+                        }
+			break;	
+		case THIRD_CIRCLE:
+                        for (int i = 0; i < resolution / 4; ++i)
+                        {
+                                p.x = 0;
+                                p.y = 1.0 - 1.0 * 4 * i / resolution;
+                                this->vertices.push_back(p);
+                        }
+                        for (int i = 0; i < resolution / 4; ++i)
+                        {
+                                p.x = cos(-PI / 6) * i * 4.0 / resolution;
+                                p.y = sin(-PI / 6) * i * 4.0 / resolution;
+                                this->vertices.push_back(p);
+                        }
+                        for (int i = 0; i < resolution / 2; ++i)
+                        {
+                                p.x = cos(-PI / 6 + 2 * PI / 3 * i * 2 / resolution);
+                                p.y = sin(-PI / 6 + 2 * PI / 3 * i * 2 / resolution);
+                                this->vertices.push_back(p);
+                        }
+			break;	
 		case HALF_CIRCLE:
                         for (int i = 0; i < resolution / 3; ++i)
                         {
