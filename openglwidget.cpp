@@ -6,15 +6,6 @@ it is involved in modifying the cane.
 
 Features:
 
-DUAL RESOLUTION:
-Two mesh resolutions are used to give an improved interaction
-experience. A LOW_RESOLUTION mode is used when the cane is undergoing
-motion (as determined by whether the user currently is holding
-the mouse down), while a HIGH_RESOLUTION mode is used otherwise.
-The idea is to give good framerate during movement in trade for
-a higher resolution (as a lower resolution is not as noticeable for
-moving objects).
-
 MODES:
 The OpenGLWidget object has a mode for each type of modification
 the user can make to the cane (in addition to a LOOK_MODE, which
@@ -620,7 +611,7 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 
 	if (e->button() == Qt::RightButton)
 	{
-		if (getSubcaneUnderMouse(mouseLocX, mouseLocY) != -1)
+		if (model->subcaneHasColorAndShape(getSubcaneUnderMouse(mouseLocX, mouseLocY)))
 			caneChangeMenu.exec(QCursor::pos());
 		else
 			rightMouseDown = true;

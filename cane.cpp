@@ -304,10 +304,8 @@ Cane* Cane :: getTopBundleNode()
 {
 	if (this->type == BUNDLE_CANETYPE)
 		return this;
-	else if (this->subcaneCount == 0)
-	{
+	if (this->subcaneCount == 0)
 		return NULL;
-	}
 
 	return this->subcanes[0]->getTopBundleNode();
 }
@@ -317,7 +315,7 @@ void Cane :: deleteCane(int subcane)
 	Cane* b = this->getTopBundleNode();
 
 	// The deletion is subcane-order-preserving intentionally
-	// This is an invariant used by 3D rendering code
+	// This is an invariant sometimes used by 3D rendering code
 	// to ensure things are sorted back to front
 	b->subcaneCount--;
 	for (int i = subcane; i < b->subcaneCount; i++)

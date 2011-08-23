@@ -164,7 +164,8 @@ void MainWindow :: setupShapeChangeDialog()
 	caneShapeBox->addItem("Circle");
 	caneShapeBox->addItem("Square");
 	caneShapeBox->addItem("Half Circle");
-	connect(caneShapeBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(setSubcaneShapeFromPicker(QString)));
+	connect(caneShapeBox, SIGNAL(currentIndexChanged(QString)), 
+		this, SLOT(setSubcaneShapeFromPicker(QString)));
         form->addRow("Shape", caneShapeBox);
 }
 
