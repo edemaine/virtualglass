@@ -278,11 +278,7 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 		}
 		cane->amts[amtIndex] = item->text(column).toFloat();
 	}
-	box.setText("lol");
-	box.exec();
 	updateBaseRecipe(cane,item,false);
-	box.setText("lolol");
-	box.exec();
 	emit recipeCaneChanged();
 }
 
