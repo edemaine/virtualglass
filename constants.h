@@ -33,7 +33,6 @@
 #define MAX_AMT_TYPES 5
 #define MAX_SNAP 30
 
-#define LOOK_MODE 1
 #define PULL_MODE 2
 #define BUNDLE_MODE 4
 #define FLATTEN_MODE 5

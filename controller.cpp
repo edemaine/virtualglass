@@ -53,7 +53,7 @@ int Controller::startUp()
 {
 	mainWindow->showMaximized();
 	mainWindow->seedLibrary();
-	model->setMode(LOOK_MODE);
+	model->setMode(BUNDLE_MODE);
 	return app->exec();
 }
 

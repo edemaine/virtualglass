@@ -249,10 +249,6 @@ void MainWindow::modeChanged(int mode)
 		modeLabel->setText("FLATTEN MODE");
 		displayTextMessage("Click and drag mouse up and down to square off cane, left and right to flatten cane",0);
 		break;
-	case LOOK_MODE:
-		modeLabel->setText("LOOK MODE");
-		displayTextMessage("Click and drag mouse to re-orient the camera position",0);
-		break;
 	case WRAP_MODE:
 		modeLabel->setText("WRAP MODE");
 		displayTextMessage("Click on first cane as the base, click and drag second cane to be the wrap",0);
@@ -903,9 +899,6 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
 	case 0x01000020: // Shift
 		openglWidget->setShiftButtonDown(true);
 		break;
-	case 0x01000021: // Control
-		openglWidget->setControlButtonDown(true);
-		break;
 	case 0x01000003: // Backspace
 	case 0x01000007: // Delete
 		openglWidget->setDeleteButtonDown(true);
@@ -929,9 +922,6 @@ void MainWindow::keyReleaseEvent(QKeyEvent* e)
 	{
 	case 0x01000020: // Shift
 		openglWidget->setShiftButtonDown(false);
-		break;
-	case 0x01000021: // Control
-		openglWidget->setControlButtonDown(false);
 		break;
 	case 0x01000003: // Backspace
 	case 0x01000007: // Delete

@@ -41,7 +41,6 @@ private:
 	QMenu caneChangeMenu;
 	bool shiftButtonDown;
 	bool rightMouseDown;
-	bool controlButtonDown;
 	bool deleteButtonDown;
 	QColor bgColor;
 	Model* model;

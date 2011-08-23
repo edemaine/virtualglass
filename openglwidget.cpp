@@ -28,7 +28,6 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 {
 	shiftButtonDown = false;
 	rightMouseDown = false;
-	controlButtonDown = false;
 	deleteButtonDown = false;
 
 	bgColor = QColor(0,0,0);
@@ -84,10 +83,6 @@ void OpenGLWidget :: setShiftButtonDown(bool state)
 	shiftButtonDown = state;
 }
 
-void OpenGLWidget :: setControlButtonDown(bool state)
-{
-	controlButtonDown = state;
-}
 
 void OpenGLWidget :: projectionChanged()
 {
@@ -107,7 +102,6 @@ void OpenGLWidget :: initializeGL()
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glAlphaFunc (GL_LEQUAL, 0.5);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
@@ -289,7 +283,9 @@ void OpenGLWidget :: paintGL()
 
 	glDisable(GL_DEPTH_TEST);	
 	glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_DST_COLOR);
+        //glBlendFunc(GL_SRC_ALPHA, GL_DST_COLOR);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	if (showAxes)
 		drawAxes();
@@ -627,11 +623,8 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 		model->setActiveSubcane(getSubcaneUnderMouse(mouseLocX, mouseLocY));
 	if (e->button() == Qt::RightButton)
 	{
-		if (controlButtonDown)
-		{
-			if (getSubcaneUnderMouse(mouseLocX, mouseLocY) != -1)
-				caneChangeMenu.exec(QCursor::pos());
-		}
+		if (getSubcaneUnderMouse(mouseLocX, mouseLocY) != -1)
+			caneChangeMenu.exec(QCursor::pos());
 		else
 			rightMouseDown = true;
 	}
@@ -739,25 +732,8 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 	mouseLocY = e->y();
 	relY = (mouseLocY - oldMouseLocY) / windowHeight;
 
-	/*
-	Do something depending on mode.
-	All modes except LOOK_MODE involve modifying the cane
-	itself, while LOOK_MODE moves the camera.
-
-	All of the calls to model->*Cane() are functions of relX/relY,
-	but the constants involved are determined by experiment,
-	i.e. how much twist `feels' reasonable for moving the mouse
-	an inch.
-	*/
 	if (rightMouseDown)
 	{
-		// Rotate camera position around look-at location.
-		if (this->controlButtonDown)
-		{
-			zoom(relY*2.0);
-		}
-		else
-		{
 		theta -= (relX * 500.0 * PI / 180.0);
 		if (!show2D)
 		{
@@ -767,23 +743,12 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		}
 
 		update();
-		}
 		return;
 	}
 
 
 	switch (model->getMode())
 	{
-	case LOOK_MODE:
-				// Rotate camera position around look-at location.
-				theta -= (relX * 500.0 * PI / 180.0);
-				if (!show2D)
-				{
-						newFee = fee - (relY * 500.0 * PI / 180.0);
-						if (newFee > 0.0f && newFee < PI)
-								fee = newFee;
-				}
-		break;
 	case PULL_MODE:
 		if (shiftButtonDown)
 		{
