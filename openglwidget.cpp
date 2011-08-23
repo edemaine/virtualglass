@@ -301,7 +301,7 @@ void OpenGLWidget :: paintGL()
 						if (model && (int)g->tag == model->getActiveSubcane()) {
 				c.xyz += make_vector(0.1f, 0.1f, 0.1f);
 			}
-			glColor4f(c.r, c.g, c.b, c.a);
+			glColor4f(c.r * c.a, c.g * c.a, c.b * c.a, c.a);
 			glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 						   GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
 		}

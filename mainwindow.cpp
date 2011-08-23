@@ -40,12 +40,12 @@ void MainWindow::setupMenuBar()
 
 	fileMenu->addSeparator();
 
-	QAction* importCane = new QAction(tr("&Import Cane"), this);
+	QAction* importCane = new QAction(tr("&Import Single Cane"), this);
 	importCane->setStatusTip(tr("Load a saved cane"));
 	connect(importCane, SIGNAL(triggered()), this, SLOT(importCaneDialog()));
 	fileMenu->addAction(importCane);
 
-	QAction* exportCane = new QAction(tr("&Export Cane"), this);
+	QAction* exportCane = new QAction(tr("&Export Current Cane"), this);
 	exportCane->setStatusTip(tr("Save the current cane to a file"));
 	connect(exportCane, SIGNAL(triggered()), this, SLOT(exportCaneDialog()));
 	fileMenu->addAction(exportCane);
@@ -57,8 +57,8 @@ void MainWindow::setupMenuBar()
 	connect(exportObj, SIGNAL(triggered()), this, SLOT(saveObjFileDialog()));
 	fileMenu->addAction(exportObj);
 
-	QAction* exportRaw = new QAction(tr("&Export raw"), this);
-	exportRaw->setStatusTip(tr("Save the geometry of the current cane as a .raw file for the visualizer"));
+	QAction* exportRaw = new QAction(tr("&Export to ray tracer"), this);
+	exportRaw->setStatusTip(tr("Save the geometry of the current cane as a .raw file for the ray tracer"));
 	connect(exportRaw, SIGNAL(triggered()), this, SLOT(saveRawFile()));
 	fileMenu->addAction(exportRaw);
 
@@ -396,7 +396,11 @@ void MainWindow::seedLibrary()
 }
 
 void MainWindow :: exportCaneDialog(){
-	QString fileName =  QFileDialog::getSaveFileName();
+
+
+	QString fileName =  QFileDialog::getSaveFileName(this, tr("Export Single Cane"), "mycane.glass", tr("Glass (*.glass)"));
+	if (!fileName.endsWith(".glass") || fileName.length() < 6)
+		return;
 
 	YAML::Emitter out;
 	out << 1;
@@ -421,7 +425,7 @@ void MainWindow :: exportCaneDialog(){
 }
 
 void MainWindow :: importCaneDialog(){
-	QString fileName = QFileDialog::getOpenFileName();
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Import Single Cane"), "", tr("Glass (*.glass)"));
 
 	std::ifstream fin(fileName.toStdString().c_str());
 	YAML::Parser parser(fin);
@@ -445,7 +449,10 @@ void MainWindow :: importCaneDialog(){
 
 void MainWindow::exportLibraryDialog()
 {
-	QString fileName =  QFileDialog::getSaveFileName();
+	QString fileName =  QFileDialog::getSaveFileName(this, tr("Export Cane Library"), "mycanes.glass", tr("Glass (*.glass)"));
+	if (!fileName.endsWith(".glass") || fileName.length() < 6)
+		return;
+
 	QList<LibraryCaneWidget*> libraryList = libraryScrollArea->findChildren<LibraryCaneWidget*>();
 
 	YAML::Emitter out;
@@ -544,7 +551,7 @@ void MainWindow::loadLibraryCane(const YAML::Node& node, Cane* cane)
 
 void MainWindow::importLibraryDialog()
 {
-	QString fileName = QFileDialog::getOpenFileName();
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Import Cane Library"), "", tr("Glass (*.glass)"));
 
 	std::ifstream fin(fileName.toStdString().c_str());
 	YAML::Parser parser(fin);

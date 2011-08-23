@@ -546,7 +546,7 @@ std::string Cane :: yamlRepresentation()
 
 	out << YAML::Key << "Defined Amounts";
 	out << YAML::Value << YAML::BeginSeq;
-	for (unsigned int j=0;j<sizeof(amts);j++){
+	for (unsigned int j = 0; j < MAX_AMT_TYPES; j++){
 		out << amtTypeToName(type,j);
 		out << zeroIfNaN(amts[j]);
 	}
@@ -554,7 +554,7 @@ std::string Cane :: yamlRepresentation()
 
 	out << YAML::Key << "Vertices";
 	out << YAML::Value << YAML::BeginSeq;
-	for (unsigned int j=0;j<sizeof(this->vertices);j++){
+	for (unsigned int j = 0; j < this->vertices.size(); j++){
 		out << zeroIfNaN(vertices[j].x);
 		out << zeroIfNaN(vertices[j].y);
 	}
