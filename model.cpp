@@ -462,22 +462,19 @@ void Model :: addCane(Cane* c)
 	if (cane == NULL)
 	{
 		cane = c->deepCopy();
-		geometryFresh = 0;
-		emit caneChanged();
+		slowGeometryUpdate();
+		cacheGeometry();
 		setMode(BUNDLE_MODE);
+		emit caneChanged();
 	}
 	else
 	{
-		cane->add(c->deepCopy());
-		geometryFresh = 0;
-		emit caneChanged();
 		if (mode != BUNDLE_MODE)
 			setMode(BUNDLE_MODE);
-		else
-		{
-			slowGeometryUpdate();
-			cacheGeometry();
-		}
+		cane->add(c->deepCopy());
+		slowGeometryUpdate();
+		cacheGeometry();
+		emit caneChanged();
 	}
 }
 

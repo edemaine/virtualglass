@@ -253,10 +253,6 @@ void MainWindow::modeChanged(int mode)
 		modeLabel->setText("FLATTEN MODE");
 		displayTextMessage("Click and drag mouse up and down to square off cane, left and right to flatten cane",0);
 		break;
-	case WRAP_MODE:
-		modeLabel->setText("WRAP MODE");
-		displayTextMessage("Click on first cane as the base, click and drag second cane to be the wrap",0);
-		break;
 	case SNAP_MODE:
 		modeLabel->setText("SNAP MODE");
 		displayTextMessage("Click to set individual snap points",0);
@@ -318,7 +314,7 @@ void MainWindow::updateLibraryToolTip(LibraryCaneWidget *lc)
 void MainWindow::setupStatusBar()
 {
 	statusBar = new QStatusBar(this);
-	modeLabel = new QLabel("????",statusBar);
+	modeLabel = new QLabel("", statusBar);
 	statusBar->addPermanentWidget(modeLabel);
 	setStatusBar(statusBar);
 }

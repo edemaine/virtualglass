@@ -35,7 +35,6 @@
 #define PULL_MODE 2
 #define BUNDLE_MODE 4
 #define FLATTEN_MODE 5
-#define WRAP_MODE 6
 #define SNAP_MODE 7
 #define SNAP_LINE_MODE 8
 #define SNAP_CIRCLE_MODE 9
