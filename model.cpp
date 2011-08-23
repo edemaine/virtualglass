@@ -234,48 +234,7 @@ void Model :: setSubcaneShape(int subcane, int shape)
 		return;
 
 	Cane* ac = cane->subcanes[subcane]->getBaseCane();
-	ac->vertices.clear();
-	
-	Point p;
-	switch (shape)
-	{
-		case CIRCLE:
-			for (int i = 0; i < LOW_ANGULAR_RESOLUTION; ++i)
-			{
-				p.x = 0.5 * cos(2 * PI * i / LOW_ANGULAR_RESOLUTION);
-				p.y = 0.5 * sin(2 * PI * i / LOW_ANGULAR_RESOLUTION);
-				ac->vertices.push_back(p);
-			}
-			break;
-		case SQUARE:
-			for (int i = 0; i < LOW_ANGULAR_RESOLUTION / 4; ++i)
-			{
-				p.x = 0.5;
-				p.y = -0.5 + 1.0 * 4 * i / LOW_ANGULAR_RESOLUTION;
-				ac->vertices.push_back(p);
-			}
-			for (int i = 0; i < LOW_ANGULAR_RESOLUTION / 4; ++i)
-			{
-				p.x = 0.5 - 1.0 * 4 * i / LOW_ANGULAR_RESOLUTION;
-				p.y = 0.5;
-				ac->vertices.push_back(p);
-			}
-			for (int i = 0; i < LOW_ANGULAR_RESOLUTION / 4; ++i)
-			{
-				p.x = -0.5;
-				p.y = 0.5 - 1.0 * 4 * i / LOW_ANGULAR_RESOLUTION;
-				ac->vertices.push_back(p);
-			}
-			for (int i = 0; i < LOW_ANGULAR_RESOLUTION / 4; ++i)
-			{
-				p.x = -0.5 + 1.0 * 4 * i / LOW_ANGULAR_RESOLUTION;
-				p.y = -0.5;
-				ac->vertices.push_back(p);
-			}
-			break;
-	}
-	ac->type = BASE_POLYGONAL_CANETYPE;
-
+	ac->setShape(shape, LOW_ANGULAR_RESOLUTION);
 	slowGeometryUpdate();
 	emit caneChanged();
 }

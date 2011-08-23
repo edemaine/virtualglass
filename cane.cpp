@@ -40,6 +40,65 @@ void Cane :: reset()
 	libraryIndex=-1;
 }
 
+void Cane :: setShape(int shape, int resolution)
+{
+	this->vertices.clear();
+	Point p;
+	switch (shape)
+	{
+		case CIRCLE:
+                        for (int i = 0; i < resolution; ++i)
+                        {
+                                p.x = 0.5 * cos(2 * PI * i / resolution);
+                                p.y = 0.5 * sin(2 * PI * i / resolution);
+                                this->vertices.push_back(p);
+                        }
+			break;
+		case SQUARE:
+                        for (int i = 0; i < resolution / 4; ++i)
+                        {
+                                p.x = 0.5;
+                                p.y = -0.5 + 1.0 * 4 * i / resolution;
+                                this->vertices.push_back(p);
+                        }
+                        for (int i = 0; i < resolution / 4; ++i)
+                        {
+                                p.x = 0.5 - 1.0 * 4 * i / resolution;
+                                p.y = 0.5;
+                                this->vertices.push_back(p);
+                        }
+                        for (int i = 0; i < resolution / 4; ++i)
+                        {
+                                p.x = -0.5;
+                                p.y = 0.5 - 1.0 * 4 * i / resolution;
+                                this->vertices.push_back(p);
+                        }
+                        for (int i = 0; i < resolution / 4; ++i)
+                        {
+                                p.x = -0.5 + 1.0 * 4 * i / resolution;
+                                p.y = -0.5;
+                                this->vertices.push_back(p);
+                        }
+			break;
+		case HALF_CIRCLE:
+                        for (int i = 0; i < resolution / 3; ++i)
+                        {
+                                p.x = 0;
+                                p.y = 1.0 - 2.0 * 3 * i / resolution;
+                                this->vertices.push_back(p);
+                        }
+                        for (int i = 0; i < 2 * resolution / 3; ++i)
+                        {
+                                p.x = cos(-PI/2 + PI * 3 * i / (2 * resolution));
+                                p.y = sin(-PI/2 + PI * 3 * i / (2 * resolution));
+                                this->vertices.push_back(p);
+                        }
+
+			break;
+	}
+	this->type = BASE_POLYGONAL_CANETYPE;
+}
+
 // Returns the number of nodes in the cane's DAG
 int Cane :: leafNodes()
 {
@@ -233,9 +292,7 @@ void Cane :: add(Cane* addl)
 
 Cane* Cane :: getBaseCane()
 {
-	if (this->type == BASE_CIRCLE_CANETYPE 
-		|| this->type == BASE_SQUARE_CANETYPE
-		|| this->type == BASE_POLYGONAL_CANETYPE)
+	if (this->type == BASE_POLYGONAL_CANETYPE)
 		return this;
 
 	if (this->type == BUNDLE_CANETYPE)
@@ -339,10 +396,6 @@ std::string typeToName(int type)
 		return "Bundle Cane";
 	case FLATTEN_CANETYPE:
 		return "Flatten Cane";
-	case BASE_CIRCLE_CANETYPE:
-		return "Base Circle Cane";
-	case BASE_SQUARE_CANETYPE:
-		return "Base Square Cane";
 	case BASE_POLYGONAL_CANETYPE:
 		return "Base Polygonal Cane";
 	case UNASSIGNED_CANETYPE:
@@ -362,10 +415,6 @@ std::string typeToType(int type)
 		return "Bundle";
 	case FLATTEN_CANETYPE:
 		return "Flatten";
-	case BASE_CIRCLE_CANETYPE:
-		return "Base Circle";
-	case BASE_SQUARE_CANETYPE:
-		return "Base Square";
 	case BASE_POLYGONAL_CANETYPE:
 		return "Base Polygon";
 	case UNASSIGNED_CANETYPE:
@@ -408,8 +457,6 @@ std::string amtTypeToName(int type,int index)
 		default:
 			return UNDEFINED;
 		}
-	case BASE_CIRCLE_CANETYPE:
-		return UNDEFINED;
 	default:
 		return UNDEFINED;
 	}

@@ -163,8 +163,9 @@ void MainWindow :: setupShapeChangeDialog()
 	QComboBox* caneShapeBox = new QComboBox(form->widget());
 	caneShapeBox->addItem("Circle");
 	caneShapeBox->addItem("Square");
+	caneShapeBox->addItem("Half Circle");
 	connect(caneShapeBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(setSubcaneShapeFromPicker(QString)));
-        form->addRow("Base Type", caneShapeBox);
+        form->addRow("Shape", caneShapeBox);
 }
 
 void MainWindow :: setSubcaneShapeFromPicker(QString s)
@@ -173,6 +174,8 @@ void MainWindow :: setSubcaneShapeFromPicker(QString s)
 		model->setSubcaneShape(caneChangeSubcane, CIRCLE);
 	else if (s == "Square")
 		model->setSubcaneShape(caneChangeSubcane, SQUARE);	
+	else if (s == "Half Circle")
+		model->setSubcaneShape(caneChangeSubcane, HALF_CIRCLE);	
 }
 
 void MainWindow :: setupCustomColorChangeDialog()
@@ -347,62 +350,48 @@ void MainWindow::setupLibraryArea()
 void MainWindow::seedLibrary()
 {
 	// Now seed the library with some basic canes
-	Cane* circle = new Cane(BASE_CIRCLE_CANETYPE);
-	Cane* square = new Cane(BASE_SQUARE_CANETYPE);
-	Cane* hexagon = new Cane(BASE_POLYGONAL_CANETYPE);
-	Cane* stretch = new Cane(PULL_CANETYPE);
+	Cane* base = new Cane(BASE_POLYGONAL_CANETYPE);
 
-	hexagon->vertices.clear();
-	for (int i=0;i<6;i++)
-	{
-		Point p = polygonalBasePoint(6,i);
-		hexagon->vertices.push_back(p);
-	}
-
-	stretch->subcaneCount = 1;
-	stretch->amts[0] = 0.0;
-	stretch->amts[1] = 100.0; // amts[0] = twist, amts[1] = stretch
-
-	circle->color.r = square->color.r = hexagon->color.r = 1.0;
-	circle->color.g = square->color.g = hexagon->color.g = 0.5;
-	circle->color.b = square->color.b = hexagon->color.b = 0.5;
-	circle->color.a = square->color.a = hexagon->color.a = 0.8;
-	stretch->subcanes[0] = circle;
-	emit setCaneSig(stretch);
+	base->color.r = 1.0;
+	base->color.g = 0.5;
+	base->color.b = 0.5;
+	base->color.a = 0.8;
+	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION);
+	emit setCaneSig(base);
 	saveCaneToLibrary();
-	stretch->subcanes[0] = square;
-	emit setCaneSig(stretch);
+	base->setShape(SQUARE, LOW_ANGULAR_RESOLUTION);
+	emit setCaneSig(base);
 	saveCaneToLibrary();
-	stretch->subcanes[0] = hexagon;
-	emit setCaneSig(stretch);
+	base->setShape(HALF_CIRCLE, LOW_ANGULAR_RESOLUTION);
+	emit setCaneSig(base);
 	saveCaneToLibrary();
 
-	circle->color.r = square->color.r = hexagon->color.r = 0.5;
-	circle->color.g = square->color.g = hexagon->color.g = 1.0;
-	circle->color.b = square->color.b = hexagon->color.b = 0.5;
-	circle->color.a = square->color.a = hexagon->color.a = 0.8;
-	stretch->subcanes[0] = circle;
-	emit setCaneSig(stretch);
+	base->color.r = 0.5;
+	base->color.g = 1.0;
+	base->color.b = 0.5;
+	base->color.a = 0.8;
+	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION);
+	emit setCaneSig(base);
 	saveCaneToLibrary();
-	stretch->subcanes[0] = square;
-	emit setCaneSig(stretch);
+	base->setShape(SQUARE, LOW_ANGULAR_RESOLUTION);
+	emit setCaneSig(base);
 	saveCaneToLibrary();
-	stretch->subcanes[0] = hexagon;
-	emit setCaneSig(stretch);
+	base->setShape(HALF_CIRCLE, LOW_ANGULAR_RESOLUTION);
+	emit setCaneSig(base);
 	saveCaneToLibrary();
 
-	circle->color.r = square->color.r = hexagon->color.r = 0.5;
-	circle->color.g = square->color.g = hexagon->color.g = 0.5;
-	circle->color.b = square->color.b = hexagon->color.b = 1.0;
-	circle->color.a = square->color.a = hexagon->color.a = 0.8;
-	stretch->subcanes[0] = circle;
-	emit setCaneSig(stretch);
+	base->color.r = 0.5;
+	base->color.g = 0.5;
+	base->color.b = 1.0;
+	base->color.a = 0.8;
+	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION);
+	emit setCaneSig(base);
 	saveCaneToLibrary();
-	stretch->subcanes[0] = square;
-	emit setCaneSig(stretch);
+	base->setShape(SQUARE, LOW_ANGULAR_RESOLUTION);
+	emit setCaneSig(base);
 	saveCaneToLibrary();
-	stretch->subcanes[0] = hexagon;
-	emit setCaneSig(stretch);
+	base->setShape(HALF_CIRCLE, LOW_ANGULAR_RESOLUTION);
+	emit setCaneSig(base);
 	saveCaneToLibrary();
 
 	emit setCaneSig(NULL);

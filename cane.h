@@ -19,6 +19,7 @@ public:
 	Cane(int type);
 	int height();
 	void reset();
+	void setShape(int shape, int resolution);
 	void shallowCopy(Cane* dest);
 	void pullIntuitive(float twistFactor, float stretchFactor);
 	void pullLinear(float twistFactor, float stretchFactor);

@@ -10,18 +10,9 @@ void generate2DMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestor
 					int resolution, bool fullTransforms, int selectionColorIndex = -1);
 void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
 				  int resolution, bool fullTransforms, int selectionColorIndex = -1);
-void meshCircularBaseCane(Geometry *geometry,
-						  Cane** ancestors, int ancestorCount, int resolution, Cane *group_cane,
-						  uint32_t group_tag, bool fullTransforms);
-void meshSquareBaseCane(Geometry *geometry,
-						Cane** ancestors, int ancestorCount, int resolution, Cane *group_cane,
-						uint32_t group_tag, bool fullTransforms);
 void meshPolygonalBaseCane(Geometry* geometry, Cane** ancestors, int ancestorCount,
 						   int resolution, Cane* group_cane, uint32_t group_tag, bool fullTransforms);
 
-void mesh2DCircularBaseCane(Geometry *geometry,
-							Cane** ancestors, int ancestorCount, int resolution, Cane *group_cane,
-							uint32_t group_tag, bool fullTransforms);
 float computeTotalStretch(Cane** ancestors, int ancestorCount);
 
 void applyFlattenTransform(Vertex* v, Cane* transformNode);

@@ -735,28 +735,15 @@ void generateMesh(Cane* c, Geometry *geometry,  Cane** ancestors, int* ancestorC
 	ancestors[*ancestorCount] = c;
         *ancestorCount += 1;
 
-        if (c->type == BASE_CIRCLE_CANETYPE || c->type == BASE_SQUARE_CANETYPE || c->type == BASE_POLYGONAL_CANETYPE)
+        if (c->type == BASE_POLYGONAL_CANETYPE)
         {
                 if (groupIndex == -1)
                         passGroupIndex = 0;
                 else
                         passGroupIndex = groupIndex;
 
-                switch (c->type)
-                {
-                        case BASE_CIRCLE_CANETYPE:
-                                meshCircularBaseCane(geometry, ancestors, *ancestorCount,
-                                        resolution, c, passGroupIndex, fullTransforms);
-                                break;
-                        case BASE_SQUARE_CANETYPE:
-                                meshSquareBaseCane(geometry, ancestors, *ancestorCount,
-                                        resolution, c, passGroupIndex, fullTransforms);
-                                break;
-                        case BASE_POLYGONAL_CANETYPE:
-                                meshPolygonalBaseCane(geometry, ancestors, *ancestorCount,
-                                        resolution, c, passGroupIndex, fullTransforms);
-                                break;
-                }
+		meshPolygonalBaseCane(geometry, ancestors, *ancestorCount,
+			resolution, c, passGroupIndex, fullTransforms);
 	}
         else if (c->type == BUNDLE_CANETYPE)
 	{
@@ -792,9 +779,9 @@ void generate2DMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestor
 	// Make recursive calls depending on the type of the current node
 	ancestors[*ancestorCount] = c;
 	*ancestorCount += 1;
-	if (c->type == BASE_CIRCLE_CANETYPE)
+	if (c->type == BASE_POLYGONAL_CANETYPE)
 	{
-		mesh2DCircularBaseCane(geometry, ancestors, *ancestorCount,
+		meshPolygonalBaseCane(geometry, ancestors, *ancestorCount,
 							   resolution, c, groupIndex, fullTransforms);
 	}
 	else
