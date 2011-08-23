@@ -24,7 +24,8 @@ void LibraryCaneWidget :: mousePressEvent(QMouseEvent* event)
 {
 	if (event->button() == Qt::RightButton)
 		return;
-	model->addCane(cane);
+	//model->addCane(cane);
+	emit addCane(cane);
 }
 
 void LibraryCaneWidget :: mouseReleaseEvent(QMouseEvent* event)

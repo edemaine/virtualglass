@@ -158,7 +158,7 @@ void MainWindow::setupMenuBar()
 void MainWindow :: setupShapeChangeDialog()
 {
 	shapeDialog = new QDialog(NULL);
-	QFormLayout* form = new QFormLayout(shapeDialog->window());	
+	QFormLayout* form = new QFormLayout(shapeDialog->window());
 
 	QComboBox* caneShapeBox = new QComboBox(form->widget());
 	caneShapeBox->addItem("Circle");
@@ -167,9 +167,9 @@ void MainWindow :: setupShapeChangeDialog()
 	caneShapeBox->addItem("Triangle");
 	caneShapeBox->addItem("Half Circle");
 	caneShapeBox->addItem("Third Circle");
-	connect(caneShapeBox, SIGNAL(currentIndexChanged(QString)), 
+	connect(caneShapeBox, SIGNAL(currentIndexChanged(QString)),
 		this, SLOT(setSubcaneShapeFromPicker(QString)));
-        form->addRow("Shape", caneShapeBox);
+		form->addRow("Shape", caneShapeBox);
 }
 
 void MainWindow :: setSubcaneShapeFromPicker(QString s)
@@ -177,22 +177,22 @@ void MainWindow :: setSubcaneShapeFromPicker(QString s)
 	if (s == "Circle")
 		model->setSubcaneShape(caneChangeSubcane, CIRCLE);
 	else if (s == "Square")
-		model->setSubcaneShape(caneChangeSubcane, SQUARE);	
+		model->setSubcaneShape(caneChangeSubcane, SQUARE);
 	else if (s == "Rectangle")
-		model->setSubcaneShape(caneChangeSubcane, RECTANGLE);	
+		model->setSubcaneShape(caneChangeSubcane, RECTANGLE);
 	else if (s == "Triangle")
-		model->setSubcaneShape(caneChangeSubcane, TRIANGLE);	
+		model->setSubcaneShape(caneChangeSubcane, TRIANGLE);
 	else if (s == "Half Circle")
-		model->setSubcaneShape(caneChangeSubcane, HALF_CIRCLE);	
+		model->setSubcaneShape(caneChangeSubcane, HALF_CIRCLE);
 	else if (s == "Third Circle")
-		model->setSubcaneShape(caneChangeSubcane, THIRD_CIRCLE);	
+		model->setSubcaneShape(caneChangeSubcane, THIRD_CIRCLE);
 }
 
 void MainWindow :: setupCustomColorChangeDialog()
 {
-        caneColorChangeColorPicker = new QColorDialog(Qt::white); 
-        caneColorChangeColorPicker->setOptions(QColorDialog::ShowAlphaChannel | QColorDialog::NoButtons);
-	connect(caneColorChangeColorPicker, SIGNAL(currentColorChanged(QColor)), this, SLOT(setSubcaneColorFromPicker(QColor))); 
+		caneColorChangeColorPicker = new QColorDialog(Qt::white);
+		caneColorChangeColorPicker->setOptions(QColorDialog::ShowAlphaChannel | QColorDialog::NoButtons);
+	connect(caneColorChangeColorPicker, SIGNAL(currentColorChanged(QColor)), this, SLOT(setSubcaneColorFromPicker(QColor)));
 }
 
 void MainWindow::shapeChangeRequest(int subcane)
@@ -588,15 +588,15 @@ void MainWindow::setupBrandColorChangeDialog()
 
 	QStringListModel* caneTypeListModel = new QStringListModel();
 	caneTypeListModel->setStringList(*caneTypeList);
-        caneTypeListBox = new KeyQListView();
+		caneTypeListBox = new KeyQListView();
 	caneTypeListBox->setModel(caneTypeListModel);
 	caneTypeListBox->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 	QStringList* dummyList = new QStringList("Please select a cane type.");
 	dummyModel = new QStringListModel();
 	dummyModel->setStringList(*dummyList);
-        caneColorListBox = new KeyQListView();//QListView();
-        caneColorListBox->setModel(dummyModel);
+		caneColorListBox = new KeyQListView();//QListView();
+		caneColorListBox->setModel(dummyModel);
 	dummyInUse = true;
 	selectedBrand = -1;
 	selectedColor = -1;
@@ -607,7 +607,7 @@ void MainWindow::setupBrandColorChangeDialog()
 
 	caneBrandForm->addRow(caneSplitter);
 
-	connect(caneTypeListBox, SIGNAL(clicked(QModelIndex)), this, 
+	connect(caneTypeListBox, SIGNAL(clicked(QModelIndex)), this,
 		SLOT(updateBrandColorPickerSublist(QModelIndex)));
 	connect(caneColorListBox, SIGNAL(clicked(QModelIndex)), this,
 		SLOT(updateBrandColorPickerColor(QModelIndex)));
@@ -941,7 +941,7 @@ void MainWindow :: newMode(int i)
 
 void MainWindow :: insertLibraryCane(Cane* c)
 {
-	if (recipeWidget->selectedItems().isEmpty())
+	if (recipeWidget->selectedItems().isEmpty() || !recipeWidget->isVisible())
 		model->addCane(c);
 	else
 	{
@@ -959,15 +959,15 @@ void MainWindow :: updateModeButtonsEnabled()
 {
 	if (model->getCane() == NULL)
 	{
-		pull_button->setEnabled(false);	
-		flatten_button->setEnabled(false);	
-		bundle_button->setEnabled(false);	
+		pull_button->setEnabled(false);
+		flatten_button->setEnabled(false);
+		bundle_button->setEnabled(false);
 	}
 	else
 	{
-		pull_button->setEnabled(true);	
-		flatten_button->setEnabled(true);	
-		bundle_button->setEnabled(true);	
+		pull_button->setEnabled(true);
+		flatten_button->setEnabled(true);
+		bundle_button->setEnabled(true);
 	}
 }
 

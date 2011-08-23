@@ -20,7 +20,6 @@ RecipeWidget::RecipeWidget(QWidget *parent, OpenGLWidget* openglWidget) :
 	connect(this,SIGNAL(recipeCaneChanged()),openglWidget->getModel(),SLOT(exactChange()));
 	connect(openglWidget->getModel(), SIGNAL(caneChanged()), this, SLOT(updateRecipe()));
 	connect(this, SIGNAL(addOperation(Cane*,int)), openglWidget->getModel(), SLOT(insertMode(Cane*,int)));
-
 	newClear();
 }
 
@@ -115,21 +114,35 @@ void RecipeWidget::updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, b
 {
 	if (rootCane==NULL)
 		return;
+	QMessageBox box;
+	box.setText("moomoo");
+	box.exec();
 	rootNode->setData(0, Qt::UserRole, QVariant::fromValue(rootCane));
+	box.setText("moomoomoo");
+	box.exec();
+
 	updateLibraryColumn(rootCane,rootNode);
+	box.setText("moomoomoomoo");
+	box.exec();
 
 	rootNode->setText(2,QString("%1").arg(rootCane->typeName()));
 	rootNode->setBackgroundColor(3,rootCane->qcolor());
 	rootNode->setText(3,"");
 
+	box.setText("moo");
+	box.exec();
 	QTreeWidgetItem* parentNode = rootNode->parent();
 	Cane* parentCane = getCane(parentNode);
-
+	box.setText("hihi");
+	box.exec();
 	int rootIndex = childIndex(rootNode,parentNode);
-
+	box.setText("hihihi");
+	box.exec();
 	if (parentCane != NULL)
 	{
 		Point p = parentCane->subcaneLocations[rootIndex];
+		box.setText("hi");
+		box.exec();
 		rootNode->setText(4,QString("%1").arg(p.x));
 		rootNode->setText(5,QString("%1").arg(p.y));
 		rootNode->setText(6,QString("%1").arg(p.z));
@@ -265,7 +278,11 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 		}
 		cane->amts[amtIndex] = item->text(column).toFloat();
 	}
+	box.setText("lol");
+	box.exec();
 	updateBaseRecipe(cane,item,false);
+	box.setText("lolol");
+	box.exec();
 	emit recipeCaneChanged();
 }
 
