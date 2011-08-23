@@ -217,9 +217,6 @@ bool Model :: subcaneHasColorAndShape(int subcane)
 	if (cane == NULL || subcane < 0 || subcane >= cane->subcaneCount)
 		return false;
 
-	if (cane->subcanes[subcane]->getTopBundleNode() != NULL)
-		return false;
-
 	Cane* baseCane = cane->subcanes[subcane]->getBaseCane();
 	
 	if (baseCane == NULL)

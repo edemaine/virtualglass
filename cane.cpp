@@ -294,7 +294,7 @@ Cane* Cane :: getBaseCane()
 	if (this->type == BASE_POLYGONAL_CANETYPE)
 		return this;
 
-	if (this->type == BUNDLE_CANETYPE)
+	if (this->type == BUNDLE_CANETYPE && this->subcaneCount > 1)
 		return NULL;
 
 	return this->subcanes[0]->getBaseCane();
