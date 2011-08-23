@@ -93,7 +93,6 @@ void Cane :: setShape(int shape, int resolution)
                                 p.y = sin(-PI/2 + PI * 3 * i / (2 * resolution));
                                 this->vertices.push_back(p);
                         }
-
 			break;
 	}
 	this->type = BASE_POLYGONAL_CANETYPE;

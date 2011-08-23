@@ -618,50 +618,49 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 	mouseLocX = e->x();
 	mouseLocY = e->y();
 
-	// Only set a new active subcane if you're going to do something with it
-	if (model->getMode() == BUNDLE_MODE || deleteButtonDown)
-		model->setActiveSubcane(getSubcaneUnderMouse(mouseLocX, mouseLocY));
 	if (e->button() == Qt::RightButton)
 	{
 		if (getSubcaneUnderMouse(mouseLocX, mouseLocY) != -1)
 			caneChangeMenu.exec(QCursor::pos());
 		else
 			rightMouseDown = true;
+		return;
 	}
-	else
+
+	// Only set a new active subcane if you're going to do something with it
+	if (model->getMode() == BUNDLE_MODE || deleteButtonDown)
+		model->setActiveSubcane(getSubcaneUnderMouse(mouseLocX, mouseLocY));
+	if (deleteButtonDown)
 	{
-		if (deleteButtonDown)
+		if (!model->deleteActiveCane())
 		{
-			if (!model->deleteActiveCane())
-			{
-				if (showSnaps) {
-					if (model->getMode() == SNAP_MODE 
-						|| model->getMode() == SNAP_CIRCLE_MODE 
-						|| model->getMode() == SNAP_LINE_MODE)
-					{
-						model->deleteSnapPoint(getClickedPlanePoint(mouseLocX,mouseLocY));
-					}
+			if (showSnaps) {
+				if (model->getMode() == SNAP_MODE 
+					|| model->getMode() == SNAP_CIRCLE_MODE 
+					|| model->getMode() == SNAP_LINE_MODE)
+				{
+					model->deleteSnapPoint(getClickedPlanePoint(mouseLocX,mouseLocY));
 				}
 			}
 		}
-		else if (showSnaps)
+	}
+	else if (showSnaps)
+	{
+		if (model->getMode() == SNAP_MODE)
 		{
-			if (model->getMode() == SNAP_MODE)
-			{
-				Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
-				model->addSnapPoint(SNAP_POINT,p);
-				emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
-			} else if (model->getMode() == SNAP_LINE_MODE)
-			{
-				Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
-				model->addSnapPoint(SNAP_LINE,p);
-				emit operationInfoSig(QString("Snap Line: %1, %2").arg(p.x).arg(p.y),2000);
-			} else if (model->getMode() == SNAP_CIRCLE_MODE)
-			{
-				Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
-				model->addSnapPoint(SNAP_CIRCLE,p);
-				emit operationInfoSig(QString("Snap Circle: %1, %2").arg(p.x).arg(p.y),2000);
-			}
+			Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
+			model->addSnapPoint(SNAP_POINT,p);
+			emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
+		} else if (model->getMode() == SNAP_LINE_MODE)
+		{
+			Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
+			model->addSnapPoint(SNAP_LINE,p);
+			emit operationInfoSig(QString("Snap Line: %1, %2").arg(p.x).arg(p.y),2000);
+		} else if (model->getMode() == SNAP_CIRCLE_MODE)
+		{
+			Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
+			model->addSnapPoint(SNAP_CIRCLE,p);
+			emit operationInfoSig(QString("Snap Circle: %1, %2").arg(p.x).arg(p.y),2000);
 		}
 	}
 
