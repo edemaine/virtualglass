@@ -135,11 +135,13 @@ void MainWindow::setupMenuBar()
 	viewMenu->addSeparator();
 
 	QAction* zoomIn = new QAction(tr("&Zoom In"), this);
+	zoomIn->setShortcut(QKeySequence("CTRL+="));
 	zoomIn->setStatusTip(tr("Zoom in the camera."));
 	connect(zoomIn, SIGNAL(triggered()), openglWidget, SLOT(zoomIn()));
 	viewMenu->addAction(zoomIn);
 
 	QAction* zoomOut = new QAction(tr("&Zoom Out"), this);
+	zoomIn->setShortcut(QKeySequence("CTRL+-"));
 	zoomOut->setStatusTip(tr("Zoom in the camera."));
 	connect(zoomOut, SIGNAL(triggered()), openglWidget, SLOT(zoomOut()));
 	viewMenu->addAction(zoomOut);
@@ -899,14 +901,6 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
 	case 0x01000003: // Backspace
 	case 0x01000007: // Delete
 		openglWidget->setDeleteButtonDown(true);
-		break;
-	case 0x2b: // +
-	case 0x3d:
-		openglWidget->zoomIn();
-		break;
-	case 0x2d: // -
-	case 0x5f:
-		openglWidget->zoomOut();
 		break;
 	default:
 		break;
