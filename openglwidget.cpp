@@ -138,6 +138,7 @@ void OpenGLWidget :: initializeGL()
 	}
 	if (!GLEW_ARB_texture_rectangle
 	 || !GLEW_ARB_window_pos
+	 || !GLEW_ARB_occlusion_query
 	 || !GLEW_EXT_blend_func_separate
 	 || !GLEW_ARB_depth_texture
 	 || !GLEW_ARB_framebuffer_object
@@ -456,10 +457,12 @@ void OpenGLWidget :: paintWithDepthPeeling()
 		gl_errors("compiling peel program.");
 	}
 
+	GLuint query = 0;
+	glGenQueriesARB(1, &query);
 
 	//Render the closest 4 depth layers:
-	const unsigned int Passes = 4;
-	for (unsigned int pass = 0; pass < Passes; ++pass) {
+	const unsigned int MaxPasses = 4;
+	for (unsigned int pass = 0; pass < MaxPasses; ++pass) {
 		//---------- setup framebuffer ----------
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, peelBuffer);
 		glPushAttrib(GL_VIEWPORT_BIT);
@@ -488,7 +491,7 @@ void OpenGLWidget :: paintWithDepthPeeling()
 			glBindTexture(GL_TEXTURE_RECTANGLE_ARB, peelPrevDepthTex);
 		}
 
-		if (pass + 1 < Passes) {
+		if (pass + 1 < MaxPasses) {
 			glEnable(GL_DEPTH_TEST);
 			glDisable(GL_BLEND);
 		} else {
@@ -497,6 +500,11 @@ void OpenGLWidget :: paintWithDepthPeeling()
 			glDisable(GL_DEPTH_TEST);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
+
+		//When actually peeling, remember how many fragments were used:
+		if (pass != 0 && pass + 1 < MaxPasses) {
+			glBeginQueryARB(GL_SAMPLES_PASSED_ARB, query);
 		}
 		//---------- draw scene --------
 		glDisable(GL_CULL_FACE);
@@ -542,6 +550,15 @@ void OpenGLWidget :: paintWithDepthPeeling()
 		gl_errors("(depth framebuffer render)");
 
 		//--------------------------
+		
+		if (pass != 0 && pass + 1 < MaxPasses) {
+			glEndQueryARB(GL_SAMPLES_PASSED_ARB);
+
+			GLuint count = 0;
+			glGetQueryObjectuivARB(query, GL_QUERY_RESULT_ARB, &count);
+
+			std::cout << "On pass " << pass << ", generated " << count << " fragments." << std::endl;
+		}
 
 		//swap out depth textures, now that we've rendered a new one:
 		std::swap(peelPrevDepthTex, peelDepthTex);
@@ -572,6 +589,8 @@ void OpenGLWidget :: paintWithDepthPeeling()
 	
 		gl_errors("(copy framebuffer)");
 	}
+
+	glDeleteQueriesARB(1, &query);
 
 	//TODO: final pass -- render background color behind everything else.
 
