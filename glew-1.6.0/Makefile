@@ -31,8 +31,16 @@
 include config/version
 
 SHELL = /bin/sh
+
+## ERIK: Comment out the following two lines for MINGW
 SYSTEM ?= $(shell config/config.guess | cut -d - -f 3 | sed -e 's/[0-9\.]//g;')
 SYSTEM.SUPPORTED = $(shell test -f config/Makefile.$(SYSTEM) && echo 1)
+
+## ERIK: Uncomment out the following two lines for MINGW
+## Then compile with
+##     PATH=/cygdrive/c/Program\ Files/QtSDK/mingw/bin mingw32-make
+#SYSTEM = mingw
+#SYSTEM.SUPPORTED = 1
 
 ifeq ($(SYSTEM.SUPPORTED), 1)
 include config/Makefile.$(SYSTEM)
