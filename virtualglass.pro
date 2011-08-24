@@ -12,7 +12,7 @@ INCLUDEPATH += . yaml-cpp/include/ yaml-cpp/util/ yaml-cpp/src/ yaml-cpp/test/
 INCLUDEPATH += glew-1.6.0/include
 QT += opengl
 
-LIBS += -Lglew-1.6.0/lib
+LIBS += -L../src/glew-1.6.0/lib
 unix {
   LIBS += -lGLEW
 }
