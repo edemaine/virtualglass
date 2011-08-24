@@ -28,6 +28,11 @@ void Model :: setOrthographicProjection()
 	setProjection(ORTHOGRAPHIC_PROJECTION);
 }
 
+void Model :: setCaneToNull()
+{
+	setCane(NULL);
+}
+
 void Model :: setPerspectiveProjection()
 {
 	setProjection(PERSPECTIVE_PROJECTION);

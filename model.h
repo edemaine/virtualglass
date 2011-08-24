@@ -57,6 +57,7 @@ signals:
 	void projectionChanged();
 
 public slots:
+	void setCaneToNull();	
 	void undo();
 	void redo();
 	void setMode(int mode);
