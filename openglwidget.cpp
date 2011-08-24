@@ -62,6 +62,8 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(QGLForm
 
 	selectBuffer = NULL;
 
+	initializeGLCalled = false;
+
 	peelEnable = true;
 	peelInitContext = NULL;
 	peelBufferSize = make_vector(0U, 0U);
@@ -142,6 +144,7 @@ void OpenGLWidget :: setDeleteButtonDown(bool state)
 
 void OpenGLWidget :: initializeGL()
 {
+	initializeGLCalled = true;
 	// set up glew:
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
@@ -182,6 +185,22 @@ void OpenGLWidget :: setBgColor(QColor color)
 	bgColor = color;
 	update();
 }
+
+QImage OpenGLWidget :: renderImage() {
+	if (!initializeGLCalled) {
+		initializeGL();
+	}
+	makeCurrent();
+	QGLFramebufferObject fb(300, 300, QGLFramebufferObject::Depth);
+	fb.bind();
+	glPushAttrib(GL_VIEWPORT_BIT);
+	glViewport(0,0,300,300);
+	paintGL();
+	glPopAttrib();
+	fb.release();
+	return fb.toImage();
+}
+
 
 int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 {
@@ -520,6 +539,11 @@ void OpenGLWidget :: paintWithDepthPeeling()
 	GLuint query = 0;
 	glGenQueriesARB(1, &query);
 
+	GLint base_draw_framebuffer = 0;
+	GLint base_read_framebuffer = 0;
+	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &base_draw_framebuffer);
+	glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &base_read_framebuffer);
+
 	//Render depth layers, front-to-back, up to MaxPasses layers:
 	const unsigned int MaxPasses = 20;
 	for (unsigned int pass = 0; pass < MaxPasses; ++pass) {
@@ -612,7 +636,7 @@ void OpenGLWidget :: paintWithDepthPeeling()
 
 		//Done drawing scene; detach framebuffer:
 		glPopAttrib();
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); //detach framebuffer
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, base_draw_framebuffer); //detach framebuffer
 		gl_errors("(depth framebuffer render)");
 
 		//--------------------------
@@ -655,7 +679,7 @@ void OpenGLWidget :: paintWithDepthPeeling()
 
 		glDisable(GL_BLEND);
 
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, base_read_framebuffer);
 	
 		gl_errors("(copy framebuffer)");
 	}
@@ -849,8 +873,12 @@ void OpenGLWidget :: setGLMatrices()
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	float w = width();
-	float h = height();
+
+	GLint viewport[4] = {0,0,0,0};
+	glGetIntegerv(GL_VIEWPORT, viewport);
+
+	float w = viewport[2];
+	float h = viewport[3];
 	if (model->getProjection() == ORTHOGRAPHIC_PROJECTION) {
 		if (w > h) {
 			float a = h / w;
@@ -1179,4 +1207,3 @@ void OpenGLWidget :: togglePeel() {
 	peelEnable = !peelEnable;
 	update();
 }
-

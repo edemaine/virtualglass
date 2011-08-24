@@ -57,6 +57,8 @@ private:
 
 	QGLFramebufferObject *selectBuffer;
 
+	bool initializeGLCalled;
+
 	bool peelEnable;
 	//various OpenGL objects used when depth peeling:
 	const QGLContext *peelInitContext; //context in which all this peel stuff got init'd -- there's something weird going on here with (possibly) copy-constructed versions of the Widget, I'm thinking.
@@ -67,6 +69,10 @@ private:
 	GLuint peelPrevDepthTex; //stores previous depth
 	GLhandleARB peelProgram; //program that rejects fragments based on depth
 	GLhandleARB nopeelProgram; //program that premultiplies by alpha, but doesn't actually reject
+
+public:
+	QImage renderImage();
+private:
 
 	int getSubcaneUnderMouse(int mouseX, int mouseY);
 	void setGLMatrices();
