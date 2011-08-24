@@ -25,7 +25,7 @@ void gl_errors(string const &where) {
 }
 }
 
-OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(QGLFormat(QGL::AlphaChannel), parent)
+OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent)
 {
 	shiftButtonDown = false;
 	rightMouseDown = false;
@@ -60,6 +60,8 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(QGLForm
 	mouseLocX = 0;
 	mouseLocY = 0;
 
+	selectBuffer = NULL;
+
 	peelEnable = true;
 	peelInitContext = NULL;
 	peelBufferSize = make_vector(0U, 0U);
@@ -78,6 +80,12 @@ OpenGLWidget :: ~OpenGLWidget()
 {
 	//Deallocate all the depth peeling resources we may have created:
 	makeCurrent();
+
+	if (selectBuffer) {
+		delete selectBuffer;
+		selectBuffer = NULL;
+	}
+
 	if (peelBuffer) {
 		glDeleteFramebuffers(1, &peelBuffer);
 		peelBuffer = 0;
@@ -179,6 +187,28 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 {
 	makeCurrent();
 	setGLMatrices();
+	GLint viewport[4] = {0,0,0,0};
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	if (mouseX < 0 || mouseX >= viewport[2] || mouseY < 0 || mouseY >= viewport[3]) {
+		return -1;
+	}
+
+	if (selectBuffer) {
+		if (selectBuffer->size().width() != viewport[2] || selectBuffer->size().height() != viewport[3]) {
+			delete selectBuffer;
+			selectBuffer = NULL;
+		}
+	}
+
+	if (!selectBuffer) {
+		selectBuffer = new QGLFramebufferObject(viewport[2], viewport[3], QGLFramebufferObject::Depth, GL_TEXTURE_2D, GL_RGBA8);
+	}
+
+	assert(selectBuffer->isValid());
+
+	selectBuffer->bind();
+	glPushAttrib(GL_VIEWPORT_BIT);
+	glViewport(0,0,viewport[2],viewport[3]);
 
 	geometry = model->getGeometry();
 
@@ -194,8 +224,8 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	glDisable(GL_BLEND);
 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].position));
 	glEnableClientState(GL_VERTEX_ARRAY);
-		for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
-				glColor4ubv(reinterpret_cast< const GLubyte * >(&(g->tag)));
+	for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
+		glColor4ubv(reinterpret_cast< const GLubyte * >(&(g->tag)));
 		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 					   GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
 	}
@@ -207,11 +237,16 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	glEnable(GL_BLEND);
 	glEnable(GL_LIGHTING);
 
+	glPopAttrib();
+	selectBuffer->release();
+
 	updateTriangles();
 
-		if (((int) c[0]) == 255)
-				return -1;
-		return ((int) c[0]);
+	gl_errors("getSubcaneUnderMouse");
+
+	if (((int) c[0]) == 255)
+			return -1;
+	return ((int) c[0]);
 }
 
 Point OpenGLWidget :: getClickedPlanePoint(int mouseLocX, int mouseLocY)
@@ -330,9 +365,10 @@ namespace {
 	string shader_log(GLhandleARB shader) {
 		GLint len = 0;
 		glGetObjectParameterivARB(shader, GL_OBJECT_INFO_LOG_LENGTH_ARB, &len);
-		vector< GLchar > log(len, '\0');
+		vector< GLchar > log;
+		log.resize(len + 1, GLchar('\0'));
 		GLint written = 0;
-		//glGetInfoLogARB(shader, len, &written, &log[0]);
+		glGetInfoLogARB(shader, len, &written, &(log[0]));
 		assert(written <= len);
 		string out = "";
 		for (unsigned int i = 0; i < log.size() && log[i] != '\0'; ++i) {
@@ -536,6 +572,7 @@ void OpenGLWidget :: paintWithDepthPeeling()
 		}
 		//---------- draw scene --------
 		glDisable(GL_CULL_FACE);
+		glDisable(GL_LIGHTING);
 
 		if (showAxes)
 			drawAxes();

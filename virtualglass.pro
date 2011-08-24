@@ -12,7 +12,7 @@ INCLUDEPATH += . yaml-cpp/include/ yaml-cpp/util/ yaml-cpp/src/ yaml-cpp/test/
 INCLUDEPATH += glew-1.6.0/include
 QT += opengl
 
-LIBS += -Lglew-1.6.0/libs -lGLEW
+LIBS += -Lglew-1.6.0/lib -lGLEW
 
 QMAKE_CFLAGS_DEBUG += -Wall -Werror -g
 QMAKE_CFLAGS_RELEASE += -Wall -Werror -g

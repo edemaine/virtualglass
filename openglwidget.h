@@ -9,6 +9,7 @@
 #include <math.h>
 #include <algorithm>
 #include <QtGui>
+#include <QGLFramebufferObject>
 #include <qgl.h>
 #include "canehistory.h"
 #include "primitives.h"
@@ -53,6 +54,8 @@ private:
 	float theta, fee, rho;
 
 	int mouseLocX, mouseLocY;
+
+	QGLFramebufferObject *selectBuffer;
 
 	bool peelEnable;
 	//various OpenGL objects used when depth peeling:
