@@ -58,6 +58,7 @@ private:
 
 	int mouseLocX, mouseLocY;
 
+	bool peelEnable;
 	//various OpenGL objects used when depth peeling:
 	const QGLContext *peelInitContext; //context in which all this peel stuff got init'd -- there's something weird going on here with (possibly) copy-constructed versions of the Widget, I'm thinking.
 	Vector2ui peelBufferSize;
@@ -66,6 +67,7 @@ private:
 	GLuint peelDepthTex; //depth texture, stores current depth
 	GLuint peelPrevDepthTex; //stores previous depth
 	GLhandleARB peelProgram; //program that rejects fragments based on depth
+	GLhandleARB nopeelProgram; //program that premultiplies by alpha, but doesn't actually reject
 
 	int getSubcaneUnderMouse(int mouseX, int mouseY);
 	void setGLMatrices();
@@ -105,6 +107,7 @@ public slots:
 	void toggleSnaps();
 	void toggleRefSnaps();
 	void toggle2D();
+	void togglePeel();
 
 protected:
 	void initializeGL();

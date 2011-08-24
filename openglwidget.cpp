@@ -31,7 +31,7 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(QGLForm
 	rightMouseDown = false;
 	deleteButtonDown = false;
 
-	bgColor = QColor(0,0,0);
+	bgColor = QColor(100, 100, 100);
 
 	QAction* changeColorCustomAction = new QAction(tr("&Change Color (Custom)"), &caneChangeMenu);
 	QAction* changeColorBrandAction = new QAction(tr("&Change Color (Brand)"), &caneChangeMenu);
@@ -62,6 +62,7 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(QGLForm
 	mouseLocX = 0;
 	mouseLocY = 0;
 
+	peelEnable = true;
 	peelInitContext = NULL;
 	peelBufferSize = make_vector(0U, 0U);
 	peelBuffer = 0;
@@ -69,6 +70,7 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(QGLForm
 	peelDepthTex = 0;
 	peelPrevDepthTex = 0;
 	peelProgram = 0;
+	nopeelProgram = 0;
 
 	setMouseTracking(true);
 	updateTriangles();
@@ -97,6 +99,10 @@ OpenGLWidget :: ~OpenGLWidget()
 	if (peelProgram) {
 		glDeleteObjectARB(peelProgram);
 		peelProgram = 0;
+	}
+	if (nopeelProgram) {
+		glDeleteObjectARB(nopeelProgram);
+		nopeelProgram = 0;
 	}
 }
 
@@ -135,6 +141,7 @@ void OpenGLWidget :: initializeGL()
 	if (err != GLEW_OK) {
 		std::cerr << "WARNING: Failure initializing glew: " << glewGetErrorString(err) << std::endl;
 		std::cerr << " ... we will continue, but code that uses extensions will cause a crash" << std::endl;
+		peelEnable = false;
 	}
 	if (!GLEW_ARB_texture_rectangle
 	 || !GLEW_ARB_window_pos
@@ -148,6 +155,7 @@ void OpenGLWidget :: initializeGL()
 	 || !GLEW_ARB_fragment_shader
 	 || !GLEW_ARB_vertex_shader) {
 		std::cerr << "WARNING: some of the extensions required for depth peeling are not present." << std::endl;
+		peelEnable = false;
 	}
 	// For shadow/lighting
 	glEnable(GL_LIGHTING);
@@ -183,6 +191,7 @@ int OpenGLWidget :: getSubcaneUnderMouse(int mouseX, int mouseY)
 	assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3));
 	assert(sizeof(Triangle) == sizeof(GLuint) * 3);
 
+	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_BLEND);
 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].position));
@@ -333,6 +342,42 @@ namespace {
 		}
 		return out;
 	}
+
+	GLhandleARB load_program(const char *frag) {
+		GLhandleARB shader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+		GLint len = strlen(frag);
+		glShaderSourceARB(shader, 1, &frag, &len);
+		glCompileShaderARB(shader);
+		{ //check shader:
+			GLint val = 0;
+			glGetObjectParameterivARB(shader, GL_OBJECT_COMPILE_STATUS_ARB, &val);
+			string log = shader_log(shader);
+			if (val == 0) {
+				std::cerr << "ERROR: failed compiling shader." << std::endl;
+				std::cerr << "Log:\n" << log << std::endl;
+			} else if (log != "") {
+				std::cerr << "WARNING: peel shader compiled, but produced messages:\n" << log << std::endl;
+			}
+		}
+		GLhandleARB program = glCreateProgramObjectARB();
+		glAttachObjectARB(program, shader);
+		glLinkProgramARB(program);
+		{ //check program:
+			GLint val = 0;
+			glGetObjectParameterivARB(program, GL_OBJECT_LINK_STATUS_ARB, &val);
+			string log = shader_log(program);
+			if (val == 0) {
+				std::cerr << "ERROR: failed linking program." << std::endl;
+				std::cerr << "Log:\n" << log << std::endl;
+			} else if (log != "") {
+				std::cerr << "WARNING: peel program linked, but produced messages:\n" << log << std::endl;
+			}
+		}
+
+		glDeleteObjectARB(shader);
+
+		return program;
+	}
 }
 
 
@@ -419,49 +464,30 @@ void OpenGLWidget :: paintWithDepthPeeling()
 		"	if (gl_FragCoord.z <= depth) { \n"
 		"		discard; \n"
 		"	} \n"
-		"	gl_FragColor = gl_Color; \n"
+		"	//Premultiply alpha to make compositing easier later: \n"
+		"	gl_FragColor = vec4(gl_Color.xyz * gl_Color.w, gl_Color.w); \n"
+		"} \n";
+		peelProgram = load_program(peel_frag);
+		gl_errors("compiling peel program.");
+	}
+
+	if (nopeelProgram == 0) {
+		const char *nopeel_frag =
+		"void main() { \n"
+		"	//Premultiply alpha to make compositing easier later: \n"
+		"	gl_FragColor = vec4(gl_Color.xyz * gl_Color.w, gl_Color.w); \n"
 		"} \n";
 
-		GLhandleARB peelShader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-		GLint len = strlen(peel_frag);
-		glShaderSourceARB(peelShader, 1, &peel_frag, &len);
-		glCompileShaderARB(peelShader);
-		{ //check shader:
-			GLint val = 0;
-			glGetObjectParameterivARB(peelShader, GL_OBJECT_COMPILE_STATUS_ARB, &val);
-			string log = shader_log(peelShader);
-			if (val == 0) {
-				std::cerr << "ERROR: failed compiling peel shader." << std::endl;
-				std::cerr << "Log:\n" << log << std::endl;
-			} else if (log != "") {
-				std::cerr << "WARNING: peel shader compiled, but produced messages:\n" << log << std::endl;
-			}
-		}
-		peelProgram = glCreateProgramObjectARB();
-		glAttachObjectARB(peelProgram, peelShader);
-		glLinkProgramARB(peelProgram);
-		{ //check program:
-			GLint val = 0;
-			glGetObjectParameterivARB(peelProgram, GL_OBJECT_LINK_STATUS_ARB, &val);
-			string log = shader_log(peelProgram);
-			if (val == 0) {
-				std::cerr << "ERROR: failed linking peel program." << std::endl;
-				std::cerr << "Log:\n" << log << std::endl;
-			} else if (log != "") {
-				std::cerr << "WARNING: peel program linked, but produced messages:\n" << log << std::endl;
-			}
-		}
 
-		glDeleteObjectARB(peelShader); //flag peelShader for deletion once peelProgram is deleted.
-
-		gl_errors("compiling peel program.");
+		nopeelProgram = load_program(nopeel_frag);
+		gl_errors("compiling nopeel program.");
 	}
 
 	GLuint query = 0;
 	glGenQueriesARB(1, &query);
 
-	//Render the closest 4 depth layers:
-	const unsigned int MaxPasses = 4;
+	//Render depth layers, front-to-back, up to MaxPasses layers:
+	const unsigned int MaxPasses = 20;
 	for (unsigned int pass = 0; pass < MaxPasses; ++pass) {
 		//---------- setup framebuffer ----------
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, peelBuffer);
@@ -485,7 +511,9 @@ void OpenGLWidget :: paintWithDepthPeeling()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//Set up peeling program to reject (close) stuff we've already rendered
-		if (pass != 0) {
+		if (pass == 0) {
+			glUseProgramObjectARB(nopeelProgram);
+		} else {
 			glUseProgramObjectARB(peelProgram);
 			glUniform1iARB(glGetUniformLocationARB(peelProgram, "min_depth"), 0);
 			glBindTexture(GL_TEXTURE_RECTANGLE_ARB, peelPrevDepthTex);
@@ -499,11 +527,13 @@ void OpenGLWidget :: paintWithDepthPeeling()
 			//hope for the best:
 			glDisable(GL_DEPTH_TEST);
 			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
 		}
 
+		bool do_query = (pass != 0);
+
 		//When actually peeling, remember how many fragments were used:
-		if (pass != 0 && pass + 1 < MaxPasses) {
+		if (do_query) {
 			glBeginQueryARB(GL_SAMPLES_PASSED_ARB, query);
 		}
 		//---------- draw scene --------
@@ -529,10 +559,10 @@ void OpenGLWidget :: paintWithDepthPeeling()
 			for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
 				assert(g->cane);
 				Color c = g->cane->color;
-							if (model && (int)g->tag == model->getActiveSubcane()) {
+				if (model && (int)g->tag == model->getActiveSubcane()) {
 					c.xyz += make_vector(0.1f, 0.1f, 0.1f);
 				}
-				glColor4f(c.r * c.a, c.g * c.a, c.b * c.a, c.a);
+				glColor4f(c.r, c.g, c.b, c.a);
 				glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 							   GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
 			}
@@ -544,58 +574,84 @@ void OpenGLWidget :: paintWithDepthPeeling()
 			glDisable(GL_LIGHTING);
 		}
 
+		if (do_query) {
+			glEndQueryARB(GL_SAMPLES_PASSED_ARB);
+		}
+
 		//Done drawing scene; detach framebuffer:
 		glPopAttrib();
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); //detach framebuffer
 		gl_errors("(depth framebuffer render)");
 
 		//--------------------------
-		
-		if (pass != 0 && pass + 1 < MaxPasses) {
-			glEndQueryARB(GL_SAMPLES_PASSED_ARB);
 
+		glUseProgramObjectARB(0);
+		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+		
+
+		if (do_query) {
 			GLuint count = 0;
 			glGetQueryObjectuivARB(query, GL_QUERY_RESULT_ARB, &count);
 
-			std::cout << "On pass " << pass << ", generated " << count << " fragments." << std::endl;
+			//std::cout << "On pass " << pass << ", generated " << count << " fragments." << std::endl;
+			//if we're no longer rendering any fragments, skip the pixel copy:
+			if (count == 0) {
+				break;
+			}
 		}
 
 		//swap out depth textures, now that we've rendered a new one:
 		std::swap(peelPrevDepthTex, peelDepthTex);
 
-		if (pass != 0) {
-			glUseProgramObjectARB(0);
-			glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
-		}
 
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, peelBuffer); //attach to READ
+		//Copy pixels over to visible framebuffer:
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, peelBuffer);
 
-		//copy pixels to screen: (I sort of hope this works)
-		glWindowPos2iARB(0,0); //DEBUG:(peelBufferSize.x / 2) * pass,0);
-		if (pass != 0) {
+		//copy pixels to screen:
+		glWindowPos2iARB(0,0);
+		if (pass == 0) {
+			//First pass, we copy:
+			glDisable(GL_BLEND);
+		} else {
+			//subsequent passes get added in:
 			glEnable(GL_BLEND);
-			glBlendFuncSeparate(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+			glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
 		}
-		//glDisable(GL_BLEND); //DEBUG
 		glDisable(GL_DEPTH_TEST);
 		//TODO: possibly use alpha test here to save some fill?
 		glCopyPixels(0,0,peelBufferSize.x,peelBufferSize.y,GL_COLOR);
-		if (pass != 0) {
-			glDisable(GL_BLEND);
-		}
 
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0); //detach framebuffer from READ as well as DRAW
-		//std::cerr << "And done." << std::endl;
+		glDisable(GL_BLEND);
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	
 		gl_errors("(copy framebuffer)");
 	}
 
 	glDeleteQueriesARB(1, &query);
 
-	//TODO: final pass -- render background color behind everything else.
+	//final pass -- render background color behind everything else.
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
 
-
-	//called automatically: swapBuffers();
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	glBegin(GL_QUADS);
+	glColor3f(bgColor.redF(), bgColor.greenF(), bgColor.blueF());
+	glVertex2f(-1.1f,-1.1f);
+	glVertex2f( 1.1f,-1.1f);
+	glVertex2f( 1.1f, 1.1f);
+	glVertex2f(-1.1f, 1.1f);
+	glEnd();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
 
 }
 
@@ -611,7 +667,11 @@ void OpenGLWidget :: paintGL()
 	this->qglClearColor(bgColor);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	paintWithDepthPeeling();
+	if (peelEnable) {
+		paintWithDepthPeeling();
+	} else {
+		paintWithoutDepthPeeling();
+	}
 }
 
 void OpenGLWidget :: paintWithoutDepthPeeling()
@@ -1305,6 +1365,11 @@ void OpenGLWidget :: toggle2D()
 		setTopView();
 	}
 	model->toggle2D();
+	update();
+}
+
+void OpenGLWidget :: togglePeel() {
+	peelEnable = !peelEnable;
 	update();
 }
 

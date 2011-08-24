@@ -75,6 +75,14 @@ void MainWindow::setupMenuBar()
 
 	viewMenu->addSeparator();
 
+	QAction* togglePeel = new QAction(tr("&Depth Peelin'"), this);
+	togglePeel->setStatusTip(tr("Show better transparency."));
+	togglePeel->setCheckable(true);
+	togglePeel->setChecked(true);
+	connect(togglePeel, SIGNAL(triggered()), openglWidget, SLOT(togglePeel()));
+	viewMenu->addAction(togglePeel);
+
+
 	QAction* toggleAxes = new QAction(tr("&Show Axes"), this);
 	toggleAxes->setStatusTip(tr("Show the reference lines on the X, Y, and Z axes."));
 	toggleAxes->setCheckable(true);
@@ -357,6 +365,35 @@ void MainWindow::seedLibrary()
 {
 	// Now seed the library with some basic canes
 	Cane* base = new Cane(BASE_POLYGONAL_CANETYPE);
+
+	//---------- just for alpha stuff ---------
+	base->color.r = 1.0;
+	base->color.g = 0.5;
+	base->color.b = 0.5;
+	base->color.a = 0.2;
+	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION);
+	emit setCaneSig(base);
+	saveCaneToLibrary();
+
+	base->color.r = 1.0;
+	base->color.g = 1.0;
+	base->color.b = 1.0;
+	base->color.a = 0.2;
+	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION);
+	emit setCaneSig(base);
+	saveCaneToLibrary();
+
+	base->color.r = 0.5;
+	base->color.g = 0.7;
+	base->color.b = 1.0;
+	base->color.a = 0.2;
+	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION);
+	emit setCaneSig(base);
+	saveCaneToLibrary();
+
+
+	//--------------------------------------------
+
 
 	base->color.r = 1.0;
 	base->color.g = 0.5;
