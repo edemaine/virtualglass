@@ -19,7 +19,6 @@ MainWindow::MainWindow(Model* model)
 	updateModeButtonsEnabled();
 
 	setWindowTitle(tr("Virtual Glass"));
-
 	resize(1000, 750);
 	move(75,25);
 }
@@ -90,22 +89,6 @@ void MainWindow::setupMenuBar()
 	openglWidget->setAxes(true);
 	connect(toggleAxes, SIGNAL(triggered()), openglWidget, SLOT(toggleAxes()));
 	viewMenu->addAction(toggleAxes);
-
-	QAction* toggleSnaps = new QAction(tr("&Show Snaps"), this);
-	toggleSnaps->setStatusTip(tr("Show and activate the snaps."));
-	toggleSnaps->setCheckable(true);
-	toggleSnaps->setChecked(true);
-	openglWidget->setSnaps(true);
-	connect(toggleSnaps, SIGNAL(triggered()), openglWidget, SLOT(toggleSnaps()));
-	viewMenu->addAction(toggleSnaps);
-
-	QAction* toggleRefSnaps = new QAction(tr("&Show Auxiliary Snaps"), this);
-	toggleRefSnaps->setStatusTip(tr("Show auxiliary snaps."));
-	toggleRefSnaps->setCheckable(true);
-	toggleRefSnaps->setChecked(true);
-	openglWidget->setRefSnaps(true);
-	connect(toggleRefSnaps, SIGNAL(triggered()), openglWidget, SLOT(toggleRefSnaps()));
-	viewMenu->addAction(toggleRefSnaps);
 
 	viewMenu->addSeparator();
 
@@ -270,18 +253,6 @@ void MainWindow::modeChanged(int mode)
 		modeLabel->setText("FLATTEN MODE");
 		displayTextMessage("Click and drag mouse up and down to square off cane, left and right to flatten cane",0);
 		break;
-	case SNAP_MODE:
-		modeLabel->setText("SNAP MODE");
-		displayTextMessage("Click to set individual snap points",0);
-		break;
-	case SNAP_LINE_MODE:
-		modeLabel->setText("SNAP LINE MODE");
-		displayTextMessage("Click to set individual snap lines",0);
-		break;
-	case SNAP_CIRCLE_MODE:
-		modeLabel->setText("SNAP CIRCLE MODE");
-		displayTextMessage("Click to set individual snap circles",0);
-		break;
 	default:
 		modeLabel->setText("UNKNOWN MODE");
 		displayTextMessage("Unknown mode not specified",0);
@@ -311,8 +282,6 @@ void MainWindow::saveCaneToLibrary()
 		return;
 
 	LibraryCaneWidget* lc = new LibraryCaneWidget((OpenGLWidget*) this->openglWidget, this->model, 0);
-	//connect(lc, SIGNAL(newIndex(int)), model->getCane(), SLOT(changeLibraryIndex(int)));
-	//lc->setMouseTracking(true);
 	stockLayout->addWidget(lc);
 	updateLibraryToolTip(lc);
 	connect(lc, SIGNAL(mouseOver(LibraryCaneWidget*)), this, SLOT(updateLibraryToolTip(LibraryCaneWidget*)));
@@ -859,8 +828,6 @@ void MainWindow::setupWorkArea()
 	flatten_button->setToolTip("Drag Mouse Horizontally to Squish, Vertically to Flatten");
 	toggle2D_button = new QPushButton("2D View");
 	toggle2D_button->setToolTip(tr("Switch between 2D and 3D view."));
-	snap_button = new QPushButton("Alternate Snap Modes");
-	snap_button->setToolTip("TODO");
 	undo_button = new QPushButton("Undo");
 	undo_button->setToolTip("Undo the last operation.");
 	redo_button = new QPushButton("Redo");
@@ -879,7 +846,6 @@ void MainWindow::setupWorkArea()
 	operButton_layout->addWidget(bundle_button);
 	operButton_layout->addWidget(flatten_button);
 	operButton_layout->addWidget(toggle2D_button);
-	operButton_layout->addWidget(snap_button);
 	operButton_layout->addWidget(redo_button);
 	operButton_layout->addWidget(undo_button);
 	operButton_layout->addWidget(save_button);

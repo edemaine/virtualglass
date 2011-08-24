@@ -48,30 +48,7 @@ public:
 	int getProjection();
 	int getMode();
 
-	int addSnapPoint(int snapMode,Point p);
-	void modifySnapPoint(float radii,int index);
-	void modifySnapPoint(float radii);
-	void modifySnapPoint(Point p);
-	void modifySnapPoint(Point p,int index);
-	Point finalizeSnapPoint(int index);
-	Point finalizeSnapPoint();
-
-	int snapPointCount(int snapMode);
-	Point snapPoint(int snapMode, int index);
-	Point snapPoint2(int snapMode, int index);
-	Point snapPoint2(int index);
-	float snapPointRadius(int snapMode, int index);
-
-	int getActiveSnapMode();
-	int getActiveSnapIndex();
-	void clearActiveSnap(bool holdSnap);
-
-	void deleteSnapPoint(Point p);
-
 	void toggle2D();
-
-	float snapLineParam;
-	float snapCircleParam;
 
 signals:
 	void caneChanged();
@@ -85,7 +62,6 @@ public slots:
 	void setMode(int mode);
 	void setMode(int mode, bool viewRecipe, Cane* c);
 	void insertMode(Cane* c, int mode);
-	void clearCurrentCane();
 	void setCane(Cane* c);
 	void exactChange();
 	void setOrthographicProjection();
@@ -101,30 +77,11 @@ private:
 	int geometryFresh;
 	int activeSubcane;
 
-	Point snapPoints[MAX_SNAP];
-	float snapPointRadii[MAX_SNAP];
-	int snapPointsCount;
-
-	Point snapSegments1[MAX_SNAP];
-	Point snapSegments2[MAX_SNAP];
-	int snapLinesCount;
-
-	Point snapCircles[MAX_SNAP];
-	float snapCircleRadii[MAX_SNAP];
-	int snapCirclesCount;
-
-	int activeSnapMode; // Which snap is being activated, or 0 if not;
-	int activeSnapIndex;
-	int activeSnapPlacementMode;
-
-	Point snapHoldPoint;
-
 	bool show2D;
 
 	void computeHighResGeometry(Geometry* highResGeometry);
 	void cacheGeometry();
 	void revertToCachedGeometry();
-	void resetAuxiliaries();
 };
 
 #endif

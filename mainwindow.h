@@ -43,7 +43,6 @@ public:
 	QPushButton* pull_button;
 	QPushButton* bundle_button;
 	QPushButton* flatten_button;
-	QPushButton* snap_button;
 	QPushButton* undo_button;
 	QPushButton* redo_button;
 	QPushButton* save_button;

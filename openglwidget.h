@@ -37,8 +37,6 @@ public:
 	void setBgColor(QColor color);
 	void setAxes(bool show);
 	void setGrid(bool show);
-	void setSnaps(bool show);
-	void setRefSnaps(bool show);
 
 private:
 	QMenu caneChangeMenu;
@@ -49,8 +47,6 @@ private:
 	Model* model;
 	Geometry *geometry;
 	bool showAxes;
-	bool showSnaps;
-	bool showRefSnaps;
 	bool show2D;
 
 	float lookAtLoc[3];
@@ -72,11 +68,6 @@ private:
 	int getSubcaneUnderMouse(int mouseX, int mouseY);
 	void setGLMatrices();
 	void drawAxes();
-	void drawGrid();
-	void drawSnaps();
-	void drawSnapPoints();
-	void drawSnapLines();
-	void drawSnapCircles();
 	void drawTriangle(Triangle* t);
 	void updateTriangles();
 	Point getClickedPlanePoint(int mouseLocX, int mouseLocY);
@@ -104,8 +95,6 @@ public slots:
 	void setSideView();
 	void projectionChanged();
 	void toggleAxes();
-	void toggleSnaps();
-	void toggleRefSnaps();
 	void toggle2D();
 	void togglePeel();
 

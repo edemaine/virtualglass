@@ -47,8 +47,6 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(QGLForm
 	geometry = NULL;
 
 	showAxes = true;
-	showSnaps = false;
-	showRefSnaps = false;
 	show2D = false;
 
 	lookAtLoc[0] = 0.0f;
@@ -334,7 +332,7 @@ namespace {
 		glGetObjectParameterivARB(shader, GL_OBJECT_INFO_LOG_LENGTH_ARB, &len);
 		vector< GLchar > log(len, '\0');
 		GLint written = 0;
-		glGetInfoLogARB(shader, len, &written, &log[0]);
+		//glGetInfoLogARB(shader, len, &written, &log[0]);
 		assert(written <= len);
 		string out = "";
 		for (unsigned int i = 0; i < log.size() && log[i] != '\0'; ++i) {
@@ -542,9 +540,6 @@ void OpenGLWidget :: paintWithDepthPeeling()
 		if (showAxes)
 			drawAxes();
 
-		if (showSnaps)
-			drawSnaps();
-
 		if (geometry) {
 			glEnable(GL_LIGHTING);
 			//Check that Vertex and Triangle have proper size:
@@ -690,9 +685,6 @@ void OpenGLWidget :: paintWithoutDepthPeeling()
 	if (showAxes)
 		drawAxes();
 
-	if (showSnaps)
-		drawSnaps();
-
 	if (geometry) {
 		glEnable(GL_LIGHTING);
 		//Check that Vertex and Triangle have proper size:
@@ -744,68 +736,6 @@ void drawDottedCircle(float radius)
 	glEnd();
 }
 
-void OpenGLWidget :: drawSnapPoints()
-{
-
-	float max=0.04;
-	for (int i=0;i<=model->snapPointCount(SNAP_POINT);i++)
-	{
-		glPushMatrix();
-		glTranslatef(model->snapPoint(SNAP_POINT,i).x,model->snapPoint(SNAP_POINT,i).y,0);
-		for (int j=1;j<=5;j++)
-		{
-			glColor3f((1-bgColor.redF())/j,(1-bgColor.greenF())/j,(1-bgColor.blueF())/j);
-			//glColor3f(1.0/j,1.0/j,1.0/j);
-			glBegin(GL_LINES);
-			glVertex3f(0,0,max*(j-1));
-			glVertex3f(0,0,max*j);
-			glEnd();
-
-		}
-
-		glColor3f((1-bgColor.redF())*3/4,(1-bgColor.greenF())*3/4,(1-bgColor.blueF())*3/4);
-		//glColor3f(0.75,0.75,0.75);
-		if (showRefSnaps)
-			drawCircle(model->snapPointRadius(SNAP_POINT,i));
-
-		glPopMatrix();
-	}
-
-}
-
-void OpenGLWidget :: drawSnapCircles()
-{
-
-	float max=0.015;
-	for (int i=0;i<=model->snapPointCount(SNAP_CIRCLE);i++)
-	{
-		glPushMatrix();
-		glTranslatef(model->snapPoint(SNAP_CIRCLE,i).x,model->snapPoint(SNAP_CIRCLE,i).y,0);
-		for (int j=1;j<=5;j++)
-		{
-			glColor3f((1-bgColor.redF())/j,(1-bgColor.greenF())/j,(1-bgColor.blueF())/j);
-			//glColor3f(1.0/j,1.0/j,1.0/j);
-			glBegin(GL_LINES);
-			glVertex3f(0,0,max*(j-1));
-			glVertex3f(0,0,max*j);
-			glEnd();
-
-		}
-		glColor3f((1-bgColor.redF())*3/4,(1-bgColor.greenF())*3/4,(1-bgColor.blueF())*3/4);
-		//glColor3f(0.75,0.75,0.75);
-
-		drawCircle(model->snapPointRadius(SNAP_CIRCLE,i));
-		if (showRefSnaps)
-		{
-			drawCircle(model->snapPointRadius(SNAP_CIRCLE,i)*(1-model->snapCircleParam));
-			drawCircle(model->snapPointRadius(SNAP_CIRCLE,i)*(1+model->snapCircleParam));
-		}
-
-		glPopMatrix();
-	}
-
-}
-
 void drawSegment(Point p1, Point p2)
 {
 	glPushMatrix();
@@ -814,68 +744,6 @@ void drawSegment(Point p1, Point p2)
 	glVertex3f(p2.x,p2.y,0);
 	glEnd();
 	glPopMatrix();
-}
-
-void OpenGLWidget :: drawSnapLines()
-{
-
-	float max=0.015;
-	for (int i=0;i<=model->snapPointCount(SNAP_LINE);i++)
-	{
-		glPushMatrix();
-		glTranslatef(model->snapPoint(SNAP_LINE,i).x,model->snapPoint(SNAP_LINE,i).y,0);
-		for (int j=1;j<=5;j++)
-		{
-			glColor3f((1-bgColor.redF())/j,(1-bgColor.greenF())/j,(1-bgColor.blueF())/j);
-			//glColor3f(1.0/j,1.0/j,1.0/j);
-			glBegin(GL_LINES);
-			glVertex3f(0,0,max*(j-1));
-			glVertex3f(0,0,max*j);
-			glEnd();
-
-		}
-		glPopMatrix();
-
-		glPushMatrix();
-		glTranslatef(model->snapPoint2(SNAP_LINE,i).x,model->snapPoint2(SNAP_LINE,i).y,0);
-		for (int j=1;j<=5;j++)
-		{
-			glColor3f((1-bgColor.redF())/j,(1-bgColor.greenF())/j,(1-bgColor.blueF())/j);
-			//glColor3f(1.0/j,1.0/j,1.0/j);
-			glBegin(GL_LINES);
-			glVertex3f(0,0,max*(j-1));
-			glVertex3f(0,0,max*j);
-			glEnd();
-
-		}
-		glPopMatrix();
-
-		glColor3f((1-bgColor.redF())*3/4,(1-bgColor.greenF())*3/4,(1-bgColor.blueF())*3/4);
-		//glColor3f(0.75,0.75,0.75);
-		Point p1 = model->snapPoint(SNAP_LINE,i);
-		Point p2 = model->snapPoint2(SNAP_LINE,i);
-		drawSegment(p1,p2);
-		if (showRefSnaps)
-		{
-			Point v = p2-p1;
-			v = p2-p1;
-			v.z = -v.x;
-			v.x = v.y;
-			v.y = v.z;
-			v.z = 0;
-			Point dist=normalize(v)*(model->snapLineParam);
-			drawSegment(p1+dist,p2+dist);
-			drawSegment(p1-dist,p2-dist);
-		}
-	}
-
-}
-
-void OpenGLWidget :: drawSnaps()
-{
-	drawSnapPoints();
-	drawSnapLines();
-	drawSnapCircles();
 }
 
 /*
@@ -922,31 +790,9 @@ void OpenGLWidget :: toggleAxes()
 	setAxes(!showAxes);
 }
 
-void OpenGLWidget :: toggleSnaps()
-{
-	setSnaps(!showSnaps);
-}
-
-void OpenGLWidget :: toggleRefSnaps()
-{
-	setRefSnaps(!showRefSnaps);
-}
-
 void OpenGLWidget :: setAxes(bool show)
 {
 	showAxes = show;
-	update();
-}
-
-void OpenGLWidget :: setSnaps(bool show)
-{
-	showSnaps = show;
-	update();
-}
-
-void OpenGLWidget :: setRefSnaps(bool show)
-{
-	showRefSnaps = show;
 	update();
 }
 
@@ -1032,36 +878,7 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 		model->setActiveSubcane(getSubcaneUnderMouse(mouseLocX, mouseLocY));
 	if (deleteButtonDown)
 	{
-		if (!model->deleteActiveCane())
-		{
-			if (showSnaps) {
-				if (model->getMode() == SNAP_MODE 
-					|| model->getMode() == SNAP_CIRCLE_MODE 
-					|| model->getMode() == SNAP_LINE_MODE)
-				{
-					model->deleteSnapPoint(getClickedPlanePoint(mouseLocX,mouseLocY));
-				}
-			}
-		}
-	}
-	else if (showSnaps)
-	{
-		if (model->getMode() == SNAP_MODE)
-		{
-			Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
-			model->addSnapPoint(SNAP_POINT,p);
-			emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
-		} else if (model->getMode() == SNAP_LINE_MODE)
-		{
-			Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
-			model->addSnapPoint(SNAP_LINE,p);
-			emit operationInfoSig(QString("Snap Line: %1, %2").arg(p.x).arg(p.y),2000);
-		} else if (model->getMode() == SNAP_CIRCLE_MODE)
-		{
-			Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
-			model->addSnapPoint(SNAP_CIRCLE,p);
-			emit operationInfoSig(QString("Snap Circle: %1, %2").arg(p.x).arg(p.y),2000);
-		}
+		model->deleteActiveCane();
 	}
 
 	update();
@@ -1076,30 +893,13 @@ void OpenGLWidget :: mouseReleaseEvent (QMouseEvent* e)
 	//check if cane is in a snap, and finalize it if true
 	if (model->getActiveSubcane() != -1)
 	{
-		if (model->getActiveSnapMode()!=NO_SNAP && showSnaps)
-		{
-			model->clearActiveSnap(false);
-		}
-		//check if cane is in a snap, and finalize it if true
-
 		model->setActiveSubcane(-1);
 	}
 
-	if (e->button() == Qt::RightButton){
+	if (e->button() == Qt::RightButton)
 		rightMouseDown = false;
-	}
 	else
-	{
-		if (showSnaps)
-		{
-			if (model->getMode() == SNAP_MODE || model->getMode() == SNAP_LINE_MODE || model->getMode() == SNAP_CIRCLE_MODE)
-			{
-				Point p = model->finalizeSnapPoint();
-				emit operationInfoSig(QString("Snap Point: %1, %2").arg(p.x).arg(p.y),2000);
-			}
-		}
 		model->slowGeometryUpdate();
-	}
 }
 
 /*
@@ -1216,19 +1016,6 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		emit operationInfoSig(QString("Squished with %1, Flattened into rectangle with %2").arg(
 			model->getCane()->amts[0]).arg(model->getCane()->amts[2]),1000);
 		break;
-	case SNAP_MODE:
-	case SNAP_LINE_MODE:
-	case SNAP_CIRCLE_MODE:
-	{
-		if (showSnaps)
-		{
-			Point p = getClickedPlanePoint(mouseLocX,mouseLocY);
-			model->modifySnapPoint(p);
-		}
-		break;
-	}
-	default:
-		break;
 	}
 
 }
@@ -1291,23 +1078,6 @@ void OpenGLWidget :: saveObjFile(std::string const &filename)
 void OpenGLWidget :: saveRawFile(std::string const &filename)
 {
 	model->saveRawFile(filename);
-}
-
-void OpenGLWidget :: drawGrid()
-{
-	//return;
-	glBegin(GL_LINES);
-	glColor3f(1-bgColor.redF(),1-bgColor.greenF(),1-bgColor.blueF());
-	float max=1;
-	float resolution=10;
-	for (float i=-max;i<=max;i+=max/resolution)
-	{
-		glVertex3f(i,0,-max);
-		glVertex3f(i,0,max);
-		glVertex3f(-max,0,i);
-		glVertex3f(max,0,i);
-	}
-	glEnd();
 }
 
 void OpenGLWidget :: drawAxes()
