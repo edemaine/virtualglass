@@ -1,4 +1,4 @@
-#include "recipeWidget.h"
+#include "recipewidget.h"
 
 RecipeWidget::RecipeWidget(QWidget *parent, OpenGLWidget* openglWidget) :
 	QTreeWidget(parent)
