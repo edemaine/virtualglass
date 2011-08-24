@@ -149,34 +149,53 @@ void MainWindow::setupMenuBar()
 void MainWindow :: setupShapeChangeDialog()
 {
 	shapeDialog = new QDialog(NULL);
-	QFormLayout* form = new QFormLayout(shapeDialog->window());
+	QFormLayout* layout = new QFormLayout(shapeDialog->window());
 
-	QComboBox* caneShapeBox = new QComboBox(form->widget());
+	caneShapeBox = new QComboBox(layout->widget());
 	caneShapeBox->addItem("Circle");
 	caneShapeBox->addItem("Square");
 	caneShapeBox->addItem("Rectangle");
 	caneShapeBox->addItem("Triangle");
 	caneShapeBox->addItem("Half Circle");
 	caneShapeBox->addItem("Third Circle");
-	connect(caneShapeBox, SIGNAL(currentIndexChanged(QString)),
-		this, SLOT(setSubcaneShapeFromPicker(QString)));
-		form->addRow("Shape", caneShapeBox);
+	connect(caneShapeBox, SIGNAL(currentIndexChanged(int)),
+		this, SLOT(shapeTypeEvent(int)));
+	layout->addRow("Shape", caneShapeBox);
+	
+	caneSizeSlider = new QSlider(Qt::Horizontal, layout->widget());
+	caneSizeSlider->setRange(1, 100);
+	layout->addRow("Size", caneSizeSlider);
+	connect(caneSizeSlider, SIGNAL(sliderMoved(int)),
+		this, SLOT(shapeSizeEvent(int)));
 }
 
-void MainWindow :: setSubcaneShapeFromPicker(QString s)
+void MainWindow :: shapeTypeEvent(int)
 {
-	if (s == "Circle")
-		model->setSubcaneShape(caneChangeSubcane, CIRCLE);
-	else if (s == "Square")
-		model->setSubcaneShape(caneChangeSubcane, SQUARE);
-	else if (s == "Rectangle")
-		model->setSubcaneShape(caneChangeSubcane, RECTANGLE);
-	else if (s == "Triangle")
-		model->setSubcaneShape(caneChangeSubcane, TRIANGLE);
-	else if (s == "Half Circle")
-		model->setSubcaneShape(caneChangeSubcane, HALF_CIRCLE);
-	else if (s == "Third Circle")
-		model->setSubcaneShape(caneChangeSubcane, THIRD_CIRCLE);
+	shapePickerEvent();
+} 
+
+void MainWindow :: shapeSizeEvent(int)
+{
+	shapePickerEvent();
+}
+
+void MainWindow :: shapePickerEvent()
+{
+	QString shape = caneShapeBox->currentText();
+	float size = caneSizeSlider->sliderPosition() / 100.0;	
+
+	if (shape == "Circle")
+		model->setSubcaneShape(caneChangeSubcane, CIRCLE, size);
+	else if (shape == "Square")
+		model->setSubcaneShape(caneChangeSubcane, SQUARE, size);
+	else if (shape == "Rectangle")
+		model->setSubcaneShape(caneChangeSubcane, RECTANGLE, size);
+	else if (shape == "Triangle")
+		model->setSubcaneShape(caneChangeSubcane, TRIANGLE, size);
+	else if (shape == "Half Circle")
+		model->setSubcaneShape(caneChangeSubcane, HALF_CIRCLE, size);
+	else if (shape == "Third Circle")
+		model->setSubcaneShape(caneChangeSubcane, THIRD_CIRCLE, size);
 }
 
 void MainWindow :: setupCustomColorChangeDialog()
@@ -340,7 +359,7 @@ void MainWindow::seedLibrary()
 	base->color.g = 0.5;
 	base->color.b = 0.5;
 	base->color.a = 0.2;
-	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION);
+	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
 	emit setCaneSig(base);
 	saveCaneToLibrary();
 
@@ -348,7 +367,7 @@ void MainWindow::seedLibrary()
 	base->color.g = 1.0;
 	base->color.b = 1.0;
 	base->color.a = 0.2;
-	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION);
+	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
 	emit setCaneSig(base);
 	saveCaneToLibrary();
 
@@ -356,7 +375,7 @@ void MainWindow::seedLibrary()
 	base->color.g = 0.7;
 	base->color.b = 1.0;
 	base->color.a = 0.2;
-	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION);
+	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
 	emit setCaneSig(base);
 	saveCaneToLibrary();
 
@@ -368,10 +387,10 @@ void MainWindow::seedLibrary()
 	base->color.g = 0.5;
 	base->color.b = 0.5;
 	base->color.a = 0.8;
-	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION);
+	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
 	emit setCaneSig(base);
 	saveCaneToLibrary();
-	base->setShape(TRIANGLE, LOW_ANGULAR_RESOLUTION);
+	base->setShape(TRIANGLE, LOW_ANGULAR_RESOLUTION, 0.2);
 	emit setCaneSig(base);
 	saveCaneToLibrary();
 
@@ -379,10 +398,10 @@ void MainWindow::seedLibrary()
 	base->color.g = 1.0;
 	base->color.b = 0.5;
 	base->color.a = 0.8;
-	base->setShape(SQUARE, LOW_ANGULAR_RESOLUTION);
+	base->setShape(SQUARE, LOW_ANGULAR_RESOLUTION, 0.2);
 	emit setCaneSig(base);
 	saveCaneToLibrary();
-	base->setShape(RECTANGLE, LOW_ANGULAR_RESOLUTION);
+	base->setShape(RECTANGLE, LOW_ANGULAR_RESOLUTION, 0.2);
 	emit setCaneSig(base);
 	saveCaneToLibrary();
 
@@ -390,10 +409,10 @@ void MainWindow::seedLibrary()
 	base->color.g = 0.5;
 	base->color.b = 1.0;
 	base->color.a = 0.8;
-	base->setShape(HALF_CIRCLE, LOW_ANGULAR_RESOLUTION);
+	base->setShape(HALF_CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
 	emit setCaneSig(base);
 	saveCaneToLibrary();
-	base->setShape(THIRD_CIRCLE, LOW_ANGULAR_RESOLUTION);
+	base->setShape(THIRD_CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
 	emit setCaneSig(base);
 	saveCaneToLibrary();
 

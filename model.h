@@ -29,7 +29,7 @@ public:
 	int getActiveSubcane();
 	bool subcaneHasColorAndShape(int subcane);
 	void setSubcaneColor(int subcane, float r, float g, float b, float a);
-	void setSubcaneShape(int subcane, int shape);
+	void setSubcaneShape(int subcane, int shape, float size);
 	Cane* getSubcane(int subcane);
 	Geometry* getGeometry();
 	void pullCane(float twistAmount, float stretchFactor);

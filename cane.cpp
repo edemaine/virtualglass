@@ -40,7 +40,7 @@ void Cane :: reset()
 	libraryIndex=-1;
 }
 
-void Cane :: setShape(int shape, int resolution)
+void Cane :: setShape(int shape, int resolution, float size)
 {
 	this->vertices.clear();
 	Point p;
@@ -50,60 +50,60 @@ void Cane :: setShape(int shape, int resolution)
 		case CIRCLE:
                         for (int i = 0; i < resolution; ++i)
                         {
-                                p.x = 0.5 * cos(2 * PI * i / resolution);
-                                p.y = 0.5 * sin(2 * PI * i / resolution);
+                                p.x = size * 0.5 * cos(2 * PI * i / resolution);
+                                p.y = size * 0.5 * sin(2 * PI * i / resolution);
                                 this->vertices.push_back(p);
                         }
 			break;
 		case SQUARE:
                         for (int i = 0; i < resolution / 4; ++i)
                         {
-                                p.x = 0.5;
-                                p.y = -0.5 + 1.0 * 4 * i / resolution;
+                                p.x = size * 0.5;
+                                p.y = size * (-0.5 + 1.0 * 4 * i / resolution);
                                 this->vertices.push_back(p);
                         }
                         for (int i = 0; i < resolution / 4; ++i)
                         {
-                                p.x = 0.5 - 1.0 * 4 * i / resolution;
-                                p.y = 0.5;
+                                p.x = size * (0.5 - 1.0 * 4 * i / resolution);
+                                p.y = size * 0.5;
                                 this->vertices.push_back(p);
                         }
                         for (int i = 0; i < resolution / 4; ++i)
                         {
-                                p.x = -0.5;
-                                p.y = 0.5 - 1.0 * 4 * i / resolution;
+                                p.x = size * -0.5;
+                                p.y = size * (0.5 - 1.0 * 4 * i / resolution);
                                 this->vertices.push_back(p);
                         }
                         for (int i = 0; i < resolution / 4; ++i)
                         {
-                                p.x = -0.5 + 1.0 * 4 * i / resolution;
-                                p.y = -0.5;
+                                p.x = size * (-0.5 + 1.0 * 4 * i / resolution);
+                                p.y = size * -0.5;
                                 this->vertices.push_back(p);
                         }
 			break;
 		case RECTANGLE:
                         for (int i = 0; i < resolution / 4; ++i)
                         {
-                                p.x = 0.5;
-                                p.y = -0.25 + 0.5 * 4 * i / resolution;
+                                p.x = size * 0.5;
+                                p.y = size * (-0.25 + 0.5 * 4 * i / resolution);
                                 this->vertices.push_back(p);
                         }
                         for (int i = 0; i < resolution / 4; ++i)
                         {
-                                p.x = 0.5 - 1.0 * 4 * i / resolution;
-                                p.y = 0.25;
+                                p.x = size * (0.5 - 1.0 * 4 * i / resolution);
+                                p.y = size * 0.25;
                                 this->vertices.push_back(p);
                         }
                         for (int i = 0; i < resolution / 4; ++i)
                         {
-                                p.x = -0.5;
-                                p.y = 0.25 - 0.5 * 4 * i / resolution;
+                                p.x = size * -0.5;
+                                p.y = size * (0.25 - 0.5 * 4 * i / resolution);
                                 this->vertices.push_back(p);
                         }
                         for (int i = 0; i < resolution / 4; ++i)
                         {
-                                p.x = -0.5 + 1.0 * 4 * i / resolution;
-                                p.y = -0.25;
+                                p.x = size * (-0.5 + 1.0 * 4 * i / resolution);
+                                p.y = size * -0.25;
                                 this->vertices.push_back(p);
                         }
 			break;
@@ -111,22 +111,22 @@ void Cane :: setShape(int shape, int resolution)
                         for (int i = 0; i < resolution / 3; ++i)
                         {
 				t = 3.0 * i / resolution;
-				p.x = 1 * (1 - t) + cos(2 * PI / 3) * t; 
-				p.y = 0 * (1 - t) + sin(2 * PI / 3) * t; 
+				p.x = size * (1 * (1 - t) + cos(2 * PI / 3) * t); 
+				p.y = size * (0 * (1 - t) + sin(2 * PI / 3) * t); 
                                 this->vertices.push_back(p);
 			}
                         for (int i = 0; i < resolution / 3; ++i)
                         {
 				t = 3.0 * i / resolution;
-				p.x = cos(2 * PI / 3) * (1 - t) + cos(4 * PI / 3) * t; 
-				p.y = sin(2 * PI / 3) * (1 - t) + sin(4 * PI / 3) * t; 
+				p.x = size * (cos(2 * PI / 3) * (1 - t) + cos(4 * PI / 3) * t); 
+				p.y = size * (sin(2 * PI / 3) * (1 - t) + sin(4 * PI / 3) * t); 
                                 this->vertices.push_back(p);
 			}
                         for (int i = 0; i < resolution / 3; ++i)
                         {
 				t = 3.0 * i / resolution;
-				p.x = cos(4 * PI / 3) * (1 - t) + 1 * t; 
-				p.y = sin(4 * PI / 3) * (1 - t) + 0 * t; 
+				p.x = size * (cos(4 * PI / 3) * (1 - t) + 1 * t); 
+				p.y = size * (sin(4 * PI / 3) * (1 - t) + 0 * t); 
                                 this->vertices.push_back(p);
                         }
 			break;	
@@ -134,19 +134,19 @@ void Cane :: setShape(int shape, int resolution)
                         for (int i = 0; i < resolution / 4; ++i)
                         {
                                 p.x = 0;
-                                p.y = 1.0 - 1.0 * 4 * i / resolution;
+                                p.y = size * (1.0 - 1.0 * 4 * i / resolution);
                                 this->vertices.push_back(p);
                         }
                         for (int i = 0; i < resolution / 4; ++i)
                         {
-                                p.x = cos(-PI / 6) * i * 4.0 / resolution;
-                                p.y = sin(-PI / 6) * i * 4.0 / resolution;
+                                p.x = size * (cos(-PI / 6) * i * 4.0 / resolution);
+                                p.y = size * (sin(-PI / 6) * i * 4.0 / resolution);
                                 this->vertices.push_back(p);
                         }
                         for (int i = 0; i < resolution / 2; ++i)
                         {
-                                p.x = cos(-PI / 6 + 2 * PI / 3 * i * 2 / resolution);
-                                p.y = sin(-PI / 6 + 2 * PI / 3 * i * 2 / resolution);
+                                p.x = size * cos(-PI / 6 + 2 * PI / 3 * i * 2 / resolution);
+                                p.y = size * sin(-PI / 6 + 2 * PI / 3 * i * 2 / resolution);
                                 this->vertices.push_back(p);
                         }
 			break;	
@@ -154,13 +154,13 @@ void Cane :: setShape(int shape, int resolution)
                         for (int i = 0; i < resolution / 3; ++i)
                         {
                                 p.x = 0;
-                                p.y = 1.0 - 2.0 * 3 * i / resolution;
+                                p.y = size * (1.0 - 2.0 * 3 * i / resolution);
                                 this->vertices.push_back(p);
                         }
                         for (int i = 0; i < 2 * resolution / 3; ++i)
                         {
-                                p.x = cos(-PI/2 + PI * 3 * i / (2 * resolution));
-                                p.y = sin(-PI/2 + PI * 3 * i / (2 * resolution));
+                                p.x = size * cos(-PI/2 + PI * 3 * i / (2 * resolution));
+                                p.y = size * sin(-PI/2 + PI * 3 * i / (2 * resolution));
                                 this->vertices.push_back(p);
                         }
 			break;

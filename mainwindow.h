@@ -59,7 +59,8 @@ public slots:
 	void colorChangeCustomRequest(int subcane);
 	void colorChangeBrandRequest(int subcane);
 	void setSubcaneColorFromPicker(QColor);
-	void setSubcaneShapeFromPicker(QString s);
+	void shapeTypeEvent(int);
+	void shapeSizeEvent(int);	
 	void caneChanged();
 	void modeChanged(int mode);
 	void projectionChanged();
@@ -86,6 +87,7 @@ public slots:
 private:
 	Model* model;
 
+	void shapePickerEvent();
 	void updateModeButtonsEnabled();
 	void updatePreview();
 	void keyPressEvent(QKeyEvent* e);
@@ -140,6 +142,8 @@ private:
 	QList<QStringList>* caneNameListList;
 	QList<QList<QColor> >* caneColorListList;
 	QDialog* shapeDialog;
+	QComboBox* caneShapeBox;
+	QSlider* caneSizeSlider;
 
 	bool isRecipe;
 

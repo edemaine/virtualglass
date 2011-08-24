@@ -167,13 +167,13 @@ bool Model :: subcaneHasColorAndShape(int subcane)
 	return true;
 }
 
-void Model :: setSubcaneShape(int subcane, int shape)
+void Model :: setSubcaneShape(int subcane, int shape, float size)
 {
 	if (!subcaneHasColorAndShape(subcane))
 		return;
 
 	Cane* ac = cane->subcanes[subcane]->getBaseCane();
-	ac->setShape(shape, LOW_ANGULAR_RESOLUTION);
+	ac->setShape(shape, LOW_ANGULAR_RESOLUTION, size);
 	slowGeometryUpdate();
 	emit caneChanged();
 }
