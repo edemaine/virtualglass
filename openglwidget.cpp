@@ -25,7 +25,7 @@ void gl_errors(string const &where) {
 }
 }
 
-OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
+OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(QGLFormat(QGL::AlphaChannel), parent)
 {
 	shiftButtonDown = false;
 	rightMouseDown = false;
@@ -138,6 +138,7 @@ void OpenGLWidget :: initializeGL()
 	}
 	if (!GLEW_ARB_texture_rectangle
 	 || !GLEW_ARB_window_pos
+	 || !GLEW_EXT_blend_func_separate
 	 || !GLEW_ARB_depth_texture
 	 || !GLEW_ARB_framebuffer_object
 	 || !GLEW_ARB_depth_texture
@@ -316,6 +317,24 @@ Point OpenGLWidget :: getClickedCanePoint(int activeSubcane, int mouseLocX, int 
 	return xy;
 }
 
+namespace {
+	//convenience function: grab the error log of a shader:
+	string shader_log(GLhandleARB shader) {
+		GLint len = 0;
+		glGetObjectParameterivARB(shader, GL_OBJECT_INFO_LOG_LENGTH_ARB, &len);
+		vector< GLchar > log(len, '\0');
+		GLint written = 0;
+		glGetInfoLogARB(shader, len, &written, &log[0]);
+		assert(written <= len);
+		string out = "";
+		for (unsigned int i = 0; i < log.size() && log[i] != '\0'; ++i) {
+			out += log[i];
+		}
+		return out;
+	}
+}
+
+
 /*
 Draws the scene layer-by-layer using the technique known as "depth peeling"
 Note: you must have already called makeCurrent() and set up the camera.
@@ -390,13 +409,57 @@ void OpenGLWidget :: paintWithDepthPeeling()
 	}
 
 	if (peelProgram == 0) {
-		//T.B.D.
+		const char *peel_frag =
+		"#extension GL_ARB_texture_rectangle : enable \n"
+		"uniform sampler2DRect min_depth; \n"
+		" \n"
+		"void main() { \n"
+		"	float depth = texture2DRect(min_depth, gl_FragCoord.xy).x; \n"
+		"	if (gl_FragCoord.z <= depth) { \n"
+		"		discard; \n"
+		"	} \n"
+		"	gl_FragColor = gl_Color; \n"
+		"} \n";
+
+		GLhandleARB peelShader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+		GLint len = strlen(peel_frag);
+		glShaderSourceARB(peelShader, 1, &peel_frag, &len);
+		glCompileShaderARB(peelShader);
+		{ //check shader:
+			GLint val = 0;
+			glGetObjectParameterivARB(peelShader, GL_OBJECT_COMPILE_STATUS_ARB, &val);
+			string log = shader_log(peelShader);
+			if (val == 0) {
+				std::cerr << "ERROR: failed compiling peel shader." << std::endl;
+				std::cerr << "Log:\n" << log << std::endl;
+			} else if (log != "") {
+				std::cerr << "WARNING: peel shader compiled, but produced messages:\n" << log << std::endl;
+			}
+		}
+		peelProgram = glCreateProgramObjectARB();
+		glAttachObjectARB(peelProgram, peelShader);
+		glLinkProgramARB(peelProgram);
+		{ //check program:
+			GLint val = 0;
+			glGetObjectParameterivARB(peelProgram, GL_OBJECT_LINK_STATUS_ARB, &val);
+			string log = shader_log(peelProgram);
+			if (val == 0) {
+				std::cerr << "ERROR: failed linking peel program." << std::endl;
+				std::cerr << "Log:\n" << log << std::endl;
+			} else if (log != "") {
+				std::cerr << "WARNING: peel program linked, but produced messages:\n" << log << std::endl;
+			}
+		}
+
+		glDeleteObjectARB(peelShader); //flag peelShader for deletion once peelProgram is deleted.
+
+		gl_errors("compiling peel program.");
 	}
 
-	//TEST: Just render a single layer to the peelBuffer;
-	//  this *should* end up as a loop:
 
-	{
+	//Render the closest 4 depth layers:
+	const unsigned int Passes = 4;
+	for (unsigned int pass = 0; pass < Passes; ++pass) {
 		//---------- setup framebuffer ----------
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, peelBuffer);
 		glPushAttrib(GL_VIEWPORT_BIT);
@@ -418,17 +481,26 @@ void OpenGLWidget :: paintWithDepthPeeling()
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//TODO: bind peelPrevDepthTex to texture unit.
-		//TODO: bind depth peeling fragment program.
+		//Set up peeling program to reject (close) stuff we've already rendered
+		if (pass != 0) {
+			glUseProgramObjectARB(peelProgram);
+			glUniform1iARB(glGetUniformLocationARB(peelProgram, "min_depth"), 0);
+			glBindTexture(GL_TEXTURE_RECTANGLE_ARB, peelPrevDepthTex);
+		}
 
+		if (pass + 1 < Passes) {
+			glEnable(GL_DEPTH_TEST);
+			glDisable(GL_BLEND);
+		} else {
+			//If we've peeled all we can peel, just render in some order and
+			//hope for the best:
+			glDisable(GL_DEPTH_TEST);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
 		//---------- draw scene --------
-
-
 		glDisable(GL_CULL_FACE);
-		glEnable(GL_DEPTH_TEST);
-		glDisable(GL_BLEND);
 
-		glDisable(GL_LIGHTING);
 		if (showAxes)
 			drawAxes();
 
@@ -469,20 +541,39 @@ void OpenGLWidget :: paintWithDepthPeeling()
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); //detach framebuffer
 		gl_errors("(depth framebuffer render)");
 
+		//--------------------------
+
+		//swap out depth textures, now that we've rendered a new one:
+		std::swap(peelPrevDepthTex, peelDepthTex);
+
+		if (pass != 0) {
+			glUseProgramObjectARB(0);
+			glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+		}
+
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, peelBuffer); //attach to READ
 
-		//TODO: disable fragment peeling program.
-
 		//copy pixels to screen: (I sort of hope this works)
-		glWindowPos2iARB(0,0);
-		//std::cerr << "copyPixels time..." << std::endl;
+		glWindowPos2iARB(0,0); //DEBUG:(peelBufferSize.x / 2) * pass,0);
+		if (pass != 0) {
+			glEnable(GL_BLEND);
+			glBlendFuncSeparate(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+		}
+		//glDisable(GL_BLEND); //DEBUG
+		glDisable(GL_DEPTH_TEST);
+		//TODO: possibly use alpha test here to save some fill?
 		glCopyPixels(0,0,peelBufferSize.x,peelBufferSize.y,GL_COLOR);
+		if (pass != 0) {
+			glDisable(GL_BLEND);
+		}
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0); //detach framebuffer from READ as well as DRAW
 		//std::cerr << "And done." << std::endl;
 	
 		gl_errors("(copy framebuffer)");
 	}
+
+	//TODO: final pass -- render background color behind everything else.
 
 
 	//called automatically: swapBuffers();
