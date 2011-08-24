@@ -11,7 +11,7 @@ LibraryCaneWidget :: LibraryCaneWidget(OpenGLWidget* o, Model* m,
 	setFixedSize(100, 100);
 	setScaledContents(true);
 
-	setPixmap(QPixmap::grabWidget(o));
+	setPixmap(QPixmap::fromImage(o->grabFrameBuffer())); //DEBUG: see if this prevents context() from changing. QPixmap::grabWidget(o));
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 }
 

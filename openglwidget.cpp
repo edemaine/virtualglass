@@ -15,6 +15,16 @@ other parts of the GUI.
 
 #include "openglwidget.h"
 
+namespace {
+void gl_errors(string const &where) {
+	GLuint err;
+	while ((err = glGetError()) != GL_NO_ERROR) {
+	cerr << "(in " << where << ") OpenGL error #" << err
+	     << ": " << gluErrorString(err) << endl;
+	}
+}
+}
+
 OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 {
 	shiftButtonDown = false;
@@ -35,7 +45,6 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 
 	model = _model;
 	geometry = NULL;
-	resolution = HIGH_RESOLUTION;
 
 	showAxes = true;
 	showSnaps = false;
@@ -53,8 +62,42 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(parent)
 	mouseLocX = 0;
 	mouseLocY = 0;
 
+	peelInitContext = NULL;
+	peelBufferSize = make_vector(0U, 0U);
+	peelBuffer = 0;
+	peelColorTex = 0;
+	peelDepthTex = 0;
+	peelPrevDepthTex = 0;
+	peelProgram = 0;
+
 	setMouseTracking(true);
 	updateTriangles();
+}
+
+OpenGLWidget :: ~OpenGLWidget()
+{
+	//Deallocate all the depth peeling resources we may have created:
+	makeCurrent();
+	if (peelBuffer) {
+		glDeleteFramebuffers(1, &peelBuffer);
+		peelBuffer = 0;
+	}
+	if (peelColorTex) {
+		glDeleteTextures(1, &peelColorTex);
+		peelColorTex = 0;
+	}
+	if (peelDepthTex) {
+		glDeleteTextures(1, &peelDepthTex);
+		peelDepthTex = 0;
+	}
+	if (peelPrevDepthTex) {
+		glDeleteTextures(1, &peelPrevDepthTex);
+		peelPrevDepthTex = 0;
+	}
+	if (peelProgram) {
+		glDeleteObjectARB(peelProgram);
+		peelProgram = 0;
+	}
 }
 
 Model* OpenGLWidget :: getModel()
@@ -87,6 +130,23 @@ void OpenGLWidget :: setDeleteButtonDown(bool state)
 
 void OpenGLWidget :: initializeGL()
 {
+	// set up glew:
+	GLenum err = glewInit();
+	if (err != GLEW_OK) {
+		std::cerr << "WARNING: Failure initializing glew: " << glewGetErrorString(err) << std::endl;
+		std::cerr << " ... we will continue, but code that uses extensions will cause a crash" << std::endl;
+	}
+	if (!GLEW_ARB_texture_rectangle
+	 || !GLEW_ARB_window_pos
+	 || !GLEW_ARB_depth_texture
+	 || !GLEW_ARB_framebuffer_object
+	 || !GLEW_ARB_depth_texture
+	 || !GLEW_ARB_shader_objects
+	 || !GLEW_ARB_shading_language_100
+	 || !GLEW_ARB_fragment_shader
+	 || !GLEW_ARB_vertex_shader) {
+		std::cerr << "WARNING: some of the extensions required for depth peeling are not present." << std::endl;
+	}
 	// For shadow/lighting
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
@@ -96,6 +156,8 @@ void OpenGLWidget :: initializeGL()
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
+
+	gl_errors("OpenGLWidget::initializeGL");
 }
 
 void OpenGLWidget :: setBgColor(QColor color)
@@ -255,6 +317,179 @@ Point OpenGLWidget :: getClickedCanePoint(int activeSubcane, int mouseLocX, int 
 }
 
 /*
+Draws the scene layer-by-layer using the technique known as "depth peeling"
+Note: you must have already called makeCurrent() and set up the camera.
+(This is meant to be a helper used from inside paintGL.)
+*/
+void OpenGLWidget :: paintWithDepthPeeling()
+{
+	//std::cout << "Painting with context " << context() << "." << std::endl;
+	//std::cout << " valid:" << context()->isValid() << std::endl;
+
+	makeCurrent(); //Shouldn't need to call this?
+
+	gl_errors("(before depth peeling)");
+	//viewport is {x,y,w,h} in window.
+	//We're querying here to get the width and height.
+	GLint viewport[4] = {0,0,0,0};
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	if (viewport[2] != GLint(peelBufferSize.x) || viewport[3] != GLint(peelBufferSize.y)) {
+		if (!peelInitContext) {
+			//Remember the first context we init'd stuff in,
+			// this can change if someone tries to QPixmap::grabWidget
+			// and that causes all sorts of bad stuff to happen.
+			peelInitContext = context();
+		}
+
+		peelBufferSize.x = viewport[2];
+		peelBufferSize.y = viewport[3];
+		std::cerr << "(re-)Allocating OpenGLWidget textures for " << peelBufferSize << " window." << std::endl;
+
+		//Since the buffer has changed size, (re-)init textures:
+		if (peelColorTex == 0) {
+			glGenTextures(1, &peelColorTex);
+		}
+		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, peelColorTex);
+		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, peelBufferSize.x, peelBufferSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+
+		if (peelDepthTex == 0) {
+			glGenTextures(1, &peelDepthTex);
+		}
+		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, peelDepthTex);
+		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_DEPTH_COMPONENT, peelBufferSize.x, peelBufferSize.y, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+
+		if (peelPrevDepthTex == 0) {
+			glGenTextures(1, &peelPrevDepthTex);
+		}
+		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, peelPrevDepthTex);
+		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_DEPTH_COMPONENT, peelBufferSize.x, peelBufferSize.y, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+
+		gl_errors("(depth peeling setup)");
+	}
+	//we had better be in the same context as init'd.
+	//If this assert is failing, stop using QPixmap::grabWidget and
+	// start using QPixmap::fromImage(widget->grabFrameBuffer())...
+	assert(peelInitContext == context());
+
+	if (peelBufferSize.x == 0 || peelBufferSize.y == 0) {
+		//nothing to render.
+		return;
+	}
+
+	if (peelBuffer == 0) {
+		glGenFramebuffers(1, &peelBuffer);
+	}
+
+	if (peelProgram == 0) {
+		//T.B.D.
+	}
+
+	//TEST: Just render a single layer to the peelBuffer;
+	//  this *should* end up as a loop:
+
+	{
+		//---------- setup framebuffer ----------
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, peelBuffer);
+		glPushAttrib(GL_VIEWPORT_BIT);
+		glViewport(0,0,peelBufferSize.x,peelBufferSize.y);
+	
+		//Set up the proper depth-n-such attachments:
+		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE_ARB, peelColorTex, 0);
+		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_RECTANGLE_ARB, peelDepthTex, 0);
+
+		{ //check:
+			GLenum ret = glCheckFramebufferStatus( GL_DRAW_FRAMEBUFFER );
+			if (ret != GL_FRAMEBUFFER_COMPLETE) {
+				std::cerr << "WARNING: FRAMEBUFFER not complete!" << std::endl;
+			}
+		}
+		gl_errors("(depth framebuffer setup)");
+
+		//clear the framebuffer:
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//TODO: bind peelPrevDepthTex to texture unit.
+		//TODO: bind depth peeling fragment program.
+
+		//---------- draw scene --------
+
+
+		glDisable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_BLEND);
+
+		glDisable(GL_LIGHTING);
+		if (showAxes)
+			drawAxes();
+
+		if (showSnaps)
+			drawSnaps();
+
+		if (geometry) {
+			glEnable(GL_LIGHTING);
+			//Check that Vertex and Triangle have proper size:
+			assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3));
+			assert(sizeof(Triangle) == sizeof(GLuint) * 3);
+
+			glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].position));
+			glNormalPointer(GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].normal));
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_NORMAL_ARRAY);
+	
+			for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
+				assert(g->cane);
+				Color c = g->cane->color;
+							if (model && (int)g->tag == model->getActiveSubcane()) {
+					c.xyz += make_vector(0.1f, 0.1f, 0.1f);
+				}
+				glColor4f(c.r * c.a, c.g * c.a, c.b * c.a, c.a);
+				glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
+							   GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
+			}
+
+
+			glDisableClientState(GL_VERTEX_ARRAY);
+			glDisableClientState(GL_NORMAL_ARRAY);
+
+			glDisable(GL_LIGHTING);
+		}
+
+		//Done drawing scene; detach framebuffer:
+		glPopAttrib();
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); //detach framebuffer
+		gl_errors("(depth framebuffer render)");
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, peelBuffer); //attach to READ
+
+		//TODO: disable fragment peeling program.
+
+		//copy pixels to screen: (I sort of hope this works)
+		glWindowPos2iARB(0,0);
+		//std::cerr << "copyPixels time..." << std::endl;
+		glCopyPixels(0,0,peelBufferSize.x,peelBufferSize.y,GL_COLOR);
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0); //detach framebuffer from READ as well as DRAW
+		//std::cerr << "And done." << std::endl;
+	
+		gl_errors("(copy framebuffer)");
+	}
+
+
+	//called automatically: swapBuffers();
+
+}
+
+/*
 Handles the drawing of a triangle mesh.
 The triangles array is created and lives in the
 Mesh object, and the OpenGLWidget object simply
@@ -262,11 +497,15 @@ receives a pointer to this array.
 */
 void OpenGLWidget :: paintGL()
 {
-
 	setGLMatrices();
 	this->qglClearColor(bgColor);
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	paintWithDepthPeeling();
+}
+
+void OpenGLWidget :: paintWithoutDepthPeeling()
+{
 	glDisable(GL_LIGHTING);
 
 	glEnable(GL_CULL_FACE);

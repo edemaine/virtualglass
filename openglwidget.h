@@ -1,6 +1,8 @@
 #ifndef OPENGLWIDGET_H
 #define OPENGLWIDGET_H
 
+#include <GL/glew.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -22,6 +24,7 @@ class OpenGLWidget : public QGLWidget
 public:
 	Model* getModel();
 	OpenGLWidget(QWidget* parent, Model* model);
+	virtual ~OpenGLWidget();
 	void setMode(int mode);
 	void setCamera(float theta, float fee);
 	Point getCameraPoint();
@@ -45,7 +48,6 @@ private:
 	QColor bgColor;
 	Model* model;
 	Geometry *geometry;
-	int resolution;
 	bool showAxes;
 	bool showSnaps;
 	bool showRefSnaps;
@@ -55,6 +57,15 @@ private:
 	float theta, fee, rho;
 
 	int mouseLocX, mouseLocY;
+
+	//various OpenGL objects used when depth peeling:
+	const QGLContext *peelInitContext; //context in which all this peel stuff got init'd -- there's something weird going on here with (possibly) copy-constructed versions of the Widget, I'm thinking.
+	Vector2ui peelBufferSize;
+	GLuint peelBuffer; //framebuffer
+	GLuint peelColorTex; //color texture, stores current layer
+	GLuint peelDepthTex; //depth texture, stores current depth
+	GLuint peelPrevDepthTex; //stores previous depth
+	GLhandleARB peelProgram; //program that rejects fragments based on depth
 
 	int getSubcaneUnderMouse(int mouseX, int mouseY);
 	void setGLMatrices();
@@ -97,6 +108,8 @@ public slots:
 
 protected:
 	void initializeGL();
+	void paintWithDepthPeeling();
+	void paintWithoutDepthPeeling();
 	void paintGL();
 	void resizeGL(int width, int height);
 	void mousePressEvent(QMouseEvent* e);
