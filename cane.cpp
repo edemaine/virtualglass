@@ -331,6 +331,17 @@ void Cane :: createBundle()
 	this->subcanes[0] = copy;
 }
 
+void Cane :: moveCaneTo(int subcane, float x, float y, float z)
+{
+	if ((unsigned)subcane >= (unsigned)subcaneCount) {
+		std::cerr << "Trying to move non-existent subcane " << subcane << std::endl;
+		return;
+	}
+	subcaneLocations[subcane].x = x;
+	subcaneLocations[subcane].y = y;
+	subcaneLocations[subcane].z = z;
+}
+
 void Cane :: moveCane(int subcane, float delta_x, float delta_y, float delta_z)
 {
 	if ((unsigned)subcane >= (unsigned)subcaneCount) {

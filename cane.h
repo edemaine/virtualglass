@@ -30,6 +30,7 @@ public:
 	void add(Cane* addl);
 	void deleteCane(int subcane);
 	void moveCane(int subcane, float delta_x, float delta_y, float delta_z);
+	void moveCaneTo(int subcane, float x, float y, float z);
 	int leafNodes();
 	Cane* deepCopy();
 	void setColor(Color color);

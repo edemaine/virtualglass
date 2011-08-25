@@ -22,6 +22,10 @@ Model :: Model()
 int Model :: addNewDefaultCane()
 {
 	addCane(defaultCane);
+	cane->moveCane(cane->subcaneCount-1, 1.0, 1.0, 0.0); 
+	
+	slowGeometryUpdate();
+	emit caneChanged();
 	return cane->subcaneCount-1;
 }
 
