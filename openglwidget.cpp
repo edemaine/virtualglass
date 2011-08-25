@@ -33,15 +33,6 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(QGLForm
 
 	bgColor = QColor(100, 100, 100);
 
-	QAction* changeColorCustomAction = new QAction(tr("&Change Color (Custom)"), &caneChangeMenu);
-	QAction* changeColorBrandAction = new QAction(tr("&Change Color (Brand)"), &caneChangeMenu);
-	QAction* changeShapeAction = new QAction(tr("&Change Shape"), &caneChangeMenu);
-	connect(changeColorCustomAction, SIGNAL(triggered()), this, SLOT(changeColorCustomEvent()));	
-	connect(changeColorBrandAction, SIGNAL(triggered()), this, SLOT(changeColorBrandEvent()));	
-	connect(changeShapeAction, SIGNAL(triggered()), this, SLOT(changeShapeEvent()));	
-	caneChangeMenu.addAction(changeColorCustomAction);
-	caneChangeMenu.addAction(changeColorBrandAction);
-	caneChangeMenu.addAction(changeShapeAction);
 
 	model = _model;
 	geometry = NULL;
@@ -903,22 +894,6 @@ void OpenGLWidget :: setGLMatrices()
 			  0.0, 0.0, 1.0);
 }
 
-
-void OpenGLWidget :: changeShapeEvent()
-{
-	emit shapeChangeRequest(getSubcaneUnderMouse(mouseLocX, mouseLocY));
-}
-
-void OpenGLWidget :: changeColorCustomEvent()
-{
-	emit colorChangeCustomRequest(getSubcaneUnderMouse(mouseLocX, mouseLocY));
-}
-
-void OpenGLWidget :: changeColorBrandEvent()
-{
-	emit colorChangeBrandRequest(getSubcaneUnderMouse(mouseLocX, mouseLocY));
-}
-
 /*
 Currently catches all mouse press events
 (left and right buttons, etc.).
@@ -932,7 +907,7 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 	if (e->button() == Qt::RightButton)
 	{
 		if (model->subcaneHasColorAndShape(getSubcaneUnderMouse(mouseLocX, mouseLocY)))
-			caneChangeMenu.exec(QCursor::pos());
+			emit caneChangeRequest(getSubcaneUnderMouse(mouseLocX, mouseLocY));
 		else
 			rightMouseDown = true;
 		return;
@@ -1048,8 +1023,7 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 		{
 			if (shiftButtonDown)
 			{
-				relY *= 5;
-				model->moveCane(0, 0, -relY);
+				model->moveCane(0, 0, relX * 5);
 			}
 			else
 			{

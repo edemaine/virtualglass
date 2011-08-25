@@ -13,9 +13,7 @@ MainWindow::MainWindow(Model* model)
 	setupLibraryArea();
 	setupStatusBar();
 	setupMenuBar();
-	setupShapeChangeDialog();
-	setupCustomColorChangeDialog();
-	setupBrandColorChangeDialog();
+	setupCaneChangeDialog();
 	updateModeButtonsEnabled();
 
 	setWindowTitle(tr("Virtual Glass"));
@@ -135,40 +133,15 @@ void MainWindow::setupMenuBar()
 	viewMenu->addSeparator();
 
 	QAction* zoomIn = new QAction(tr("&Zoom In"), this);
-	zoomIn->setShortcut(QKeySequence("CTRL+="));
 	zoomIn->setStatusTip(tr("Zoom in the camera."));
 	connect(zoomIn, SIGNAL(triggered()), openglWidget, SLOT(zoomIn()));
 	viewMenu->addAction(zoomIn);
 
 	QAction* zoomOut = new QAction(tr("&Zoom Out"), this);
-	zoomIn->setShortcut(QKeySequence("CTRL+-"));
 	zoomOut->setStatusTip(tr("Zoom in the camera."));
 	connect(zoomOut, SIGNAL(triggered()), openglWidget, SLOT(zoomOut()));
 	viewMenu->addAction(zoomOut);
 
-}
-
-void MainWindow :: setupShapeChangeDialog()
-{
-	shapeDialog = new QDialog(NULL);
-	QFormLayout* layout = new QFormLayout(shapeDialog->window());
-
-	caneShapeBox = new QComboBox(layout->widget());
-	caneShapeBox->addItem("Circle");
-	caneShapeBox->addItem("Square");
-	caneShapeBox->addItem("Rectangle");
-	caneShapeBox->addItem("Triangle");
-	caneShapeBox->addItem("Half Circle");
-	caneShapeBox->addItem("Third Circle");
-	connect(caneShapeBox, SIGNAL(currentIndexChanged(int)),
-		this, SLOT(shapeTypeEvent(int)));
-	layout->addRow("Shape", caneShapeBox);
-	
-	caneSizeSlider = new QSlider(Qt::Horizontal, layout->widget());
-	caneSizeSlider->setRange(1, 100);
-	layout->addRow("Size", caneSizeSlider);
-	connect(caneSizeSlider, SIGNAL(sliderMoved(int)),
-		this, SLOT(shapeSizeEvent(int)));
 }
 
 void MainWindow :: shapeTypeEvent(int)
@@ -200,49 +173,14 @@ void MainWindow :: shapePickerEvent()
 		model->setSubcaneShape(caneChangeSubcane, THIRD_CIRCLE, size);
 }
 
-void MainWindow :: setupCustomColorChangeDialog()
-{
-		caneColorChangeColorPicker = new QColorDialog(Qt::white);
-		caneColorChangeColorPicker->setOptions(QColorDialog::ShowAlphaChannel | QColorDialog::NoButtons);
-	connect(caneColorChangeColorPicker, SIGNAL(currentColorChanged(QColor)), this, SLOT(setSubcaneColorFromPicker(QColor)));
-}
-
-void MainWindow::shapeChangeRequest(int subcane)
+void MainWindow::caneChangeRequest(int subcane)
 {
 	caneChangeSubcane = subcane;
 	if (model->subcaneHasColorAndShape(subcane))
 	{
-		shapeDialog->show();
+		changeDialog->show();
 	}
 }
-
-void MainWindow::colorChangeCustomRequest(int subcane)
-{
-	// If the subcane isn't a simple type that we can change easily
-	// Goal is to support finding the base cane selected no matter what
-	// but selection is hard
-	caneChangeSubcane = subcane;
-	if (model->subcaneHasColorAndShape(subcane))
-	{
-		caneColorChangeColorPicker->show();
-	}
-}
-
-void MainWindow::colorChangeBrandRequest(int subcane)
-{
-	caneChangeSubcane = subcane;
-	if (model->subcaneHasColorAndShape(subcane))
-	{
-		brandDialog->show();
-	}
-}
-
-void MainWindow :: setSubcaneColorFromPicker(QColor)
-{
-	QColor color = caneColorChangeColorPicker->currentColor();
-	model->setSubcaneColor(caneChangeSubcane, color.redF(), color.greenF(), color.blueF(), color.alphaF());
-}
-
 
 void MainWindow::projectionChanged()
 {
@@ -602,20 +540,18 @@ void MainWindow::importLibraryDialog()
 	displayTextMessage("Library loaded from: " + fileName);
 }
 
-void MainWindow::setupBrandColorChangeDialog()
+void MainWindow::setupCaneChangeDialog()
 {
-	// ZZZ
-
-	brandDialog = new QDialog(NULL);
-	QFormLayout* caneBrandForm = new QFormLayout(brandDialog->window());
+	changeDialog = new QDialog(NULL);
+	QFormLayout* layout = new QFormLayout(changeDialog->window());
 
 	loadOfficialCanes();
 
-	QSplitter* caneSplitter = new QSplitter(caneBrandForm->widget());
+	QSplitter* caneSplitter = new QSplitter(layout->widget());
 
 	QStringListModel* caneTypeListModel = new QStringListModel();
 	caneTypeListModel->setStringList(*caneTypeList);
-		caneTypeListBox = new KeyQListView();
+	caneTypeListBox = new KeyQListView();
 	caneTypeListBox->setModel(caneTypeListModel);
 	caneTypeListBox->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
@@ -632,12 +568,29 @@ void MainWindow::setupBrandColorChangeDialog()
 	caneSplitter->addWidget(caneTypeListBox);
 	caneSplitter->addWidget(caneColorListBox);
 
-	caneBrandForm->addRow(caneSplitter);
+	layout->addRow(caneSplitter);
 
 	connect(caneTypeListBox, SIGNAL(clicked(QModelIndex)), this,
 		SLOT(updateBrandColorPickerSublist(QModelIndex)));
 	connect(caneColorListBox, SIGNAL(clicked(QModelIndex)), this,
 		SLOT(updateBrandColorPickerColor(QModelIndex)));
+
+        caneShapeBox = new QComboBox(layout->widget());
+        caneShapeBox->addItem("Circle");
+        caneShapeBox->addItem("Square");
+        caneShapeBox->addItem("Rectangle");
+        caneShapeBox->addItem("Triangle");
+        caneShapeBox->addItem("Half Circle");
+        caneShapeBox->addItem("Third Circle");
+        connect(caneShapeBox, SIGNAL(currentIndexChanged(int)),
+                this, SLOT(shapeTypeEvent(int)));
+        layout->addRow("Shape", caneShapeBox);
+
+        caneSizeSlider = new QSlider(Qt::Horizontal, layout->widget());
+        caneSizeSlider->setRange(1, 100);
+        connect(caneSizeSlider, SIGNAL(sliderMoved(int)),
+                this, SLOT(shapeSizeEvent(int)));
+       	layout->addRow("Size", caneSizeSlider);
 }
 
 void MainWindow::updateBrandColorPickerColor(QModelIndex i)
@@ -817,7 +770,7 @@ void MainWindow::newBrandCaneDialog()
 		selectedBrand = -1;
 		selectedColor = -1;
 	}
-	brandDialog->exec();
+	changeDialog->exec();
 }
 
 void MainWindow::changeBgColorDialog()
@@ -901,6 +854,14 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
 	case 0x01000003: // Backspace
 	case 0x01000007: // Delete
 		openglWidget->setDeleteButtonDown(true);
+		break;
+	case 0x2b: // +
+	case 0x3d:
+		openglWidget->zoomIn();
+		break;
+	case 0x2d: // -
+	case 0x5f:
+		openglWidget->zoomOut();
 		break;
 	default:
 		break;
