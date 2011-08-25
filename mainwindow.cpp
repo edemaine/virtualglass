@@ -544,6 +544,7 @@ void MainWindow::setupCaneChangeDialog()
 {
 	changeDialog = new QDialog(NULL);
 	QFormLayout* layout = new QFormLayout(changeDialog->window());
+	layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
 
 	loadOfficialCanes();
 
@@ -558,8 +559,8 @@ void MainWindow::setupCaneChangeDialog()
 	QStringList* dummyList = new QStringList("Please select a cane type.");
 	dummyModel = new QStringListModel();
 	dummyModel->setStringList(*dummyList);
-		caneColorListBox = new KeyQListView();//QListView();
-		caneColorListBox->setModel(dummyModel);
+	caneColorListBox = new KeyQListView();//QListView();
+	caneColorListBox->setModel(dummyModel);
 	dummyInUse = true;
 	selectedBrand = -1;
 	selectedColor = -1;
@@ -582,15 +583,24 @@ void MainWindow::setupCaneChangeDialog()
         caneShapeBox->addItem("Triangle");
         caneShapeBox->addItem("Half Circle");
         caneShapeBox->addItem("Third Circle");
-        connect(caneShapeBox, SIGNAL(currentIndexChanged(int)),
-                this, SLOT(shapeTypeEvent(int)));
-        layout->addRow("Shape", caneShapeBox);
+        layout->addRow("Shape:", caneShapeBox);
 
+	
         caneSizeSlider = new QSlider(Qt::Horizontal, layout->widget());
         caneSizeSlider->setRange(1, 100);
+	QBoxLayout* sliderLayout = new QBoxLayout(QBoxLayout::LeftToRight, layout->widget());
+	QLabel* lsLabel = new QLabel("0 in.", sliderLayout->widget());
+	QLabel* rsLabel = new QLabel("6 in.", sliderLayout->widget());
+	sliderLayout->insertWidget(0, lsLabel); 
+	sliderLayout->insertWidget(1, caneSizeSlider);
+	sliderLayout->insertWidget(2, rsLabel); 
+
+       	layout->addRow("Diameter:", sliderLayout);
+
+        connect(caneShapeBox, SIGNAL(currentIndexChanged(int)),
+                this, SLOT(shapeTypeEvent(int)));
         connect(caneSizeSlider, SIGNAL(sliderMoved(int)),
                 this, SLOT(shapeSizeEvent(int)));
-       	layout->addRow("Size", caneSizeSlider);
 }
 
 void MainWindow::updateBrandColorPickerColor(QModelIndex i)
