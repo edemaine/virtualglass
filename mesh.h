@@ -6,9 +6,7 @@
 #include "cane.h"
 #include "geometry.h"
 
-void generate2DMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
-					int resolution, bool fullTransforms, int selectionColorIndex = -1);
-void generateMesh(Cane* c, Geometry *geometry, Cane** ancestors, int* ancestorCount,
+void generateMesh(Cane* c, Geometry *geometry, float meshHeight, Cane** ancestors, int* ancestorCount,
 				  int resolution, bool fullTransforms, int selectionColorIndex = -1);
 void meshPolygonalBaseCane(Geometry* geometry, Cane** ancestors, int ancestorCount,
 						   int resolution, Cane* group_cane, uint32_t group_tag, bool fullTransforms);

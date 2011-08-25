@@ -10,6 +10,7 @@ Model :: Model()
 	history = new CaneHistory();
 	geometryFresh = 0;
 	activeSubcane = -1;
+	geometryHeight = 1.0;
 
 	defaultCane = new Cane(BASE_POLYGONAL_CANETYPE);
 	defaultCane->setColor(1.0, 1.0, 1.0, 1.0);
@@ -17,6 +18,14 @@ Model :: Model()
 
 	geometryFresh = 0;
 }
+
+void Model :: setGeometryHeight(float height)
+{
+	geometryHeight = height;
+	slowGeometryUpdate();
+	cacheGeometry();
+	emit caneChanged();
+} 
 
 int Model :: addNewDefaultCane()
 {
@@ -239,7 +248,7 @@ void Model :: slowGeometryUpdate()
 	geometry.clear();
 	if (cane != NULL)
 	{
-		generateMesh(cane, &geometry, ancestors, &ancestorCount, LOW_RESOLUTION, false);
+		generateMesh(cane, &geometry, geometryHeight, ancestors, &ancestorCount, LOW_RESOLUTION, false);
 	}
 	else
 		return;
@@ -269,7 +278,7 @@ void Model :: computeHighResGeometry(Geometry* geometry)
 	geometry->clear();
 	if (cane != NULL)
 	{
-		generateMesh(cane, geometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
+		generateMesh(cane, geometry, geometryHeight, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
 	}
 }
 

@@ -810,9 +810,8 @@ void MainWindow::saveRawFile()
 	openglWidget->saveRawFile("cane.raw");
 }
 
-void MainWindow::setupWorkArea()
+void MainWindow::setupButtonBar()
 {
-
 	pull_button = new QPushButton("Pull");
 	pull_button->setToolTip("Drag Mouse Horizontally to Twist, Vertically to Stretch. Use Shift to twist and stretch independently.");
 	bundle_button = new QPushButton("Bundle");
@@ -833,7 +832,7 @@ void MainWindow::setupWorkArea()
 	previewLabel->setFixedSize(100,100);
 	previewLabel->setScaledContents(true);
 
-	QVBoxLayout* operButton_layout = new QVBoxLayout();
+	operButton_layout = new QVBoxLayout();
 	operButton_layout->addWidget(pull_button);
 	operButton_layout->addWidget(bundle_button);
 	operButton_layout->addWidget(flatten_button);
@@ -844,21 +843,50 @@ void MainWindow::setupWorkArea()
 	operButton_layout->addWidget(clear_button);
 	operButton_layout->addWidget(previewLabel,1, Qt::AlignHCenter);
 	previewLabel->setHidden(true);
+}
 
+void MainWindow::setupOGLArea()
+{
+	oglLayoutWidget = new QWidget(stackLayout->widget());
+	QHBoxLayout* oglLayout = new QHBoxLayout();
+	oglLayoutWidget->setLayout(oglLayout);
+
+	// Setup opengl 3D view
+	openglWidget = new OpenGLWidget(oglLayoutWidget, model);
+	oglLayout->addWidget(openglWidget);
+
+	// Setup slider
+	oglGeometryHeightSlider = new QSlider(Qt::Vertical, oglLayoutWidget);
+	oglGeometryHeightSlider->setRange(1, 100);
+	oglGeometryHeightSlider->setSliderPosition(25);
+        connect(oglGeometryHeightSlider, SIGNAL(sliderMoved(int)),
+                this, SLOT(geometryHeightEvent(int)));
+	oglLayout->addWidget(oglGeometryHeightSlider);
+}
+
+void MainWindow::geometryHeightEvent(int)
+{
+	float newHeight = oglGeometryHeightSlider->sliderPosition() / 100.0 * 4.0;
+
+	model->setGeometryHeight(newHeight);
+}
+
+void MainWindow::setupWorkArea()
+{
 	QHBoxLayout* workLayout = new QHBoxLayout(windowLayout->widget());
+	setupButtonBar();
 	workLayout->addLayout(operButton_layout);
 
 	stackLayout = new QStackedLayout(workLayout->widget());
 
-	openglWidget = new OpenGLWidget(stackLayout->widget(), model);
+	setupOGLArea();
 	setupRecipeArea();
 
-	stackLayout->addWidget(openglWidget);
+	stackLayout->addWidget(oglLayoutWidget);
 	stackLayout->addWidget(recipeWidget);
-	stackLayout->setCurrentWidget(openglWidget);
+	stackLayout->setCurrentWidget(oglLayoutWidget);
 
 	workLayout->addLayout(stackLayout,1);
-	//workLayout->addWidget(recipeWidget,1);
 	windowLayout->addLayout(workLayout, 5);
 }
 

@@ -55,6 +55,7 @@ signals:
 public slots:
 	void addNewDefaultCane();
 	void caneChangeRequest(int subcane);
+	void geometryHeightEvent(int);
 	void shapeTypeEvent(int);
 	void shapeSizeEvent(int);	
 	void caneChanged();
@@ -88,8 +89,10 @@ private:
 	void updatePreview();
 	void keyPressEvent(QKeyEvent* e);
 	void keyReleaseEvent(QKeyEvent* e);
-	void setupLibraryArea();
+	void setupButtonBar();
 	void setupRecipeArea();
+	void setupOGLArea();
+	void setupLibraryArea();
 	void setupStatusBar();
 	void setupWorkArea();
 	void setupMenuBar();
@@ -110,6 +113,9 @@ private:
 	QGraphicsScene* workscene;
 	QScrollArea* scrollArea;
 	QScrollArea* libraryScrollArea;
+	QVBoxLayout* operButton_layout;
+	QWidget* oglLayoutWidget;
+	QSlider* oglGeometryHeightSlider;
 	QBoxLayout* stockLayout;
 	QStackedLayout* stackLayout;
 	QTabWidget* tabWidget;
@@ -136,6 +142,7 @@ private:
 	QList<QList<QColor> >* caneColorListList;
 	QComboBox* caneShapeBox;
 	QSlider* caneSizeSlider;
+	QSlider* caneHeightSlider;
 
 	bool isRecipe;
 

@@ -45,6 +45,7 @@ public:
 	void saveObjFile(std::string const &filename);
 	void saveRawFile(std::string const &filename);
 	void setProjection(int p);
+	void setGeometryHeight(float height);
 
 	int getProjection();
 	int getMode();
@@ -68,6 +69,7 @@ public slots:
 	void setPerspectiveProjection();
 
 private:
+	float geometryHeight;
 	int mode;
 	int projection;
 	Cane *cane;
