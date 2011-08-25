@@ -103,6 +103,7 @@ public slots:
 
 protected:
 	void initializeGL();
+	void checkDepthPeel();
 	void paintWithDepthPeeling();
 	void paintWithoutDepthPeeling();
 	void paintGL();

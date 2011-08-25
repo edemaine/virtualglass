@@ -20,7 +20,7 @@ void gl_errors(string const &where) {
 	GLuint err;
 	while ((err = glGetError()) != GL_NO_ERROR) {
 	cerr << "(in " << where << ") OpenGL error #" << err
-	     << ": " << gluErrorString(err) << endl;
+		 << ": " << gluErrorString(err) << endl;
 	}
 }
 }
@@ -133,10 +133,8 @@ void OpenGLWidget :: setDeleteButtonDown(bool state)
 	deleteButtonDown = state;
 }
 
-void OpenGLWidget :: initializeGL()
+void OpenGLWidget :: checkDepthPeel()
 {
-	initializeGLCalled = true;
-	// set up glew:
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
 		std::cerr << "WARNING: Failure initializing glew: " << glewGetErrorString(err) << std::endl;
@@ -157,6 +155,13 @@ void OpenGLWidget :: initializeGL()
 		std::cerr << "WARNING: some of the extensions required for depth peeling are not present." << std::endl;
 		peelEnable = false;
 	}
+}
+
+void OpenGLWidget :: initializeGL()
+{
+	initializeGLCalled = true;
+	// set up glew:
+	checkDepthPeel();
 	// For shadow/lighting
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
@@ -542,7 +547,7 @@ void OpenGLWidget :: paintWithDepthPeeling()
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, peelBuffer);
 		glPushAttrib(GL_VIEWPORT_BIT);
 		glViewport(0,0,peelBufferSize.x,peelBufferSize.y);
-	
+
 		//Set up the proper depth-n-such attachments:
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE_ARB, peelColorTex, 0);
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_RECTANGLE_ARB, peelDepthTex, 0);
@@ -602,7 +607,7 @@ void OpenGLWidget :: paintWithDepthPeeling()
 			glNormalPointer(GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].normal));
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glEnableClientState(GL_NORMAL_ARRAY);
-	
+
 			for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
 				assert(g->cane);
 				Color c = g->cane->color;
@@ -634,7 +639,7 @@ void OpenGLWidget :: paintWithDepthPeeling()
 
 		glUseProgramObjectARB(0);
 		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
-		
+
 
 		if (do_query) {
 			GLuint count = 0;
@@ -671,7 +676,7 @@ void OpenGLWidget :: paintWithDepthPeeling()
 		glDisable(GL_BLEND);
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, base_read_framebuffer);
-	
+
 		gl_errors("(copy framebuffer)");
 	}
 
@@ -723,7 +728,7 @@ void OpenGLWidget :: paintGL()
 
 void OpenGLWidget :: paintWithoutDepthPeeling()
 {
-	glEnable(GL_DEPTH_TEST);	
+	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
 	if (showAxes)
@@ -751,7 +756,7 @@ void OpenGLWidget :: paintWithoutDepthPeeling()
 						   GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
 		}
 
-		
+
 
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_NORMAL_ARRAY);
@@ -759,7 +764,7 @@ void OpenGLWidget :: paintWithoutDepthPeeling()
 		glDisable(GL_LIGHTING);
 	}
 
-	glDisable(GL_DEPTH_TEST);	
+	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 
 	//called automatically: swapBuffers();
@@ -1146,5 +1151,6 @@ void OpenGLWidget :: toggle2D()
 
 void OpenGLWidget :: togglePeel() {
 	peelEnable = !peelEnable;
+	checkDepthPeel();
 	update();
 }
