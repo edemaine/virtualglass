@@ -49,8 +49,6 @@ public:
 	int getProjection();
 	int getMode();
 
-	void toggle2D();
-
 signals:
 	void caneChanged();
 	void textMessage(QString msg);
@@ -79,8 +77,6 @@ private:
 	Geometry geometry;
 	int geometryFresh;
 	int activeSubcane;
-
-	bool show2D;
 
 	void computeHighResGeometry(Geometry* highResGeometry);
 	void cacheGeometry();

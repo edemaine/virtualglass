@@ -6,7 +6,6 @@ Model :: Model()
 {
 	mode = 0;
 	projection = PERSPECTIVE_PROJECTION;
-	show2D = false;
 	cane = NULL;
 	history = new CaneHistory();
 	geometryFresh = 0;
@@ -240,14 +239,7 @@ void Model :: slowGeometryUpdate()
 	geometry.clear();
 	if (cane != NULL)
 	{
-		if (show2D)
-		{
-			generate2DMesh(cane, &geometry, ancestors, &ancestorCount, LOW_RESOLUTION, false);
-		}
-		else
-		{
-			generateMesh(cane, &geometry, ancestors, &ancestorCount, LOW_RESOLUTION, false);
-		}
+		generateMesh(cane, &geometry, ancestors, &ancestorCount, LOW_RESOLUTION, false);
 	}
 	else
 		return;
@@ -277,14 +269,7 @@ void Model :: computeHighResGeometry(Geometry* geometry)
 	geometry->clear();
 	if (cane != NULL)
 	{
-		if (show2D)
-		{
-			generate2DMesh(cane, geometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
-		}
-		else
-		{
-			generateMesh(cane, geometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
-		}
+		generateMesh(cane, geometry, ancestors, &ancestorCount, HIGH_RESOLUTION, true);
 	}
 }
 
@@ -448,13 +433,6 @@ void Model :: saveRawFile(std::string const &filename)
 	Geometry highResGeometry;
 	computeHighResGeometry(&highResGeometry);
 	highResGeometry.save_raw_file(filename);
-}
-
-void Model :: toggle2D()
-{
-	show2D = !show2D;
-	geometryFresh = 0;
-	emit caneChanged();
 }
 
 void Model::exactChange()

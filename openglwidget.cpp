@@ -865,7 +865,7 @@ void OpenGLWidget :: setGLMatrices()
 
 	float w = viewport[2];
 	float h = viewport[3];
-	if (model->getProjection() == ORTHOGRAPHIC_PROJECTION) {
+	if (model->getProjection() == ORTHOGRAPHIC_PROJECTION || show2D) {
 		if (w > h) {
 			float a = h / w;
 			float s = 1.0f / rho;
@@ -881,9 +881,20 @@ void OpenGLWidget :: setGLMatrices()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	float eyeLoc[3];
-	eyeLoc[0] = lookAtLoc[0] + rho*sin(fee)*cos(theta);
-	eyeLoc[1] = lookAtLoc[1] + rho*sin(fee)*sin(theta);
-	eyeLoc[2] = lookAtLoc[2] + rho*cos(fee);
+
+	if (show2D)
+	{
+		eyeLoc[0] = lookAtLoc[0] + rho*sin(0.0001)*cos(theta);
+		eyeLoc[1] = lookAtLoc[1] + rho*sin(0.0001)*sin(theta);
+		eyeLoc[2] = lookAtLoc[2] + rho*cos(0.0001);
+	}
+	else
+	{
+		eyeLoc[0] = lookAtLoc[0] + rho*sin(fee)*cos(theta);
+		eyeLoc[1] = lookAtLoc[1] + rho*sin(fee)*sin(theta);
+		eyeLoc[2] = lookAtLoc[2] + rho*cos(fee);
+	}
+
 	gluLookAt(eyeLoc[0], eyeLoc[1], eyeLoc[2],
 			  lookAtLoc[0], lookAtLoc[1], lookAtLoc[2],
 			  0.0, 0.0, 1.0);
@@ -1022,21 +1033,10 @@ void OpenGLWidget :: mouseMoveEvent (QMouseEvent* e)
 			}
 			else
 			{
-				if (show2D)
-				{
-					Point newCanePoint = getClickedPlanePoint(mouseLocX,mouseLocY);
-					Point oldCanePoint = getClickedPlanePoint(oldMouseLocX,oldMouseLocY);
-					float x2D = newCanePoint.x-oldCanePoint.x;
-					float y2D = newCanePoint.y-oldCanePoint.y;
-					model->moveCane(x2D, y2D, 0);
-				}
-				else
-				{
-					relX *= 1.75 * rho; // tone it down
-					relY *= 1.5 * rho; // tone it down
-					model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
-						relX * sin(theta + PI / 2.0) + relY * sin(theta), 0);
-				}
+				relX *= 1.75 * rho; // tone it down
+				relY *= 1.5 * rho; // tone it down
+				model->moveCane(relX * cos(theta + PI / 2.0) + relY * cos(theta),
+					relX * sin(theta + PI / 2.0) + relY * sin(theta), 0);
 			}
 		}
 		if (model->getActiveSubcane() != -1 && model->getCane()) {
@@ -1075,33 +1075,11 @@ void OpenGLWidget :: zoom(float z)
 
 void OpenGLWidget :: setCamera(float theta, float fee)
 {
-	if (show2D)
-	{
-		this->theta = theta;
-		this->fee = 0.01;
-		update();
-		return;
-	}
 	this->theta = theta;
 	this->fee = fee;
 	update();
 }
 
-Point OpenGLWidget :: getCameraPoint()
-{
-
-	Point result;
-	result.z=rho*cos(fee);
-	result.x=rho*cos(theta)*sin(fee);
-	result.y=rho*sin(theta)*sin(fee);
-	return result;
-}
-
-Vector3f OpenGLWidget :: getCameraDirection()
-{
-	Point camPoint = -getCameraPoint()/rho;
-	return Vector3f(camPoint);
-}
 
 
 void OpenGLWidget :: saveObjFile(std::string const &filename)
@@ -1163,12 +1141,6 @@ void OpenGLWidget :: drawAxes()
 void OpenGLWidget :: toggle2D()
 {
 	show2D = !show2D;
-	model->setProjection(ORTHOGRAPHIC_PROJECTION);
-	if (show2D)
-	{
-		setTopView();
-	}
-	model->toggle2D();
 	update();
 }
 

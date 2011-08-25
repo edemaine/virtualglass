@@ -30,8 +30,6 @@ public:
 	virtual ~OpenGLWidget();
 	void setMode(int mode);
 	void setCamera(float theta, float fee);
-	Point getCameraPoint();
-	Vector3f getCameraDirection();
 	void saveObjFile(std::string const &filename);
 	void saveRawFile(std::string const &filename);
 	void setShiftButtonDown(bool state);
