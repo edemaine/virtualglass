@@ -110,7 +110,7 @@ private:
 	QGraphicsScene* workscene;
 	QScrollArea* scrollArea;
 	QScrollArea* libraryScrollArea;
-	QHBoxLayout* stockLayout;
+	QBoxLayout* stockLayout;
 	QStackedLayout* stackLayout;
 	QTabWidget* tabWidget;
 	QLabel* imageLabel;

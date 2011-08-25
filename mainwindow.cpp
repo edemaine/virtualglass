@@ -287,7 +287,7 @@ Point polygonalBasePoint(int total,int index)
 void MainWindow::setupLibraryArea()
 {
 	QWidget* stockWidget = new QWidget;
-	stockLayout = new QHBoxLayout(stockWidget);
+	stockLayout = new QBoxLayout(QBoxLayout::RightToLeft, stockWidget);
 	stockLayout->setSpacing(10);
 
 	libraryScrollArea = new QScrollArea;
@@ -368,7 +368,7 @@ void MainWindow::seedLibrary()
 	model->setCane(base);
 	saveCaneToLibrary();
 
-	model->setCane(base);
+	model->setCane(NULL);
 	displayTextMessage("Default library loaded");
 }
 
