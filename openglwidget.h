@@ -18,6 +18,8 @@
 #include "cane.h"
 using namespace std;
 
+
+
 class OpenGLWidget : public QGLWidget
 {
 	Q_OBJECT

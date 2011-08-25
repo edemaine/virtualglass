@@ -723,16 +723,8 @@ void OpenGLWidget :: paintGL()
 
 void OpenGLWidget :: paintWithoutDepthPeeling()
 {
-	glDisable(GL_LIGHTING);
-
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-
-	glDisable(GL_DEPTH_TEST);	
-	glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_DST_COLOR);
-        //glBlendFunc(GL_SRC_ALPHA, GL_DST_COLOR);
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_DEPTH_TEST);	
+	glDisable(GL_BLEND);
 
 	if (showAxes)
 		drawAxes();
@@ -751,10 +743,10 @@ void OpenGLWidget :: paintWithoutDepthPeeling()
 		for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
 			assert(g->cane);
 			Color c = g->cane->color;
-						if (model && (int)g->tag == model->getActiveSubcane()) {
+			if (model && (int)g->tag == model->getActiveSubcane()) {
 				c.xyz += make_vector(0.1f, 0.1f, 0.1f);
 			}
-			glColor4f(c.r * c.a, c.g * c.a, c.b * c.a, c.a);
+			glColor4f(c.r, c.g, c.b, 1.0);
 			glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 						   GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
 		}
@@ -766,6 +758,9 @@ void OpenGLWidget :: paintWithoutDepthPeeling()
 
 		glDisable(GL_LIGHTING);
 	}
+
+	glDisable(GL_DEPTH_TEST);	
+	glEnable(GL_BLEND);
 
 	//called automatically: swapBuffers();
 }
