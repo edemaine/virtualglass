@@ -593,7 +593,6 @@ void MainWindow::setupCaneChangeDialog()
         caneShapeBox->addItem("Third Circle");
         layout->addRow("Shape:", caneShapeBox);
 
-	
         caneSizeSlider = new QSlider(Qt::Horizontal, layout->widget());
         caneSizeSlider->setRange(1, 100);
 	QBoxLayout* sliderLayout = new QBoxLayout(QBoxLayout::LeftToRight, layout->widget());
@@ -853,20 +852,31 @@ void MainWindow::setupOGLArea()
 
 	// Setup opengl 3D view
 	openglWidget = new OpenGLWidget(oglLayoutWidget, model);
-	oglLayout->addWidget(openglWidget);
+	oglLayout->addWidget(openglWidget, 1);
 
 	// Setup slider
 	oglGeometryHeightSlider = new QSlider(Qt::Vertical, oglLayoutWidget);
-	oglGeometryHeightSlider->setRange(1, 100);
-	oglGeometryHeightSlider->setSliderPosition(25);
+	oglGeometryHeightSlider->setRange(1, 24);
+	oglGeometryHeightSlider->setSliderPosition(6);
+	oglGeometryHeightSlider->setTickInterval(1);
+	oglGeometryHeightSlider->setTickPosition(QSlider::TicksBothSides);
         connect(oglGeometryHeightSlider, SIGNAL(sliderMoved(int)),
                 this, SLOT(geometryHeightEvent(int)));
-	oglLayout->addWidget(oglGeometryHeightSlider);
+
+	// Setup slider with its labels
+	QVBoxLayout* oglSliderLayout = new QVBoxLayout();
+	QLabel* bsLabel = new QLabel("1 in.", oglLayoutWidget);
+	QLabel* tsLabel = new QLabel("24 in.", oglLayoutWidget);
+	oglSliderLayout->addWidget(tsLabel);	
+	oglSliderLayout->addWidget(oglGeometryHeightSlider);	
+	oglSliderLayout->addWidget(bsLabel);	
+	
+	oglLayout->addLayout(oglSliderLayout);
 }
 
 void MainWindow::geometryHeightEvent(int)
 {
-	float newHeight = oglGeometryHeightSlider->sliderPosition() / 100.0 * 4.0;
+	float newHeight = oglGeometryHeightSlider->sliderPosition() / 6.0;
 
 	model->setGeometryHeight(newHeight);
 }
