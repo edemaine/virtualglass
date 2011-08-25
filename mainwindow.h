@@ -50,8 +50,6 @@ public:
 	QPushButton* toggle2D_button;
 
 signals:
-	void setCaneSig(Cane* c);
-	void clearCommandSig();
 	void setNewMode(int i, bool viewRecipe,Cane* c);
 
 public slots:

@@ -34,7 +34,6 @@ Controller::Controller(int argc, char **argv)
 	connect(mainWindow->undo_button, SIGNAL(pressed()), model, SLOT(undo()));
 	connect(mainWindow->redo_button, SIGNAL(pressed()), model, SLOT(redo()));
 	connect(mainWindow->clear_button, SIGNAL(pressed()), model, SLOT(setCaneToNull()));
-	connect(mainWindow, SIGNAL(setCaneSig(Cane*)), model, SLOT(setCane(Cane*)));
 	connect(mainWindow->save_button, SIGNAL(pressed()), mainWindow, SLOT(saveCaneToLibrary()));
 	connect(mainWindow->openglWidget, SIGNAL(operationInfoSig(QString,int)), mainWindow,
 			SLOT(displayTextMessage(QString,int)));

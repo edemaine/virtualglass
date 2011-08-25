@@ -312,7 +312,7 @@ void MainWindow::seedLibrary()
 	base->color.b = 0.5;
 	base->color.a = 0.2;
 	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
-	emit setCaneSig(base);
+	model->setCane(base);
 	saveCaneToLibrary();
 
 	base->color.r = 1.0;
@@ -320,7 +320,7 @@ void MainWindow::seedLibrary()
 	base->color.b = 1.0;
 	base->color.a = 0.2;
 	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
-	emit setCaneSig(base);
+	model->setCane(base);
 	saveCaneToLibrary();
 
 	base->color.r = 0.5;
@@ -328,7 +328,7 @@ void MainWindow::seedLibrary()
 	base->color.b = 1.0;
 	base->color.a = 0.2;
 	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
-	emit setCaneSig(base);
+	model->setCane(base);
 	saveCaneToLibrary();
 
 
@@ -340,10 +340,10 @@ void MainWindow::seedLibrary()
 	base->color.b = 0.5;
 	base->color.a = 0.8;
 	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
-	emit setCaneSig(base);
+	model->setCane(base);
 	saveCaneToLibrary();
 	base->setShape(TRIANGLE, LOW_ANGULAR_RESOLUTION, 0.2);
-	emit setCaneSig(base);
+	model->setCane(base);
 	saveCaneToLibrary();
 
 	base->color.r = 0.5;
@@ -351,10 +351,10 @@ void MainWindow::seedLibrary()
 	base->color.b = 0.5;
 	base->color.a = 0.8;
 	base->setShape(SQUARE, LOW_ANGULAR_RESOLUTION, 0.2);
-	emit setCaneSig(base);
+	model->setCane(base);
 	saveCaneToLibrary();
 	base->setShape(RECTANGLE, LOW_ANGULAR_RESOLUTION, 0.2);
-	emit setCaneSig(base);
+	model->setCane(base);
 	saveCaneToLibrary();
 
 	base->color.r = 0.5;
@@ -362,13 +362,13 @@ void MainWindow::seedLibrary()
 	base->color.b = 1.0;
 	base->color.a = 0.8;
 	base->setShape(HALF_CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
-	emit setCaneSig(base);
+	model->setCane(base);
 	saveCaneToLibrary();
 	base->setShape(THIRD_CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
-	emit setCaneSig(base);
+	model->setCane(base);
 	saveCaneToLibrary();
 
-	emit setCaneSig(NULL);
+	model->setCane(base);
 	displayTextMessage("Default library loaded");
 }
 
@@ -414,13 +414,11 @@ void MainWindow :: importCaneDialog(){
 	Cane loadCane = Cane(UNASSIGNED_CANETYPE);
 	loadLibraryCane(doc[0],&loadCane);
 
-	//model->setCane(&loadCane);
-	emit setCaneSig(&loadCane);
+	model->setCane(&loadCane);
 
 	saveCaneToLibrary();
 
-	//model->clearCurrentCane();
-	emit setCaneSig(NULL);
+	model->setCane(NULL);
 	displayTextMessage("Cane loaded from: " + fileName);
 }
 
@@ -541,14 +539,12 @@ void MainWindow::importLibraryDialog()
 		Cane loadCane = Cane(UNASSIGNED_CANETYPE);
 		loadLibraryCane(doc[i],&loadCane);
 
-		//model->setCane(&loadCane);
-		emit setCaneSig(&loadCane);
+		model->setCane(&loadCane);
 
 		saveCaneToLibrary();
 	}
 
-	//model->clearCurrentCane();
-	emit setCaneSig(NULL);
+	model->setCane(NULL);
 	displayTextMessage("Library loaded from: " + fileName);
 }
 
