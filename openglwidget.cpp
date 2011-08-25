@@ -868,11 +868,11 @@ void OpenGLWidget :: setGLMatrices()
 	if (model->getProjection() == ORTHOGRAPHIC_PROJECTION || show2D) {
 		if (w > h) {
 			float a = h / w;
-			float s = 1.0f / rho;
+			float s = 2.2f / rho;
 			glScalef(a * s, s,-0.01);
 		} else {
 			float a = w / h;
-			float s = 1.0f / rho;
+			float s = 2.2f / rho;
 			glScalef(s, a * s,-0.01);
 		}
 	} else {
