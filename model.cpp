@@ -12,7 +12,17 @@ Model :: Model()
 	geometryFresh = 0;
 	activeSubcane = -1;
 
+	defaultCane = new Cane(BASE_POLYGONAL_CANETYPE);
+	defaultCane->setColor(1.0, 1.0, 1.0, 1.0);
+	defaultCane->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION, 0.3);
+
 	geometryFresh = 0;
+}
+
+int Model :: addNewDefaultCane()
+{
+	addCane(defaultCane);
+	return cane->subcaneCount-1;
 }
 
 Cane* Model :: getSubcane(int subcane)

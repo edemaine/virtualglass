@@ -142,6 +142,18 @@ void MainWindow::setupMenuBar()
 	connect(zoomOut, SIGNAL(triggered()), openglWidget, SLOT(zoomOut()));
 	viewMenu->addAction(zoomOut);
 
+
+	caneMenu = menuBar()->addMenu(tr("&New Cane"));
+
+	QAction* addCane = new QAction(tr("&Add Cane"), this);
+	addCane->setStatusTip(tr("Add a new cane to the piece."));
+	connect(addCane, SIGNAL(triggered()), this, SLOT(addNewDefaultCane()));
+	caneMenu->addAction(addCane);
+}
+
+void MainWindow :: addNewDefaultCane()
+{
+	caneChangeRequest(model->addNewDefaultCane());	
 }
 
 void MainWindow :: shapeTypeEvent(int)

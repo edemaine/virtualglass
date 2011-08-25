@@ -27,6 +27,7 @@ public:
 	CaneHistory* getHistory();
 	void setActiveSubcane(int subcane);
 	int getActiveSubcane();
+	int addNewDefaultCane();
 	bool subcaneHasColorAndShape(int subcane);
 	void setSubcaneColor(int subcane, float r, float g, float b, float a);
 	void setSubcaneShape(int subcane, int shape, float size);
@@ -72,6 +73,7 @@ private:
 	int mode;
 	int projection;
 	Cane *cane;
+	Cane *defaultCane;
 	CaneHistory *history;
 	Geometry cachedGeometry;
 	Geometry geometry;

@@ -430,6 +430,14 @@ Cane* Cane :: deepCopy()
 	return copy;
 }
 
+void Cane :: setColor(float r, float g, float b, float a)
+{
+	this->color.r = r;
+	this->color.g = g;
+	this->color.b = b;
+	this->color.a = a;
+}
+
 void Cane :: setColor(Color color)
 {
 	this->color = color;

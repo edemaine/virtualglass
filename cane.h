@@ -33,6 +33,7 @@ public:
 	int leafNodes();
 	Cane* deepCopy();
 	void setColor(Color color);
+	void setColor(float r, float g, float b, float a);
 	void setColor(QColor color);
 	Cane* getBaseCane();
 	Cane* getTopBundleNode();

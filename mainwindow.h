@@ -55,6 +55,7 @@ signals:
 	void setNewMode(int i, bool viewRecipe,Cane* c);
 
 public slots:
+	void addNewDefaultCane();
 	void caneChangeRequest(int subcane);
 	void shapeTypeEvent(int);
 	void shapeSizeEvent(int);	
