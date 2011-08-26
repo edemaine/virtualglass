@@ -958,6 +958,6 @@ void MainWindow :: updateModeButtonsEnabled()
 
 void MainWindow::updatePreview()
 {
-	//previewLabel->setPixmap(QPixmap::fromImage(openglWidget->grabFrameBuffer()));
-	previewLabel->setPixmap(QPixmap::grabWidget(openglWidget));
+	previewLabel->setPixmap(QPixmap::fromImage(openglWidget->grabFrameBuffer()));
+	//previewLabel->setPixmap(QPixmap::grabWidget(openglWidget));
 }
