@@ -25,14 +25,16 @@ void MainWindow::setupMenuBar()
 {
 	fileMenu = menuBar()->addMenu(tr("&File"));
 
-	QAction* importLibrary = new QAction(tr("&Import Library"), this);
-	importLibrary->setStatusTip(tr("Load a saved library of canes"));
+	QAction* importLibrary = new QAction(tr("&Import Canes"), this);
+	importLibrary->setStatusTip(tr("Loads saved canes"));
 	connect(importLibrary, SIGNAL(triggered()), this, SLOT(importLibraryDialog()));
+	importLibrary->setShortcut(QKeySequence("CTRL+O"));
 	fileMenu->addAction(importLibrary);
 
 	QAction* exportLibrary = new QAction(tr("&Export Library"), this);
 	exportLibrary->setStatusTip(tr("Save the current library of canes to a file"));
 	connect(exportLibrary, SIGNAL(triggered()), this, SLOT(exportLibraryDialog()));
+	exportLibrary->setShortcut(QKeySequence("CTRL+S"));
 	fileMenu->addAction(exportLibrary);
 
 	fileMenu->addSeparator();
@@ -40,11 +42,13 @@ void MainWindow::setupMenuBar()
 	QAction* importCane = new QAction(tr("&Import Single Cane"), this);
 	importCane->setStatusTip(tr("Load a saved cane"));
 	connect(importCane, SIGNAL(triggered()), this, SLOT(importCaneDialog()));
+	importCane->setShortcut(QKeySequence("SHIFT+CTRL+O"));
 	fileMenu->addAction(importCane);
 
 	QAction* exportCane = new QAction(tr("&Export Current Cane"), this);
 	exportCane->setStatusTip(tr("Save the current cane to a file"));
 	connect(exportCane, SIGNAL(triggered()), this, SLOT(exportCaneDialog()));
+	exportCane->setShortcut(QKeySequence("SHIFT+CTRL+S"));
 	fileMenu->addAction(exportCane);
 
 	fileMenu->addSeparator();
@@ -77,6 +81,7 @@ void MainWindow::setupMenuBar()
 	togglePeel->setCheckable(true);
 	togglePeel->setChecked(true);
 	connect(togglePeel, SIGNAL(triggered()), openglWidget, SLOT(togglePeel()));
+	connect(openglWidget, SIGNAL(updatePeelButton(bool)), togglePeel, SLOT(setChecked(bool)));
 	viewMenu->addAction(togglePeel);
 
 
@@ -135,11 +140,17 @@ void MainWindow::setupMenuBar()
 	QAction* zoomIn = new QAction(tr("&Zoom In"), this);
 	zoomIn->setStatusTip(tr("Zoom in the camera."));
 	connect(zoomIn, SIGNAL(triggered()), openglWidget, SLOT(zoomIn()));
+	QList<QKeySequence> zoomInShortcuts;
+	zoomInShortcuts << QKeySequence("CTRL+=") << QKeySequence("CTRL++");
+	zoomIn->setShortcuts(zoomInShortcuts);
 	viewMenu->addAction(zoomIn);
 
 	QAction* zoomOut = new QAction(tr("&Zoom Out"), this);
 	zoomOut->setStatusTip(tr("Zoom in the camera."));
 	connect(zoomOut, SIGNAL(triggered()), openglWidget, SLOT(zoomOut()));
+	QList<QKeySequence> zoomOutShortcuts;
+	zoomOutShortcuts << QKeySequence("CTRL+-") << QKeySequence("CTRL+_");
+	zoomOut->setShortcuts(zoomOutShortcuts);
 	viewMenu->addAction(zoomOut);
 
 
@@ -148,18 +159,19 @@ void MainWindow::setupMenuBar()
 	QAction* addCane = new QAction(tr("&Add Cane"), this);
 	addCane->setStatusTip(tr("Add a new cane to the piece."));
 	connect(addCane, SIGNAL(triggered()), this, SLOT(addNewDefaultCane()));
+	addCane->setShortcut(QKeySequence("CTRL+N"));
 	caneMenu->addAction(addCane);
 }
 
 void MainWindow :: addNewDefaultCane()
 {
-	caneChangeRequest(model->addNewDefaultCane());	
+	caneChangeRequest(model->addNewDefaultCane());
 }
 
 void MainWindow :: shapeTypeEvent(int)
 {
 	shapePickerEvent();
-} 
+}
 
 void MainWindow :: shapeSizeEvent(int)
 {
@@ -169,7 +181,7 @@ void MainWindow :: shapeSizeEvent(int)
 void MainWindow :: shapePickerEvent()
 {
 	QString shape = caneShapeBox->currentText();
-	float size = caneSizeSlider->sliderPosition() / 100.0;	
+	float size = caneSizeSlider->sliderPosition() / 100.0;
 
 	if (shape == "Circle")
 		model->setSubcaneShape(caneChangeSubcane, CIRCLE, size);
@@ -229,7 +241,26 @@ void MainWindow::modeChanged(int mode)
 		displayTextMessage("Unknown mode not specified",0);
 		break;
 	}
+	checkButton(mode);
+}
 
+void MainWindow::checkButton(int mode)
+{
+	pull_button->setFlat(false);
+	bundle_button->setFlat(false);
+	flatten_button->setFlat(false);
+	switch(mode)
+	{
+	case PULL_MODE:
+		pull_button->setFlat(true);
+		break;
+	case BUNDLE_MODE:
+		bundle_button->setFlat(true);
+		break;
+	case FLATTEN_MODE:
+		flatten_button->setFlat(true);
+		break;
+	}
 }
 
 void MainWindow::libraryCaneDestroyed(QObject* obj)
@@ -258,6 +289,8 @@ void MainWindow::saveCaneToLibrary()
 	connect(lc, SIGNAL(mouseOver(LibraryCaneWidget*)), this, SLOT(updateLibraryToolTip(LibraryCaneWidget*)));
 	connect(stockLayout, SIGNAL(destroyed(QObject*)), this, SLOT(libraryCaneDestroyed(QObject*)));
 	connect(lc,SIGNAL(addCane(Cane*)),this,SLOT(insertLibraryCane(Cane*)));
+	connect(lc,SIGNAL(requestDelete(Cane*)),openglWidget,SLOT(processLibraryDelete(Cane*)));
+	connect(openglWidget, SIGNAL(acceptLibraryDelete(Cane*)), lc, SLOT(deleteRequestAccepted(Cane*)));
 }
 
 void MainWindow::updateLibraryToolTip(LibraryCaneWidget *lc)
@@ -584,30 +617,30 @@ void MainWindow::setupCaneChangeDialog()
 	connect(caneColorListBox, SIGNAL(clicked(QModelIndex)), this,
 		SLOT(updateBrandColorPickerColor(QModelIndex)));
 
-        caneShapeBox = new QComboBox(layout->widget());
-        caneShapeBox->addItem("Circle");
-        caneShapeBox->addItem("Square");
-        caneShapeBox->addItem("Rectangle");
-        caneShapeBox->addItem("Triangle");
-        caneShapeBox->addItem("Half Circle");
-        caneShapeBox->addItem("Third Circle");
-        layout->addRow("Shape:", caneShapeBox);
+		caneShapeBox = new QComboBox(layout->widget());
+		caneShapeBox->addItem("Circle");
+		caneShapeBox->addItem("Square");
+		caneShapeBox->addItem("Rectangle");
+		caneShapeBox->addItem("Triangle");
+		caneShapeBox->addItem("Half Circle");
+		caneShapeBox->addItem("Third Circle");
+		layout->addRow("Shape:", caneShapeBox);
 
-        caneSizeSlider = new QSlider(Qt::Horizontal, layout->widget());
-        caneSizeSlider->setRange(1, 100);
+		caneSizeSlider = new QSlider(Qt::Horizontal, layout->widget());
+		caneSizeSlider->setRange(1, 100);
 	QBoxLayout* sliderLayout = new QBoxLayout(QBoxLayout::LeftToRight, layout->widget());
 	QLabel* lsLabel = new QLabel("0 in.", sliderLayout->widget());
 	QLabel* rsLabel = new QLabel("6 in.", sliderLayout->widget());
-	sliderLayout->insertWidget(0, lsLabel); 
+	sliderLayout->insertWidget(0, lsLabel);
 	sliderLayout->insertWidget(1, caneSizeSlider);
-	sliderLayout->insertWidget(2, rsLabel); 
+	sliderLayout->insertWidget(2, rsLabel);
 
-       	layout->addRow("Diameter:", sliderLayout);
+		layout->addRow("Diameter:", sliderLayout);
 
-        connect(caneShapeBox, SIGNAL(currentIndexChanged(int)),
-                this, SLOT(shapeTypeEvent(int)));
-        connect(caneSizeSlider, SIGNAL(sliderMoved(int)),
-                this, SLOT(shapeSizeEvent(int)));
+		connect(caneShapeBox, SIGNAL(currentIndexChanged(int)),
+				this, SLOT(shapeTypeEvent(int)));
+		connect(caneSizeSlider, SIGNAL(sliderMoved(int)),
+				this, SLOT(shapeSizeEvent(int)));
 }
 
 void MainWindow::updateBrandColorPickerColor(QModelIndex i)
@@ -813,19 +846,26 @@ void MainWindow::setupButtonBar()
 {
 	pull_button = new QPushButton("Pull");
 	pull_button->setToolTip("Drag Mouse Horizontally to Twist, Vertically to Stretch. Use Shift to twist and stretch independently.");
+	pull_button->setShortcut(QKeySequence("CTRL+P"));
 	bundle_button = new QPushButton("Bundle");
+	bundle_button->setShortcut(QKeySequence("CTRL+B"));
 	flatten_button = new QPushButton("Flatten");
 	flatten_button->setToolTip("Drag Mouse Horizontally to Squish, Vertically to Flatten");
+	flatten_button->setShortcut(QKeySequence("CTRL+F"));
 	toggle2D_button = new QPushButton("2D View");
 	toggle2D_button->setToolTip(tr("Switch between 2D and 3D view."));
 	undo_button = new QPushButton("Undo");
+	undo_button->setShortcut(QKeySequence("CTRL+Z"));
 	undo_button->setToolTip("Undo the last operation.");
 	redo_button = new QPushButton("Redo");
+	redo_button->setShortcut(QKeySequence("CTRL+Y"));
 	redo_button->setToolTip("Redo the last operation.");
 	save_button = new QPushButton("Save");
 	save_button->setToolTip("Save Current Model to Library");
+	save_button->setShortcut(QKeySequence("CTRL+S"));
 	clear_button = new QPushButton("Clear");
 	clear_button->setToolTip("Clear Current Model");
+	clear_button->setShortcut(QKeySequence("CTRL+R"));
 
 	previewLabel = new QLabel();
 	previewLabel->setFixedSize(100,100);
@@ -835,6 +875,7 @@ void MainWindow::setupButtonBar()
 	operButton_layout->addWidget(pull_button);
 	operButton_layout->addWidget(bundle_button);
 	operButton_layout->addWidget(flatten_button);
+
 	operButton_layout->addWidget(toggle2D_button);
 	operButton_layout->addWidget(redo_button);
 	operButton_layout->addWidget(undo_button);
@@ -860,17 +901,17 @@ void MainWindow::setupOGLArea()
 	oglGeometryHeightSlider->setSliderPosition(6);
 	oglGeometryHeightSlider->setTickInterval(1);
 	oglGeometryHeightSlider->setTickPosition(QSlider::TicksBothSides);
-        connect(oglGeometryHeightSlider, SIGNAL(sliderMoved(int)),
-                this, SLOT(geometryHeightEvent(int)));
+		connect(oglGeometryHeightSlider, SIGNAL(sliderMoved(int)),
+				this, SLOT(geometryHeightEvent(int)));
 
 	// Setup slider with its labels
 	QVBoxLayout* oglSliderLayout = new QVBoxLayout();
 	QLabel* bsLabel = new QLabel("1 in.", oglLayoutWidget);
 	QLabel* tsLabel = new QLabel("24 in.", oglLayoutWidget);
-	oglSliderLayout->addWidget(tsLabel);	
-	oglSliderLayout->addWidget(oglGeometryHeightSlider);	
-	oglSliderLayout->addWidget(bsLabel);	
-	
+	oglSliderLayout->addWidget(tsLabel);
+	oglSliderLayout->addWidget(oglGeometryHeightSlider);
+	oglSliderLayout->addWidget(bsLabel);
+
 	oglLayout->addLayout(oglSliderLayout);
 }
 
@@ -910,14 +951,6 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
 	case 0x01000003: // Backspace
 	case 0x01000007: // Delete
 		openglWidget->setDeleteButtonDown(true);
-		break;
-	case 0x2b: // +
-	case 0x3d:
-		openglWidget->zoomIn();
-		break;
-	case 0x2d: // -
-	case 0x5f:
-		openglWidget->zoomOut();
 		break;
 	default:
 		break;

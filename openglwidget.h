@@ -87,6 +87,8 @@ signals:
 	void modeChangedSig(int mode);
 	void operationInfoSig(QString str,int msec);
 	void updatePreview();
+	void acceptLibraryDelete(Cane* c);
+	void updatePeelButton(bool b);
 
 public slots:
 	void zoomIn();
@@ -100,6 +102,7 @@ public slots:
 	void toggleAxes();
 	void toggle2D();
 	void togglePeel();
+	void processLibraryDelete(Cane* c);
 
 protected:
 	void initializeGL();

@@ -24,6 +24,10 @@ signals:
 	void mouseOver(LibraryCaneWidget*);
 	void newIndex(int index);
 	void addCane(Cane* c);
+	void requestDelete(Cane* c);
+
+public slots:
+	void deleteRequestAccepted(Cane* c);
 
 private:
 	Cane* cane;

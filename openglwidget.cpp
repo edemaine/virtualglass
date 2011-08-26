@@ -1152,5 +1152,12 @@ void OpenGLWidget :: toggle2D()
 void OpenGLWidget :: togglePeel() {
 	peelEnable = !peelEnable;
 	checkDepthPeel();
+	emit updatePeelButton(peelEnable);
 	update();
+}
+
+void OpenGLWidget :: processLibraryDelete(Cane* c)
+{
+	if (deleteButtonDown)
+		emit acceptLibraryDelete(c);
 }

@@ -31,8 +31,14 @@ void LibraryCaneWidget :: mousePressEvent(QMouseEvent* event)
 void LibraryCaneWidget :: mouseReleaseEvent(QMouseEvent* event)
 {
 	if (event->button() == Qt::RightButton) {
-		this->deleteLater();
+		emit requestDelete(cane);
 	}
+}
+
+void LibraryCaneWidget :: deleteRequestAccepted(Cane* c)
+{
+	if (cane==c)
+		this->deleteLater();
 }
 
 void LibraryCaneWidget :: enterEvent(QEvent*)

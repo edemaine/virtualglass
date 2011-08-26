@@ -16,19 +16,19 @@ class View;
 class KeyQListView : public QListView
 {
 public:
-        KeyQListView(QWidget * parent) : QListView(parent) {}
-        KeyQListView() : QListView() {}
+		KeyQListView(QWidget * parent) : QListView(parent) {}
+		KeyQListView() : QListView() {}
 protected:
-        void keyPressEvent(QKeyEvent *event)
-        {
-                QModelIndex oldIdx = currentIndex();
-                QListView::keyPressEvent(event);
-                QModelIndex newIdx = currentIndex();
-                if(oldIdx.row() != newIdx.row())
-                {
-                        emit clicked(newIdx);
-                }
-        }
+		void keyPressEvent(QKeyEvent *event)
+		{
+				QModelIndex oldIdx = currentIndex();
+				QListView::keyPressEvent(event);
+				QModelIndex newIdx = currentIndex();
+				if(oldIdx.row() != newIdx.row())
+				{
+						emit clicked(newIdx);
+				}
+		}
 };
 
 class MainWindow : public QMainWindow
@@ -57,7 +57,7 @@ public slots:
 	void caneChangeRequest(int subcane);
 	void geometryHeightEvent(int);
 	void shapeTypeEvent(int);
-	void shapeSizeEvent(int);	
+	void shapeSizeEvent(int);
 	void caneChanged();
 	void modeChanged(int mode);
 	void projectionChanged();
@@ -97,6 +97,7 @@ private:
 	void setupWorkArea();
 	void setupMenuBar();
 	void setupCaneChangeDialog();
+	void checkButton(int mode);
 
 //	QStringListModel* dummyModel;
 	void loadOfficialCanes();
@@ -129,15 +130,15 @@ private:
 	QDialog* changeDialog;
 	QSplitter* caneSplitter;
 	QStringListModel* caneTypeListModel;
-        KeyQListView* caneTypeListBox;
+		KeyQListView* caneTypeListBox;
 	QStringList* dummyList;
 	QStringListModel* dummyModel;
 	bool dummyInUse;
 	int selectedBrand;
 	int selectedColor;
 	QStringList* caneTypeList;
-        //QTreeView* caneColorListBox;
-        KeyQListView* caneColorListBox;
+		//QTreeView* caneColorListBox;
+		KeyQListView* caneColorListBox;
 	QList<QStringList>* caneNameListList;
 	QList<QList<QColor> >* caneColorListList;
 	QComboBox* caneShapeBox;
