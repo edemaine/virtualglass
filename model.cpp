@@ -231,7 +231,6 @@ void Model :: setCane(Cane* c)
 	history->saveState(cane);
 	cane = c;
 	slowGeometryUpdate();
-	history->saveState(cane);
 	emit caneChanged();
 }
 
