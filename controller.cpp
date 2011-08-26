@@ -38,8 +38,8 @@ Controller::Controller(int argc, char **argv)
 	connect(mainWindow->openglWidget, SIGNAL(operationInfoSig(QString,int)), mainWindow,
 			SLOT(displayTextMessage(QString,int)));
 
-	connect(mainWindow->openglWidget, SIGNAL(caneChangeRequest(int)), 
-		mainWindow, SLOT(caneChangeRequest(int))); 
+	connect(mainWindow->openglWidget, SIGNAL(caneChangeRequest(int)),
+		mainWindow, SLOT(caneChangeRequest(int)));
 }
 
 int Controller::startUp()

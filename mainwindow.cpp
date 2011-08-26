@@ -890,6 +890,11 @@ void MainWindow::saveRawFile()
 	openglWidget->saveRawFile("cane.raw");
 }
 
+void MainWindow::toggleFlat()
+{
+	toggle2D_button->setFlat(!toggle2D_button->isFlat());
+}
+
 void MainWindow::setupButtonBar()
 {
 	pull_button = new QPushButton("Pull");
@@ -902,6 +907,7 @@ void MainWindow::setupButtonBar()
 	flatten_button->setShortcut(QKeySequence("CTRL+F"));
 	toggle2D_button = new QPushButton("2D View");
 	toggle2D_button->setToolTip(tr("Switch between 2D and 3D view."));
+	connect(toggle2D_button, SIGNAL(pressed()), this, SLOT(toggleFlat()));
 	undo_button = new QPushButton("Undo");
 	undo_button->setShortcut(QKeySequence("CTRL+Z"));
 	undo_button->setToolTip("Undo the last operation.");

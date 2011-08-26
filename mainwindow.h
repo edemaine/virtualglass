@@ -63,6 +63,8 @@ public slots:
 	void updateLibraryToolTip(LibraryCaneWidget* lc);
 	void newMode(int i);
 	void insertLibraryCane(Cane* c);
+	void toggleFlat();
+
 private:
 	Model* model;
 
