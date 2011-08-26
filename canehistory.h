@@ -10,21 +10,15 @@ public:
 	CaneHistory();
 	void saveState(Cane* c);
 	Cane* getState();
+	bool canUndo();
 	Cane* undo();
+	bool canRedo();
 	Cane* redo();
-	bool isMostRecent();
-	bool isAvailable();
-	bool isBusy();
-	void setBusy(bool isChanging);
 
 private:
-	Cane** past;
-	int maxSize;
-	int curPast;
-	int maxCur;
-	void doubleSize();
-	void clearRecentState(int index);
-	bool isChanging;
+	Cane* buffer[20];
+	int curPosition;
+	int endOfValid;
 };
 
 #endif

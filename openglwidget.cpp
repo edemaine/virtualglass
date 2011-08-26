@@ -114,7 +114,6 @@ void OpenGLWidget :: caneChanged()
 {
 	updateTriangles();
 	repaint();
-	model->getHistory()->setBusy(false);
 }
 
 void OpenGLWidget :: setShiftButtonDown(bool state)

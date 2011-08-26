@@ -27,6 +27,7 @@ void Model :: setGeometryHeight(float height)
 	emit caneChanged();
 } 
 
+
 int Model :: addNewDefaultCane()
 {
 	addCane(defaultCane);
@@ -34,6 +35,7 @@ int Model :: addNewDefaultCane()
 	
 	slowGeometryUpdate();
 	emit caneChanged();
+	history->saveState(cane);
 	return cane->subcaneCount-1;
 }
 
@@ -52,6 +54,7 @@ void Model :: setOrthographicProjection()
 
 void Model :: setCaneToNull()
 {
+	history->saveState(cane);
 	setCane(NULL);
 }
 
@@ -237,6 +240,7 @@ void Model :: setCane(Cane* c)
 	history->saveState(cane);
 	cane = c;
 	geometryFresh = 0;
+	history->saveState(cane);
 	emit caneChanged();
 }
 
@@ -381,53 +385,22 @@ void Model :: addCane(Cane* c, Cane* d)
 
 void Model :: undo()
 {
-	if (history->isAvailable())
+	if (history->canUndo())
 	{
-		history->setBusy(true);
-	}
-	else
-	{
-		return;
-	}
-	if (history->isMostRecent())
-	{
-		history->saveState(cane);
-		history->undo();
-	}
-	Cane* temp = history->undo();
-	if (temp != NULL)
-	{
-		cane = temp;
-		geometryFresh = 0;
+		cane = history->undo();
+		slowGeometryUpdate();
 		emit caneChanged();
-	}
-	else
-	{
-		history->setBusy(false);
 	}
 }
 
 void Model :: redo()
 {
-	if (history->isAvailable())
+	if (history->canRedo())
 	{
-		history->setBusy(true);
-	}
-	else
-	{
-		return;
-	}
-	Cane* temp = history->redo();
-	if (temp != NULL)
-	{
-		cane = temp;
-		geometryFresh = 0;
+		cane = history->redo();
+		slowGeometryUpdate();
 		emit caneChanged();
-	}
-	else
-	{
-		history->setBusy(false);
-	}
+	}	
 }
 
 void Model :: saveObjFile(std::string const &filename)

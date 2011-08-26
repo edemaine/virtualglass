@@ -3,90 +3,65 @@
 
 CaneHistory :: CaneHistory()
 {
-	past = new Cane*[100];
-	for (int i=0;i<100;i++)
-	{
-		past[i]=NULL;
-	}
-	maxSize = 100;
-	curPast = 0; //everything from curPast-1 and less is a saved state, 0 represents currently viewed state
-	maxCur = -1; //represents the most advanced the history is in its current timeline
-	isChanging = false;
-}
-
-void CaneHistory :: clearRecentState(int index)
-{
-	for(int i=index+1;i<=maxCur;i++)
-	{
-		past[i]=NULL;
-	}
-	maxCur = index-1;
+	buffer[0] = NULL;
+	curPosition = 0; // The current last saved state
+	endOfValid = 0; // The end of saved states
 }
 
 void CaneHistory :: saveState(Cane* c)
 {
-	if (curPast == maxSize)
-		doubleSize();
-
-	if (c != NULL)
-		past[curPast] = c->deepCopy();
-	curPast++;
-	if (maxCur+1<curPast)
-		maxCur++;
+	// If you're out of space, just scoot everything backwards
+	if (curPosition == 19)
+	{
+		for (int i = 1; i < 20; i++)
+			buffer[i-1] = buffer[i];
+		buffer[19] = c;
+	}
+	// Otherwise move forward and save the state
 	else
-		clearRecentState(curPast);
+	{
+		++curPosition;
+		endOfValid = curPosition;
+		buffer[curPosition] = c;
+	}
 }
 
 Cane* CaneHistory :: getState()
 {
-	if (curPast < 0 || curPast>maxCur+1)
-		return NULL;
-	return past[curPast];
+	return buffer[curPosition];
+}
+
+bool CaneHistory :: canUndo()
+{
+	return (curPosition > 0);
 }
 
 Cane* CaneHistory :: undo()
 {
-	if (curPast == 0)
+	if (canUndo())
+	{
+		--curPosition;
 		return getState();
-	curPast--;
-	return getState();
+	}
+	else
+		return getState();
+}
+
+bool CaneHistory :: canRedo()
+{
+	return !(curPosition == 19 || curPosition == endOfValid);
 }
 
 Cane* CaneHistory :: redo()
 {
-	if (curPast > maxCur + 1)
-		return getState();
-	curPast++;
-	return getState();
-}
-
-void CaneHistory :: doubleSize()
-{
-	Cane** newPast = new Cane*[2*maxSize];
-	for (int i = 0; i < maxSize; ++i)
+	if (canRedo())
 	{
-		newPast[i] = past[i];
+		++curPosition;
+		return buffer[curPosition]; 
 	}
-	maxSize *= 2;
-	delete[] past;
-	past = newPast;
+	else
+		return buffer[curPosition];
 }
 
-bool CaneHistory :: isAvailable()
-{
-	return !isChanging;
-}
 
-bool CaneHistory :: isBusy()
-{
-	return isChanging;
-}
 
-void CaneHistory :: setBusy(bool isChanging)
-{
-	this->isChanging = isChanging;
-}
-bool CaneHistory :: isMostRecent()
-{
-	return curPast == maxCur + 1;
-}
