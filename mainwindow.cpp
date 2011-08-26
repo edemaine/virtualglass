@@ -238,19 +238,19 @@ void MainWindow::modeChanged(int mode)
 
 void MainWindow::checkButton(int mode)
 {
-	pull_button->setFlat(false);
-	bundle_button->setFlat(false);
-	flatten_button->setFlat(false);
+	pull_button->setDown(false);
+	bundle_button->setDown(false);
+	flatten_button->setDown(false);
 	switch(mode)
 	{
 	case PULL_MODE:
-		pull_button->setFlat(true);
+		pull_button->setDown(true);
 		break;
 	case BUNDLE_MODE:
-		bundle_button->setFlat(true);
+		bundle_button->setDown(true);
 		break;
 	case FLATTEN_MODE:
-		flatten_button->setFlat(true);
+		flatten_button->setDown(true);
 		break;
 	}
 }
@@ -398,7 +398,7 @@ void MainWindow::seedLibrary()
 
 void MainWindow :: exportCaneDialog(){
 
-	QString fileName =  QFileDialog::getSaveFileName(this, tr("Export Single Cane"), 
+	QString fileName =  QFileDialog::getSaveFileName(this, tr("Export Single Cane"),
 		"mycane.glass", tr("Glass (*.glass)"));
 
 	Cane* cane = this->openglWidget->getModel()->getCane();
@@ -421,7 +421,7 @@ void MainWindow::exportLibraryDialog()
 	for (int i = 0; i < libraryList.size(); ++i)
 	{
 		Cane* cane = libraryList.at(i)->getCane();
-		canes.push_back(cane);	
+		canes.push_back(cane);
 	}
 
 	saveCanesToFile(fileName, canes);
@@ -509,8 +509,8 @@ void MainWindow::setupCaneChangeDialog()
 
 	// Ok, cancel buttons
 	QHBoxLayout* buttonLayout = new QHBoxLayout(layout->widget());
-	QPushButton* okButton = new QPushButton("Ok", layout->widget()); 
-	QPushButton* cancelButton = new QPushButton("Cancel", layout->widget()); 
+	QPushButton* okButton = new QPushButton("Ok", layout->widget());
+	QPushButton* cancelButton = new QPushButton("Cancel", layout->widget());
 	buttonLayout->addStretch();
 	buttonLayout->addWidget(okButton);
 	buttonLayout->addWidget(cancelButton);
@@ -755,7 +755,7 @@ void MainWindow::saveRawFile()
 
 void MainWindow::toggleFlat()
 {
-	toggle2D_button->setFlat(!toggle2D_button->isFlat());
+	toggle2D_button->setDown(!toggle2D_button->isDown());
 }
 
 void MainWindow::setupButtonBar()
