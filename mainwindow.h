@@ -48,7 +48,6 @@ public slots:
 	void exportLibraryDialog();
 	void importLibraryDialog();
 	void exportCaneDialog();
-	void importCaneDialog();
 	void newBrandCaneDialog();
 	void changeBgColorDialog();
 	void saveObjFileDialog();

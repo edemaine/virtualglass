@@ -24,27 +24,19 @@ void MainWindow::setupMenuBar()
 {
 	fileMenu = menuBar()->addMenu(tr("&File"));
 
-	QAction* importLibrary = new QAction(tr("&Import Canes"), this);
-	importLibrary->setStatusTip(tr("Loads saved canes"));
-	connect(importLibrary, SIGNAL(triggered()), this, SLOT(importLibraryDialog()));
-	importLibrary->setShortcut(QKeySequence("CTRL+O"));
-	fileMenu->addAction(importLibrary);
-
-	QAction* exportLibrary = new QAction(tr("&Export Library"), this);
-	exportLibrary->setStatusTip(tr("Save the current library of canes to a file"));
-	connect(exportLibrary, SIGNAL(triggered()), this, SLOT(exportLibraryDialog()));
+	QAction* exportLibrary = new QAction(tr("&Load canes"), this);
+	exportLibrary->setStatusTip(tr("Load a library of saved canes"));
+	connect(exportLibrary, SIGNAL(triggered()), this, SLOT(importLibraryDialog()));
 	exportLibrary->setShortcut(QKeySequence("CTRL+S"));
 	fileMenu->addAction(exportLibrary);
 
-	fileMenu->addSeparator();
+	QAction* importLibrary = new QAction(tr("&Save all canes"), this);
+	importLibrary->setStatusTip(tr("Save the current library of canes"));
+	connect(importLibrary, SIGNAL(triggered()), this, SLOT(exportLibraryDialog()));
+	importLibrary->setShortcut(QKeySequence("CTRL+O"));
+	fileMenu->addAction(importLibrary);
 
-	QAction* importCane = new QAction(tr("&Import Single Cane"), this);
-	importCane->setStatusTip(tr("Load a saved cane"));
-	connect(importCane, SIGNAL(triggered()), this, SLOT(importCaneDialog()));
-	importCane->setShortcut(QKeySequence("SHIFT+CTRL+O"));
-	fileMenu->addAction(importCane);
-
-	QAction* exportCane = new QAction(tr("&Export Current Cane"), this);
+	QAction* exportCane = new QAction(tr("&Save current cane"), this);
 	exportCane->setStatusTip(tr("Save the current cane to a file"));
 	connect(exportCane, SIGNAL(triggered()), this, SLOT(exportCaneDialog()));
 	exportCane->setShortcut(QKeySequence("SHIFT+CTRL+S"));
@@ -420,21 +412,6 @@ void MainWindow :: exportCaneDialog(){
 	displayTextMessage("Cane saved to: " + fileName);
 }
 
-void MainWindow :: importCaneDialog(){
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Import Single Cane"), 
-		"", tr("Glass (*.glass)"));
-	
-	vector<Cane*> canes = loadCanesFromFile(fileName);
-	if (canes.size() < 1)
-		return;
-
-	model->setCane(canes[0]);
-	saveCaneToLibrary();
-
-	model->setCane(NULL);
-	displayTextMessage("Cane loaded from: " + fileName);
-}
-
 void MainWindow::exportLibraryDialog()
 {
 	QString fileName =  QFileDialog::getSaveFileName(this, tr("Export Cane Library"), "mycanes.glass", tr("Glass (*.glass)"));
@@ -527,7 +504,7 @@ void MainWindow::setupCaneChangeDialog()
 
 	connect(caneShapeBox, SIGNAL(currentIndexChanged(int)),
 			this, SLOT(shapeTypeEvent(int)));
-	connect(caneSizeSlider, SIGNAL(sliderMoved(int)),
+	connect(caneSizeSlider, SIGNAL(valueChanged(int)),
 			this, SLOT(shapeSizeEvent(int)));
 
 	// Ok, cancel buttons
@@ -841,8 +818,8 @@ void MainWindow::setupOGLArea()
 	oglGeometryHeightSlider->setSliderPosition(6);
 	oglGeometryHeightSlider->setTickInterval(1);
 	oglGeometryHeightSlider->setTickPosition(QSlider::TicksBothSides);
-		connect(oglGeometryHeightSlider, SIGNAL(sliderMoved(int)),
-				this, SLOT(geometryHeightEvent(int)));
+	connect(oglGeometryHeightSlider, SIGNAL(valueChanged(int)),
+		this, SLOT(geometryHeightEvent(int)));
 
 	// Setup slider with its labels
 	QVBoxLayout* oglSliderLayout = new QVBoxLayout();

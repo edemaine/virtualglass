@@ -1,7 +1,6 @@
 
 #include "canefile.h"
 
-
 void saveCanesToFile(QString fileName, vector<Cane*> canes)
 {
 	if (!fileName.endsWith(".glass") || fileName.length() < 6)
@@ -108,7 +107,6 @@ vector<Cane*> loadCanesFromFile(QString fileName)
 	YAML::Node doc;
 	parser.GetNextDocument(doc);
 	parser.GetNextDocument(doc);
-
 
 	vector<Cane*> canes;
 	canes.clear();
