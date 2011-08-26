@@ -28,9 +28,6 @@ bool RecipeWidget :: isLibraryCane(QTreeWidgetItem* item)
 	if (item==NULL)
 		return false;
 	Cane* cane = getCane(item);
-	QMessageBox box;
-	box.setText("poo");
-	box.exec();
 	if (cane==NULL)
 		return false;
 	if (item->text(1) == " ")
@@ -40,6 +37,8 @@ bool RecipeWidget :: isLibraryCane(QTreeWidgetItem* item)
 
 bool RecipeWidget :: isTopLibraryCane(QTreeWidgetItem* item)
 {
+	if (item==NULL)
+		return false;
 	Cane* cane = getCane(item);
 	if (cane==NULL)
 		return false;
@@ -98,16 +97,11 @@ Cane* RecipeWidget::getCane(QTreeWidgetItem* node)
 	}
 	else
 	{
-		QMessageBox box;
-		box.setText("apple");
-		box.exec();
-		QVariant data = node->data(0,Qt::UserRole);
-		box.setText("app");
-		box.exec();
-		if (data.isNull() || !data.isValid())
+		if (node == NULL)
 			return NULL;
-		box.setText("a");
-		box.exec();
+		QVariant data = node->data(0,Qt::UserRole);
+		if (data == NULL || data.isNull() || !data.isValid())
+			return NULL;
 		return data.value<Cane*>();
 	}
 }
@@ -230,7 +224,6 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 	if (!this->isVisible() || !caneOutdated)
 		return;
 	Cane* cane = getCane(item);
-	QMessageBox box;
 	if ((column>=4 && column<=6) && (!isLibraryCane(item) || isTopLibraryCane(item)))
 	{
 		Point p;
@@ -243,38 +236,22 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 			updateBaseRecipe(cane,item,column);
 			return;
 		}
-		QMessageBox box;
-		box.setText("hi");
-		//box.exec();
 		QTreeWidgetItem* itemParent=item->parent();
 		int itemIndex=0;
 		if (item!=visibleRootItem())
 		{
 			itemIndex = childIndex(item,itemParent);
 		}
-		box.setText("hihi");
-		//box.exec();
 		Cane* caneParent=getCane(itemParent);
 		if (caneParent!=NULL && caneParent->type == BUNDLE_CANETYPE)
 		{
 			caneParent->subcaneLocations[itemIndex] = p;
 		}
-		box.setText("hihihi");
-		//box.exec();
 		emit recipeCaneChanged();
-		box.setText("hihihihi");
-		//box.exec();
-	}
-	if (isLibraryCane(item))
-	{
-		box.setText("test");
-		box.exec();
 		updateBaseRecipe(cane,item,column);
 		return;
 	}
-	box.setText("moo");
-	box.exec();
-	if (column<=2 || column==3)
+	if (isLibraryCane(item) || column<=2 || column==3)
 	{
 		updateBaseRecipe(cane,item,column);
 		return;
@@ -290,14 +267,8 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 		}
 		cane->amts[amtIndex] = item->text(column).toFloat();
 	}
-	box.setText("moomoo");
-	box.exec();
 	updateBaseRecipe(cane,item,false);
-	box.setText("moomoomoo");
-	box.exec();
 	emit recipeCaneChanged();
-	box.setText("moomoomoomoo");
-	//box.exec();
 }
 
 void RecipeWidget :: updateRecipe()
@@ -398,13 +369,13 @@ void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, boo
 		updateRecipe(subCane,nextLevelCaneWidget,tempLibrary);
 		rootNode->addChild(nextLevelCaneWidget);
 	}
-	rootNode->setExpanded(false);
 }
 
 void RecipeWidget :: newClear()
 {
 	clear();
 	invisibleRootItem()->addChild(new QTreeWidgetItem());
+	visibleRootItem()->setExpanded(false);
 	caneOutdated = false;
 }
 
