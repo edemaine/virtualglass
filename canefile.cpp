@@ -33,6 +33,7 @@ void saveCanesToFile(QString fileName, vector<Cane*> canes)
 
 void parseCaneFromYAML(const YAML::Node& node, Cane* cane)
 {
+
 	std::string caneLiteral;
 	node.GetScalar(caneLiteral);
 
@@ -61,9 +62,13 @@ void parseCaneFromYAML(const YAML::Node& node, Cane* cane)
 
 	for(YAML::Iterator it2 = caneVertices.begin(); it2 != caneVertices.end(); ++it2)
 	{
-		*it2 >> cane->vertices[verticesCount].x;
-		++it2;
-		*it2 >> cane->vertices[verticesCount].y;
+		const YAML::Node& caneVertex = *it2;
+		Point loc;
+
+		caneVertex[0] >> loc.x;
+		caneVertex[1] >> loc.y;
+		loc.z = 0.0;
+		cane->vertices.push_back(loc);
 		verticesCount++;
 	}
 
@@ -106,7 +111,7 @@ vector<Cane*> loadCanesFromFile(QString fileName)
 
 
 	vector<Cane*> canes;
-	canes.clear();	
+	canes.clear();
 	for(unsigned i = 0; i < doc.size(); ++i) {
 		Cane* cane = new Cane(UNASSIGNED_CANETYPE);
 		parseCaneFromYAML(doc[i], cane);

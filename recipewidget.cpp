@@ -25,7 +25,12 @@ RecipeWidget::RecipeWidget(QWidget *parent, OpenGLWidget* openglWidget) :
 
 bool RecipeWidget :: isLibraryCane(QTreeWidgetItem* item)
 {
+	if (item==NULL)
+		return false;
 	Cane* cane = getCane(item);
+	QMessageBox box;
+	box.setText("poo");
+	box.exec();
 	if (cane==NULL)
 		return false;
 	if (item->text(1) == " ")
@@ -93,9 +98,16 @@ Cane* RecipeWidget::getCane(QTreeWidgetItem* node)
 	}
 	else
 	{
+		QMessageBox box;
+		box.setText("apple");
+		box.exec();
 		QVariant data = node->data(0,Qt::UserRole);
+		box.setText("app");
+		box.exec();
 		if (data.isNull() || !data.isValid())
 			return NULL;
+		box.setText("a");
+		box.exec();
 		return data.value<Cane*>();
 	}
 }
@@ -114,35 +126,21 @@ void RecipeWidget::updateBaseRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, b
 {
 	if (rootCane==NULL)
 		return;
-	QMessageBox box;
-	box.setText("moomoo");
-	box.exec();
 	rootNode->setData(0, Qt::UserRole, QVariant::fromValue(rootCane));
-	box.setText("moomoomoo");
-	box.exec();
 
 	updateLibraryColumn(rootCane,rootNode);
-	box.setText("moomoomoomoo");
-	box.exec();
 
 	rootNode->setText(2,QString("%1").arg(rootCane->typeName()));
 	rootNode->setBackgroundColor(3,rootCane->qcolor());
 	rootNode->setText(3,"");
 
-	box.setText("moo");
-	box.exec();
 	QTreeWidgetItem* parentNode = rootNode->parent();
 	Cane* parentCane = getCane(parentNode);
-	box.setText("hihi");
-	box.exec();
 	int rootIndex = childIndex(rootNode,parentNode);
-	box.setText("hihihi");
-	box.exec();
 	if (parentCane != NULL)
 	{
 		Point p = parentCane->subcaneLocations[rootIndex];
-		box.setText("hi");
-		box.exec();
+
 		rootNode->setText(4,QString("%1").arg(p.x));
 		rootNode->setText(5,QString("%1").arg(p.y));
 		rootNode->setText(6,QString("%1").arg(p.z));
@@ -232,6 +230,7 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 	if (!this->isVisible() || !caneOutdated)
 		return;
 	Cane* cane = getCane(item);
+	QMessageBox box;
 	if ((column>=4 && column<=6) && (!isLibraryCane(item) || isTopLibraryCane(item)))
 	{
 		Point p;
@@ -244,24 +243,37 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 			updateBaseRecipe(cane,item,column);
 			return;
 		}
+		QMessageBox box;
+		box.setText("hi");
+		//box.exec();
 		QTreeWidgetItem* itemParent=item->parent();
 		int itemIndex=0;
 		if (item!=visibleRootItem())
 		{
 			itemIndex = childIndex(item,itemParent);
 		}
+		box.setText("hihi");
+		//box.exec();
 		Cane* caneParent=getCane(itemParent);
 		if (caneParent!=NULL && caneParent->type == BUNDLE_CANETYPE)
 		{
 			caneParent->subcaneLocations[itemIndex] = p;
 		}
+		box.setText("hihihi");
+		//box.exec();
 		emit recipeCaneChanged();
+		box.setText("hihihihi");
+		//box.exec();
 	}
 	if (isLibraryCane(item))
 	{
+		box.setText("test");
+		box.exec();
 		updateBaseRecipe(cane,item,column);
 		return;
 	}
+	box.setText("moo");
+	box.exec();
 	if (column<=2 || column==3)
 	{
 		updateBaseRecipe(cane,item,column);
@@ -278,8 +290,14 @@ void RecipeWidget :: changeData(QTreeWidgetItem* item,int column)
 		}
 		cane->amts[amtIndex] = item->text(column).toFloat();
 	}
+	box.setText("moomoo");
+	box.exec();
 	updateBaseRecipe(cane,item,false);
+	box.setText("moomoomoo");
+	box.exec();
 	emit recipeCaneChanged();
+	box.setText("moomoomoomoo");
+	//box.exec();
 }
 
 void RecipeWidget :: updateRecipe()
@@ -327,21 +345,16 @@ void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, boo
 		return;
 	if (rootCane == NULL)
 		return;
-	QMessageBox box;
-	box.setText("moo");
-	//box.exec();
 	if (rootNode == visibleRootItem())
 	{
 		//rootNode->setFlags(rootNode->flags() | Qt::ItemIsEditable);
 		rootNode->setData(0, Qt::UserRole, QVariant::fromValue(rootCane));
 		isInLibrary = isInLibrary || updateLibraryColumn(rootCane,rootNode,isInLibrary);
-		box.setText("moomoo");
-		//box.exec();
+
 		rootNode->setText(2,QString("%1").arg(rootCane->typeName()));
 		rootNode->setBackgroundColor(3,rootCane->qcolor());
 		rootNode->setText(3,"");
-		box.setText("moomoomoo");
-		//box.exec();
+
 		rootNode->setText(4,QString("%1").arg(0));
 		rootNode->setText(5,QString("%1").arg(0));
 		rootNode->setText(6,QString("%1").arg(0));
@@ -354,8 +367,6 @@ void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, boo
 		}
 	}
 
-	box.setText("hi");
-	//box.exec();
 	int numCane = rootCane->subcaneCount;
 	for (int i=0;i<numCane;i++)
 	{
@@ -372,8 +383,7 @@ void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, boo
 		nextLevelCaneWidget->setText(2,QString("%1").arg(subCane->typeName()));
 		nextLevelCaneWidget->setBackgroundColor(3,subCane->qcolor());
 		nextLevelCaneWidget->setText(3,"");
-		box.setText("hihi");
-		//box.exec();
+
 		nextLevelCaneWidget->setText(4,QString("%1").arg(rootCane->subcaneLocations[i].x));
 		nextLevelCaneWidget->setText(5,QString("%1").arg(rootCane->subcaneLocations[i].y));
 		nextLevelCaneWidget->setText(6,QString("%1").arg(rootCane->subcaneLocations[i].z));
@@ -384,8 +394,7 @@ void RecipeWidget :: updateRecipe(Cane* rootCane, QTreeWidgetItem* rootNode, boo
 			nextLevelCaneWidget->setToolTip(7+j, QString("%1").arg(subCane->typeAmt(subCane->type,j)));
 			nextLevelCaneWidget->setStatusTip(7+j, QString("%1").arg(subCane->typeAmt(subCane->type,j)));
 		}
-		box.setText("hihihi");
-		//box.exec();
+
 		updateRecipe(subCane,nextLevelCaneWidget,tempLibrary);
 		rootNode->addChild(nextLevelCaneWidget);
 	}
