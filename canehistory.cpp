@@ -14,15 +14,21 @@ void CaneHistory :: saveState(Cane* c)
 	if (curPosition == 19)
 	{
 		for (int i = 1; i < 20; i++)
-			buffer[i-1] = buffer[i];
-		buffer[19] = c;
+			buffer[i-1] = buffer[i]; // memory leak here when buffer[0] ptr is lost
+		if (c == NULL)
+			buffer[19] = c;
+		else
+			buffer[19] = c->deepCopy();
 	}
 	// Otherwise move forward and save the state
 	else
 	{
 		++curPosition;
 		endOfValid = curPosition;
-		buffer[curPosition] = c;
+		if (c == NULL)
+			buffer[curPosition] = c;
+		else	
+			buffer[curPosition] = c->deepCopy();
 	}
 }
 
