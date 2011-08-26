@@ -10,26 +10,9 @@
 #include "cane.h"
 #include "yaml-cpp/yaml.h"
 #include "model.h"
+#include "keyqlistview.h"
 
 class View;
-
-class KeyQListView : public QListView
-{
-public:
-		KeyQListView(QWidget * parent) : QListView(parent) {}
-		KeyQListView() : QListView() {}
-protected:
-		void keyPressEvent(QKeyEvent *event)
-		{
-				QModelIndex oldIdx = currentIndex();
-				QListView::keyPressEvent(event);
-				QModelIndex newIdx = currentIndex();
-				if(oldIdx.row() != newIdx.row())
-				{
-						emit clicked(newIdx);
-				}
-		}
-};
 
 class MainWindow : public QMainWindow
 {
