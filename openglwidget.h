@@ -36,6 +36,7 @@ public:
 	void setBgColor(QColor color);
 	void setAxes(bool show);
 	void setGrid(bool show);
+	bool is2D();
 
 private:
 	bool shiftButtonDown;

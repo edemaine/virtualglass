@@ -1148,3 +1148,8 @@ void OpenGLWidget :: processLibraryDelete(Cane* c)
 	if (deleteButtonDown)
 		emit acceptLibraryDelete(c);
 }
+
+bool OpenGLWidget :: is2D()
+{
+	return show2D;
+}
