@@ -24,22 +24,24 @@ void MainWindow::setupMenuBar()
 {
 	fileMenu = menuBar()->addMenu(tr("&File"));
 
-	QAction* exportLibrary = new QAction(tr("&Load canes"), this);
-	exportLibrary->setStatusTip(tr("Load a library of saved canes"));
-	connect(exportLibrary, SIGNAL(triggered()), this, SLOT(importLibraryDialog()));
-	exportLibrary->setShortcut(QKeySequence("CTRL+O"));
-	fileMenu->addAction(exportLibrary);
-
-	QAction* importLibrary = new QAction(tr("&Save all canes"), this);
-	importLibrary->setStatusTip(tr("Save the current library of canes"));
-	connect(importLibrary, SIGNAL(triggered()), this, SLOT(exportLibraryDialog()));
-	importLibrary->setShortcut(QKeySequence("CTRL+S"));
+	QAction* importLibrary = new QAction(tr("&Load canes"), this);
+	importLibrary->setStatusTip(tr("Load a library of saved canes"));
+	connect(importLibrary, SIGNAL(triggered()), this, SLOT(importLibraryDialog()));
+	QList<QKeySequence> importShortcuts;
+	importShortcuts << QKeySequence("CTRL+O") << QKeySequence("SHIFT+CTRL+O");
+	importLibrary->setShortcuts(importShortcuts);
 	fileMenu->addAction(importLibrary);
+
+	QAction* exportLibrary = new QAction(tr("&Save all canes"), this);
+	exportLibrary->setStatusTip(tr("Save the current library of canes"));
+	connect(exportLibrary, SIGNAL(triggered()), this, SLOT(exportLibraryDialog()));
+	exportLibrary->setShortcut(QKeySequence("SHIFT+CTRL+S"));
+	fileMenu->addAction(exportLibrary);
 
 	QAction* exportCane = new QAction(tr("&Save current cane"), this);
 	exportCane->setStatusTip(tr("Save the current cane to a file"));
 	connect(exportCane, SIGNAL(triggered()), this, SLOT(exportCaneDialog()));
-	exportCane->setShortcut(QKeySequence("SHIFT+CTRL+S"));
+	exportCane->setShortcut(QKeySequence("CTRL+S"));
 	fileMenu->addAction(exportCane);
 
 	fileMenu->addSeparator();
@@ -779,7 +781,7 @@ void MainWindow::setupButtonBar()
 	redo_button->setToolTip("Redo the last operation.");
 	save_button = new QPushButton("Save");
 	save_button->setToolTip("Save Current Model to Library");
-	save_button->setShortcut(QKeySequence("CTRL+A"));
+	save_button->setShortcut(QKeySequence("CTRL+S"));
 	clear_button = new QPushButton("Clear");
 	clear_button->setToolTip("Clear Current Model");
 	clear_button->setShortcut(QKeySequence("CTRL+R"));
