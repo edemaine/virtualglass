@@ -8,7 +8,6 @@ Model :: Model()
 	projection = PERSPECTIVE_PROJECTION;
 	cane = NULL;
 	history = new CaneHistory();
-	geometryFresh = 0;
 	activeSubcane = -1;
 	geometryHeight = 1.0;
 
@@ -16,14 +15,13 @@ Model :: Model()
 	defaultCane->setColor(1.0, 1.0, 1.0, 1.0);
 	defaultCane->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION, 0.3);
 
-	geometryFresh = 0;
+	slowGeometryUpdate();
 }
 
 void Model :: setGeometryHeight(float height)
 {
 	geometryHeight = height;
 	slowGeometryUpdate();
-	cacheGeometry();
 	emit caneChanged();
 } 
 
@@ -121,21 +119,18 @@ void Model :: setMode(int mode)
 		history->saveState(cane);
 		cane->createFlatten();
 		slowGeometryUpdate();
-		cacheGeometry();
 		activeSubcane = -1;
 		break;
 	case PULL_MODE:
 		history->saveState(cane);
 		cane->createPull();
 		slowGeometryUpdate();
-		cacheGeometry();
 		activeSubcane = -1;
 		break;
 	case BUNDLE_MODE:
 		history->saveState(cane);
 		cane->createBundle();
 		slowGeometryUpdate();
-		cacheGeometry();
 		activeSubcane = -1;
 		break;
 	}
@@ -161,19 +156,16 @@ void Model :: insertMode(Cane* c, int mode)
 		history->saveState(cane);
 		c->createFlatten();
 		slowGeometryUpdate();
-		cacheGeometry();
 		break;
 	case PULL_MODE:
 		history->saveState(cane);
 		c->createPull();
 		slowGeometryUpdate();
-		cacheGeometry();
 		break;
 	case BUNDLE_MODE:
 		history->saveState(cane);
 		c->createBundle();
 		slowGeometryUpdate();
-		cacheGeometry();
 		activeSubcane = -1;
 		break;
 	}
@@ -225,7 +217,6 @@ void Model :: setActiveSubcane(int subcane)
         if (activeSubcane != subcane)
 	{
 		activeSubcane = subcane;
-		geometryFresh = 0;
 		emit caneChanged();
         }
 }
@@ -239,7 +230,7 @@ void Model :: setCane(Cane* c)
 {
 	history->saveState(cane);
 	cane = c;
-	geometryFresh = 0;
+	slowGeometryUpdate();
 	history->saveState(cane);
 	emit caneChanged();
 }
@@ -269,7 +260,6 @@ void Model :: slowGeometryUpdate()
 	default:
 		break;
 	}
-	geometryFresh = 1;
 
 	emit caneChanged();
 }
@@ -293,8 +283,6 @@ Cane* Model :: getCane()
 
 Geometry* Model :: getGeometry()
 {
-	if (!geometryFresh)
-		slowGeometryUpdate();
 	return &geometry;
 }
 
@@ -304,7 +292,6 @@ void Model :: pullCane(float twistAmount, float stretchAmount)
 	cane->pullIntuitive(twistAmount, stretchAmount);
 	applyPullTransform(&geometry, cane);
 
-	geometryFresh = 1;
 	emit caneChanged();
 }
 
@@ -314,7 +301,6 @@ void Model :: flattenCane(float rectangle_ratio, float rectangle_theta, float fl
 	cane->flatten(rectangle_ratio, rectangle_theta, flatness);
 	applyFlattenTransform(&geometry, cane);
 
-	geometryFresh = 1;
 	emit caneChanged();
 }
 
@@ -328,7 +314,6 @@ void Model :: moveCane(float delta_x, float delta_y, float delta_z)
 	applyPartialMoveTransform(&geometry, cane, activeSubcane, delta_x, delta_y, delta_z);
 	cacheGeometry();
 
-	geometryFresh = 1;
 	emit caneChanged();
 }
 
@@ -350,7 +335,6 @@ void Model :: addCane(Cane* c)
 	{
 		cane = c->deepCopy();
 		slowGeometryUpdate();
-		cacheGeometry();
 		setMode(BUNDLE_MODE);
 		emit caneChanged();
 	}
@@ -360,7 +344,6 @@ void Model :: addCane(Cane* c)
 			setMode(BUNDLE_MODE);
 		cane->add(c->deepCopy());
 		slowGeometryUpdate();
-		cacheGeometry();
 		emit caneChanged();
 	}
 }
@@ -371,14 +354,13 @@ void Model :: addCane(Cane* c, Cane* d)
 	if (c != NULL)
 	{
 		c->add(d->deepCopy());
-		geometryFresh = 0;
+		slowGeometryUpdate();
 		emit caneChanged();
 		if (mode != BUNDLE_MODE)
 			setMode(BUNDLE_MODE);
 		else
 		{
 			slowGeometryUpdate();
-			cacheGeometry();
 		}
 	}
 }
@@ -419,6 +401,6 @@ void Model :: saveRawFile(std::string const &filename)
 
 void Model::exactChange()
 {
-	geometryFresh = 0;
+	slowGeometryUpdate();
 	emit caneChanged();
 }

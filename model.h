@@ -77,7 +77,6 @@ private:
 	CaneHistory *history;
 	Geometry cachedGeometry;
 	Geometry geometry;
-	int geometryFresh;
 	int activeSubcane;
 
 	void computeHighResGeometry(Geometry* highResGeometry);
