@@ -8,9 +8,9 @@
 #include "primitives.h"
 #include "librarycanewidget.h"
 #include "cane.h"
-#include "yaml-cpp/yaml.h"
 #include "model.h"
 #include "keyqlistview.h"
+#include "canefile.h"
 
 class View;
 
@@ -54,7 +54,6 @@ public slots:
 	void saveObjFileDialog();
 	void saveRawFile();
 	void libraryCaneDestroyed(QObject* obj);
-	void loadLibraryCane(const YAML::Node& node, Cane* cane);
 	void displayTextMessage(QString message,int msec);
 	void displayTextMessage(QString message);
 	void updateBrandColorPickerSublist(QModelIndex i);

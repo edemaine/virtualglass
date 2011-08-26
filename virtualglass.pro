@@ -26,7 +26,7 @@ QMAKE_CXXFLAGS += -Wall -Werror -g
 
 # Input
 HEADERS += mainwindow.h openglwidget.h cane.h primitives.h model.h controller.h librarycanewidget.h \
-	constants.h canehistory.h geometry.h mesh.h keyqlistview.h Vector.hpp \
+	constants.h canehistory.h geometry.h mesh.h keyqlistview.h canefile.h Vector.hpp \
 	recipewidget.h Box.hpp
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
@@ -79,7 +79,7 @@ HEADERS += yaml-cpp/src/token.h \
 	yaml-cpp/src/collectionstack.h
 
 SOURCES += main.cpp mainwindow.cpp openglwidget.cpp cane.cpp model.cpp controller.cpp librarycanewidget.cpp \
-	canehistory.cpp geometry.cpp mesh.cpp \
+	canehistory.cpp geometry.cpp mesh.cpp canefile.cpp \
 	recipewidget.cpp
 
 SOURCES += yaml-cpp/src/tag.cpp \

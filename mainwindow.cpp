@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include <fstream>
 
 MainWindow::MainWindow(Model* model)
 {
@@ -407,48 +406,29 @@ void MainWindow::seedLibrary()
 
 void MainWindow :: exportCaneDialog(){
 
-
-	QString fileName =  QFileDialog::getSaveFileName(this, tr("Export Single Cane"), "mycane.glass", tr("Glass (*.glass)"));
-	if (!fileName.endsWith(".glass") || fileName.length() < 6)
-		return;
-
-	YAML::Emitter out;
-	out << 1;
-	out << YAML::BeginSeq;
+	QString fileName =  QFileDialog::getSaveFileName(this, tr("Export Single Cane"), 
+		"mycane.glass", tr("Glass (*.glass)"));
 
 	Cane* cane = this->openglWidget->getModel()->getCane();
-	out << YAML::Literal << cane->yamlRepresentation();
-	out << YAML::EndSeq;
-
-	QFile file(fileName);
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+	if (cane == NULL)
 		return;
 
-	file.reset();
+	vector<Cane*> canes;
+	canes.push_back(cane);
+	saveCanesToFile(fileName, canes);
 
-	QTextStream outStream(&file);
-	outStream << out.c_str() << "\n";
-	outStream.flush();
-	file.close();
-
-	displayTextMessage("Cane Saved to: " + fileName);
+	displayTextMessage("Cane saved to: " + fileName);
 }
 
 void MainWindow :: importCaneDialog(){
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Import Single Cane"), "", tr("Glass (*.glass)"));
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Import Single Cane"), 
+		"", tr("Glass (*.glass)"));
+	
+	vector<Cane*> canes = loadCanesFromFile(fileName);
+	if (canes.size() < 1)
+		return;
 
-	std::ifstream fin(fileName.toStdString().c_str());
-	YAML::Parser parser(fin);
-
-	YAML::Node doc;
-	parser.GetNextDocument(doc);
-	parser.GetNextDocument(doc);
-
-	Cane loadCane = Cane(UNASSIGNED_CANETYPE);
-	loadLibraryCane(doc[0],&loadCane);
-
-	model->setCane(&loadCane);
-
+	model->setCane(canes[0]);
 	saveCaneToLibrary();
 
 	model->setCane(NULL);
@@ -458,122 +438,28 @@ void MainWindow :: importCaneDialog(){
 void MainWindow::exportLibraryDialog()
 {
 	QString fileName =  QFileDialog::getSaveFileName(this, tr("Export Cane Library"), "mycanes.glass", tr("Glass (*.glass)"));
-	if (!fileName.endsWith(".glass") || fileName.length() < 6)
-		return;
 
+	vector<Cane*> canes;
 	QList<LibraryCaneWidget*> libraryList = libraryScrollArea->findChildren<LibraryCaneWidget*>();
-
-	YAML::Emitter out;
-	out << libraryList.size();
-	out << YAML::BeginSeq;
-
-	for (int i=0;i<libraryList.size();i++)
+	for (int i = 0; i < libraryList.size(); ++i)
 	{
 		Cane* cane = libraryList.at(i)->getCane();
-		out << YAML::Literal << cane->yamlRepresentation();
+		canes.push_back(cane);	
 	}
 
-	out << YAML::EndSeq;
+	saveCanesToFile(fileName, canes);
 
-	QFile file(fileName);
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-		return;
-
-	file.reset();
-
-	QTextStream outStream(&file);
-	outStream << out.c_str() << "\n";
-	outStream.flush();
-	file.close();
-
-	displayTextMessage("Library Saved to: " + fileName);
-}
-
-void MainWindow::loadLibraryCane(const YAML::Node& node, Cane* cane)
-{
-
-	std::string caneLiteral;
-	node.GetScalar(caneLiteral);
-
-	istringstream sstream ( caneLiteral );
-	YAML::Parser newParser (sstream);
-	YAML::Node newNode;
-	newParser.GetNextDocument(newNode);
-
-	newNode["Type"] >> cane->type;
-
-	const YAML::Node& caneAmts = newNode["Defined Amounts"];
-
-	int amtsCount=0;
-
-	for(YAML::Iterator it2=caneAmts.begin();it2!=caneAmts.end();++it2)
-	{
-		std::string temp;
-		*it2 >> temp;
-
-		++it2;
-
-		*it2 >> cane->amts[amtsCount];
-		amtsCount++;
-	}
-
-	const YAML::Node& caneVertices = newNode["Vertices"];
-	int verticesCount=0;
-
-	for(YAML::Iterator it2=caneVertices.begin();it2!=caneVertices.end();++it2)
-	{
-		*it2 >> cane->vertices[verticesCount].x;
-
-		++it2;
-		*it2 >> cane->vertices[verticesCount].y;
-		verticesCount++;
-	}
-
-	newNode["Number of Subcanes"] >> cane->subcaneCount;
-
-	const YAML::Node& subLocations = newNode["Subcane Locations"];
-	int subLocationCount=0;
-	for(YAML::Iterator it3=subLocations.begin();it3!=subLocations.end();++it3) {
-		const YAML::Node& subCaneLocation = *it3;
-		subCaneLocation[0] >> cane->subcaneLocations[subLocationCount].x;
-		subCaneLocation[1] >> cane->subcaneLocations[subLocationCount].y;
-		subCaneLocation[2] >> cane->subcaneLocations[subLocationCount].z;
-		subLocationCount++;
-	}
-
-	newNode["RGBA Color"][0] >> cane->color.r;
-	newNode["RGBA Color"][1] >> cane->color.g;
-	newNode["RGBA Color"][2] >> cane->color.b;
-	newNode["RGBA Color"][3] >> cane->color.a;
-
-	const YAML::Node& subCanes = newNode["Subcanes"];
-	int subCaneCount = 0;
-	for(YAML::Iterator it4=subCanes.begin();it4!=subCanes.end();++it4) {
-		const YAML::Node& subCane = *it4;
-		Cane* loadCane = new Cane(UNASSIGNED_CANETYPE);
-		loadLibraryCane(subCane,loadCane);
-		cane->subcanes[subCaneCount]=loadCane;
-		subCaneCount++;
-	}
+	displayTextMessage("Library saved to: " + fileName);
 }
 
 void MainWindow::importLibraryDialog()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Import Cane Library"), "", tr("Glass (*.glass)"));
 
-	std::ifstream fin(fileName.toStdString().c_str());
-	YAML::Parser parser(fin);
+	vector<Cane*> canes = loadCanesFromFile(fileName);
 
-	YAML::Node doc;
-	parser.GetNextDocument(doc);
-	parser.GetNextDocument(doc);
-
-	for(unsigned i=0;i<doc.size();i++) {
-		Cane loadCane = Cane(UNASSIGNED_CANETYPE);
-		loadLibraryCane(doc[i],&loadCane);
-
-		model->setCane(&loadCane);
-
+	for(unsigned i = 0; i < canes.size(); ++i) {
+		model->setCane(canes[i]);
 		saveCaneToLibrary();
 	}
 
@@ -881,13 +767,13 @@ void MainWindow::saveObjFileDialog()
 	QString file = QFileDialog::getSaveFileName(this, tr("Save obj file"), "", tr("Wavefront obj files (*.obj);;All files (*)"));
 	if (!file.isNull())
 	{
-		openglWidget->saveObjFile(qPrintable(file));
+		model->saveObjFile(qPrintable(file));
 	}
 }
 
 void MainWindow::saveRawFile()
 {
-	openglWidget->saveRawFile("cane.raw");
+	model->saveRawFile("cane.raw");
 }
 
 void MainWindow::toggleFlat()

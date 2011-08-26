@@ -1084,18 +1084,6 @@ void OpenGLWidget :: setCamera(float theta, float fee)
 	update();
 }
 
-
-
-void OpenGLWidget :: saveObjFile(std::string const &filename)
-{
-	model->saveObjFile(filename);
-}
-
-void OpenGLWidget :: saveRawFile(std::string const &filename)
-{
-	model->saveRawFile(filename);
-}
-
 void OpenGLWidget :: drawAxes()
 {
 	glBegin(GL_LINES);

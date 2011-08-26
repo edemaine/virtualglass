@@ -16,6 +16,7 @@
 #include "primitives.h"
 #include "geometry.h"
 #include "mesh.h"
+#include "canefile.h"
 
 using std::vector;	
 
