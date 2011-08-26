@@ -20,10 +20,8 @@ public:
 	void newLibraryIndex(int index);
 
 signals:
-	void modeChangedSig(int mode);
 	void mouseOver(LibraryCaneWidget*);
 	void newIndex(int index);
-	void addCane(Cane* c);
 	void requestDelete(Cane* c);
 
 public slots:

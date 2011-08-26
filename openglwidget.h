@@ -84,7 +84,6 @@ private:
 
 signals:
 	void caneChangeRequest(int subcane);
-	void modeChangedSig(int mode);
 	void operationInfoSig(QString str,int msec);
 	void updatePreview();
 	void acceptLibraryDelete(Cane* c);

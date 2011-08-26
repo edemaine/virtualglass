@@ -288,7 +288,6 @@ void MainWindow::saveCaneToLibrary()
 	updateLibraryToolTip(lc);
 	connect(lc, SIGNAL(mouseOver(LibraryCaneWidget*)), this, SLOT(updateLibraryToolTip(LibraryCaneWidget*)));
 	connect(stockLayout, SIGNAL(destroyed(QObject*)), this, SLOT(libraryCaneDestroyed(QObject*)));
-	connect(lc,SIGNAL(addCane(Cane*)),this,SLOT(insertLibraryCane(Cane*)));
 	connect(lc,SIGNAL(requestDelete(Cane*)),openglWidget,SLOT(processLibraryDelete(Cane*)));
 	connect(openglWidget, SIGNAL(acceptLibraryDelete(Cane*)), lc, SLOT(deleteRequestAccepted(Cane*)));
 }
