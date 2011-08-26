@@ -71,7 +71,7 @@ void MainWindow::setupMenuBar()
 
 	QAction* togglePeel = new QAction(tr("&Depth Peelin'"), this);
 	togglePeel->setStatusTip(tr("Show better transparency."));
-	togglePeel->setCheckable(true);
+	togglePeel->setCheckable(openglWidget->peelEnabled());
 	togglePeel->setChecked(true);
 	connect(togglePeel, SIGNAL(triggered()), openglWidget, SLOT(togglePeel()));
 	connect(openglWidget, SIGNAL(updatePeelButton(bool)), togglePeel, SLOT(setChecked(bool)));

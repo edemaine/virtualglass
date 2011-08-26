@@ -88,7 +88,7 @@ void RecipeWidget :: colorPicker(QTreeWidgetItem* item,int column)
 	}
 	else
 	{
-	updateBaseRecipe(cane,item,column);
+		updateBaseRecipe(cane,item,column);
 	}
 }
 

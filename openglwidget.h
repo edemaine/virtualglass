@@ -37,6 +37,7 @@ public:
 	void setAxes(bool show);
 	void setGrid(bool show);
 	bool is2D();
+	bool peelEnabled();
 
 private:
 	bool shiftButtonDown;

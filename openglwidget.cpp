@@ -156,11 +156,17 @@ void OpenGLWidget :: checkDepthPeel()
 	}
 }
 
+bool OpenGLWidget :: peelEnabled()
+{
+	return peelEnable;
+}
+
 void OpenGLWidget :: initializeGL()
 {
 	initializeGLCalled = true;
 	// set up glew:
 	checkDepthPeel();
+	emit updatePeelButton(peelEnable);
 	// For shadow/lighting
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
