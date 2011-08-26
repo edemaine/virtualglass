@@ -27,13 +27,13 @@ void MainWindow::setupMenuBar()
 	QAction* exportLibrary = new QAction(tr("&Load canes"), this);
 	exportLibrary->setStatusTip(tr("Load a library of saved canes"));
 	connect(exportLibrary, SIGNAL(triggered()), this, SLOT(importLibraryDialog()));
-	exportLibrary->setShortcut(QKeySequence("CTRL+S"));
+	exportLibrary->setShortcut(QKeySequence("CTRL+O"));
 	fileMenu->addAction(exportLibrary);
 
 	QAction* importLibrary = new QAction(tr("&Save all canes"), this);
 	importLibrary->setStatusTip(tr("Save the current library of canes"));
 	connect(importLibrary, SIGNAL(triggered()), this, SLOT(exportLibraryDialog()));
-	importLibrary->setShortcut(QKeySequence("CTRL+O"));
+	importLibrary->setShortcut(QKeySequence("CTRL+S"));
 	fileMenu->addAction(importLibrary);
 
 	QAction* exportCane = new QAction(tr("&Save current cane"), this);
@@ -779,7 +779,7 @@ void MainWindow::setupButtonBar()
 	redo_button->setToolTip("Redo the last operation.");
 	save_button = new QPushButton("Save");
 	save_button->setToolTip("Save Current Model to Library");
-	save_button->setShortcut(QKeySequence("CTRL+S"));
+	save_button->setShortcut(QKeySequence("CTRL+A"));
 	clear_button = new QPushButton("Clear");
 	clear_button->setToolTip("Clear Current Model");
 	clear_button->setShortcut(QKeySequence("CTRL+R"));
