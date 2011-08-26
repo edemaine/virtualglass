@@ -40,6 +40,14 @@ void Cane :: reset()
 	libraryIndex=-1;
 }
 
+void Cane :: setShape(vector<Point> vertices)
+{
+	this->vertices.clear();
+	for (unsigned int i = 0; i < vertices.size(); ++i)
+		this->vertices.push_back(vertices[i]);
+	this->type = BASE_POLYGONAL_CANETYPE;
+}
+
 void Cane :: setShape(int shape, int resolution, float size)
 {
 	this->vertices.clear();

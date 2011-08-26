@@ -181,7 +181,7 @@ void MainWindow :: shapeSizeEvent(int)
 void MainWindow :: shapePickerEvent()
 {
 	QString shape = caneShapeBox->currentText();
-	float size = caneSizeSlider->sliderPosition() / 100.0;
+	float size = caneSizeSlider->sliderPosition() / 60.0;
 
 	if (shape == "Circle")
 		model->setSubcaneShape(caneChangeSubcane, CIRCLE, size);
@@ -200,6 +200,7 @@ void MainWindow :: shapePickerEvent()
 void MainWindow::caneChangeRequest(int subcane)
 {
 	caneChangeSubcane = subcane;
+	saveCaneColorAndShape();
 	if (model->subcaneHasColorAndShape(subcane))
 	{
 		changeDialog->show();
@@ -616,30 +617,78 @@ void MainWindow::setupCaneChangeDialog()
 	connect(caneColorListBox, SIGNAL(clicked(QModelIndex)), this,
 		SLOT(updateBrandColorPickerColor(QModelIndex)));
 
-		caneShapeBox = new QComboBox(layout->widget());
-		caneShapeBox->addItem("Circle");
-		caneShapeBox->addItem("Square");
-		caneShapeBox->addItem("Rectangle");
-		caneShapeBox->addItem("Triangle");
-		caneShapeBox->addItem("Half Circle");
-		caneShapeBox->addItem("Third Circle");
-		layout->addRow("Shape:", caneShapeBox);
+	// Shape drop-down menu
+	caneShapeBox = new QComboBox(layout->widget());
+	caneShapeBox->addItem("Circle");
+	caneShapeBox->addItem("Square");
+	caneShapeBox->addItem("Rectangle");
+	caneShapeBox->addItem("Triangle");
+	caneShapeBox->addItem("Half Circle");
+	caneShapeBox->addItem("Third Circle");
+	layout->addRow("Shape:", caneShapeBox);
 
-		caneSizeSlider = new QSlider(Qt::Horizontal, layout->widget());
-		caneSizeSlider->setRange(1, 100);
+	// Size slider
+	caneSizeSlider = new QSlider(Qt::Horizontal, layout->widget());
+	caneSizeSlider->setRange(1, 60);
 	QBoxLayout* sliderLayout = new QBoxLayout(QBoxLayout::LeftToRight, layout->widget());
-	QLabel* lsLabel = new QLabel("0 in.", sliderLayout->widget());
+	QLabel* lsLabel = new QLabel("0.1 in.", sliderLayout->widget());
 	QLabel* rsLabel = new QLabel("6 in.", sliderLayout->widget());
 	sliderLayout->insertWidget(0, lsLabel);
 	sliderLayout->insertWidget(1, caneSizeSlider);
 	sliderLayout->insertWidget(2, rsLabel);
 
-		layout->addRow("Diameter:", sliderLayout);
+	layout->addRow("Diameter:", sliderLayout);
 
-		connect(caneShapeBox, SIGNAL(currentIndexChanged(int)),
-				this, SLOT(shapeTypeEvent(int)));
-		connect(caneSizeSlider, SIGNAL(sliderMoved(int)),
-				this, SLOT(shapeSizeEvent(int)));
+	connect(caneShapeBox, SIGNAL(currentIndexChanged(int)),
+			this, SLOT(shapeTypeEvent(int)));
+	connect(caneSizeSlider, SIGNAL(sliderMoved(int)),
+			this, SLOT(shapeSizeEvent(int)));
+
+	// Ok, cancel buttons
+	QHBoxLayout* buttonLayout = new QHBoxLayout(layout->widget());
+	QPushButton* okButton = new QPushButton("Ok", layout->widget()); 
+	QPushButton* cancelButton = new QPushButton("Cancel", layout->widget()); 
+	buttonLayout->addStretch();
+	buttonLayout->addWidget(okButton);
+	buttonLayout->addWidget(cancelButton);
+	buttonLayout->addStretch();
+	layout->addRow(buttonLayout);
+
+	connect(cancelButton, SIGNAL(clicked()),
+			this, SLOT(cancelCaneChangeDialog()));
+	connect(okButton, SIGNAL(clicked()),
+			changeDialog, SLOT(hide()));
+	connect(changeDialog, SIGNAL(rejected()),
+			this, SLOT(cancelCaneChangeDialog()));
+
+}
+
+void MainWindow::cancelCaneChangeDialog()
+{
+	revertCaneColorAndShape();
+	changeDialog->hide();
+}
+
+void MainWindow :: saveCaneColorAndShape()
+{
+	Color* c = model->getSubcaneColor(caneChangeSubcane);
+	savedColor.r = c->r;
+	savedColor.g = c->g;
+	savedColor.b = c->b;
+	savedColor.a = c->a;
+
+	vector<Point> vertices = model->getSubcaneShape(caneChangeSubcane);
+	savedShape.clear();
+	for (unsigned int i = 0; i < vertices.size(); ++i)
+	{
+		savedShape.push_back(vertices[i]);
+	}
+}
+
+void MainWindow :: revertCaneColorAndShape()
+{
+	model->setSubcaneColor(caneChangeSubcane, &savedColor);
+	model->setSubcaneShape(caneChangeSubcane, savedShape);
 }
 
 void MainWindow::updateBrandColorPickerColor(QModelIndex i)

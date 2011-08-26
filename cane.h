@@ -12,6 +12,8 @@
 #include "yaml-cpp/yaml.h"
 #include <QColor>
 
+using std::vector;
+
 class Cane
 {
 public:
@@ -20,6 +22,7 @@ public:
 	int height();
 	void reset();
 	void setShape(int shape, int resolution, float size);
+	void setShape(vector<Point> vertices);
 	void shallowCopy(Cane* dest);
 	void pullIntuitive(float twistFactor, float stretchFactor);
 	void pullLinear(float twistFactor, float stretchFactor);

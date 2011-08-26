@@ -184,22 +184,46 @@ bool Model :: subcaneHasColorAndShape(int subcane)
 	return true;
 }
 
+vector<Point> Model :: getSubcaneShape(int subcane)
+{
+	return cane->subcanes[subcane]->getBaseCane()->vertices;
+}
+
+void Model :: setSubcaneShape(int subcane, vector<Point> vertices)
+{
+	Cane* ac = cane->subcanes[subcane]->getBaseCane();
+	ac->setShape(vertices);
+	slowGeometryUpdate();
+	emit caneChanged();
+}
+
 void Model :: setSubcaneShape(int subcane, int shape, float size)
 {
-	if (!subcaneHasColorAndShape(subcane))
-		return;
-
 	Cane* ac = cane->subcanes[subcane]->getBaseCane();
 	ac->setShape(shape, LOW_ANGULAR_RESOLUTION, size);
 	slowGeometryUpdate();
 	emit caneChanged();
 }
 
+Color* Model :: getSubcaneColor(int subcane)
+{
+	return &(cane->subcanes[subcane]->getBaseCane()->color);
+}
+
+void Model :: setSubcaneColor(int subcane, Color* c)
+{
+	Cane* ac = cane->subcanes[subcane]->getBaseCane();
+	ac->color.r = c->r;
+	ac->color.g = c->g;
+	ac->color.b = c->b;
+	ac->color.a = c->a;
+	
+	slowGeometryUpdate();
+	emit caneChanged();
+}
+
 void Model :: setSubcaneColor(int subcane, float r, float g, float b, float a)
 {
-	if (!subcaneHasColorAndShape(subcane))
-		return;
-
 	Cane* ac = cane->subcanes[subcane]->getBaseCane();
 	ac->color.r = r;
 	ac->color.g = g;

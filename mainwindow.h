@@ -63,10 +63,11 @@ public slots:
 	void updateLibraryToolTip(LibraryCaneWidget* lc);
 	void newMode(int i);
 	void insertLibraryCane(Cane* c);
-
 private:
 	Model* model;
 
+	void saveCaneColorAndShape();
+	void revertCaneColorAndShape();
 	void shapePickerEvent();
 	void updateModeButtonsEnabled();
 	void updatePreview();
@@ -82,7 +83,6 @@ private:
 	void setupCaneChangeDialog();
 	void checkButton(int mode);
 
-//	QStringListModel* dummyModel;
 	void loadOfficialCanes();
 
 	QMenu* caneMenu;
@@ -110,6 +110,8 @@ private:
 
 	QLabel* previewLabel;
 	int caneChangeSubcane;
+	Color savedColor;
+	std::vector<Point> savedShape;
 	QDialog* changeDialog;
 	QSplitter* caneSplitter;
 	QStringListModel* caneTypeListModel;
@@ -120,8 +122,7 @@ private:
 	int selectedBrand;
 	int selectedColor;
 	QStringList* caneTypeList;
-		//QTreeView* caneColorListBox;
-		KeyQListView* caneColorListBox;
+	KeyQListView* caneColorListBox;
 	QList<QStringList>* caneNameListList;
 	QList<QList<QColor> >* caneColorListList;
 	QComboBox* caneShapeBox;
@@ -130,7 +131,9 @@ private:
 
 	bool isRecipe;
 
+private slots:
 
+	void cancelCaneChangeDialog();
 };
 
 #endif
