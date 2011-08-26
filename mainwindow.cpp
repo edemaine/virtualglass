@@ -907,7 +907,7 @@ void MainWindow::toggleRecipe()
 	} else
 	{
 		openglWidget->setVisible(true);
-		stackLayout->setCurrentWidget(openglWidget);
+		stackLayout->setCurrentWidget(oglLayoutWidget);
 		previewLabel->setHidden(true);
 	}
 }
