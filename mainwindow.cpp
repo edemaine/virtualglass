@@ -449,6 +449,7 @@ void MainWindow::importLibraryDialog()
 void MainWindow::setupCaneChangeDialog()
 {
 	changeDialog = new QDialog(NULL);
+	changeDialog->setWindowModality(Qt::ApplicationModal);
 	QFormLayout* layout = new QFormLayout(changeDialog->window());
 	layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
 
