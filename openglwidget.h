@@ -30,6 +30,7 @@ public:
 	virtual ~OpenGLWidget();
 	void setMode(int mode);
 	void setCamera(float theta, float fee);
+	void setGeometryHeight(float newHeight);
 	void setShiftButtonDown(bool state);
 	void setControlButtonDown(bool state);
 	void setDeleteButtonDown(bool state);

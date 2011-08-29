@@ -815,7 +815,7 @@ void MainWindow::setupOGLArea()
 	openglWidget = new OpenGLWidget(oglLayoutWidget, model);
 	oglLayout->addWidget(openglWidget, 1);
 
-	// Setup slider
+	// Setup slider for how much length of cane is shown
 	oglGeometryHeightSlider = new QSlider(Qt::Vertical, oglLayoutWidget);
 	oglGeometryHeightSlider->setRange(1, 24);
 	oglGeometryHeightSlider->setSliderPosition(6);
@@ -840,6 +840,7 @@ void MainWindow::geometryHeightEvent(int)
 	float newHeight = oglGeometryHeightSlider->sliderPosition() / 6.0;
 
 	model->setGeometryHeight(newHeight);
+	openglWidget->setGeometryHeight(newHeight);
 }
 
 void MainWindow::setupWorkArea()

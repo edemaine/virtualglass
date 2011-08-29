@@ -33,7 +33,6 @@ OpenGLWidget :: OpenGLWidget(QWidget *parent, Model* _model) : QGLWidget(QGLForm
 
 	bgColor = QColor(100, 100, 100);
 
-
 	model = _model;
 	geometry = NULL;
 
@@ -115,6 +114,13 @@ void OpenGLWidget :: caneChanged()
 	updateTriangles();
 	repaint();
 }
+
+void OpenGLWidget :: setGeometryHeight(float newHeight)
+{
+	lookAtLoc[2] = newHeight / 2;
+	update();
+}
+
 
 void OpenGLWidget :: setShiftButtonDown(bool state)
 {
