@@ -111,7 +111,7 @@ private:
 	QLabel* previewLabel;
 	int caneChangeSubcane;
 	Color savedColor;
-	std::vector<Point> savedShape;
+	CaneShape savedShape;
 	QDialog* changeDialog;
 	QSplitter* caneSplitter;
 	QStringListModel* caneTypeListModel;

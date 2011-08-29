@@ -32,12 +32,10 @@ public:
 	int getActiveSubcane();
 	int addNewDefaultCane();
 	Color* getSubcaneColor(int subcane);
-	vector<Point> getSubcaneShape(int subcane);
+	CaneShape* getSubcaneShape(int subcane);
 	bool subcaneHasColorAndShape(int subcane);
-	void setSubcaneColor(int subcane, float r, float g, float b, float a);
 	void setSubcaneColor(int subcane, Color* c);
-	void setSubcaneShape(int subcane, int shape, float size);
-	void setSubcaneShape(int subcane, vector<Point> vertices);
+	void setSubcaneShape(int subcane, CaneShape* shape);
 	Cane* getSubcane(int subcane);
 	Geometry* getGeometry();
 	void pullCane(float twistAmount, float stretchFactor);

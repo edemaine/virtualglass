@@ -173,21 +173,25 @@ void MainWindow :: shapeSizeEvent(int)
 
 void MainWindow :: shapePickerEvent()
 {
-	QString shape = caneShapeBox->currentText();
-	float size = caneSizeSlider->sliderPosition() / 60.0;
+	QString shapeText = caneShapeBox->currentText();
+	float diameter = caneSizeSlider->sliderPosition() / 60.0;
+	CaneShape shape;
+	int resolution = LOW_ANGULAR_RESOLUTION;
 
-	if (shape == "Circle")
-		model->setSubcaneShape(caneChangeSubcane, CIRCLE, size);
-	else if (shape == "Square")
-		model->setSubcaneShape(caneChangeSubcane, SQUARE, size);
-	else if (shape == "Rectangle")
-		model->setSubcaneShape(caneChangeSubcane, RECTANGLE, size);
-	else if (shape == "Triangle")
-		model->setSubcaneShape(caneChangeSubcane, TRIANGLE, size);
-	else if (shape == "Half Circle")
-		model->setSubcaneShape(caneChangeSubcane, HALF_CIRCLE, size);
-	else if (shape == "Third Circle")
-		model->setSubcaneShape(caneChangeSubcane, THIRD_CIRCLE, size);
+	if (shapeText == "Circle")
+		shape.setByTypeAndDiameter(CIRCLE_SHAPE, diameter, resolution);
+	else if (shapeText == "Half Circle")
+		shape.setByTypeAndDiameter(HALF_CIRCLE_SHAPE, diameter, resolution);
+	else if (shapeText == "Third Circle")
+		shape.setByTypeAndDiameter(THIRD_CIRCLE_SHAPE, diameter, resolution);
+	else if (shapeText == "Square")
+		shape.setByTypeAndDiameter(SQUARE_SHAPE, diameter, resolution);
+	else if (shapeText == "Rectangle")
+		shape.setByTypeAndDiameter(RECTANGLE_SHAPE, diameter, resolution);
+	else if (shapeText == "Triangle")
+		shape.setByTypeAndDiameter(TRIANGLE_SHAPE, diameter, resolution);
+
+	model->setSubcaneShape(caneChangeSubcane, &shape);
 }
 
 void MainWindow::caneChangeRequest(int subcane)
@@ -196,6 +200,12 @@ void MainWindow::caneChangeRequest(int subcane)
 	saveCaneColorAndShape();
 	if (model->subcaneHasColorAndShape(subcane))
 	{
+		CaneShape* subcaneShape = model->getSubcaneShape(subcane);
+		if (subcaneShape->getType() != UNDEFINED_SHAPE)
+		{
+			caneShapeBox->setCurrentIndex(subcaneShape->getType()-1);
+			caneSizeSlider->setSliderPosition(((int) (subcaneShape->getDiameter() * 60)));
+		}
 		changeDialog->show();
 	}
 }
@@ -337,7 +347,7 @@ void MainWindow::seedLibrary()
 	base->color.g = 0.5;
 	base->color.b = 0.5;
 	base->color.a = 0.2;
-	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
+	base->shape.setByTypeAndDiameter(CIRCLE_SHAPE, 0.2, LOW_ANGULAR_RESOLUTION);
 	model->setCane(base);
 	saveCaneToLibrary();
 
@@ -345,7 +355,7 @@ void MainWindow::seedLibrary()
 	base->color.g = 1.0;
 	base->color.b = 1.0;
 	base->color.a = 0.2;
-	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
+	base->shape.setByTypeAndDiameter(CIRCLE_SHAPE, 0.2, LOW_ANGULAR_RESOLUTION);
 	model->setCane(base);
 	saveCaneToLibrary();
 
@@ -353,7 +363,7 @@ void MainWindow::seedLibrary()
 	base->color.g = 0.7;
 	base->color.b = 1.0;
 	base->color.a = 0.2;
-	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
+	base->shape.setByTypeAndDiameter(CIRCLE_SHAPE, 0.2, LOW_ANGULAR_RESOLUTION);
 	model->setCane(base);
 	saveCaneToLibrary();
 
@@ -365,10 +375,10 @@ void MainWindow::seedLibrary()
 	base->color.g = 0.5;
 	base->color.b = 0.5;
 	base->color.a = 0.8;
-	base->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
+	base->shape.setByTypeAndDiameter(CIRCLE_SHAPE, 0.2, LOW_ANGULAR_RESOLUTION);
 	model->setCane(base);
 	saveCaneToLibrary();
-	base->setShape(TRIANGLE, LOW_ANGULAR_RESOLUTION, 0.2);
+	base->shape.setByTypeAndDiameter(TRIANGLE_SHAPE, 0.2, LOW_ANGULAR_RESOLUTION);
 	model->setCane(base);
 	saveCaneToLibrary();
 
@@ -376,10 +386,10 @@ void MainWindow::seedLibrary()
 	base->color.g = 1.0;
 	base->color.b = 0.5;
 	base->color.a = 0.8;
-	base->setShape(SQUARE, LOW_ANGULAR_RESOLUTION, 0.2);
+	base->shape.setByTypeAndDiameter(SQUARE_SHAPE, 0.2, LOW_ANGULAR_RESOLUTION);
 	model->setCane(base);
 	saveCaneToLibrary();
-	base->setShape(RECTANGLE, LOW_ANGULAR_RESOLUTION, 0.2);
+	base->shape.setByTypeAndDiameter(RECTANGLE_SHAPE, 0.2, LOW_ANGULAR_RESOLUTION);
 	model->setCane(base);
 	saveCaneToLibrary();
 
@@ -387,10 +397,10 @@ void MainWindow::seedLibrary()
 	base->color.g = 0.5;
 	base->color.b = 1.0;
 	base->color.a = 0.8;
-	base->setShape(HALF_CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
+	base->shape.setByTypeAndDiameter(HALF_CIRCLE_SHAPE, 0.2, LOW_ANGULAR_RESOLUTION);
 	model->setCane(base);
 	saveCaneToLibrary();
-	base->setShape(THIRD_CIRCLE, LOW_ANGULAR_RESOLUTION, 0.2);
+	base->shape.setByTypeAndDiameter(THIRD_CIRCLE_SHAPE, 0.2, LOW_ANGULAR_RESOLUTION);
 	model->setCane(base);
 	saveCaneToLibrary();
 
@@ -484,13 +494,17 @@ void MainWindow::setupCaneChangeDialog()
 		SLOT(updateBrandColorPickerColor(QModelIndex)));
 
 	// Shape drop-down menu
+	// It is assumed that the constant values corresponding
+	// to CIRCLE_SHAPE, SQUARE_SHAPE, etc. start at 1 and increase
+	// and are contiguous. The shapes corresponding to these values
+	// must be added to the caneShapeBox in this ascending order.
 	caneShapeBox = new QComboBox(layout->widget());
 	caneShapeBox->addItem("Circle");
+	caneShapeBox->addItem("Half Circle");
+	caneShapeBox->addItem("Third Circle");
 	caneShapeBox->addItem("Square");
 	caneShapeBox->addItem("Rectangle");
 	caneShapeBox->addItem("Triangle");
-	caneShapeBox->addItem("Half Circle");
-	caneShapeBox->addItem("Third Circle");
 	layout->addRow("Shape:", caneShapeBox);
 
 	// Size slider
@@ -543,18 +557,13 @@ void MainWindow :: saveCaneColorAndShape()
 	savedColor.b = c->b;
 	savedColor.a = c->a;
 
-	vector<Point> vertices = model->getSubcaneShape(caneChangeSubcane);
-	savedShape.clear();
-	for (unsigned int i = 0; i < vertices.size(); ++i)
-	{
-		savedShape.push_back(vertices[i]);
-	}
+	model->getSubcaneShape(caneChangeSubcane)->copy(&savedShape);
 }
 
 void MainWindow :: revertCaneColorAndShape()
 {
 	model->setSubcaneColor(caneChangeSubcane, &savedColor);
-	model->setSubcaneShape(caneChangeSubcane, savedShape);
+	model->setSubcaneShape(caneChangeSubcane, &savedShape);
 }
 
 void MainWindow::updateBrandColorPickerColor(QModelIndex i)
@@ -564,7 +573,12 @@ void MainWindow::updateBrandColorPickerColor(QModelIndex i)
 			selectedColor >= caneColorListList->at(selectedBrand).size())
 		return;
 	QColor color = caneColorListList->at(selectedBrand).at(selectedColor);
-	model->setSubcaneColor(caneChangeSubcane, color.redF(), color.greenF(), color.blueF(), color.alphaF());
+	Color c;
+	c.r = color.redF();
+	c.g = color.greenF();
+	c.b = color.blueF();
+	c.a = color.alphaF();
+	model->setSubcaneColor(caneChangeSubcane, &c);
 }
 
 void MainWindow::updateBrandColorPickerSublist(QModelIndex i)

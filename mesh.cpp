@@ -310,10 +310,10 @@ void meshPolygonalBaseCane(Geometry* geometry, float meshHeight, Cane** ancestor
         //Generate verts:
         for (unsigned int i = 0; i < axialResolution; ++i)
         {
-                for (unsigned int j = 0; j < group_cane->vertices.size(); ++j)
+                for (unsigned int j = 0; j < group_cane->shape.getVertices().size(); ++j)
                 {
                         Point p;
-                        p = group_cane->vertices[j];
+                        p = group_cane->shape.getVertices()[j];
                         p.z = ((float) i) / ((axialResolution-1) * total_stretch);
                         Point n;
                         n.x = p.x;
@@ -325,12 +325,14 @@ void meshPolygonalBaseCane(Geometry* geometry, float meshHeight, Cane** ancestor
         //Generate triangles linking them:
         for (unsigned int i = 0; i + 1 < axialResolution; ++i)
         {
-                for (unsigned int j = 0; j < group_cane->vertices.size(); ++j)
+                for (unsigned int j = 0; j < group_cane->shape.getVertices().size(); ++j)
                 {
-                        uint32_t p1 = first_vert + i * group_cane->vertices.size() + j;
-                        uint32_t p2 = first_vert + (i+1) * group_cane->vertices.size() + j;
-                        uint32_t p3 = first_vert + i * group_cane->vertices.size() + (j+1) % group_cane->vertices.size();
-                        uint32_t p4 = first_vert + (i+1) * group_cane->vertices.size() + (j+1) % group_cane->vertices.size();
+                        uint32_t p1 = first_vert + i * group_cane->shape.getVertices().size() + j;
+                        uint32_t p2 = first_vert + (i+1) * group_cane->shape.getVertices().size() + j;
+                        uint32_t p3 = first_vert + i * group_cane->shape.getVertices().size() 
+				+ (j+1) % group_cane->shape.getVertices().size();
+                        uint32_t p4 = first_vert + (i+1) * group_cane->shape.getVertices().size() 
+				+ (j+1) % group_cane->shape.getVertices().size();
                         // Four points that define a (non-flat) quad are used
                         // to create two triangles.
                         geometry->triangles.push_back(Triangle(p2, p1, p4));
@@ -348,10 +350,10 @@ void meshPolygonalBaseCane(Geometry* geometry, float meshHeight, Cane** ancestor
                 float z = (side?1.0:0.0);
                 float nz = (side?1.0:-1.0);
                 uint32_t base = geometry->vertices.size();
-                for (unsigned int j = 0; j < group_cane->vertices.size(); ++j)
+                for (unsigned int j = 0; j < group_cane->shape.getVertices().size(); ++j)
                 {
                         Point p;
-                        p = group_cane->vertices[j];
+                        p = group_cane->shape.getVertices()[j];
                         p.z = z / total_stretch;
                         Point n;
                         n.x = 0.0; n.y = 0.0; n.z = nz;
@@ -359,14 +361,14 @@ void meshPolygonalBaseCane(Geometry* geometry, float meshHeight, Cane** ancestor
                 }
                 if (side)
                 {
-                        for (unsigned int j = 1; j + 1 < group_cane->vertices.size(); ++j)
+                        for (unsigned int j = 1; j + 1 < group_cane->shape.getVertices().size(); ++j)
                         {
                                 geometry->triangles.push_back(Triangle(base, base + j, base + j + 1));
                         }
                 }
                 else
                 {
-                        for (unsigned int j = 1; j + 1 < group_cane->vertices.size(); ++j)
+                        for (unsigned int j = 1; j + 1 < group_cane->shape.getVertices().size(); ++j)
                         {
                                 geometry->triangles.push_back(Triangle(base, base + j + 1, base + j));
                         }

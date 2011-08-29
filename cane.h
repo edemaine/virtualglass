@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include "caneshape.h"
 #include "primitives.h"
 #include "constants.h"
 #include "yaml-cpp/yaml.h"
@@ -21,8 +22,7 @@ public:
 	Cane(int type);
 	int height();
 	void reset();
-	void setShape(int shape, int resolution, float size);
-	void setShape(vector<Point> vertices);
+	void setShape(CaneShape* shape);
 	void shallowCopy(Cane* dest);
 	void pullIntuitive(float twistFactor, float stretchFactor);
 	void pullLinear(float twistFactor, float stretchFactor);
@@ -47,7 +47,7 @@ public:
 	QString typeAmt(int type, int index);
 
 	int type;
-	std::vector<Point> vertices;
+	CaneShape shape;
 	float amts[MAX_AMT_TYPES];
 	int subcaneCount;
 	Point subcaneLocations[MAX_SUBCANE_COUNT]; // z is center displacement

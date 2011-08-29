@@ -18,18 +18,22 @@
 #define PERSPECTIVE_PROJECTION 1
 #define ORTHOGRAPHIC_PROJECTION 2
 
+
+// Valid shapes are assumed to start at 1 and be contiguous
+// up to some index. Some code uses this constraint. 
 #define UNASSIGNED_CANETYPE 0
 #define PULL_CANETYPE 1
 #define BUNDLE_CANETYPE 2
 #define FLATTEN_CANETYPE 3
 #define BASE_POLYGONAL_CANETYPE 4
 
-#define CIRCLE 1
-#define HALF_CIRCLE 2
-#define THIRD_CIRCLE 3
-#define SQUARE 4
-#define RECTANGLE 5
-#define TRIANGLE 6
+#define UNDEFINED_SHAPE 0
+#define CIRCLE_SHAPE 1
+#define HALF_CIRCLE_SHAPE 2
+#define THIRD_CIRCLE_SHAPE 3
+#define SQUARE_SHAPE 4
+#define RECTANGLE_SHAPE 5
+#define TRIANGLE_SHAPE 6
 
 #define MAX_ANCESTORS 20
 #define MAX_AMT_TYPES 5

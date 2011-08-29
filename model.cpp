@@ -1,6 +1,6 @@
 
-#include "model.h"
 #include <QMessageBox>
+#include "model.h"
 
 Model :: Model()
 {
@@ -13,7 +13,7 @@ Model :: Model()
 
 	defaultCane = new Cane(BASE_POLYGONAL_CANETYPE);
 	defaultCane->setColor(1.0, 1.0, 1.0, 1.0);
-	defaultCane->setShape(CIRCLE, LOW_ANGULAR_RESOLUTION, 0.3);
+	defaultCane->shape.setByTypeAndDiameter(CIRCLE_SHAPE, 0.3, LOW_ANGULAR_RESOLUTION);
 
 	slowGeometryUpdate();
 }
@@ -184,23 +184,14 @@ bool Model :: subcaneHasColorAndShape(int subcane)
 	return true;
 }
 
-vector<Point> Model :: getSubcaneShape(int subcane)
+CaneShape* Model :: getSubcaneShape(int subcane)
 {
-	return cane->subcanes[subcane]->getBaseCane()->vertices;
+	return &(cane->subcanes[subcane]->getBaseCane()->shape);
 }
 
-void Model :: setSubcaneShape(int subcane, vector<Point> vertices)
+void Model :: setSubcaneShape(int subcane, CaneShape* newShape)
 {
-	Cane* ac = cane->subcanes[subcane]->getBaseCane();
-	ac->setShape(vertices);
-	slowGeometryUpdate();
-	emit caneChanged();
-}
-
-void Model :: setSubcaneShape(int subcane, int shape, float size)
-{
-	Cane* ac = cane->subcanes[subcane]->getBaseCane();
-	ac->setShape(shape, LOW_ANGULAR_RESOLUTION, size);
+	newShape->copy(&(cane->subcanes[subcane]->getBaseCane()->shape));
 	slowGeometryUpdate();
 	emit caneChanged();
 }
@@ -217,18 +208,6 @@ void Model :: setSubcaneColor(int subcane, Color* c)
 	ac->color.g = c->g;
 	ac->color.b = c->b;
 	ac->color.a = c->a;
-	
-	slowGeometryUpdate();
-	emit caneChanged();
-}
-
-void Model :: setSubcaneColor(int subcane, float r, float g, float b, float a)
-{
-	Cane* ac = cane->subcanes[subcane]->getBaseCane();
-	ac->color.r = r;
-	ac->color.g = g;
-	ac->color.b = b;
-	ac->color.a = a;
 	
 	slowGeometryUpdate();
 	emit caneChanged();

@@ -23,7 +23,7 @@ void Cane :: reset()
 	int i;
 
 	type = UNASSIGNED_CANETYPE;
-	vertices.clear();
+	shape.clear();
 	for (i = 0; i < MAX_AMT_TYPES; ++i)
 	{
 		amts[i] = 0.0;
@@ -40,140 +40,9 @@ void Cane :: reset()
 	libraryIndex=-1;
 }
 
-void Cane :: setShape(vector<Point> vertices)
+void Cane :: setShape(CaneShape* shape)
 {
-	this->vertices.clear();
-	for (unsigned int i = 0; i < vertices.size(); ++i)
-		this->vertices.push_back(vertices[i]);
-	this->type = BASE_POLYGONAL_CANETYPE;
-}
-
-void Cane :: setShape(int shape, int resolution, float size)
-{
-	this->vertices.clear();
-	Point p;
-	float t;
-	switch (shape)
-	{
-		case CIRCLE:
-						for (int i = 0; i < resolution; ++i)
-						{
-								p.x = size * 0.5 * cos(2 * PI * i / resolution);
-								p.y = size * 0.5 * sin(2 * PI * i / resolution);
-								this->vertices.push_back(p);
-						}
-			break;
-		case SQUARE:
-						for (int i = 0; i < resolution / 4; ++i)
-						{
-								p.x = size * 0.5;
-								p.y = size * (-0.5 + 1.0 * 4 * i / resolution);
-								this->vertices.push_back(p);
-						}
-						for (int i = 0; i < resolution / 4; ++i)
-						{
-								p.x = size * (0.5 - 1.0 * 4 * i / resolution);
-								p.y = size * 0.5;
-								this->vertices.push_back(p);
-						}
-						for (int i = 0; i < resolution / 4; ++i)
-						{
-								p.x = size * -0.5;
-								p.y = size * (0.5 - 1.0 * 4 * i / resolution);
-								this->vertices.push_back(p);
-						}
-						for (int i = 0; i < resolution / 4; ++i)
-						{
-								p.x = size * (-0.5 + 1.0 * 4 * i / resolution);
-								p.y = size * -0.5;
-								this->vertices.push_back(p);
-						}
-			break;
-		case RECTANGLE:
-						for (int i = 0; i < resolution / 4; ++i)
-						{
-								p.x = size * 0.5;
-								p.y = size * (-0.25 + 0.5 * 4 * i / resolution);
-								this->vertices.push_back(p);
-						}
-						for (int i = 0; i < resolution / 4; ++i)
-						{
-								p.x = size * (0.5 - 1.0 * 4 * i / resolution);
-								p.y = size * 0.25;
-								this->vertices.push_back(p);
-						}
-						for (int i = 0; i < resolution / 4; ++i)
-						{
-								p.x = size * -0.5;
-								p.y = size * (0.25 - 0.5 * 4 * i / resolution);
-								this->vertices.push_back(p);
-						}
-						for (int i = 0; i < resolution / 4; ++i)
-						{
-								p.x = size * (-0.5 + 1.0 * 4 * i / resolution);
-								p.y = size * -0.25;
-								this->vertices.push_back(p);
-						}
-			break;
-		case TRIANGLE:
-						for (int i = 0; i < resolution / 3; ++i)
-						{
-				t = 3.0 * i / resolution;
-				p.x = size * (1 * (1 - t) + cos(2 * PI / 3) * t);
-				p.y = size * (0 * (1 - t) + sin(2 * PI / 3) * t);
-								this->vertices.push_back(p);
-			}
-						for (int i = 0; i < resolution / 3; ++i)
-						{
-				t = 3.0 * i / resolution;
-				p.x = size * (cos(2 * PI / 3) * (1 - t) + cos(4 * PI / 3) * t);
-				p.y = size * (sin(2 * PI / 3) * (1 - t) + sin(4 * PI / 3) * t);
-								this->vertices.push_back(p);
-			}
-						for (int i = 0; i < resolution / 3; ++i)
-						{
-				t = 3.0 * i / resolution;
-				p.x = size * (cos(4 * PI / 3) * (1 - t) + 1 * t);
-				p.y = size * (sin(4 * PI / 3) * (1 - t) + 0 * t);
-								this->vertices.push_back(p);
-						}
-			break;
-		case THIRD_CIRCLE:
-						for (int i = 0; i < resolution / 4; ++i)
-						{
-								p.x = 0;
-								p.y = size * (1.0 - 1.0 * 4 * i / resolution);
-								this->vertices.push_back(p);
-						}
-						for (int i = 0; i < resolution / 4; ++i)
-						{
-								p.x = size * (cos(-PI / 6) * i * 4.0 / resolution);
-								p.y = size * (sin(-PI / 6) * i * 4.0 / resolution);
-								this->vertices.push_back(p);
-						}
-						for (int i = 0; i < resolution / 2; ++i)
-						{
-								p.x = size * cos(-PI / 6 + 2 * PI / 3 * i * 2 / resolution);
-								p.y = size * sin(-PI / 6 + 2 * PI / 3 * i * 2 / resolution);
-								this->vertices.push_back(p);
-						}
-			break;
-		case HALF_CIRCLE:
-						for (int i = 0; i < resolution / 3; ++i)
-						{
-								p.x = 0;
-								p.y = size * (1.0 - 2.0 * 3 * i / resolution);
-								this->vertices.push_back(p);
-						}
-						for (int i = 0; i < 2 * resolution / 3; ++i)
-						{
-								p.x = size * cos(-PI/2 + PI * 3 * i / (2 * resolution));
-								p.y = size * sin(-PI/2 + PI * 3 * i / (2 * resolution));
-								this->vertices.push_back(p);
-						}
-			break;
-	}
-	this->type = BASE_POLYGONAL_CANETYPE;
+	shape->copy(&(this->shape));
 }
 
 // Returns the number of nodes in the cane's DAG
@@ -199,10 +68,7 @@ void Cane :: shallowCopy(Cane* dest)
 	int i;
 
 	dest->type = this->type;
-	for (unsigned int v = 0; v < this->vertices.size(); ++v)
-	{
-		dest->vertices.push_back(this->vertices[v]);
-	}
+	this->shape.copy(&(dest->shape));
 	for (i = 0; i < MAX_AMT_TYPES; ++i)
 	{
 		dest->amts[i] = this->amts[i];
@@ -310,7 +176,7 @@ void Cane :: createFlatten()
 	this->shallowCopy(copy);
 	this->reset();
 	this->type = FLATTEN_CANETYPE;
-		this->amts[0] = 0.0;
+	this->amts[0] = 0.0;
 	this->amts[1] = 0.0;
 	this->amts[2] = 0.0;
 	this->subcaneCount = 1;
@@ -420,10 +286,7 @@ Cane* Cane :: deepCopy()
 	Cane* copy;
 
 	copy = new Cane(this->type);
-	for (unsigned int v = 0; v < this->vertices.size(); ++v)
-	{
-		copy->vertices.push_back(this->vertices[v]);
-	}
+	this->shape.copy(&(copy->shape));
 
 	for (i = 0; i < MAX_AMT_TYPES; ++i)
 	{
@@ -581,8 +444,8 @@ std::string Cane :: yamlRepresentation()
 
 	out << YAML::Key << "Vertices";
 	out << YAML::Value << YAML::BeginSeq;
-	for (unsigned int j = 0; j < this->vertices.size(); j++){
-		Point loc = vertices[j];
+	for (unsigned int j = 0; j < this->shape.getVertices().size(); j++){
+		Point loc = this->shape.getVertices()[j];
 		out << YAML::BeginSeq;
 		out << zeroIfNaN(loc.x) << zeroIfNaN(loc.y);
 		out << YAML::EndSeq;
