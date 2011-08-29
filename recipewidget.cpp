@@ -107,7 +107,7 @@ Cane* RecipeWidget::getCane(QTreeWidgetItem* node)
 		if (node == NULL)
 			return NULL;
 		QVariant data = node->data(0,Qt::UserRole);
-		if (data == NULL || data.isNull() || !data.isValid())
+		if (data.isNull() || data.isNull() || !data.isValid())
 			return NULL;
 		return data.value<Cane*>();
 	}
