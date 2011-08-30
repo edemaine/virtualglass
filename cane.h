@@ -39,12 +39,17 @@ public:
 	void setColor(Color color);
 	void setColor(float r, float g, float b, float a);
 	void setColor(QColor color);
+        void setColor(Color color, QString name);
+        void setColor(float r, float g, float b, float a, QString name);
+        void setColor(QColor color, QString name);
+        void setName(QString name);
 	Cane* getBaseCane();
 	Cane* getTopBundleNode();
 	std::string yamlRepresentation();
 	QColor qcolor();
 	QString typeName();
 	QString typeAmt(int type, int index);
+        QString colorName();
 
 	int type;
 	CaneShape shape;
@@ -53,6 +58,7 @@ public:
 	Point subcaneLocations[MAX_SUBCANE_COUNT]; // z is center displacement
 	Cane* subcanes[MAX_SUBCANE_COUNT];
 	Color color;
+        QString brandColorName;
 	int libraryIndex;
 
 public slots:

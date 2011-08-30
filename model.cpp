@@ -213,6 +213,14 @@ void Model :: setSubcaneColor(int subcane, Color* c)
 	emit caneChanged();
 }
 
+void Model :: setSubcaneAlpha(int subcane, int newAlpha)
+{
+        Cane* ac = cane->subcanes[subcane]->getBaseCane();
+        Color* newColor = new Color(ac->color);
+        newColor->a = newAlpha/float(255);
+        setSubcaneColor(subcane, newColor);
+}
+
 void Model :: setActiveSubcane(int subcane)
 {
         if (cane == NULL)

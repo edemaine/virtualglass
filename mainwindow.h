@@ -41,6 +41,7 @@ public slots:
 	void geometryHeightEvent(int);
 	void shapeTypeEvent(int);
 	void shapeSizeEvent(int);
+        void changeAlphaEvent(int i);
 	void caneChanged();
 	void modeChanged(int mode);
 	void projectionChanged();
@@ -81,7 +82,7 @@ private:
 	void setupWorkArea();
 	void setupMenuBar();
 	void setupCaneChangeDialog();
-	void checkButton(int mode);
+        void checkButton(int mode);
 
 	void loadOfficialCanes();
 
@@ -126,6 +127,7 @@ private:
 	QList<QStringList>* caneNameListList;
 	QList<QList<QColor> >* caneColorListList;
 	QComboBox* caneShapeBox;
+        QSlider* caneAlphaSlider;
 	QSlider* caneSizeSlider;
 	QSlider* caneHeightSlider;
 

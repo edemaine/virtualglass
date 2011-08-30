@@ -32,7 +32,7 @@ Reichenbach Opaques
 - 114,151,43,255
 [R-76 Opal Light Green] 	
 - 222,216,111,255
-[R-77 Crown Yellow] 	
+[R-77 Corn Yellow] 	
 - 247,186,8,255
 [R-78 Canary Yellow] 	
 - 252,207,1,255
@@ -50,9 +50,9 @@ Reichenbach Opaques
 - 131,149,201,255
 [R-85 Opal Aquamarine] 	
 - 88,106,122,255
-[R-86 Turquoise (teal)] 	
+[R-86 Opal Turquoise (Teal)] 	
 - 98,152,134,255
-[R-87 Water Blue (turquoise)] 	
+[R-87 Water Blue (Turquoise)] 	
 - 85,144,157,255
 [R-88 Opal Violet] 	
 - 144,106,140,255
@@ -66,7 +66,7 @@ Reichenbach Opaques
 - 62,56,72,255
 [R-93 Opal Sea Blue]
 - 1,149,169,255
-[R-94 Opal Plum Blue] 	
+[R-94 Plum Blue] 	
 - 118,89,90,255
 [R-95 Opal Black (reduces)] 	
 - 67,55,55,255
@@ -84,7 +84,7 @@ Reichenbach Opaques
 - 247,244,239,255
 [R-105 Florence] 	
 - 230,194,153,255
-[R-106 Irise Enamel Dark Brown (reduces)] 	
+[R-106 Irise Dark Brown (reduces)] 	
 - 70,51,42,255
 [R-107 Iris Opal Yellow (reduces)] 	
 - 85,52,30,255
@@ -100,7 +100,7 @@ Reichenbach Opaques
 - 255,119,37,255
 [R-120 Curry ]
 - 201,114,10,255
-[R-121 Opal Orange] 	
+[R-121 Reddish Opal Orange] 	
 - 211,56,42,255
 [R-122 Imperial Red ]
 - 205,80,24,255
@@ -128,7 +128,7 @@ Reichenbach Opaques
 - 198,146,156,255
 [R-153 Opalescence Light Blue]
 - 144,178,191,255
-[R-154 Pale Night Blue] 	
+[R-154 Pale Light Blue] 	
 - 152,198,197,255
 [R-156 Opal Olive Green] 	
 - 111,110,53,255
@@ -852,7 +852,7 @@ Kugler Opaques
 - 32,140,159,255
 [K172 Opal Blue Grey]
 - 214,231,248,255
-[K190 Light Turquoise]
+[K190 K 190 Light Turquoise]
 - 0,145,181,255
 [K242 Dense Blue]
 - 34,117,200,255
@@ -1041,6 +1041,8 @@ Kugler Transparents
 - 27,182,194,126
 [K104 Sky-Blue]
 - 65,192,254,126
+[K105A Silver Blue]
+- 0,152,225,255
 [K210 Sari Blue]
 - 0,112,179,126
 [K221 Light Blue]

@@ -507,3 +507,26 @@ void Cane :: changeLibraryIndex(int index)
 {
 	libraryIndex = index;
 }
+
+void Cane :: setName(QString name)
+{
+        brandColorName = name;
+}
+
+void Cane :: setColor(Color color, QString name)
+{
+        setColor(color);
+        setName(name);
+}
+
+void Cane :: setColor(float r, float g, float b, float a, QString name)
+{
+        setColor(r,g,b,a);
+        setName(name);
+}
+
+void Cane :: setColor(QColor color, QString name)
+{
+        setColor(color);
+        setName(name);
+}
