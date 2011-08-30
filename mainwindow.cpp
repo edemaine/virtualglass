@@ -631,6 +631,9 @@ void MainWindow::updateBrandColorPickerSublist(QModelIndex i)
 	}
 }
 
+#define NCOLORPATHS 2
+QString colorPaths[NCOLORPATHS] = {"Colors1.txt", "../src/Colors1.txt"};
+
 void MainWindow::loadOfficialCanes()
 {
 	caneTypeList = new QStringList;
@@ -640,12 +643,23 @@ void MainWindow::loadOfficialCanes()
 	QList<QColor>* caneColorList = new QList<QColor>();
 	int currentCane = -1;
 	bool onColor = false;
-	QFile file("../src/Colors1.txt");
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+
+	int i;
+	for (i = 0; i < NCOLORPATHS; i++)
+		if (QFile::exists (colorPaths[i]))
+			break;
+	if (i >= NCOLORPATHS)
 	{
-		caneTypeList->append("File Misread");
+		caneTypeList->append("Could not find "+colorPaths[0]);
 		return;
 	}
+	QFile file(colorPaths[i]);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		caneTypeList->append("Could not read "+colorPaths[0]);
+		return;
+	}
+
 	while (!file.atEnd()) {
 		QByteArray line = file.readLine();
 		//                process_line(line);
