@@ -1,13 +1,9 @@
-/*
- * (unfinished) SVG parsing code from an (unfinished) game Jim has
- * been working on. This code is released into the public domain.
- */
 #ifndef SVG_HPP
 #define SVG_HPP
 
-#include <Vector/Vector.hpp>
-#include <Vector/Box.hpp>
-#include <Vector/Matrix.hpp>
+#include "Vector.hpp"
+#include "Box.hpp"
+#include "Matrix.hpp"
 
 #include <list>
 #include <string>
@@ -19,15 +15,39 @@ typedef Matrix< double, 2, 3 > Matrix;
 
 class Paint {
 public:
-	Paint() : color(make_vector(1.0f, 0.0f, 1.0f, 1.0f)) {
+	Paint() : color(make_vector(1.0f, 0.0f, 1.0f, 1.0f)), opacity(1.0f) {
 	}
 	Vector4f color;
+	float opacity;
 	//TODO: support gradients
+	Vector4ub to_gl_color() const {
+		Vector4ub ret;
+		for (unsigned int i = 0; i < 4; ++i) {
+			int val;
+			if (i != 3) {
+				val = color.c[i] * 256;
+			} else {
+				val = color.c[i] * opacity * 256;
+			}
+			if (val < 0) val = 0;
+			if (val > 255) val = 255;
+			ret.c[i] = val;
+		}
+		return ret;
+	}
+};
+
+class ArcInfo {
+public:
+	ArcInfo(bool _large_arc_flag, bool _sweep_flag) : large_arc_flag(_large_arc_flag), sweep_flag(_sweep_flag) {
+	}
+	bool large_arc_flag;
+	bool sweep_flag;
 };
 
 class Node {
 public:
-	Node() : tag(""), transform(identity_matrix< double, 2, 3 >()), stroke_width(1.0), fill_rule(FILL_EVENODD) {
+	Node() : tag(""), transform(identity_matrix< double, 2, 3 >()), stroke_width(1.0), fill_rule(FILL_NONZERO) {
 	}
 	//tag read from file:
 	std::string tag;
@@ -57,23 +77,33 @@ public:
 		OP_LINETO = 'L', //consumes 1 coord
 		OP_CLOSEPATH = 'Z', //consumes 0 coords
 		OP_CURVETO = 'C', //cubic bezier curve, consumes 3 coords
-		OP_ARCTO = 'A', //arc, consumes 2 coords (midpoint,end)
-		//Note that several ARCTOs might result from one SVG arc command,
-		// as this ARCTO is using my midpoint notation.
-		//Note also that I'm not entirely sure that midpoint notation
-		// can actually produce elliptical arcs properly.
+		OP_ARCTO = 'A', //arc, consumes 3 coords (x axis, y axis, endpoint) and 1 arc_info
 	};
 	std::vector< Vector2d > coords;
+	std::vector< ArcInfo > arc_infos;
 	void moveto(Vector2d const &pos) {
-		ops.push_back('M');
+		ops.push_back(OP_MOVETO);
 		coords.push_back(pos);
 	}
 	void lineto(Vector2d const &pos) {
-		ops.push_back('L');
+		ops.push_back(OP_LINETO);
 		coords.push_back(pos);
 	}
+	void arcto(Vector2d const &x_axis, Vector2d const &y_axis, ArcInfo const &info, Vector2d const &to) {
+		ops.push_back(OP_ARCTO);
+		arc_infos.push_back(info);
+		coords.push_back(x_axis);
+		coords.push_back(y_axis);
+		coords.push_back(to);
+	}
+	void curveto(Vector2d const &c1, Vector2d const &c2, Vector2d const &end) {
+		ops.push_back(OP_CURVETO);
+		coords.push_back(c1);
+		coords.push_back(c2);
+		coords.push_back(end);
+	}
 	void closepath() {
-		ops.push_back('Z');
+		ops.push_back(OP_CLOSEPATH);
 	}
 	//'tol' is subdivision tolerance, after xform. (Output curve within 'tol' of true curve.)
 	//paths will start/end with same point if closed

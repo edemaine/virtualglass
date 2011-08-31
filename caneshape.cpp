@@ -19,9 +19,10 @@ void CaneShape :: copy(CaneShape* dest)
 	dest->setVertices(this->getVertices());
 	dest->setType(this->getType());
 	dest->setDiameter(this->getDiameter());
+	dest->tris = tris;
 }
 
-void CaneShape :: setVertices(vector<Point> vertices)
+void CaneShape :: setVertices(vector< Vector2f > const &vertices)
 {
 	this->vertices.clear();
 	for (unsigned int i = 0; i < vertices.size(); ++i)
@@ -41,7 +42,7 @@ void CaneShape :: setDiameter(float diameter)
 }
 
 
-vector<Point> CaneShape :: getVertices()
+vector< Vector2f > const &CaneShape :: getVertices()
 {
 	return vertices;
 }
@@ -56,7 +57,7 @@ float CaneShape :: getDiameter()
 	return diameter;
 } 
 
-void CaneShape :: setByVertices(vector<Point> vertices)
+void CaneShape :: setByVertices(vector< Vector2f > const &vertices)
 {
 	setVertices(vertices);
 	type = UNDEFINED_SHAPE;
@@ -68,9 +69,9 @@ void CaneShape :: setByTypeAndDiameter(int type, float diameter, int resolution)
 	clear();
 	setType(type);
 	setDiameter(diameter);
-	Point p;
+	Vector2f p;
 	float t;
-	vector<Point> vertices;
+	vector<Vector2f> vertices;
 	vertices.clear();
 	switch (type)
 	{

@@ -445,9 +445,20 @@ std::string Cane :: yamlRepresentation()
 	out << YAML::Key << "Vertices";
 	out << YAML::Value << YAML::BeginSeq;
 	for (unsigned int j = 0; j < this->shape.getVertices().size(); j++){
-		Point loc = this->shape.getVertices()[j];
+		Vector2f loc = this->shape.getVertices()[j];
 		out << YAML::BeginSeq;
 		out << zeroIfNaN(loc.x) << zeroIfNaN(loc.y);
+		out << YAML::EndSeq;
+	}
+	out << YAML::EndSeq;
+
+	out << YAML::Key << "Triangles";
+	out << YAML::Value << YAML::BeginSeq;
+	for (unsigned int j = 0; j < this->shape.tris.size(); j++){
+		out << YAML::BeginSeq;
+		out << this->shape.tris[j].c[0];
+		out << this->shape.tris[j].c[1];
+		out << this->shape.tris[j].c[2];
 		out << YAML::EndSeq;
 	}
 	out << YAML::EndSeq;

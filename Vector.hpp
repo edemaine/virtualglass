@@ -31,178 +31,186 @@ public:
 
 template< typename NUM >
 class Vector< NUM, 0 > {
-public:
-	NUM *c; //sure, why not.
-	//empty.
+	public:
+		NUM *c; //sure, why not.
+		//empty.
 };
 
 template< typename NUM >
 class Vector< NUM, 2 > {
-public:
+	public:
 #ifndef NOUNION
-	union {
+		union {
 #endif
-		NUM c[2];
+			NUM c[2];
 #ifndef NOUNION
-		struct {
-			NUM x;
-			NUM y;
+			struct {
+				NUM x;
+				NUM y;
+			};
+			struct {
+				NUM u;
+				NUM v;
+			};
 		};
-		struct {
-			NUM u;
-			NUM v;
-		};
-	};
 #endif
-	NUM & operator[](int const &i) {
-		return c[i];
-	}
-	const NUM & operator[](int const &i) const {
-		return c[i];
-	}
-	template< typename NUM2 >
-	inline Vector< NUM, 2 > &operator=( Vector< NUM2, 2 > const & b) {
-		for (unsigned int i = 0; i < 2; ++i) {
-			c[i] = (NUM)b.c[i];
+		NUM & operator[](int const &i) {
+			return c[i];
 		}
-		return *this;
-	}
+		const NUM & operator[](int const &i) const {
+			return c[i];
+		}
+		template< typename NUM2 >
+		inline Vector< NUM, 2 > &operator=( Vector< NUM2, 2 > const & b) {
+			for (unsigned int i = 0; i < 2; ++i) {
+				c[i] = (NUM)b.c[i];
+			}
+			return *this;
+		}
 
 };
 
 
 template< typename NUM >
 class Vector< NUM, 3 > {
-public:
+	public:
 #ifndef NOUNION
-	union {
+		union {
 #endif
-		NUM c[3];
+			NUM c[3];
 #ifndef NOUNION
-		struct {
-			NUM x;
-			NUM y;
-			NUM z;
-		};
-		struct {
-			Vector< NUM, 2 > xy;
-			NUM pad1;
-		};
-		struct {
-			NUM pad2;
-			Vector< NUM, 2 > yz;
-		};
-		struct {
-			NUM r;
-			NUM g;
-			NUM b;
-		};
-		struct {
-			NUM h;
-			NUM s;
-			NUM v;
-		};
+			struct {
+				NUM x;
+				NUM y;
+				NUM z;
+			};
+			struct {
+				Vector< NUM, 2 > xy;
+				NUM pad1;
+			};
+			struct {
+				NUM pad2;
+				Vector< NUM, 2 > yz;
+			};
+			struct {
+				NUM r;
+				NUM g;
+				NUM b;
+			};
+			struct {
+				NUM h;
+				NUM s;
+				NUM v;
+			};
 
-	};
+		};
 #endif
-	NUM & operator[](int const &i) {
-		return c[i];
-	}
-	const NUM & operator[](int const &i) const {
-		return c[i];
-	}
-	template< typename NUM2 >
-	inline Vector< NUM, 3 > &operator=( Vector< NUM2, 3 > const & b) {
-		for (unsigned int i = 0; i < 3; ++i) {
-			c[i] = (NUM)b.c[i];
+		NUM & operator[](int const &i) {
+			return c[i];
 		}
-		return *this;
-	}
+		const NUM & operator[](int const &i) const {
+			return c[i];
+		}
+		template< typename NUM2 >
+		inline Vector< NUM, 3 > &operator=( Vector< NUM2, 3 > const & b) {
+			for (unsigned int i = 0; i < 3; ++i) {
+				c[i] = (NUM)b.c[i];
+			}
+			return *this;
+		}
 
-	void set(NUM const &v1, NUM const &v2, NUM const &v3) {
-		c[0] = v1;
-		c[1] = v2;
-		c[2] = v3;
-	}
+		void set(NUM const &v1, NUM const &v2, NUM const &v3) {
+			c[0] = v1;
+			c[1] = v2;
+			c[2] = v3;
+		}
 
 };
 
 
 template< typename NUM >
 class Vector< NUM, 4 > {
-public:
+	public:
 #ifndef NOUNION
-	union {
+		union {
 #endif
-		NUM c[4];
+			NUM c[4];
 #ifndef NOUNION
-		struct {
-			NUM x;
-			NUM y;
-			NUM z;
-			NUM w;
+			struct {
+				NUM x;
+				NUM y;
+				NUM z;
+				NUM w;
+			};
+			struct {
+				NUM r;
+				NUM g;
+				NUM b;
+				NUM a;
+			};
+			struct {
+				NUM pad1;
+				Vector< NUM, 2 > yz;
+				NUM pad2;
+			};
+			struct {
+				Vector< NUM, 2 > xy;
+				Vector< NUM, 2 > zw;
+			};
+			struct {
+				Vector< NUM, 3 > xyz;
+				NUM pad3;
+			};
+			struct {
+				NUM pad4;
+				Vector< NUM, 3 > yzw;
+			};
 		};
-		struct {
-			NUM r;
-			NUM g;
-			NUM b;
-			NUM a;
-		};
-		struct {
-			NUM pad1;
-			Vector< NUM, 2 > yz;
-			NUM pad2;
-		};
-		struct {
-			Vector< NUM, 2 > xy;
-			Vector< NUM, 2 > zw;
-		};
-		struct {
-			Vector< NUM, 3 > xyz;
-			NUM pad3;
-		};
-		struct {
-			NUM pad4;
-			Vector< NUM, 3 > yzw;
-		};
-	};
 #endif
-	NUM & operator[](int const &i) {
-		return c[i];
-	}
-	const NUM & operator[](int const &i) const {
-		return c[i];
-	}
-
-	template< typename NUM2 >
-	inline Vector< NUM, 4 > &operator=( Vector< NUM2, 4 > const & b) {
-		for (unsigned int i = 0; i < 4; ++i) {
-			c[i] = (NUM)b.c[i];
+		NUM & operator[](int const &i) {
+			return c[i];
 		}
-		return *this;
-	}
+		const NUM & operator[](int const &i) const {
+			return c[i];
+		}
+
+		template< typename NUM2 >
+		inline Vector< NUM, 4 > &operator=( Vector< NUM2, 4 > const & b) {
+			for (unsigned int i = 0; i < 4; ++i) {
+				c[i] = (NUM)b.c[i];
+			}
+			return *this;
+		}
 
 };
 
 
+typedef Vector<   double, 2 > Vector2d ;
+typedef Vector<    float, 2 > Vector2f ;
+typedef Vector<  int32_t, 2 > Vector2i ;
+typedef Vector<  int16_t, 2 > Vector2s ;
+typedef Vector<   int8_t, 2 > Vector2b ;
+typedef Vector< uint32_t, 2 > Vector2ui ;
+typedef Vector< uint16_t, 2 > Vector2us ;
+typedef Vector<  uint8_t, 2 > Vector2ub ;
 
-typedef Vector< double, 2 > Vector2d ;
-typedef Vector<  float, 2 > Vector2f ;
-typedef Vector<    int, 2 > Vector2i ;
-typedef Vector<    short, 2 > Vector2s ;
-typedef Vector< unsigned int, 2 > Vector2ui ;
+typedef Vector<   double, 3 > Vector3d ;
+typedef Vector<    float, 3 > Vector3f ;
+typedef Vector<  int32_t, 3 > Vector3i ;
+typedef Vector<  int16_t, 3 > Vector3s ;
+typedef Vector<   int8_t, 3 > Vector3b ;
+typedef Vector< uint32_t, 3 > Vector3ui ;
+typedef Vector< uint16_t, 3 > Vector3us ;
+typedef Vector<  uint8_t, 3 > Vector3ub ;
 
-typedef Vector< double, 3 > Vector3d ;
-typedef Vector<  float, 3 > Vector3f ;
-typedef Vector<    int, 3 > Vector3i ;
-typedef Vector<    short, 3 > Vector3s ;
-typedef Vector< unsigned int, 3 > Vector3ui ;
-
-typedef Vector< double, 4 > Vector4d ;
-typedef Vector<  float, 4 > Vector4f ;
-typedef Vector<    int, 4 > Vector4i ;
-typedef Vector<    short, 4 > Vector4s ;
-typedef Vector< unsigned int, 4 > Vector4ui ;
+typedef Vector<   double, 4 > Vector4d ;
+typedef Vector<    float, 4 > Vector4f ;
+typedef Vector<  int32_t, 4 > Vector4i ;
+typedef Vector<  int16_t, 4 > Vector4s ;
+typedef Vector<   int8_t, 4 > Vector4b ;
+typedef Vector< uint32_t, 4 > Vector4ui ;
+typedef Vector< uint16_t, 4 > Vector4us ;
+typedef Vector<  uint8_t, 4 > Vector4ub ;
 
 //these should be cunningly optimized.
 template< typename NUM, int SIZE >
@@ -220,6 +228,16 @@ inline void operator+=( Vector< NUM, SIZE > &a, Vector< NUM, SIZE > const & b) {
 		a.c[i] += b.c[i];
 	}
 }
+
+template< typename NUM, int SIZE >
+inline NUM sum( Vector< NUM, SIZE > const &v) {
+	NUM ret = 0;
+	for (unsigned int i = 0; i < SIZE; ++i) {
+		ret += v.c[i];
+	}
+	return ret;
+}
+
 
 template< typename NUM, int SIZE >
 inline void operator-=( Vector< NUM, SIZE > &a, Vector< NUM, SIZE > const & b) {
@@ -479,8 +497,8 @@ istream &operator>>(istream &in, Vector< NUM, SIZE > &vec) {
 			}
 		}
 		if (!(in >> vec.c[i])) {
-			in.setstate( std::ios::failbit );
-			return in;
+				in.setstate( std::ios::failbit );
+				return in;
 		}
 	}
 	if (!(in >> c) || c != ')') {
@@ -626,5 +644,13 @@ typedef HashVector< float, 4 > HashVector4f;
 typedef HashVector< double, 2 > HashVector2d;
 typedef HashVector< double, 3 > HashVector3d;
 typedef HashVector< double, 4 > HashVector4d;
+
+typedef HashVector< int32_t, 2 > HashVector2i;
+typedef HashVector< int32_t, 3 > HashVector3i;
+typedef HashVector< int32_t, 4 > HashVector4i;
+
+typedef HashVector< uint32_t, 2 > HashVector2ui;
+typedef HashVector< uint32_t, 3 > HashVector3ui;
+typedef HashVector< uint32_t, 4 > HashVector4ui;
 
 #endif

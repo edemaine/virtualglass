@@ -41,7 +41,7 @@ public slots:
 	void geometryHeightEvent(int);
 	void shapeTypeEvent(int);
 	void shapeSizeEvent(int);
-        void changeAlphaEvent(int i);
+	void changeAlphaEvent(int i);
 	void caneChanged();
 	void modeChanged(int mode);
 	void projectionChanged();
@@ -51,6 +51,7 @@ public slots:
 	void exportCaneDialog();
 	void newBrandCaneDialog();
 	void changeBgColorDialog();
+	void loadSVGFileDialog();
 	void saveObjFileDialog();
 	void saveRawFile();
 	void libraryCaneDestroyed(QObject* obj);

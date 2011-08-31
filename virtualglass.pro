@@ -22,12 +22,15 @@ win32 {
 
 QMAKE_CFLAGS_DEBUG += -Wall -Werror -g
 QMAKE_CFLAGS_RELEASE += -Wall -Werror -g
-QMAKE_CXXFLAGS += -Wall -Werror -g
+QMAKE_CXXFLAGS += -Wall -Werror -g -std=gnu++0x
 
 # Input
 HEADERS += mainwindow.h openglwidget.h cane.h primitives.h model.h controller.h librarycanewidget.h \
 	constants.h canehistory.h geometry.h mesh.h keyqlistview.h canefile.h caneshape.h Vector.hpp \
-	recipewidget.h Box.hpp
+	recipewidget.h Box.hpp \
+	Vector.hpp Matrix.hpp Box.hpp \
+	SVG.hpp PlanarMap.hpp MersenneTwister.hpp \
+
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
 	yaml-cpp/include/yaml-cpp/traits.h \
@@ -79,7 +82,9 @@ HEADERS += yaml-cpp/src/token.h \
 	yaml-cpp/src/collectionstack.h
 
 SOURCES += main.cpp mainwindow.cpp openglwidget.cpp cane.cpp model.cpp controller.cpp librarycanewidget.cpp \
-	canehistory.cpp geometry.cpp mesh.cpp canefile.cpp caneshape.cpp recipewidget.cpp
+	canehistory.cpp geometry.cpp mesh.cpp canefile.cpp caneshape.cpp recipewidget.cpp \
+	SVG.cpp PlanarMap.cpp \
+
 
 SOURCES += yaml-cpp/src/tag.cpp \
 	yaml-cpp/src/stream.cpp \

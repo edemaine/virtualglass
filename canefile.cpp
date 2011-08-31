@@ -57,21 +57,35 @@ void parseCaneFromYAML(const YAML::Node& node, Cane* cane)
 	}
 
 	const YAML::Node& caneVertices = newNode["Vertices"];
-	vector<Point> vertices;
-	vertices.clear();
+	vector< Vector2f > vertices;
 
 	for(YAML::Iterator it2 = caneVertices.begin(); it2 != caneVertices.end(); ++it2)
 	{
 		const YAML::Node& caneVertex = *it2;
-		Point loc;
+		Vector2f loc;
 
 		caneVertex[0] >> loc.x;
 		caneVertex[1] >> loc.y;
-		loc.z = 0.0;
 		vertices.push_back(loc);
 	}
 
 	cane->shape.setByVertices(vertices);
+
+	const YAML::Node& caneTriangles = newNode["Triangles"];
+	vector< Vector3ui > tris;
+
+	for(YAML::Iterator it2 = caneTriangles.begin(); it2 != caneTriangles.end(); ++it2)
+	{
+		const YAML::Node& caneTriangle = *it2;
+		Vector3ui tri;
+		caneTriangle[0] >> tri.c[0];
+		caneTriangle[1] >> tri.c[1];
+		caneTriangle[2] >> tri.c[2];
+		tris.push_back(tri);
+	}
+
+	cane->shape.tris = tris;
+
 
 	newNode["Number of Subcanes"] >> cane->subcaneCount;
 

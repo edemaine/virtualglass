@@ -1,4 +1,16 @@
 #include "mainwindow.h"
+#include "SVG.hpp"
+#include "PlanarMap.hpp"
+
+#include <set>
+#include <map>
+#include <deque>
+#include <limits>
+
+using std::set;
+using std::map;
+using std::deque;
+using std::numeric_limits;
 
 MainWindow::MainWindow(Model* model)
 {
@@ -43,6 +55,13 @@ void MainWindow::setupMenuBar()
 	connect(exportCane, SIGNAL(triggered()), this, SLOT(exportCaneDialog()));
 	exportCane->setShortcut(QKeySequence("CTRL+S"));
 	fileMenu->addAction(exportCane);
+
+	fileMenu->addSeparator();
+
+	QAction* loadSVG = new QAction(tr("Cane from SVG"), this);
+	loadSVG->setStatusTip(tr("Create a cane based on an SVG file"));
+	connect(loadSVG, SIGNAL(triggered()), this, SLOT(loadSVGFileDialog()));
+	fileMenu->addAction(loadSVG);
 
 	fileMenu->addSeparator();
 
@@ -788,6 +807,218 @@ void MainWindow::newBrandCaneDialog()
 void MainWindow::changeBgColorDialog()
 {
 	openglWidget->setBgColor(QColorDialog::getColor());
+}
+
+class SVGPath {
+public:
+	SVGPath() : color(make_vector(0.5f, 0.5f, 0.5f, 1.0f)) {
+	}
+	Vector4f color;
+	vector< Vector2d > points;
+	vector< Vector3ui > tris;
+};
+
+void remove_triangle(Vector3ui const &tri, map< Vector2ui, Vector3ui > &edge_to_tri, set< Vector3ui > &unclaimed_tris) {
+	for (unsigned int i = 0; i < 3; ++i) {
+		Vector2ui edge = make_vector(tri.c[i], tri.c[(i+1)%3]);
+		map< Vector2ui, Vector3ui >::iterator f = edge_to_tri.find(edge);
+		assert(f != edge_to_tri.end());
+		edge_to_tri.erase(f);
+	}
+	set< Vector3ui >::iterator tf = unclaimed_tris.find(tri);
+	assert(tf != unclaimed_tris.end());
+	unclaimed_tris.erase(tf);
+}
+
+void run_nodes(double tol, SVG::Matrix const &prev_xform, SVG::Node const &node, Vector2d &center, double &inch, vector< SVGPath > &paths) {
+	SVG::Matrix xform = prev_xform * make_matrix(node.transform, transpose(make_matrix(make_vector(0.0, 0.0, 1.0))));
+	if (node.tag == "inch") {
+		//TODO: run node and children and set inch to x bounds.
+		return;
+	} else if (node.tag == "center") {
+		//TODO: run node and children and set center to xform'd center of bounds
+		return;
+	} else if (node.tag != "") {
+		std::cerr << "WARNING: ignoring tag '" << node.tag << "' in SVG." << std::endl;
+		return;
+	}
+	vector< vector< Vector2d > > node_paths;
+	node.execute(xform, tol, node_paths);
+	Box2d bounds;
+	bounds.min = make_vector< double, 2 >(numeric_limits< double >::infinity());
+	bounds.max = make_vector< double, 2 >(-numeric_limits< double >::infinity());
+	for (vector< vector< Vector2d > >::iterator path = node_paths.begin(); path != node_paths.end(); ++path) {
+		for (vector< Vector2d >::const_iterator v = path->begin(); v != path->end(); ++v) {
+			bounds.min = min(bounds.min, *v);
+			bounds.max = max(bounds.max, *v);
+		}
+	}
+
+	if (bounds.min.x < bounds.max.x) {
+		vector< Vector2d > points;
+		vector< Vector3ui > tris;
+		PlanarMap::fill(node.fill_rule, node_paths, bounds, points, tris);
+
+		set< Vector3ui > unclaimed_tris(tris.begin(), tris.end()); //should be an unordered_set but I don't recall how to get that to compile on OSX.
+		map< Vector2ui, Vector3ui > edge_to_tri;
+		for (vector< Vector3ui >::const_iterator tri = tris.begin(); tri != tris.end(); ++tri) {
+			assert(!edge_to_tri.count(make_vector(tri->c[0], tri->c[1])));
+			assert(!edge_to_tri.count(make_vector(tri->c[1], tri->c[2])));
+			assert(!edge_to_tri.count(make_vector(tri->c[2], tri->c[0])));
+			edge_to_tri.insert(make_pair(make_vector(tri->c[0], tri->c[1]), *tri));
+			edge_to_tri.insert(make_pair(make_vector(tri->c[1], tri->c[2]), *tri));
+			edge_to_tri.insert(make_pair(make_vector(tri->c[2], tri->c[0]), *tri));
+		}
+		std::cout << " --- doing segment --- " << std::endl;
+		std::cout << "Triangles:\n";
+		for (vector< Vector3ui >::const_iterator tri = tris.begin(); tri != tris.end(); ++tri) {
+			std::cout << " " << *tri << "\n";
+		}
+
+		while (!unclaimed_tris.empty()) {
+			Vector3ui seed = *unclaimed_tris.begin();
+			std::cout << " seed: " << seed << std::endl;
+			remove_triangle(seed, edge_to_tri, unclaimed_tris);
+			vector< Vector3ui > used_triangles(1, seed);
+			vector< Vector2ui > edges_to_expand;
+			edges_to_expand.push_back(make_vector(seed[0],seed[1]));
+			edges_to_expand.push_back(make_vector(seed[1],seed[2]));
+			edges_to_expand.push_back(make_vector(seed[2],seed[0]));
+			while (!edges_to_expand.empty()) {
+				Vector2ui last_edge = edges_to_expand.back();
+				std::cout << "  doing edge: " << last_edge << std::endl;
+				edges_to_expand.pop_back();
+				//see if we can expand this edge by finding a triangle on the other side of it:
+				map< Vector2ui, Vector3ui >::iterator f = edge_to_tri.find(make_vector(last_edge[1], last_edge[0]));
+				if (f == edge_to_tri.end()) {
+					//No triangle. This edge is done!
+					std::cout << "   nothin'" << std::endl;
+					continue;
+				}
+				//There was a triangle. 
+				Vector3ui tri = f->second;
+				std::cout << "   tri: " << tri << std::endl;
+				//remove free triangle data structures, add to claimed list:
+				remove_triangle(tri, edge_to_tri, unclaimed_tris);
+				used_triangles.push_back(tri);
+				//Figure out which new edges to add:
+				bool found = false;
+				for (unsigned int i = 0; i < 3; ++i) {
+					unsigned int a = tri[i];
+					unsigned int b = tri[(i+1)%3];
+					unsigned int c = tri[(i+2)%3];
+					if (a == last_edge[1] && b == last_edge[0]) {
+						assert(!found);
+						found = true;
+						edges_to_expand.push_back(make_vector(b,c));
+						edges_to_expand.push_back(make_vector(c,a));
+					}
+				}
+				assert(found);
+			} //while (edges to expand)
+
+			assert(!used_triangles.empty());
+
+			SVGPath path;
+			path.color = node.fill_paint.color;
+			path.color.w *= node.fill_paint.opacity;
+
+			vector< unsigned int > new_idx(points.size(), -1U);
+			for (vector< Vector3ui >::const_iterator tri = used_triangles.begin(); tri != used_triangles.end(); ++tri) {
+				Vector3ui out = *tri;
+				for (unsigned int i = 0; i < 3; ++i) {
+					unsigned int &v = out[i];
+					assert(v < new_idx.size());
+					if (new_idx[v] >= path.points.size()) {
+						new_idx[v] = path.points.size();
+						path.points.push_back(points[v]);
+					}
+					v = new_idx[v];
+				}
+				path.tris.push_back(out);
+			}
+			std::cout << " -> path with " << path.tris.size() << " triangles over " << path.points.size() << " points." << std::endl;
+
+			std::cout << "triangles:";
+			for (vector< Vector3ui >::const_iterator t = path.tris.begin(); t != path.tris.end(); ++t) {
+				std::cout << " " << *t;
+			}
+			std::cout << std::endl;
+
+			paths.push_back(path);
+		} //while (triangles exist to claim)
+
+	} //if (nonempty node)
+
+	for (std::list< SVG::Node >::const_iterator n = node.children.begin(); n != node.children.end(); ++n) {
+		run_nodes(tol, xform, *n, center, inch, paths);
+	}
+
+}
+
+void MainWindow::loadSVGFileDialog()
+{
+	QString file = QFileDialog::getOpenFileName(this, tr("Load SVG file"), "", tr("Scalable Vector Graphics files (*.svg);;All files (*)"));
+	if (!file.isNull())
+	{
+		SVG::SVG svg;
+		if (!SVG::load_svg(qPrintable(file), svg))
+		{
+			QMessageBox::warning(this, tr("Loading SVG file failed."), tr("Loading a cane from SVG failed. There may be words about this on the console."));
+		}
+		else
+		{
+			double page_rad = length(svg.page);
+			if (page_rad == 0.0) {
+				std::cerr << "WARNING: page is very small." << std::endl;
+				page_rad = 1.0;
+			}
+			//map SVG page to unit square -- will actually remap later
+			//based on contained scale data, but this is a starting point.
+			SVG::Matrix page_to_unit = identity_matrix< double, 2, 3 >();
+			page_to_unit(0,0) =  2.0 / page_rad;
+			page_to_unit(1,1) = -2.0 / page_rad; //flip SVG coords to reasonable coords.
+			page_to_unit(0,2) = -0.5 * svg.page.x * page_to_unit(0,0);
+			page_to_unit(1,2) = -0.5 * svg.page.y * page_to_unit(1,1);
+
+			Vector2d center = make_vector(0.0, 0.0);
+			double inch = 1.0;
+			vector< SVGPath > paths;
+			run_nodes(0.01, page_to_unit, svg.root, center, inch, paths);
+
+
+			//Cane* base = new Cane(BUNDLE_CANETYPE);
+			for (vector< SVGPath >::iterator path = paths.begin(); path != paths.end(); ++path) {
+				assert(!path->tris.empty());
+				Box2d bounds;
+				bounds.min = make_vector< double, 2 >(numeric_limits< double >::infinity());
+				bounds.max = -bounds.min;
+				for (vector< Vector2d >::const_iterator p = path->points.begin(); p != path->points.end(); ++p) {
+					bounds.min = min(bounds.min, *p);
+					bounds.max = max(bounds.max, *p);
+				}
+				assert(bounds.min.x <= bounds.max.x);
+				assert(bounds.min.y <= bounds.max.y);
+
+				Vector2d center = bounds.center();
+
+				Cane* child = new Cane(BASE_POLYGONAL_CANETYPE);
+				child->color = path->color;
+				child->shape.type = UNDEFINED_SHAPE;
+				child->shape.vertices.resize(path->points.size());
+				for (unsigned int i = 0; i < path->points.size(); ++i) {
+					child->shape.vertices[i] = make_vector< float >(path->points[i] - center);
+				}
+				child->shape.tris = path->tris;
+				child->shape.diameter = 1.0f;
+				model->setCane(child);
+				saveCaneToLibrary();
+
+				//TODO: figure out how not to leak 'base'
+			}
+
+		}
+	}
 }
 
 void MainWindow::saveObjFileDialog()

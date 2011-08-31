@@ -2,7 +2,6 @@
 #define MATRIX_HPP
 
 #include "Vector.hpp"
-#include "Quat.hpp"
 
 #include <assert.h>
 
@@ -259,30 +258,6 @@ Matrix< NUM, ROWS, COLS > identity_matrix() {
 		ret(i,i) = 1;
 	}
 	return ret;
-}
-
-template< typename NUM >
-Matrix< NUM, 3, 3 > rotation_matrix(Quat< NUM > const &a) {
-	NUM wx = a.w * a.x;
-	NUM wy = a.w * a.y;
-	NUM wz = a.w * a.z;
-
-	NUM xx = a.x * a.x;
-	NUM xy = a.x * a.y;
-	NUM xz = a.x * a.z;
-
-	NUM yy = a.y * a.y;
-	NUM yz = a.y * a.z;
-
-	NUM zz = a.z * a.z;
-
-	NUM res[9] = {
-		1 - 2*yy - 2*zz,	2 * xy + 2 * wz,	2 * xz - 2 * wy,
-		2 * xy - 2 * wz,	1 - 2*xx - 2*zz,	2 * yz + 2 * wx,
-		2 * xz + 2 * wy,	2 * yz - 2 * wx,	1 - 2*xx - 2*yy
-	};
-	return make_matrix< NUM, 3, 3 >(res);
-
 }
 
 #include <iostream>
