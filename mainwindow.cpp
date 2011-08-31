@@ -830,13 +830,47 @@ void remove_triangle(Vector3ui const &tri, map< Vector2ui, Vector3ui > &edge_to_
 	unclaimed_tris.erase(tf);
 }
 
+//get bounds, without actually going to all the trouble of triangulating:
+void update_bounds(double tol, SVG::Matrix const &xform, SVG::Node const &node, Box2d &bounds) {
+	vector< vector< Vector2d > > node_paths;
+	node.execute(xform, tol, node_paths);
+	for (vector< vector< Vector2d > >::iterator path = node_paths.begin(); path != node_paths.end(); ++path) {
+		for (vector< Vector2d >::const_iterator v = path->begin(); v != path->end(); ++v) {
+			bounds.min = min(bounds.min, *v);
+			bounds.max = max(bounds.max, *v);
+		}
+	}
+
+	for (std::list< SVG::Node >::const_iterator n = node.children.begin(); n != node.children.end(); ++n) {
+		SVG::Matrix next_xform = xform * make_matrix(n->transform, transpose(make_matrix(make_vector(0.0, 0.0, 1.0))));
+		update_bounds(tol, next_xform, *n, bounds);
+	}
+}
+
 void run_nodes(double tol, SVG::Matrix const &prev_xform, SVG::Node const &node, Vector2d &center, double &inch, vector< SVGPath > &paths) {
 	SVG::Matrix xform = prev_xform * make_matrix(node.transform, transpose(make_matrix(make_vector(0.0, 0.0, 1.0))));
-	if (node.tag == "inch") {
-		//TODO: run node and children and set inch to x bounds.
-		return;
-	} else if (node.tag == "center") {
-		//TODO: run node and children and set center to xform'd center of bounds
+	if (node.tag == "inch" || node.tag == "center") {
+		//need to run children to get center or size:
+		double diag_scale = length(xform * make_vector(1.0, 1.0, 0.0));
+		double sub_tol = tol;
+		if (diag_scale > 0.001) {
+			sub_tol /= diag_scale;
+		}
+		Box2d bounds;
+		bounds.min = make_vector< double, 2 >(numeric_limits< double >::infinity());
+		bounds.max = make_vector< double, 2 >(-numeric_limits< double >::infinity());
+		SVG::Matrix identity = identity_matrix< double, 2, 3 >();
+
+		update_bounds(sub_tol, identity, node, bounds);
+		if (bounds.min.x <= bounds.max.x) {
+			if (node.tag == "center") {
+				center = xform * make_vector(bounds.center(), 1.0);
+			} else if (node.tag == "inch") {
+				inch = length(xform * make_vector(bounds.size().x, 0.0, 0.0));
+			} else {
+				assert(0);
+			}
+		}
 		return;
 	} else if (node.tag != "") {
 		std::cerr << "WARNING: ignoring tag '" << node.tag << "' in SVG." << std::endl;
@@ -869,15 +903,9 @@ void run_nodes(double tol, SVG::Matrix const &prev_xform, SVG::Node const &node,
 			edge_to_tri.insert(make_pair(make_vector(tri->c[1], tri->c[2]), *tri));
 			edge_to_tri.insert(make_pair(make_vector(tri->c[2], tri->c[0]), *tri));
 		}
-		std::cout << " --- doing segment --- " << std::endl;
-		std::cout << "Triangles:\n";
-		for (vector< Vector3ui >::const_iterator tri = tris.begin(); tri != tris.end(); ++tri) {
-			std::cout << " " << *tri << "\n";
-		}
 
 		while (!unclaimed_tris.empty()) {
 			Vector3ui seed = *unclaimed_tris.begin();
-			std::cout << " seed: " << seed << std::endl;
 			remove_triangle(seed, edge_to_tri, unclaimed_tris);
 			vector< Vector3ui > used_triangles(1, seed);
 			vector< Vector2ui > edges_to_expand;
@@ -886,18 +914,15 @@ void run_nodes(double tol, SVG::Matrix const &prev_xform, SVG::Node const &node,
 			edges_to_expand.push_back(make_vector(seed[2],seed[0]));
 			while (!edges_to_expand.empty()) {
 				Vector2ui last_edge = edges_to_expand.back();
-				std::cout << "  doing edge: " << last_edge << std::endl;
 				edges_to_expand.pop_back();
 				//see if we can expand this edge by finding a triangle on the other side of it:
 				map< Vector2ui, Vector3ui >::iterator f = edge_to_tri.find(make_vector(last_edge[1], last_edge[0]));
 				if (f == edge_to_tri.end()) {
 					//No triangle. This edge is done!
-					std::cout << "   nothin'" << std::endl;
 					continue;
 				}
 				//There was a triangle. 
 				Vector3ui tri = f->second;
-				std::cout << "   tri: " << tri << std::endl;
 				//remove free triangle data structures, add to claimed list:
 				remove_triangle(tri, edge_to_tri, unclaimed_tris);
 				used_triangles.push_back(tri);
@@ -937,13 +962,6 @@ void run_nodes(double tol, SVG::Matrix const &prev_xform, SVG::Node const &node,
 				}
 				path.tris.push_back(out);
 			}
-			std::cout << " -> path with " << path.tris.size() << " triangles over " << path.points.size() << " points." << std::endl;
-
-			std::cout << "triangles:";
-			for (vector< Vector3ui >::const_iterator t = path.tris.begin(); t != path.tris.end(); ++t) {
-				std::cout << " " << *t;
-			}
-			std::cout << std::endl;
 
 			paths.push_back(path);
 		} //while (triangles exist to claim)
@@ -985,9 +1003,27 @@ void MainWindow::loadSVGFileDialog()
 			double inch = 1.0;
 			vector< SVGPath > paths;
 			run_nodes(0.01, page_to_unit, svg.root, center, inch, paths);
+			std::cerr << "Inch is " << inch << " units." << std::endl;
+			std::cerr << "Center is at " << center << "." << std::endl;
+			double to_inches = 1.0;
+			if (inch > 0.001) {
+				to_inches = 1.0 / inch;
+			}
+			//Center on 'center' and convert to inches:
+			Box2d test_bounds;
+			test_bounds.min = make_vector< double, 2 >(numeric_limits< double >::infinity());
+			test_bounds.max = -test_bounds.min;
+			for (vector< SVGPath >::iterator path = paths.begin(); path != paths.end(); ++path) {
+				for (vector< Vector2d >::iterator p = path->points.begin(); p != path->points.end(); ++p) {
+					*p = (*p - center) * to_inches;
+					test_bounds.min = min(test_bounds.min, *p);
+					test_bounds.max = max(test_bounds.max, *p);
+				}
+			}
+			std::cerr << "After transformation, cane fits in " << test_bounds.min << " to " << test_bounds.max << " box." << std::endl;
 
-
-			//Cane* base = new Cane(BUNDLE_CANETYPE);
+			//build cane:
+			Cane* base = new Cane(BUNDLE_CANETYPE);
 			for (vector< SVGPath >::iterator path = paths.begin(); path != paths.end(); ++path) {
 				assert(!path->tris.empty());
 				Box2d bounds;
@@ -1000,22 +1036,32 @@ void MainWindow::loadSVGFileDialog()
 				assert(bounds.min.x <= bounds.max.x);
 				assert(bounds.min.y <= bounds.max.y);
 
-				Vector2d center = bounds.center();
+				Vector2d local_center = bounds.center();
 
 				Cane* child = new Cane(BASE_POLYGONAL_CANETYPE);
 				child->color = path->color;
 				child->shape.type = UNDEFINED_SHAPE;
 				child->shape.vertices.resize(path->points.size());
 				for (unsigned int i = 0; i < path->points.size(); ++i) {
-					child->shape.vertices[i] = make_vector< float >(path->points[i] - center);
+					child->shape.vertices[i] = make_vector< float >(path->points[i] - local_center);
 				}
 				child->shape.tris = path->tris;
 				child->shape.diameter = 1.0f;
 				model->setCane(child);
 				saveCaneToLibrary();
+				if (base->subcaneCount < MAX_SUBCANE_COUNT) {
+					base->subcanes[base->subcaneCount] = child;
+					base->subcaneLocations[base->subcaneCount].xy = make_vector< float >(local_center);
+					base->subcaneLocations[base->subcaneCount].z = 0.0f;
+					base->subcaneCount += 1;
+				} else {
+					std::cout << "Ran out of subcanes." << std::endl;
+				}
 
 				//TODO: figure out how not to leak 'base'
 			}
+			model->setCane(base);
+			saveCaneToLibrary();
 
 		}
 	}
