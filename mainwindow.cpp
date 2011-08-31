@@ -432,6 +432,10 @@ void MainWindow :: exportCaneDialog(){
 	QString fileName =  QFileDialog::getSaveFileName(this, tr("Export Single Cane"),
 		"mycane.glass", tr("Glass (*.glass)"));
 
+	if (fileName==NULL)
+		return;
+	if (fileName=="")
+		return;
 	Cane* cane = this->openglWidget->getModel()->getCane();
 	if (cane == NULL)
 		return;
@@ -447,6 +451,10 @@ void MainWindow::exportLibraryDialog()
 {
 	QString fileName =  QFileDialog::getSaveFileName(this, tr("Export Cane Library"), "mycanes.glass", tr("Glass (*.glass)"));
 
+	if (fileName==NULL)
+		return;
+	if (fileName=="")
+		return;
 	vector<Cane*> canes;
 	QList<LibraryCaneWidget*> libraryList = libraryScrollArea->findChildren<LibraryCaneWidget*>();
 	for (int i = 0; i < libraryList.size(); ++i)
@@ -464,6 +472,10 @@ void MainWindow::importLibraryDialog()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Import Cane Library"), "", tr("Glass (*.glass)"));
 
+	if (fileName==NULL)
+		return;
+	if (fileName=="")
+		return;
 	vector<Cane*> canes = loadCanesFromFile(fileName);
 
 	for(unsigned i = 0; i < canes.size(); ++i) {
@@ -505,27 +517,27 @@ void MainWindow::setupCaneChangeDialog()
 	caneSplitter->addWidget(caneTypeListBox);
 	caneSplitter->addWidget(caneColorListBox);
 
-        // Alpha slider
-        caneAlphaSlider = new QSlider(Qt::Vertical, layout->widget());
-        caneAlphaSlider->setRange(0, 255);
-        QSplitter* alphaSliderLayout = new QSplitter(Qt::Vertical, layout->widget());
-        QLabel* alphaNameLabel = new QLabel("Opacity", alphaSliderLayout);
-        QLabel* alphaLsLabel = new QLabel("0%", alphaSliderLayout);
-        QLabel* alphaRsLabel = new QLabel("100%", alphaSliderLayout);
-        alphaSliderLayout->insertWidget(0, alphaNameLabel);
-        alphaSliderLayout->insertWidget(1, alphaRsLabel);
-        alphaSliderLayout->insertWidget(2, caneAlphaSlider);
-        alphaSliderLayout->insertWidget(3, alphaLsLabel);
+		// Alpha slider
+		caneAlphaSlider = new QSlider(Qt::Vertical, layout->widget());
+		caneAlphaSlider->setRange(0, 255);
+		QSplitter* alphaSliderLayout = new QSplitter(Qt::Vertical, layout->widget());
+		QLabel* alphaNameLabel = new QLabel("Opacity", alphaSliderLayout);
+		QLabel* alphaLsLabel = new QLabel("0%", alphaSliderLayout);
+		QLabel* alphaRsLabel = new QLabel("100%", alphaSliderLayout);
+		alphaSliderLayout->insertWidget(0, alphaNameLabel);
+		alphaSliderLayout->insertWidget(1, alphaRsLabel);
+		alphaSliderLayout->insertWidget(2, caneAlphaSlider);
+		alphaSliderLayout->insertWidget(3, alphaLsLabel);
 
-        caneSplitter->addWidget(alphaSliderLayout);
-        layout->addRow(caneSplitter);
+		caneSplitter->addWidget(alphaSliderLayout);
+		layout->addRow(caneSplitter);
 
 	connect(caneTypeListBox, SIGNAL(clicked(QModelIndex)), this,
 		SLOT(updateBrandColorPickerSublist(QModelIndex)));
 	connect(caneColorListBox, SIGNAL(clicked(QModelIndex)), this,
 		SLOT(updateBrandColorPickerColor(QModelIndex)));
-        connect(caneAlphaSlider, SIGNAL(valueChanged(int)),
-                        this, SLOT(changeAlphaEvent(int)));
+		connect(caneAlphaSlider, SIGNAL(valueChanged(int)),
+						this, SLOT(changeAlphaEvent(int)));
 
 	// Shape drop-down menu
 	// It is assumed that the constant values corresponding
@@ -579,7 +591,7 @@ void MainWindow::setupCaneChangeDialog()
 
 void MainWindow::changeAlphaEvent(int i)
 {
-        model->setSubcaneAlpha(caneChangeSubcane, i);
+		model->setSubcaneAlpha(caneChangeSubcane, i);
 }
 
 void MainWindow::cancelCaneChangeDialog()
@@ -921,7 +933,7 @@ void run_nodes(double tol, SVG::Matrix const &prev_xform, SVG::Node const &node,
 					//No triangle. This edge is done!
 					continue;
 				}
-				//There was a triangle. 
+				//There was a triangle.
 				Vector3ui tri = f->second;
 				//remove free triangle data structures, add to claimed list:
 				remove_triangle(tri, edge_to_tri, unclaimed_tris);
@@ -1088,54 +1100,54 @@ void MainWindow::toggleFlat()
 
 void MainWindow::setupButtonBar()
 {
-        int iconSize = this->size().height()/9;
+		int iconSize = this->size().height()/9;
 	pull_button = new QPushButton("Pull");
 	pull_button->setToolTip("Drag Mouse Horizontally to Twist, Vertically to Stretch. Use Shift to twist and stretch independently.");
 	pull_button->setShortcut(QKeySequence("CTRL+P"));
-        QImage pull_icon ("../src/icon_pull.png");
-        pull_button->setIcon(QPixmap::fromImage(pull_icon));
-        pull_button->setIconSize(QSize(iconSize,iconSize));
+		QImage pull_icon ("../src/icon_pull.png");
+		pull_button->setIcon(QPixmap::fromImage(pull_icon));
+		pull_button->setIconSize(QSize(iconSize,iconSize));
 	bundle_button = new QPushButton("Bundle");
 	bundle_button->setShortcut(QKeySequence("CTRL+B"));
-        QImage bundle_icon ("../src/icon_bundle.png");
-        bundle_button->setIcon(QPixmap::fromImage(bundle_icon));
-        bundle_button->setIconSize(QSize(iconSize,iconSize));
+		QImage bundle_icon ("../src/icon_bundle.png");
+		bundle_button->setIcon(QPixmap::fromImage(bundle_icon));
+		bundle_button->setIconSize(QSize(iconSize,iconSize));
 	flatten_button = new QPushButton("Flatten");
 	flatten_button->setToolTip("Drag Mouse Horizontally to Squish, Vertically to Flatten");
 	flatten_button->setShortcut(QKeySequence("CTRL+F"));
-        QImage flatten_icon ("../src/icon_flatten.png");
-        flatten_button->setIcon(QPixmap::fromImage(flatten_icon));
-        flatten_button->setIconSize(QSize(iconSize,iconSize));
+		QImage flatten_icon ("../src/icon_flatten.png");
+		flatten_button->setIcon(QPixmap::fromImage(flatten_icon));
+		flatten_button->setIconSize(QSize(iconSize,iconSize));
 	toggle2D_button = new QPushButton("2D View");
 	toggle2D_button->setToolTip(tr("Switch between 2D and 3D view."));
 	connect(toggle2D_button, SIGNAL(clicked()), this, SLOT(toggleFlat()));
-        QImage toggle2D_icon ("../src/icon_2dview.png");
-        toggle2D_button->setIcon(QPixmap::fromImage(toggle2D_icon));
-        toggle2D_button->setIconSize(QSize(iconSize,iconSize));
+		QImage toggle2D_icon ("../src/icon_2dview.png");
+		toggle2D_button->setIcon(QPixmap::fromImage(toggle2D_icon));
+		toggle2D_button->setIconSize(QSize(iconSize,iconSize));
 	undo_button = new QPushButton("Undo");
 	undo_button->setShortcut(QKeySequence("CTRL+Z"));
 	undo_button->setToolTip("Undo the last operation.");
-        QImage undo_icon ("../src/icon_undo.png");
-        undo_button->setIcon(QPixmap::fromImage(undo_icon));
-        undo_button->setIconSize(QSize(iconSize,iconSize));
+		QImage undo_icon ("../src/icon_undo.png");
+		undo_button->setIcon(QPixmap::fromImage(undo_icon));
+		undo_button->setIconSize(QSize(iconSize,iconSize));
 	redo_button = new QPushButton("Redo");
 	redo_button->setShortcut(QKeySequence("CTRL+Y"));
 	redo_button->setToolTip("Redo the last operation.");
-        QImage redo_icon ("../src/icon_redo.png");
-        redo_button->setIcon(QPixmap::fromImage(redo_icon));
-        redo_button->setIconSize(QSize(iconSize,iconSize));
+		QImage redo_icon ("../src/icon_redo.png");
+		redo_button->setIcon(QPixmap::fromImage(redo_icon));
+		redo_button->setIconSize(QSize(iconSize,iconSize));
 	save_button = new QPushButton("Save");
 	save_button->setToolTip("Save Current Model to Library");
 	save_button->setShortcut(QKeySequence("CTRL+S"));
-        QImage save_icon ("../src/icon_save.png");
-        save_button->setIcon(QPixmap::fromImage(save_icon));
-        save_button->setIconSize(QSize(iconSize,iconSize));
+		QImage save_icon ("../src/icon_save.png");
+		save_button->setIcon(QPixmap::fromImage(save_icon));
+		save_button->setIconSize(QSize(iconSize,iconSize));
 	clear_button = new QPushButton("Clear");
 	clear_button->setToolTip("Clear Current Model");
 	clear_button->setShortcut(QKeySequence("CTRL+R"));
-        QImage clear_icon ("../src/icon_clear.png");
-        clear_button->setIcon(QPixmap::fromImage(clear_icon));
-        clear_button->setIconSize(QSize(iconSize,iconSize));
+		QImage clear_icon ("../src/icon_clear.png");
+		clear_button->setIcon(QPixmap::fromImage(clear_icon));
+		clear_button->setIconSize(QSize(iconSize,iconSize));
 
 	previewLabel = new QLabel();
 	previewLabel->setFixedSize(100,100);
