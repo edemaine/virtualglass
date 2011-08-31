@@ -14,7 +14,13 @@ QT += opengl
 
 LIBS += -L../src/glew-1.6.0/lib
 unix {
-  LIBS += -lGLEW
+	LIBS += -lGLEW
+}
+unix:!macx {
+  QMAKE_CXXFLAGS += -std=gnu++0x
+}
+macx {
+  QMAKE_CXXFLAGS += -DUNORDERED_MAP_WORKAROUND
 }
 win32 {
   LIBS += -lglew32
@@ -23,7 +29,7 @@ LIBS += -lexpat
 
 QMAKE_CFLAGS_DEBUG += -Wall -Werror -g
 QMAKE_CFLAGS_RELEASE += -Wall -Werror -g
-QMAKE_CXXFLAGS += -Wall -Werror -g -std=gnu++0x
+QMAKE_CXXFLAGS += -Wall -Werror -g
 
 # Input
 HEADERS += mainwindow.h openglwidget.h cane.h primitives.h model.h controller.h librarycanewidget.h \

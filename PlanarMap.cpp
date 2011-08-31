@@ -4,8 +4,15 @@
 #include "Matrix.hpp"
 
 #include <algorithm>
+
+#ifdef UNORDERED_MAP_WORKAROUND
+#include <tr1/unordered_map>
+using std::tr1::unordered_map;
+#else
 #include <unordered_map>
-#include <unordered_set>
+using std::unordered_map;
+#endif
+
 
 using std::vector;
 using std::make_pair;
@@ -589,7 +596,7 @@ bool PlanarMap::peel_loop() {
 void PlanarMap::do_face_counts() {
 	if (face_loops.empty()) return;
 
-	std::unordered_map< Vector2ui, int, HashVector2ui > edge_to_count;
+	unordered_map< Vector2ui, int, HashVector2ui > edge_to_count;
 	assert(edge_counts.size() == edges.size());
 	for (vector< Vector2ui >::iterator e = edges.begin(); e != edges.end(); ++e) {
 		assert(!edge_to_count.count(*e));
@@ -599,7 +606,7 @@ void PlanarMap::do_face_counts() {
 		edge_to_count.insert(make_pair(rev,-edge_counts[e - edges.begin()]));
 	}
 
-	std::unordered_map< Vector2ui, unsigned int, HashVector2ui > edge_to_face;
+	unordered_map< Vector2ui, unsigned int, HashVector2ui > edge_to_face;
 	assert(loop_faces.size() == loops.size());
 	for (unsigned int l = 0; l < loops.size(); ++l) {
 		for (unsigned int i = 0; i < loops[l].size(); ++i) {
