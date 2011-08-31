@@ -19,6 +19,7 @@ unix {
 win32 {
   LIBS += -lglew32
 }
+LIBS += -lexpat
 
 QMAKE_CFLAGS_DEBUG += -Wall -Werror -g
 QMAKE_CFLAGS_RELEASE += -Wall -Werror -g
