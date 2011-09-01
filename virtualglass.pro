@@ -23,6 +23,7 @@ macx {
   QMAKE_CXXFLAGS += -DUNORDERED_MAP_WORKAROUND
 }
 win32 {
+  QMAKE_CXXFLAGS += -std=gnu++0x
   LIBS += -lglew32
 }
 LIBS += -lexpat
