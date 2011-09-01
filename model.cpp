@@ -260,9 +260,11 @@ void Model :: setCane(Cane* c)
 		case FLATTEN_CANETYPE:
 			mode = FLATTEN_MODE;
 			break;
+		case BASE_POLYGONAL_CANETYPE:
+			mode = NO_MODE;
+			break;
 	}
 	emit modeChanged(mode);
-		
 }
 
 void Model :: slowGeometryUpdate()

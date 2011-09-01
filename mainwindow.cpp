@@ -221,11 +221,13 @@ void MainWindow::caneChangeRequest(int subcane)
 	if (model->subcaneHasColorAndShape(subcane))
 	{
 		CaneShape* subcaneShape = model->getSubcaneShape(subcane);
+		Color* subcaneColor = model->getSubcaneColor(subcane);
 		if (subcaneShape->getType() != UNDEFINED_SHAPE)
 		{
 			caneShapeBox->setCurrentIndex(subcaneShape->getType()-1);
 			caneSizeSlider->setSliderPosition(((int) (subcaneShape->getDiameter() * 60)));
 		}
+		caneAlphaSlider->setSliderPosition(((int) (subcaneColor->a * 255)));
 		changeDialog->show();
 	}
 }
@@ -259,6 +261,9 @@ void MainWindow::modeChanged(int mode)
 	case FLATTEN_MODE:
 		modeLabel->setText("FLATTEN MODE");
 		displayTextMessage("Click and drag mouse up and down to square off cane, left and right to flatten cane",0);
+		break;
+	case NO_MODE:
+		modeLabel->setText("NO MODE");
 		break;
 	default:
 		modeLabel->setText("UNKNOWN MODE");

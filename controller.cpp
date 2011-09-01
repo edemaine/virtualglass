@@ -17,9 +17,7 @@ Controller::Controller(int argc, char **argv)
 	connect(model, SIGNAL(modeChanged(int)), mainWindow, SLOT(modeChanged(int)));
 	connect(model, SIGNAL(caneChanged()), mainWindow->openglWidget, SLOT(caneChanged()));
 	connect(model, SIGNAL(caneChanged()), mainWindow, SLOT(caneChanged()));
-	//connect(mainWindow->openglWidget, SIGNAL(finishedChangingCane()), mainWindow, SLOT(caneChanged()));
 	connect(model, SIGNAL(projectionChanged()), mainWindow, SLOT(projectionChanged()));
-
 
 	connect(model, SIGNAL(projectionChanged()), mainWindow->openglWidget, SLOT(projectionChanged()));
 
@@ -48,7 +46,7 @@ int Controller::startUp()
 {
 	mainWindow->showMaximized();
 	mainWindow->seedLibrary();
-	model->setMode(BUNDLE_MODE);
+	model->setMode(NO_MODE);
 	return app->exec();
 }
 

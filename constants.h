@@ -38,6 +38,7 @@
 #define MAX_ANCESTORS 20
 #define MAX_AMT_TYPES 5
 
+#define NO_MODE 1
 #define PULL_MODE 2
 #define BUNDLE_MODE 4
 #define FLATTEN_MODE 5

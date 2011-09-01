@@ -8,9 +8,7 @@ Features:
 
 MODES:
 The OpenGLWidget object has a mode for each type of modification
-the user can make to the cane (in addition to a LOOK_MODE, which
-changes the orientation of the cane only). Changing modes is handled by
-other parts of the GUI.
+the user can make to the cane 
 */
 
 #include "openglwidget.h"
