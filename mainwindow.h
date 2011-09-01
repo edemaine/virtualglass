@@ -82,7 +82,8 @@ private:
 	void setupStatusBar();
 	void setupWorkArea();
 	void setupMenuBar();
-	void setupCaneChangeDialog();
+	void setupChangeDialog();
+	void setupArrangementDialog();
         void checkButton(int mode);
 
 	void loadOfficialCanes();
@@ -100,8 +101,10 @@ private:
 	QScrollArea* scrollArea;
 	QScrollArea* libraryScrollArea;
 	QVBoxLayout* operButton_layout;
+	QWidget* casLayoutWidget;
 	QWidget* oglLayoutWidget;
 	QSlider* oglGeometryHeightSlider;
+	QSlider* arrangementSizeSlider;
 	QBoxLayout* stockLayout;
 	QStackedLayout* stackLayout;
 	QTabWidget* tabWidget;
@@ -115,6 +118,7 @@ private:
 	Color savedColor;
 	CaneShape savedShape;
 	QDialog* changeDialog;
+	QDialog* arrangementDialog;
 	QSplitter* caneSplitter;
 	QStringListModel* caneTypeListModel;
 		KeyQListView* caneTypeListBox;

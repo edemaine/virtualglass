@@ -24,7 +24,8 @@ MainWindow::MainWindow(Model* model)
 	setupLibraryArea();
 	setupStatusBar();
 	setupMenuBar();
-	setupCaneChangeDialog();
+	setupChangeDialog();
+	setupArrangementDialog();
 	updateModeButtonsEnabled();
 
 	setWindowTitle(tr("Virtual Glass"));
@@ -487,10 +488,26 @@ void MainWindow::importLibraryDialog()
 	displayTextMessage("Library loaded from: " + fileName);
 }
 
-void MainWindow::setupCaneChangeDialog()
+void MainWindow::setupArrangementDialog()
+{
+	arrangementDialog = new QDialog(NULL);
+	QFormLayout* layout = new QFormLayout(arrangementDialog->window());
+	layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+
+	arrangementSizeSlider = new QSlider(Qt::Horizontal, layout->widget());
+	arrangementSizeSlider->setRange(1, 60);
+	QBoxLayout* sliderLayout = new QBoxLayout(QBoxLayout::LeftToRight, layout->widget());
+	QLabel* lsLabel = new QLabel("0.1 in.", sliderLayout->widget());
+	QLabel* rsLabel = new QLabel("6 in.", sliderLayout->widget());
+	sliderLayout->insertWidget(0, lsLabel);
+	sliderLayout->insertWidget(1, arrangementSizeSlider);
+	sliderLayout->insertWidget(2, rsLabel);
+
+}
+
+void MainWindow::setupChangeDialog()
 {
 	changeDialog = new QDialog(NULL);
-	changeDialog->setWindowModality(Qt::ApplicationModal);
 	QFormLayout* layout = new QFormLayout(changeDialog->window());
 	layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
 
@@ -517,20 +534,21 @@ void MainWindow::setupCaneChangeDialog()
 	caneSplitter->addWidget(caneTypeListBox);
 	caneSplitter->addWidget(caneColorListBox);
 
-		// Alpha slider
-		caneAlphaSlider = new QSlider(Qt::Vertical, layout->widget());
-		caneAlphaSlider->setRange(0, 255);
-		QSplitter* alphaSliderLayout = new QSplitter(Qt::Vertical, layout->widget());
-		QLabel* alphaNameLabel = new QLabel("Opacity", alphaSliderLayout);
-		QLabel* alphaLsLabel = new QLabel("0%", alphaSliderLayout);
-		QLabel* alphaRsLabel = new QLabel("100%", alphaSliderLayout);
-		alphaSliderLayout->insertWidget(0, alphaNameLabel);
-		alphaSliderLayout->insertWidget(1, alphaRsLabel);
-		alphaSliderLayout->insertWidget(2, caneAlphaSlider);
-		alphaSliderLayout->insertWidget(3, alphaLsLabel);
-
-		caneSplitter->addWidget(alphaSliderLayout);
-		layout->addRow(caneSplitter);
+	// Alpha slider
+	casLayoutWidget = new QWidget(caneSplitter);
+	QVBoxLayout* alphaSliderLayout = new QVBoxLayout();
+	casLayoutWidget->setLayout(alphaSliderLayout);
+	caneAlphaSlider = new QSlider(Qt::Vertical, casLayoutWidget);
+	caneAlphaSlider->setRange(0, 255);
+	QLabel* alphaNameLabel = new QLabel("Opacity", casLayoutWidget);
+	QLabel* alphaLsLabel = new QLabel("0%", casLayoutWidget);
+	QLabel* alphaRsLabel = new QLabel("100%", casLayoutWidget);
+	alphaSliderLayout->addWidget(alphaNameLabel);
+	alphaSliderLayout->addWidget(alphaRsLabel);
+	alphaSliderLayout->addWidget(caneAlphaSlider);
+	alphaSliderLayout->addWidget(alphaLsLabel);
+	caneSplitter->addWidget(casLayoutWidget);
+	layout->addRow(caneSplitter);
 
 	connect(caneTypeListBox, SIGNAL(clicked(QModelIndex)), this,
 		SLOT(updateBrandColorPickerSublist(QModelIndex)));
