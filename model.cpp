@@ -240,9 +240,29 @@ int Model :: getActiveSubcane()
 void Model :: setCane(Cane* c)
 {
 	history->saveState(cane);
-	cane = c;
+	if (c != NULL)
+		cane = c->deepCopy();
+	else
+		cane = NULL;
 	slowGeometryUpdate();
 	emit caneChanged();
+	if (cane == NULL)
+		return;
+
+	switch (cane->type)
+	{
+		case BUNDLE_CANETYPE:
+			mode = BUNDLE_MODE;
+			break;
+		case PULL_CANETYPE:
+			mode = PULL_MODE;
+			break;
+		case FLATTEN_CANETYPE:
+			mode = FLATTEN_MODE;
+			break;
+	}
+	emit modeChanged(mode);
+		
 }
 
 void Model :: slowGeometryUpdate()
@@ -343,10 +363,7 @@ void Model :: addCane(Cane* c)
 	history->saveState(cane);
 	if (cane == NULL)
 	{
-		cane = c->deepCopy();
-		slowGeometryUpdate();
-		setMode(BUNDLE_MODE);
-		emit caneChanged();
+		setCane(c);
 	}
 	else
 	{
@@ -358,6 +375,13 @@ void Model :: addCane(Cane* c)
 	}
 }
 
+
+/*
+This is like addCane(Cane*), but not quite.
+It's not clear why it should be different, or
+why it's copy-pasted and does not reference the
+other version...maybe this can be fixed eventually?
+*/
 void Model :: addCane(Cane* c, Cane* d)
 {
 	history->saveState(cane);
@@ -368,10 +392,6 @@ void Model :: addCane(Cane* c, Cane* d)
 		emit caneChanged();
 		if (mode != BUNDLE_MODE)
 			setMode(BUNDLE_MODE);
-		else
-		{
-			slowGeometryUpdate();
-		}
 	}
 }
 
