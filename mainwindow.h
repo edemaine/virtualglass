@@ -36,6 +36,7 @@ signals:
 	void setNewMode(int i, bool viewRecipe,Cane* c);
 
 public slots:
+	void arrangementRequest(Cane* c);
 	void addNewDefaultCane();
 	void caneChangeRequest(int subcane);
 	void geometryHeightEvent(int);
@@ -104,7 +105,8 @@ private:
 	QWidget* casLayoutWidget;
 	QWidget* oglLayoutWidget;
 	QSlider* oglGeometryHeightSlider;
-	QSlider* arrangementSizeSlider;
+	QSlider* arrangementRadiusSlider;
+	QSlider* arrangementCountSlider;
 	QBoxLayout* stockLayout;
 	QStackedLayout* stackLayout;
 	QTabWidget* tabWidget;

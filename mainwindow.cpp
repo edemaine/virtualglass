@@ -316,10 +316,19 @@ void MainWindow::saveCaneToLibrary()
 	stockLayout->addWidget(lc);
 	updateLibraryToolTip(lc);
 	connect(lc, SIGNAL(mouseOver(LibraryCaneWidget*)), this, SLOT(updateLibraryToolTip(LibraryCaneWidget*)));
+	// still working on arrangement dialog feature
+	//connect(lc, SIGNAL(arrangementRequest(Cane*)), this, SLOT(arrangementRequest(Cane*)));
 	connect(stockLayout, SIGNAL(destroyed(QObject*)), this, SLOT(libraryCaneDestroyed(QObject*)));
-	connect(lc,SIGNAL(requestDelete(Cane*)),openglWidget,SLOT(processLibraryDelete(Cane*)));
+	connect(lc, SIGNAL(requestDelete(Cane*)), openglWidget, SLOT(processLibraryDelete(Cane*)));
 	connect(openglWidget, SIGNAL(acceptLibraryDelete(Cane*)), lc, SLOT(deleteRequestAccepted(Cane*)));
 }
+
+void MainWindow::arrangementRequest(Cane* c)
+{	
+	model->addCane(c);
+	arrangementDialog->show();
+}
+
 
 void MainWindow::updateLibraryToolTip(LibraryCaneWidget *lc)
 {
@@ -498,16 +507,30 @@ void MainWindow::setupArrangementDialog()
 	arrangementDialog = new QDialog(NULL);
 	QFormLayout* layout = new QFormLayout(arrangementDialog->window());
 	layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+	arrangementDialog->setLayout(layout);
 
-	arrangementSizeSlider = new QSlider(Qt::Horizontal, layout->widget());
-	arrangementSizeSlider->setRange(1, 60);
-	QBoxLayout* sliderLayout = new QBoxLayout(QBoxLayout::LeftToRight, layout->widget());
-	QLabel* lsLabel = new QLabel("0.1 in.", sliderLayout->widget());
-	QLabel* rsLabel = new QLabel("6 in.", sliderLayout->widget());
-	sliderLayout->insertWidget(0, lsLabel);
-	sliderLayout->insertWidget(1, arrangementSizeSlider);
-	sliderLayout->insertWidget(2, rsLabel);
+	arrangementRadiusSlider = new QSlider(Qt::Horizontal, layout->widget());
+	arrangementRadiusSlider->setRange(1, 60);
+	QBoxLayout* radiusLayout = new QBoxLayout(QBoxLayout::LeftToRight, layout->widget());
+	QLabel* lsLabel = new QLabel("0.1 in.", radiusLayout->widget());
+	QLabel* rsLabel = new QLabel("6 in.", radiusLayout->widget());
+	radiusLayout->insertWidget(0, lsLabel);
+	radiusLayout->insertWidget(1, arrangementRadiusSlider);
+	radiusLayout->insertWidget(2, rsLabel);
 
+	layout->addRow("Arrangement radius", radiusLayout);
+
+	arrangementCountSlider = new QSlider(Qt::Horizontal, layout->widget());
+	arrangementCountSlider->setRange(2, 20);
+	QBoxLayout* countLayout = new QBoxLayout(QBoxLayout::LeftToRight, layout->widget());
+	lsLabel = new QLabel("2 ", countLayout->widget());
+	rsLabel = new QLabel("20", countLayout->widget());
+	countLayout->insertWidget(0, lsLabel);
+	countLayout->insertWidget(1, arrangementCountSlider);
+	countLayout->insertWidget(2, rsLabel);
+
+	layout->addRow("Number of canes", countLayout);
+	
 }
 
 void MainWindow::setupChangeDialog()
@@ -609,12 +632,11 @@ void MainWindow::setupChangeDialog()
 			changeDialog, SLOT(hide()));
 	connect(changeDialog, SIGNAL(rejected()),
 			this, SLOT(cancelCaneChangeDialog()));
-
 }
 
 void MainWindow::changeAlphaEvent(int i)
 {
-		model->setSubcaneAlpha(caneChangeSubcane, i);
+	model->setSubcaneAlpha(caneChangeSubcane, i);
 }
 
 void MainWindow::cancelCaneChangeDialog()

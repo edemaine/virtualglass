@@ -20,6 +20,7 @@ public:
 	void newLibraryIndex(int index);
 
 signals:
+	void arrangementRequest(Cane* c);
 	void mouseOver(LibraryCaneWidget*);
 	void newIndex(int index);
 	void requestDelete(Cane* c);
