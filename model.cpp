@@ -173,37 +173,80 @@ void Model :: insertMode(Cane* c, int mode)
 
 bool Model :: subcaneHasColorAndShape(int subcane)
 {
-	if (cane == NULL || subcane < 0 || subcane >= cane->subcaneCount)
+	if (cane == NULL)
 		return false;
 
-	Cane* baseCane = cane->subcanes[subcane]->getBaseCane();
-	
-	if (baseCane == NULL)
-		return false; 
-
-	return true;
+	Cane* baseCane;
+	if (cane->type == BASE_POLYGONAL_CANETYPE && subcane == 0)
+	{
+		if (subcane == 0)
+			return true;
+		else
+			return false;
+	}
+	else 
+	{
+		if (0 <= subcane && subcane < cane->subcaneCount)
+		{
+ 			baseCane = cane->subcanes[subcane]->getBaseCane();
+			return (baseCane != NULL);
+		}
+		else
+			return false;
+	}
 }
 
 CaneShape* Model :: getSubcaneShape(int subcane)
 {
-	return &(cane->subcanes[subcane]->getBaseCane()->shape);
+	if (cane == NULL)
+		return NULL;
+
+	if (cane->type == BASE_POLYGONAL_CANETYPE)
+	{
+		return &(cane->shape);
+	}
+	else
+	{
+		Cane* baseCane = cane->subcanes[subcane]->getBaseCane();
+		return &(baseCane->shape);
+	}
 }
 
 void Model :: setSubcaneShape(int subcane, CaneShape* newShape)
 {
-	newShape->copy(&(cane->subcanes[subcane]->getBaseCane()->shape));
+	if (cane == NULL)
+		return;
+
+	if (cane->type == BASE_POLYGONAL_CANETYPE)
+		newShape->copy(&(cane->shape));
+	else
+		newShape->copy(&(cane->subcanes[subcane]->getBaseCane()->shape));
+
 	slowGeometryUpdate();
 	emit caneChanged();
 }
 
 Color* Model :: getSubcaneColor(int subcane)
 {
+	if (cane == NULL)
+		return NULL;
+
+	if (cane->type == BASE_POLYGONAL_CANETYPE)
+		return &(cane->color);
+
 	return &(cane->subcanes[subcane]->getBaseCane()->color);
 }
 
 void Model :: setSubcaneColor(int subcane, Color* c)
 {
-	Cane* ac = cane->subcanes[subcane]->getBaseCane();
+	if (cane == NULL)
+		return;
+
+	Cane* ac;
+	if (cane->type == BASE_POLYGONAL_CANETYPE)
+		ac = cane;
+	else
+		ac = cane->subcanes[subcane]->getBaseCane();
 	ac->color.r = c->r;
 	ac->color.g = c->g;
 	ac->color.b = c->b;
@@ -215,7 +258,15 @@ void Model :: setSubcaneColor(int subcane, Color* c)
 
 void Model :: setSubcaneAlpha(int subcane, int newAlpha)
 {
-        Cane* ac = cane->subcanes[subcane]->getBaseCane();
+	if (cane == NULL)
+		return;
+
+	Cane* ac;
+	if (cane->type == BASE_POLYGONAL_CANETYPE)
+		ac = cane;
+	else
+		ac = cane->subcanes[subcane]->getBaseCane();
+
         Color* newColor = new Color(ac->color);
         newColor->a = newAlpha/float(255);
         setSubcaneColor(subcane, newColor);
