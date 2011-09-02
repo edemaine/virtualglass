@@ -29,7 +29,7 @@ void Model :: setGeometryHeight(float height)
 int Model :: addNewDefaultCane()
 {
 	addCane(defaultCane);
-	cane->moveCane(cane->subcaneCount-1, 1.0, 1.0, 0.0); 
+        cane->moveCane(cane->subcaneCount-1, 0.0, 0.0, 0.0);
 	
 	slowGeometryUpdate();
 	emit caneChanged();
@@ -235,6 +235,22 @@ Color* Model :: getSubcaneColor(int subcane)
 		return &(cane->color);
 
 	return &(cane->subcanes[subcane]->getBaseCane()->color);
+}
+
+void Model :: setSubcaneLocation(int subcane, float x, float y, float z)
+{
+        if (cane == NULL)
+                return;
+
+        Cane* ac;
+        if (cane->type == BASE_POLYGONAL_CANETYPE)
+                ac = cane;
+        else
+                ac = cane->subcanes[subcane]->getBaseCane();
+        ac->moveCaneTo(subcane,x,y,z);
+
+        slowGeometryUpdate();
+        emit caneChanged();
 }
 
 void Model :: setSubcaneColor(int subcane, Color* c)

@@ -567,7 +567,8 @@ void MainWindow::setupChangeDialog()
 	QVBoxLayout* alphaSliderLayout = new QVBoxLayout();
 	casLayoutWidget->setLayout(alphaSliderLayout);
 	caneAlphaSlider = new QSlider(Qt::Vertical, casLayoutWidget);
-	caneAlphaSlider->setRange(0, 255);
+        caneAlphaSlider->setRange(0, 254);
+        caneAlphaSlider->setValue(254);
 	QLabel* alphaNameLabel = new QLabel("Opacity", casLayoutWidget);
 	QLabel* alphaLsLabel = new QLabel("0%", casLayoutWidget);
 	QLabel* alphaRsLabel = new QLabel("100%", casLayoutWidget);
@@ -616,6 +617,43 @@ void MainWindow::setupChangeDialog()
 	connect(caneSizeSlider, SIGNAL(valueChanged(int)),
 			this, SLOT(shapeSizeEvent(int)));
 
+        // Location slider
+        xySliderResolution = 4;
+
+        QGridLayout* xy_editorLayout = new QGridLayout(layout->widget());
+
+        x_editlabel = new QLabel("X position:", xy_editorLayout->widget());
+        x_editbox = new QLineEdit(xy_editorLayout->widget());
+        x_editbox->setValidator(new QDoubleValidator());
+        x_editbox->setText("0.0");
+        x_editslider = new QSlider(Qt::Horizontal, xy_editorLayout->widget());
+        x_editslider->setRange(-xySliderResolution,xySliderResolution);
+        x_editslider->setValue(0);
+        x_editslider->setTickPosition(QSlider::TicksBothSides);
+        x_editslider->setTickInterval(1);
+        y_editlabel = new QLabel("Y position:", xy_editorLayout->widget());
+        y_editbox = new QLineEdit(xy_editorLayout->widget());
+        y_editbox->setValidator(new QDoubleValidator());
+        y_editbox->setText("0.0");
+        y_editslider = new QSlider(Qt::Horizontal, xy_editorLayout->widget());
+        y_editslider->setRange(-xySliderResolution,xySliderResolution);
+        y_editslider->setValue(0);
+        y_editslider->setTickPosition(QSlider::TicksBothSides);
+        y_editslider->setTickInterval(1);
+
+        xy_editorLayout->addWidget(x_editlabel,0,0,1,1);
+        xy_editorLayout->addWidget(x_editbox,0,2,1,1);
+        xy_editorLayout->addWidget(x_editslider,1,0,1,3);
+        xy_editorLayout->addWidget(y_editlabel,0,4,1,1);
+        xy_editorLayout->addWidget(y_editbox,0,6,1,1);
+        xy_editorLayout->addWidget(y_editslider,1,4,1,3);
+        layout->addRow(xy_editorLayout);
+
+        connect(x_editbox, SIGNAL(editingFinished()),this,SLOT(x_changeEditSliderFromText()));
+        connect(x_editslider, SIGNAL(valueChanged(int)),this,SLOT(x_changeEditTextFromSlider(int)));
+        connect(y_editbox, SIGNAL(editingFinished()),this,SLOT(y_changeEditSliderFromText()));
+        connect(y_editslider, SIGNAL(valueChanged(int)),this,SLOT(y_changeEditTextFromSlider(int)));
+
 	// Ok, cancel buttons
 	QHBoxLayout* buttonLayout = new QHBoxLayout(layout->widget());
 	QPushButton* okButton = new QPushButton("Ok", layout->widget());
@@ -632,6 +670,79 @@ void MainWindow::setupChangeDialog()
 			changeDialog, SLOT(hide()));
 	connect(changeDialog, SIGNAL(rejected()),
 			this, SLOT(cancelCaneChangeDialog()));
+}
+
+
+void MainWindow::x_changeEditSliderFromText()
+{
+        float n = x_editbox->text().toFloat();
+        if (n > xySliderResolution)
+        {
+                x_editslider->setValue(xySliderResolution);
+        }
+        else if (n < -xySliderResolution)
+        {
+                x_editslider->setValue(-xySliderResolution);
+        }
+        else
+        {
+            x_editslider->setValue(round(n * xySliderResolution));
+        }
+        //model->setSubcaneLocation(caneChangeSubcane,n,0,0);
+        model->moveCane(n,0,0);
+}
+
+void MainWindow::x_changeEditTextFromSlider(int i)
+{
+        QString s;
+        s.sprintf("%.2f", double(i)/double(xySliderResolution));
+        x_editbox->setText(s);
+        //model->setSubcaneLocation(caneChangeSubcane,float(i)/float(xySliderResolution),0,0);
+        model->moveCane(float(i)/float(xySliderResolution),0,0);
+}
+
+void MainWindow::y_changeEditSliderFromText()
+{
+        float n = y_editbox->text().toFloat();
+        if (n > xySliderResolution)
+        {
+                y_editslider->setValue(xySliderResolution);
+        }
+        else if (n < -xySliderResolution)
+        {
+                y_editslider->setValue(-xySliderResolution);
+        }
+        else
+        {
+            y_editslider->setValue(round(n * xySliderResolution));
+        }
+        //model->setSubcaneLocation(caneChangeSubcane,0,n,0);
+        model->moveCane(0,n,0);
+}
+
+void MainWindow::y_changeEditTextFromSlider(int i)
+{
+        QString s;
+        s.sprintf("%.2f", double(i)/double(xySliderResolution));
+        y_editbox->setText(s);
+        //model->setSubcaneLocation(caneChangeSubcane,0,float(i)/float(xySliderResolution),0);
+        model->moveCane(0,float(i)/float(xySliderResolution),0);
+}
+
+void MainWindow::updateCaneAlphaSlider(int i)
+{
+        if (i > 255 || i < 0)
+                return;
+        if (i == 255)
+        {
+                caneAlphaSlider->setValue(254);
+                caneAlphaSlider->setEnabled(false);
+        }
+        else
+        {
+                caneAlphaSlider->setEnabled(true);
+                caneAlphaSlider->setValue(i);
+        }
 }
 
 void MainWindow::changeAlphaEvent(int i)
@@ -670,11 +781,12 @@ void MainWindow::updateBrandColorPickerColor(QModelIndex i)
 		return;
 	QColor color = caneColorListList->at(selectedBrand).at(selectedColor);
 	Color c;
-	c.r = color.redF();
-	c.g = color.greenF();
-	c.b = color.blueF();
-	c.a = color.alphaF();
-	model->setSubcaneColor(caneChangeSubcane, &c);
+        c.r = color.redF();
+        c.g = color.greenF();
+        c.b = color.blueF();
+        c.a = color.alphaF();
+        updateCaneAlphaSlider(c.a*255);
+        model->setSubcaneColor(caneChangeSubcane, &c);
 }
 
 void MainWindow::updateBrandColorPickerSublist(QModelIndex i)
@@ -1146,6 +1258,12 @@ void MainWindow::toggleFlat()
 void MainWindow::setupButtonBar()
 {
 	int iconSize = this->size().height()/9;
+        cane_button = new QPushButton("New Cane");
+        cane_button->setToolTip("Add a New Cane to the Piece.");
+        cane_button->setShortcut(QKeySequence("CTRL+N"));
+        QImage cane_icon ("../src/icon_newcane.png");
+        cane_button->setIcon(QPixmap::fromImage(cane_icon));
+        cane_button->setIconSize(QSize(iconSize,iconSize));
 	pull_button = new QPushButton("Pull");
 	pull_button->setToolTip("Drag Mouse Horizontally to Twist, Vertically to Stretch. Use Shift to twist and stretch independently.");
 	pull_button->setShortcut(QKeySequence("CTRL+P"));
@@ -1199,6 +1317,7 @@ void MainWindow::setupButtonBar()
 	previewLabel->setScaledContents(true);
 
 	operButton_layout = new QVBoxLayout();
+        operButton_layout->addWidget(cane_button);
 	operButton_layout->addWidget(pull_button);
 	operButton_layout->addWidget(bundle_button);
 	operButton_layout->addWidget(flatten_button);

@@ -404,7 +404,7 @@ Reichenbach Transparents
 [R-60 Opaline] 	
 - 247,239,220,126
 [R-100 Lead Crystal] 	
-- 235,216,194,126
+- 255,255,255,126
 [R-102 Silver Crystal (reduces)]
 - 220,209,179,126
 [R-118 Smoky Topaz] 	
@@ -460,7 +460,7 @@ Reichenbach Transparents
 [R-221 Light Blue] 	
 - 145,187,229,126
 [R-225 Alabaster] 	
-- 246,238,214,126
+- 255,255,255,126
 [R-228 Dark Heliotrope] 	
 - 141,72,107,126
 [R-229 Amber]
@@ -656,7 +656,7 @@ Gaffer Opals
 Gaffer Transparents
 
 [G000 Clear Lead Crystal]
-- 249,249,249,126
+- 255,255,255,126
 [G010 Gold Ruby Extra]
 - 152,20,57,126
 [G011 Gold Amethyst]
@@ -738,7 +738,7 @@ Gaffer Transparents
 [G067 Green Lustre]
 - 2,181,178,126
 [G068 Clear Lustre]
-- 246,246,246,126
+- 255,255,255,126
 [G070 Saffron]
 - 253,122,56,126
 [G071 Orange]

@@ -23,6 +23,7 @@ public:
 	void seedLibrary();
 	OpenGLWidget* openglWidget;
 	RecipeWidget* recipeWidget;
+        QPushButton* cane_button;
 	QPushButton* pull_button;
 	QPushButton* bundle_button;
 	QPushButton* flatten_button;
@@ -34,6 +35,8 @@ public:
 
 signals:
 	void setNewMode(int i, bool viewRecipe,Cane* c);
+        void x_locationChanged(float f);
+        void y_locationChanged(float f);
 
 public slots:
 	void arrangementRequest(Cane* c);
@@ -66,6 +69,11 @@ public slots:
 	void insertLibraryCane(Cane* c);
 	void toggleFlat();
 
+        void x_changeEditSliderFromText();
+        void x_changeEditTextFromSlider(int i);
+        void y_changeEditSliderFromText();
+        void y_changeEditTextFromSlider(int i);
+
 private:
 	Model* model;
 
@@ -86,6 +94,7 @@ private:
 	void setupChangeDialog();
 	void setupArrangementDialog();
         void checkButton(int mode);
+        void updateCaneAlphaSlider(int i);
 
 	void loadOfficialCanes();
 
@@ -137,6 +146,14 @@ private:
         QSlider* caneAlphaSlider;
 	QSlider* caneSizeSlider;
 	QSlider* caneHeightSlider;
+
+        int xySliderResolution;
+        QLabel* x_editlabel;
+        QLineEdit* x_editbox;
+        QSlider* x_editslider;
+        QLabel* y_editlabel;
+        QLineEdit* y_editbox;
+        QSlider* y_editslider;
 
 	bool isRecipe;
 
