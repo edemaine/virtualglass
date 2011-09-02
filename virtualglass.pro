@@ -30,7 +30,7 @@ LIBS += -lexpat
 
 QMAKE_CFLAGS_DEBUG += -Wall -Werror -g
 QMAKE_CFLAGS_RELEASE += -Wall -Werror -g
-QMAKE_CXXFLAGS += -Wall -Werror -g
+QMAKE_CXXFLAGS += -Wall -Werror -Wno-deprecated -g
 
 # Input
 HEADERS += mainwindow.h openglwidget.h cane.h primitives.h model.h controller.h librarycanewidget.h \
