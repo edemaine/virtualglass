@@ -237,16 +237,25 @@ Color* Model :: getSubcaneColor(int subcane)
 	return &(cane->subcanes[subcane]->getBaseCane()->color);
 }
 
+Point* Model :: getSubcaneLocation(int subcane)
+{
+        if (cane == NULL)
+                return NULL;
+
+        return &(cane->subcaneLocations[subcane]);
+}
+
 void Model :: setSubcaneLocation(int subcane, float x, float y, float z)
 {
         if (cane == NULL)
                 return;
 
-        Cane* ac;
+        Cane* ac = cane;
+/*        Cane* ac;
         if (cane->type == BASE_POLYGONAL_CANETYPE)
                 ac = cane;
         else
-                ac = cane->subcanes[subcane]->getBaseCane();
+                ac = cane->subcanes[subcane]->getBaseCane();*/
         ac->moveCaneTo(subcane,x,y,z);
 
         slowGeometryUpdate();

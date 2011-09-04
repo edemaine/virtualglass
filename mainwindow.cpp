@@ -194,7 +194,7 @@ void MainWindow :: shapeSizeEvent(int)
 void MainWindow :: shapePickerEvent()
 {
 	QString shapeText = caneShapeBox->currentText();
-	float diameter = caneSizeSlider->sliderPosition() / 60.0;
+        float diameter = caneSizeEditBox->text().toFloat()/10.0;//caneSizeSlider->sliderPosition() / 60.0;
 	CaneShape shape;
 	int resolution = LOW_ANGULAR_RESOLUTION;
 
@@ -602,25 +602,42 @@ void MainWindow::setupChangeDialog()
 
 	// Size slider
 	caneSizeSlider = new QSlider(Qt::Horizontal, layout->widget());
-	caneSizeSlider->setRange(1, 60);
-	QBoxLayout* sliderLayout = new QBoxLayout(QBoxLayout::LeftToRight, layout->widget());
-	QLabel* lsLabel = new QLabel("0.1 in.", sliderLayout->widget());
-	QLabel* rsLabel = new QLabel("6 in.", sliderLayout->widget());
-	sliderLayout->insertWidget(0, lsLabel);
-	sliderLayout->insertWidget(1, caneSizeSlider);
-	sliderLayout->insertWidget(2, rsLabel);
+        caneSizeSlider->setRange(1, 60);
+//        caneSizeSlider->setSizePolicy(2);
+        QBoxLayout* sliderLayout1 = new QBoxLayout(QBoxLayout::LeftToRight, layout->widget());
+        QBoxLayout* sliderLayout2 = new QBoxLayout(QBoxLayout::LeftToRight, layout->widget());
+        QLabel* lsLabel = new QLabel("0.1 in.", sliderLayout2->widget());
+        QLabel* rsLabel = new QLabel("6 in.", sliderLayout2->widget());
+        QLabel* boxLabel = new QLabel("inches", sliderLayout1->widget());
+        caneSizeEditBox = new QLineEdit(sliderLayout1->widget());
+        caneSizeEditBox->setValidator(new QDoubleValidator());
+        caneSizeEditBox->setText("1.0");
+        sliderLayout2->insertWidget(0, lsLabel);
+        sliderLayout2->insertWidget(1, caneSizeSlider);
+        sliderLayout2->insertWidget(2, rsLabel);
+        sliderLayout1->insertWidget(0, caneSizeEditBox);
+        sliderLayout1->insertWidget(1, boxLabel);
 
-	layout->addRow("Diameter:", sliderLayout);
+        layout->addRow("Diameter:", sliderLayout1);
+        layout->addRow(sliderLayout2);
 
+        connect(caneSizeEditBox, SIGNAL(editingFinished()),
+                        this,SLOT(size_changeEditSliderFromText()));
+        connect(caneSizeSlider, SIGNAL(valueChanged(int)),
+                        this,SLOT(size_changeEditTextFromSlider(int)));
 	connect(caneShapeBox, SIGNAL(currentIndexChanged(int)),
 			this, SLOT(shapeTypeEvent(int)));
 	connect(caneSizeSlider, SIGNAL(valueChanged(int)),
-			this, SLOT(shapeSizeEvent(int)));
+                        this, SLOT(shapeSizeEvent(int)));
 
 		// Location slider
-		xySliderResolution = 4;
+        xySliderResolution = 6;
+        radiusSliderResolution = 6;
+        thetaSliderResolution = 60;
+        radiusMaxByDefault = 2;
 
 		QGridLayout* xy_editorLayout = new QGridLayout(layout->widget());
+        QGridLayout* rtheta_editorLayout = new QGridLayout(layout->widget());
 
 		x_editlabel = new QLabel("X position:", xy_editorLayout->widget());
 		x_editbox = new QLineEdit(xy_editorLayout->widget());
@@ -641,18 +658,48 @@ void MainWindow::setupChangeDialog()
 		y_editslider->setTickPosition(QSlider::TicksBothSides);
 		y_editslider->setTickInterval(1);
 
-		xy_editorLayout->addWidget(x_editlabel,0,0,1,1);
-		xy_editorLayout->addWidget(x_editbox,0,2,1,1);
-		xy_editorLayout->addWidget(x_editslider,1,0,1,3);
-		xy_editorLayout->addWidget(y_editlabel,0,4,1,1);
-		xy_editorLayout->addWidget(y_editbox,0,6,1,1);
-		xy_editorLayout->addWidget(y_editslider,1,4,1,3);
-		layout->addRow(xy_editorLayout);
+        radius_editlabel = new QLabel("Radius:", rtheta_editorLayout->widget());
+        radius_editbox = new QLineEdit(rtheta_editorLayout->widget());
+        radius_editbox->setValidator(new QDoubleValidator());
+        radius_editbox->setText("0.0");
+        radius_editslider = new QSlider(Qt::Horizontal, rtheta_editorLayout->widget());
+        radius_editslider->setRange(0,radiusSliderResolution*radiusMaxByDefault);
+        radius_editslider->setValue(0);
+        radius_editslider->setTickPosition(QSlider::TicksBothSides);
+        radius_editslider->setTickInterval(1);
+        theta_editlabel = new QLabel("Angle:", rtheta_editorLayout->widget());
+        theta_editbox = new QLineEdit(rtheta_editorLayout->widget());
+        theta_editbox->setValidator(new QDoubleValidator());
+        theta_editbox->setText("0.0");
+        theta_editslider = new QSlider(Qt::Horizontal, rtheta_editorLayout->widget());
+        theta_editslider->setRange(0,thetaSliderResolution-1);
+        theta_editslider->setValue(0);
+        theta_editslider->setTickPosition(QSlider::TicksBothSides);
+        theta_editslider->setTickInterval(1);
+
+        xy_editorLayout->addWidget(x_editlabel,0,0,1,1);
+        xy_editorLayout->addWidget(x_editbox,0,2,1,1);
+        xy_editorLayout->addWidget(x_editslider,1,0,1,3);
+        xy_editorLayout->addWidget(y_editlabel,0,4,1,1);
+        xy_editorLayout->addWidget(y_editbox,0,6,1,1);
+        xy_editorLayout->addWidget(y_editslider,1,4,1,3);
+        layout->addRow(xy_editorLayout);
+        rtheta_editorLayout->addWidget(radius_editlabel,0,0,1,1);
+        rtheta_editorLayout->addWidget(radius_editbox,0,2,1,1);
+        rtheta_editorLayout->addWidget(radius_editslider,1,0,1,3);
+        rtheta_editorLayout->addWidget(theta_editlabel,0,4,1,1);
+        rtheta_editorLayout->addWidget(theta_editbox,0,6,1,1);
+        rtheta_editorLayout->addWidget(theta_editslider,1,4,1,3);
+        layout->addRow(rtheta_editorLayout);
 
 		connect(x_editbox, SIGNAL(editingFinished()),this,SLOT(x_changeEditSliderFromText()));
 		connect(x_editslider, SIGNAL(valueChanged(int)),this,SLOT(x_changeEditTextFromSlider(int)));
 		connect(y_editbox, SIGNAL(editingFinished()),this,SLOT(y_changeEditSliderFromText()));
 		connect(y_editslider, SIGNAL(valueChanged(int)),this,SLOT(y_changeEditTextFromSlider(int)));
+        connect(radius_editbox, SIGNAL(editingFinished()),this,SLOT(radius_changeEditSliderFromText()));
+        connect(radius_editslider, SIGNAL(valueChanged(int)),this,SLOT(radius_changeEditTextFromSlider(int)));
+        connect(theta_editbox, SIGNAL(editingFinished()),this,SLOT(theta_changeEditSliderFromText()));
+        connect(theta_editslider, SIGNAL(valueChanged(int)),this,SLOT(theta_changeEditTextFromSlider(int)));
 
 	// Ok, cancel buttons
 	QHBoxLayout* buttonLayout = new QHBoxLayout(layout->widget());
@@ -672,61 +719,252 @@ void MainWindow::setupChangeDialog()
 			this, SLOT(cancelCaneChangeDialog()));
 }
 
+void MainWindow::size_changeEditSliderFromText()
+{
+        QString s = caneSizeEditBox->text();
+        float n = caneSizeEditBox->text().toFloat();
+        if (n > 60)
+        {
+                caneSizeSlider->setValue(60);
+        }
+        else if (n < 1)
+        {
+                caneSizeSlider->setValue(1);
+                return;
+        }
+        else
+        {
+                caneSizeSlider->setValue(round(n*10));
+        }
+        caneSizeEditBox->setText(s);
+        emit shapeSizeEvent(n);
+}
+
+void MainWindow::size_changeEditTextFromSlider(int i)
+{
+        QString s;
+        s.sprintf("%.1f", double(i)/double(10));
+        caneSizeEditBox->setText(s);
+        emit shapeSizeEvent(i);
+}
+
+void MainWindow::disconnectLocationSignals()
+{
+    disconnect(x_editbox, SIGNAL(editingFinished()),this,SLOT(x_changeEditSliderFromText()));
+    disconnect(x_editslider, SIGNAL(valueChanged(int)),this,SLOT(x_changeEditTextFromSlider(int)));
+    disconnect(y_editbox, SIGNAL(editingFinished()),this,SLOT(y_changeEditSliderFromText()));
+    disconnect(y_editslider, SIGNAL(valueChanged(int)),this,SLOT(y_changeEditTextFromSlider(int)));
+    disconnect(radius_editbox, SIGNAL(editingFinished()),this,SLOT(radius_changeEditSliderFromText()));
+    disconnect(radius_editslider, SIGNAL(valueChanged(int)),this,SLOT(radius_changeEditTextFromSlider(int)));
+    disconnect(theta_editbox, SIGNAL(editingFinished()),this,SLOT(theta_changeEditSliderFromText()));
+    disconnect(theta_editslider, SIGNAL(valueChanged(int)),this,SLOT(theta_changeEditTextFromSlider(int)));
+}
+
+void MainWindow::reconnectLocationSignals()
+{
+    connect(x_editbox, SIGNAL(editingFinished()),this,SLOT(x_changeEditSliderFromText()));
+    connect(x_editslider, SIGNAL(valueChanged(int)),this,SLOT(x_changeEditTextFromSlider(int)));
+    connect(y_editbox, SIGNAL(editingFinished()),this,SLOT(y_changeEditSliderFromText()));
+    connect(y_editslider, SIGNAL(valueChanged(int)),this,SLOT(y_changeEditTextFromSlider(int)));
+    connect(radius_editbox, SIGNAL(editingFinished()),this,SLOT(radius_changeEditSliderFromText()));
+    connect(radius_editslider, SIGNAL(valueChanged(int)),this,SLOT(radius_changeEditTextFromSlider(int)));
+    connect(theta_editbox, SIGNAL(editingFinished()),this,SLOT(theta_changeEditSliderFromText()));
+    connect(theta_editslider, SIGNAL(valueChanged(int)),this,SLOT(theta_changeEditTextFromSlider(int)));
+}
 
 void MainWindow::x_changeEditSliderFromText()
 {
-		float n = x_editbox->text().toFloat();
-		if (n > xySliderResolution)
-		{
-				x_editslider->setValue(xySliderResolution);
-		}
-		else if (n < -xySliderResolution)
-		{
-				x_editslider->setValue(-xySliderResolution);
-		}
-		else
-		{
-			x_editslider->setValue(round(n * xySliderResolution));
-		}
-		//model->setSubcaneLocation(caneChangeSubcane,n,0,0);
-		model->moveCane(n,0,0);
+        disconnectLocationSignals();
+        QString s = x_editbox->text();
+        float n = x_editbox->text().toFloat();
+        if (n > xySliderResolution)
+        {
+                x_editslider->setValue(xySliderResolution);
+        }
+        else if (n < -xySliderResolution)
+        {
+                x_editslider->setValue(-xySliderResolution);
+        }
+        else
+        {
+            x_editslider->setValue(round(n * xySliderResolution));
+        }
+        x_editbox->setText(s);
+        changeRThetaFromXY();
 }
 
 void MainWindow::x_changeEditTextFromSlider(int i)
 {
-		QString s;
-		s.sprintf("%.2f", double(i)/double(xySliderResolution));
-		x_editbox->setText(s);
-		//model->setSubcaneLocation(caneChangeSubcane,float(i)/float(xySliderResolution),0,0);
-		model->moveCane(float(i)/float(xySliderResolution),0,0);
+        disconnectLocationSignals();
+        QString s;
+        s.sprintf("%.2f", double(i)/double(xySliderResolution));
+        x_editbox->setText(s);
+        changeRThetaFromXY();
 }
 
 void MainWindow::y_changeEditSliderFromText()
 {
-		float n = y_editbox->text().toFloat();
-		if (n > xySliderResolution)
-		{
-				y_editslider->setValue(xySliderResolution);
-		}
-		else if (n < -xySliderResolution)
-		{
-				y_editslider->setValue(-xySliderResolution);
-		}
-		else
-		{
-			y_editslider->setValue(round(n * xySliderResolution));
-		}
-		//model->setSubcaneLocation(caneChangeSubcane,0,n,0);
-		model->moveCane(0,n,0);
+        disconnectLocationSignals();
+        QString s = y_editbox->text();
+        float n = y_editbox->text().toFloat();
+        if (n > xySliderResolution)
+        {
+                y_editslider->setValue(xySliderResolution);
+        }
+        else if (n < -xySliderResolution)
+        {
+                y_editslider->setValue(-xySliderResolution);
+        }
+        else
+        {
+            y_editslider->setValue(round(n * xySliderResolution));
+        }
+        y_editbox->setText(s);
+        changeRThetaFromXY();
 }
 
 void MainWindow::y_changeEditTextFromSlider(int i)
 {
-		QString s;
-		s.sprintf("%.2f", double(i)/double(xySliderResolution));
-		y_editbox->setText(s);
-		//model->setSubcaneLocation(caneChangeSubcane,0,float(i)/float(xySliderResolution),0);
-		model->moveCane(0,float(i)/float(xySliderResolution),0);
+        disconnectLocationSignals();
+        QString s;
+        s.sprintf("%.2f", double(i)/double(xySliderResolution));
+        y_editbox->setText(s);
+        changeRThetaFromXY();
+}
+
+void MainWindow::radius_changeEditSliderFromText()
+{
+        disconnectLocationSignals();
+        QString s = radius_editbox->text();
+        float n = radius_editbox->text().toFloat();
+        if (n > radiusMaxByDefault)
+        {
+                radius_editslider->setValue(radiusSliderResolution*radiusMaxByDefault);
+        }
+        else if (n < 0)
+        {
+                s.sprintf("%.2f", -n);
+                if (-n > radiusMaxByDefault)
+                {
+                        radius_editslider->setValue(radiusSliderResolution*radiusMaxByDefault);
+                }
+                else
+                {
+                        radius_editslider->setValue(round(-n*radiusSliderResolution));
+                }
+                float r = theta_editbox->text().toFloat();
+                QString* r_string = new QString();
+                if (r >= 180)
+                        r_string->sprintf("%.2f", r - 180);
+                else
+                        r_string->sprintf("%.2f", r + 180);
+                theta_editslider->setValue(round(r / thetaSliderResolution));
+                theta_editbox->setText(*r_string);
+        }
+        else
+        {
+                radius_editslider->setValue(round(n * radiusSliderResolution));
+        }
+        radius_editbox->setText(s);
+        changeXYFromRTheta();
+}
+
+void MainWindow::radius_changeEditTextFromSlider(int i)
+{
+        disconnectLocationSignals();
+        QString s;
+        s.sprintf("%.2f", double(i)/double(radiusSliderResolution));
+        radius_editbox->setText(s);
+        changeXYFromRTheta();
+}
+
+void MainWindow::theta_changeEditSliderFromText()
+{
+        disconnectLocationSignals();
+        QString s = theta_editbox->text();
+        float n = theta_editbox->text().toFloat();
+        while (n >= 360)
+                n = n - 360;
+        while (n < 0)
+                n = n + 360;
+        s.sprintf("%.2f", n);
+        theta_editslider->setValue(round(n * thetaSliderResolution / 360.0));
+        theta_editbox->setText(s);
+        changeXYFromRTheta();
+}
+
+void MainWindow::theta_changeEditTextFromSlider(int i)
+{
+        disconnectLocationSignals();
+        QString s;
+        s.sprintf("%.2f", i * 360 / double(thetaSliderResolution));
+        theta_editbox->setText(s);
+        changeXYFromRTheta();
+}
+
+void MainWindow::changeRThetaFromXY()
+{
+        float new_r = sqrt(pow(x_editbox->text().toFloat(),2) + pow(y_editbox->text().toFloat(),2));
+        float new_theta = atan(y_editbox->text().toFloat() / x_editbox->text().toFloat())*180.0/3.14159265;
+        if (x_editbox->text().toFloat() < 0)
+                new_theta = new_theta + 180;
+        if (new_theta < 0)
+                new_theta = new_theta + 360;
+        QString* r = new QString();
+        QString* theta = new QString();
+        r->sprintf("%.2f", new_r);
+        theta->sprintf("%.2f", new_theta);
+        if (new_r > radiusMaxByDefault)
+        {
+                radius_editslider->setValue(radiusSliderResolution*radiusMaxByDefault);
+        }
+        else
+        {
+                radius_editslider->setValue(round(new_r * radiusSliderResolution));
+        }
+        radius_editbox->setText(*r);
+        theta_editslider->setValue(round(new_theta * thetaSliderResolution / 360.0));
+        theta_editbox->setText(*theta);
+        model->setSubcaneLocation(caneChangeSubcane,x_editbox->text().toFloat(),y_editbox->text().toFloat(),0);
+        reconnectLocationSignals();
+}
+
+void MainWindow::changeXYFromRTheta()
+{
+        float new_x = radius_editbox->text().toFloat() * cos(theta_editbox->text().toFloat()*3.14159265/180.0);
+        float new_y = radius_editbox->text().toFloat() * sin(theta_editbox->text().toFloat()*3.14159265/180.0);
+        QString* x = new QString();
+        QString* y = new QString();
+        x->sprintf("%.2f", new_x);
+        y->sprintf("%.2f", new_y);
+        if (new_x > xySliderResolution)
+        {
+                x_editslider->setValue(xySliderResolution);
+        }
+        else if (new_x < -xySliderResolution)
+        {
+                x_editslider->setValue(-xySliderResolution);
+        }
+        else
+        {
+                x_editslider->setValue(round(new_x * xySliderResolution));
+        }
+        x_editbox->setText(*x);
+        if (new_y > xySliderResolution)
+        {
+                y_editslider->setValue(xySliderResolution);
+        }
+        else if (new_y < -xySliderResolution)
+        {
+                y_editslider->setValue(-xySliderResolution);
+        }
+        else
+        {
+                y_editslider->setValue(round(new_y * xySliderResolution));
+        }
+        y_editbox->setText(*y);
+        model->setSubcaneLocation(caneChangeSubcane,x_editbox->text().toFloat(),y_editbox->text().toFloat(),0);
+        reconnectLocationSignals();
 }
 
 void MainWindow::updateCaneAlphaSlider(int i)
@@ -765,12 +1003,15 @@ void MainWindow :: saveCaneColorAndShape()
 	savedColor.a = c->a;
 
 	model->getSubcaneShape(caneChangeSubcane)->copy(&savedShape);
+
+        savedLocation = *(model->getSubcaneLocation(caneChangeSubcane));
 }
 
 void MainWindow :: revertCaneColorAndShape()
 {
 	model->setSubcaneColor(caneChangeSubcane, &savedColor);
 	model->setSubcaneShape(caneChangeSubcane, &savedShape);
+        model->setSubcaneLocation(caneChangeSubcane, savedLocation.x, savedLocation.y, savedLocation.z);
 }
 
 void MainWindow::updateBrandColorPickerColor(QModelIndex i)

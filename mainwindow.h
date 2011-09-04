@@ -69,10 +69,20 @@ public slots:
 	void insertLibraryCane(Cane* c);
 	void toggleFlat();
 
-		void x_changeEditSliderFromText();
-		void x_changeEditTextFromSlider(int i);
-		void y_changeEditSliderFromText();
-		void y_changeEditTextFromSlider(int i);
+        void size_changeEditSliderFromText();
+        void size_changeEditTextFromSlider(int i);
+        void disconnectLocationSignals();
+        void reconnectLocationSignals();
+        void x_changeEditSliderFromText();
+        void x_changeEditTextFromSlider(int i);
+        void y_changeEditSliderFromText();
+        void y_changeEditTextFromSlider(int i);
+        void radius_changeEditSliderFromText();
+        void radius_changeEditTextFromSlider(int i);
+        void theta_changeEditSliderFromText();
+        void theta_changeEditTextFromSlider(int i);
+        void changeRThetaFromXY();
+        void changeXYFromRTheta();
 
 private:
 	Model* model;
@@ -129,6 +139,7 @@ private:
 	int caneChangeSubcane;
 	Color savedColor;
 	CaneShape savedShape;
+        Point savedLocation;
 	QDialog* changeDialog;
 	QDialog* arrangementDialog;
 	QSplitter* caneSplitter;
@@ -146,15 +157,25 @@ private:
 	QComboBox* caneShapeBox;
 		QSlider* caneAlphaSlider;
 	QSlider* caneSizeSlider;
+        QLineEdit* caneSizeEditBox;
 	QSlider* caneHeightSlider;
 
 		int xySliderResolution;
-		QLabel* x_editlabel;
-		QLineEdit* x_editbox;
-		QSlider* x_editslider;
-		QLabel* y_editlabel;
-		QLineEdit* y_editbox;
-		QSlider* y_editslider;
+        int radiusSliderResolution;
+        int thetaSliderResolution;
+        int radiusMaxByDefault;
+        QLabel* x_editlabel;
+        QLineEdit* x_editbox;
+        QSlider* x_editslider;
+        QLabel* y_editlabel;
+        QLineEdit* y_editbox;
+        QSlider* y_editslider;
+        QLabel* radius_editlabel;
+        QLineEdit* radius_editbox;
+        QSlider* radius_editslider;
+        QLabel* theta_editlabel;
+        QLineEdit* theta_editbox;
+        QSlider* theta_editslider;
 
 	bool isRecipe;
 
