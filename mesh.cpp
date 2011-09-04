@@ -308,6 +308,9 @@ void meshPolygonalBaseCane(Geometry* geometry, float meshHeight, Cane** ancestor
 	//need to remember the first triangle so we can tag it later
 	uint32_t first_triangle = geometry->triangles.size();
 
+	// Tiny offset for avoiding collinear triangles in different canes
+	float random_z_offset = 0.001 * rand() / RAND_MAX; 
+
 	/*
 	Draw the walls of the polygon. Note that the z location is
 	adjusted by the total stretch experienced by the cane so that
@@ -390,7 +393,7 @@ void meshPolygonalBaseCane(Geometry* geometry, float meshHeight, Cane** ancestor
 			{
 				Point p;
 				p.xy = points[(*loop)[j]];
-				p.z = ((float) i) / ((axialResolution-1) * total_stretch);
+				p.z = ((float) i) / ((axialResolution-1) * total_stretch) + random_z_offset;
 				Point n;
 				//This is a terrible normal estimate, but I guess it gets re-estimated anyway.
 				n.x = p.x;
@@ -430,7 +433,9 @@ void meshPolygonalBaseCane(Geometry* geometry, float meshHeight, Cane** ancestor
 		{
 			Point p;
 			p.xy = points[j];
-			p.z = z / total_stretch;
+			// Put last point in general position
+			p.z = z / total_stretch + random_z_offset;
+
 			Point n;
 			n.x = 0.0; n.y = 0.0; n.z = nz;
 			geometry->vertices.push_back(Vertex(p, n));

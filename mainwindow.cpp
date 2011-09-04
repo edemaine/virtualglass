@@ -194,7 +194,7 @@ void MainWindow :: shapeSizeEvent(int)
 void MainWindow :: shapePickerEvent()
 {
 	QString shapeText = caneShapeBox->currentText();
-		float diameter = caneSizeEditBox->text().toFloat()/10.0;//caneSizeSlider->sliderPosition() / 60.0;
+		float diameter = caneSizeEditBox->text().toFloat()/6.0;//caneSizeSlider->sliderPosition() / 60.0;
 	CaneShape shape;
 	int resolution = LOW_ANGULAR_RESOLUTION;
 
