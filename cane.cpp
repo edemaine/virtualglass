@@ -343,6 +343,14 @@ float zeroIfNaN(float n)
 	return changeIfNaN(n,0);
 }
 
+std::string dotIfNull(QString s)
+{
+	if (s == NULL)
+		return ".";
+	else
+		return s.toStdString();
+}
+
 std::string typeToName(int type)
 {
 	switch(type)
@@ -463,6 +471,12 @@ std::string Cane :: yamlRepresentation()
 	}
 	out << YAML::EndSeq;
 
+	out << YAML::Key << "Shape Type";
+	out << YAML::Value << shape.type;
+
+	out << YAML::Key << "Shape Diameter";
+	out << YAML::Value << zeroIfNaN(shape.diameter);
+
 	out << YAML::Key << "Number of Subcanes";
 	out << YAML::Value << subcaneCount;
 
@@ -482,6 +496,9 @@ std::string Cane :: yamlRepresentation()
 	out << YAML::Value << YAML::BeginSeq;
 	out << color.r << color.g << color.b << color.a;
 	out << YAML::EndSeq;
+
+	out << YAML::Key << "Brand Color";
+	out << YAML::Value << dotIfNull(this->brandColorName);
 
 	out << YAML::Key << "Subcanes";
 	out << YAML::Value << YAML::BeginSeq;
@@ -521,23 +538,23 @@ void Cane :: changeLibraryIndex(int index)
 
 void Cane :: setName(QString name)
 {
-        brandColorName = name;
+		brandColorName = name;
 }
 
 void Cane :: setColor(Color color, QString name)
 {
-        setColor(color);
-        setName(name);
+		setColor(color);
+		setName(name);
 }
 
 void Cane :: setColor(float r, float g, float b, float a, QString name)
 {
-        setColor(r,g,b,a);
-        setName(name);
+		setColor(r,g,b,a);
+		setName(name);
 }
 
 void Cane :: setColor(QColor color, QString name)
 {
-        setColor(color);
-        setName(name);
+		setColor(color);
+		setName(name);
 }

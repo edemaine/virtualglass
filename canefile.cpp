@@ -85,7 +85,11 @@ void parseCaneFromYAML(const YAML::Node& node, Cane* cane)
 	}
 
 	cane->shape.tris = tris;
-
+	newNode["Shape Type"] >> cane->shape.type;
+	newNode["Shape Diameter"] >> cane->shape.diameter;
+	std::string temp;
+	newNode["Brand Color"] >> temp;
+	cane->brandColorName = temp.c_str();
 
 	newNode["Number of Subcanes"] >> cane->subcaneCount;
 
