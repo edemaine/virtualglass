@@ -167,12 +167,14 @@ private:
 		int radiusSliderResolution;
 		int thetaSliderResolution;
 		int radiusMaxByDefault;
+                QLabel* xy_editlabel;
 		QLabel* x_editlabel;
 		QLineEdit* x_editbox;
 		QSlider* x_editslider;
 		QLabel* y_editlabel;
 		QLineEdit* y_editbox;
 		QSlider* y_editslider;
+                QLabel* rtheta_editlabel;
 		QLabel* radius_editlabel;
 		QLineEdit* radius_editbox;
 		QSlider* radius_editslider;

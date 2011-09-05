@@ -665,6 +665,8 @@ void MainWindow::setupChangeDialog()
 		QGridLayout* xy_editorLayout = new QGridLayout(layout->widget());
 		QGridLayout* rtheta_editorLayout = new QGridLayout(layout->widget());
 
+                xy_editlabel = new QLabel("Rectangular Coordinates", xy_editorLayout->widget());
+                xy_editlabel->setAlignment(Qt::AlignHCenter);
 		x_editlabel = new QLabel("X position:", xy_editorLayout->widget());
 		x_editbox = new QLineEdit(xy_editorLayout->widget());
 		x_editbox->setValidator(new QDoubleValidator());
@@ -684,7 +686,9 @@ void MainWindow::setupChangeDialog()
 		y_editslider->setTickPosition(QSlider::TicksBothSides);
 		y_editslider->setTickInterval(1);
 
-		radius_editlabel = new QLabel("Radius:", rtheta_editorLayout->widget());
+                rtheta_editlabel = new QLabel("Polar Coordinates", rtheta_editorLayout->widget());
+                rtheta_editlabel->setAlignment(Qt::AlignHCenter);
+                radius_editlabel = new QLabel("R:", rtheta_editorLayout->widget());
 		radius_editbox = new QLineEdit(rtheta_editorLayout->widget());
 		radius_editbox->setValidator(new QDoubleValidator());
 		radius_editbox->setText("0.0");
@@ -693,7 +697,7 @@ void MainWindow::setupChangeDialog()
 		radius_editslider->setValue(0);
 		radius_editslider->setTickPosition(QSlider::TicksBothSides);
 		radius_editslider->setTickInterval(1);
-		theta_editlabel = new QLabel("Angle:", rtheta_editorLayout->widget());
+                theta_editlabel = new QLabel("Theta:", rtheta_editorLayout->widget());
 		theta_editbox = new QLineEdit(rtheta_editorLayout->widget());
 		theta_editbox->setValidator(new QDoubleValidator());
 		theta_editbox->setText("0.0");
@@ -703,19 +707,21 @@ void MainWindow::setupChangeDialog()
 		theta_editslider->setTickPosition(QSlider::TicksBothSides);
 		theta_editslider->setTickInterval(1);
 
-		xy_editorLayout->addWidget(x_editlabel,0,0,1,1);
-		xy_editorLayout->addWidget(x_editbox,0,2,1,1);
-		xy_editorLayout->addWidget(x_editslider,1,0,1,3);
-		xy_editorLayout->addWidget(y_editlabel,0,4,1,1);
-		xy_editorLayout->addWidget(y_editbox,0,6,1,1);
-		xy_editorLayout->addWidget(y_editslider,1,4,1,3);
+                xy_editorLayout->addWidget(xy_editlabel,0,0,1,7);
+                xy_editorLayout->addWidget(x_editlabel,1,0,1,1);
+                xy_editorLayout->addWidget(x_editbox,1,2,1,1);
+                xy_editorLayout->addWidget(x_editslider,2,0,1,3);
+                xy_editorLayout->addWidget(y_editlabel,1,4,1,1);
+                xy_editorLayout->addWidget(y_editbox,1,6,1,1);
+                xy_editorLayout->addWidget(y_editslider,2,4,1,3);
 		layout->addRow(xy_editorLayout);
-		rtheta_editorLayout->addWidget(radius_editlabel,0,0,1,1);
-		rtheta_editorLayout->addWidget(radius_editbox,0,2,1,1);
-		rtheta_editorLayout->addWidget(radius_editslider,1,0,1,3);
-		rtheta_editorLayout->addWidget(theta_editlabel,0,4,1,1);
-		rtheta_editorLayout->addWidget(theta_editbox,0,6,1,1);
-		rtheta_editorLayout->addWidget(theta_editslider,1,4,1,3);
+                rtheta_editorLayout->addWidget(rtheta_editlabel,0,0,1,7);
+                rtheta_editorLayout->addWidget(radius_editlabel,1,0,1,1);
+                rtheta_editorLayout->addWidget(radius_editbox,1,2,1,1);
+                rtheta_editorLayout->addWidget(radius_editslider,2,0,1,3);
+                rtheta_editorLayout->addWidget(theta_editlabel,1,4,1,1);
+                rtheta_editorLayout->addWidget(theta_editbox,1,6,1,1);
+                rtheta_editorLayout->addWidget(theta_editslider,2,4,1,3);
 		layout->addRow(rtheta_editorLayout);
 
                 connect(x_editbox, SIGNAL(editingFinished()),this,SLOT(x_changeEditSliderFromText()));
