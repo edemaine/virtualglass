@@ -927,7 +927,9 @@ void OpenGLWidget :: mousePressEvent (QMouseEvent* e)
 	if (e->button() == Qt::RightButton)
 	{
 		if (model->subcaneHasColorAndShape(getSubcaneUnderMouse(mouseLocX, mouseLocY)) && !this->deleteButtonDown)
+		{
 			emit caneChangeRequest(getSubcaneUnderMouse(mouseLocX, mouseLocY));
+		}
 		else
 			rightMouseDown = true;
 		return;

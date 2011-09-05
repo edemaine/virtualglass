@@ -35,15 +35,15 @@ public:
 
 signals:
 	void setNewMode(int i, bool viewRecipe,Cane* c);
-		void x_locationChanged(float f);
-		void y_locationChanged(float f);
+	void x_locationChanged(float f);
+	void y_locationChanged(float f);
 
 public slots:
 	void arrangementRequest(Cane* c);
 	void addNewDefaultCane();
 	void caneChangeRequest(int subcane);
 	void geometryHeightEvent(int);
-	void shapeTypeEvent(int);
+	void caneShapeBoxChanged(int);
 	void shapeSizeEvent(int);
 	void changeAlphaEvent(int i);
 	void caneChanged();
@@ -89,6 +89,7 @@ public slots:
 private:
 	Model* model;
 
+	void updateCaneChangeDialog();
 	void saveCaneColorAndShape();
 	void revertCaneColorAndShape();
 	void shapePickerEvent();
