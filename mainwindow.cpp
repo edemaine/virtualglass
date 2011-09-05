@@ -246,9 +246,9 @@ void MainWindow::caneChangeRequest(int subcane)
                                                 /* The following doesn't work as expected. For some reason, index() doesn't return a valid
                                                 index, and thus the selection in caneColorListBox doesn't work. This doesn't crash anything,
                                                 but it means that the specific color of the cane, when right-clicked, isn't selected in the box. */
-                                                QModelIndex colorIndex = caneColorListBox->selectionModel()->model()->index(selectedColor,0);
+                                                /*QModelIndex colorIndex = caneColorListBox->selectionModel()->model()->index(selectedColor,0);
                                                 if ( colorIndex.isValid() )
-                                                        caneColorListBox->selectionModel()->select(colorIndex,QItemSelectionModel::SelectCurrent);
+                                                        caneColorListBox->selectionModel()->select(colorIndex,QItemSelectionModel::SelectCurrent);*/
                                                 break;
                                         }
                                 }
