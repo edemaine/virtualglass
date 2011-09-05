@@ -229,7 +229,7 @@ void MainWindow::caneChangeRequest(int subcane)
 			caneSizeSlider->setSliderPosition(((int) (subcaneShape->getDiameter() * 60)));
 		}
 		caneAlphaSlider->setSliderPosition(((int) (subcaneColor->a * 255)));
-                if (subcaneBrand != NULL)
+                /*if (subcaneBrand != NULL)
                 {
                         for(int i = 0; i < caneNameListList->size(); i++)
                         {
@@ -248,12 +248,12 @@ void MainWindow::caneChangeRequest(int subcane)
                                                 but it means that the specific color of the cane, when right-clicked, isn't selected in the box. */
                                                 /*QModelIndex colorIndex = caneColorListBox->selectionModel()->model()->index(selectedColor,0);
                                                 if ( colorIndex.isValid() )
-                                                        caneColorListBox->selectionModel()->select(colorIndex,QItemSelectionModel::SelectCurrent);*/
+                                                        caneColorListBox->selectionModel()->select(colorIndex,QItemSelectionModel::SelectCurrent);/
                                                 break;
                                         }
                                 }
                         }
-                }
+                }*/
 		changeDialog->show();
 	}
 }
