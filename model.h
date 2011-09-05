@@ -34,11 +34,14 @@ public:
 	Color* getSubcaneColor(int subcane);
 	CaneShape* getSubcaneShape(int subcane);
 		Point* getSubcaneLocation(int subcane);
+        QString* getSubcaneBrand(int subcane);
 	bool subcaneHasColorAndShape(int subcane);
 		void setSubcaneLocation(int subcane, float x, float y, float z);
+        void setSubcaneColor(int subcane, Color* c, QString name);
 	void setSubcaneColor(int subcane, Color* c);
 	void setSubcaneShape(int subcane, CaneShape* shape);
 		void setSubcaneAlpha(int subcane, int newAlpha);
+        void setSubcaneBrand(int subcane, QString name);
 	Cane* getSubcane(int subcane);
 	Geometry* getGeometry();
 	void pullCane(float twistAmount, float stretchFactor);

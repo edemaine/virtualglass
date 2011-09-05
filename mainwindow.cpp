@@ -222,12 +222,38 @@ void MainWindow::caneChangeRequest(int subcane)
 	{
 		CaneShape* subcaneShape = model->getSubcaneShape(subcane);
 		Color* subcaneColor = model->getSubcaneColor(subcane);
+                QString* subcaneBrand = model->getSubcaneBrand(subcane);
 		if (subcaneShape->getType() != UNDEFINED_SHAPE)
 		{
 			caneShapeBox->setCurrentIndex(subcaneShape->getType()-1);
 			caneSizeSlider->setSliderPosition(((int) (subcaneShape->getDiameter() * 60)));
 		}
 		caneAlphaSlider->setSliderPosition(((int) (subcaneColor->a * 255)));
+                if (subcaneBrand != NULL)
+                {
+                        for(int i = 0; i < caneNameListList->size(); i++)
+                        {
+                                for(int j = 0; j < caneNameListList->at(i).size(); j++)
+                                {
+                                        if (model->getSubcane(caneChangeSubcane)->matchesBrandColorName(caneNameListList->at(i).at(j)))
+                                        {
+                                                selectedBrand = i;
+                                                selectedColor = j;
+                                                updateBrandColorPickerSublist(i);
+                                                QModelIndex brandIndex = caneTypeListModel->index(selectedBrand,0);
+                                                if ( brandIndex.isValid() )
+                                                        caneTypeListBox->selectionModel()->select(brandIndex,QItemSelectionModel::SelectCurrent);
+                                                /* The following doesn't work as expected. For some reason, index() doesn't return a valid
+                                                index, and thus the selection in caneColorListBox doesn't work. This doesn't crash anything,
+                                                but it means that the specific color of the cane, when right-clicked, isn't selected in the box. */
+                                                QModelIndex colorIndex = caneColorListBox->selectionModel()->model()->index(selectedColor,0);
+                                                if ( colorIndex.isValid() )
+                                                        caneColorListBox->selectionModel()->select(colorIndex,QItemSelectionModel::SelectCurrent);
+                                                break;
+                                        }
+                                }
+                        }
+                }
 		changeDialog->show();
 	}
 }
@@ -543,7 +569,7 @@ void MainWindow::setupChangeDialog()
 
 	QSplitter* caneSplitter = new QSplitter(layout->widget());
 
-	QStringListModel* caneTypeListModel = new QStringListModel();
+        caneTypeListModel = new QStringListModel();
 	caneTypeListModel->setStringList(*caneTypeList);
 	caneTypeListBox = new KeyQListView();
 	caneTypeListBox->setModel(caneTypeListModel);
@@ -621,7 +647,7 @@ void MainWindow::setupChangeDialog()
 		layout->addRow("Diameter:", sliderLayout1);
 		layout->addRow(sliderLayout2);
 
-		connect(caneSizeEditBox, SIGNAL(editingFinished()),
+                connect(caneSizeEditBox, SIGNAL(editingFinished()),
 						this,SLOT(size_changeEditSliderFromText()));
 		connect(caneSizeSlider, SIGNAL(valueChanged(int)),
 						this,SLOT(size_changeEditTextFromSlider(int)));
@@ -692,13 +718,13 @@ void MainWindow::setupChangeDialog()
 		rtheta_editorLayout->addWidget(theta_editslider,1,4,1,3);
 		layout->addRow(rtheta_editorLayout);
 
-		connect(x_editbox, SIGNAL(editingFinished()),this,SLOT(x_changeEditSliderFromText()));
+                connect(x_editbox, SIGNAL(editingFinished()),this,SLOT(x_changeEditSliderFromText()));
 		connect(x_editslider, SIGNAL(valueChanged(int)),this,SLOT(x_changeEditTextFromSlider(int)));
-		connect(y_editbox, SIGNAL(editingFinished()),this,SLOT(y_changeEditSliderFromText()));
+                connect(y_editbox, SIGNAL(editingFinished()),this,SLOT(y_changeEditSliderFromText()));
 		connect(y_editslider, SIGNAL(valueChanged(int)),this,SLOT(y_changeEditTextFromSlider(int)));
-		connect(radius_editbox, SIGNAL(editingFinished()),this,SLOT(radius_changeEditSliderFromText()));
+                connect(radius_editbox, SIGNAL(editingFinished()),this,SLOT(radius_changeEditSliderFromText()));
 		connect(radius_editslider, SIGNAL(valueChanged(int)),this,SLOT(radius_changeEditTextFromSlider(int)));
-		connect(theta_editbox, SIGNAL(editingFinished()),this,SLOT(theta_changeEditSliderFromText()));
+                connect(theta_editbox, SIGNAL(editingFinished()),this,SLOT(theta_changeEditSliderFromText()));
 		connect(theta_editslider, SIGNAL(valueChanged(int)),this,SLOT(theta_changeEditTextFromSlider(int)));
 
 	// Ok, cancel buttons
@@ -759,25 +785,25 @@ void MainWindow::size_changeEditTextFromSlider(int i)
 
 void MainWindow::disconnectLocationSignals()
 {
-	disconnect(x_editbox, SIGNAL(editingFinished()),this,SLOT(x_changeEditSliderFromText()));
+        disconnect(x_editbox, SIGNAL(editingFinished()),this,SLOT(x_changeEditSliderFromText()));
 	disconnect(x_editslider, SIGNAL(valueChanged(int)),this,SLOT(x_changeEditTextFromSlider(int)));
-	disconnect(y_editbox, SIGNAL(editingFinished()),this,SLOT(y_changeEditSliderFromText()));
+        disconnect(y_editbox, SIGNAL(editingFinished()),this,SLOT(y_changeEditSliderFromText()));
 	disconnect(y_editslider, SIGNAL(valueChanged(int)),this,SLOT(y_changeEditTextFromSlider(int)));
-	disconnect(radius_editbox, SIGNAL(editingFinished()),this,SLOT(radius_changeEditSliderFromText()));
+        disconnect(radius_editbox, SIGNAL(editingFinished()),this,SLOT(radius_changeEditSliderFromText()));
 	disconnect(radius_editslider, SIGNAL(valueChanged(int)),this,SLOT(radius_changeEditTextFromSlider(int)));
-	disconnect(theta_editbox, SIGNAL(editingFinished()),this,SLOT(theta_changeEditSliderFromText()));
+        disconnect(theta_editbox, SIGNAL(editingFinished()),this,SLOT(theta_changeEditSliderFromText()));
 	disconnect(theta_editslider, SIGNAL(valueChanged(int)),this,SLOT(theta_changeEditTextFromSlider(int)));
 }
 
 void MainWindow::reconnectLocationSignals()
 {
-	connect(x_editbox, SIGNAL(editingFinished()),this,SLOT(x_changeEditSliderFromText()));
+        connect(x_editbox, SIGNAL(editingFinished()),this,SLOT(x_changeEditSliderFromText()));
 	connect(x_editslider, SIGNAL(valueChanged(int)),this,SLOT(x_changeEditTextFromSlider(int)));
-	connect(y_editbox, SIGNAL(editingFinished()),this,SLOT(y_changeEditSliderFromText()));
+        connect(y_editbox, SIGNAL(editingFinished()),this,SLOT(y_changeEditSliderFromText()));
 	connect(y_editslider, SIGNAL(valueChanged(int)),this,SLOT(y_changeEditTextFromSlider(int)));
-	connect(radius_editbox, SIGNAL(editingFinished()),this,SLOT(radius_changeEditSliderFromText()));
+        connect(radius_editbox, SIGNAL(editingFinished()),this,SLOT(radius_changeEditSliderFromText()));
 	connect(radius_editslider, SIGNAL(valueChanged(int)),this,SLOT(radius_changeEditTextFromSlider(int)));
-	connect(theta_editbox, SIGNAL(editingFinished()),this,SLOT(theta_changeEditSliderFromText()));
+        connect(theta_editbox, SIGNAL(editingFinished()),this,SLOT(theta_changeEditSliderFromText()));
 	connect(theta_editslider, SIGNAL(valueChanged(int)),this,SLOT(theta_changeEditTextFromSlider(int)));
 }
 
@@ -1014,6 +1040,7 @@ void MainWindow :: saveCaneColorAndShape()
 	model->getSubcaneShape(caneChangeSubcane)->copy(&savedShape);
 
 		savedLocation = *(model->getSubcaneLocation(caneChangeSubcane));
+        savedBrand = *(model->getSubcaneBrand(caneChangeSubcane));
 }
 
 void MainWindow :: revertCaneColorAndShape()
@@ -1021,11 +1048,17 @@ void MainWindow :: revertCaneColorAndShape()
 	model->setSubcaneColor(caneChangeSubcane, &savedColor);
 	model->setSubcaneShape(caneChangeSubcane, &savedShape);
 		model->setSubcaneLocation(caneChangeSubcane, savedLocation.x, savedLocation.y, savedLocation.z);
+        model->setSubcaneBrand(caneChangeSubcane, savedBrand);
 }
 
 void MainWindow::updateBrandColorPickerColor(QModelIndex i)
 {
-	selectedColor = i.row();
+        updateBrandColorPickerColor(i.row());
+}
+
+void MainWindow::updateBrandColorPickerColor(int i)
+{
+        selectedColor = i;
 	if (selectedBrand == -1 || selectedColor == -1 || selectedBrand >= caneColorListList->size() ||
 			selectedColor >= caneColorListList->at(selectedBrand).size())
 		return;
@@ -1037,11 +1070,16 @@ void MainWindow::updateBrandColorPickerColor(QModelIndex i)
 		c.a = color.alphaF();
 		updateCaneAlphaSlider(c.a*255);
 		model->setSubcaneColor(caneChangeSubcane, &c);
+                model->setSubcaneBrand(caneChangeSubcane,caneNameListList->at(selectedBrand).at(selectedColor));
 }
 
 void MainWindow::updateBrandColorPickerSublist(QModelIndex i)
 {
-	int index = i.row();
+        updateBrandColorPickerSublist(i.row());
+}
+
+void MainWindow::updateBrandColorPickerSublist(int index)
+{
 	if (index < 0 || index >= caneColorListList->size())
 	{
 		if (!dummyInUse)
@@ -1059,7 +1097,7 @@ void MainWindow::updateBrandColorPickerSublist(QModelIndex i)
 		if (!dummyInUse)
 		{
 			QItemSelectionModel *m = caneColorListBox->selectionModel();
-			caneColorListBox->setModel(new QStandardItemModel(caneNameListList->at(index).size(),1));
+                        caneColorListBox->setModel(new QStandardItemModel(caneNameListList->at(index).size(),1,caneColorListBox));
 			for (int i = 0; i < caneNameListList->at(index).size(); i++)
 			{
 				caneColorListBox->model()->setData(caneColorListBox->model()->index(i,0),caneNameListList->at(index).at(i),Qt::DisplayRole);
@@ -1074,7 +1112,7 @@ void MainWindow::updateBrandColorPickerSublist(QModelIndex i)
 		}
 		else
 		{
-			caneColorListBox->setModel(new QStandardItemModel(caneNameListList->at(index).size(),1));
+                        caneColorListBox->setModel(new QStandardItemModel(caneNameListList->at(index).size(),1,caneColorListBox));
 			for (int i = 0; i < caneNameListList->at(index).size(); i++)
 			{
 				caneColorListBox->model()->setData(caneColorListBox->model()->index(i,0),caneNameListList->at(index).at(i),Qt::DisplayRole);

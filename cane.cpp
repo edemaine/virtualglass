@@ -227,6 +227,20 @@ void Cane :: moveCane(int subcane, float delta_x, float delta_y, float delta_z)
 	subcaneLocations[subcane].z += delta_z;
 }
 
+QString Cane :: toValidBrandName(QString name)
+{
+        name = name.trimmed();
+        QStringList name_pieces = name.split(' ');
+        QString* valid_name = new QString(name_pieces.at(0));
+        valid_name->remove('-');
+        return *valid_name;
+}
+
+bool Cane :: matchesBrandColorName(QString name)
+{
+        return this->brandColorName.compare(toValidBrandName(name)) == 0;
+}
+
 void Cane :: add(Cane* addl)
 {
 	if (this->type != BUNDLE_CANETYPE)
@@ -538,7 +552,7 @@ void Cane :: changeLibraryIndex(int index)
 
 void Cane :: setName(QString name)
 {
-		brandColorName = name;
+        brandColorName = toValidBrandName(name);
 }
 
 void Cane :: setColor(Color color, QString name)

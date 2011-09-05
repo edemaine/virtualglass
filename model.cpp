@@ -246,6 +246,17 @@ Color* Model :: getSubcaneColor(int subcane)
 	return &(cane->subcanes[subcane]->getBaseCane()->color);
 }
 
+QString* Model :: getSubcaneBrand(int subcane)
+{
+        if (cane == NULL)
+                return NULL;
+
+        if (cane->type == BASE_POLYGONAL_CANETYPE)
+                return &(cane->brandColorName);
+
+        return &(cane->subcanes[subcane]->getBaseCane()->brandColorName);
+}
+
 Point* Model :: getSubcaneLocation(int subcane)
 {
 		if (cane == NULL)
@@ -269,6 +280,39 @@ void Model :: setSubcaneLocation(int subcane, float x, float y, float z)
 
 		slowGeometryUpdate();
 		emit caneChanged(true);
+}
+
+void Model :: setSubcaneBrand(int subcane, QString name)
+{
+        if (cane == NULL)
+                return;
+
+        Cane* ac;
+        if (cane->type == BASE_POLYGONAL_CANETYPE)
+                ac = cane;
+        else
+                ac = cane->subcanes[subcane]->getBaseCane();
+        ac->setName(name);
+}
+
+void Model :: setSubcaneColor(int subcane, Color* c, QString name)
+{
+        if (cane == NULL)
+                return;
+
+        Cane* ac;
+        if (cane->type == BASE_POLYGONAL_CANETYPE)
+                ac = cane;
+        else
+                ac = cane->subcanes[subcane]->getBaseCane();
+        ac->color.r = c->r;
+        ac->color.g = c->g;
+        ac->color.b = c->b;
+        ac->color.a = c->a;
+        ac->setName(name);
+
+        slowGeometryUpdate();
+        emit caneChanged();
 }
 
 void Model :: setSubcaneColor(int subcane, Color* c)

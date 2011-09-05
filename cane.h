@@ -43,6 +43,8 @@ public:
         void setColor(float r, float g, float b, float a, QString name);
         void setColor(QColor color, QString name);
         void setName(QString name);
+        QString toValidBrandName(QString name);
+        bool matchesBrandColorName(QString name);
 	Cane* getBaseCane();
 	Cane* getTopBundleNode();
 	std::string yamlRepresentation();

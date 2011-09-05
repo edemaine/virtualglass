@@ -62,7 +62,9 @@ public slots:
 	void displayTextMessage(QString message,int msec);
 	void displayTextMessage(QString message);
 	void updateBrandColorPickerSublist(QModelIndex i);
+        void updateBrandColorPickerSublist(int index);
 	void updateBrandColorPickerColor(QModelIndex i);
+        void updateBrandColorPickerColor(int i);
 	void toggleRecipe();
 	void updateLibraryToolTip(LibraryCaneWidget* lc);
 	void newMode(int i);
@@ -140,6 +142,7 @@ private:
 	Color savedColor;
 	CaneShape savedShape;
 		Point savedLocation;
+        QString savedBrand;
 	QDialog* changeDialog;
 	QDialog* arrangementDialog;
 	QSplitter* caneSplitter;
