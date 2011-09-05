@@ -15,6 +15,8 @@ Model :: Model()
 	defaultCane->setColor(1.0, 1.0, 1.0, 1.0);
 	defaultCane->shape.setByTypeAndDiameter(CIRCLE_SHAPE, 0.3, LOW_ANGULAR_RESOLUTION);
 
+	connect(this, SIGNAL(caneChanged(bool)), this, SLOT(safeSave(bool)));
+
 	slowGeometryUpdate();
 }
 
@@ -22,26 +24,33 @@ void Model :: setGeometryHeight(float height)
 {
 	geometryHeight = height;
 	slowGeometryUpdate();
-	emit caneChanged();
-} 
+	emit caneChanged(true);
+}
 
 
 int Model :: addNewDefaultCane()
 {
 	addCane(defaultCane);
-        cane->moveCane(cane->subcaneCount-1, 0.0, 0.0, 0.0);
-	
+		cane->moveCane(cane->subcaneCount-1, 0.0, 0.0, 0.0);
+
 	slowGeometryUpdate();
-	emit caneChanged();
-	history->saveState(cane);
+	emit caneChanged(true);
+	//history->saveState(cane);
 	return cane->subcaneCount-1;
+}
+
+void Model :: safeSave(bool save)
+{
+	if (save)
+		history->saveState(cane);
+	emit caneChanged();
 }
 
 Cane* Model :: getSubcane(int subcane)
 {
 	if (cane == NULL || subcane < 0 || subcane >= cane->subcaneCount)
 		return NULL;
-	
+
 	return cane->subcanes[subcane];
 }
 
@@ -184,11 +193,11 @@ bool Model :: subcaneHasColorAndShape(int subcane)
 		else
 			return false;
 	}
-	else 
+	else
 	{
 		if (0 <= subcane && subcane < cane->subcaneCount)
 		{
- 			baseCane = cane->subcanes[subcane]->getBaseCane();
+			baseCane = cane->subcanes[subcane]->getBaseCane();
 			return (baseCane != NULL);
 		}
 		else
@@ -223,7 +232,7 @@ void Model :: setSubcaneShape(int subcane, CaneShape* newShape)
 		newShape->copy(&(cane->subcanes[subcane]->getBaseCane()->shape));
 
 	slowGeometryUpdate();
-	emit caneChanged();
+	emit caneChanged(true);
 }
 
 Color* Model :: getSubcaneColor(int subcane)
@@ -239,27 +248,27 @@ Color* Model :: getSubcaneColor(int subcane)
 
 Point* Model :: getSubcaneLocation(int subcane)
 {
-        if (cane == NULL)
-                return NULL;
+		if (cane == NULL)
+				return NULL;
 
-        return &(cane->subcaneLocations[subcane]);
+		return &(cane->subcaneLocations[subcane]);
 }
 
 void Model :: setSubcaneLocation(int subcane, float x, float y, float z)
 {
-        if (cane == NULL)
-                return;
+		if (cane == NULL)
+				return;
 
-        Cane* ac = cane;
+		Cane* ac = cane;
 /*        Cane* ac;
-        if (cane->type == BASE_POLYGONAL_CANETYPE)
-                ac = cane;
-        else
-                ac = cane->subcanes[subcane]->getBaseCane();*/
-        ac->moveCaneTo(subcane,x,y,z);
+		if (cane->type == BASE_POLYGONAL_CANETYPE)
+				ac = cane;
+		else
+				ac = cane->subcanes[subcane]->getBaseCane();*/
+		ac->moveCaneTo(subcane,x,y,z);
 
-        slowGeometryUpdate();
-        emit caneChanged();
+		slowGeometryUpdate();
+		emit caneChanged(true);
 }
 
 void Model :: setSubcaneColor(int subcane, Color* c)
@@ -276,9 +285,9 @@ void Model :: setSubcaneColor(int subcane, Color* c)
 	ac->color.g = c->g;
 	ac->color.b = c->b;
 	ac->color.a = c->a;
-	
+
 	slowGeometryUpdate();
-	emit caneChanged();
+	emit caneChanged(true);
 }
 
 void Model :: setSubcaneAlpha(int subcane, int newAlpha)
@@ -292,20 +301,20 @@ void Model :: setSubcaneAlpha(int subcane, int newAlpha)
 	else
 		ac = cane->subcanes[subcane]->getBaseCane();
 
-        Color* newColor = new Color(ac->color);
-        newColor->a = newAlpha/float(255);
-        setSubcaneColor(subcane, newColor);
+		Color* newColor = new Color(ac->color);
+		newColor->a = newAlpha/float(255);
+		setSubcaneColor(subcane, newColor);
 }
 
 void Model :: setActiveSubcane(int subcane)
 {
-        if (cane == NULL)
+		if (cane == NULL)
 		return;
-        if (activeSubcane != subcane)
+		if (activeSubcane != subcane)
 	{
 		activeSubcane = subcane;
-		emit caneChanged();
-        }
+		emit caneChanged(false);
+		}
 }
 
 int Model :: getActiveSubcane()
@@ -315,13 +324,13 @@ int Model :: getActiveSubcane()
 
 void Model :: setCane(Cane* c)
 {
-	history->saveState(cane);
+	//history->saveState(cane);
 	if (c != NULL)
 		cane = c->deepCopy();
 	else
 		cane = NULL;
 	slowGeometryUpdate();
-	emit caneChanged();
+	emit caneChanged(true);
 	if (cane == NULL)
 		return;
 
@@ -369,7 +378,7 @@ void Model :: slowGeometryUpdate()
 		break;
 	}
 
-	emit caneChanged();
+	emit caneChanged(true);
 }
 
 void Model :: computeHighResGeometry(Geometry* geometry)
@@ -400,7 +409,7 @@ void Model :: pullCane(float twistAmount, float stretchAmount)
 	cane->pullIntuitive(twistAmount, stretchAmount);
 	applyPullTransform(&geometry, cane);
 
-	emit caneChanged();
+	emit caneChanged(false);
 }
 
 void Model :: flattenCane(float rectangle_ratio, float rectangle_theta, float flatness)
@@ -409,7 +418,7 @@ void Model :: flattenCane(float rectangle_ratio, float rectangle_theta, float fl
 	cane->flatten(rectangle_ratio, rectangle_theta, flatness);
 	applyFlattenTransform(&geometry, cane);
 
-	emit caneChanged();
+	emit caneChanged(false);
 }
 
 void Model :: moveCane(float delta_x, float delta_y, float delta_z)
@@ -417,28 +426,28 @@ void Model :: moveCane(float delta_x, float delta_y, float delta_z)
 	if (cane == NULL || activeSubcane == -1)
 		return;
 
-        revertToCachedGeometry();
-        cane->moveCane(activeSubcane, delta_x, delta_y, delta_z);
+		revertToCachedGeometry();
+		cane->moveCane(activeSubcane, delta_x, delta_y, delta_z);
 	applyPartialMoveTransform(&geometry, cane, activeSubcane, delta_x, delta_y, delta_z);
 	cacheGeometry();
 
-	emit caneChanged();
+	emit caneChanged(false);
 }
 
 bool Model :: deleteActiveCane()
 {
 	if (cane == NULL || activeSubcane == -1)
 		return false;
-	history->saveState(cane);
+	//history->saveState(cane);
 	cane->deleteCane(activeSubcane);
 	slowGeometryUpdate();
-	emit caneChanged();
+	emit caneChanged(true);
 	return true;
 }
 
 void Model :: addCane(Cane* c)
 {
-	history->saveState(cane);
+	//history->saveState(cane);
 	if (cane == NULL)
 	{
 		setCane(c);
@@ -449,7 +458,7 @@ void Model :: addCane(Cane* c)
 			setMode(BUNDLE_MODE);
 		cane->add(c->deepCopy());
 		slowGeometryUpdate();
-		emit caneChanged();
+		emit caneChanged(true);
 	}
 }
 
@@ -467,7 +476,7 @@ void Model :: addCane(Cane* c, Cane* d)
 	{
 		c->add(d->deepCopy());
 		slowGeometryUpdate();
-		emit caneChanged();
+		emit caneChanged(true);
 		if (mode != BUNDLE_MODE)
 			setMode(BUNDLE_MODE);
 	}
@@ -478,8 +487,9 @@ void Model :: undo()
 	if (history->canUndo())
 	{
 		cane = history->undo();
+		this->setMode(NO_MODE);
 		slowGeometryUpdate();
-		emit caneChanged();
+		emit caneChanged(false);
 	}
 }
 
@@ -488,9 +498,10 @@ void Model :: redo()
 	if (history->canRedo())
 	{
 		cane = history->redo();
+		this->setMode(NO_MODE);
 		slowGeometryUpdate();
-		emit caneChanged();
-	}	
+		emit caneChanged(false);
+	}
 }
 
 void Model :: saveObjFile(std::string const &filename)
@@ -510,5 +521,5 @@ void Model :: saveRawFile(std::string const &filename)
 void Model::exactChange()
 {
 	slowGeometryUpdate();
-	emit caneChanged();
+	emit caneChanged(true);
 }

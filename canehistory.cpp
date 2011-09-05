@@ -27,7 +27,7 @@ void CaneHistory :: saveState(Cane* c)
 		endOfValid = curPosition;
 		if (c == NULL)
 			buffer[curPosition] = c;
-		else	
+		else
 			buffer[curPosition] = c->deepCopy();
 	}
 }
@@ -63,11 +63,14 @@ Cane* CaneHistory :: redo()
 	if (canRedo())
 	{
 		++curPosition;
-		return buffer[curPosition]; 
+		return buffer[curPosition];
 	}
 	else
 		return buffer[curPosition];
 }
 
-
+int CaneHistory :: getPosition()
+{
+	return this->curPosition;
+}
 

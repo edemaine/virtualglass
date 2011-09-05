@@ -18,7 +18,7 @@
 #include "mesh.h"
 #include "canefile.h"
 
-using std::vector;	
+using std::vector;
 
 class Model : public QObject
 {
@@ -33,12 +33,12 @@ public:
 	int addNewDefaultCane();
 	Color* getSubcaneColor(int subcane);
 	CaneShape* getSubcaneShape(int subcane);
-        Point* getSubcaneLocation(int subcane);
+		Point* getSubcaneLocation(int subcane);
 	bool subcaneHasColorAndShape(int subcane);
-        void setSubcaneLocation(int subcane, float x, float y, float z);
+		void setSubcaneLocation(int subcane, float x, float y, float z);
 	void setSubcaneColor(int subcane, Color* c);
 	void setSubcaneShape(int subcane, CaneShape* shape);
-        void setSubcaneAlpha(int subcane, int newAlpha);
+		void setSubcaneAlpha(int subcane, int newAlpha);
 	Cane* getSubcane(int subcane);
 	Geometry* getGeometry();
 	void pullCane(float twistAmount, float stretchFactor);
@@ -60,12 +60,13 @@ public:
 
 signals:
 	void caneChanged();
+	void caneChanged(bool save);
 	void textMessage(QString msg);
 	void modeChanged(int mode);
 	void projectionChanged();
 
 public slots:
-	void setCaneToNull();	
+	void setCaneToNull();
 	void undo();
 	void redo();
 	void setMode(int mode);
@@ -75,6 +76,7 @@ public slots:
 	void exactChange();
 	void setOrthographicProjection();
 	void setPerspectiveProjection();
+	void safeSave(bool save);
 
 private:
 	float geometryHeight;

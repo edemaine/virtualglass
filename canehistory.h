@@ -14,6 +14,7 @@ public:
 	Cane* undo();
 	bool canRedo();
 	Cane* redo();
+	int getPosition();
 
 private:
 	Cane* buffer[20];
