@@ -222,7 +222,7 @@ void MainWindow::caneChangeRequest(int subcane)
 	{
 		CaneShape* subcaneShape = model->getSubcaneShape(subcane);
 		Color* subcaneColor = model->getSubcaneColor(subcane);
-                QString* subcaneBrand = model->getSubcaneBrand(subcane);
+                //QString* subcaneBrand = model->getSubcaneBrand(subcane);
 		if (subcaneShape->getType() != UNDEFINED_SHAPE)
 		{
 			caneShapeBox->setCurrentIndex(subcaneShape->getType()-1);
@@ -243,10 +243,10 @@ void MainWindow::caneChangeRequest(int subcane)
                                                 QModelIndex brandIndex = caneTypeListModel->index(selectedBrand,0);
                                                 if ( brandIndex.isValid() )
                                                         caneTypeListBox->selectionModel()->select(brandIndex,QItemSelectionModel::SelectCurrent);
-                                                /* The following doesn't work as expected. For some reason, index() doesn't return a valid
-                                                index, and thus the selection in caneColorListBox doesn't work. This doesn't crash anything,
-                                                but it means that the specific color of the cane, when right-clicked, isn't selected in the box. */
-                                                /*QModelIndex colorIndex = caneColorListBox->selectionModel()->model()->index(selectedColor,0);
+                                                // The following doesn't work as expected. For some reason, index() doesn't return a valid
+                                                // index, and thus the selection in caneColorListBox doesn't work. This doesn't crash anything,
+                                                // but it means that the specific color of the cane, when right-clicked, isn't selected in the box.
+                                                //QModelIndex colorIndex = caneColorListBox->selectionModel()->model()->index(selectedColor,0);
                                                 if ( colorIndex.isValid() )
                                                         caneColorListBox->selectionModel()->select(colorIndex,QItemSelectionModel::SelectCurrent);/
                                                 break;
