@@ -33,12 +33,10 @@ QMAKE_CFLAGS_RELEASE += -Wall -Werror -g
 QMAKE_CXXFLAGS += -Wall -Werror -Wno-deprecated -g
 
 # Input
-HEADERS += mainwindow.h openglwidget.h cane.h primitives.h model.h controller.h librarycanewidget.h \
-	constants.h canehistory.h geometry.h mesh.h keyqlistview.h canefile.h caneshape.h Vector.hpp \
-	recipewidget.h Box.hpp \
-	Vector.hpp Matrix.hpp Box.hpp \
-	SVG.hpp PlanarMap.hpp MersenneTwister.hpp \
-
+HEADERS += primitives.h constants.h Vector.hpp \ 
+	pullplan.h pulltemplate.h \ 
+	mainwindow.h \
+	controller.h model.h 
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
 	yaml-cpp/include/yaml-cpp/traits.h \
@@ -89,9 +87,10 @@ HEADERS += yaml-cpp/src/token.h \
 	yaml-cpp/src/directives.h \
 	yaml-cpp/src/collectionstack.h
 
-SOURCES += main.cpp mainwindow.cpp openglwidget.cpp cane.cpp model.cpp controller.cpp librarycanewidget.cpp \
-	canehistory.cpp geometry.cpp mesh.cpp canefile.cpp caneshape.cpp recipewidget.cpp \
-	SVG.cpp PlanarMap.cpp \
+SOURCES += main.cpp \ 
+	pullplan.cpp pulltemplate.cpp \
+	model.cpp controller.cpp \
+	mainwindow.cpp 
 
 
 SOURCES += yaml-cpp/src/tag.cpp \

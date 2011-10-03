@@ -2,15 +2,11 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#define LOW_AXIAL_RESOLUTION 100
-#define LOW_ANGULAR_RESOLUTION 24
-#define HIGH_AXIAL_RESOLUTION 300
-#define HIGH_ANGULAR_RESOLUTION 60
 #define MAX_SUBCANE_COUNT 1000
 #define MAX_FILENAME_LENGTH 200
 
-#define LOW_RESOLUTION 1
-#define HIGH_RESOLUTION 2
+#define MODE_2D 1
+#define MODE_3D 2
 
 #define ALL_SUBCANES -1
 #define NO_SUBCANES -2
@@ -18,22 +14,23 @@
 #define PERSPECTIVE_PROJECTION 1
 #define ORTHOGRAPHIC_PROJECTION 2
 
-
-// Valid shapes are assumed to start at 1 and be contiguous
-// up to some index. Some code uses this constraint. 
 #define UNASSIGNED_CANETYPE 0
 #define PULL_CANETYPE 1
 #define BUNDLE_CANETYPE 2
 #define FLATTEN_CANETYPE 3
 #define BASE_POLYGONAL_CANETYPE 4
+#define PLATE_CANETYPE 5 
+#define BARREL_CANETYPE 6
 
-#define UNDEFINED_SHAPE 0
+// Valid shapes are assumed to start at 1 and be contiguous
+// up to some index. Some code uses this constraint. 
 #define CIRCLE_SHAPE 1
 #define HALF_CIRCLE_SHAPE 2
 #define THIRD_CIRCLE_SHAPE 3
 #define SQUARE_SHAPE 4
 #define RECTANGLE_SHAPE 5
 #define TRIANGLE_SHAPE 6
+#define UNDEFINED_SHAPE 7
 
 #define MAX_ANCESTORS 20
 #define MAX_AMT_TYPES 5
