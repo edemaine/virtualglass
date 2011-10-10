@@ -5,6 +5,7 @@
 
 #include <QtGui>
 #include <QObject>
+#include "niceviewwidget.h"
 
 class MainWindow : public QMainWindow
 {
@@ -16,11 +17,19 @@ class MainWindow : public QMainWindow
 	private:
 		// Methods
 		void setupTable();
-		void setupEditors();
 		void setupNiceView();	
+		void setupPullPlanEditor();
+		void setupConnections();
 
 		// Variables
 		QWidget* centralWidget;
+		QHBoxLayout* centralLayout;
+		QFormLayout* editorLayout;
+		QLabel* editorLabel;
+		QComboBox* pullTemplateComboBox;
+		QLabel* niceViewLabel;
+		QVBoxLayout* niceViewLayout;
+		NiceViewWidget* niceViewWidget;
 };
 
 

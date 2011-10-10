@@ -34,9 +34,9 @@ QMAKE_CXXFLAGS += -Wall -Werror -Wno-deprecated -g
 
 # Input
 HEADERS += primitives.h constants.h Vector.hpp \ 
-	pullplan.h pulltemplate.h \ 
-	mainwindow.h \
-	controller.h model.h 
+	pullplan.h pulltemplate.h basepullplan.h \ 
+	mainwindow.h niceviewwidget.h \
+	controller.h model.h geometry.h \ 
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
 	yaml-cpp/include/yaml-cpp/traits.h \
@@ -88,9 +88,9 @@ HEADERS += yaml-cpp/src/token.h \
 	yaml-cpp/src/collectionstack.h
 
 SOURCES += main.cpp \ 
-	pullplan.cpp pulltemplate.cpp \
-	model.cpp controller.cpp \
-	mainwindow.cpp 
+	pullplan.cpp pulltemplate.cpp basepullplan.cpp \
+	model.cpp controller.cpp geometry.cpp \
+	mainwindow.cpp niceviewwidget.cpp 
 
 
 SOURCES += yaml-cpp/src/tag.cpp \
