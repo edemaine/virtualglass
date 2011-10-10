@@ -22,6 +22,7 @@ MainWindow :: MainWindow(Model* model)
 void MainWindow :: setupConnections()
 {
 	connect(pullTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pullTemplateChanged(int)));	
+	connect(savePullPlanButton, SIGNAL(pressed()), this, SLOT(savePullPlan()));	
 }
 
 void MainWindow :: setupTable()
@@ -34,7 +35,7 @@ void MainWindow :: setupTable()
 	QWidget* pullPlanLibraryWidget = new QWidget(centralWidget);
 	tableLayout->addWidget(pullPlanLibraryWidget);	
 	
-	QHBoxLayout* pullPlanLibraryLayout = new QHBoxLayout(pullPlanLibraryWidget);
+	pullPlanLibraryLayout = new QHBoxLayout(pullPlanLibraryWidget);
 	pullPlanLibraryLayout->setSpacing(10);
 	tableLayout->addLayout(pullPlanLibraryLayout);
 
@@ -75,6 +76,15 @@ void MainWindow :: setupPullPlanEditor()
 	pullTemplateGraphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pullTemplateGraphicsView->ensureVisible(0, 0, 400, 400, 5, 5);
 	editorLayout->addWidget(pullTemplateGraphicsView); 	
+
+	savePullPlanButton = new QPushButton("Save Pull Plan");
+	editorLayout->addWidget(savePullPlanButton);
+}
+
+void MainWindow :: savePullPlan()
+{
+	PullPlanLibraryWidget* pplw = new PullPlanLibraryWidget(niceViewWidget);
+	pullPlanLibraryLayout->addWidget(pplw);	
 }
 
 void MainWindow :: loadPullTemplate(PullTemplate* pt)

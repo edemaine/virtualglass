@@ -6,6 +6,7 @@
 #include <QtGui>
 #include <QObject>
 #include "niceviewwidget.h"
+#include "pullplanlibrarywidget.h"
 #include "pulltemplate.h"
 #include "model.h"
 
@@ -34,10 +35,12 @@ class MainWindow : public QMainWindow
 		QVBoxLayout* niceViewLayout;
 		NiceViewWidget* niceViewWidget;
 		QScrollArea* pullPlanLibraryScrollArea;
+		QPushButton* savePullPlanButton; 
+		QHBoxLayout* pullPlanLibraryLayout;
 
 	private slots:
 		void pullTemplateChanged(int index);
-		
+		void savePullPlan();	
 };
 
 
