@@ -6,13 +6,15 @@
 #include <QtGui>
 #include <QObject>
 #include "niceviewwidget.h"
+#include "pulltemplate.h"
+#include "model.h"
 
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 
 	public:
-		MainWindow();
+		MainWindow(Model* model);
 
 	private:
 		// Methods
@@ -20,16 +22,22 @@ class MainWindow : public QMainWindow
 		void setupNiceView();	
 		void setupPullPlanEditor();
 		void setupConnections();
+		void loadPullTemplate(PullTemplate* pt);
 
 		// Variables
+		Model* model;
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
-		QFormLayout* editorLayout;
-		QLabel* editorLabel;
 		QComboBox* pullTemplateComboBox;
+		QGraphicsScene* pullTemplateGraphicsScene;
 		QLabel* niceViewLabel;
 		QVBoxLayout* niceViewLayout;
 		NiceViewWidget* niceViewWidget;
+		QScrollArea* pullPlanLibraryScrollArea;
+
+	private slots:
+		void pullTemplateChanged(int index);
+		
 };
 
 

@@ -22,6 +22,10 @@
 #define PLATE_CANETYPE 5 
 #define BARREL_CANETYPE 6
 
+// Valid templates are assumed to start at 1 and be contiguous
+#define LINE_THREE 1
+#define LINE_FIVE 2
+
 // Valid shapes are assumed to start at 1 and be contiguous
 // up to some index. Some code uses this constraint. 
 #define CIRCLE_SHAPE 1
