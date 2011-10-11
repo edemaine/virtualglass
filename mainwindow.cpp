@@ -19,6 +19,38 @@ MainWindow :: MainWindow(Model* model)
         move(75,25);
 }
 
+void MainWindow :: mousePressEvent(QMouseEvent* event)
+{
+	PullPlanLibraryWidget* pplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
+	if (pplw == NULL)
+		return;
+
+	QPixmap pixmap = *pplw->pixmap();
+
+	QMimeData *mimeData = new QMimeData;
+	mimeData->setText("0");
+
+	QDrag *drag = new QDrag(this);
+	drag->setMimeData(mimeData);
+	drag->setPixmap(pixmap);
+	drag->setHotSpot(QPoint(50, 50)); // - child->pos());
+
+	pplw->setPixmap(pixmap);
+
+	if (drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction) == Qt::MoveAction)
+		pplw->close();
+	else 
+	{
+		pplw->show();
+		pplw->setPixmap(pixmap);
+     	}
+}
+
+void MainWindow :: dragMoveEvent(QDragMoveEvent* event)
+{
+	event->acceptProposedAction();
+}
+
 void MainWindow :: setupConnections()
 {
 	connect(pullTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pullTemplateChanged(int)));	
@@ -46,8 +78,8 @@ void MainWindow :: setupTable()
         pullPlanLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
         pullPlanLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         pullPlanLibraryScrollArea->setFixedHeight(130);
-
 	tableLayout->addWidget(pullPlanLibraryScrollArea);	
+
 }
 
 void MainWindow :: setupPullPlanEditor()
@@ -70,6 +102,7 @@ void MainWindow :: setupPullPlanEditor()
 	pullTemplateGraphicsScene->setBackgroundBrush(Qt::gray);
 
 	QGraphicsView* pullTemplateGraphicsView = new QGraphicsView(pullTemplateGraphicsScene, centralWidget);
+	pullTemplateGraphicsView->setAcceptDrops(true);
 	pullTemplateGraphicsView->setFixedWidth(410);
 	pullTemplateGraphicsView->setFixedHeight(410);
 	pullTemplateGraphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -79,6 +112,9 @@ void MainWindow :: setupPullPlanEditor()
 
 	savePullPlanButton = new QPushButton("Save Pull Plan");
 	editorLayout->addWidget(savePullPlanButton);
+
+	pullTemplateComboBox->setCurrentIndex(0);
+	pullTemplateChanged(0);
 }
 
 void MainWindow :: savePullPlan()

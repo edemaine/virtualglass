@@ -16,6 +16,8 @@ class MainWindow : public QMainWindow
 
 	public:
 		MainWindow(Model* model);
+        	void mousePressEvent(QMouseEvent* event);
+        	void dragMoveEvent(QDragMoveEvent* event);
 
 	private:
 		// Methods
