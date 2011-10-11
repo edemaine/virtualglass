@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include "primitives.h"
-#include "basepullplan.h"
+#include "pullplan.h"
 
 // Mesh stuff
 class Vertex
@@ -33,14 +33,14 @@ class Cane;
 class Group
 {
 public:
-	Group(uint32_t _triangle_begin, uint32_t _triangle_size, uint32_t _vertex_begin, uint32_t _vertex_size, BasePullPlan *_basepullplan, uint32_t _tag)
-		: triangle_begin(_triangle_begin), triangle_size(_triangle_size), vertex_begin(_vertex_begin), vertex_size(_vertex_size), basepullplan(_basepullplan), tag(_tag) {
+	Group(uint32_t _triangle_begin, uint32_t _triangle_size, uint32_t _vertex_begin, uint32_t _vertex_size, PullPlan *_pullplan, uint32_t _tag)
+		: triangle_begin(_triangle_begin), triangle_size(_triangle_size), vertex_begin(_vertex_begin), vertex_size(_vertex_size), pullplan(_pullplan), tag(_tag) {
 	}
 	uint32_t triangle_begin;
 	uint32_t triangle_size;
 	uint32_t vertex_begin;
 	uint32_t vertex_size;
-	BasePullPlan* basepullplan;
+	PullPlan* pullplan;
 	uint32_t tag;
 };
 
@@ -65,7 +65,7 @@ public:
 		for (std::vector< Group >::const_iterator g = groups.begin(); g != groups.end(); ++g) {
 			if (g->triangle_begin >= triangles.size()) return false;
 			if (g->triangle_begin + g->triangle_size > triangles.size()) return false;
-			if (g->basepullplan == NULL) return false;
+			if (g->pullplan == NULL) return false;
 			if (g->vertex_begin >= vertices.size()) return false;
 			if (g->vertex_begin + g->vertex_size > vertices.size()) return false;
 		}

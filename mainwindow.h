@@ -9,6 +9,7 @@
 #include "pullplanlibrarywidget.h"
 #include "pulltemplate.h"
 #include "model.h"
+#include "pullplan.h"
 
 class MainWindow : public QMainWindow
 {
@@ -28,6 +29,8 @@ class MainWindow : public QMainWindow
 		void loadPullTemplate(PullTemplate* pt);
 
 		// Variables
+		PullPlan* pullPlanEditorPlan;
+		PullPlan* defaultPullPlanEditorPlan;
 		Model* model;
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;

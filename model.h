@@ -3,6 +3,7 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include "pullplan.h"
 #include "pulltemplate.h"
 #include "constants.h"
 

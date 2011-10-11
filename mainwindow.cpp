@@ -84,6 +84,10 @@ void MainWindow :: setupTable()
 
 void MainWindow :: setupPullPlanEditor()
 {
+	pullPlanEditorPlan = new PullPlan();
+	defaultPullPlanEditorPlan = new PullPlan();
+	defaultPullPlanEditorPlan->setColor(1.0, 1.0, 1.0, 0.1);	
+
 	QVBoxLayout* editorLayout = new QVBoxLayout(centralWidget);
 	centralLayout->addLayout(editorLayout, 1);
 
@@ -125,16 +129,22 @@ void MainWindow :: savePullPlan()
 
 void MainWindow :: loadPullTemplate(PullTemplate* pt)
 {
+	QPen pen;
+	pen.setWidth(5);
 	pullTemplateGraphicsScene->clear();
-	pullTemplateGraphicsScene->addEllipse(0, 0, 400, 400);
+	pullTemplateGraphicsScene->addEllipse(0, 0, 400, 400, pen);
+	pen.setWidth(10);
 	Point upperLeft; 
 	for (unsigned int i = 0; i < pt->locations.size(); ++i)
 	{
+		pen.setColor(QColor(i*20, i*20, i*20));
 		upperLeft.x = -pt->diameters[i]/2 * 200.0 + pt->locations[i].x * 200.0;
 		upperLeft.y = -pt->diameters[i]/2 * 200.0 + pt->locations[i].y * 200.0;
 		pullTemplateGraphicsScene->addEllipse(200.0 + upperLeft.x, 200.0 + upperLeft.y, 
-			pt->diameters[i] * 200.0, pt->diameters[i] * 200.0);
+			pt->diameters[i] * 200.0, pt->diameters[i] * 200.0, pen);
 	}		
+
+	pullPlanEditorPlan->setPullTemplate(pt, defaultPullPlanEditorPlan);
 } 
 
 void MainWindow :: pullTemplateChanged(int newIndex)
