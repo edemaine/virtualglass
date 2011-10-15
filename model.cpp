@@ -5,6 +5,18 @@ Model :: Model()
 {
 	// Initialize pull templates
 	initializePullTemplates();
+	geometry = new Geometry();
+}
+
+Geometry* Model :: getGeometry(PullPlan* plan)
+{
+	geometry->clear();
+	PullPlan* ancestors[1000];
+	int ancestorCount = 0;
+
+	generateMesh(plan, geometry, ancestors, &ancestorCount);
+
+	return geometry; 
 }
 
 void Model :: initializePullTemplates()

@@ -26,7 +26,8 @@ class MainWindow : public QMainWindow
 		void setupNiceView();	
 		void setupPullPlanEditor();
 		void setupConnections();
-		void loadPullTemplate(PullTemplate* pt);
+		void updatePullPlanEditor();
+		void updateNiceView();
 
 		// Variables
 		PullPlan* pullPlanEditorPlan;
@@ -44,7 +45,7 @@ class MainWindow : public QMainWindow
 		QHBoxLayout* pullPlanLibraryLayout;
 
 	private slots:
-		void pullTemplateChanged(int index);
+		void pullTemplateComboBoxChanged(int index);
 		void savePullPlan();	
 };
 

@@ -53,7 +53,7 @@ void MainWindow :: dragMoveEvent(QDragMoveEvent* event)
 
 void MainWindow :: setupConnections()
 {
-	connect(pullTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pullTemplateChanged(int)));	
+	connect(pullTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pullTemplateComboBoxChanged(int)));	
 	connect(savePullPlanButton, SIGNAL(pressed()), this, SLOT(savePullPlan()));	
 }
 
@@ -118,7 +118,6 @@ void MainWindow :: setupPullPlanEditor()
 	editorLayout->addWidget(savePullPlanButton);
 
 	pullTemplateComboBox->setCurrentIndex(0);
-	pullTemplateChanged(0);
 }
 
 void MainWindow :: savePullPlan()
@@ -127,7 +126,7 @@ void MainWindow :: savePullPlan()
 	pullPlanLibraryLayout->addWidget(pplw);	
 }
 
-void MainWindow :: loadPullTemplate(PullTemplate* pt)
+void MainWindow :: updatePullPlanEditor()
 {
 	QPen pen;
 	pen.setWidth(5);
@@ -135,6 +134,7 @@ void MainWindow :: loadPullTemplate(PullTemplate* pt)
 	pullTemplateGraphicsScene->addEllipse(0, 0, 400, 400, pen);
 	pen.setWidth(10);
 	Point upperLeft; 
+	PullTemplate* pt = pullPlanEditorPlan->getTemplate();
 	for (unsigned int i = 0; i < pt->locations.size(); ++i)
 	{
 		pen.setColor(QColor(i*20, i*20, i*20));
@@ -143,21 +143,18 @@ void MainWindow :: loadPullTemplate(PullTemplate* pt)
 		pullTemplateGraphicsScene->addEllipse(200.0 + upperLeft.x, 200.0 + upperLeft.y, 
 			pt->diameters[i] * 200.0, pt->diameters[i] * 200.0, pen);
 	}		
-
-	pullPlanEditorPlan->setPullTemplate(pt, defaultPullPlanEditorPlan);
 } 
 
-void MainWindow :: pullTemplateChanged(int newIndex)
+void MainWindow :: updateNiceView()
 {
-	switch (newIndex+1)
-	{
-		case LINE_THREE:
-			loadPullTemplate(model->getPullTemplate(LINE_THREE));
-			break;		
-		case LINE_FIVE:
-			loadPullTemplate(model->getPullTemplate(LINE_FIVE));
-			break;		
-	}
+	niceViewWidget->setGeometry(model->getGeometry(pullPlanEditorPlan));	
+}
+
+void MainWindow :: pullTemplateComboBoxChanged(int newIndex)
+{
+	pullPlanEditorPlan->setTemplate(model->getPullTemplate(newIndex+1), defaultPullPlanEditorPlan);
+	updatePullPlanEditor();
+	updateNiceView();
 }
 
 void MainWindow :: setupNiceView()

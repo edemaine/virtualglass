@@ -28,6 +28,7 @@ public:
 	virtual ~NiceViewWidget();
 	void setCamera(float theta, float fee);
 	bool peelEnabled();
+	void setGeometry(Geometry* g);
 
 private:
 	bool leftMouseDown;

@@ -608,6 +608,12 @@ void NiceViewWidget :: mousePressEvent (QMouseEvent* e)
 	}
 }
 
+void NiceViewWidget :: setGeometry(Geometry* g)
+{
+	geometry = g;
+	update();
+}
+
 /*
 Currently catches all mouse release events
 (left and right buttons, etc.).
