@@ -44,6 +44,7 @@ void PullTemplateGraphicsView :: dropEvent(QDropEvent* event)
 void PullTemplateGraphicsView :: paintEvent(QPaintEvent *event)
 {
 	QPainter painter;
+	painter.setRenderHint(QPainter::HighQualityAntialiasing);
 	painter.begin(this);
 	painter.fillRect(event->rect(), Qt::black);
 	QPen pen;
