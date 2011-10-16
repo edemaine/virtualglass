@@ -28,8 +28,12 @@ void MainWindow :: mousePressEvent(QMouseEvent* event)
 	QPixmap pixmap = *pplw->pixmap();
 
 	QMimeData *mimeData = new QMimeData;
+	//Color c = pplw->getPullPlan()->getColor();
 	char buf[100];
-	sprintf(buf, "%p", pplw->getPullPlan());
+	int r = 255;
+	int g = 255;
+	int b = 255;
+	sprintf(buf, "%d %d %d", r, g, b);
 	mimeData->setText(buf);
 
 	QDrag *drag = new QDrag(this);
