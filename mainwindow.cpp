@@ -94,16 +94,13 @@ void MainWindow :: setupPullPlanEditor()
 	QVBoxLayout* editorLayout = new QVBoxLayout(centralWidget);
 	centralLayout->addLayout(editorLayout, 1);
 
-	QLabel* editorLabel = new QLabel("Editor Area");
-	editorLayout->addWidget(editorLabel);
-
 	QLabel* templateLabel = new QLabel("Pull Template");
-	editorLayout->addWidget(templateLabel);
+	editorLayout->addWidget(templateLabel, 0);
 
 	pullTemplateComboBox = new QComboBox(centralWidget);
 	pullTemplateComboBox->addItem("Three line");
 	pullTemplateComboBox->addItem("Five line");
-	editorLayout->addWidget(pullTemplateComboBox);
+	editorLayout->addWidget(pullTemplateComboBox, 0);
 
 	pullTemplateGraphicsScene = new QGraphicsScene(centralWidget);	
 	pullTemplateGraphicsScene->setBackgroundBrush(Qt::gray);
@@ -115,7 +112,7 @@ void MainWindow :: setupPullPlanEditor()
 	pullTemplateGraphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pullTemplateGraphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pullTemplateGraphicsView->ensureVisible(0, 0, 400, 400, 5, 5);
-	editorLayout->addWidget(pullTemplateGraphicsView); 	
+	editorLayout->addWidget(pullTemplateGraphicsView, 10); 	
 
 	savePullPlanButton = new QPushButton("Save Pull Plan");
 	editorLayout->addWidget(savePullPlanButton);
@@ -164,9 +161,6 @@ void MainWindow :: setupNiceView()
 {
 	niceViewLayout = new QVBoxLayout(centralWidget);
 	centralLayout->addLayout(niceViewLayout, 1);
-
-	niceViewLabel = new QLabel("Nice View Area");
-	niceViewLayout->addWidget(niceViewLabel);
 
 	niceViewWidget = new NiceViewWidget(centralWidget);
 	niceViewLayout->addWidget(niceViewWidget);

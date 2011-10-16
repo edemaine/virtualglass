@@ -71,6 +71,7 @@ void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vect
 {
 	unsigned int angularResolution = 15;
 	unsigned int axialResolution = 60;
+	float meshLength = 10.0;
 
 	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
@@ -164,7 +165,7 @@ void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vect
 			{
 				Point p;
 				p.xy = points[(*loop)[j]];
-				p.z = ((float) i) / ((axialResolution-1)) + random_z_offset;
+				p.z = meshLength * ((float) i) / ((axialResolution-1)) + random_z_offset;
 				Point n;
 				//This is a terrible normal estimate, but I guess it gets re-estimated anyway.
 				n.x = p.x;
@@ -198,7 +199,7 @@ void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vect
 	*/
 	for (int side = 0; side <= 1; ++side) 
 	{
-		float z = (side ? 1.0:0.0);
+		float z = meshLength * (side ? 1.0:0.0);
 		float nz = (side ? 1.0:-1.0);
 		uint32_t base = geometry->vertices.size();
 		for (unsigned int j = 0; j < points.size(); ++j)
