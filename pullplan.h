@@ -27,7 +27,7 @@ class PullPlan
 		float getTwist();
 		float getLength();
 
-		bool isBase();
+		bool isBase;
 		void setColor(float r, float g, float b, float a);
 		Color getColor();
 	
@@ -38,7 +38,6 @@ class PullPlan
 		float twist;
 		float length;	
 		Color color;
-		bool isBasePullPlan;
 };
 
 #endif

@@ -85,8 +85,11 @@ void MainWindow :: setupTable()
 void MainWindow :: setupPullPlanEditor()
 {
 	pullPlanEditorPlan = new PullPlan();
+	pullPlanEditorPlan->isBase = false;
+
 	defaultPullPlanEditorPlan = new PullPlan();
 	defaultPullPlanEditorPlan->setColor(1.0, 1.0, 1.0, 0.1);	
+	defaultPullPlanEditorPlan->isBase = true;
 
 	QVBoxLayout* editorLayout = new QVBoxLayout(centralWidget);
 	centralLayout->addLayout(editorLayout, 1);

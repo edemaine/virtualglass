@@ -11,10 +11,10 @@ Model :: Model()
 Geometry* Model :: getGeometry(PullPlan* plan)
 {
 	geometry->clear();
-	PullPlan* ancestors[1000];
-	int ancestorCount = 0;
+	vector<PullPlan*> ancestors;
+	vector<int> ancestorIndices;
 
-	generateMesh(plan, geometry, ancestors, &ancestorCount);
+	generateMesh(plan, geometry, ancestors, ancestorIndices);
 
 	return geometry; 
 }

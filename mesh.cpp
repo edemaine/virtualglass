@@ -9,91 +9,56 @@ using std::map;
 using std::make_pair;
 
 
-Point rotate(Point pre, float theta)
+void applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentPlan, int subplan)
 {
-	Point post;
-
-	post.x = cos(theta) * pre.x - sin(theta) * pre.y;
-	post.y = sin(theta) * pre.x + cos(theta) * pre.y;
-	post.z = pre.z;
-
-	return post;
+	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
+	{
+		applyMoveAndResizeTransform(&(geometry->vertices[v]), parentPlan, subplan);
+	}
 }
 
-Vertex rotateX(Vertex pre, float theta)
-{
-	Vertex post;
-
-	post.position.x = pre.position.x;
-	post.position.y = cos(theta) * pre.position.y - sin(theta) * pre.position.z;
-	post.position.z = sin(theta) * pre.position.y + cos(theta) * pre.position.z;
-
-	post.normal.x = pre.normal.x;
-	post.normal.y = cos(theta) * pre.normal.y + sin(theta) * pre.normal.z;
-	post.normal.z = sin(theta) * pre.normal.y - cos(theta) * pre.normal.z;
-
-	return post;
-}
-
-void applyMoveTransform(Vertex* v, PullPlan* parentNode, int subplan)
+void applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int subplan)
 {
 	Point locationInParent = parentNode->getTemplate()->locations[subplan];
+	float diameter = parentNode->getTemplate()->diameters[subplan];
 
-	// Z location
-	float preTheta = atan2(v->position.y, v->position.x);
-	float postTheta = preTheta + locationInParent.z;
-	float r = length(v->position.xy);
-	v->position.x = r * cos(postTheta);
-	v->position.y = r * sin(postTheta);
+	// Adjust diameter
+	float theta = atan2(v->position.y, v->position.x);
+	v->position.x = diameter / 2.0 * cos(theta); 
+	v->position.y = diameter / 2.0 * sin(theta); 
 
-	// XY location
+	// Adjust to location in parent
 	v->position.x += locationInParent.x;
 	v->position.y += locationInParent.y;
 }
 
-void applyPullTransform(Geometry* geometry, PullPlan* transformNode)
+void applyTwistTransform(Geometry* geometry, PullPlan* transformNode)
 {
 	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
 	{
-		applyPullTransform(&(geometry->vertices[v]), transformNode);
+		applyTwistTransform(&(geometry->vertices[v]), transformNode);
 	}
-	geometry->compute_normals_from_triangles();
 }
 
-void applyPullTransform(Vertex* v, PullPlan* transformNode)
+void applyTwistTransform(Vertex* v, PullPlan* transformNode)
 {
 	float twist = transformNode->getTwist();
-	float stretch = transformNode->getLength();
 
-	// Apply twist first
+	// Apply twist
 	float preTheta = atan2(v->position.y, v->position.x);
 	float r = length(v->position.xy);
-	float transformTheta = stretch * twist * v->position.z;
+	float transformTheta = twist * v->position.z;
 	float postTheta = preTheta + transformTheta;
 	v->position.x = r * cos(postTheta);
 	v->position.y = r * sin(postTheta);
-
-	// Then apply stretch
-	v->position.x /= sqrt(stretch);
-	v->position.y /= sqrt(stretch);
-	v->position.z *= stretch;
 }
 
-Vertex applyTransforms(Vertex v, PullPlan** ancestors, int ancestorCount)
+Vertex applyTransforms(Vertex v, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
 {
-	for (unsigned int i = ancestorCount - 1; i > 0; --i)
+	for (int i = ancestors.size() - 2; i >= 0; --i)
 	{
-		int subcaneIndex = -1;
-		for (unsigned int j = 0; j < ancestors[i]->getTemplate()->locations.size(); ++j)
-		{
-			if (ancestors[i]->getSubplans()[j] == ancestors[i+1])
-			{
-				subcaneIndex = j;
-				break;
-			}
-		}
-		applyMoveTransform(&v, ancestors[i], subcaneIndex);
-		applyPullTransform(&v, ancestors[i]);
+		applyMoveAndResizeTransform(&v, ancestors[i], ancestorIndices[i]);
+		applyTwistTransform(&v, ancestors[i]);
 	}
 	return v;
 }
@@ -102,7 +67,7 @@ Vertex applyTransforms(Vertex v, PullPlan** ancestors, int ancestorCount)
 typedef map< Vector2ui, Vector2ui > EdgeMap;
 typedef set< Vector2ui > EdgeSet;
 
-void meshPolygonalBaseCane(Geometry* geometry, PullPlan** ancestors, int ancestorCount, PullPlan* plan, uint32_t group_tag)
+void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* plan, uint32_t group_tag)
 {
 	unsigned int angularResolution = 15;
 	unsigned int axialResolution = 60;
@@ -115,33 +80,17 @@ void meshPolygonalBaseCane(Geometry* geometry, PullPlan** ancestors, int ancesto
 	// Tiny offset for avoiding collinear triangles in different canes
 	float random_z_offset = 0.001 * rand() / RAND_MAX;
 
-	/*
-	Draw the walls of the polygon. Note that the z location is
-	adjusted by the total stretch experienced by the cane so that
-	the z values range between 0 and 1.
-	*/
-
 	Vector2f p;
 	vector< Vector2f > points;
 	for (unsigned int i = 0; i < angularResolution; ++i)
 	{
-		p[0] = cos(2 * PI * i / angularResolution);
-		p[1] = sin(2 * PI * i / angularResolution);
-
+		p.x = cos(2 * PI * i / angularResolution);
+		p.y = sin(2 * PI * i / angularResolution);
 		points.push_back(p);
 	} 
 
-	Vector3ui t;
-	vector< Vector3ui > tris;
-	for (unsigned int i = 2; i < angularResolution; ++i)
-	{
-		t[0] = 0;
-		t[1] = 1;
-		t[2] = i;
-		tris.push_back(t);
-	}
-
 	//Generate verts:
+	vector< Vector3ui > tris;
 	if (tris.empty() && points.size() >= 3) {
 		tris.resize(points.size() - 2);
 		for (unsigned int i = 0; i < tris.size(); ++i) {
@@ -282,10 +231,11 @@ void meshPolygonalBaseCane(Geometry* geometry, PullPlan** ancestors, int ancesto
 
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
-		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorCount);
+		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorIndices);
 	}
 	geometry->compute_normals_from_triangles();
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, plan, group_tag));
+
 }
 
 
@@ -296,7 +246,7 @@ the transforms array is filled with with the transformations encountered at each
 leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
-void generateMesh(PullPlan* plan, Geometry *geometry, PullPlan** ancestors, int* ancestorCount, int groupIndex)
+void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, int groupIndex)
 {
 	int passGroupIndex;
 
@@ -304,17 +254,16 @@ void generateMesh(PullPlan* plan, Geometry *geometry, PullPlan** ancestors, int*
 		return;
 
 	// Make recursive calls depending on the type of the current node
-	ancestors[*ancestorCount] = plan;
-	*ancestorCount += 1;
+	ancestors.push_back(plan);
 
-	if (plan->isBase())
+	if (plan->isBase)
 	{
 		if (groupIndex == -1)
 			passGroupIndex = 0;
 		else
 			passGroupIndex = groupIndex;
 		
-		meshPolygonalBaseCane(geometry, ancestors, *ancestorCount, plan, passGroupIndex);
+		meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan, passGroupIndex);
 	}
 	else 
 	{
@@ -324,10 +273,13 @@ void generateMesh(PullPlan* plan, Geometry *geometry, PullPlan** ancestors, int*
 				passGroupIndex = i;
 			else
 				passGroupIndex = groupIndex;
-			generateMesh(plan->getSubplans()[i], geometry, ancestors, ancestorCount, passGroupIndex);
+
+			ancestorIndices.push_back(i);
+			generateMesh(plan->getSubplans()[i], geometry, ancestors, ancestorIndices, passGroupIndex);
+			ancestorIndices.pop_back();
 		}
 	}
-	*ancestorCount -= 1;
+	ancestors.pop_back();
 }
 
 
