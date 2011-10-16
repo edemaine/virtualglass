@@ -28,7 +28,9 @@ void MainWindow :: mousePressEvent(QMouseEvent* event)
 	QPixmap pixmap = *pplw->pixmap();
 
 	QMimeData *mimeData = new QMimeData;
-	mimeData->setText("0");
+	char buf[100];
+	sprintf(buf, "%p", pplw->getPullPlan());
+	mimeData->setText(buf);
 
 	QDrag *drag = new QDrag(this);
 	drag->setMimeData(mimeData);

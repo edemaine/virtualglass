@@ -28,7 +28,9 @@ void PullTemplateGraphicsView :: dropEvent(QDropEvent* event)
 			+ fabs(event->pos().y() - (200.0 * locs[i].y + 200.0)) < (dias[i]/2.0)*200.0)
 		{
 			event->accept();
-			
+			plan->getSubplans()[i] = new PullPlan();
+			plan->getSubplans()[i]->isBase = true;
+			plan->getSubplans()[i]->setColor(1.0, 0.3, 0.3, 0.7);
 			return;	
 		}
 	} 
