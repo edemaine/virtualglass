@@ -104,14 +104,7 @@ void MainWindow :: setupPullPlanEditor()
 
 	pullTemplateGraphicsScene = new QGraphicsScene(centralWidget);	
 	pullTemplateGraphicsScene->setBackgroundBrush(Qt::gray);
-
-	QGraphicsView* pullTemplateGraphicsView = new QGraphicsView(pullTemplateGraphicsScene, centralWidget);
-	pullTemplateGraphicsView->setAcceptDrops(true);
-	pullTemplateGraphicsView->setFixedWidth(410);
-	pullTemplateGraphicsView->setFixedHeight(410);
-	pullTemplateGraphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	pullTemplateGraphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	pullTemplateGraphicsView->ensureVisible(0, 0, 400, 400, 5, 5);
+	PullTemplateGraphicsView* pullTemplateGraphicsView = new PullTemplateGraphicsView(pullTemplateGraphicsScene, centralWidget);
 	editorLayout->addWidget(pullTemplateGraphicsView, 10); 	
 
 	savePullPlanButton = new QPushButton("Save Pull Plan");

@@ -10,6 +10,7 @@
 #include "pulltemplate.h"
 #include "model.h"
 #include "pullplan.h"
+#include "pulltemplategraphicsview.h"
 
 class MainWindow : public QMainWindow
 {
