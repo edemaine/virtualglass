@@ -4,11 +4,13 @@
 
 PullTemplateGraphicsView :: PullTemplateGraphicsView(PullPlan* plan, QWidget* parent) : QWidget(parent)
 {
+	width = 500;
+	height = 500;	
+
 	setAcceptDrops(true);
-	setFixedWidth(410);
-	setFixedHeight(410);
+	setFixedWidth(width + 10);
+	setFixedHeight(height + 10);
 	this->plan = plan;
-	
 }
 
 void PullTemplateGraphicsView :: dragEnterEvent(QDragEnterEvent* event)
@@ -23,8 +25,8 @@ void PullTemplateGraphicsView :: dropEvent(QDropEvent* event)
 	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
 	{
 		SubpullTemplate* subpull = &(plan->getTemplate()->subpulls[i]);
-		if (fabs(event->pos().x() - (200.0 * subpull->location.x + 205.0)) 
-			+ fabs(event->pos().y() - (200.0 * subpull->location.y + 205.0)) < (subpull->diameter/2.0)*200.0)
+		if (fabs(event->pos().x() - (width/2 * subpull->location.x + width/2 + 10)) 
+			+ fabs(event->pos().y() - (width/2 * subpull->location.y + width/2 + 10)) < (subpull->diameter/2.0)*width/2)
 		{
 			event->accept();
 			PullPlan* ptr;
@@ -46,7 +48,7 @@ void PullTemplateGraphicsView :: paintEvent(QPaintEvent *event)
 	pen.setColor(Qt::white);
 	painter.setPen(pen);
 
-	painter.drawEllipse(5, 5, 400, 400);
+	painter.drawEllipse(5, 5, width, height);
 
 	pen.setWidth(5);
 	painter.setPen(pen);
@@ -68,18 +70,18 @@ void PullTemplateGraphicsView :: paintEvent(QPaintEvent *event)
 		}
 		painter.setPen(pen);
 
-		int x = (subpull->location.x - subpull->diameter/2.0) * 200 + 205;
- 		int y = (subpull->location.y - subpull->diameter/2.0) * 200 + 205;
- 		int width = subpull->diameter * 200;
-		int height = subpull->diameter * 200;
+		int rX = (subpull->location.x - subpull->diameter/2.0) * width/2 + width/2 + 5;
+ 		int rY = (subpull->location.y - subpull->diameter/2.0) * width/2 + height/2 + 5;
+ 		int rWidth = subpull->diameter * width/2;
+		int rHeight = subpull->diameter * height/2;
 
 		switch (subpull->shape)
 		{
 			case CIRCLE_SHAPE:
-				painter.drawEllipse(x, y, width, height);
+				painter.drawEllipse(rX, rY, rWidth, rHeight);
 				break;	
 			case SQUARE_SHAPE:
-				painter.drawRect(x, y, width, height);
+				painter.drawRect(rX, rY, rWidth, rHeight);
 				break;	
 		}
 	}

@@ -15,14 +15,15 @@ MainWindow :: MainWindow(Model* model)
 	setupConnections();
 
         setWindowTitle(tr("Virtual Glass"));
-        resize(1000, 750);
-        move(75,25);
+        move(0, 0);
 }
 
 void MainWindow :: seedTable()
 {
 	// Sampling of Reichenbach colors from Kim's color file
 	ColorBarLibraryWidget* cblw = new ColorBarLibraryWidget(1, 58, 186, 128);
+	colorBarLibraryLayout->addWidget(cblw);	
+	cblw = new ColorBarLibraryWidget(222, 205, 1, 126);
 	colorBarLibraryLayout->addWidget(cblw);	
 	cblw = new ColorBarLibraryWidget(2, 101, 35, 128);
 	colorBarLibraryLayout->addWidget(cblw);	
@@ -31,6 +32,12 @@ void MainWindow :: seedTable()
 	cblw = new ColorBarLibraryWidget(226, 190, 161, 255);
 	colorBarLibraryLayout->addWidget(cblw);	
 	cblw = new ColorBarLibraryWidget(50, 102, 54, 255);
+	colorBarLibraryLayout->addWidget(cblw);	
+	cblw = new ColorBarLibraryWidget(60, 31, 37, 255);
+	colorBarLibraryLayout->addWidget(cblw);	
+	cblw = new ColorBarLibraryWidget(131, 149, 201, 255);
+	colorBarLibraryLayout->addWidget(cblw);	
+	cblw = new ColorBarLibraryWidget(138, 155, 163, 255);
 	colorBarLibraryLayout->addWidget(cblw);	
 }
 
@@ -87,32 +94,29 @@ void MainWindow :: setupConnections()
 void MainWindow :: setupTable()
 {
 	QVBoxLayout* tableLayout = new QVBoxLayout(centralWidget);
-	centralLayout->addLayout(tableLayout, 1);
+	centralLayout->addLayout(tableLayout);
 
 	// Setup color bar scrolling library
 	QWidget* colorBarLibraryWidget = new QWidget(centralWidget);
-	tableLayout->addWidget(colorBarLibraryWidget);
-
 	colorBarLibraryLayout = new QHBoxLayout(colorBarLibraryWidget);
 	colorBarLibraryLayout->setSpacing(10);
-	tableLayout->addLayout(colorBarLibraryLayout);
+	colorBarLibraryWidget->setLayout(colorBarLibraryLayout);
 
-        colorBarLibraryScrollArea = new QScrollArea;
+        colorBarLibraryScrollArea = new QScrollArea(centralWidget);
         colorBarLibraryScrollArea->setBackgroundRole(QPalette::Dark);
         colorBarLibraryScrollArea->setWidget(colorBarLibraryWidget);
         colorBarLibraryScrollArea->setWidgetResizable(true);
         colorBarLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
         colorBarLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         colorBarLibraryScrollArea->setFixedHeight(130);
+        colorBarLibraryScrollArea->setFixedWidth(500);
 	tableLayout->addWidget(colorBarLibraryScrollArea);	
 
 	// Setup pull plan scrolling library
 	QWidget* pullPlanLibraryWidget = new QWidget(centralWidget);
-	tableLayout->addWidget(pullPlanLibraryWidget);	
-	
 	pullPlanLibraryLayout = new QHBoxLayout(pullPlanLibraryWidget);
 	pullPlanLibraryLayout->setSpacing(10);
-	tableLayout->addLayout(pullPlanLibraryLayout);
+	pullPlanLibraryWidget->setLayout(pullPlanLibraryLayout);
 
         pullPlanLibraryScrollArea = new QScrollArea;
         pullPlanLibraryScrollArea->setBackgroundRole(QPalette::Dark);
@@ -121,6 +125,7 @@ void MainWindow :: setupTable()
         pullPlanLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
         pullPlanLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         pullPlanLibraryScrollArea->setFixedHeight(130);
+        pullPlanLibraryScrollArea->setFixedWidth(500);
 	tableLayout->addWidget(pullPlanLibraryScrollArea);	
 }
 
@@ -135,7 +140,7 @@ void MainWindow :: setupPullPlanEditor()
 	pullPlanEditorPlan->setTemplate(model->getPullTemplate(1), defaultPullPlanEditorPlan);
 
 	QVBoxLayout* editorLayout = new QVBoxLayout(centralWidget);
-	centralLayout->addLayout(editorLayout, 1);
+	centralLayout->addLayout(editorLayout);
 
 	pullTemplateComboBox = new QComboBox(centralWidget);
 	pullTemplateComboBox->addItem("Three line");
@@ -183,7 +188,7 @@ void MainWindow :: pullTemplateComboBoxChanged(int newIndex)
 void MainWindow :: setupNiceView()
 {
 	niceViewLayout = new QVBoxLayout(centralWidget);
-	centralLayout->addLayout(niceViewLayout, 1);
+	centralLayout->addLayout(niceViewLayout);
 
 	niceViewWidget = new NiceViewWidget(centralWidget);
 	niceViewLayout->addWidget(niceViewWidget);

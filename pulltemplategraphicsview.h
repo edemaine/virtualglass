@@ -22,7 +22,8 @@ class PullTemplateGraphicsView : public QWidget
 
 	private:
 		PullPlan* plan;
-	
+		int width;
+		int height;	
 };
 
 
