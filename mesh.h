@@ -6,6 +6,7 @@
 #include <vector.h>
 #include "pullplan.h"
 #include "geometry.h"
+#include "subpulltemplate.h"
 
 void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, int groupIndex = -1);
 void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* plan, uint32_t group_tag);

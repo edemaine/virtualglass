@@ -21,8 +21,9 @@ class Model
 		void initializePullTemplates();
 
 		// Variables
-		PullTemplate lineThreePullTemplate;
-		PullTemplate lineFivePullTemplate;
+		PullTemplate lineThreeCirclesPullTemplate;
+		PullTemplate lineFiveCirclesPullTemplate;
+		PullTemplate squareFourSquaresPullTemplate;
 		Geometry* geometry;
 };
 

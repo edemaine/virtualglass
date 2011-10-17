@@ -19,8 +19,9 @@ void applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentPlan, int s
 
 void applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int subplan)
 {
-	Point locationInParent = parentNode->getTemplate()->locations[subplan];
-	float diameter = parentNode->getTemplate()->diameters[subplan];
+	SubpullTemplate* subTemp = &(parentNode->getTemplate()->subpulls[subplan]);
+	Point locationInParent = subTemp->location;
+	float diameter = subTemp->diameter;
 
 	// Adjust diameter
 	float theta = atan2(v->position.y, v->position.x);

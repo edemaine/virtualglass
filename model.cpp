@@ -28,12 +28,21 @@ void Model :: initializePullTemplates()
 	for (int i = 0; i < 3; ++i)
 	{
 		p.x = -0.6666666 + 0.6666 * i;
-		lineThreePullTemplate.addSubcane(p, 0.6666);
+		lineThreeCirclesPullTemplate.addSubpullTemplate(SubpullTemplate(CIRCLE_SHAPE, p, 0.6666, 0));
 	}
 	for (int i = 0; i < 5; ++i)
 	{
 		p.x = -0.8 + 0.4 * i;
-		lineFivePullTemplate.addSubcane(p, 0.4);
+		lineFiveCirclesPullTemplate.addSubpullTemplate(SubpullTemplate(CIRCLE_SHAPE, p, 0.4, 0));
+	}
+	for (int i = 0; i < 2; ++i)
+	{
+		for (int j = 0; j < 2; ++j)
+		{
+			p.x = -0.3 + 0.6 * i;
+			p.y = -0.3 + 0.6 * j;
+			squareFourSquaresPullTemplate.addSubpullTemplate(SubpullTemplate(SQUARE_SHAPE, p, 0.6, 0));
+		}
 	}
 }
 
@@ -41,10 +50,12 @@ PullTemplate* Model :: getPullTemplate(int pt)
 {
 	switch (pt)
 	{
-		case LINE_THREE:
-			return &lineThreePullTemplate;
-		case LINE_FIVE:
-			return &lineFivePullTemplate;
+		case LINE_THREE_CIRCLES:
+			return &lineThreeCirclesPullTemplate;
+		case LINE_FIVE_CIRCLES:
+			return &lineFiveCirclesPullTemplate;
+		case SQUARE_FOUR_SQUARES:
+			return &squareFourSquaresPullTemplate;
 		default:
 			return NULL;
 	}

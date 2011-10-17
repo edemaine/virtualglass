@@ -20,12 +20,11 @@ void PullTemplateGraphicsView :: dropEvent(QDropEvent* event)
 {
 	event->setDropAction(Qt::CopyAction);
 
-	vector<Point> locs = plan->getTemplate()->locations;
-	vector<float> dias = plan->getTemplate()->diameters;
-	for (unsigned int i = 0; i < locs.size(); ++i)
+	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
 	{
-		if (fabs(event->pos().x() - (200.0 * locs[i].x + 200.0)) 
-			+ fabs(event->pos().y() - (200.0 * locs[i].y + 200.0)) < (dias[i]/2.0)*200.0)
+		SubpullTemplate* subpull = &(plan->getTemplate()->subpulls[i]);
+		if (fabs(event->pos().x() - (200.0 * subpull->location.x + 200.0)) 
+			+ fabs(event->pos().y() - (200.0 * subpull->location.y + 200.0)) < (subpull->diameter/2.0)*200.0)
 		{
 			event->accept();
 			//QString* colors = event->mimeData()->text();
@@ -56,10 +55,9 @@ void PullTemplateGraphicsView :: paintEvent(QPaintEvent *event)
 	pen.setWidth(5);
 	painter.setPen(pen);
 	
-	vector<Point> locs = plan->getTemplate()->locations;
-	vector<float> dias = plan->getTemplate()->diameters;
-	for (unsigned int i = 0; i < locs.size(); ++i)
+	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
 	{
+		SubpullTemplate* subpull = &(plan->getTemplate()->subpulls[i]);
 		if (plan->getSubplans()[i]->isBase)
 		{
 			Color c = plan->getSubplans()[i]->getColor();
@@ -67,9 +65,21 @@ void PullTemplateGraphicsView :: paintEvent(QPaintEvent *event)
 		}
 		else
 			pen.setColor(Qt::white);
-		painter.setPen(pen);	
-		painter.drawEllipse((1.0 + locs[i].x - dias[i]/2.0) * 200.0, (1.0 + locs[i].y - dias[i]/2.0) * 200.0, 
-			dias[i]*200.0, dias[i]*200.0);
+		painter.setPen(pen);
+		int x = (1.0 + subpull->location.x - subpull->diameter/2.0) * 200;
+ 		int y = (1.0 + subpull->location.y - subpull->diameter/2.0) * 200;
+ 		int width = subpull->diameter * 200;
+		int height = subpull->diameter * 200;
+
+		switch (subpull->shape)
+		{
+			case CIRCLE_SHAPE:
+				painter.drawEllipse(x, y, width, height);
+				break;	
+			case SQUARE_SHAPE:
+				painter.drawRect(x, y, width, height);
+				break;	
+		}
 	}
 
 	painter.end();

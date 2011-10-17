@@ -3,19 +3,12 @@
 
 PullTemplate :: PullTemplate()
 {
-	clearTemplate();
+	subpulls.clear();
 }
 
-void PullTemplate :: clearTemplate()
+void PullTemplate :: addSubpullTemplate(SubpullTemplate pull)
 {
-	locations.clear();
-	diameters.clear();
-}
-
-void PullTemplate :: addSubcane(Point location, float diameter)
-{
-	locations.push_back(location);
-	diameters.push_back(diameter);
+	subpulls.push_back(pull);
 } 
 
 

@@ -22,12 +22,11 @@ class PullPlan
 		vector<PullPlan*> getSubplans();
 
 		void setTwist(float twist);
-		void setLength(float length);
 
 		float getTwist();
-		float getLength();
 
 		bool isBase;
+
 		void setColor(float r, float g, float b, float a);
 		Color getColor();
 	
@@ -36,7 +35,6 @@ class PullPlan
 		PullTemplate* pullTemplate;
 		vector<PullPlan*> subplans;
 		float twist;
-		float length;	
 		Color color;
 };
 

@@ -107,6 +107,7 @@ void MainWindow :: setupPullPlanEditor()
 	pullTemplateComboBox = new QComboBox(centralWidget);
 	pullTemplateComboBox->addItem("Three line");
 	pullTemplateComboBox->addItem("Five line");
+	pullTemplateComboBox->addItem("Four square");
 	editorLayout->addWidget(pullTemplateComboBox, 0);
 
 	pullTemplateGraphicsView = new PullTemplateGraphicsView(pullPlanEditorPlan, centralWidget);

@@ -4,6 +4,7 @@
 
 #include <vector>
 #include "primitives.h"
+#include "subpulltemplate.h"
 
 using std::vector;
 
@@ -11,10 +12,8 @@ class PullTemplate
 {
 	public:
 		PullTemplate();
-		void clearTemplate();
-		void addSubcane(Point location, float diameter);
-		vector<Point> locations;
-		vector<float> diameters; 
+		void addSubpullTemplate(SubpullTemplate sub);
+		vector<SubpullTemplate> subpulls;
 };
 
 #endif
