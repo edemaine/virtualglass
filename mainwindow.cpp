@@ -14,7 +14,6 @@ MainWindow :: MainWindow(Model* model)
 	setupNiceView();
 	setupConnections();
 	seedTable();
-	emit someDataChanged();
 
         setWindowTitle(tr("Virtual Glass"));
         resize(1000, 750);
@@ -23,7 +22,10 @@ MainWindow :: MainWindow(Model* model)
 
 void MainWindow :: seedTable()
 {
-	
+	pullPlanEditorPlan->setTemplate(model->getPullTemplate(1), defaultPullPlanEditorPlan);
+	pullPlanEditorPlan->isBase = false;
+	emit someDataChanged();
+	savePullPlan();	
 }
 
 void MainWindow :: mousePressEvent(QMouseEvent* event)
@@ -99,7 +101,6 @@ void MainWindow :: setupPullPlanEditor()
 	defaultPullPlanEditorPlan = new PullPlan();
 	defaultPullPlanEditorPlan->setColor(1.0, 1.0, 1.0, 0.1);	
 	defaultPullPlanEditorPlan->isBase = true;
-	pullPlanEditorPlan->setTemplate(model->getPullTemplate(1), defaultPullPlanEditorPlan);
 
 	QVBoxLayout* editorLayout = new QVBoxLayout(centralWidget);
 	centralLayout->addLayout(editorLayout, 1);
