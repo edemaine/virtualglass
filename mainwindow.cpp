@@ -13,10 +13,17 @@ MainWindow :: MainWindow(Model* model)
 	setupPullPlanEditor();
 	setupNiceView();
 	setupConnections();
+	seedTable();
+	emit someDataChanged();
 
         setWindowTitle(tr("Virtual Glass"));
         resize(1000, 750);
         move(75,25);
+}
+
+void MainWindow :: seedTable()
+{
+			
 }
 
 void MainWindow :: mousePressEvent(QMouseEvent* event)
@@ -27,21 +34,19 @@ void MainWindow :: mousePressEvent(QMouseEvent* event)
 
 	QPixmap pixmap = *pplw->pixmap();
 
-	QMimeData *mimeData = new QMimeData;
-	//Color c = pplw->getPullPlan()->getColor();
-	char buf[100];
-	int r = 255;
-	int g = 255;
-	int b = 255;
-	sprintf(buf, "%d %d %d", r, g, b);
-	mimeData->setText(buf);
+	PullPlan* fakePlan = new PullPlan();
+	fakePlan->isBase = true;
+	fakePlan->setColor(1.0, 0.5, 0.5, 0.4);
+	char buf[128];
+	sprintf(buf, "%p", fakePlan);//pplw->getPullPlan());
+	QByteArray pointerData(buf); 
+	QMimeData* mimeData = new QMimeData;
+	mimeData->setText(pointerData);
 
 	QDrag *drag = new QDrag(this);
 	drag->setMimeData(mimeData);
 	drag->setPixmap(pixmap);
-	drag->setHotSpot(QPoint(50, 50)); // - child->pos());
-
-	pplw->setPixmap(pixmap);
+	drag->setHotSpot(QPoint(50, 50)); 
 
 	if (drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction) == Qt::MoveAction)
 		pplw->close();
@@ -61,6 +66,8 @@ void MainWindow :: setupConnections()
 {
 	connect(pullTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pullTemplateComboBoxChanged(int)));	
 	connect(savePullPlanButton, SIGNAL(pressed()), this, SLOT(savePullPlan()));	
+	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+	connect(pullTemplateGraphicsView, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }
 
 void MainWindow :: setupTable()
@@ -85,7 +92,6 @@ void MainWindow :: setupTable()
         pullPlanLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         pullPlanLibraryScrollArea->setFixedHeight(130);
 	tableLayout->addWidget(pullPlanLibraryScrollArea);	
-
 }
 
 void MainWindow :: setupPullPlanEditor()
@@ -121,8 +127,14 @@ void MainWindow :: setupPullPlanEditor()
 
 void MainWindow :: savePullPlan()
 {
-	PullPlanLibraryWidget* pplw = new PullPlanLibraryWidget(niceViewWidget);
+	PullPlanLibraryWidget* pplw = new PullPlanLibraryWidget(niceViewWidget, pullPlanEditorPlan);
 	pullPlanLibraryLayout->addWidget(pplw);	
+}
+
+void MainWindow :: updateEverything()
+{
+	updatePullPlanEditor();
+	updateNiceView();
 }
 
 void MainWindow :: updatePullPlanEditor()
@@ -138,8 +150,7 @@ void MainWindow :: updateNiceView()
 void MainWindow :: pullTemplateComboBoxChanged(int newIndex)
 {
 	pullPlanEditorPlan->setTemplate(model->getPullTemplate(newIndex+1), defaultPullPlanEditorPlan);
-	updatePullPlanEditor();
-	updateNiceView();
+	emit someDataChanged();
 }
 
 void MainWindow :: setupNiceView()

@@ -27,14 +27,10 @@ void PullTemplateGraphicsView :: dropEvent(QDropEvent* event)
 			+ fabs(event->pos().y() - (200.0 * subpull->location.y + 200.0)) < (subpull->diameter/2.0)*200.0)
 		{
 			event->accept();
-			//QString* colors = event->mimeData()->text();
-			float r = (rand() % 10) / 10.0;
-			float g = (rand() % 10) / 10.0;
-			float b = (rand() % 10) / 10.0;
-			plan->getSubplans()[i] = new PullPlan();
-			plan->getSubplans()[i]->isBase = true;
-			plan->getSubplans()[i]->setColor(r, g, b, 0.7);
-			repaint();
+			PullPlan* ptr;
+			sscanf(event->mimeData()->text().toAscii().constData(), "%p", &ptr);
+			plan->setSubplan(i, ptr);
+			emit someDataChanged();
 			return;	
 		}
 	} 

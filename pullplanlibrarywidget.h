@@ -11,9 +11,7 @@ class PullPlanLibraryWidget : public QLabel
 	Q_OBJECT
 
 public:
-	PullPlanLibraryWidget(NiceViewWidget* nvw, QWidget* parent=0);
-	//void mousePressEvent(QMouseEvent* event);
-	//void mouseMoveEvent(QMouseEvent* event);
+	PullPlanLibraryWidget(NiceViewWidget* nvw, PullPlan* plan, QWidget* parent=0);
 	PullPlan* getPullPlan();
 
 private:

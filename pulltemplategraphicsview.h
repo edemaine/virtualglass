@@ -12,6 +12,9 @@ class PullTemplateGraphicsView : public QWidget
 	public:
 		PullTemplateGraphicsView(PullPlan* plan, QWidget* parent=0);
 
+	signals:
+		void someDataChanged();
+
 	protected:
 		void dragEnterEvent(QDragEnterEvent* dee);
 		void dropEvent(QDropEvent* de);

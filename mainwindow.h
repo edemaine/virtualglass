@@ -20,6 +20,9 @@ class MainWindow : public QMainWindow
 		MainWindow(Model* model);
         	void mousePressEvent(QMouseEvent* event);
         	void dragMoveEvent(QDragMoveEvent* event);
+	
+	signals:
+		void someDataChanged();
 
 	private:
 		// Methods
@@ -29,6 +32,7 @@ class MainWindow : public QMainWindow
 		void setupConnections();
 		void updatePullPlanEditor();
 		void updateNiceView();
+		void seedTable();
 
 		// Variables
 		PullPlan* pullPlanEditorPlan;
@@ -45,7 +49,9 @@ class MainWindow : public QMainWindow
 		QPushButton* savePullPlanButton; 
 		QHBoxLayout* pullPlanLibraryLayout;
 
+
 	private slots:
+		void updateEverything();
 		void pullTemplateComboBoxChanged(int index);
 		void savePullPlan();	
 };

@@ -2,9 +2,6 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#define PERSPECTIVE_PROJECTION 1
-#define ORTHOGRAPHIC_PROJECTION 2
-
 // Valid templates are assumed to start at 1 and be contiguous
 #define LINE_THREE_CIRCLES 1
 #define LINE_FIVE_CIRCLES 2
