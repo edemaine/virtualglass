@@ -11,6 +11,7 @@ Controller::Controller(int argc, char **argv)
 int Controller::startUp()
 {
 	mainWindow->showMaximized();
+	mainWindow->seedTable();
 	return app->exec();
 }
 

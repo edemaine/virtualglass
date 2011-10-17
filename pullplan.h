@@ -27,7 +27,7 @@ class PullPlan
 
 		bool isBase;
 
-		void setColor(float r, float g, float b, float a);
+		void setColor(int r, int g, int b, int a);
 		Color getColor();
 
 		PullPlan* deepCopy();

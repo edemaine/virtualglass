@@ -10,12 +10,12 @@ class PullPlanLibraryWidget : public QLabel
 {
 	Q_OBJECT
 
-public:
-	PullPlanLibraryWidget(NiceViewWidget* nvw, PullPlan* plan, QWidget* parent=0);
-	PullPlan* getPullPlan();
+	public:
+		PullPlanLibraryWidget(NiceViewWidget* nvw, PullPlan* plan, QWidget* parent=0);
+		PullPlan* getPullPlan();
 
-private:
-	PullPlan* pullPlan;
+	private:
+		PullPlan* pullPlan;
 };
 
 #endif

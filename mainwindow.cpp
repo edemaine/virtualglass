@@ -13,7 +13,6 @@ MainWindow :: MainWindow(Model* model)
 	setupPullPlanEditor();
 	setupNiceView();
 	setupConnections();
-	seedTable();
 
         setWindowTitle(tr("Virtual Glass"));
         resize(1000, 750);
@@ -22,22 +21,44 @@ MainWindow :: MainWindow(Model* model)
 
 void MainWindow :: seedTable()
 {
-	pullPlanEditorPlan->setTemplate(model->getPullTemplate(1), defaultPullPlanEditorPlan);
-	pullPlanEditorPlan->isBase = false;
-	emit someDataChanged();
-	savePullPlan();	
+	// Sampling of Reichenbach colors from Kim's color file
+	ColorBarLibraryWidget* cblw = new ColorBarLibraryWidget(1, 58, 186, 128);
+	colorBarLibraryLayout->addWidget(cblw);	
+	cblw = new ColorBarLibraryWidget(2, 101, 35, 128);
+	colorBarLibraryLayout->addWidget(cblw);	
+	cblw = new ColorBarLibraryWidget(253, 122, 56, 128);
+	colorBarLibraryLayout->addWidget(cblw);	
+	cblw = new ColorBarLibraryWidget(226, 190, 161, 255);
+	colorBarLibraryLayout->addWidget(cblw);	
+	cblw = new ColorBarLibraryWidget(50, 102, 54, 255);
+	colorBarLibraryLayout->addWidget(cblw);	
 }
 
 void MainWindow :: mousePressEvent(QMouseEvent* event)
 {
+	PullPlan* plan;
+	QPixmap pixmap;	
+	
 	PullPlanLibraryWidget* pplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
 	if (pplw == NULL)
-		return;
-
-	QPixmap pixmap = *pplw->pixmap();
+	{
+		ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
+		if (cblw == NULL)
+			return;
+		else
+		{
+			plan = cblw->getPullPlan();
+			pixmap = *cblw->pixmap();
+		}
+	}
+	else
+	{
+		plan = pplw->getPullPlan();
+		pixmap = *pplw->pixmap();
+	}
 
 	char buf[128];
-	sprintf(buf, "%p", pplw->getPullPlan());
+	sprintf(buf, "%p", plan);
 	QByteArray pointerData(buf); 
 	QMimeData* mimeData = new QMimeData;
 	mimeData->setText(pointerData);
@@ -47,13 +68,7 @@ void MainWindow :: mousePressEvent(QMouseEvent* event)
 	drag->setPixmap(pixmap);
 	drag->setHotSpot(QPoint(50, 50)); 
 
-	if (drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction) == Qt::MoveAction)
-		pplw->close();
-	else 
-	{
-		pplw->show();
-		pplw->setPixmap(pixmap);
-     	}
+	drag->exec(Qt::CopyAction);
 }
 
 void MainWindow :: dragMoveEvent(QDragMoveEvent* event)
@@ -76,6 +91,25 @@ void MainWindow :: setupTable()
 	QLabel* tableLabel = new QLabel("Table Area");
 	tableLayout->addWidget(tableLabel);	
 
+	// Setup color bar scrolling library
+	QWidget* colorBarLibraryWidget = new QWidget(centralWidget);
+	tableLayout->addWidget(colorBarLibraryWidget);
+
+	colorBarLibraryLayout = new QHBoxLayout(colorBarLibraryWidget);
+	colorBarLibraryLayout->setSpacing(10);
+	tableLayout->addLayout(colorBarLibraryLayout);
+
+        colorBarLibraryScrollArea = new QScrollArea;
+        colorBarLibraryScrollArea->setBackgroundRole(QPalette::Dark);
+        colorBarLibraryScrollArea->setWidget(colorBarLibraryWidget);
+        colorBarLibraryScrollArea->setWidgetResizable(true);
+        colorBarLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        colorBarLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        colorBarLibraryScrollArea->setFixedHeight(130);
+	tableLayout->addWidget(colorBarLibraryScrollArea);	
+
+
+	// Setup pull plan scrolling library
 	QWidget* pullPlanLibraryWidget = new QWidget(centralWidget);
 	tableLayout->addWidget(pullPlanLibraryWidget);	
 	
@@ -95,12 +129,13 @@ void MainWindow :: setupTable()
 
 void MainWindow :: setupPullPlanEditor()
 {
+	defaultPullPlanEditorPlan = new PullPlan();
+	defaultPullPlanEditorPlan->setColor(255, 255, 255, 25);
+	defaultPullPlanEditorPlan->isBase = true;
+
 	pullPlanEditorPlan = new PullPlan();
 	pullPlanEditorPlan->isBase = false;
-
-	defaultPullPlanEditorPlan = new PullPlan();
-	defaultPullPlanEditorPlan->setColor(1.0, 1.0, 1.0, 0.1);	
-	defaultPullPlanEditorPlan->isBase = true;
+	pullPlanEditorPlan->setTemplate(model->getPullTemplate(1), defaultPullPlanEditorPlan);
 
 	QVBoxLayout* editorLayout = new QVBoxLayout(centralWidget);
 	centralLayout->addLayout(editorLayout, 1);

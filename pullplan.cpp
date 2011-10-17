@@ -12,7 +12,7 @@ void PullPlan :: clear()
 	this->pullTemplate = NULL;
 	this->subplans.clear();
 	this->twist = 0.0;
-	color.r = color.g = color.b = color.a = 1.0;
+	color.r = color.g = color.b = color.a = 255;
 }
 
 void PullPlan :: setTemplate(PullTemplate* pt, PullPlan* defaultSubplan)
@@ -28,7 +28,7 @@ PullTemplate* PullPlan :: getTemplate()
 	return this->pullTemplate;
 }
 
-void PullPlan :: setColor(float r, float g, float b, float a)
+void PullPlan :: setColor(int r, int g, int b, int a)
 {
 	color.r = r;
 	color.g = g;

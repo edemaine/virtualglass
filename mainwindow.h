@@ -7,6 +7,7 @@
 #include <QObject>
 #include "niceviewwidget.h"
 #include "pullplanlibrarywidget.h"
+#include "colorbarlibrarywidget.h"
 #include "pulltemplate.h"
 #include "model.h"
 #include "pullplan.h"
@@ -20,6 +21,7 @@ class MainWindow : public QMainWindow
 		MainWindow(Model* model);
         	void mousePressEvent(QMouseEvent* event);
         	void dragMoveEvent(QDragMoveEvent* event);
+		void seedTable();
 	
 	signals:
 		void someDataChanged();
@@ -32,7 +34,6 @@ class MainWindow : public QMainWindow
 		void setupConnections();
 		void updatePullPlanEditor();
 		void updateNiceView();
-		void seedTable();
 
 		// Variables
 		PullPlan* pullPlanEditorPlan;
@@ -46,8 +47,10 @@ class MainWindow : public QMainWindow
 		QVBoxLayout* niceViewLayout;
 		NiceViewWidget* niceViewWidget;
 		QScrollArea* pullPlanLibraryScrollArea;
+		QScrollArea* colorBarLibraryScrollArea;
 		QPushButton* savePullPlanButton; 
 		QHBoxLayout* pullPlanLibraryLayout;
+		QHBoxLayout* colorBarLibraryLayout;
 
 
 	private slots:

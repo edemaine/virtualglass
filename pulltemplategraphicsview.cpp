@@ -57,11 +57,18 @@ void PullTemplateGraphicsView :: paintEvent(QPaintEvent *event)
 		if (plan->getSubplans()[i]->isBase)
 		{
 			Color c = plan->getSubplans()[i]->getColor();
-			pen.setColor(QColor(c.r*255, c.g*255, c.b*255));
+			painter.setBrush(QColor(c.r, c.g, c.b, c.a));
+			pen.setColor(QColor(c.r, c.g, c.b, c.a));
+			pen.setStyle(Qt::SolidLine);
 		}
 		else
+		{
+			painter.setBrush(Qt::NoBrush);
 			pen.setColor(Qt::white);
+			pen.setStyle(Qt::DotLine);
+		}
 		painter.setPen(pen);
+
 		int x = (1.0 + subpull->location.x - subpull->diameter/2.0) * 200;
  		int y = (1.0 + subpull->location.y - subpull->diameter/2.0) * 200;
  		int width = subpull->diameter * 200;
