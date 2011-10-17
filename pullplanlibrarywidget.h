@@ -11,11 +11,13 @@ class PullPlanLibraryWidget : public QLabel
 	Q_OBJECT
 
 	public:
-		PullPlanLibraryWidget(NiceViewWidget* nvw, PullPlan* plan, QWidget* parent=0);
+		PullPlanLibraryWidget(QPixmap niceViewPixmap, QPixmap editorPixmap, PullPlan* plan, QWidget* parent=0);
 		PullPlan* getPullPlan();
+		QPixmap getEditorPixmap();
 
 	private:
 		PullPlan* pullPlan;
+		QPixmap editorPixmap;
 };
 
 #endif

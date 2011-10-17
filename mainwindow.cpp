@@ -66,7 +66,7 @@ void MainWindow :: mousePressEvent(QMouseEvent* event)
 	else
 	{
 		plan = pplw->getPullPlan();
-		pixmap = *pplw->pixmap();
+		pixmap = pplw->getEditorPixmap();
 	}
 
 	char buf[128];
@@ -199,7 +199,9 @@ void MainWindow :: pullPlanTwistSliderChanged(int)
 
 void MainWindow :: savePullPlan()
 {
-	PullPlanLibraryWidget* pplw = new PullPlanLibraryWidget(niceViewWidget, pullPlanEditorPlan);
+	PullPlanLibraryWidget* pplw = new PullPlanLibraryWidget(
+		QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100), 
+		QPixmap::grabWidget(pullTemplateGraphicsView).scaled(100, 100), pullPlanEditorPlan);
 	pullPlanLibraryLayout->addWidget(pplw);	
 }
 

@@ -1,5 +1,4 @@
 
-
 #include "pulltemplategraphicsview.h"
 
 PullTemplateGraphicsView :: PullTemplateGraphicsView(PullPlan* plan, QWidget* parent) : QWidget(parent)
@@ -46,11 +45,12 @@ void PullTemplateGraphicsView :: paintEvent(QPaintEvent *event)
 	painter.fillRect(event->rect(), Qt::black);
 	QPen pen;
 	pen.setColor(Qt::white);
+	pen.setWidth(3);
 	painter.setPen(pen);
 
 	painter.drawEllipse(5, 5, width, height);
 
-	pen.setWidth(5);
+	pen.setWidth(3);
 	painter.setPen(pen);
 	
 	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
