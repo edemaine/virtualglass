@@ -23,7 +23,7 @@ MainWindow :: MainWindow(Model* model)
 
 void MainWindow :: seedTable()
 {
-			
+	
 }
 
 void MainWindow :: mousePressEvent(QMouseEvent* event)
@@ -34,11 +34,8 @@ void MainWindow :: mousePressEvent(QMouseEvent* event)
 
 	QPixmap pixmap = *pplw->pixmap();
 
-	PullPlan* fakePlan = new PullPlan();
-	fakePlan->isBase = true;
-	fakePlan->setColor(1.0, 0.5, 0.5, 0.4);
 	char buf[128];
-	sprintf(buf, "%p", fakePlan);//pplw->getPullPlan());
+	sprintf(buf, "%p", pplw->getPullPlan());
 	QByteArray pointerData(buf); 
 	QMimeData* mimeData = new QMimeData;
 	mimeData->setText(pointerData);

@@ -32,7 +32,7 @@ NiceViewWidget :: NiceViewWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::Alp
 
 	theta = -PI/2.0;
 	fee = PI/4.0;
-	rho = 3.0;
+	rho = 10.0;
 
 	mouseLocX = 0;
 	mouseLocY = 0;

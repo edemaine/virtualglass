@@ -25,8 +25,9 @@ void applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int subplan)
 
 	// Adjust diameter
 	float theta = atan2(v->position.y, v->position.x);
-	v->position.x = diameter / 2.0 * cos(theta); 
-	v->position.y = diameter / 2.0 * sin(theta); 
+	float r = length(v->position.xy);
+	v->position.x = r * diameter / 2.0 * cos(theta); 
+	v->position.y = r * diameter / 2.0 * sin(theta); 
 
 	// Adjust to location in parent
 	v->position.x += locationInParent.x;

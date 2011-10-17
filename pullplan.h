@@ -29,6 +29,8 @@ class PullPlan
 
 		void setColor(float r, float g, float b, float a);
 		Color getColor();
+
+		PullPlan* deepCopy();
 	
 	private:
 		// Variables

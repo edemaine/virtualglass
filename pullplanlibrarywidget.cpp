@@ -11,7 +11,7 @@ PullPlanLibraryWidget :: PullPlanLibraryWidget(NiceViewWidget* niceViewWidget, P
 	setPixmap(QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100));
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
-	this->pullPlan = plan;
+	this->pullPlan = plan->deepCopy();
 }
 
 PullPlan* PullPlanLibraryWidget :: getPullPlan()
