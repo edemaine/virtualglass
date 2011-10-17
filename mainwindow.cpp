@@ -88,8 +88,6 @@ void MainWindow :: setupTable()
 {
 	QVBoxLayout* tableLayout = new QVBoxLayout(centralWidget);
 	centralLayout->addLayout(tableLayout, 1);
-	QLabel* tableLabel = new QLabel("Table Area");
-	tableLayout->addWidget(tableLabel);	
 
 	// Setup color bar scrolling library
 	QWidget* colorBarLibraryWidget = new QWidget(centralWidget);
@@ -107,7 +105,6 @@ void MainWindow :: setupTable()
         colorBarLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         colorBarLibraryScrollArea->setFixedHeight(130);
 	tableLayout->addWidget(colorBarLibraryScrollArea);	
-
 
 	// Setup pull plan scrolling library
 	QWidget* pullPlanLibraryWidget = new QWidget(centralWidget);
@@ -139,9 +136,6 @@ void MainWindow :: setupPullPlanEditor()
 
 	QVBoxLayout* editorLayout = new QVBoxLayout(centralWidget);
 	centralLayout->addLayout(editorLayout, 1);
-
-	QLabel* templateLabel = new QLabel("Pull Template");
-	editorLayout->addWidget(templateLabel, 0);
 
 	pullTemplateComboBox = new QComboBox(centralWidget);
 	pullTemplateComboBox->addItem("Three line");

@@ -31,7 +31,7 @@ NiceViewWidget :: NiceViewWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::Alp
 	lookAtLoc[2] = 5.0;
 
 	theta = -PI/2.0;
-	fee = PI/4.0;
+	fee = PI/2;
 	rho = 10.0;
 
 	mouseLocX = 0;
@@ -51,7 +51,6 @@ NiceViewWidget :: NiceViewWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::Alp
 	peelProgram = 0;
 	nopeelProgram = 0;
 
-	setMouseTracking(true);
 	geometry = NULL;
 }
 
@@ -634,14 +633,8 @@ part of the mode feature.
 void NiceViewWidget :: mouseMoveEvent (QMouseEvent* e)
 {
 	float relX, relY;
-	float newFee;
 	float windowWidth, windowHeight;
 	int oldMouseLocX, oldMouseLocY;
-
-	// only admit mouse moves without a button down if in
-	// bundle mode (for illumination upon scrollover of cane)
-	if (e->buttons() == 0)
-		return;
 
 	windowWidth = this->width();
 	windowHeight = this->height();
@@ -656,11 +649,7 @@ void NiceViewWidget :: mouseMoveEvent (QMouseEvent* e)
 
 	if (leftMouseDown)
 	{
-		theta -= (relX * 500.0 * PI / 180.0);
-		newFee = fee - (relY * 500.0 * PI / 180.0);
-		if (newFee > 0.0f && newFee < PI)
-			fee = newFee;
-
+		theta -= (relX * 100.0 * PI / 180.0);
 		update();
 		return;
 	}
