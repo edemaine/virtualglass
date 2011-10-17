@@ -25,24 +25,45 @@ void Model :: initializePullTemplates()
 
 	p.x = p.y = p.z = 0.0;
 
+	// Line of three circles 
 	for (int i = 0; i < 3; ++i)
 	{
 		p.x = -0.6666666 + 0.6666 * i;
 		lineThreeCirclesPullTemplate.addSubpullTemplate(SubpullTemplate(CIRCLE_SHAPE, p, 0.65, 0));
 	}
+
+	// Line of five circles
 	for (int i = 0; i < 5; ++i)
 	{
 		p.x = -0.8 + 0.4 * i;
 		lineFiveCirclesPullTemplate.addSubpullTemplate(SubpullTemplate(CIRCLE_SHAPE, p, 0.39, 0));
 	}
+
+	// Square of four circles
 	for (int i = 0; i < 2; ++i)
 	{
 		for (int j = 0; j < 2; ++j)
 		{
 			p.x = -0.3 + 0.6 * i;
 			p.y = -0.3 + 0.6 * j;
-			squareFourSquaresPullTemplate.addSubpullTemplate(SubpullTemplate(SQUARE_SHAPE, p, 0.59, 0));
+			squareFourCirclesPullTemplate.addSubpullTemplate(SubpullTemplate(CIRCLE_SHAPE, p, 0.59, 0));
 		}
+	}
+
+	// X of nine circles
+	for (int i = 0; i < 5; ++i)
+	{
+		p.x = -0.8 + 0.4 * i;
+		p.y = 0.0;
+		xNineCirclesPullTemplate.addSubpullTemplate(SubpullTemplate(CIRCLE_SHAPE, p, 0.39, 0));
+	}
+	for (int i = 0; i < 5; ++i)
+	{
+		if (i == 2)
+			continue;
+		p.x = 0.0;
+		p.y = -0.8 + 0.4 * i;
+		xNineCirclesPullTemplate.addSubpullTemplate(SubpullTemplate(CIRCLE_SHAPE, p, 0.39, 0));
 	}
 }
 
@@ -54,8 +75,10 @@ PullTemplate* Model :: getPullTemplate(int pt)
 			return &lineThreeCirclesPullTemplate;
 		case LINE_FIVE_CIRCLES:
 			return &lineFiveCirclesPullTemplate;
-		case SQUARE_FOUR_SQUARES:
-			return &squareFourSquaresPullTemplate;
+		case SQUARE_FOUR_CIRCLES:
+			return &squareFourCirclesPullTemplate;
+		case X_NINE_CIRCLES:
+			return &xNineCirclesPullTemplate;
 		default:
 			return NULL;
 	}

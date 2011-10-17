@@ -5,7 +5,8 @@
 // Valid templates are assumed to start at 1 and be contiguous
 #define LINE_THREE_CIRCLES 1
 #define LINE_FIVE_CIRCLES 2
-#define SQUARE_FOUR_SQUARES 3
+#define SQUARE_FOUR_CIRCLES 3
+#define X_NINE_CIRCLES 4
 
 #define CIRCLE_SHAPE 1
 #define SQUARE_SHAPE 2

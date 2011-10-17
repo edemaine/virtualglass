@@ -21,7 +21,9 @@ MainWindow :: MainWindow(Model* model)
 void MainWindow :: seedTable()
 {
 	// Sampling of Reichenbach colors from Kim's color file
-	ColorBarLibraryWidget* cblw = new ColorBarLibraryWidget(1, 58, 186, 128);
+	ColorBarLibraryWidget* cblw = new ColorBarLibraryWidget(255, 255, 255, 100);
+	colorBarLibraryLayout->addWidget(cblw);	
+	cblw = new ColorBarLibraryWidget(1, 58, 186, 128);
 	colorBarLibraryLayout->addWidget(cblw);	
 	cblw = new ColorBarLibraryWidget(222, 205, 1, 126);
 	colorBarLibraryLayout->addWidget(cblw);	
@@ -39,6 +41,9 @@ void MainWindow :: seedTable()
 	colorBarLibraryLayout->addWidget(cblw);	
 	cblw = new ColorBarLibraryWidget(138, 155, 163, 255);
 	colorBarLibraryLayout->addWidget(cblw);	
+
+	// setup the editor/3D view
+	emit someDataChanged();		
 }
 
 void MainWindow :: mousePressEvent(QMouseEvent* event)
@@ -134,7 +139,7 @@ void MainWindow :: setupTable()
 void MainWindow :: setupPullPlanEditor()
 {
 	defaultPullPlanEditorPlan = new PullPlan();
-	defaultPullPlanEditorPlan->setColor(255, 255, 255, 25);
+	defaultPullPlanEditorPlan->setColor(255, 255, 255, 100);
 	defaultPullPlanEditorPlan->isBase = true;
 
 	pullPlanEditorPlan = new PullPlan();
@@ -148,6 +153,7 @@ void MainWindow :: setupPullPlanEditor()
 	pullTemplateComboBox->addItem("Three line");
 	pullTemplateComboBox->addItem("Five line");
 	pullTemplateComboBox->addItem("Four square");
+	pullTemplateComboBox->addItem("Nine X");
 	editorLayout->addWidget(pullTemplateComboBox, 0);
 
 	pullTemplateGraphicsView = new PullTemplateGraphicsView(pullPlanEditorPlan, centralWidget);

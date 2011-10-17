@@ -23,7 +23,8 @@ class Model
 		// Variables
 		PullTemplate lineThreeCirclesPullTemplate;
 		PullTemplate lineFiveCirclesPullTemplate;
-		PullTemplate squareFourSquaresPullTemplate;
+		PullTemplate squareFourCirclesPullTemplate;
+		PullTemplate xNineCirclesPullTemplate;
 		Geometry* geometry;
 };
 
