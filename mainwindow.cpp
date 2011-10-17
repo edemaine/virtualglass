@@ -89,6 +89,8 @@ void MainWindow :: setupConnections()
 	connect(savePullPlanButton, SIGNAL(pressed()), this, SLOT(savePullPlan()));	
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(pullTemplateGraphicsView, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+	connect(pullPlanTwistSlider, SIGNAL(valueChanged(int)), this, SLOT(pullPlanTwistSliderChanged(int)));
+	connect(pullPlanTwistSpin, SIGNAL(valueChanged(double)), this, SLOT(pullPlanTwistSpinChanged(double)));
 }
 
 void MainWindow :: setupTable()
@@ -151,10 +153,42 @@ void MainWindow :: setupPullPlanEditor()
 	pullTemplateGraphicsView = new PullTemplateGraphicsView(pullPlanEditorPlan, centralWidget);
 	editorLayout->addWidget(pullTemplateGraphicsView, 10); 	
 
+	QHBoxLayout* twistLayout = new QHBoxLayout(centralWidget);
+	editorLayout->addLayout(twistLayout);
+
+	pullPlanTwistSpin = new QDoubleSpinBox(centralWidget);
+	pullPlanTwistSpin->setDecimals(1);
+	pullPlanTwistSpin->setSingleStep(0.2);
+	pullPlanTwistSpin->setRange(-10000.0, 10000.0);
+	twistLayout->addWidget(pullPlanTwistSpin, 1);
+
+	pullPlanTwistSlider = new QSlider(Qt::Horizontal, centralWidget);
+	pullPlanTwistSlider->setRange(0, 100);
+	pullPlanTwistSlider->setTickInterval(5);
+	pullPlanTwistSlider->setTickPosition(QSlider::TicksBothSides);
+	pullPlanTwistSlider->setSliderPosition(50);
+	twistLayout->addWidget(pullPlanTwistSlider, 10);	
+
 	savePullPlanButton = new QPushButton("Save Pull Plan");
 	editorLayout->addWidget(savePullPlanButton);
 
 	pullTemplateComboBox->setCurrentIndex(0);
+}
+
+void MainWindow :: pullPlanTwistSpinChanged(double)
+{
+        int tick = static_cast<int>(pullPlanTwistSpin->value() / 0.2) + 50;
+	tick = MAX(tick, 0); // clamp
+	tick = MIN(tick, 100);
+	pullPlanTwistSlider->setSliderPosition(tick);
+	someDataChanged();
+}
+
+void MainWindow :: pullPlanTwistSliderChanged(int)
+{
+        float twist = (pullPlanTwistSlider->sliderPosition() - 50) / 5.0;
+	pullPlanEditorPlan->setTwist(twist);
+	someDataChanged();
 }
 
 void MainWindow :: savePullPlan()
@@ -172,6 +206,13 @@ void MainWindow :: updateEverything()
 void MainWindow :: updatePullPlanEditor()
 {
 	pullTemplateGraphicsView->repaint();
+	float twist = pullPlanEditorPlan->getTwist();
+	pullPlanTwistSlider->setSliderPosition((twist * 5.0) + 50);
+	// We set the spinbox based on the slider because the slider is not continuous, and
+	// they really should match, i.e. you can input any value into the spinbox
+	// BUT this should be clamped to a tick position value in the slider, otherwise
+	// it is weird
+	pullPlanTwistSpin->setValue((pullPlanTwistSlider->sliderPosition() - 50) / 5.0);
 } 
 
 void MainWindow :: updateNiceView()

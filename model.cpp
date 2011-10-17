@@ -28,12 +28,12 @@ void Model :: initializePullTemplates()
 	for (int i = 0; i < 3; ++i)
 	{
 		p.x = -0.6666666 + 0.6666 * i;
-		lineThreeCirclesPullTemplate.addSubpullTemplate(SubpullTemplate(CIRCLE_SHAPE, p, 0.6666, 0));
+		lineThreeCirclesPullTemplate.addSubpullTemplate(SubpullTemplate(CIRCLE_SHAPE, p, 0.65, 0));
 	}
 	for (int i = 0; i < 5; ++i)
 	{
 		p.x = -0.8 + 0.4 * i;
-		lineFiveCirclesPullTemplate.addSubpullTemplate(SubpullTemplate(CIRCLE_SHAPE, p, 0.4, 0));
+		lineFiveCirclesPullTemplate.addSubpullTemplate(SubpullTemplate(CIRCLE_SHAPE, p, 0.39, 0));
 	}
 	for (int i = 0; i < 2; ++i)
 	{
@@ -41,7 +41,7 @@ void Model :: initializePullTemplates()
 		{
 			p.x = -0.3 + 0.6 * i;
 			p.y = -0.3 + 0.6 * j;
-			squareFourSquaresPullTemplate.addSubpullTemplate(SubpullTemplate(SQUARE_SHAPE, p, 0.6, 0));
+			squareFourSquaresPullTemplate.addSubpullTemplate(SubpullTemplate(SQUARE_SHAPE, p, 0.59, 0));
 		}
 	}
 }
