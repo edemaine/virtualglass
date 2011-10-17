@@ -49,7 +49,7 @@ void applyTwistTransform(Vertex* v, PullPlan* transformNode)
 	// Apply twist
 	float preTheta = atan2(v->position.y, v->position.x);
 	float r = length(v->position.xy);
-	float transformTheta = twist * v->position.z;
+	float transformTheta = twist / 10.0 * v->position.z;
 	float postTheta = preTheta + transformTheta;
 	v->position.x = r * cos(postTheta);
 	v->position.y = r * sin(postTheta);

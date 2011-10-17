@@ -47,11 +47,8 @@ void PullTemplateGraphicsView :: paintEvent(QPaintEvent *event)
 	pen.setColor(Qt::white);
 	pen.setWidth(3);
 	painter.setPen(pen);
-
 	painter.drawEllipse(5, 5, width, height);
 
-	pen.setWidth(3);
-	painter.setPen(pen);
 	
 	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
 	{

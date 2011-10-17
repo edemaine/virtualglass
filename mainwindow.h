@@ -52,14 +52,14 @@ class MainWindow : public QMainWindow
 		QHBoxLayout* pullPlanLibraryLayout;
 		QHBoxLayout* colorBarLibraryLayout;
 		QSlider* pullPlanTwistSlider;
-		QDoubleSpinBox* pullPlanTwistSpin;
+		QSpinBox* pullPlanTwistSpin;
 
 	private slots:
 		void updateEverything();
 		void pullTemplateComboBoxChanged(int index);
 		void savePullPlan();	
 		void pullPlanTwistSliderChanged(int p);
-		void pullPlanTwistSpinChanged(double v);
+		void pullPlanTwistSpinChanged(int p);
 };
 
 
