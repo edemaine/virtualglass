@@ -27,9 +27,16 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		if (fabs(event->pos().x() - (width/2 * subpull->location.x + width/2 + 10)) 
 			+ fabs(event->pos().y() - (width/2 * subpull->location.y + width/2 + 10)) < (subpull->diameter/2.0)*width/2)
 		{
-			event->accept();
 			PullPlan* ptr;
 			sscanf(event->mimeData()->text().toAscii().constData(), "%p", &ptr);
+
+			// Check that there is no mismatch between plan and template
+			if (ptr->getTemplate()->shape == AMORPHOUS_SHAPE 
+				|| ptr->getTemplate()->shape == plan->getTemplate()->subpulls[i].shape)
+				event->accept();
+			else
+				continue;
+
 			if (ptr->getTemplate()->shape == AMORPHOUS_SHAPE) // if it's a color bar
 			{
 				PullPlan* basePullPlan = NULL;
