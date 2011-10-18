@@ -29,8 +29,6 @@ class PullPlan
 
 		void setColor(int r, int g, int b, int a);
 		Color getColor();
-
-		PullPlan* deepCopy();
 	
 	private:
 		// Variables

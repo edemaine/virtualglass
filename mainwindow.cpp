@@ -66,7 +66,7 @@ void MainWindow :: mousePressEvent(QMouseEvent* event)
 	else
 	{
 		plan = pplw->getPullPlan();
-		pixmap = pplw->getEditorPixmap();
+		pixmap = *pplw->getEditorPixmap();
 	}
 
 	char buf[128];
@@ -91,7 +91,7 @@ void MainWindow :: dragMoveEvent(QDragMoveEvent* event)
 void MainWindow :: setupConnections()
 {
 	connect(pullTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pullTemplateComboBoxChanged(int)));	
-	connect(savePullPlanButton, SIGNAL(pressed()), this, SLOT(savePullPlan()));	
+	connect(newPullPlanButton, SIGNAL(pressed()), this, SLOT(newPullPlan()));	
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(pullTemplateGraphicsView, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(pullPlanTwistSlider, SIGNAL(valueChanged(int)), this, SLOT(pullPlanTwistSliderChanged(int)));
@@ -134,6 +134,9 @@ void MainWindow :: setupTable()
         pullPlanLibraryScrollArea->setFixedHeight(130);
         pullPlanLibraryScrollArea->setFixedWidth(500);
 	tableLayout->addWidget(pullPlanLibraryScrollArea);	
+
+	newPullPlanButton = new QPushButton("New Pull Plan");
+	tableLayout->addWidget(newPullPlanButton);
 }
 
 void MainWindow :: setupPullPlanEditor()
@@ -145,6 +148,8 @@ void MainWindow :: setupPullPlanEditor()
 	pullPlanEditorPlan = new PullPlan();
 	pullPlanEditorPlan->isBase = false;
 	pullPlanEditorPlan->setTemplate(model->getPullTemplate(1), defaultPullPlanEditorPlan);
+	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), QPixmap::fromImage(QImage("./duck.jpg")), pullPlanEditorPlan);
+	pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);	
 
 	QVBoxLayout* editorLayout = new QVBoxLayout(centralWidget);
 	centralLayout->addLayout(editorLayout);
@@ -174,9 +179,6 @@ void MainWindow :: setupPullPlanEditor()
 	pullPlanTwistSlider->setSliderPosition(0);
 	twistLayout->addWidget(pullPlanTwistSlider, 10);	
 
-	savePullPlanButton = new QPushButton("Save Pull Plan");
-	editorLayout->addWidget(savePullPlanButton);
-
 	pullTemplateComboBox->setCurrentIndex(0);
 }
 
@@ -194,18 +196,36 @@ void MainWindow :: pullPlanTwistSliderChanged(int)
 	someDataChanged();
 }
 
-void MainWindow :: savePullPlan()
+void MainWindow :: newPullPlan()
 {
-	PullPlanLibraryWidget* pplw = new PullPlanLibraryWidget(
-		QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100), 
-		QPixmap::grabWidget(pullTemplateGraphicsView).scaled(100, 100), pullPlanEditorPlan);
-	pullPlanLibraryLayout->addWidget(pplw);	
+	// Create the new plan
+	pullPlanEditorPlan = new PullPlan();
+	pullPlanEditorPlan->isBase = false;
+	pullPlanEditorPlan->setTemplate(model->getPullTemplate(1), defaultPullPlanEditorPlan);
+
+	// Create the new library entry
+	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
+		QPixmap::fromImage(QImage("./duck.jpg")), pullPlanEditorPlan);
+	pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);	
+
+	// Give the new plan to the editor
+	pullTemplateGraphicsView->setPullPlan(pullPlanEditorPlan);
+
+	// Trigger GUI updates
+	emit someDataChanged();
 }
 
 void MainWindow :: updateEverything()
 {
 	updatePullPlanEditor();
 	updateNiceView();
+	updateLibrary();
+}
+
+void MainWindow :: updateLibrary()
+{
+	pullPlanEditorPlanLibraryWidget->updatePixmaps(QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100),
+		QPixmap::grabWidget(pullTemplateGraphicsView).scaled(100, 100));
 }
 
 void MainWindow :: updatePullPlanEditor()

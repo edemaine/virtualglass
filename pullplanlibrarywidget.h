@@ -13,7 +13,8 @@ class PullPlanLibraryWidget : public QLabel
 	public:
 		PullPlanLibraryWidget(QPixmap niceViewPixmap, QPixmap editorPixmap, PullPlan* plan, QWidget* parent=0);
 		PullPlan* getPullPlan();
-		QPixmap getEditorPixmap();
+		const QPixmap* getEditorPixmap();
+		void updatePixmaps(QPixmap niceViewPixmap, QPixmap editorPixmap);
 
 	private:
 		PullPlan* pullPlan;

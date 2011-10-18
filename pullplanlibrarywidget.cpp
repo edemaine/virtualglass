@@ -11,8 +11,7 @@ PullPlanLibraryWidget :: PullPlanLibraryWidget(QPixmap niceViewPixmap, QPixmap e
 
 	setPixmap(niceViewPixmap);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
-
-	this->pullPlan = plan->deepCopy();
+	this->pullPlan = plan;
 	this->editorPixmap = editorPixmap;
 }
 
@@ -21,8 +20,14 @@ PullPlan* PullPlanLibraryWidget :: getPullPlan()
 	return pullPlan;
 }
 
-QPixmap PullPlanLibraryWidget :: getEditorPixmap()
+void PullPlanLibraryWidget :: updatePixmaps(QPixmap niceViewPixmap, QPixmap editorPixmap)
 {
-	return this->editorPixmap;
+        setPixmap(niceViewPixmap);
+	this->editorPixmap = editorPixmap;
+}
+
+const QPixmap* PullPlanLibraryWidget :: getEditorPixmap()
+{
+	return &(this->editorPixmap);
 }
 

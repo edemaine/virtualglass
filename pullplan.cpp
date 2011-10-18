@@ -62,18 +62,6 @@ float PullPlan :: getTwist()
 	return this->twist;
 }
 
-PullPlan* PullPlan :: deepCopy()
-{
-	PullPlan* copy = new PullPlan();
-
-	copy->pullTemplate = this->pullTemplate;
-	copy->subplans = this->subplans;
-	copy->twist = this->twist;
-	copy->color = this->color;	
-	copy->isBase = this->isBase;
-
-	return copy;
-}
 
 
 

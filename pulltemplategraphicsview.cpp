@@ -37,6 +37,11 @@ void PullTemplateGraphicsView :: dropEvent(QDropEvent* event)
 	} 
 }
 
+void PullTemplateGraphicsView :: setPullPlan(PullPlan* plan)
+{
+	this->plan = plan;
+}
+
 void PullTemplateGraphicsView :: paintEvent(QPaintEvent *event)
 {
 	QPainter painter;

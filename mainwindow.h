@@ -34,10 +34,12 @@ class MainWindow : public QMainWindow
 		void setupConnections();
 		void updatePullPlanEditor();
 		void updateNiceView();
+		void updateLibrary();
 
 		// Variables
 		PullPlan* pullPlanEditorPlan;
 		PullPlan* defaultPullPlanEditorPlan;
+		PullPlanLibraryWidget* pullPlanEditorPlanLibraryWidget;
 		Model* model;
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
@@ -48,16 +50,16 @@ class MainWindow : public QMainWindow
 		NiceViewWidget* niceViewWidget;
 		QScrollArea* pullPlanLibraryScrollArea;
 		QScrollArea* colorBarLibraryScrollArea;
-		QPushButton* savePullPlanButton; 
 		QHBoxLayout* pullPlanLibraryLayout;
 		QHBoxLayout* colorBarLibraryLayout;
 		QSlider* pullPlanTwistSlider;
 		QSpinBox* pullPlanTwistSpin;
+		QPushButton* newPullPlanButton;
 
 	private slots:
 		void updateEverything();
 		void pullTemplateComboBoxChanged(int index);
-		void savePullPlan();	
+		void newPullPlan();	
 		void pullPlanTwistSliderChanged(int p);
 		void pullPlanTwistSpinChanged(int p);
 };

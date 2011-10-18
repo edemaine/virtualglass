@@ -11,7 +11,8 @@ class PullTemplateGraphicsView : public QWidget
 
 	public:
 		PullTemplateGraphicsView(PullPlan* plan, QWidget* parent=0);
-
+		void setPullPlan(PullPlan* plan);
+	
 	signals:
 		void someDataChanged();
 
