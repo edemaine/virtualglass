@@ -1,5 +1,5 @@
 
-#include "pulltemplategraphicsview.h"
+#include "pullplaneditorviewwidget.h"
 
 PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
 {
