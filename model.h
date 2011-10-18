@@ -26,6 +26,9 @@ class Model
 		PullTemplate squareFourCirclesPullTemplate;
 		PullTemplate xNineCirclesPullTemplate;
 		Geometry* geometry;
+
+		PullPlan* circleCasingPlan;
+		PullPlan* squareCasingPlan;
 };
 
 #endif

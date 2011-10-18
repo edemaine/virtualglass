@@ -14,18 +14,35 @@ Geometry* Model :: getGeometry(PullPlan* plan)
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
 
-	generateMesh(plan, geometry, ancestors, ancestorIndices);
+	switch (plan->getTemplate()->shape)
+	{
+		case CIRCLE_SHAPE:
+			generateMesh(plan, geometry, ancestors, ancestorIndices, circleCasingPlan);
+			break;
+		case SQUARE_SHAPE:
+			generateMesh(plan, geometry, ancestors, ancestorIndices, circleCasingPlan);
+			break;
+	}	
 
 	return geometry; 
 }
 
 void Model :: initializePullTemplates()
 {
+	circleCasingPlan = new PullPlan();
+	circleCasingPlan->isBase = true;
+	circleCasingPlan->setColor(255, 255, 255, 30);
+	
+	squareCasingPlan = new PullPlan();
+	squareCasingPlan->isBase = true;
+	squareCasingPlan->setColor(255, 255, 255, 30);
+
 	Point p;
 
 	p.x = p.y = p.z = 0.0;
 
 	// Line of three circles 
+	lineThreeCirclesPullTemplate.shape = CIRCLE_SHAPE;
 	for (int i = 0; i < 3; ++i)
 	{
 		p.x = -0.6666666 + 0.6666 * i;
@@ -33,6 +50,7 @@ void Model :: initializePullTemplates()
 	}
 
 	// Line of five circles
+	lineFiveCirclesPullTemplate.shape = CIRCLE_SHAPE;
 	for (int i = 0; i < 5; ++i)
 	{
 		p.x = -0.8 + 0.4 * i;
@@ -40,6 +58,7 @@ void Model :: initializePullTemplates()
 	}
 
 	// Square of four circles
+	squareFourCirclesPullTemplate.shape = CIRCLE_SHAPE;
 	for (int i = 0; i < 2; ++i)
 	{
 		for (int j = 0; j < 2; ++j)
@@ -51,6 +70,7 @@ void Model :: initializePullTemplates()
 	}
 
 	// X of nine circles
+	xNineCirclesPullTemplate.shape = CIRCLE_SHAPE;
 	for (int i = 0; i < 5; ++i)
 	{
 		p.x = -0.8 + 0.4 * i;

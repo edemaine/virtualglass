@@ -238,7 +238,6 @@ void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vect
 	}
 	geometry->compute_normals_from_triangles();
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, plan, group_tag));
-
 }
 
 
@@ -249,12 +248,20 @@ the transforms array is filled with with the transformations encountered at each
 leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
-void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, int groupIndex)
+void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* casingPlan, int groupIndex)
 {
 	int passGroupIndex;
 
 	if (plan == NULL)
 		return;
+
+	// Deal with casing first
+	if (casingPlan != NULL)
+	{
+		ancestors.push_back(casingPlan);
+		meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, casingPlan, 0);
+		ancestors.pop_back();
+	}
 
 	// Make recursive calls depending on the type of the current node
 	ancestors.push_back(plan);
@@ -278,7 +285,7 @@ void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestor
 				passGroupIndex = groupIndex;
 
 			ancestorIndices.push_back(i);
-			generateMesh(plan->getSubplans()[i], geometry, ancestors, ancestorIndices, passGroupIndex);
+			generateMesh(plan->getSubplans()[i], geometry, ancestors, ancestorIndices, NULL, passGroupIndex);
 			ancestorIndices.pop_back();
 		}
 	}
