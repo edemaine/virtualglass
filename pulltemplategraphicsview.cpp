@@ -1,7 +1,7 @@
 
 #include "pulltemplategraphicsview.h"
 
-PullTemplateGraphicsView :: PullTemplateGraphicsView(PullPlan* plan, QWidget* parent) : QWidget(parent)
+PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
 {
 	width = 500;
 	height = 500;	
@@ -12,12 +12,12 @@ PullTemplateGraphicsView :: PullTemplateGraphicsView(PullPlan* plan, QWidget* pa
 	this->plan = plan;
 }
 
-void PullTemplateGraphicsView :: dragEnterEvent(QDragEnterEvent* event)
+void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 {
 	event->acceptProposedAction();
 }
 
-void PullTemplateGraphicsView :: dropEvent(QDropEvent* event)
+void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
 	event->setDropAction(Qt::CopyAction);
 
@@ -37,12 +37,12 @@ void PullTemplateGraphicsView :: dropEvent(QDropEvent* event)
 	} 
 }
 
-void PullTemplateGraphicsView :: setPullPlan(PullPlan* plan)
+void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan)
 {
 	this->plan = plan;
 }
 
-void PullTemplateGraphicsView :: paintEvent(QPaintEvent *event)
+void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 {
 	QPainter painter;
 	painter.setRenderHint(QPainter::HighQualityAntialiasing);

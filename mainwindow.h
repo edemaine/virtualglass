@@ -44,7 +44,7 @@ class MainWindow : public QMainWindow
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
 		QComboBox* pullTemplateComboBox;
-		PullTemplateGraphicsView* pullTemplateGraphicsView;
+		PullPlanEditorViewWidget* pullPlanEditorViewWidget;
 		QLabel* niceViewLabel;
 		QVBoxLayout* niceViewLayout;
 		NiceViewWidget* niceViewWidget;

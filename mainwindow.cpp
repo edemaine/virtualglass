@@ -95,7 +95,7 @@ void MainWindow :: setupConnections()
 	connect(pullTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pullTemplateComboBoxChanged(int)));	
 	connect(newPullPlanButton, SIGNAL(pressed()), this, SLOT(newPullPlan()));	
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
-	connect(pullTemplateGraphicsView, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+	connect(pullPlanEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(pullPlanTwistSlider, SIGNAL(valueChanged(int)), this, SLOT(pullPlanTwistSliderChanged(int)));
 	connect(pullPlanTwistSpin, SIGNAL(valueChanged(int)), this, SLOT(pullPlanTwistSpinChanged(int)));
 }
@@ -163,8 +163,8 @@ void MainWindow :: setupPullPlanEditor()
 	pullTemplateComboBox->addItem("Nine X");
 	editorLayout->addWidget(pullTemplateComboBox, 0);
 
-	pullTemplateGraphicsView = new PullTemplateGraphicsView(pullPlanEditorPlan, centralWidget);
-	editorLayout->addWidget(pullTemplateGraphicsView, 10); 	
+	pullPlanEditorViewWidget = new PullPlanEditorViewWidget(pullPlanEditorPlan, centralWidget);
+	editorLayout->addWidget(pullPlanEditorViewWidget, 10); 	
 
 	QHBoxLayout* twistLayout = new QHBoxLayout(centralWidget);
 	editorLayout->addLayout(twistLayout);
@@ -211,7 +211,7 @@ void MainWindow :: newPullPlan()
 	pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);	
 
 	// Give the new plan to the editor
-	pullTemplateGraphicsView->setPullPlan(pullPlanEditorPlan);
+	pullPlanEditorViewWidget->setPullPlan(pullPlanEditorPlan);
 
 	// Trigger GUI updates
 	emit someDataChanged();
@@ -227,12 +227,12 @@ void MainWindow :: updateEverything()
 void MainWindow :: updateLibrary()
 {
 	pullPlanEditorPlanLibraryWidget->updatePixmaps(QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100),
-		QPixmap::grabWidget(pullTemplateGraphicsView).scaled(100, 100));
+		QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100));
 }
 
 void MainWindow :: updatePullPlanEditor()
 {
-	pullTemplateGraphicsView->repaint();
+	pullPlanEditorViewWidget->repaint();
 	int twist = pullPlanEditorPlan->getTwist();
 	pullPlanTwistSlider->setSliderPosition(twist);
 	pullPlanTwistSpin->setValue(twist);

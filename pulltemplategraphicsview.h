@@ -1,16 +1,16 @@
 
-#ifndef PULLTEMPLATEGRAPHICSVIEW_H
-#define PULLTEMPLATEHRAPHICSVIEW_H
+#ifndef PULLPLANEDITORVIEWWIDGET_H
+#define PULLPLANEDITORVIEWWIDGET_H
 
 #include <QtGui>
 #include "pullplan.h"
 
-class PullTemplateGraphicsView : public QWidget
+class PullPlanEditorViewWidget : public QWidget
 {
 	Q_OBJECT
 
 	public:
-		PullTemplateGraphicsView(PullPlan* plan, QWidget* parent=0);
+		PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent=0);
 		void setPullPlan(PullPlan* plan);
 	
 	signals:
