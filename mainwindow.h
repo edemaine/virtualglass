@@ -11,7 +11,7 @@
 #include "pulltemplate.h"
 #include "model.h"
 #include "pullplan.h"
-#include "pulltemplategraphicsview.h"
+#include "pullplaneditorviewwidget.h"
 
 class MainWindow : public QMainWindow
 {
