@@ -41,6 +41,8 @@ void MainWindow :: seedTable()
 	colorBarLibraryLayout->addWidget(cblw);	
 	cblw = new ColorBarLibraryWidget(138, 155, 163, 255);
 	colorBarLibraryLayout->addWidget(cblw);	
+	cblw = new ColorBarLibraryWidget(255, 255, 255, 10);
+	colorBarLibraryLayout->addWidget(cblw);	
 
 	// setup the editor/3D view
 	emit someDataChanged();		
