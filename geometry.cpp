@@ -92,9 +92,9 @@ void Geometry::save_raw_file(std::string const &filename) const {
 			{ //write group color:
 				assert(g->pullplan);
 				//Glass has diffuse skin coat over absorbing inner coat.
-				Vector4f skin_color = g->pullplan->getColor();
+				Vector4f skin_color = g->pullplan->color;
 				//Filter-per-unit-length:
-				Vector3f filter_after_unit = g->pullplan->getColor().xyz;
+				Vector3f filter_after_unit = g->pullplan->color.xyz;
 				//intensify color:
 				for (unsigned int i = 0; i < 3; ++i) {
 					filter_after_unit.c[i] = powf(filter_after_unit.c[i], 20.0f);

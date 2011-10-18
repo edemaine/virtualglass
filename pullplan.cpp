@@ -1,39 +1,41 @@
 
 #include "pullplan.h"
 
-PullPlan :: PullPlan()
+PullPlan :: PullPlan(int pullTemplate, bool isBase, Color color)
 {
-	clear();	
-	isBase = true;
-}
-
-void PullPlan :: clear()
-{
-	this->pullTemplate = NULL;
-	this->subplans.clear();
+	setTemplate(new PullTemplate(pullTemplate));
+	this->color = color;
+	this->isBase = isBase;
 	this->twist = 0.0;
-	color.r = color.g = color.b = color.a = 255;
 }
 
-void PullPlan :: setTemplate(PullTemplate* pt, PullPlan* defaultSubplan)
+void PullPlan :: setTemplate(PullTemplate* pt)
 {
 	this->pullTemplate = pt;
 	this->subplans.clear();
+
+	// initialize the pull plan's subplans to be something boring and base
 	for (unsigned int i = 0; i < pt->subpulls.size(); ++i)
-		subplans.push_back(defaultSubplan);
+	{
+		Color color;
+		color.r = color.g = color.b = 1.0;
+		color.a = 0.4;
+		switch (pt->subpulls[i].shape)	
+		{
+			// this is a memory leak
+			case CIRCLE_SHAPE:
+				subplans.push_back(new PullPlan(CIRCLE_BASE_TEMPLATE, true, color)); 
+				break;
+			case SQUARE_SHAPE:
+				subplans.push_back(new PullPlan(SQUARE_BASE_TEMPLATE, true, color)); 
+				break;
+		}
+	}
 }
 
 PullTemplate* PullPlan :: getTemplate()
 {
 	return this->pullTemplate;
-}
-
-void PullPlan :: setColor(int r, int g, int b, int a)
-{
-	color.r = r;
-	color.g = g;
-	color.b = b;
-	color.a = a;
 }
 
 void PullPlan :: setSubplan(unsigned int index, PullPlan* plan)
@@ -47,20 +49,6 @@ vector<PullPlan*> PullPlan :: getSubplans()
 	return subplans;
 }
 
-Color PullPlan :: getColor()
-{
-	return color;
-}
-
-void PullPlan :: setTwist(float twist)
-{
-	this->twist = twist;
-}
-
-float PullPlan :: getTwist()
-{
-	return this->twist;
-}
 
 
 

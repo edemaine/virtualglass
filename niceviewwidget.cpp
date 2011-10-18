@@ -386,8 +386,8 @@ void NiceViewWidget :: paintWithDepthPeeling()
 
 			for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
 				assert(g->pullplan);
-				Color c = g->pullplan->getColor();
-				glColor4f(c.r/255.0, c.g/255.0, c.b/255.0, c.a/255.0);
+				Color c = g->pullplan->color;
+				glColor4f(c.r, c.g, c.b, c.a);
 				glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 							   GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
 			}
@@ -517,7 +517,7 @@ void NiceViewWidget :: paintWithoutDepthPeeling()
 
 		for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
 			assert(g->pullplan);
-			Color c = g->pullplan->getColor();
+			Color c = g->pullplan->color;
 			glColor4f(c.r, c.g, c.b, 1.0);
 			glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 						   GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));

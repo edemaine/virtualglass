@@ -1,7 +1,7 @@
 
 #include "colorbarlibrarywidget.h"
 
-ColorBarLibraryWidget :: ColorBarLibraryWidget(int r, int g, int b, int a, QWidget* parent): QLabel(parent)
+ColorBarLibraryWidget :: ColorBarLibraryWidget(Color color, QWidget* parent): QLabel(parent)
 {
 	setBackgroundRole(QPalette::Base);
 	setFixedSize(100, 100);
@@ -9,13 +9,11 @@ ColorBarLibraryWidget :: ColorBarLibraryWidget(int r, int g, int b, int a, QWidg
 	setMouseTracking(true);
 
 	QPixmap image(100, 100);
-	image.fill(QColor(r, g, b, a));
+	image.fill(QColor(255*color.r, 255*color.g, 255*color.b, 255*color.a));
 	setPixmap(image);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
-	this->pullPlan = new PullPlan();
-	this->pullPlan->isBase = true;
-	this->pullPlan->setColor(r, g, b, a);
+	this->pullPlan = new PullPlan(AMORPHOUS_BASE_TEMPLATE, true, color);
 }
 
 PullPlan* ColorBarLibraryWidget :: getPullPlan()

@@ -5,16 +5,14 @@
 #include <vector>
 #include "primitives.h"
 #include "subpulltemplate.h"
+#include "constants.h"
 
 using std::vector;
-
-class PullPlan;
 
 class PullTemplate
 {
 	public:
-		PullTemplate();
-		void addSubpullTemplate(SubpullTemplate sub);
+		PullTemplate(int t);
 		vector<SubpullTemplate> subpulls;
 		int shape;	
 };

@@ -3,9 +3,12 @@
 
 Model :: Model()
 {
-	// Initialize pull templates
-	initializePullTemplates();
 	geometry = new Geometry();
+	Color color;
+	color.r = color.g = color.b = 1.0;
+	color.a = 0.2;
+	circleCasing = new PullPlan(CIRCLE_BASE_TEMPLATE, true, color); 
+	squareCasing = new PullPlan(SQUARE_BASE_TEMPLATE, true, color); 
 }
 
 Geometry* Model :: getGeometry(PullPlan* plan)
@@ -17,91 +20,18 @@ Geometry* Model :: getGeometry(PullPlan* plan)
 	switch (plan->getTemplate()->shape)
 	{
 		case CIRCLE_SHAPE:
-			generateMesh(plan, geometry, ancestors, ancestorIndices, circleCasingPlan);
+			generateMesh(plan, geometry, ancestors, ancestorIndices, circleCasing);
 			break;
 		case SQUARE_SHAPE:
-			generateMesh(plan, geometry, ancestors, ancestorIndices, circleCasingPlan);
+			generateMesh(plan, geometry, ancestors, ancestorIndices, squareCasing);
 			break;
-	}	
+		default:
+			generateMesh(plan, geometry, ancestors, ancestorIndices);
+			break;
+	}
 
 	return geometry; 
 }
 
-void Model :: initializePullTemplates()
-{
-	circleCasingPlan = new PullPlan();
-	circleCasingPlan->isBase = true;
-	circleCasingPlan->setColor(255, 255, 255, 30);
-	
-	squareCasingPlan = new PullPlan();
-	squareCasingPlan->isBase = true;
-	squareCasingPlan->setColor(255, 255, 255, 30);
-
-	Point p;
-
-	p.x = p.y = p.z = 0.0;
-
-	// Line of three circles 
-	lineThreeCirclesPullTemplate.shape = CIRCLE_SHAPE;
-	for (int i = 0; i < 3; ++i)
-	{
-		p.x = -0.6666666 + 0.6666 * i;
-		lineThreeCirclesPullTemplate.addSubpullTemplate(SubpullTemplate(CIRCLE_SHAPE, p, 0.65, 0));
-	}
-
-	// Line of five circles
-	lineFiveCirclesPullTemplate.shape = CIRCLE_SHAPE;
-	for (int i = 0; i < 5; ++i)
-	{
-		p.x = -0.8 + 0.4 * i;
-		lineFiveCirclesPullTemplate.addSubpullTemplate(SubpullTemplate(CIRCLE_SHAPE, p, 0.39, 0));
-	}
-
-	// Square of four circles
-	squareFourCirclesPullTemplate.shape = CIRCLE_SHAPE;
-	for (int i = 0; i < 2; ++i)
-	{
-		for (int j = 0; j < 2; ++j)
-		{
-			p.x = -0.3 + 0.6 * i;
-			p.y = -0.3 + 0.6 * j;
-			squareFourCirclesPullTemplate.addSubpullTemplate(SubpullTemplate(CIRCLE_SHAPE, p, 0.59, 0));
-		}
-	}
-
-	// X of nine circles
-	xNineCirclesPullTemplate.shape = CIRCLE_SHAPE;
-	for (int i = 0; i < 5; ++i)
-	{
-		p.x = -0.8 + 0.4 * i;
-		p.y = 0.0;
-		xNineCirclesPullTemplate.addSubpullTemplate(SubpullTemplate(CIRCLE_SHAPE, p, 0.39, 0));
-	}
-	for (int i = 0; i < 5; ++i)
-	{
-		if (i == 2)
-			continue;
-		p.x = 0.0;
-		p.y = -0.8 + 0.4 * i;
-		xNineCirclesPullTemplate.addSubpullTemplate(SubpullTemplate(CIRCLE_SHAPE, p, 0.39, 0));
-	}
-}
-
-PullTemplate* Model :: getPullTemplate(int pt)
-{
-	switch (pt)
-	{
-		case LINE_THREE_CIRCLES:
-			return &lineThreeCirclesPullTemplate;
-		case LINE_FIVE_CIRCLES:
-			return &lineFiveCirclesPullTemplate;
-		case SQUARE_FOUR_CIRCLES:
-			return &squareFourCirclesPullTemplate;
-		case X_NINE_CIRCLES:
-			return &xNineCirclesPullTemplate;
-		default:
-			return NULL;
-	}
-}
 
 

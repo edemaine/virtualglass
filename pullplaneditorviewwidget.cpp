@@ -30,7 +30,23 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			event->accept();
 			PullPlan* ptr;
 			sscanf(event->mimeData()->text().toAscii().constData(), "%p", &ptr);
-			plan->setSubplan(i, ptr);
+			if (ptr->getTemplate()->shape == AMORPHOUS_SHAPE) // if it's a color bar
+			{
+				PullPlan* basePullPlan = NULL;
+				switch (plan->getTemplate()->subpulls[i].shape)
+				{
+					// This is a memory leak, as every drag of a color bar makes a new pull plan
+					case CIRCLE_SHAPE:
+						basePullPlan = new PullPlan(CIRCLE_BASE_TEMPLATE, true, ptr->color); 
+						break;
+					case SQUARE_SHAPE:
+						basePullPlan = new PullPlan(SQUARE_BASE_TEMPLATE, true, ptr->color); 
+						break;
+				}
+				plan->setSubplan(i, basePullPlan);	
+			}
+			else // it's a regular pull plan
+				plan->setSubplan(i, ptr);
 			emit someDataChanged();
 			return;	
 		}
@@ -68,8 +84,8 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 		SubpullTemplate* subpull = &(plan->getTemplate()->subpulls[i]);
 		if (plan->getSubplans()[i]->isBase)
 		{
-			Color c = plan->getSubplans()[i]->getColor();
-			painter.setBrush(QColor(c.r, c.g, c.b, c.a));
+			Color c = plan->getSubplans()[i]->color;
+			painter.setBrush(QColor(255*c.r, 255*c.g, 255*c.b, 255*c.a));
 			pen.setStyle(Qt::NoPen);
 		}
 		else

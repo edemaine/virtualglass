@@ -21,27 +21,82 @@ MainWindow :: MainWindow(Model* model)
 void MainWindow :: seedTable()
 {
 	// Sampling of Reichenbach colors from Kim's color file
-	ColorBarLibraryWidget* cblw = new ColorBarLibraryWidget(255, 255, 255, 100);
+	Color color;
+	ColorBarLibraryWidget* cblw;
+
+	color.r = color.g = color.b = 1.0;
+	color.a = 0.4;
+	cblw = new ColorBarLibraryWidget(color);
 	colorBarLibraryLayout->addWidget(cblw);	
-	cblw = new ColorBarLibraryWidget(1, 58, 186, 128);
+
+	color.r = 1/255.0;
+	color.g = 58/255.0;
+	color.b = 186/255.0;
+	color.a = 128/255.0;
+	cblw = new ColorBarLibraryWidget(color);
 	colorBarLibraryLayout->addWidget(cblw);	
-	cblw = new ColorBarLibraryWidget(222, 205, 1, 126);
+
+	color.r = 222/255.0;
+	color.g = 205/255.0;
+	color.b = 1/255.0;
+	color.a = 126/255.0;
+	cblw = new ColorBarLibraryWidget(color);
 	colorBarLibraryLayout->addWidget(cblw);	
-	cblw = new ColorBarLibraryWidget(2, 101, 35, 128);
+
+	color.r = 2/255.0;
+	color.g = 101/255.0;
+	color.b = 35/255.0;
+	color.a = 128/255.0;
+	cblw = new ColorBarLibraryWidget(color);
 	colorBarLibraryLayout->addWidget(cblw);	
-	cblw = new ColorBarLibraryWidget(253, 122, 56, 128);
+
+	color.r = 253/255.0;
+	color.g = 122/255.0;
+	color.b = 56/255.0;
+	color.a = 128/255.0;
+	cblw = new ColorBarLibraryWidget(color);
 	colorBarLibraryLayout->addWidget(cblw);	
-	cblw = new ColorBarLibraryWidget(226, 190, 161, 255);
+
+	color.r = 226/255.0;
+	color.g = 190/255.0;
+	color.b = 161/255.0;
+	color.a = 255/255.0;
+	cblw = new ColorBarLibraryWidget(color);
 	colorBarLibraryLayout->addWidget(cblw);	
-	cblw = new ColorBarLibraryWidget(50, 102, 54, 255);
+
+	color.r = 50/255.0;
+	color.g = 102/255.0;
+	color.b = 54/255.0;
+	color.a = 255/255.0;
+	cblw = new ColorBarLibraryWidget(color);
 	colorBarLibraryLayout->addWidget(cblw);	
-	cblw = new ColorBarLibraryWidget(60, 31, 37, 255);
+
+	color.r = 60/255.0;
+	color.g = 31/255.0;
+	color.b = 37/255.0;
+	color.a = 255/255.0;
+	cblw = new ColorBarLibraryWidget(color);
 	colorBarLibraryLayout->addWidget(cblw);	
-	cblw = new ColorBarLibraryWidget(131, 149, 201, 255);
+
+	color.r = 131/255.0;
+	color.g = 149/255.0;
+	color.b = 201/255.0;
+	color.a = 255/255.0;
+	cblw = new ColorBarLibraryWidget(color);
 	colorBarLibraryLayout->addWidget(cblw);	
-	cblw = new ColorBarLibraryWidget(138, 155, 163, 255);
+
+	color.r = 138/255.0;
+	color.g = 155/255.0;
+	color.b = 163/255.0;
+	color.a = 255/255.0;
+	cblw = new ColorBarLibraryWidget(color);
 	colorBarLibraryLayout->addWidget(cblw);	
-	cblw = new ColorBarLibraryWidget(255, 255, 255, 10);
+
+	color.r = 255/255.0;
+	color.g = 255/255.0;
+	color.b = 255/255.0;
+	color.a = 10/255.0;
+	cblw = new ColorBarLibraryWidget(color);
 	colorBarLibraryLayout->addWidget(cblw);	
 
 	// setup the editor/3D view
@@ -143,13 +198,10 @@ void MainWindow :: setupTable()
 
 void MainWindow :: setupPullPlanEditor()
 {
-	defaultPullPlanEditorPlan = new PullPlan();
-	defaultPullPlanEditorPlan->setColor(255, 255, 255, 100);
-	defaultPullPlanEditorPlan->isBase = true;
+	defaultColor.r = defaultColor.g = defaultColor.b = 1.0;
+	defaultColor.a = 0.4;
 
-	pullPlanEditorPlan = new PullPlan();
-	pullPlanEditorPlan->isBase = false;
-	pullPlanEditorPlan->setTemplate(model->getPullTemplate(1), defaultPullPlanEditorPlan);
+	pullPlanEditorPlan = new PullPlan(LINE_THREE_CIRCLES_TEMPLATE, false, defaultColor);
 	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), QPixmap::fromImage(QImage("./duck.jpg")), pullPlanEditorPlan);
 	pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);	
 
@@ -157,10 +209,11 @@ void MainWindow :: setupPullPlanEditor()
 	centralLayout->addLayout(editorLayout);
 
 	pullTemplateComboBox = new QComboBox(centralWidget);
-	pullTemplateComboBox->addItem("Three line");
-	pullTemplateComboBox->addItem("Five line");
-	pullTemplateComboBox->addItem("Four square");
-	pullTemplateComboBox->addItem("Nine X");
+	pullTemplateComboBox->addItem("Three circles on a line");
+	pullTemplateComboBox->addItem("Five circles on a line");
+	pullTemplateComboBox->addItem("Four circles in a square");
+	pullTemplateComboBox->addItem("Nine circles in a X");
+	pullTemplateComboBox->addItem("Four squares in a square");
 	editorLayout->addWidget(pullTemplateComboBox, 0);
 
 	pullPlanEditorViewWidget = new PullPlanEditorViewWidget(pullPlanEditorPlan, centralWidget);
@@ -194,16 +247,14 @@ void MainWindow :: pullPlanTwistSpinChanged(int)
 void MainWindow :: pullPlanTwistSliderChanged(int)
 {
         float twist = pullPlanTwistSlider->sliderPosition();
-	pullPlanEditorPlan->setTwist(twist);
+	pullPlanEditorPlan->twist = twist;
 	someDataChanged();
 }
 
 void MainWindow :: newPullPlan()
 {
 	// Create the new plan
-	pullPlanEditorPlan = new PullPlan();
-	pullPlanEditorPlan->isBase = false;
-	pullPlanEditorPlan->setTemplate(model->getPullTemplate(1), defaultPullPlanEditorPlan);
+	pullPlanEditorPlan = new PullPlan(LINE_THREE_CIRCLES_TEMPLATE, false, defaultColor); 
 
 	// Create the new library entry
 	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
@@ -233,7 +284,7 @@ void MainWindow :: updateLibrary()
 void MainWindow :: updatePullPlanEditor()
 {
 	pullPlanEditorViewWidget->repaint();
-	int twist = pullPlanEditorPlan->getTwist();
+	int twist = pullPlanEditorPlan->twist;
 	pullPlanTwistSlider->setSliderPosition(twist);
 	pullPlanTwistSpin->setValue(twist);
 } 
@@ -245,7 +296,7 @@ void MainWindow :: updateNiceView()
 
 void MainWindow :: pullTemplateComboBoxChanged(int newIndex)
 {
-	pullPlanEditorPlan->setTemplate(model->getPullTemplate(newIndex+1), defaultPullPlanEditorPlan);
+	pullPlanEditorPlan->setTemplate(new PullTemplate(newIndex+1));
 	emit someDataChanged();
 }
 

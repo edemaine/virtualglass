@@ -44,7 +44,7 @@ void applyTwistTransform(Geometry* geometry, PullPlan* transformNode)
 
 void applyTwistTransform(Vertex* v, PullPlan* transformNode)
 {
-	float twist = transformNode->getTwist();
+	float twist = transformNode->twist;
 
 	// Apply twist
 	float preTheta = atan2(v->position.y, v->position.x);
@@ -65,7 +65,6 @@ Vertex applyTransforms(Vertex v, vector<PullPlan*> ancestors, vector<int> ancest
 	return v;
 }
 
-
 typedef map< Vector2ui, Vector2ui > EdgeMap;
 typedef set< Vector2ui > EdgeSet;
 
@@ -85,12 +84,43 @@ void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vect
 
 	Vector2f p;
 	vector< Vector2f > points;
-	for (unsigned int i = 0; i < angularResolution; ++i)
+	switch (plan->getTemplate()->shape)
 	{
-		p.x = cos(2 * PI * i / angularResolution);
-		p.y = sin(2 * PI * i / angularResolution);
-		points.push_back(p);
-	} 
+		case CIRCLE_SHAPE:
+			for (unsigned int i = 0; i < angularResolution; ++i)
+			{
+				p.x = cos(2 * PI * i / angularResolution);
+				p.y = sin(2 * PI * i / angularResolution);
+				points.push_back(p);
+			}
+			break;
+		case SQUARE_SHAPE: 
+			for (unsigned int i = 0; i < angularResolution / 4; ++i)
+			{
+				p.x = 1.0;
+				p.y = -1.0 + 8.0 * i / angularResolution;
+				points.push_back(p);
+			}
+			for (unsigned int i = 0; i < angularResolution / 4; ++i)
+			{
+				p.x = 1.0 - 8.0 * i / angularResolution;
+				p.y = 1.0;
+				points.push_back(p);
+			}
+			for (unsigned int i = 0; i < angularResolution / 4; ++i)
+			{
+				p.x = -1.0;
+				p.y = 1.0 - 8.0 * i / angularResolution;
+				points.push_back(p);
+			}
+			for (unsigned int i = 0; i < angularResolution / 4; ++i)
+			{
+				p.x = -1.0 + 8.0 * i / angularResolution;
+				p.y = -1.0;
+				points.push_back(p);
+			}
+			break;
+	}
 
 	//Generate verts:
 	vector< Vector3ui > tris;

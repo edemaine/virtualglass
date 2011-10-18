@@ -12,30 +12,22 @@ class PullPlan;
 class PullPlan
 {
 	public:
-		PullPlan();
-		void clear();
+		PullPlan(int pullTemplate, bool isBase, Color color);
 
-		void setTemplate(PullTemplate* pt, PullPlan* defaultSubplan);
+		void setTemplate(PullTemplate* pt);
 		PullTemplate* getTemplate();
 
 		void setSubplan(unsigned int index, PullPlan* subplan);
 		vector<PullPlan*> getSubplans();
 
-		void setTwist(float twist);
-
-		float getTwist();
-
+		float twist;
 		bool isBase;
-
-		void setColor(int r, int g, int b, int a);
-		Color getColor();
+		Color color;
 	
 	private:
 		// Variables
 		PullTemplate* pullTemplate;
 		vector<PullPlan*> subplans;
-		float twist;
-		Color color;
 };
 
 #endif

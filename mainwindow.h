@@ -5,6 +5,7 @@
 
 #include <QtGui>
 #include <QObject>
+#include "constants.h"
 #include "niceviewwidget.h"
 #include "pullplanlibrarywidget.h"
 #include "colorbarlibrarywidget.h"
@@ -39,6 +40,7 @@ class MainWindow : public QMainWindow
 		// Variables
 		PullPlan* pullPlanEditorPlan;
 		PullPlan* defaultPullPlanEditorPlan;
+		Color defaultColor;
 		PullPlanLibraryWidget* pullPlanEditorPlanLibraryWidget;
 		Model* model;
 		QWidget* centralWidget;
