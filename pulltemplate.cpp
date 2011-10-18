@@ -37,7 +37,7 @@ PullTemplate :: PullTemplate(int t)
 			for (int i = 0; i < 3; ++i)
 			{
 				p.x = -0.6666666 + 0.6666 * i;
-				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.65, 0));
+				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.60, 0));
 			}
 			break;	
 		case LINE_FIVE_CIRCLES_TEMPLATE:
