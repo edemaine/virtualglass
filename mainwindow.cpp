@@ -287,6 +287,7 @@ void MainWindow :: updatePullPlanEditor()
 	int twist = pullPlanEditorPlan->twist;
 	pullPlanTwistSlider->setSliderPosition(twist);
 	pullPlanTwistSpin->setValue(twist);
+	pullTemplateComboBox->setCurrentIndex(pullPlanEditorPlan->getTemplate()->type-1);
 } 
 
 void MainWindow :: updateNiceView()
@@ -296,8 +297,15 @@ void MainWindow :: updateNiceView()
 
 void MainWindow :: pullTemplateComboBoxChanged(int newIndex)
 {
-	pullPlanEditorPlan->setTemplate(new PullTemplate(newIndex+1));
-	emit someDataChanged();
+	// Only do anything if the change caused the combo box to not match
+	// the type of the current template, otherwise we might
+	// cause a reset to the default template subcanes instead of 
+	// some user specified ones 
+	if (newIndex+1 != pullPlanEditorPlan->getTemplate()->type)
+	{
+		pullPlanEditorPlan->setTemplate(new PullTemplate(newIndex+1));
+		emit someDataChanged();
+	}
 }
 
 void MainWindow :: setupNiceView()

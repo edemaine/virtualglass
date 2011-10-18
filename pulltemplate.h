@@ -15,6 +15,7 @@ class PullTemplate
 		PullTemplate(int t);
 		vector<SubpullTemplate> subpulls;
 		int shape;	
+		int type;
 };
 
 #endif

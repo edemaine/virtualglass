@@ -5,6 +5,8 @@ PullTemplate :: PullTemplate(int t)
 {
 	Point p;
 
+	this->type = t;
+
 	switch (t)
 	{
 		case CIRCLE_BASE_TEMPLATE:

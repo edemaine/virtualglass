@@ -2,7 +2,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-// Valid templates are assumed to start at 1 and be contiguous
+// IMPORTANT: The list of templates that show up in the UI menu must start
+// at 1 and be contiguous. Everything else must come after. 
 #define LINE_THREE_CIRCLES_TEMPLATE 1
 #define LINE_FIVE_CIRCLES_TEMPLATE 2
 #define SQUARE_FOUR_CIRCLES_TEMPLATE 3
