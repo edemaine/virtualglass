@@ -153,6 +153,8 @@ void MainWindow :: setupConnections()
 	connect(pullPlanEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(pullPlanTwistSlider, SIGNAL(valueChanged(int)), this, SLOT(pullPlanTwistSliderChanged(int)));
 	connect(pullPlanTwistSpin, SIGNAL(valueChanged(int)), this, SLOT(pullPlanTwistSpinChanged(int)));
+
+	connect(pickupTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pickupTemplateComboBoxChanged(int)));	
 }
 
 void MainWindow :: setupTable()
@@ -213,7 +215,20 @@ void MainWindow :: setupEditors()
 
 void MainWindow :: setupPickupPlanEditor()
 {
+	pickupPlanEditorPlan = new PickupPlan(THREE_HORIZONTALS_TEMPLATE);
+
 	pickupPlanEditorPage = new QWidget(editorTabs);
+
+	QVBoxLayout* editorLayout = new QVBoxLayout(pickupPlanEditorPage);
+	pickupPlanEditorPage->setLayout(editorLayout);
+
+	pickupTemplateComboBox = new QComboBox(pickupPlanEditorPage);
+	pickupTemplateComboBox->addItem("Horizontal stack");
+	pickupTemplateComboBox->addItem("Vertical stack");
+	editorLayout->addWidget(pickupTemplateComboBox, 0);	
+
+	pickupPlanEditorViewWidget = new PickupPlanEditorViewWidget(pickupPlanEditorPlan, pickupPlanEditorPage);
+	editorLayout->addWidget(pickupPlanEditorViewWidget, 10); 	
 }
 
 void MainWindow :: setupPullPlanEditor()
@@ -312,6 +327,15 @@ void MainWindow :: updatePullPlanEditor()
 void MainWindow :: updateNiceView()
 {
 	niceViewWidget->setGeometry(model->getGeometry(pullPlanEditorPlan));	
+}
+
+void MainWindow :: pickupTemplateComboBoxChanged(int newIndex)
+{
+	if (newIndex+1 != pickupPlanEditorPlan->getTemplate()->type)
+	{
+		pickupPlanEditorPlan->setTemplate(new PickupTemplate(newIndex+1));
+		emit someDataChanged();
+	}
 }
 
 void MainWindow :: pullTemplateComboBoxChanged(int newIndex)

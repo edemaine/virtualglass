@@ -13,6 +13,8 @@
 #include "model.h"
 #include "pullplan.h"
 #include "pullplaneditorviewwidget.h"
+#include "pickupplan.h"
+#include "pickupplaneditorviewwidget.h"
 
 class MainWindow : public QMainWindow
 {
@@ -44,14 +46,16 @@ class MainWindow : public QMainWindow
 		QWidget* pullPlanEditorPage;
 		QWidget* pickupPlanEditorPage;
 		PullPlan* pullPlanEditorPlan;
-		PullPlan* defaultPullPlanEditorPlan;
+		PickupPlan* pickupPlanEditorPlan;
 		Color defaultColor;
 		PullPlanLibraryWidget* pullPlanEditorPlanLibraryWidget;
 		Model* model;
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
 		QComboBox* pullTemplateComboBox;
+		QComboBox* pickupTemplateComboBox;
 		PullPlanEditorViewWidget* pullPlanEditorViewWidget;
+		PickupPlanEditorViewWidget* pickupPlanEditorViewWidget;
 		QLabel* niceViewLabel;
 		QVBoxLayout* niceViewLayout;
 		NiceViewWidget* niceViewWidget;
@@ -66,6 +70,7 @@ class MainWindow : public QMainWindow
 	private slots:
 		void updateEverything();
 		void pullTemplateComboBoxChanged(int index);
+		void pickupTemplateComboBoxChanged(int index);
 		void newPullPlan();	
 		void pullPlanTwistSliderChanged(int p);
 		void pullPlanTwistSpinChanged(int p);
