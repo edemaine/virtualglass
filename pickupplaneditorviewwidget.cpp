@@ -7,8 +7,8 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* plan, QWidg
 	height = 500;	
 
 	setAcceptDrops(true);
-	setFixedWidth(width + 10);
-	setFixedHeight(height + 10);
+	setFixedWidth(width + 20);
+	setFixedHeight(height + 20);
 	this->plan = plan;
 }
 
@@ -41,16 +41,25 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 				br.y = sp->location.y + sp->length/2;	
 				break;		
 		}	
+
+		ul.x = ul.x * width/2 + width/2 + 10;  
+		ul.y = ul.y * height/2 + height/2 + 10;  
+		br.x = br.x * width/2 + width/2 + 10;  
+		br.y = br.y * height/2 + height/2 + 10;  
 	
 		if (ul.x < event->pos().x() && event->pos().x() < br.x 
 			&& ul.y < event->pos().y() && event->pos().y() < br.y)
 		{
-			PullPlan* ptr;
-			sscanf(event->mimeData()->text().toAscii().constData(), "%p", &ptr);
-			plan->setSubplan(i, ptr);
-			emit someDataChanged();
-			return;	
+			event->accept();
 		}
+		else
+			continue;
+
+		PullPlan* ptr;
+		sscanf(event->mimeData()->text().toAscii().constData(), "%p", &ptr);
+		plan->setSubplan(i, ptr);
+		emit someDataChanged();
+		return;	
 	} 
 }
 
@@ -70,11 +79,10 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 	pen.setWidth(3);
 	painter.setPen(pen);
 
-	painter.drawRect(5, 5, width, height);
+	painter.drawRect(10, 10, width, height);
 	
 	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
 	{
-		SubpickupTemplate* sp = &(plan->getTemplate()->subpulls[i]);
 		if (plan->getSubplans()[i]->isBase)
 		{
 			Color c = plan->getSubplans()[i]->color;
@@ -90,17 +98,18 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 		painter.setPen(pen);
 
 		int rX, rY, rWidth, rHeight;
+		SubpickupTemplate* sp = &(plan->getTemplate()->subpulls[i]);
 		switch (sp->orientation)
 		{
 			case HORIZONTAL_ORIENTATION:
-				rX = (sp->location.x - sp->length/2.0) * width/2 + width/2 + 5;
- 				rY = (sp->location.y - sp->width/2.0) * width/2 + height/2 + 5;
+				rX = (sp->location.x - sp->length/2.0) * width/2 + width/2 + 10;
+ 				rY = (sp->location.y - sp->width/2.0) * width/2 + height/2 + 10;
  				rWidth = sp->length * width/2;
 				rHeight = sp->width * height/2;
 				break;
 			case VERTICAL_ORIENTATION:
-				rX = (sp->location.x - sp->width/2.0) * width/2 + width/2 + 5;
- 				rY = (sp->location.y - sp->length/2.0) * width/2 + height/2 + 5;
+				rX = (sp->location.x - sp->width/2.0) * width/2 + width/2 + 10;
+ 				rY = (sp->location.y - sp->length/2.0) * width/2 + height/2 + 10;
  				rWidth = sp->width * width/2;
 				rHeight = sp->length * height/2;
 				break;

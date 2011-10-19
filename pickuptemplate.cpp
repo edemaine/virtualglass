@@ -14,7 +14,7 @@ PickupTemplate :: PickupTemplate(int t)
 			for (int i = 0; i < 3; ++i)
 			{
 				p.y = -0.6666666 + 0.6666 * i;
-				subpulls.push_back(SubpickupTemplate(p, HORIZONTAL_ORIENTATION, 2.0, 0.5));
+				subpulls.push_back(SubpickupTemplate(p, HORIZONTAL_ORIENTATION, 1.9, 0.5));
 			}
 			break;
 		case THREE_VERTICALS_TEMPLATE:
@@ -22,7 +22,7 @@ PickupTemplate :: PickupTemplate(int t)
 			for (int i = 0; i < 3; ++i)
 			{
 				p.x = -0.6666666 + 0.6666 * i;
-				subpulls.push_back(SubpickupTemplate(p, VERTICAL_ORIENTATION, 2.0, 0.5));
+				subpulls.push_back(SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.9, 0.5));
 			}
 			break;
 	}

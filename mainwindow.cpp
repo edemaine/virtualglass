@@ -155,6 +155,7 @@ void MainWindow :: setupConnections()
 	connect(pullPlanTwistSpin, SIGNAL(valueChanged(int)), this, SLOT(pullPlanTwistSpinChanged(int)));
 
 	connect(pickupTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pickupTemplateComboBoxChanged(int)));	
+	connect(pickupPlanEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }
 
 void MainWindow :: setupTable()

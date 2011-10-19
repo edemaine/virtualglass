@@ -7,8 +7,8 @@ PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* pa
 	height = 500;	
 
 	setAcceptDrops(true);
-	setFixedWidth(width + 10);
-	setFixedHeight(height + 10);
+	setFixedWidth(width + 20);
+	setFixedHeight(height + 20);
 	this->plan = plan;
 }
 
@@ -79,10 +79,10 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 	switch (plan->getTemplate()->shape)
 	{
 		case CIRCLE_SHAPE:
-			painter.drawEllipse(5, 5, width, height);
+			painter.drawEllipse(10, 10, width, height);
 			break;
 		case SQUARE_SHAPE:
-			painter.drawRect(5, 5, width, height);
+			painter.drawRect(10, 10, width, height);
 			break;
 	}
 	
@@ -103,8 +103,8 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 		}
 		painter.setPen(pen);
 
-		int rX = (subpull->location.x - subpull->diameter/2.0) * width/2 + width/2 + 5;
- 		int rY = (subpull->location.y - subpull->diameter/2.0) * width/2 + height/2 + 5;
+		int rX = (subpull->location.x - subpull->diameter/2.0) * width/2 + width/2 + 10;
+ 		int rY = (subpull->location.y - subpull->diameter/2.0) * width/2 + height/2 + 10;
  		int rWidth = subpull->diameter * width/2;
 		int rHeight = subpull->diameter * height/2;
 
