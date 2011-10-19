@@ -156,6 +156,7 @@ void MainWindow :: setupConnections()
 
 	connect(pickupTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pickupTemplateComboBoxChanged(int)));	
 	connect(pickupPlanEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+	connect(newPickupPlanButton, SIGNAL(pressed()), this, SLOT(newPickupPlan()));	
 }
 
 void MainWindow :: setupTable()
@@ -214,6 +215,8 @@ void MainWindow :: setupTable()
         pickupPlanLibraryScrollArea->setFixedWidth(500);
 	tableLayout->addWidget(pickupPlanLibraryScrollArea);	
 
+	newPickupPlanButton = new QPushButton("New Pickup Plan");
+	tableLayout->addWidget(newPickupPlanButton);
 }
 
 void MainWindow :: setupEditors()
@@ -234,6 +237,8 @@ void MainWindow :: setupEditors()
 void MainWindow :: setupPickupPlanEditor()
 {
 	pickupPlanEditorPlan = new PickupPlan(THREE_HORIZONTALS_TEMPLATE);
+	pickupPlanEditorPlanLibraryWidget = new PickupPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), QPixmap::fromImage(QImage("./duck.jpg")), pickupPlanEditorPlan);
+        pickupPlanLibraryLayout->addWidget(pickupPlanEditorPlanLibraryWidget);
 
 	pickupPlanEditorPage = new QWidget(editorTabs);
 
@@ -303,6 +308,23 @@ void MainWindow :: pullPlanTwistSliderChanged(int)
 	someDataChanged();
 }
 
+void MainWindow :: newPickupPlan()
+{
+	// Create the new plan
+	pickupPlanEditorPlan = new PickupPlan(THREE_HORIZONTALS_TEMPLATE);
+
+	// Create the new library entry
+	pickupPlanEditorPlanLibraryWidget = new PickupPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
+		QPixmap::fromImage(QImage("./duck.jpg")), pickupPlanEditorPlan);
+	pickupPlanLibraryLayout->addWidget(pickupPlanEditorPlanLibraryWidget);	
+
+	// Give the new plan to the editor
+	pickupPlanEditorViewWidget->setPickupPlan(pickupPlanEditorPlan);
+
+	// Trigger GUI updates
+	emit someDataChanged();
+}
+
 void MainWindow :: newPullPlan()
 {
 	// Create the new plan
@@ -331,6 +353,8 @@ void MainWindow :: updateLibrary()
 {
 	pullPlanEditorPlanLibraryWidget->updatePixmaps(QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100),
 		QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100));
+	pickupPlanEditorPlanLibraryWidget->updatePixmaps(QPixmap::grabWidget(pickupPlanEditorViewWidget).scaled(100, 100),
+		QPixmap::grabWidget(pickupPlanEditorViewWidget).scaled(100, 100));
 }
 
 void MainWindow :: updatePullPlanEditor()

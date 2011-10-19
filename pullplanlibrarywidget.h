@@ -4,7 +4,6 @@
 #include <QtGui>
 #include <QObject>
 #include "pullplan.h"
-#include "niceviewwidget.h"
 
 class PullPlanLibraryWidget : public QLabel
 {

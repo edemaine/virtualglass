@@ -7,6 +7,7 @@
 #include <QObject>
 #include "constants.h"
 #include "niceviewwidget.h"
+#include "pickupplanlibrarywidget.h"
 #include "pullplanlibrarywidget.h"
 #include "colorbarlibrarywidget.h"
 #include "pulltemplate.h"
@@ -49,6 +50,7 @@ class MainWindow : public QMainWindow
 		PickupPlan* pickupPlanEditorPlan;
 		Color defaultColor;
 		PullPlanLibraryWidget* pullPlanEditorPlanLibraryWidget;
+		PickupPlanLibraryWidget* pickupPlanEditorPlanLibraryWidget;
 		Model* model;
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
@@ -68,12 +70,14 @@ class MainWindow : public QMainWindow
 		QSlider* pullPlanTwistSlider;
 		QSpinBox* pullPlanTwistSpin;
 		QPushButton* newPullPlanButton;
+		QPushButton* newPickupPlanButton;
 
 	private slots:
 		void updateEverything();
 		void pullTemplateComboBoxChanged(int index);
 		void pickupTemplateComboBoxChanged(int index);
 		void newPullPlan();	
+		void newPickupPlan();	
 		void pullPlanTwistSliderChanged(int p);
 		void pullPlanTwistSpinChanged(int p);
 };
