@@ -61,8 +61,10 @@ class MainWindow : public QMainWindow
 		NiceViewWidget* niceViewWidget;
 		QScrollArea* pullPlanLibraryScrollArea;
 		QScrollArea* colorBarLibraryScrollArea;
+		QScrollArea* pickupPlanLibraryScrollArea;
 		QHBoxLayout* pullPlanLibraryLayout;
 		QHBoxLayout* colorBarLibraryLayout;
+		QHBoxLayout* pickupPlanLibraryLayout;
 		QSlider* pullPlanTwistSlider;
 		QSpinBox* pullPlanTwistSpin;
 		QPushButton* newPullPlanButton;

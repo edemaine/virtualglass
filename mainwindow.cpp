@@ -197,6 +197,23 @@ void MainWindow :: setupTable()
 
 	newPullPlanButton = new QPushButton("New Pull Plan");
 	tableLayout->addWidget(newPullPlanButton);
+
+	// Setup pickup plan scrolling library
+	QWidget* pickupPlanLibraryWidget = new QWidget(centralWidget);
+	pickupPlanLibraryLayout = new QHBoxLayout(pickupPlanLibraryWidget);
+	pickupPlanLibraryLayout->setSpacing(10);
+	pickupPlanLibraryWidget->setLayout(pickupPlanLibraryLayout);
+
+        pickupPlanLibraryScrollArea = new QScrollArea;
+        pickupPlanLibraryScrollArea->setBackgroundRole(QPalette::Dark);
+        pickupPlanLibraryScrollArea->setWidget(pickupPlanLibraryWidget);
+        pickupPlanLibraryScrollArea->setWidgetResizable(true);
+        pickupPlanLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        pickupPlanLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        pickupPlanLibraryScrollArea->setFixedHeight(130);
+        pickupPlanLibraryScrollArea->setFixedWidth(500);
+	tableLayout->addWidget(pickupPlanLibraryScrollArea);	
+
 }
 
 void MainWindow :: setupEditors()
