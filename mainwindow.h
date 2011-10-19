@@ -31,13 +31,18 @@ class MainWindow : public QMainWindow
 		// Methods
 		void setupTable();
 		void setupNiceView();	
+		void setupEditors();
 		void setupPullPlanEditor();
+		void setupPickupPlanEditor();
 		void setupConnections();
 		void updatePullPlanEditor();
 		void updateNiceView();
 		void updateLibrary();
 
 		// Variables
+		QTabWidget* editorTabs;
+		QWidget* pullPlanEditorPage;
+		QWidget* pickupPlanEditorPage;
 		PullPlan* pullPlanEditorPlan;
 		PullPlan* defaultPullPlanEditorPlan;
 		Color defaultColor;

@@ -10,7 +10,7 @@ MainWindow :: MainWindow(Model* model)
 
         centralLayout = new QHBoxLayout(centralWidget);
 	setupTable();
-	setupPullPlanEditor();
+	setupEditors();
 	setupNiceView();
 	setupConnections();
 
@@ -196,19 +196,38 @@ void MainWindow :: setupTable()
 	tableLayout->addWidget(newPullPlanButton);
 }
 
-void MainWindow :: setupPullPlanEditor()
+void MainWindow :: setupEditors()
 {
 	defaultColor.r = defaultColor.g = defaultColor.b = 1.0;
 	defaultColor.a = 0.4;
 
+	editorTabs = new QTabWidget(centralWidget);
+	centralLayout->addWidget(editorTabs);
+
+	setupPullPlanEditor();
+	editorTabs->addTab(pullPlanEditorPage, "Pull Plan");
+
+	setupPickupPlanEditor();
+	editorTabs->addTab(pickupPlanEditorPage, "Pickup Plan");
+}
+
+void MainWindow :: setupPickupPlanEditor()
+{
+	pickupPlanEditorPage = new QWidget(editorTabs);
+}
+
+void MainWindow :: setupPullPlanEditor()
+{
 	pullPlanEditorPlan = new PullPlan(LINE_THREE_CIRCLES_TEMPLATE, false, defaultColor);
 	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), QPixmap::fromImage(QImage("./duck.jpg")), pullPlanEditorPlan);
 	pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);	
 
-	QVBoxLayout* editorLayout = new QVBoxLayout(centralWidget);
-	centralLayout->addLayout(editorLayout);
+	pullPlanEditorPage = new QWidget(editorTabs);
 
-	pullTemplateComboBox = new QComboBox(centralWidget);
+	QVBoxLayout* editorLayout = new QVBoxLayout(pullPlanEditorPage);
+	pullPlanEditorPage->setLayout(editorLayout);
+
+	pullTemplateComboBox = new QComboBox(pullPlanEditorPage);
 	pullTemplateComboBox->addItem("Three circles on a line");
 	pullTemplateComboBox->addItem("Five circles on a line");
 	pullTemplateComboBox->addItem("Four circles in a square");
@@ -216,18 +235,18 @@ void MainWindow :: setupPullPlanEditor()
 	pullTemplateComboBox->addItem("Four squares in a square");
 	editorLayout->addWidget(pullTemplateComboBox, 0);
 
-	pullPlanEditorViewWidget = new PullPlanEditorViewWidget(pullPlanEditorPlan, centralWidget);
+	pullPlanEditorViewWidget = new PullPlanEditorViewWidget(pullPlanEditorPlan, pullPlanEditorPage);
 	editorLayout->addWidget(pullPlanEditorViewWidget, 10); 	
 
-	QHBoxLayout* twistLayout = new QHBoxLayout(centralWidget);
+	QHBoxLayout* twistLayout = new QHBoxLayout(pullPlanEditorPage);
 	editorLayout->addLayout(twistLayout);
 
-	pullPlanTwistSpin = new QSpinBox(centralWidget);
+	pullPlanTwistSpin = new QSpinBox(pullPlanEditorPage);
 	pullPlanTwistSpin->setRange(-50, 50);
 	pullPlanTwistSpin->setSingleStep(1);
 	twistLayout->addWidget(pullPlanTwistSpin, 1);
 
-	pullPlanTwistSlider = new QSlider(Qt::Horizontal, centralWidget);
+	pullPlanTwistSlider = new QSlider(Qt::Horizontal, pullPlanEditorPage);
 	pullPlanTwistSlider->setRange(-50, 50);
 	pullPlanTwistSlider->setTickInterval(5);
 	pullPlanTwistSlider->setTickPosition(QSlider::TicksBothSides);
