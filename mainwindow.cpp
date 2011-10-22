@@ -103,11 +103,38 @@ void MainWindow :: seedTable()
 	emit someDataChanged();		
 }
 
+void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
+{
+	if (!(event->buttons() & Qt::LeftButton))
+		return;
+
+	PullPlanLibraryWidget* pplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
+	if (pplw == NULL)
+		return;
+
+	pullPlanEditorPlanLibraryWidget = pplw;	
+	pullPlanEditorPlan = pplw->getPullPlan();
+	pullPlanEditorViewWidget->setPullPlan(pullPlanEditorPlan);
+	emit someDataChanged();
+}
+
+
 void MainWindow :: mousePressEvent(QMouseEvent* event)
+{
+	if (event->button() == Qt::LeftButton)
+		this->dragStartPosition = event->pos(); 
+}
+
+void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 {
 	PullPlan* plan;
 	QPixmap pixmap;	
-	
+
+	if (!(event->buttons() & Qt::LeftButton))
+		return;
+	if ((event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
+		return; 
+
 	PullPlanLibraryWidget* pplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
 	if (pplw == NULL)
 	{

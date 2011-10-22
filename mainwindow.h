@@ -24,6 +24,8 @@ class MainWindow : public QMainWindow
 	public:
 		MainWindow(Model* model);
         	void mousePressEvent(QMouseEvent* event);
+        	void mouseMoveEvent(QMouseEvent* event);
+		void mouseDoubleClickEvent(QMouseEvent* event);
         	void dragMoveEvent(QDragMoveEvent* event);
 		void seedTable();
 	
@@ -43,6 +45,7 @@ class MainWindow : public QMainWindow
 		void updateLibrary();
 
 		// Variables
+		QPoint dragStartPosition;
 		QTabWidget* editorTabs;
 		QWidget* pullPlanEditorPage;
 		QWidget* pickupPlanEditorPage;

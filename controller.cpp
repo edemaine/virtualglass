@@ -4,6 +4,8 @@
 Controller::Controller(int argc, char **argv)
 {
 	app = new QApplication(argc, argv);
+	app->setStartDragDistance(30);
+
 	model = new Model();
 	mainWindow = new MainWindow(model);
 }
