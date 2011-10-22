@@ -108,14 +108,25 @@ void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
 	if (!(event->buttons() & Qt::LeftButton))
 		return;
 
-	PullPlanLibraryWidget* pplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
-	if (pplw == NULL)
-		return;
+	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
+	PickupPlanLibraryWidget* pkplw = dynamic_cast<PickupPlanLibraryWidget*>(childAt(event->pos()));
 
-	pullPlanEditorPlanLibraryWidget = pplw;	
-	pullPlanEditorPlan = pplw->getPullPlan();
-	pullPlanEditorViewWidget->setPullPlan(pullPlanEditorPlan);
-	emit someDataChanged();
+	if (plplw != NULL)
+	{
+		pullPlanEditorPlanLibraryWidget = plplw;	
+		pullPlanEditorPlan = plplw->getPullPlan();
+		pullPlanEditorViewWidget->setPullPlan(pullPlanEditorPlan);
+		editorStack->setCurrentIndex(0);
+		emit someDataChanged();
+	}
+	else if (pkplw != NULL)
+	{
+		pickupPlanEditorPlanLibraryWidget = pkplw;	
+		pickupPlanEditorPlan = pkplw->getPickupPlan();
+		pickupPlanEditorViewWidget->setPickupPlan(pickupPlanEditorPlan);
+		editorStack->setCurrentIndex(1);
+		emit someDataChanged();
+	}
 }
 
 
@@ -127,7 +138,7 @@ void MainWindow :: mousePressEvent(QMouseEvent* event)
 
 void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 {
-	PullPlan* plan;
+	void* plan = NULL;
 	QPixmap pixmap;	
 
 	if (!(event->buttons() & Qt::LeftButton))
@@ -135,22 +146,23 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	if ((event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
 		return; 
 
-	PullPlanLibraryWidget* pplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
-	if (pplw == NULL)
+	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
+	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
+	PickupPlanLibraryWidget* pkplw = dynamic_cast<PickupPlanLibraryWidget*>(childAt(event->pos()));
+	if (cblw != NULL)
 	{
-		ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
-		if (cblw == NULL)
-			return;
-		else
-		{
-			plan = cblw->getPullPlan();
-			pixmap = *cblw->pixmap();
-		}
+		plan = cblw->getPullPlan();
+		pixmap = *cblw->pixmap();
 	}
-	else
+	else if (plplw != NULL)
 	{
-		plan = pplw->getPullPlan();
-		pixmap = *pplw->getEditorPixmap();
+		plan = plplw->getPullPlan();
+		pixmap = *plplw->getEditorPixmap();
+	}
+	else if (pkplw != NULL)
+	{
+		plan = pkplw->getPickupPlan();
+		pixmap = *pkplw->getEditorPixmap();
 	}
 
 	char buf[128];
@@ -251,14 +263,14 @@ void MainWindow :: setupEditors()
 	defaultColor.r = defaultColor.g = defaultColor.b = 1.0;
 	defaultColor.a = 0.4;
 
-	editorTabs = new QTabWidget(centralWidget);
-	centralLayout->addWidget(editorTabs);
+	editorStack = new QStackedWidget(centralWidget);
+	centralLayout->addWidget(editorStack);
 
 	setupPullPlanEditor();
-	editorTabs->addTab(pullPlanEditorPage, "Pull Plan");
+	editorStack->addWidget(pullPlanEditorPage);
 
 	setupPickupPlanEditor();
-	editorTabs->addTab(pickupPlanEditorPage, "Pickup Plan");
+	editorStack->addWidget(pickupPlanEditorPage);
 }
 
 void MainWindow :: setupPickupPlanEditor()
@@ -267,7 +279,7 @@ void MainWindow :: setupPickupPlanEditor()
 	pickupPlanEditorPlanLibraryWidget = new PickupPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), QPixmap::fromImage(QImage("./duck.jpg")), pickupPlanEditorPlan);
         pickupPlanLibraryLayout->addWidget(pickupPlanEditorPlanLibraryWidget);
 
-	pickupPlanEditorPage = new QWidget(editorTabs);
+	pickupPlanEditorPage = new QWidget(editorStack);
 
 	QVBoxLayout* editorLayout = new QVBoxLayout(pickupPlanEditorPage);
 	pickupPlanEditorPage->setLayout(editorLayout);
@@ -287,7 +299,7 @@ void MainWindow :: setupPullPlanEditor()
 	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), QPixmap::fromImage(QImage("./duck.jpg")), pullPlanEditorPlan);
 	pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);	
 
-	pullPlanEditorPage = new QWidget(editorTabs);
+	pullPlanEditorPage = new QWidget(editorStack);
 
 	QVBoxLayout* editorLayout = new QVBoxLayout(pullPlanEditorPage);
 	pullPlanEditorPage->setLayout(editorLayout);
@@ -372,6 +384,7 @@ void MainWindow :: newPullPlan()
 void MainWindow :: updateEverything()
 {
 	updatePullPlanEditor();
+	updatePickupPlanEditor();
 	updateNiceView();
 	updateLibrary();
 }
@@ -382,6 +395,12 @@ void MainWindow :: updateLibrary()
 		QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100));
 	pickupPlanEditorPlanLibraryWidget->updatePixmaps(QPixmap::grabWidget(pickupPlanEditorViewWidget).scaled(100, 100),
 		QPixmap::grabWidget(pickupPlanEditorViewWidget).scaled(100, 100));
+}
+
+void MainWindow :: updatePickupPlanEditor()
+{
+	pickupPlanEditorViewWidget->repaint();
+	pickupTemplateComboBox->setCurrentIndex(pullPlanEditorPlan->getTemplate()->type-1);
 }
 
 void MainWindow :: updatePullPlanEditor()

@@ -41,12 +41,13 @@ class MainWindow : public QMainWindow
 		void setupPickupPlanEditor();
 		void setupConnections();
 		void updatePullPlanEditor();
+		void updatePickupPlanEditor();
 		void updateNiceView();
 		void updateLibrary();
 
 		// Variables
 		QPoint dragStartPosition;
-		QTabWidget* editorTabs;
+		QStackedWidget* editorStack;
 		QWidget* pullPlanEditorPage;
 		QWidget* pickupPlanEditorPage;
 		PullPlan* pullPlanEditorPlan;
