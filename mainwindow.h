@@ -46,6 +46,7 @@ class MainWindow : public QMainWindow
 		void setupConnections();
 		void updatePullPlanEditor();
 		void updatePickupPlanEditor();
+		void updatePieceEditor();
 		void updateNiceView();
 		void updateLibrary();
 
@@ -91,6 +92,7 @@ class MainWindow : public QMainWindow
 		void updateEverything();
 		void pullTemplateComboBoxChanged(int index);
 		void pickupTemplateComboBoxChanged(int index);
+		void pieceTemplateComboBoxChanged(int index);
 		void newPullPlan();	
 		void newPickupPlan();	
 		void pullPlanTwistSliderChanged(int p);

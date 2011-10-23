@@ -221,6 +221,7 @@ void MainWindow :: setupConnections()
 	connect(pickupPlanEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(newPickupPlanButton, SIGNAL(pressed()), this, SLOT(newPickupPlan()));	
 
+	connect(pieceTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pieceTemplateComboBoxChanged(int)));	
 	connect(pieceEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }
 
@@ -452,6 +453,7 @@ void MainWindow :: updateEverything()
 {
 	updatePullPlanEditor();
 	updatePickupPlanEditor();
+	updatePieceEditor();
 	updateNiceView();
 	updateLibrary();
 }
@@ -476,6 +478,12 @@ void MainWindow :: updateLibrary()
 				QPixmap::grabWidget(pieceEditorViewWidget).scaled(100, 100));
 			break;
 	}
+}
+
+void MainWindow :: updatePieceEditor()
+{
+	pieceEditorViewWidget->repaint();
+	pieceTemplateComboBox->setCurrentIndex(pieceEditorPlan->getTemplate()->type-1);
 }
 
 void MainWindow :: updatePickupPlanEditor()
@@ -503,6 +511,15 @@ void MainWindow :: updateNiceView()
 		case 1:
 			niceViewWidget->setGeometry(model->getGeometry(pickupPlanEditorPlan));	
 			break;
+	}
+}
+
+void MainWindow :: pieceTemplateComboBoxChanged(int newIndex)
+{
+	if (newIndex+1 != pieceEditorPlan->getTemplate()->type)
+	{
+		pieceEditorPlan->setTemplate(new PieceTemplate(newIndex+1));
+		emit someDataChanged();
 	}
 }
 

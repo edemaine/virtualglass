@@ -52,17 +52,13 @@ void PieceEditorViewWidget :: paintEvent(QPaintEvent *event)
 	pen.setWidth(3);
 	painter.setPen(pen);
 
-	painter.drawRect(width/4 + 5, height/4 + 5, width/2, height/2);
-	painter.end();
+	painter.drawEllipse(width/8 + 10, height/8 + 10, 3*width/4, 3*height/4);
 
-	// It's really not clear what to draw here...will punt for now
-
-	/*	
-	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
+	for (unsigned int i = 0; i < piece->getPickup()->getTemplate()->subpulls.size(); ++i)
 	{
-		if (plan->getSubplans()[i]->isBase)
+		if (piece->getPickup()->getSubplans()[i]->isBase)
 		{
-			Color c = plan->getSubplans()[i]->color;
+			Color c = piece->getPickup()->getSubplans()[i]->color;
 			painter.setBrush(QColor(255*c.r, 255*c.g, 255*c.b, 255*c.a));
 			pen.setStyle(Qt::NoPen);
 		}
@@ -75,20 +71,20 @@ void PieceEditorViewWidget :: paintEvent(QPaintEvent *event)
 		painter.setPen(pen);
 
 		int rX, rY, rWidth, rHeight;
-		SubpickupTemplate* sp = &(plan->getTemplate()->subpulls[i]);
+		SubpickupTemplate* sp = &(piece->getPickup()->getTemplate()->subpulls[i]);
 		switch (sp->orientation)
 		{
 			case HORIZONTAL_ORIENTATION:
-				rX = (sp->location.x - sp->length/2.0) * width/2 + width/2 + 10;
- 				rY = (sp->location.y - sp->width/2.0) * width/2 + height/2 + 10;
- 				rWidth = sp->length * width/2;
-				rHeight = sp->width * height/2;
+				rX = (sp->location.x - sp->length/2.0) * width/4 + width/2 + 10;
+ 				rY = (sp->location.y - sp->width/2.0) * width/4 + height/2 + 10;
+ 				rWidth = sp->length * width/4;
+				rHeight = sp->width * height/4;
 				break;
 			case VERTICAL_ORIENTATION:
-				rX = (sp->location.x - sp->width/2.0) * width/2 + width/2 + 10;
- 				rY = (sp->location.y - sp->length/2.0) * width/2 + height/2 + 10;
- 				rWidth = sp->width * width/2;
-				rHeight = sp->length * height/2;
+				rX = (sp->location.x - sp->width/2.0) * width/4 + width/2 + 10;
+ 				rY = (sp->location.y - sp->length/2.0) * width/4 + height/2 + 10;
+ 				rWidth = sp->width * width/4;
+				rHeight = sp->length * height/4;
 				break;
 			default:
 				exit(1);
@@ -96,7 +92,7 @@ void PieceEditorViewWidget :: paintEvent(QPaintEvent *event)
 
 		painter.drawRect(rX, rY, rWidth, rHeight);
 	}
-	*/
+	painter.end();
 }
 
 
