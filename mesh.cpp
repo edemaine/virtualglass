@@ -58,26 +58,32 @@ void applyTwistTransform(Vertex* v, PullPlan* transformNode)
 void applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 {
 	// Shrink length to correct length
-	v->position.z = v->position.z * spt->length;
+	v->position.z = v->position.z * spt->length / 2.0;
 
 	// Shrink width to correct width
 	float theta = atan2(v->position.y, v->position.x);
 	float r = length(v->position.xy); 
-	v->position.x = r * spt->width * 10.0 / 2.0 * cos(theta);	
-	v->position.y = r * spt->width * 10.0 / 2.0 * sin(theta);	
+	v->position.x = r * spt->width * 2.0 * cos(theta);	
+	v->position.y = r * spt->width * 2.0 * sin(theta);	
 
 	// Change orientation if needed
-	if (spt->orientation == HORIZONTAL_ORIENTATION)
+	float tmp;
+	switch (spt->orientation)
 	{
-		float tmp = v->position.x;
-		v->position.x = v->position.z;
-		v->position.z = -tmp;
+		case HORIZONTAL_ORIENTATION:
+			tmp = v->position.x;
+			v->position.x = v->position.z;
+			v->position.z = -tmp;
+			v->position.z += 5.0;
+			v->position.x -= 5.0;
+			break;
+		case VERTICAL_ORIENTATION:
+			break;
 	}
 
 	// Offset by location
-	//v->position.x = v->position.x + spt->location.x * 10.0;
-	v->position.y = v->position.y + spt->location.x * 10.0;
-	v->position.z = v->position.z + spt->location.y * 10.0;
+	v->position.x = v->position.x + spt->location.x * 5.0;
+	v->position.z = v->position.z + spt->location.y * 5.0;
 }
 
 
