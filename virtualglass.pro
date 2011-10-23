@@ -35,9 +35,10 @@ QMAKE_CXXFLAGS += -Wall -Werror -Wno-deprecated -g
 # Input
 HEADERS += primitives.h constants.h Vector.hpp \ 
 	pullplan.h pulltemplate.h subpulltemplate.h pickupplan.h \
+	piece.h piecetemplate.h \
 	pickuptemplate.h subpickuptemplate.h pickupplaneditorviewwidget.h \ 
-	mainwindow.h niceviewwidget.h pickupplanlibrarywidget.h pullplanlibrarywidget.h \
-	pullplaneditorviewwidget.h colorbarlibrarywidget.h \
+	mainwindow.h niceviewwidget.h pickupplanlibrarywidget.h pullplanlibrarywidget.h piecelibrarywidget.h \
+	pullplaneditorviewwidget.h colorbarlibrarywidget.h pieceeditorviewwidget.h \
 	controller.h model.h geometry.h mesh.h \ 
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
@@ -91,10 +92,11 @@ HEADERS += yaml-cpp/src/token.h \
 
 SOURCES += main.cpp \ 
 	pullplan.cpp pulltemplate.cpp subpulltemplate.cpp \
+	piece.cpp piecetemplate.cpp \
 	pickupplan.cpp pickuptemplate.cpp subpickuptemplate.cpp pickupplaneditorviewwidget.cpp \
 	model.cpp controller.cpp geometry.cpp mesh.cpp \
-	mainwindow.cpp niceviewwidget.cpp pullplanlibrarywidget.cpp pickupplanlibrarywidget.cpp \
-	pullplaneditorviewwidget.cpp colorbarlibrarywidget.cpp 
+	mainwindow.cpp niceviewwidget.cpp pullplanlibrarywidget.cpp pickupplanlibrarywidget.cpp piecelibrarywidget.cpp \
+	pullplaneditorviewwidget.cpp colorbarlibrarywidget.cpp pieceeditorviewwidget.cpp 
 
 
 SOURCES += yaml-cpp/src/tag.cpp \

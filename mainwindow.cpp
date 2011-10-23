@@ -104,7 +104,9 @@ void MainWindow :: seedTable()
 
 	editorStack->setCurrentIndex(1);
 	emit someDataChanged();		
-	editorStack->setCurrentIndex(0);
+	editorStack->setCurrentIndex(2);
+	emit someDataChanged();		
+	editorStack->setCurrentIndex(0); // return to 0
 	emit someDataChanged();		
 }
 
@@ -115,6 +117,7 @@ void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
 
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
 	PickupPlanLibraryWidget* pkplw = dynamic_cast<PickupPlanLibraryWidget*>(childAt(event->pos()));
+	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
 
 	if (plplw != NULL)
 	{
@@ -130,6 +133,14 @@ void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
 		pickupPlanEditorPlan = pkplw->getPickupPlan();
 		pickupPlanEditorViewWidget->setPickupPlan(pickupPlanEditorPlan);
 		editorStack->setCurrentIndex(1);
+		emit someDataChanged();
+	}
+	else if (plw != NULL)
+	{
+		pieceEditorPlanLibraryWidget = plw;	
+		pieceEditorPlan = plw->getPiece();
+		pieceEditorViewWidget->setPiece(pieceEditorPlan);
+		editorStack->setCurrentIndex(2);
 		emit someDataChanged();
 	}
 }
@@ -154,6 +165,7 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
 	PickupPlanLibraryWidget* pkplw = dynamic_cast<PickupPlanLibraryWidget*>(childAt(event->pos()));
+	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
 	if (cblw != NULL)
 	{
 		plan = cblw->getPullPlan();
@@ -168,6 +180,11 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	{
 		plan = pkplw->getPickupPlan();
 		pixmap = *pkplw->getEditorPixmap();
+	}
+	else if (plw != NULL)
+	{
+		plan = plw->getPiece();
+		pixmap = *plw->getEditorPixmap();
 	}
 	else
 		return;
@@ -203,6 +220,8 @@ void MainWindow :: setupConnections()
 	connect(pickupTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pickupTemplateComboBoxChanged(int)));	
 	connect(pickupPlanEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(newPickupPlanButton, SIGNAL(pressed()), this, SLOT(newPickupPlan()));	
+
+	connect(pieceEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }
 
 void MainWindow :: setupTable()
@@ -263,6 +282,22 @@ void MainWindow :: setupTable()
 
 	newPickupPlanButton = new QPushButton("New Pickup Plan");
 	tableLayout->addWidget(newPickupPlanButton);
+
+	// Setup piece scrolling library
+	QWidget* pieceLibraryWidget = new QWidget(centralWidget);
+	pieceLibraryLayout = new QHBoxLayout(pieceLibraryWidget);
+	pieceLibraryLayout->setSpacing(10);
+	pieceLibraryWidget->setLayout(pieceLibraryLayout);
+
+        pieceLibraryScrollArea = new QScrollArea;
+        pieceLibraryScrollArea->setBackgroundRole(QPalette::Dark);
+        pieceLibraryScrollArea->setWidget(pieceLibraryWidget);
+        pieceLibraryScrollArea->setWidgetResizable(true);
+        pieceLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        pieceLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        pieceLibraryScrollArea->setFixedHeight(130);
+        pieceLibraryScrollArea->setFixedWidth(500);
+	tableLayout->addWidget(pieceLibraryScrollArea);	
 }
 
 void MainWindow :: setupEditors()
@@ -278,12 +313,37 @@ void MainWindow :: setupEditors()
 
 	setupPickupPlanEditor();
 	editorStack->addWidget(pickupPlanEditorPage);
+
+	setupPieceEditor();
+	editorStack->addWidget(pieceEditorPage);
+}
+
+void MainWindow :: setupPieceEditor()
+{
+	pieceEditorPlan = new Piece(SPHERE_TEMPLATE);
+	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
+		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);
+        pieceLibraryLayout->addWidget(pieceEditorPlanLibraryWidget);
+
+	pieceEditorPage = new QWidget(editorStack);
+
+	QVBoxLayout* editorLayout = new QVBoxLayout(pieceEditorPage);
+	pieceEditorPage->setLayout(editorLayout);
+
+	pieceTemplateComboBox = new QComboBox(pieceEditorPage);
+	pieceTemplateComboBox->addItem("Sphere");
+	pieceTemplateComboBox->addItem("Plate");
+	editorLayout->addWidget(pieceTemplateComboBox, 0);	
+
+	pieceEditorViewWidget = new PieceEditorViewWidget(pieceEditorPlan, pieceEditorPage);
+	editorLayout->addWidget(pieceEditorViewWidget, 10); 	
 }
 
 void MainWindow :: setupPickupPlanEditor()
 {
 	pickupPlanEditorPlan = new PickupPlan(THREE_HORIZONTALS_TEMPLATE);
-	pickupPlanEditorPlanLibraryWidget = new PickupPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), QPixmap::fromImage(QImage("./duck.jpg")), pickupPlanEditorPlan);
+	pickupPlanEditorPlanLibraryWidget = new PickupPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
+		QPixmap::fromImage(QImage("./duck.jpg")), pickupPlanEditorPlan);
         pickupPlanLibraryLayout->addWidget(pickupPlanEditorPlanLibraryWidget);
 
 	pickupPlanEditorPage = new QWidget(editorStack);
@@ -409,6 +469,11 @@ void MainWindow :: updateLibrary()
 			pickupPlanEditorPlanLibraryWidget->updatePixmaps(
 				QPixmap::grabWidget(pickupPlanEditorViewWidget).scaled(100, 100),
 				QPixmap::grabWidget(pickupPlanEditorViewWidget).scaled(100, 100));
+			break;
+		case 2:
+			pieceEditorPlanLibraryWidget->updatePixmaps(
+				QPixmap::grabWidget(pieceEditorViewWidget).scaled(100, 100),
+				QPixmap::grabWidget(pieceEditorViewWidget).scaled(100, 100));
 			break;
 	}
 }

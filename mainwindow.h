@@ -7,6 +7,7 @@
 #include <QObject>
 #include "constants.h"
 #include "niceviewwidget.h"
+#include "piecelibrarywidget.h"
 #include "pickupplanlibrarywidget.h"
 #include "pullplanlibrarywidget.h"
 #include "colorbarlibrarywidget.h"
@@ -16,6 +17,8 @@
 #include "pullplaneditorviewwidget.h"
 #include "pickupplan.h"
 #include "pickupplaneditorviewwidget.h"
+#include "piece.h"
+#include "pieceeditorviewwidget.h"
 
 class MainWindow : public QMainWindow
 {
@@ -39,6 +42,7 @@ class MainWindow : public QMainWindow
 		void setupEditors();
 		void setupPullPlanEditor();
 		void setupPickupPlanEditor();
+		void setupPieceEditor();
 		void setupConnections();
 		void updatePullPlanEditor();
 		void updatePickupPlanEditor();
@@ -50,27 +54,34 @@ class MainWindow : public QMainWindow
 		QStackedWidget* editorStack;
 		QWidget* pullPlanEditorPage;
 		QWidget* pickupPlanEditorPage;
+		QWidget* pieceEditorPage;
 		PullPlan* pullPlanEditorPlan;
 		PickupPlan* pickupPlanEditorPlan;
+		Piece* pieceEditorPlan;
 		Color defaultColor;
 		PullPlanLibraryWidget* pullPlanEditorPlanLibraryWidget;
 		PickupPlanLibraryWidget* pickupPlanEditorPlanLibraryWidget;
+		PieceLibraryWidget* pieceEditorPlanLibraryWidget;
 		Model* model;
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
 		QComboBox* pullTemplateComboBox;
 		QComboBox* pickupTemplateComboBox;
+		QComboBox* pieceTemplateComboBox;
 		PullPlanEditorViewWidget* pullPlanEditorViewWidget;
 		PickupPlanEditorViewWidget* pickupPlanEditorViewWidget;
+		PieceEditorViewWidget* pieceEditorViewWidget;
 		QLabel* niceViewLabel;
 		QVBoxLayout* niceViewLayout;
 		NiceViewWidget* niceViewWidget;
 		QScrollArea* pullPlanLibraryScrollArea;
 		QScrollArea* colorBarLibraryScrollArea;
 		QScrollArea* pickupPlanLibraryScrollArea;
+		QScrollArea* pieceLibraryScrollArea;
 		QHBoxLayout* pullPlanLibraryLayout;
 		QHBoxLayout* colorBarLibraryLayout;
 		QHBoxLayout* pickupPlanLibraryLayout;
+		QHBoxLayout* pieceLibraryLayout;
 		QSlider* pullPlanTwistSlider;
 		QSpinBox* pullPlanTwistSpin;
 		QPushButton* newPullPlanButton;
