@@ -39,21 +39,26 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 
 			if (ptr->getTemplate()->shape == AMORPHOUS_SHAPE) // if it's a color bar
 			{
-				PullPlan* basePullPlan = NULL;
 				switch (plan->getTemplate()->subpulls[i].shape)
 				{
 					// This is a memory leak, as every drag of a color bar makes a new pull plan
 					case CIRCLE_SHAPE:
-						basePullPlan = new PullPlan(CIRCLE_BASE_TEMPLATE, true, ptr->color); 
+						ptr = new PullPlan(CIRCLE_BASE_TEMPLATE, true, ptr->color); 
 						break;
 					case SQUARE_SHAPE:
-						basePullPlan = new PullPlan(SQUARE_BASE_TEMPLATE, true, ptr->color); 
+						ptr = new PullPlan(SQUARE_BASE_TEMPLATE, true, ptr->color); 
 						break;
 				}
-				plan->setSubplan(i, basePullPlan);	
 			}
-			else // it's a regular pull plan
-				plan->setSubplan(i, ptr);
+
+			// Fill in the entire group			
+			int group = plan->getTemplate()->subpulls[i].group;
+			for (unsigned int j = 0; j < plan->getTemplate()->subpulls.size(); ++j)
+			{
+				if (plan->getTemplate()->subpulls[j].group == group)
+					plan->setSubplan(j, ptr);
+			}
+
 			emit someDataChanged();
 			return;	
 		}

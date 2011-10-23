@@ -7,11 +7,12 @@
 class SubpickupTemplate
 {
 	public:
-		SubpickupTemplate(Point location, int orientation, float length, float width);
+		SubpickupTemplate(Point location, int orientation, float length, float width, int group);
 		Point location;
 		int orientation;
 		float length;
 		float width;
+		int group;
 };
 
 

@@ -223,6 +223,7 @@ void MainWindow :: setupConnections()
 
 	connect(pieceTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pieceTemplateComboBoxChanged(int)));	
 	connect(pieceEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+	connect(newPieceButton, SIGNAL(pressed()), this, SLOT(newPiece()));	
 }
 
 void MainWindow :: setupTable()
@@ -299,6 +300,9 @@ void MainWindow :: setupTable()
         pieceLibraryScrollArea->setFixedHeight(130);
         pieceLibraryScrollArea->setFixedWidth(500);
 	tableLayout->addWidget(pieceLibraryScrollArea);	
+
+	newPieceButton = new QPushButton("New Piece");
+	tableLayout->addWidget(newPieceButton);
 }
 
 void MainWindow :: setupEditors()
@@ -413,6 +417,19 @@ void MainWindow :: pullPlanTwistSliderChanged(int)
         float twist = pullPlanTwistSlider->sliderPosition();
 	pullPlanEditorPlan->twist = twist;
 	someDataChanged();
+}
+
+void MainWindow :: newPiece()
+{
+	pieceEditorPlan = new Piece(SPHERE_TEMPLATE);
+
+	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
+		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);
+	pieceLibraryLayout->addWidget(pieceEditorPlanLibraryWidget);	
+
+	pieceEditorViewWidget->setPiece(pieceEditorPlan);
+
+	emit someDataChanged();
 }
 
 void MainWindow :: newPickupPlan()

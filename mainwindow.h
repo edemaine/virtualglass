@@ -51,6 +51,7 @@ class MainWindow : public QMainWindow
 		void updateLibrary();
 
 		// Variables
+		QWidget* drawingWidget;
 		QPoint dragStartPosition;
 		QStackedWidget* editorStack;
 		QWidget* pullPlanEditorPage;
@@ -87,6 +88,7 @@ class MainWindow : public QMainWindow
 		QSpinBox* pullPlanTwistSpin;
 		QPushButton* newPullPlanButton;
 		QPushButton* newPickupPlanButton;
+		QPushButton* newPieceButton;
 
 	private slots:
 		void updateEverything();
@@ -95,6 +97,7 @@ class MainWindow : public QMainWindow
 		void pieceTemplateComboBoxChanged(int index);
 		void newPullPlan();	
 		void newPickupPlan();	
+		void newPiece();	
 		void pullPlanTwistSliderChanged(int p);
 		void pullPlanTwistSpinChanged(int p);
 };
