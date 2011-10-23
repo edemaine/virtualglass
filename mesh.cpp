@@ -55,6 +55,32 @@ void applyTwistTransform(Vertex* v, PullPlan* transformNode)
 	v->position.y = r * sin(postTheta);
 }
 
+void applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
+{
+	// Shrink length to correct length
+	v->position.z = v->position.z * spt->length;
+
+	// Shrink width to correct width
+	float theta = atan2(v->position.y, v->position.x);
+	float r = length(v->position.xy); 
+	v->position.x = r * spt->width * 10.0 / 2.0 * cos(theta);	
+	v->position.y = r * spt->width * 10.0 / 2.0 * sin(theta);	
+
+	// Change orientation if needed
+	if (spt->orientation == HORIZONTAL_ORIENTATION)
+	{
+		float tmp = v->position.x;
+		v->position.x = v->position.z;
+		v->position.z = -tmp;
+	}
+
+	// Offset by location
+	//v->position.x = v->position.x + spt->location.x * 10.0;
+	v->position.y = v->position.y + spt->location.x * 10.0;
+	v->position.z = v->position.z + spt->location.y * 10.0;
+}
+
+
 Vertex applyTransforms(Vertex v, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
 {
 	for (int i = ancestors.size() - 2; i >= 0; --i)
@@ -268,6 +294,38 @@ void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vect
 	}
 	geometry->compute_normals_from_triangles();
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, plan, group_tag));
+}
+
+
+void generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
+{
+	if (plan == NULL)
+		return;
+
+	geometry->clear();
+	for (unsigned int i = 0; i < plan->getSubplans().size(); ++i)
+	{
+		ancestors.clear();
+		ancestorIndices.clear();
+		generateMesh(plan->getSubplans()[i], geometry, ancestors, ancestorIndices, NULL, i); 
+
+		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
+		{
+			if (geometry->groups[g].tag == i)
+			{
+				Group* subpullGroup = &(geometry->groups[g]);
+
+				// Apply transformation to only these vertices
+				for (uint32_t v = subpullGroup->vertex_begin; 
+					v < subpullGroup->vertex_begin + subpullGroup->vertex_size; ++v)
+				{
+					applyPickupTransform(&(geometry->vertices[v]), &(plan->getTemplate()->subpulls[i]));
+				}
+			}
+		}
+	}
+	geometry->compute_normals_from_triangles();
+
 }
 
 

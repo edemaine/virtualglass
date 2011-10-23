@@ -101,6 +101,11 @@ void MainWindow :: seedTable()
 
 	// setup the editor/3D view
 	emit someDataChanged();		
+
+	editorStack->setCurrentIndex(1);
+	emit someDataChanged();		
+	editorStack->setCurrentIndex(0);
+	emit someDataChanged();		
 }
 
 void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
@@ -391,16 +396,25 @@ void MainWindow :: updateEverything()
 
 void MainWindow :: updateLibrary()
 {
-	pullPlanEditorPlanLibraryWidget->updatePixmaps(QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100),
-		QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100));
-	pickupPlanEditorPlanLibraryWidget->updatePixmaps(QPixmap::grabWidget(pickupPlanEditorViewWidget).scaled(100, 100),
-		QPixmap::grabWidget(pickupPlanEditorViewWidget).scaled(100, 100));
+	switch (editorStack->currentIndex())
+	{
+		case 0:
+			pullPlanEditorPlanLibraryWidget->updatePixmaps(
+				QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100), 
+				QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100));
+			break;
+		case 1:
+			pickupPlanEditorPlanLibraryWidget->updatePixmaps(
+				QPixmap::grabWidget(pickupPlanEditorViewWidget).scaled(100, 100),
+				QPixmap::grabWidget(pickupPlanEditorViewWidget).scaled(100, 100));
+			break;
+	}
 }
 
 void MainWindow :: updatePickupPlanEditor()
 {
 	pickupPlanEditorViewWidget->repaint();
-	pickupTemplateComboBox->setCurrentIndex(pullPlanEditorPlan->getTemplate()->type-1);
+	pickupTemplateComboBox->setCurrentIndex(pickupPlanEditorPlan->getTemplate()->type-1);
 }
 
 void MainWindow :: updatePullPlanEditor()
@@ -414,7 +428,15 @@ void MainWindow :: updatePullPlanEditor()
 
 void MainWindow :: updateNiceView()
 {
-	niceViewWidget->setGeometry(model->getGeometry(pullPlanEditorPlan));	
+	switch (editorStack->currentIndex())
+	{
+		case 0:
+			niceViewWidget->setGeometry(model->getGeometry(pullPlanEditorPlan));	
+			break;
+		case 1:
+			niceViewWidget->setGeometry(model->getGeometry(pickupPlanEditorPlan));	
+			break;
+	}
 }
 
 void MainWindow :: pickupTemplateComboBoxChanged(int newIndex)

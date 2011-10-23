@@ -33,5 +33,15 @@ Geometry* Model :: getGeometry(PullPlan* plan)
 	return geometry; 
 }
 
+Geometry* Model :: getGeometry(PickupPlan* plan)
+{
+	geometry->clear();
+	vector<PullPlan*> ancestors;
+	vector<int> ancestorIndices;
+
+	generateMesh(plan, geometry, ancestors, ancestorIndices);
+
+	return geometry;
+}
 
 
