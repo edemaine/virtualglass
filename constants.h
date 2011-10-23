@@ -22,7 +22,7 @@
 
 // Piece template types
 #define SPHERE_TEMPLATE 1
-#define PLATE_TEMPLATE 2
+#define ROLLUP_TEMPLATE 2
 
 #define CIRCLE_SHAPE 1
 #define SQUARE_SHAPE 2

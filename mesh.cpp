@@ -86,6 +86,44 @@ void applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 	v->position.z = v->position.z + spt->location.y * 5.0;
 }
 
+void applySphereTransform(Geometry* geometry)
+{
+        for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
+        {
+                applySphereTransform(&(geometry->vertices[v]));
+        }
+}
+
+void applySphereTransform(Vertex* v)
+{
+	float theta = atan2(v->position.y, v->position.x);
+	float r = length(v->position.xy);
+
+	v->position.x = r * cos(theta) * 2 * sin(PI/2 + PI/2 * (v->position.z - 5.0) / 5.0);
+	v->position.y = r * sin(theta) * 2 * sin(PI/2 + PI/2 * (v->position.z - 5.0) / 5.0);
+}
+
+
+
+void applyRollupTransform(Geometry* geometry)
+{
+        for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
+        {
+                applyRollupTransform(&(geometry->vertices[v]));
+        }
+}
+
+void applyRollupTransform(Vertex* v)
+{
+	// send x value to theta value 
+	// -5.0 goes to -PI, 5.0 goes to PI
+	// everything gets a base radius of 5.0
+
+	float theta = PI * v->position.x / 5.0;
+	float r = 5.0 / PI + v->position.y;
+	v->position.x = r * cos(theta);
+	v->position.y = r * sin(theta);
+}
 
 Vertex applyTransforms(Vertex v, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
 {
@@ -302,6 +340,26 @@ void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vect
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, plan, group_tag));
 }
 
+void generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
+{
+	if (piece == NULL)
+		return;
+
+	geometry->clear();
+	
+	generateMesh(piece->getPickup(), geometry, ancestors, ancestorIndices);		
+	switch (piece->getTemplate()->type)
+	{
+		case ROLLUP_TEMPLATE:
+			applyRollupTransform(geometry);
+			break;
+		case SPHERE_TEMPLATE:
+			applyRollupTransform(geometry);
+			applySphereTransform(geometry);
+			break;
+	}	
+	geometry->compute_normals_from_triangles();
+}
 
 void generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
 {

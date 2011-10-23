@@ -44,4 +44,15 @@ Geometry* Model :: getGeometry(PickupPlan* plan)
 	return geometry;
 }
 
+Geometry* Model :: getGeometry(Piece* piece)
+{
+	geometry->clear();
+	vector<PullPlan*> ancestors;
+	vector<int> ancestorIndices;
+
+	generateMesh(piece, geometry, ancestors, ancestorIndices);
+
+	return geometry;
+}
+
 

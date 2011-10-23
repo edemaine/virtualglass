@@ -7,6 +7,7 @@
 #include "geometry.h"
 #include "pullplan.h"
 #include "pickupplan.h"
+#include "piece.h"
 
 class Model
 {
@@ -14,6 +15,7 @@ class Model
 		Model();
 		Geometry* getGeometry(PullPlan* p);
 		Geometry* getGeometry(PickupPlan* p);
+		Geometry* getGeometry(Piece* p);
 
 	private:
 		Geometry* geometry;

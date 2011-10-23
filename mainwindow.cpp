@@ -333,7 +333,7 @@ void MainWindow :: setupPieceEditor()
 
 	pieceTemplateComboBox = new QComboBox(pieceEditorPage);
 	pieceTemplateComboBox->addItem("Sphere");
-	pieceTemplateComboBox->addItem("Plate");
+	pieceTemplateComboBox->addItem("Rollup");
 	editorLayout->addWidget(pieceTemplateComboBox, 0);	
 
 	pieceEditorViewWidget = new PieceEditorViewWidget(pieceEditorPlan, pieceEditorPage);
@@ -510,6 +510,9 @@ void MainWindow :: updateNiceView()
 			break;
 		case 1:
 			niceViewWidget->setGeometry(model->getGeometry(pickupPlanEditorPlan));	
+			break;
+		case 2:
+			niceViewWidget->setGeometry(model->getGeometry(pieceEditorPlan));	
 			break;
 	}
 }
