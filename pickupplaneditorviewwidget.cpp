@@ -57,7 +57,14 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 
 		PullPlan* ptr;
 		sscanf(event->mimeData()->text().toAscii().constData(), "%p", &ptr);
-		plan->setSubplan(i, ptr);
+		if (ptr->getTemplate()->shape == AMORPHOUS_SHAPE) // if it's a color bar
+		{
+			// This is a memory leak, as every drag of a color bar makes a new pull plan
+			PullPlan* basePullPlan = new PullPlan(CIRCLE_BASE_TEMPLATE, true, ptr->color);
+			plan->setSubplan(i, basePullPlan);
+		}
+		else // it's a regular pull plan
+			plan->setSubplan(i, ptr);
 		emit someDataChanged();
 		return;	
 	} 

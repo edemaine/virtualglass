@@ -169,6 +169,8 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 		plan = pkplw->getPickupPlan();
 		pixmap = *pkplw->getEditorPixmap();
 	}
+	else
+		return;
 
 	char buf[128];
 	sprintf(buf, "%p", plan);

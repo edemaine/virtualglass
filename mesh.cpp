@@ -63,8 +63,8 @@ void applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 	// Shrink width to correct width
 	float theta = atan2(v->position.y, v->position.x);
 	float r = length(v->position.xy); 
-	v->position.x = r * spt->width * 2.0 * cos(theta);	
-	v->position.y = r * spt->width * 2.0 * sin(theta);	
+	v->position.x = r * spt->width * 2.5 * cos(theta);	
+	v->position.y = r * spt->width * 2.5 * sin(theta);	
 
 	// Change orientation if needed
 	float tmp;
