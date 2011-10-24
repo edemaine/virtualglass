@@ -30,10 +30,6 @@ void PickupPlan :: setSubplan(unsigned int index, PullPlan* plan)
 {
 	if (index < this->pickupTemplate->subpulls.size())
 	{
-		// If the subplan is base, then it is ok to throwaway, 
-		// since base plans are only made as copies from some factory-type process
-		if (subplans[index]->isBase)
-			 delete subplans[index];
 		subplans[index] = plan;
 	}
 }

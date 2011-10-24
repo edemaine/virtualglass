@@ -100,7 +100,7 @@ void applySphereTransform(Vertex* v)
 	float r = length(v->position.xy);
 
 	v->position.x = r * cos(theta) * 2 * sin(PI/2 + PI/2 * (v->position.z - 5.0) / 5.0);
-	v->position.y = r * sin(theta) * 2 * sin(PI/2 + PI/2 * (v->position.z - 5.0) / 5.0);
+	v->position.y = -r * sin(theta) * 2 * sin(PI/2 + PI/2 * (v->position.z - 5.0) / 5.0);
 }
 
 
