@@ -23,19 +23,19 @@ void PullTemplate :: updateSubpulls()
 			{
 				for (int j = 0; j < 2; ++j)
 				{
-					p.x = radius * (-0.3 + 0.6 * i);
-					p.y = radius * (-0.3 + 0.6 * j);
-					subpulls[i].location = p;
-					subpulls[i].diameter = radius * 0.5; 
+					p.x = radius * (-0.5 + 1.0 * i);
+					p.y = radius * (-0.5 + 1.0 * j);
+					subpulls[2*i + j].location = p;
+					subpulls[2*i + j].diameter = radius * 0.9; 
 				}
 			}
 			break;
 		case LINE_THREE_CIRCLES_TEMPLATE:
 			for (int i = 0; i < 3; ++i)
 			{
-				p.x = radius * (-0.6666666 + 0.6666 * i);
+				p.x = radius * (-0.6666 + 0.6666 * i);
 				subpulls[i].location = p;
-				subpulls[i].diameter = radius * 0.5; 
+				subpulls[i].diameter = radius * 0.65; 
 			}
 			break;	
 		case LINE_FIVE_CIRCLES_TEMPLATE:
@@ -53,8 +53,8 @@ void PullTemplate :: updateSubpulls()
 				{
 					p.x = radius * (-0.3 + 0.6 * i);
 					p.y = radius * (-0.3 + 0.6 * j);
-					subpulls[i].location = p;
-					subpulls[i].diameter = radius * 0.59; 
+					subpulls[2*i + j].location = p;
+					subpulls[2*i + j].diameter = radius * 0.59; 
 				}
 			}
 			break;			
@@ -66,14 +66,19 @@ void PullTemplate :: updateSubpulls()
 				subpulls[i].location = p;
 				subpulls[i].diameter = radius * 0.39; 
 			}
-			for (int i = 0; i < 5; ++i)
+			for (int i = 0; i < 2; ++i)
 			{
-				if (i == 2)
-					continue;
 				p.x = 0.0;
 				p.y = radius * (-0.8 + 0.4 * i);
-				subpulls[i].location = p;
-				subpulls[i].diameter = radius * 0.39; 
+				subpulls[i+5].location = p;
+				subpulls[i+5].diameter = radius * 0.39; 
+			}
+			for (int i = 3; i < 5; ++i)
+			{
+				p.x = 0.0;
+				p.y = radius * (-0.8 + 0.4 * i);
+				subpulls[i+4].location = p;
+				subpulls[i+4].diameter = radius * 0.39; 
 			}
 			break;
 	}	
@@ -97,7 +102,7 @@ void PullTemplate :: initializeSubpulls()
 			this->shape = AMORPHOUS_SHAPE;
 			break;
 		case SQUARE_FOUR_SQUARES_TEMPLATE:
-			this->shape = SQUARE_SHAPE;
+			this->shape = CIRCLE_SHAPE;
 			for (int i = 0; i < 4; ++i)
 			{
 				subpulls.push_back(SubpullTemplate(SQUARE_SHAPE, p, 0.5, 0));

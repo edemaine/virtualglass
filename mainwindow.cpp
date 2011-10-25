@@ -444,8 +444,6 @@ void MainWindow :: setupPullPlanEditor()
 
 	QLabel* twistLabel3 = new QLabel("50", pullPlanEditorPage);
 	twistLayout->addWidget(twistLabel3);
-
-	//pullTemplateComboBox->setCurrentIndex(0);
 }
 
 void MainWindow :: pullTemplateShapeButtonGroupChanged(int)
