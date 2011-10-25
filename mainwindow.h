@@ -20,6 +20,7 @@
 #include "piece.h"
 #include "pieceeditorviewwidget.h"
 #include "pulltemplatelibrarywidget.h"
+#include "pickuptemplatelibrarywidget.h"
 
 class MainWindow : public QMainWindow
 {
@@ -68,7 +69,6 @@ class MainWindow : public QMainWindow
 		Model* model;
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
-		QComboBox* pickupTemplateComboBox;
 		QComboBox* pieceTemplateComboBox;
 		PullPlanEditorViewWidget* pullPlanEditorViewWidget;
 		PickupPlanEditorViewWidget* pickupPlanEditorViewWidget;
@@ -85,6 +85,7 @@ class MainWindow : public QMainWindow
 		QHBoxLayout* pickupPlanLibraryLayout;
 		QHBoxLayout* pieceLibraryLayout;
 		QHBoxLayout* pullTemplateLibraryLayout;
+		QHBoxLayout* pickupTemplateLibraryLayout;
 		QSlider* pullPlanTwistSlider;
 		QSlider* pullTemplateCasingThicknessSlider;
 		QSpinBox* pullPlanTwistSpin;
@@ -94,7 +95,6 @@ class MainWindow : public QMainWindow
 
 	private slots:
 		void updateEverything();
-		void pickupTemplateComboBoxChanged(int index);
 		void pieceTemplateComboBoxChanged(int index);
 		void newPullPlan();	
 		void newPickupPlan();	

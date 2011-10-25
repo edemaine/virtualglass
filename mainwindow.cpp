@@ -102,13 +102,7 @@ void MainWindow :: seedEverything()
 	// setup the editor/3D view
 	emit someDataChanged();		
 
-	// Propogate 3D/editor view imagery into libraries by quickly loading
-	// each starter pull plan, pickup plan, piece
-	editorStack->setCurrentIndex(1);
-	emit someDataChanged();		
-	editorStack->setCurrentIndex(2);
-	emit someDataChanged();		
-	editorStack->setCurrentIndex(0);  // end in pull plan mode
+	editorStack->setCurrentIndex(0);  
 	emit someDataChanged();		
 
 	// Load pull template types
@@ -121,6 +115,25 @@ void MainWindow :: seedEverything()
 			QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100), i);
 		pullTemplateLibraryLayout->addWidget(ptlw);
 	}
+
+	// Load pull template types
+	editorStack->setCurrentIndex(1);
+	emit someDataChanged();		
+	
+	for (int i = THREE_HORIZONTALS_TEMPLATE; i <= THREE_VERTICALS_TEMPLATE; ++i)
+	{
+		pickupPlanEditorPlan->setTemplate(new PickupTemplate(i));
+		emit someDataChanged();
+		PickupTemplateLibraryWidget *ptlw = new PickupTemplateLibraryWidget(
+			QPixmap::grabWidget(pickupPlanEditorViewWidget).scaled(100, 100), i);
+		pickupTemplateLibraryLayout->addWidget(ptlw);
+	}
+
+	editorStack->setCurrentIndex(2);
+	emit someDataChanged();		
+
+	editorStack->setCurrentIndex(0); // end in pull plan mode
+	emit someDataChanged();		
 }
 
 void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
@@ -132,6 +145,7 @@ void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
 	PickupPlanLibraryWidget* pkplw = dynamic_cast<PickupPlanLibraryWidget*>(childAt(event->pos()));
 	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
 	PullTemplateLibraryWidget* ptlw = dynamic_cast<PullTemplateLibraryWidget*>(childAt(event->pos()));
+	PickupTemplateLibraryWidget* pktlw = dynamic_cast<PickupTemplateLibraryWidget*>(childAt(event->pos()));
 
 	if (plplw != NULL)
 	{
@@ -160,6 +174,11 @@ void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
 	else if (ptlw != NULL)
 	{
 		pullPlanEditorPlan->setTemplate(new PullTemplate(ptlw->getPullTemplateType(), 0.0));
+		emit someDataChanged();
+	}
+	else if (pktlw != NULL)
+	{
+		pickupPlanEditorPlan->setTemplate(new PickupTemplate(pktlw->getPickupTemplateType()));
 		emit someDataChanged();
 	}
 }
@@ -238,7 +257,6 @@ void MainWindow :: setupConnections()
 	connect(pullPlanTwistSlider, SIGNAL(valueChanged(int)), this, SLOT(pullPlanTwistSliderChanged(int)));
 	connect(pullPlanTwistSpin, SIGNAL(valueChanged(int)), this, SLOT(pullPlanTwistSpinChanged(int)));
 
-	connect(pickupTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pickupTemplateComboBoxChanged(int)));	
 	connect(pickupPlanEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(newPickupPlanButton, SIGNAL(pressed()), this, SLOT(newPickupPlan()));	
 
@@ -377,10 +395,21 @@ void MainWindow :: setupPickupPlanEditor()
 	QVBoxLayout* editorLayout = new QVBoxLayout(pickupPlanEditorPage);
 	pickupPlanEditorPage->setLayout(editorLayout);
 
-	pickupTemplateComboBox = new QComboBox(pickupPlanEditorPage);
-	pickupTemplateComboBox->addItem("Horizontal stack");
-	pickupTemplateComboBox->addItem("Vertical stack");
-	editorLayout->addWidget(pickupTemplateComboBox, 0);	
+	// Setup pickup template scrolling library
+	QWidget* pickupTemplateLibraryWidget = new QWidget(centralWidget);
+	pickupTemplateLibraryLayout = new QHBoxLayout(pickupTemplateLibraryWidget);
+	pickupTemplateLibraryLayout->setSpacing(10);
+	pickupTemplateLibraryWidget->setLayout(pullTemplateLibraryLayout);
+
+        QScrollArea* pickupTemplateLibraryScrollArea = new QScrollArea(centralWidget);
+        pickupTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
+        pickupTemplateLibraryScrollArea->setWidget(pickupTemplateLibraryWidget);
+        pickupTemplateLibraryScrollArea->setWidgetResizable(true);
+        pickupTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        pickupTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        pickupTemplateLibraryScrollArea->setFixedHeight(130);
+        pickupTemplateLibraryScrollArea->setFixedWidth(520);
+	editorLayout->addWidget(pickupTemplateLibraryScrollArea);	
 
 	pickupPlanEditorViewWidget = new PickupPlanEditorViewWidget(pickupPlanEditorPlan, pickupPlanEditorPage);
 	editorLayout->addWidget(pickupPlanEditorViewWidget, 10); 	
@@ -412,6 +441,7 @@ void MainWindow :: setupPullPlanEditor()
         pullTemplateLibraryScrollArea->setFixedHeight(130);
         pullTemplateLibraryScrollArea->setFixedWidth(520);
 	editorLayout->addWidget(pullTemplateLibraryScrollArea);	
+
 
 	pullPlanEditorViewWidget = new PullPlanEditorViewWidget(pullPlanEditorPlan, pullPlanEditorPage);
 	editorLayout->addWidget(pullPlanEditorViewWidget, 10); 	
@@ -599,7 +629,6 @@ void MainWindow :: updatePieceEditor()
 void MainWindow :: updatePickupPlanEditor()
 {
 	pickupPlanEditorViewWidget->repaint();
-	pickupTemplateComboBox->setCurrentIndex(pickupPlanEditorPlan->getTemplate()->type-1);
 }
 
 void MainWindow :: updatePullPlanEditor()
@@ -638,15 +667,6 @@ void MainWindow :: pieceTemplateComboBoxChanged(int newIndex)
 	if (newIndex+1 != pieceEditorPlan->getTemplate()->type)
 	{
 		pieceEditorPlan->setTemplate(new PieceTemplate(newIndex+1));
-		emit someDataChanged();
-	}
-}
-
-void MainWindow :: pickupTemplateComboBoxChanged(int newIndex)
-{
-	if (newIndex+1 != pickupPlanEditorPlan->getTemplate()->type)
-	{
-		pickupPlanEditorPlan->setTemplate(new PickupTemplate(newIndex+1));
 		emit someDataChanged();
 	}
 }
