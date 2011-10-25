@@ -12,10 +12,21 @@ using std::vector;
 class PullTemplate
 {
 	public:
-		PullTemplate(int t);
+		PullTemplate(int type, float casingThickness);
 		vector<SubpullTemplate> subpulls;
 		int shape;	
 		int type;
+		void setCasingThickness(float t);
+		float getCasingThickness();
+
+	private:
+		// Methods
+		void initializeSubpulls();
+		void updateSubpulls();
+
+		// Variables
+		float casingThickness;
+			
 };
 
 #endif

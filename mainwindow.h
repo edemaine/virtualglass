@@ -85,6 +85,7 @@ class MainWindow : public QMainWindow
 		QHBoxLayout* pickupPlanLibraryLayout;
 		QHBoxLayout* pieceLibraryLayout;
 		QSlider* pullPlanTwistSlider;
+		QSlider* pullTemplateCasingThicknessSlider;
 		QSpinBox* pullPlanTwistSpin;
 		QPushButton* newPullPlanButton;
 		QPushButton* newPickupPlanButton;
@@ -99,6 +100,7 @@ class MainWindow : public QMainWindow
 		void newPickupPlan();	
 		void newPiece();	
 		void pullPlanTwistSliderChanged(int p);
+		void pullTemplateCasingThicknessSliderChanged(int p);
 		void pullPlanTwistSpinChanged(int p);
 		void pullTemplateShapeButtonGroupChanged(int);
 };

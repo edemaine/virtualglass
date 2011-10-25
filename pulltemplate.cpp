@@ -1,13 +1,91 @@
 
 #include "pulltemplate.h"
 
-PullTemplate :: PullTemplate(int t)
+PullTemplate :: PullTemplate(int type, float casingThickness)
+{
+	this->type = type;
+	this->casingThickness = casingThickness;
+
+	initializeSubpulls(); // need to just allocate the right number of subpulls with casing thickness 0
+	updateSubpulls(); // need to change locations of subpulls, but nothing else
+}
+
+void PullTemplate :: updateSubpulls()
 {
 	Point p;
+	float radius = 1.0 - casingThickness;
 
-	this->type = t;
+	p.x = p.y = p.z = 0.0;
+	switch (this->type)
+	{
+		case SQUARE_FOUR_SQUARES_TEMPLATE:
+			for (int i = 0; i < 2; ++i)
+			{
+				for (int j = 0; j < 2; ++j)
+				{
+					p.x = radius * (-0.3 + 0.6 * i);
+					p.y = radius * (-0.3 + 0.6 * j);
+					subpulls[i].location = p;
+					subpulls[i].diameter = radius * 0.5; 
+				}
+			}
+			break;
+		case LINE_THREE_CIRCLES_TEMPLATE:
+			for (int i = 0; i < 3; ++i)
+			{
+				p.x = radius * (-0.6666666 + 0.6666 * i);
+				subpulls[i].location = p;
+				subpulls[i].diameter = radius * 0.5; 
+			}
+			break;	
+		case LINE_FIVE_CIRCLES_TEMPLATE:
+			for (int i = 0; i < 5; ++i)
+			{
+				p.x = radius * (-0.8 + 0.4 * i);
+				subpulls[i].location = p;
+				subpulls[i].diameter = radius * 0.39; 
+			}
+			break;			
+		case SQUARE_FOUR_CIRCLES_TEMPLATE:
+			for (int i = 0; i < 2; ++i)
+			{
+				for (int j = 0; j < 2; ++j)
+				{
+					p.x = radius * (-0.3 + 0.6 * i);
+					p.y = radius * (-0.3 + 0.6 * j);
+					subpulls[i].location = p;
+					subpulls[i].diameter = radius * 0.59; 
+				}
+			}
+			break;			
+		case X_NINE_CIRCLES_TEMPLATE:
+			for (int i = 0; i < 5; ++i)
+			{
+				p.x = radius * (-0.8 + 0.4 * i);
+				p.y = 0.0;
+				subpulls[i].location = p;
+				subpulls[i].diameter = radius * 0.39; 
+			}
+			for (int i = 0; i < 5; ++i)
+			{
+				if (i == 2)
+					continue;
+				p.x = 0.0;
+				p.y = radius * (-0.8 + 0.4 * i);
+				subpulls[i].location = p;
+				subpulls[i].diameter = radius * 0.39; 
+			}
+			break;
+	}	
+}
 
-	switch (t)
+
+void PullTemplate :: initializeSubpulls()
+{
+	Point p;
+	p.x = p.y = p.z = 0.0;
+
+	switch (type)
 	{
 		case CIRCLE_BASE_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
@@ -19,64 +97,43 @@ PullTemplate :: PullTemplate(int t)
 			this->shape = AMORPHOUS_SHAPE;
 			break;
 		case SQUARE_FOUR_SQUARES_TEMPLATE:
-			p.x = p.y = p.z = 0.0;
 			this->shape = SQUARE_SHAPE;
-			for (int i = 0; i < 2; ++i)
+			for (int i = 0; i < 4; ++i)
 			{
-				for (int j = 0; j < 2; ++j)
-				{
-					p.x = -0.3 + 0.6 * i;
-					p.y = -0.3 + 0.6 * j;
-					subpulls.push_back(SubpullTemplate(SQUARE_SHAPE, p, 0.5, 0));
-				}
+				subpulls.push_back(SubpullTemplate(SQUARE_SHAPE, p, 0.5, 0));
 			}
 			break;
 		case LINE_THREE_CIRCLES_TEMPLATE:
-			p.x = p.y = p.z = 0.0;
 			this->shape = CIRCLE_SHAPE;
 			for (int i = 0; i < 3; ++i)
 			{
-				p.x = -0.6666666 + 0.6666 * i;
 				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.60, 0));
 			}
 			break;	
 		case LINE_FIVE_CIRCLES_TEMPLATE:
-			p.x = p.y = p.z = 0.0;
 			this->shape = CIRCLE_SHAPE;
 			for (int i = 0; i < 5; ++i)
 			{
-				p.x = -0.8 + 0.4 * i;
 				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.39, 0));
 			}
 			break;			
 		case SQUARE_FOUR_CIRCLES_TEMPLATE:
-			p.x = p.y = p.z = 0.0;
 			this->shape = CIRCLE_SHAPE;
-			for (int i = 0; i < 2; ++i)
+			for (int i = 0; i < 4; ++i)
 			{
-				for (int j = 0; j < 2; ++j)
-				{
-					p.x = -0.3 + 0.6 * i;
-					p.y = -0.3 + 0.6 * j;
-					subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.59, 0));
-				}
+				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.59, 0));
 			}
 			break;			
 		case X_NINE_CIRCLES_TEMPLATE:
-			p.x = p.y = p.z = 0.0;
 			this->shape = CIRCLE_SHAPE;
 			for (int i = 0; i < 5; ++i)
 			{
-				p.x = -0.8 + 0.4 * i;
-				p.y = 0.0;
 				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.39, 0));
 			}
 			for (int i = 0; i < 5; ++i)
 			{
 				if (i == 2)
 					continue;
-				p.x = 0.0;
-				p.y = -0.8 + 0.4 * i;
 				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.39, 0));
 			}
 			break;	
@@ -84,5 +141,15 @@ PullTemplate :: PullTemplate(int t)
 }
 
 
+void PullTemplate :: setCasingThickness(float thickness)
+{
+	this->casingThickness = thickness;
+	updateSubpulls();
+}
+
+float PullTemplate :: getCasingThickness()
+{
+	return this->casingThickness;
+}
 
 

@@ -215,6 +215,8 @@ void MainWindow :: setupConnections()
 	connect(newPullPlanButton, SIGNAL(pressed()), this, SLOT(newPullPlan()));	
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(pullPlanEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+	connect(pullTemplateCasingThicknessSlider, SIGNAL(valueChanged(int)), 
+		this, SLOT(pullTemplateCasingThicknessSliderChanged(int)));
 	connect(pullPlanTwistSlider, SIGNAL(valueChanged(int)), this, SLOT(pullPlanTwistSliderChanged(int)));
 	connect(pullPlanTwistSpin, SIGNAL(valueChanged(int)), this, SLOT(pullPlanTwistSpinChanged(int)));
 
@@ -398,6 +400,18 @@ void MainWindow :: setupPullPlanEditor()
 	pullPlanEditorViewWidget = new PullPlanEditorViewWidget(pullPlanEditorPlan, pullPlanEditorPage);
 	editorLayout->addWidget(pullPlanEditorViewWidget, 10); 	
 
+	// Casing thickness slider stuff
+	QHBoxLayout* casingThicknessLayout = new QHBoxLayout(pullPlanEditorPage);
+	editorLayout->addLayout(casingThicknessLayout);
+
+	pullTemplateCasingThicknessSlider = new QSlider(Qt::Horizontal, pullPlanEditorPage);
+	pullTemplateCasingThicknessSlider->setRange(0, 100);
+	//pullTemplateCasingThicknessSlider->setTickInterval(0.1);
+	pullTemplateCasingThicknessSlider->setTickPosition(QSlider::TicksBothSides);
+	pullTemplateCasingThicknessSlider->setSliderPosition(0);
+	casingThicknessLayout->addWidget(pullTemplateCasingThicknessSlider, 10);	
+
+	// Twist slider stuff
 	QHBoxLayout* twistLayout = new QHBoxLayout(pullPlanEditorPage);
 	editorLayout->addLayout(twistLayout);
 
@@ -439,6 +453,13 @@ void MainWindow :: pullPlanTwistSpinChanged(int)
 {
         int tick = pullPlanTwistSpin->value();
 	pullPlanTwistSlider->setSliderPosition(tick);
+	someDataChanged();
+}
+
+void MainWindow :: pullTemplateCasingThicknessSliderChanged(int)
+{
+        float thickness = pullTemplateCasingThicknessSlider->sliderPosition() / 100.0;
+	pullPlanEditorPlan->getTemplate()->setCasingThickness(thickness);
 	someDataChanged();
 }
 
@@ -543,6 +564,10 @@ void MainWindow :: updatePullPlanEditor()
 {
 	static_cast<QCheckBox*>(pullTemplateShapeButtonGroup->button(pullPlanEditorPlan->getTemplate()->shape))->setCheckState(Qt::Checked);
 	pullTemplateComboBox->setCurrentIndex(pullPlanEditorPlan->getTemplate()->type-1);
+
+        int thickness = (int) (pullPlanEditorPlan->getTemplate()->getCasingThickness() * 100);
+        pullTemplateCasingThicknessSlider->setSliderPosition(thickness);
+
 	int twist = pullPlanEditorPlan->twist;
 	pullPlanTwistSlider->setSliderPosition(twist);
 	pullPlanTwistSpin->setValue(twist);
@@ -591,7 +616,7 @@ void MainWindow :: pullTemplateComboBoxChanged(int newIndex)
 	// some user specified ones 
 	if (newIndex+1 != pullPlanEditorPlan->getTemplate()->type)
 	{
-		pullPlanEditorPlan->setTemplate(new PullTemplate(newIndex+1));
+		pullPlanEditorPlan->setTemplate(new PullTemplate(newIndex+1, 0.0));
 		emit someDataChanged();
 	}
 }
