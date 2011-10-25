@@ -109,7 +109,7 @@ void MainWindow :: seedEverything()
 	for (int i = LINE_THREE_CIRCLES_TEMPLATE; i <= SQUARE_FOUR_SQUARES_TEMPLATE; ++i)
 	{
 		pullPlanEditorPlan->setTemplate(new PullTemplate(i, 0.0));
-		pullPlanEditorPlan->getTemplate()->shape = AMORPHOUS_SHAPE;
+		pullPlanEditorPlan->getTemplate()->shape = AMORPHOUS_SHAPE; // stop the border from being drawn
 		emit someDataChanged();
 		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
 			QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100), i);
@@ -133,6 +133,7 @@ void MainWindow :: seedEverything()
 	emit someDataChanged();		
 
 	editorStack->setCurrentIndex(0); // end in pull plan mode
+	pullPlanEditorPlan->setTemplate(new PullTemplate(LINE_THREE_CIRCLES_TEMPLATE, 0.0));
 	emit someDataChanged();		
 }
 
