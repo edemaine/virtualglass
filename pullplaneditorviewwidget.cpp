@@ -73,8 +73,8 @@ void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan)
 void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 {
 	QPainter painter;
-	painter.setRenderHint(QPainter::Antialiasing);
 	painter.begin(this);
+	painter.setRenderHint(QPainter::Antialiasing);
 	painter.fillRect(event->rect(), Qt::black);
 	QPen pen;
 	pen.setColor(Qt::white);

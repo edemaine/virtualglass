@@ -83,8 +83,8 @@ void PickupPlanEditorViewWidget :: setPickupPlan(PickupPlan* plan)
 void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 {
 	QPainter painter;
-	painter.setRenderHint(QPainter::HighQualityAntialiasing);
 	painter.begin(this);
+        painter.setRenderHint(QPainter::Antialiasing);
 	painter.fillRect(event->rect(), Qt::black);
 	QPen pen;
 	pen.setColor(Qt::white);

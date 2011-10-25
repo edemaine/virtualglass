@@ -115,6 +115,7 @@ void MainWindow :: seedEverything()
 	for (int i = LINE_THREE_CIRCLES_TEMPLATE; i <= SQUARE_FOUR_SQUARES_TEMPLATE; ++i)
 	{
 		pullPlanEditorPlan->setTemplate(new PullTemplate(i, 0.0));
+		pullPlanEditorPlan->getTemplate()->shape = AMORPHOUS_SHAPE;
 		emit someDataChanged();
 		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
 			QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100), i);
@@ -603,7 +604,9 @@ void MainWindow :: updatePickupPlanEditor()
 
 void MainWindow :: updatePullPlanEditor()
 {
-	static_cast<QCheckBox*>(pullTemplateShapeButtonGroup->button(pullPlanEditorPlan->getTemplate()->shape))->setCheckState(Qt::Checked);
+	// Only attempt to set the shape if it's defined; it's undefined during loading
+	if (pullPlanEditorPlan->getTemplate()->shape < AMORPHOUS_SHAPE)
+		static_cast<QCheckBox*>(pullTemplateShapeButtonGroup->button(pullPlanEditorPlan->getTemplate()->shape))->setCheckState(Qt::Checked);
 
         int thickness = (int) (pullPlanEditorPlan->getTemplate()->getCasingThickness() * 100);
         pullTemplateCasingThicknessSlider->setSliderPosition(thickness);
