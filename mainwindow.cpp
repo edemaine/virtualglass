@@ -277,7 +277,7 @@ void MainWindow :: setupTable()
 	colorBarLibraryLayout->setSpacing(10);
 	colorBarLibraryWidget->setLayout(colorBarLibraryLayout);
 
-        colorBarLibraryScrollArea = new QScrollArea(centralWidget);
+        QScrollArea* colorBarLibraryScrollArea = new QScrollArea(centralWidget);
         colorBarLibraryScrollArea->setBackgroundRole(QPalette::Dark);
         colorBarLibraryScrollArea->setWidget(colorBarLibraryWidget);
         colorBarLibraryScrollArea->setWidgetResizable(true);
@@ -293,7 +293,7 @@ void MainWindow :: setupTable()
 	pullPlanLibraryLayout->setSpacing(10);
 	pullPlanLibraryWidget->setLayout(pullPlanLibraryLayout);
 
-        pullPlanLibraryScrollArea = new QScrollArea;
+        QScrollArea* pullPlanLibraryScrollArea = new QScrollArea;
         pullPlanLibraryScrollArea->setBackgroundRole(QPalette::Dark);
         pullPlanLibraryScrollArea->setWidget(pullPlanLibraryWidget);
         pullPlanLibraryScrollArea->setWidgetResizable(true);
@@ -312,7 +312,7 @@ void MainWindow :: setupTable()
 	pickupPlanLibraryLayout->setSpacing(10);
 	pickupPlanLibraryWidget->setLayout(pickupPlanLibraryLayout);
 
-        pickupPlanLibraryScrollArea = new QScrollArea;
+        QScrollArea* pickupPlanLibraryScrollArea = new QScrollArea;
         pickupPlanLibraryScrollArea->setBackgroundRole(QPalette::Dark);
         pickupPlanLibraryScrollArea->setWidget(pickupPlanLibraryWidget);
         pickupPlanLibraryScrollArea->setWidgetResizable(true);
@@ -331,7 +331,7 @@ void MainWindow :: setupTable()
 	pieceLibraryLayout->setSpacing(10);
 	pieceLibraryWidget->setLayout(pieceLibraryLayout);
 
-        pieceLibraryScrollArea = new QScrollArea;
+        QScrollArea* pieceLibraryScrollArea = new QScrollArea;
         pieceLibraryScrollArea->setBackgroundRole(QPalette::Dark);
         pieceLibraryScrollArea->setWidget(pieceLibraryWidget);
         pieceLibraryScrollArea->setWidgetResizable(true);

@@ -76,10 +76,6 @@ class MainWindow : public QMainWindow
 		QLabel* niceViewLabel;
 		QVBoxLayout* niceViewLayout;
 		NiceViewWidget* niceViewWidget;
-		QScrollArea* pullPlanLibraryScrollArea;
-		QScrollArea* colorBarLibraryScrollArea;
-		QScrollArea* pickupPlanLibraryScrollArea;
-		QScrollArea* pieceLibraryScrollArea;
 		QHBoxLayout* pullPlanLibraryLayout;
 		QHBoxLayout* colorBarLibraryLayout;
 		QHBoxLayout* pickupPlanLibraryLayout;
