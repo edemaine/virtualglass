@@ -13,7 +13,7 @@ Controller::Controller(int argc, char **argv)
 int Controller::startUp()
 {
 	mainWindow->show(); 
-	mainWindow->seedTable();
+	mainWindow->seedEverything();
 	return app->exec();
 }
 

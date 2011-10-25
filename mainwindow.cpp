@@ -18,7 +18,7 @@ MainWindow :: MainWindow(Model* model)
         move(0, 0);
 }
 
-void MainWindow :: seedTable()
+void MainWindow :: seedEverything()
 {
 	// Sampling of Reichenbach colors from Kim's color file
 	Color color;
@@ -102,12 +102,24 @@ void MainWindow :: seedTable()
 	// setup the editor/3D view
 	emit someDataChanged();		
 
+	// Propogate 3D/editor view imagery into libraries by quickly loading
+	// each starter pull plan, pickup plan, piece
 	editorStack->setCurrentIndex(1);
 	emit someDataChanged();		
 	editorStack->setCurrentIndex(2);
 	emit someDataChanged();		
-	editorStack->setCurrentIndex(0); // return to 0
+	editorStack->setCurrentIndex(0);  // end in pull plan mode
 	emit someDataChanged();		
+
+	// Load pull template types
+	for (int i = LINE_THREE_CIRCLES_TEMPLATE; i <= SQUARE_FOUR_SQUARES_TEMPLATE; ++i)
+	{
+		pullPlanEditorPlan->setTemplate(new PullTemplate(i, 0.0));
+		emit someDataChanged();
+		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
+			QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100), i);
+		pullTemplateLibraryLayout->addWidget(ptlw);
+	}
 }
 
 void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
@@ -118,6 +130,7 @@ void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
 	PickupPlanLibraryWidget* pkplw = dynamic_cast<PickupPlanLibraryWidget*>(childAt(event->pos()));
 	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
+	PullTemplateLibraryWidget* ptlw = dynamic_cast<PullTemplateLibraryWidget*>(childAt(event->pos()));
 
 	if (plplw != NULL)
 	{
@@ -141,6 +154,11 @@ void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
 		pieceEditorPlan = plw->getPiece();
 		pieceEditorViewWidget->setPiece(pieceEditorPlan);
 		editorStack->setCurrentIndex(2);
+		emit someDataChanged();
+	}
+	else if (ptlw != NULL)
+	{
+		pullPlanEditorPlan->setTemplate(new PullTemplate(ptlw->getPullTemplateType(), 0.0));
 		emit someDataChanged();
 	}
 }
@@ -211,7 +229,6 @@ void MainWindow :: dragMoveEvent(QDragMoveEvent* event)
 void MainWindow :: setupConnections()
 {
 	connect(pullTemplateShapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(pullTemplateShapeButtonGroupChanged(int)));
-	connect(pullTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pullTemplateComboBoxChanged(int)));	
 	connect(newPullPlanButton, SIGNAL(pressed()), this, SLOT(newPullPlan()));	
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(pullPlanEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
@@ -379,6 +396,25 @@ void MainWindow :: setupPullPlanEditor()
 	QVBoxLayout* editorLayout = new QVBoxLayout(pullPlanEditorPage);
 	pullPlanEditorPage->setLayout(editorLayout);
 
+	// Setup pull template scrolling library
+	QWidget* pullTemplateLibraryWidget = new QWidget(centralWidget);
+	pullTemplateLibraryLayout = new QHBoxLayout(pullTemplateLibraryWidget);
+	pullTemplateLibraryLayout->setSpacing(10);
+	pullTemplateLibraryWidget->setLayout(pullTemplateLibraryLayout);
+
+        QScrollArea* pullTemplateLibraryScrollArea = new QScrollArea(centralWidget);
+        pullTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
+        pullTemplateLibraryScrollArea->setWidget(pullTemplateLibraryWidget);
+        pullTemplateLibraryScrollArea->setWidgetResizable(true);
+        pullTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        pullTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        pullTemplateLibraryScrollArea->setFixedHeight(130);
+        pullTemplateLibraryScrollArea->setFixedWidth(520);
+	editorLayout->addWidget(pullTemplateLibraryScrollArea);	
+
+	pullPlanEditorViewWidget = new PullPlanEditorViewWidget(pullPlanEditorPlan, pullPlanEditorPage);
+	editorLayout->addWidget(pullPlanEditorViewWidget, 10); 	
+
 	QCheckBox* circleCheckBox = new QCheckBox("Circle");
 	QCheckBox* squareCheckBox = new QCheckBox("Square");
 	pullTemplateShapeButtonGroup = new QButtonGroup();
@@ -388,17 +424,6 @@ void MainWindow :: setupPullPlanEditor()
 	pullTemplateShapeLayout->addWidget(circleCheckBox);	
 	pullTemplateShapeLayout->addWidget(squareCheckBox);
 	editorLayout->addLayout(pullTemplateShapeLayout);
-
-	pullTemplateComboBox = new QComboBox(pullPlanEditorPage);
-	pullTemplateComboBox->addItem("Three circles on a line");
-	pullTemplateComboBox->addItem("Five circles on a line");
-	pullTemplateComboBox->addItem("Four circles in a square");
-	pullTemplateComboBox->addItem("Nine circles in a X");
-	pullTemplateComboBox->addItem("Four squares in a square");
-	editorLayout->addWidget(pullTemplateComboBox, 0);
-
-	pullPlanEditorViewWidget = new PullPlanEditorViewWidget(pullPlanEditorPlan, pullPlanEditorPage);
-	editorLayout->addWidget(pullPlanEditorViewWidget, 10); 	
 
 	// Casing thickness slider stuff
 	QHBoxLayout* casingThicknessLayout = new QHBoxLayout(pullPlanEditorPage);
@@ -579,7 +604,6 @@ void MainWindow :: updatePickupPlanEditor()
 void MainWindow :: updatePullPlanEditor()
 {
 	static_cast<QCheckBox*>(pullTemplateShapeButtonGroup->button(pullPlanEditorPlan->getTemplate()->shape))->setCheckState(Qt::Checked);
-	pullTemplateComboBox->setCurrentIndex(pullPlanEditorPlan->getTemplate()->type-1);
 
         int thickness = (int) (pullPlanEditorPlan->getTemplate()->getCasingThickness() * 100);
         pullTemplateCasingThicknessSlider->setSliderPosition(thickness);
@@ -620,19 +644,6 @@ void MainWindow :: pickupTemplateComboBoxChanged(int newIndex)
 	if (newIndex+1 != pickupPlanEditorPlan->getTemplate()->type)
 	{
 		pickupPlanEditorPlan->setTemplate(new PickupTemplate(newIndex+1));
-		emit someDataChanged();
-	}
-}
-
-void MainWindow :: pullTemplateComboBoxChanged(int newIndex)
-{
-	// Only do anything if the change caused the combo box to not match
-	// the type of the current template, otherwise we might
-	// cause a reset to the default template subcanes instead of 
-	// some user specified ones 
-	if (newIndex+1 != pullPlanEditorPlan->getTemplate()->type)
-	{
-		pullPlanEditorPlan->setTemplate(new PullTemplate(newIndex+1, 0.0));
 		emit someDataChanged();
 	}
 }

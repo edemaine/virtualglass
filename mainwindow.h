@@ -19,6 +19,7 @@
 #include "pickupplaneditorviewwidget.h"
 #include "piece.h"
 #include "pieceeditorviewwidget.h"
+#include "pulltemplatelibrarywidget.h"
 
 class MainWindow : public QMainWindow
 {
@@ -30,7 +31,7 @@ class MainWindow : public QMainWindow
         	void mouseMoveEvent(QMouseEvent* event);
 		void mouseDoubleClickEvent(QMouseEvent* event);
         	void dragMoveEvent(QDragMoveEvent* event);
-		void seedTable();
+		void seedEverything();
 	
 	signals:
 		void someDataChanged();
@@ -67,7 +68,6 @@ class MainWindow : public QMainWindow
 		Model* model;
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
-		QComboBox* pullTemplateComboBox;
 		QComboBox* pickupTemplateComboBox;
 		QComboBox* pieceTemplateComboBox;
 		PullPlanEditorViewWidget* pullPlanEditorViewWidget;
@@ -84,6 +84,7 @@ class MainWindow : public QMainWindow
 		QHBoxLayout* colorBarLibraryLayout;
 		QHBoxLayout* pickupPlanLibraryLayout;
 		QHBoxLayout* pieceLibraryLayout;
+		QHBoxLayout* pullTemplateLibraryLayout;
 		QSlider* pullPlanTwistSlider;
 		QSlider* pullTemplateCasingThicknessSlider;
 		QSpinBox* pullPlanTwistSpin;
@@ -93,7 +94,6 @@ class MainWindow : public QMainWindow
 
 	private slots:
 		void updateEverything();
-		void pullTemplateComboBoxChanged(int index);
 		void pickupTemplateComboBoxChanged(int index);
 		void pieceTemplateComboBoxChanged(int index);
 		void newPullPlan();	

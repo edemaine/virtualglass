@@ -22,7 +22,7 @@ NiceViewWidget :: NiceViewWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::Alp
 	leftMouseDown = false;
 
 	bgColor = QColor(0, 0, 0);
-	setFixedSize(400, 800);
+	setFixedSize(500, 800);
 
 	geometry = NULL;
 

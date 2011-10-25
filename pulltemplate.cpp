@@ -23,10 +23,10 @@ void PullTemplate :: updateSubpulls()
 			{
 				for (int j = 0; j < 2; ++j)
 				{
-					p.x = radius * (-0.5 + 1.0 * i);
-					p.y = radius * (-0.5 + 1.0 * j);
+					p.x = radius * (-0.35 + 0.7 * i);
+					p.y = radius * (-0.35 + 0.7 * j);
 					subpulls[2*i + j].location = p;
-					subpulls[2*i + j].diameter = radius * 0.9; 
+					subpulls[2*i + j].diameter = radius * 0.67; 
 				}
 			}
 			break;
@@ -51,10 +51,10 @@ void PullTemplate :: updateSubpulls()
 			{
 				for (int j = 0; j < 2; ++j)
 				{
-					p.x = radius * (-0.3 + 0.6 * i);
-					p.y = radius * (-0.3 + 0.6 * j);
+					p.x = radius * (-0.4 + 0.8 * i);
+					p.y = radius * (-0.4 + 0.8 * j);
 					subpulls[2*i + j].location = p;
-					subpulls[2*i + j].diameter = radius * 0.59; 
+					subpulls[2*i + j].diameter = radius * 0.79; 
 				}
 			}
 			break;			
