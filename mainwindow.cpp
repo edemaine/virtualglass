@@ -404,6 +404,12 @@ void MainWindow :: setupPullPlanEditor()
 	QHBoxLayout* casingThicknessLayout = new QHBoxLayout(pullPlanEditorPage);
 	editorLayout->addLayout(casingThicknessLayout);
 
+	QLabel* casingLabel1 = new QLabel("Casing Thickness:", pullPlanEditorPage);
+	casingThicknessLayout->addWidget(casingLabel1, 0);
+
+	QLabel* casingLabel2 = new QLabel("0%", pullPlanEditorPage);
+	casingThicknessLayout->addWidget(casingLabel2, 0);
+
 	pullTemplateCasingThicknessSlider = new QSlider(Qt::Horizontal, pullPlanEditorPage);
 	pullTemplateCasingThicknessSlider->setRange(0, 100);
 	//pullTemplateCasingThicknessSlider->setTickInterval(0.1);
@@ -411,14 +417,23 @@ void MainWindow :: setupPullPlanEditor()
 	pullTemplateCasingThicknessSlider->setSliderPosition(0);
 	casingThicknessLayout->addWidget(pullTemplateCasingThicknessSlider, 10);	
 
+	QLabel* casingLabel3 = new QLabel("100%", pullPlanEditorPage);
+	casingThicknessLayout->addWidget(casingLabel3, 0);
+
 	// Twist slider stuff
 	QHBoxLayout* twistLayout = new QHBoxLayout(pullPlanEditorPage);
 	editorLayout->addLayout(twistLayout);
+
+	QLabel* twistLabel1 = new QLabel("Twist:", pullPlanEditorPage);
+	twistLayout->addWidget(twistLabel1);
 
 	pullPlanTwistSpin = new QSpinBox(pullPlanEditorPage);
 	pullPlanTwistSpin->setRange(-50, 50);
 	pullPlanTwistSpin->setSingleStep(1);
 	twistLayout->addWidget(pullPlanTwistSpin, 1);
+
+	QLabel* twistLabel2 = new QLabel("-50", pullPlanEditorPage);
+	twistLayout->addWidget(twistLabel2);
 
 	pullPlanTwistSlider = new QSlider(Qt::Horizontal, pullPlanEditorPage);
 	pullPlanTwistSlider->setRange(-50, 50);
@@ -427,7 +442,10 @@ void MainWindow :: setupPullPlanEditor()
 	pullPlanTwistSlider->setSliderPosition(0);
 	twistLayout->addWidget(pullPlanTwistSlider, 10);	
 
-	pullTemplateComboBox->setCurrentIndex(0);
+	QLabel* twistLabel3 = new QLabel("50", pullPlanEditorPage);
+	twistLayout->addWidget(twistLabel3);
+
+	//pullTemplateComboBox->setCurrentIndex(0);
 }
 
 void MainWindow :: pullTemplateShapeButtonGroupChanged(int)
