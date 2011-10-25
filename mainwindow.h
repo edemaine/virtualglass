@@ -51,7 +51,7 @@ class MainWindow : public QMainWindow
 		void updateLibrary();
 
 		// Variables
-		QWidget* drawingWidget;
+		QButtonGroup* pullTemplateShapeButtonGroup;		
 		QPoint dragStartPosition;
 		QStackedWidget* editorStack;
 		QWidget* pullPlanEditorPage;
@@ -100,6 +100,7 @@ class MainWindow : public QMainWindow
 		void newPiece();	
 		void pullPlanTwistSliderChanged(int p);
 		void pullPlanTwistSpinChanged(int p);
+		void pullTemplateShapeButtonGroupChanged(int);
 };
 
 

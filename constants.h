@@ -2,9 +2,9 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-// IMPORTANT: The list of templates that show up in the UI menu must start
-// at 1 and be contiguous. Everything else must come after. This is true
-// for ALL template types separately 
+// IMPORTANT: The lists of templates/shapes must start
+// at 1 and be contiguous. This is used in the UI to make
+// conversions from menu items to constants simple.
 
 // Pull template types
 #define LINE_THREE_CIRCLES_TEMPLATE 1

@@ -210,6 +210,7 @@ void MainWindow :: dragMoveEvent(QDragMoveEvent* event)
 
 void MainWindow :: setupConnections()
 {
+	connect(pullTemplateShapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(pullTemplateShapeButtonGroupChanged(int)));
 	connect(pullTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pullTemplateComboBoxChanged(int)));	
 	connect(newPullPlanButton, SIGNAL(pressed()), this, SLOT(newPullPlan()));	
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
@@ -376,6 +377,16 @@ void MainWindow :: setupPullPlanEditor()
 	QVBoxLayout* editorLayout = new QVBoxLayout(pullPlanEditorPage);
 	pullPlanEditorPage->setLayout(editorLayout);
 
+	QCheckBox* circleCheckBox = new QCheckBox("Circle");
+	QCheckBox* squareCheckBox = new QCheckBox("Square");
+	pullTemplateShapeButtonGroup = new QButtonGroup();
+	pullTemplateShapeButtonGroup->addButton(circleCheckBox, 1);
+	pullTemplateShapeButtonGroup->addButton(squareCheckBox, 2);
+	QHBoxLayout* pullTemplateShapeLayout = new QHBoxLayout(pullPlanEditorPage);
+	pullTemplateShapeLayout->addWidget(circleCheckBox);	
+	pullTemplateShapeLayout->addWidget(squareCheckBox);
+	editorLayout->addLayout(pullTemplateShapeLayout);
+
 	pullTemplateComboBox = new QComboBox(pullPlanEditorPage);
 	pullTemplateComboBox->addItem("Three circles on a line");
 	pullTemplateComboBox->addItem("Five circles on a line");
@@ -403,6 +414,25 @@ void MainWindow :: setupPullPlanEditor()
 	twistLayout->addWidget(pullPlanTwistSlider, 10);	
 
 	pullTemplateComboBox->setCurrentIndex(0);
+}
+
+void MainWindow :: pullTemplateShapeButtonGroupChanged(int)
+{
+	switch (pullTemplateShapeButtonGroup->checkedId())
+	{
+		case 1:
+			if (pullPlanEditorPlan->getTemplate()->shape == CIRCLE_SHAPE)
+				return;
+			pullPlanEditorPlan->getTemplate()->shape = CIRCLE_SHAPE;
+			someDataChanged();
+			break;
+		case 2:
+			if (pullPlanEditorPlan->getTemplate()->shape == SQUARE_SHAPE)
+				return;
+			pullPlanEditorPlan->getTemplate()->shape = SQUARE_SHAPE;
+			someDataChanged();
+			break;
+	}
 }
 
 void MainWindow :: pullPlanTwistSpinChanged(int)
@@ -511,11 +541,12 @@ void MainWindow :: updatePickupPlanEditor()
 
 void MainWindow :: updatePullPlanEditor()
 {
-	pullPlanEditorViewWidget->repaint();
+	static_cast<QCheckBox*>(pullTemplateShapeButtonGroup->button(pullPlanEditorPlan->getTemplate()->shape))->setCheckState(Qt::Checked);
+	pullTemplateComboBox->setCurrentIndex(pullPlanEditorPlan->getTemplate()->type-1);
 	int twist = pullPlanEditorPlan->twist;
 	pullPlanTwistSlider->setSliderPosition(twist);
 	pullPlanTwistSpin->setValue(twist);
-	pullTemplateComboBox->setCurrentIndex(pullPlanEditorPlan->getTemplate()->type-1);
+	pullPlanEditorViewWidget->repaint();
 } 
 
 void MainWindow :: updateNiceView()
