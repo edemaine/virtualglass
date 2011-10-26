@@ -23,10 +23,6 @@
 #define FIVE_AND_FIVE_VERTICALS_TEMPLATE 4
 #define SIX_COLUMNS_OF_TEN_HORIZONTALS_TEMPLATE 5
 
-// Piece template types
-#define SPHERE_TEMPLATE 1
-#define ROLLUP_TEMPLATE 2
-
 // Geometric shapes
 #define CIRCLE_SHAPE 1
 #define SQUARE_SHAPE 2

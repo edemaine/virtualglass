@@ -84,15 +84,32 @@ void applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 	v->position.z = v->position.z + spt->location.y * 5.0;
 }
 
-void applySphereTransform(Geometry* geometry)
+void applyWavyTwoTransform(Geometry* geometry)
 {
         for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
         {
-                applySphereTransform(&(geometry->vertices[v]));
+                applyWavyTwoTransform(&(geometry->vertices[v]));
         }
 }
 
-void applySphereTransform(Vertex* v)
+void applyWavyTwoTransform(Vertex* v)
+{
+	float theta = atan2(v->position.y, v->position.x);
+	float r = length(v->position.xy);
+
+	v->position.x = r * (1.2 + 0.2 * cos(theta + PI/4) + 0.5 * sin(1.1 * v->position.z)) * cos(theta + v->position.z / 7.0);  
+	v->position.y = r * (0.9 + 0.4 * sin(theta + PI/6) + 0.1 * cos(1.6 * v->position.z)) * sin(theta + v->position.z / 7.0);
+}
+
+void applyWavyOneTransform(Geometry* geometry)
+{
+        for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
+        {
+                applyWavyOneTransform(&(geometry->vertices[v]));
+        }
+}
+
+void applyWavyOneTransform(Vertex* v)
 {
 	float theta = atan2(v->position.y, v->position.x);
 	float r = length(v->position.xy);
@@ -348,9 +365,13 @@ void generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*> ancestors,
 		case ROLLUP_TEMPLATE:
 			applyRollupTransform(geometry);
 			break;
-		case SPHERE_TEMPLATE:
+		case WAVY_ONE_TEMPLATE:
 			applyRollupTransform(geometry);
-			applySphereTransform(geometry);
+			applyWavyOneTransform(geometry);
+			break;
+		case WAVY_TWO_TEMPLATE:
+			applyRollupTransform(geometry);
+			applyWavyTwoTransform(geometry);
 			break;
 	}	
 	geometry->compute_normals_from_triangles();

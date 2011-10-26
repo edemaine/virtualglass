@@ -365,7 +365,7 @@ void MainWindow :: setupEditors()
 
 void MainWindow :: setupPieceEditor()
 {
-	pieceEditorPlan = new Piece(SPHERE_TEMPLATE);
+	pieceEditorPlan = new Piece(WAVY_ONE_TEMPLATE);
 	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
 		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);
         pieceLibraryLayout->addWidget(pieceEditorPlanLibraryWidget);
@@ -376,7 +376,8 @@ void MainWindow :: setupPieceEditor()
 	pieceEditorPage->setLayout(editorLayout);
 
 	pieceTemplateComboBox = new QComboBox(pieceEditorPage);
-	pieceTemplateComboBox->addItem("Sphere");
+	pieceTemplateComboBox->addItem("Wavy 1");
+	pieceTemplateComboBox->addItem("Wavy 2");
 	pieceTemplateComboBox->addItem("Rollup");
 	editorLayout->addWidget(pieceTemplateComboBox, 0);	
 
@@ -545,7 +546,7 @@ void MainWindow :: pullPlanTwistSliderChanged(int)
 
 void MainWindow :: newPiece()
 {
-	pieceEditorPlan = new Piece(SPHERE_TEMPLATE);
+	pieceEditorPlan = new Piece(WAVY_ONE_TEMPLATE);
 
 	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
 		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);

@@ -31,8 +31,11 @@ void applyPickupTransform(Vertex* p, SubpickupTemplate* spt);
 void applyRollupTransform(Vertex* p);
 void applyRollupTransform(Geometry* p);
 
-void applySphereTransform(Vertex* p);
-void applySphereTransform(Geometry* p);
+void applyWavyOneTransform(Vertex* p);
+void applyWavyOneTransform(Geometry* p);
+
+void applyWavyTwoTransform(Vertex* p);
+void applyWavyTwoTransform(Geometry* p);
 
 #endif
 
