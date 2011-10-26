@@ -74,8 +74,6 @@ void applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 			tmp = v->position.x;
 			v->position.x = v->position.z;
 			v->position.z = -tmp;
-			v->position.z += 5.0;
-			v->position.x -= 5.0;
 			break;
 		case VERTICAL_ORIENTATION:
 			break;
@@ -99,11 +97,9 @@ void applySphereTransform(Vertex* v)
 	float theta = atan2(v->position.y, v->position.x);
 	float r = length(v->position.xy);
 
-	v->position.x = r * cos(theta) * 2 * sin(PI/2 + PI/2 * (v->position.z - 5.0) / 5.0);
-	v->position.y = -r * sin(theta) * 2 * sin(PI/2 + PI/2 * (v->position.z - 5.0) / 5.0);
+	v->position.x = r * (1.0 + 0.3 * cos(theta + PI/3) + 0.2 * sin(1.3 * v->position.z)) * cos(theta);  
+	v->position.y = r * (1.0 + 0.5 * sin(theta + PI/5) + 0.3 * cos(1.1 * v->position.z)) * sin(theta);
 }
-
-
 
 void applyRollupTransform(Geometry* geometry)
 {
@@ -118,7 +114,6 @@ void applyRollupTransform(Vertex* v)
 	// send x value to theta value 
 	// -5.0 goes to -PI, 5.0 goes to PI
 	// everything gets a base radius of 5.0
-
 	float theta = PI * v->position.x / 5.0;
 	float r = 5.0 / PI + v->position.y;
 	v->position.x = r * cos(theta);

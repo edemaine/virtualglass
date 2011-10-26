@@ -120,7 +120,7 @@ void MainWindow :: seedEverything()
 	editorStack->setCurrentIndex(1);
 	emit someDataChanged();		
 	
-	for (int i = TEN_HORIZONTALS_TEMPLATE; i <= FIVE_AND_FIVE_VERTICALS_TEMPLATE; ++i)
+	for (int i = TEN_HORIZONTALS_TEMPLATE; i <= SIX_COLUMNS_OF_TEN_HORIZONTALS_TEMPLATE; ++i)
 	{
 		pickupPlanEditorPlan->setTemplate(new PickupTemplate(i));
 		emit someDataChanged();
@@ -653,12 +653,15 @@ void MainWindow :: updateNiceView()
 	{
 		case 0:
 			niceViewWidget->setGeometry(model->getGeometry(pullPlanEditorPlan));	
+			niceViewWidget->setCameraMode(PULLPLAN_MODE);
 			break;
 		case 1:
 			niceViewWidget->setGeometry(model->getGeometry(pickupPlanEditorPlan));	
+			niceViewWidget->setCameraMode(PICKUPPLAN_MODE);
 			break;
 		case 2:
 			niceViewWidget->setGeometry(model->getGeometry(pieceEditorPlan));	
+			niceViewWidget->setCameraMode(PIECE_MODE);
 			break;
 	}
 }

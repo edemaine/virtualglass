@@ -46,7 +46,7 @@ void PieceEditorViewWidget :: paintEvent(QPaintEvent *event)
 	QPainter painter;
 	painter.begin(this);
         painter.setRenderHint(QPainter::Antialiasing);
-	painter.fillRect(event->rect(), Qt::black);
+	painter.fillRect(event->rect(), QColor(200, 200, 200));
 	QPen pen;
 	pen.setColor(Qt::white);
 	pen.setWidth(3);
@@ -70,27 +70,39 @@ void PieceEditorViewWidget :: paintEvent(QPaintEvent *event)
 		}
 		painter.setPen(pen);
 
-		int rX, rY, rWidth, rHeight;
-		SubpickupTemplate* sp = &(piece->pickup->getTemplate()->subpulls[i]);
-		switch (sp->orientation)
-		{
-			case HORIZONTAL_ORIENTATION:
-				rX = (sp->location.x - sp->length/2.0) * width/4 + width/2 + 10;
- 				rY = (sp->location.y - sp->width/2.0) * width/4 + height/2 + 10;
- 				rWidth = sp->length * width/4;
-				rHeight = sp->width * height/4;
-				break;
-			case VERTICAL_ORIENTATION:
-				rX = (sp->location.x - sp->width/2.0) * width/4 + width/2 + 10;
- 				rY = (sp->location.y - sp->length/2.0) * width/4 + height/2 + 10;
- 				rWidth = sp->width * width/4;
-				rHeight = sp->length * height/4;
-				break;
-			default:
-				exit(1);
-		}
+                SubpickupTemplate* sp = &(piece->pickup->getTemplate()->subpulls[i]);
+                Point ll;
+                float rWidth, rHeight;
+                switch (sp->orientation)
+                {
+                        case HORIZONTAL_ORIENTATION:
+                                ll.x = sp->location.x;
+                                ll.y = sp->location.y - sp->width/2;
+                                rWidth = sp->length;
+                                rHeight = sp->width;
+                                break;
+                        case VERTICAL_ORIENTATION:
+                                ll.x = sp->location.x - sp->width/2;
+                                ll.y = sp->location.y;
+                                rWidth = sp->width;
+                                rHeight = sp->length;
+                                break;
+                        default:
+                                exit(1);
+                }
 
-		painter.drawRect(rX, rY, rWidth, rHeight);
+		ll.x *= 0.5;
+		ll.y *= 0.5;
+		rWidth *= 0.5;
+		rHeight *= 0.5;
+
+                // Scale to pixels
+                ll.x = ll.x * width/2 + width/2 + 10;
+                ll.y = ll.y * height/2 + height/2 + 10;
+                rWidth *= width/2;
+                rHeight *= height/2;
+
+		painter.drawRect(ll.x, ll.y, rWidth, rHeight);
 	}
 	painter.end();
 }

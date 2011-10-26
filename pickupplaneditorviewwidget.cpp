@@ -24,31 +24,32 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
 	{
 		SubpickupTemplate* sp = &(plan->getTemplate()->subpulls[i]);
-		Point ul, br;
+		Point ll, ur;
 
 		switch (sp->orientation)
 		{
 			case HORIZONTAL_ORIENTATION:
-				ul.x = sp->location.x - sp->length/2;	
-				ul.y = sp->location.y - sp->width/2;	
-				br.x = sp->location.x + sp->length/2;	
-				br.y = sp->location.y + sp->width/2;	
+				ll.x = sp->location.x;
+				ll.y = sp->location.y - sp->width/2;
+				ur.x = sp->location.x + sp->length;	
+				ur.y = sp->location.y + sp->width/2;	
 				break;		
 			case VERTICAL_ORIENTATION:
-				ul.x = sp->location.x - sp->width/2;	
-				ul.y = sp->location.y - sp->length/2;	
-				br.x = sp->location.x + sp->width/2;	
-				br.y = sp->location.y + sp->length/2;	
+				ll.x = sp->location.x - sp->width/2;	
+				ll.y = sp->location.y;	
+				ur.x = sp->location.x + sp->width/2;	
+				ur.y = sp->location.y + sp->length;	
 				break;		
 		}	
 
-		ul.x = ul.x * width/2 + width/2 + 10;  
-		ul.y = ul.y * height/2 + height/2 + 10;  
-		br.x = br.x * width/2 + width/2 + 10;  
-		br.y = br.y * height/2 + height/2 + 10;  
+		// Scale to pixels
+		ll.x = ll.x * width/2 + width/2 + 10;  
+		ll.y = ll.y * height/2 + height/2 + 10;  
+		ur.x = ur.x * width/2 + width/2 + 10;  
+		ur.y = ur.y * height/2 + height/2 + 10;  
 	
-		if (ul.x < event->pos().x() && event->pos().x() < br.x 
-			&& ul.y < event->pos().y() && event->pos().y() < br.y)
+		if (ll.x < event->pos().x() && event->pos().x() < ur.x 
+			&& ll.y < event->pos().y() && event->pos().y() < ur.y)
 		{
 			event->accept();
 		}
@@ -85,7 +86,7 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 	QPainter painter;
 	painter.begin(this);
         painter.setRenderHint(QPainter::Antialiasing);
-	painter.fillRect(event->rect(), Qt::black);
+	painter.fillRect(event->rect(), QColor(200, 200, 200));
 	QPen pen;
 	pen.setColor(Qt::white);
 	pen.setWidth(3);
@@ -109,27 +110,34 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 		}
 		painter.setPen(pen);
 
-		int rX, rY, rWidth, rHeight;
 		SubpickupTemplate* sp = &(plan->getTemplate()->subpulls[i]);
-		switch (sp->orientation)
-		{
-			case HORIZONTAL_ORIENTATION:
-				rX = (sp->location.x - sp->length/2.0) * width/2 + width/2 + 10;
- 				rY = (sp->location.y - sp->width/2.0) * width/2 + height/2 + 10;
- 				rWidth = sp->length * width/2;
-				rHeight = sp->width * height/2;
-				break;
-			case VERTICAL_ORIENTATION:
-				rX = (sp->location.x - sp->width/2.0) * width/2 + width/2 + 10;
- 				rY = (sp->location.y - sp->length/2.0) * width/2 + height/2 + 10;
- 				rWidth = sp->width * width/2;
-				rHeight = sp->length * height/2;
-				break;
+                Point ll;
+		float rWidth, rHeight;
+                switch (sp->orientation)
+                {
+                        case HORIZONTAL_ORIENTATION:
+                                ll.x = sp->location.x;
+                                ll.y = sp->location.y - sp->width/2;
+				rWidth = sp->length;
+				rHeight = sp->width;
+                                break;
+                        case VERTICAL_ORIENTATION:
+                                ll.x = sp->location.x - sp->width/2;
+                                ll.y = sp->location.y;
+				rWidth = sp->width;
+				rHeight = sp->length;
+                                break;
 			default:
 				exit(1);
-		}
+                }
 
-		painter.drawRect(rX, rY, rWidth, rHeight);
+                // Scale to pixels
+                ll.x = ll.x * width/2 + width/2 + 10;
+                ll.y = ll.y * height/2 + height/2 + 10;
+		rWidth *= width/2;
+		rHeight *= height/2;
+		
+		painter.drawRect(ll.x, ll.y, rWidth, rHeight);
 	}
 
 	painter.end();
