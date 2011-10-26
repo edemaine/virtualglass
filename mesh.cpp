@@ -115,7 +115,7 @@ void applyRollupTransform(Vertex* v)
 	// -5.0 goes to -PI, 5.0 goes to PI
 	// everything gets a base radius of 5.0
 	float theta = PI * v->position.x / 5.0;
-	float r = 5.0 / PI + v->position.y;
+	float r = 5.0 / PI - v->position.y;
 	v->position.x = r * cos(theta);
 	v->position.y = r * sin(theta);
 }
