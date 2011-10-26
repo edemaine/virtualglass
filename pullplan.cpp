@@ -38,18 +38,6 @@ PullTemplate* PullPlan :: getTemplate()
 	return this->pullTemplate;
 }
 
-void PullPlan :: setSubplan(unsigned int index, PullPlan* plan)
-{
-	if (index < pullTemplate->subpulls.size())
-	{
-		subplans[index] = plan;
-	}
-}
-
-vector<PullPlan*> PullPlan :: getSubplans()
-{
-	return subplans;
-}
 
 
 

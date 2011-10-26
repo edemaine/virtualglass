@@ -26,18 +26,6 @@ PickupTemplate* PickupPlan :: getTemplate()
 	return this->pickupTemplate;
 }
 
-void PickupPlan :: setSubplan(unsigned int index, PullPlan* plan)
-{
-	if (index < this->pickupTemplate->subpulls.size())
-	{
-		subplans[index] = plan;
-	}
-}
-
-vector<PullPlan*> PickupPlan :: getSubplans()
-{
-	return subplans;
-}
 
 
 

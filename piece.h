@@ -15,14 +15,12 @@ class Piece
 
 		void setTemplate(PieceTemplate* pt);
 		PieceTemplate* getTemplate();
+		
+		PickupPlan* pickup;
 
-		void setPickup(PickupPlan* pickup);
-		PickupPlan* getPickup();
-	
 	private:
 		// Variables
 		PieceTemplate* pieceTemplate;
-		PickupPlan* pickup;
 };
 
 #endif

@@ -18,13 +18,11 @@ class PickupPlan
 		void setTemplate(PickupTemplate* pt);
 		PickupTemplate* getTemplate();
 
-		void setSubplan(unsigned int index, PullPlan* subplan);
-		vector<PullPlan*> getSubplans();
+		vector<PullPlan*> subplans;
 	
 	private:
 		// Variables
 		PickupTemplate* pickupTemplate;
-		vector<PullPlan*> subplans;
 };
 
 #endif

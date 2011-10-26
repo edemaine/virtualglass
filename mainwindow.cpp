@@ -120,7 +120,7 @@ void MainWindow :: seedEverything()
 	editorStack->setCurrentIndex(1);
 	emit someDataChanged();		
 	
-	for (int i = THREE_HORIZONTALS_TEMPLATE; i <= THREE_VERTICALS_TEMPLATE; ++i)
+	for (int i = TEN_HORIZONTALS_TEMPLATE; i <= FIVE_AND_FIVE_VERTICALS_TEMPLATE; ++i)
 	{
 		pickupPlanEditorPlan->setTemplate(new PickupTemplate(i));
 		emit someDataChanged();
@@ -386,7 +386,7 @@ void MainWindow :: setupPieceEditor()
 
 void MainWindow :: setupPickupPlanEditor()
 {
-	pickupPlanEditorPlan = new PickupPlan(THREE_HORIZONTALS_TEMPLATE);
+	pickupPlanEditorPlan = new PickupPlan(TEN_HORIZONTALS_TEMPLATE);
 	pickupPlanEditorPlanLibraryWidget = new PickupPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
 		QPixmap::fromImage(QImage("./duck.jpg")), pickupPlanEditorPlan);
         pickupPlanLibraryLayout->addWidget(pickupPlanEditorPlanLibraryWidget);
@@ -559,7 +559,7 @@ void MainWindow :: newPiece()
 void MainWindow :: newPickupPlan()
 {
 	// Create the new plan
-	pickupPlanEditorPlan = new PickupPlan(THREE_HORIZONTALS_TEMPLATE);
+	pickupPlanEditorPlan = new PickupPlan(TEN_HORIZONTALS_TEMPLATE);
 
 	// Create the new library entry
 	pickupPlanEditorPlanLibraryWidget = new PickupPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 

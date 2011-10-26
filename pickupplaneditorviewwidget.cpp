@@ -67,7 +67,7 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		for (unsigned int j = 0; j < plan->getTemplate()->subpulls.size(); ++j)
 		{
 			if (plan->getTemplate()->subpulls[j].group == group)
-				plan->setSubplan(j, ptr);
+				plan->subplans[j] = ptr;
 		}
 		
 		emit someDataChanged();
@@ -95,9 +95,9 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 	
 	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
 	{
-		if (plan->getSubplans()[i]->isBase)
+		if (plan->subplans[i]->isBase)
 		{
-			Color c = plan->getSubplans()[i]->color;
+			Color c = plan->subplans[i]->color;
 			painter.setBrush(QColor(255*c.r, 255*c.g, 255*c.b, 255*c.a));
 			pen.setStyle(Qt::NoPen);
 		}

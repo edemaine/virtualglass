@@ -32,7 +32,7 @@ void PieceEditorViewWidget :: dropEvent(QDropEvent* event)
 
 	PickupPlan* ptr;
 	sscanf(event->mimeData()->text().toAscii().constData(), "%p", &ptr);
-	piece->setPickup(ptr);	
+	piece->pickup = ptr;
 	emit someDataChanged();
 }
 
@@ -54,11 +54,11 @@ void PieceEditorViewWidget :: paintEvent(QPaintEvent *event)
 
 	painter.drawEllipse(width/8 + 10, height/8 + 10, 3*width/4, 3*height/4);
 
-	for (unsigned int i = 0; i < piece->getPickup()->getTemplate()->subpulls.size(); ++i)
+	for (unsigned int i = 0; i < piece->pickup->getTemplate()->subpulls.size(); ++i)
 	{
-		if (piece->getPickup()->getSubplans()[i]->isBase)
+		if (piece->pickup->subplans[i]->isBase)
 		{
-			Color c = piece->getPickup()->getSubplans()[i]->color;
+			Color c = piece->pickup->subplans[i]->color;
 			painter.setBrush(QColor(255*c.r, 255*c.g, 255*c.b, 255*c.a));
 			pen.setStyle(Qt::NoPen);
 		}
@@ -71,7 +71,7 @@ void PieceEditorViewWidget :: paintEvent(QPaintEvent *event)
 		painter.setPen(pen);
 
 		int rX, rY, rWidth, rHeight;
-		SubpickupTemplate* sp = &(piece->getPickup()->getTemplate()->subpulls[i]);
+		SubpickupTemplate* sp = &(piece->pickup->getTemplate()->subpulls[i]);
 		switch (sp->orientation)
 		{
 			case HORIZONTAL_ORIENTATION:

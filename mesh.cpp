@@ -347,7 +347,7 @@ void generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*> ancestors,
 
 	geometry->clear();
 	
-	generateMesh(piece->getPickup(), geometry, ancestors, ancestorIndices);		
+	generateMesh(piece->pickup, geometry, ancestors, ancestorIndices);		
 	switch (piece->getTemplate()->type)
 	{
 		case ROLLUP_TEMPLATE:
@@ -367,11 +367,11 @@ void generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPlan*> ancest
 		return;
 
 	geometry->clear();
-	for (unsigned int i = 0; i < plan->getSubplans().size(); ++i)
+	for (unsigned int i = 0; i < plan->subplans.size(); ++i)
 	{
 		ancestors.clear();
 		ancestorIndices.clear();
-		generateMesh(plan->getSubplans()[i], geometry, ancestors, ancestorIndices, NULL, i); 
+		generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, NULL, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
 		{
@@ -429,7 +429,7 @@ void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestor
 	}
 	else 
 	{
-		for (unsigned int i = 0; i < plan->getSubplans().size(); ++i)
+		for (unsigned int i = 0; i < plan->subplans.size(); ++i)
 		{
 			if (groupIndex == -1)
 				passGroupIndex = i;
@@ -437,7 +437,7 @@ void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestor
 				passGroupIndex = groupIndex;
 
 			ancestorIndices.push_back(i);
-			generateMesh(plan->getSubplans()[i], geometry, ancestors, ancestorIndices, NULL, passGroupIndex);
+			generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, NULL, passGroupIndex);
 			ancestorIndices.pop_back();
 		}
 	}
