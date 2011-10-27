@@ -39,6 +39,8 @@ private:
 	QColor bgColor;
 	Geometry *geometry;
 
+	int cameraMode;
+	
 	float lookAtLoc[3];
 	float theta, fee, rho;
 
