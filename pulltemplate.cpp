@@ -18,6 +18,10 @@ void PullTemplate :: updateSubpulls()
 	p.x = p.y = p.z = 0.0;
 	switch (this->type)
 	{
+		case ONE_COLORED_CASING_TEMPLATE:
+			subpulls[0].diameter = radius * 1.0; 
+			subpulls[1].diameter = radius * 1.99; 
+			break;	
 		case SQUARE_FOUR_SQUARES_TEMPLATE:
 			for (int i = 0; i < 2; ++i)
 			{
@@ -141,6 +145,11 @@ void PullTemplate :: initializeSubpulls()
 					continue;
 				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.39, i % 2));
 			}
+			break;	
+		case ONE_COLORED_CASING_TEMPLATE:
+			this->shape = CIRCLE_SHAPE;
+			subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 1.0, 0));
+			subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 1.99, 1));
 			break;	
 	}
 }

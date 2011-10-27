@@ -93,8 +93,10 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 			painter.drawRect(10, 10, width, height);
 			break;
 	}
-	
-	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
+
+	// Draw back to front for subplans contained in other subplans, 
+	// which are checked front to back.	
+	for (unsigned int i = plan->getTemplate()->subpulls.size()-1; i < plan->getTemplate()->subpulls.size(); --i)
 	{
 		SubpullTemplate* subpull = &(plan->getTemplate()->subpulls[i]);
 		if (plan->subplans[i]->isBase)

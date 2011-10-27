@@ -6,16 +6,6 @@
 // at 1 and be contiguous. This is used in the UI to make
 // conversions from menu items to constants simple.
 
-// Pull template types
-#define LINE_THREE_CIRCLES_TEMPLATE 1
-#define LINE_FIVE_CIRCLES_TEMPLATE 2
-#define SQUARE_FOUR_CIRCLES_TEMPLATE 3
-#define X_NINE_CIRCLES_TEMPLATE 4
-#define SQUARE_FOUR_SQUARES_TEMPLATE 5
-#define CIRCLE_BASE_TEMPLATE 6
-#define SQUARE_BASE_TEMPLATE 7
-#define AMORPHOUS_BASE_TEMPLATE 8
-
 // Pickup template types
 #define TEN_HORIZONTALS_TEMPLATE 1
 #define FIVE_AND_FIVE_HORIZONTALS_TEMPLATE 2

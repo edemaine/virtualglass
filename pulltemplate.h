@@ -7,6 +7,17 @@
 #include "subpulltemplate.h"
 #include "constants.h"
 
+// Pull template types
+#define LINE_THREE_CIRCLES_TEMPLATE 1
+#define LINE_FIVE_CIRCLES_TEMPLATE 2
+#define SQUARE_FOUR_CIRCLES_TEMPLATE 3
+#define X_NINE_CIRCLES_TEMPLATE 4
+#define SQUARE_FOUR_SQUARES_TEMPLATE 5
+#define ONE_COLORED_CASING_TEMPLATE 6
+#define CIRCLE_BASE_TEMPLATE 7
+#define SQUARE_BASE_TEMPLATE 8
+#define AMORPHOUS_BASE_TEMPLATE 9
+
 using std::vector;
 
 class PullTemplate
