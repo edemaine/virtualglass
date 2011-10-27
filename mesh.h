@@ -29,13 +29,10 @@ Vertex applyTransforms(Vertex p, PullPlan** ancestors, int ancestorCount);
 void applyPickupTransform(Vertex* p, SubpickupTemplate* spt);
 
 void applyRollupTransform(Vertex* p);
-void applyRollupTransform(Geometry* p);
-
 void applyWavyOneTransform(Vertex* p);
-void applyWavyOneTransform(Geometry* p);
-
 void applyWavyTwoTransform(Vertex* p);
-void applyWavyTwoTransform(Geometry* p);
+void applyWavyThreeTransform(Vertex* p);
+void applyWavyFourTransform(Vertex* p);
 
 #endif
 

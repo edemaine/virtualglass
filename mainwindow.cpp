@@ -378,6 +378,8 @@ void MainWindow :: setupPieceEditor()
 	pieceTemplateComboBox = new QComboBox(pieceEditorPage);
 	pieceTemplateComboBox->addItem("Wavy 1");
 	pieceTemplateComboBox->addItem("Wavy 2");
+	pieceTemplateComboBox->addItem("Wavy 3");
+	pieceTemplateComboBox->addItem("Wavy 4");
 	pieceTemplateComboBox->addItem("Rollup");
 	editorLayout->addWidget(pieceTemplateComboBox, 0);	
 

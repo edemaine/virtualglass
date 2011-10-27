@@ -84,12 +84,22 @@ void applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 	v->position.z = v->position.z + spt->location.y * 5.0;
 }
 
-void applyWavyTwoTransform(Geometry* geometry)
+void applyWavyFourTransform(Vertex* v)
 {
-        for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
-        {
-                applyWavyTwoTransform(&(geometry->vertices[v]));
-        }
+	float theta = atan2(v->position.y, v->position.x);
+	float r = length(v->position.xy);
+
+	v->position.x = r * (1.0 + 0.2 * cos(v->position.z)) * cos(theta + fabs(v->position.z) / 5.0);  
+	v->position.y = r * (1.2 - 0.2 * cos(v->position.z)) * sin(theta + fabs(v->position.z) / 5.0);  
+}
+
+void applyWavyThreeTransform(Vertex* v)
+{
+	float theta = atan2(v->position.y, v->position.x);
+	float r = length(v->position.xy);
+
+	v->position.x = r * (1.0 - 1.0 / (fabs(v->position.z) + 1.5)) * (0.8 - v->position.z / 10.0) * cos(theta + v->position.z / 7.0);  
+	v->position.y = r * (1.0 - 1.0 / (fabs(v->position.z) + 1.5)) * sin(theta + v->position.z / 7.0);  
 }
 
 void applyWavyTwoTransform(Vertex* v)
@@ -101,14 +111,6 @@ void applyWavyTwoTransform(Vertex* v)
 	v->position.y = r * (0.9 + 0.4 * sin(theta + PI/6) + 0.1 * cos(1.6 * v->position.z)) * sin(theta + v->position.z / 7.0);
 }
 
-void applyWavyOneTransform(Geometry* geometry)
-{
-        for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
-        {
-                applyWavyOneTransform(&(geometry->vertices[v]));
-        }
-}
-
 void applyWavyOneTransform(Vertex* v)
 {
 	float theta = atan2(v->position.y, v->position.x);
@@ -116,14 +118,6 @@ void applyWavyOneTransform(Vertex* v)
 
 	v->position.x = r * (1.0 + 0.3 * cos(theta + PI/3) + 0.2 * sin(1.3 * v->position.z)) * cos(theta);  
 	v->position.y = r * (1.0 + 0.5 * sin(theta + PI/5) + 0.3 * cos(1.1 * v->position.z)) * sin(theta);
-}
-
-void applyRollupTransform(Geometry* geometry)
-{
-        for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
-        {
-                applyRollupTransform(&(geometry->vertices[v]));
-        }
 }
 
 void applyRollupTransform(Vertex* v)
@@ -360,19 +354,33 @@ void generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*> ancestors,
 	geometry->clear();
 	
 	generateMesh(piece->pickup, geometry, ancestors, ancestorIndices);		
-	switch (piece->getTemplate()->type)
-	{
-		case ROLLUP_TEMPLATE:
-			applyRollupTransform(geometry);
-			break;
-		case WAVY_ONE_TEMPLATE:
-			applyRollupTransform(geometry);
-			applyWavyOneTransform(geometry);
-			break;
-		case WAVY_TWO_TEMPLATE:
-			applyRollupTransform(geometry);
-			applyWavyTwoTransform(geometry);
-			break;
+	
+	Vertex* v;
+        for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
+        {
+		v = &(geometry->vertices[i]);
+		switch (piece->getTemplate()->type)
+		{
+			case ROLLUP_TEMPLATE:
+				applyRollupTransform(v);
+				break;
+			case WAVY_ONE_TEMPLATE:
+				applyRollupTransform(v);
+				applyWavyOneTransform(v);
+				break;
+			case WAVY_TWO_TEMPLATE:
+				applyRollupTransform(v);
+				applyWavyTwoTransform(v);
+				break;
+			case WAVY_THREE_TEMPLATE:
+				applyRollupTransform(v);
+				applyWavyThreeTransform(v);
+				break;
+			case WAVY_FOUR_TEMPLATE:
+				applyRollupTransform(v);
+				applyWavyFourTransform(v);
+				break;
+		}
 	}	
 	geometry->compute_normals_from_triangles();
 }
