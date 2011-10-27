@@ -21,8 +21,11 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
 	event->setDropAction(Qt::CopyAction);
 
-	PullPlan* ptr;
-	sscanf(event->mimeData()->text().toAscii().constData(), "%p", &ptr);
+        PullPlan* droppedPlan;
+        int type;
+        sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &droppedPlan, &type);
+        if (type != PULL_PLAN_MIME) // if the thing passed isn't a pull plan 
+                return;  
 
 	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
 	{
@@ -59,17 +62,17 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		else
 			continue;
 
-		if (ptr->getTemplate()->shape == AMORPHOUS_SHAPE) // if it's a color bar
+		if (droppedPlan->getTemplate()->shape == AMORPHOUS_SHAPE) // if it's a color bar
 		{
 			// This is a memory leak, as every drag of a color bar makes a new pull plan
-			ptr = new PullPlan(CIRCLE_BASE_TEMPLATE, true, ptr->color);
+			droppedPlan = new PullPlan(CIRCLE_BASE_TEMPLATE, true, droppedPlan->color);
 		}
 
 		int group = plan->getTemplate()->subpulls[i].group;
 		for (unsigned int j = 0; j < plan->getTemplate()->subpulls.size(); ++j)
 		{
 			if (plan->getTemplate()->subpulls[j].group == group)
-				plan->subplans[j] = ptr;
+				plan->subplans[j] = droppedPlan;
 		}
 		
 		emit someDataChanged();

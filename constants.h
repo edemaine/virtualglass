@@ -22,6 +22,11 @@
 #define HORIZONTAL_ORIENTATION 1
 #define VERTICAL_ORIENTATION 2
 
+// Types of MIME data
+#define PULL_PLAN_MIME 1
+#define PICKUP_PLAN_MIME 2
+#define PIECE_MIME 3
+
 #define PI 3.14159265358979323846f
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))

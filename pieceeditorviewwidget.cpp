@@ -28,11 +28,14 @@ void PieceEditorViewWidget :: dropEvent(QDropEvent* event)
 	if ((event->pos() - center).manhattanLength() > width/4 + height/4)
 		return;
 
+        PickupPlan* droppedPickup;
+        int type;
+        sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &droppedPickup, &type);
+        if (type != PICKUP_PLAN_MIME)
+                return;
+ 
 	event->accept();
-
-	PickupPlan* ptr;
-	sscanf(event->mimeData()->text().toAscii().constData(), "%p", &ptr);
-	piece->pickup = ptr;
+	piece->pickup = droppedPickup;
 	emit someDataChanged();
 }
 

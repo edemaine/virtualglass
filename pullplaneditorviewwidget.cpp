@@ -21,8 +21,14 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
 	event->setDropAction(Qt::CopyAction);
 
-	PullPlan* ptr;
-	sscanf(event->mimeData()->text().toAscii().constData(), "%p", &ptr);
+	PullPlan* droppedPlan;
+	int type;
+	sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &droppedPlan, &type);
+	if (type != PULL_PLAN_MIME) // if the thing passed isn't a pull plan (no, you can't put a piece in your pull plan)
+		return;  
+
+	if (droppedPlan == plan) // don't allow circular DAGs
+		return;
 
 	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
 	{
@@ -30,26 +36,22 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		if (fabs(event->pos().x() - (width/2 * subpull->location.x + width/2 + 10)) 
 			+ fabs(event->pos().y() - (width/2 * subpull->location.y + width/2 + 10)) < (subpull->diameter/2.0)*width/2)
 		{
-			if (ptr == plan) // don't allow circular DAGs
-				return;
-
-			// Check that there is no mismatch between plan and template
-			if (ptr->getTemplate()->shape == AMORPHOUS_SHAPE 
-				|| ptr->getTemplate()->shape == plan->getTemplate()->subpulls[i].shape)
+			if (droppedPlan->getTemplate()->shape == AMORPHOUS_SHAPE 
+				|| droppedPlan->getTemplate()->shape == plan->getTemplate()->subpulls[i].shape)
 				event->accept();
 			else
 				continue;
 
-			if (ptr->getTemplate()->shape == AMORPHOUS_SHAPE) // if it's a color bar
+			if (droppedPlan->getTemplate()->shape == AMORPHOUS_SHAPE) // if it's a color bar
 			{
 				switch (plan->getTemplate()->subpulls[i].shape)
 				{
 					// This is a memory leak, as every drag of a color bar makes a new pull plan
 					case CIRCLE_SHAPE:
-						ptr = new PullPlan(CIRCLE_BASE_TEMPLATE, true, ptr->color); 
+						droppedPlan = new PullPlan(CIRCLE_BASE_TEMPLATE, true, droppedPlan->color); 
 						break;
 					case SQUARE_SHAPE:
-						ptr = new PullPlan(SQUARE_BASE_TEMPLATE, true, ptr->color); 
+						droppedPlan = new PullPlan(SQUARE_BASE_TEMPLATE, true, droppedPlan->color); 
 						break;
 				}
 			}
@@ -59,7 +61,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			for (unsigned int j = 0; j < plan->getTemplate()->subpulls.size(); ++j)
 			{
 				if (plan->getTemplate()->subpulls[j].group == group)
-					plan->subplans[j] = ptr;
+					plan->subplans[j] = droppedPlan;
 			}
 
 			emit someDataChanged();

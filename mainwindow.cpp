@@ -205,31 +205,36 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
 	PickupPlanLibraryWidget* pkplw = dynamic_cast<PickupPlanLibraryWidget*>(childAt(event->pos()));
 	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
+	int type;
 	if (cblw != NULL)
 	{
 		plan = cblw->getPullPlan();
 		pixmap = *cblw->pixmap();
+		type = PULL_PLAN_MIME;
 	}
 	else if (plplw != NULL)
 	{
 		plan = plplw->getPullPlan();
 		pixmap = *plplw->getEditorPixmap();
+		type = PULL_PLAN_MIME;
 	}
 	else if (pkplw != NULL)
 	{
 		plan = pkplw->getPickupPlan();
 		pixmap = *pkplw->getEditorPixmap();
+		type = PICKUP_PLAN_MIME;
 	}
 	else if (plw != NULL)
 	{
 		plan = plw->getPiece();
 		pixmap = *plw->getEditorPixmap();
+		type = PIECE_MIME;
 	}
 	else
 		return;
 
-	char buf[128];
-	sprintf(buf, "%p", plan);
+	char buf[500];
+	sprintf(buf, "%p %d", plan, type);
 	QByteArray pointerData(buf); 
 	QMimeData* mimeData = new QMimeData;
 	mimeData->setText(pointerData);
