@@ -22,6 +22,10 @@
 #include "pulltemplatelibrarywidget.h"
 #include "pickuptemplatelibrarywidget.h"
 
+#define PULLPLAN_EDITOR 0
+#define PICKUPPLAN_EDITOR 1
+#define PIECE_EDITOR 2
+
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
