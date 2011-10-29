@@ -641,21 +641,29 @@ void MainWindow :: updatePullPlanEditor()
 
 void MainWindow :: updateNiceView()
 {
+	Geometry* geometry;
+
 	switch (editorStack->currentIndex())
 	{
 		case PULLPLAN_EDITOR:
-			niceViewWidget->setGeometry(model->getGeometry(pullPlanEditorPlan));	
+ 			geometry = model->getGeometry(pullPlanEditorPlan);
 			niceViewWidget->setCameraMode(PULLPLAN_MODE);
 			break;
 		case PICKUPPLAN_EDITOR:
-			niceViewWidget->setGeometry(model->getGeometry(pickupPlanEditorPlan));	
+ 			geometry = model->getGeometry(pickupPlanEditorPlan);
 			niceViewWidget->setCameraMode(PICKUPPLAN_MODE);
 			break;
 		case PIECE_EDITOR:
-			niceViewWidget->setGeometry(model->getGeometry(pieceEditorPlan));	
+ 			geometry = model->getGeometry(pieceEditorPlan);
 			niceViewWidget->setCameraMode(PIECE_MODE);
 			break;
+		default:
+			exit(1);
 	}
+
+	niceViewWidget->setGeometry(geometry);
+	if (writeRawCheckBox->checkState() == Qt::Checked)	
+		geometry->save_raw_file("./cane.raw");
 }
 
 void MainWindow :: pieceTemplateComboBoxChanged(int newIndex)
@@ -674,5 +682,10 @@ void MainWindow :: setupNiceView()
 
 	niceViewWidget = new NiceViewWidget(centralWidget);
 	niceViewLayout->addWidget(niceViewWidget);
+
+	writeRawCheckBox = new QCheckBox("Write .raw file", centralWidget);
+	writeRawCheckBox->setCheckState(Qt::Unchecked);
+	niceViewLayout->addWidget(writeRawCheckBox, 0);
 }
+
 

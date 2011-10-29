@@ -66,25 +66,25 @@ PickupTemplate :: PickupTemplate(int t)
 		case FOUR_SQUARES_OF_TEN_VERTICALS_TEMPLATE:
 			for (int i = 0; i < 10; ++i)
 			{
-				p.x = -0.9 + 0.1 * i;
+				p.x = -0.95 + 0.1 * i;
 				p.y = 0.01;
 				subpulls.push_back(SubpickupTemplate(p, VERTICAL_ORIENTATION, 0.99, 0.09, 0));
 			}
 			for (int i = 0; i < 10; ++i)
 			{
-				p.x = -0.9 + 0.1 * i;
+				p.x = -0.95 + 0.1 * i;
 				p.y = -0.99;
 				subpulls.push_back(SubpickupTemplate(p, VERTICAL_ORIENTATION, 0.99, 0.09, 1));
 			}
 			for (int i = 0; i < 10; ++i)
 			{
-				p.x = 0.1 + 0.1 * i;
+				p.x = 0.05 + 0.1 * i;
 				p.y = -0.99;
 				subpulls.push_back(SubpickupTemplate(p, VERTICAL_ORIENTATION, 0.99, 0.09, 2));
 			}
 			for (int i = 0; i < 10; ++i)
 			{
-				p.x = 0.1 + 0.1 * i;
+				p.x = 0.05 + 0.1 * i;
 				p.y = 0.01;
 				subpulls.push_back(SubpickupTemplate(p, VERTICAL_ORIENTATION, 0.99, 0.09, 3));
 			}

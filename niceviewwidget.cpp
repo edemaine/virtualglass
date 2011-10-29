@@ -17,6 +17,8 @@ void gl_errors(string const &where) {
 }
 }
 
+
+
 NiceViewWidget :: NiceViewWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent)
 {
 	leftMouseDown = false;
@@ -687,7 +689,7 @@ void NiceViewWidget :: setCameraMode(int m)
 		case PULLPLAN_MODE:
 			theta = -PI/2.0;
 			fee = PI/2;
-			rho = 12.0;
+			rho = 11.0;
 			lookAtLoc[0] = 0.0;
 			lookAtLoc[1] = 0.0;
 			lookAtLoc[2] = 5.0;

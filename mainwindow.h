@@ -57,6 +57,7 @@ class MainWindow : public QMainWindow
 		void updateLibrary();
 
 		// Variables
+		QCheckBox* writeRawCheckBox;
 		QGridLayout* tableGridLayout;
 		int pullPlanCount; 
 		int pickupPlanCount; 
