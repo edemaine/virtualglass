@@ -147,7 +147,7 @@ typedef set< Vector2ui > EdgeSet;
 void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* plan, uint32_t group_tag)
 {
 	unsigned int angularResolution = 15;
-	unsigned int axialResolution = 60;
+	unsigned int axialResolution = 40;
 	float meshLength = 10.0;
 
 	//need to know first vertex position so we can transform 'em all later

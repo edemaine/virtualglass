@@ -6,13 +6,6 @@
 // at 1 and be contiguous. This is used in the UI to make
 // conversions from menu items to constants simple.
 
-// Pickup template types
-#define TEN_HORIZONTALS_TEMPLATE 1
-#define FIVE_AND_FIVE_HORIZONTALS_TEMPLATE 2
-#define TEN_VERTICALS_TEMPLATE 3
-#define FIVE_AND_FIVE_VERTICALS_TEMPLATE 4
-#define SIX_COLUMNS_OF_TEN_HORIZONTALS_TEMPLATE 5
-
 // Geometric shapes
 #define CIRCLE_SHAPE 1
 #define SQUARE_SHAPE 2

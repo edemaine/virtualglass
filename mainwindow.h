@@ -57,6 +57,11 @@ class MainWindow : public QMainWindow
 		void updateLibrary();
 
 		// Variables
+		QGridLayout* tableGridLayout;
+		int pullPlanCount; 
+		int pickupPlanCount; 
+		int pieceCount; 
+		int colorBarCount; 
 		QButtonGroup* pullTemplateShapeButtonGroup;		
 		QPoint dragStartPosition;
 		QStackedWidget* editorStack;
@@ -80,10 +85,6 @@ class MainWindow : public QMainWindow
 		QLabel* niceViewLabel;
 		QVBoxLayout* niceViewLayout;
 		NiceViewWidget* niceViewWidget;
-		QHBoxLayout* pullPlanLibraryLayout;
-		QHBoxLayout* colorBarLibraryLayout;
-		QHBoxLayout* pickupPlanLibraryLayout;
-		QHBoxLayout* pieceLibraryLayout;
 		QHBoxLayout* pullTemplateLibraryLayout;
 		QHBoxLayout* pickupTemplateLibraryLayout;
 		QSlider* pullPlanTwistSlider;
@@ -92,6 +93,7 @@ class MainWindow : public QMainWindow
 		QPushButton* newPullPlanButton;
 		QPushButton* newPickupPlanButton;
 		QPushButton* newPieceButton;
+		QPushButton* newColorButton;
 
 	private slots:
 		void updateEverything();

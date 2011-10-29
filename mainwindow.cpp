@@ -27,77 +27,88 @@ void MainWindow :: seedEverything()
 	color.r = color.g = color.b = 1.0;
 	color.a = 0.4;
 	cblw = new ColorBarLibraryWidget(color);
-	colorBarLibraryLayout->addWidget(cblw);	
+	tableGridLayout->addWidget(cblw, colorBarCount, 0);	
+	++colorBarCount;
 
 	color.r = 1/255.0;
 	color.g = 58/255.0;
 	color.b = 186/255.0;
 	color.a = 128/255.0;
 	cblw = new ColorBarLibraryWidget(color);
-	colorBarLibraryLayout->addWidget(cblw);	
+	tableGridLayout->addWidget(cblw, colorBarCount, 0);	
+	++colorBarCount;
 
 	color.r = 222/255.0;
 	color.g = 205/255.0;
 	color.b = 1/255.0;
 	color.a = 126/255.0;
 	cblw = new ColorBarLibraryWidget(color);
-	colorBarLibraryLayout->addWidget(cblw);	
+	tableGridLayout->addWidget(cblw, colorBarCount, 0);	
+	++colorBarCount;
 
 	color.r = 2/255.0;
 	color.g = 101/255.0;
 	color.b = 35/255.0;
 	color.a = 128/255.0;
 	cblw = new ColorBarLibraryWidget(color);
-	colorBarLibraryLayout->addWidget(cblw);	
+	tableGridLayout->addWidget(cblw, colorBarCount, 0);	
+	++colorBarCount;
 
 	color.r = 253/255.0;
 	color.g = 122/255.0;
 	color.b = 56/255.0;
 	color.a = 128/255.0;
 	cblw = new ColorBarLibraryWidget(color);
-	colorBarLibraryLayout->addWidget(cblw);	
+	tableGridLayout->addWidget(cblw, colorBarCount, 0);	
+	++colorBarCount;
 
 	color.r = 226/255.0;
 	color.g = 190/255.0;
 	color.b = 161/255.0;
 	color.a = 255/255.0;
 	cblw = new ColorBarLibraryWidget(color);
-	colorBarLibraryLayout->addWidget(cblw);	
+	tableGridLayout->addWidget(cblw, colorBarCount, 0);	
+	++colorBarCount;
 
 	color.r = 50/255.0;
 	color.g = 102/255.0;
 	color.b = 54/255.0;
 	color.a = 255/255.0;
 	cblw = new ColorBarLibraryWidget(color);
-	colorBarLibraryLayout->addWidget(cblw);	
+	tableGridLayout->addWidget(cblw, colorBarCount, 0);	
+	++colorBarCount;
 
 	color.r = 60/255.0;
 	color.g = 31/255.0;
 	color.b = 37/255.0;
 	color.a = 255/255.0;
 	cblw = new ColorBarLibraryWidget(color);
-	colorBarLibraryLayout->addWidget(cblw);	
+	tableGridLayout->addWidget(cblw, colorBarCount, 0);	
+	++colorBarCount;
 
 	color.r = 131/255.0;
 	color.g = 149/255.0;
 	color.b = 201/255.0;
 	color.a = 255/255.0;
 	cblw = new ColorBarLibraryWidget(color);
-	colorBarLibraryLayout->addWidget(cblw);	
+	tableGridLayout->addWidget(cblw, colorBarCount, 0);	
+	++colorBarCount;
 
 	color.r = 138/255.0;
 	color.g = 155/255.0;
 	color.b = 163/255.0;
 	color.a = 255/255.0;
 	cblw = new ColorBarLibraryWidget(color);
-	colorBarLibraryLayout->addWidget(cblw);	
+	tableGridLayout->addWidget(cblw, colorBarCount, 0);	
+	++colorBarCount;
 
 	color.r = 255/255.0;
 	color.g = 255/255.0;
 	color.b = 255/255.0;
 	color.a = 10/255.0;
 	cblw = new ColorBarLibraryWidget(color);
-	colorBarLibraryLayout->addWidget(cblw);	
+	tableGridLayout->addWidget(cblw, colorBarCount, 0);	
+	++colorBarCount;
 
 	// setup the editor/3D view
 	emit someDataChanged();		
@@ -120,7 +131,7 @@ void MainWindow :: seedEverything()
 	editorStack->setCurrentIndex(PICKUPPLAN_EDITOR);
 	emit someDataChanged();		
 	
-	for (int i = TEN_HORIZONTALS_TEMPLATE; i <= SIX_COLUMNS_OF_TEN_HORIZONTALS_TEMPLATE; ++i)
+	for (int i = TWENTY_HORIZONTALS_TEMPLATE; i <= FOUR_SQUARES_OF_TEN_VERTICALS_TEMPLATE; ++i)
 	{
 		pickupPlanEditorPlan->setTemplate(new PickupTemplate(i));
 		emit someDataChanged();
@@ -276,78 +287,36 @@ void MainWindow :: setupTable()
 	QVBoxLayout* tableLayout = new QVBoxLayout(centralWidget);
 	centralLayout->addLayout(tableLayout);
 
-	// Setup color bar scrolling library
-	QWidget* colorBarLibraryWidget = new QWidget(centralWidget);
-	colorBarLibraryLayout = new QHBoxLayout(colorBarLibraryWidget);
-	colorBarLibraryLayout->setSpacing(10);
-	colorBarLibraryWidget->setLayout(colorBarLibraryLayout);
-
-        QScrollArea* colorBarLibraryScrollArea = new QScrollArea(centralWidget);
-        colorBarLibraryScrollArea->setBackgroundRole(QPalette::Dark);
-        colorBarLibraryScrollArea->setWidget(colorBarLibraryWidget);
-        colorBarLibraryScrollArea->setWidgetResizable(true);
-        colorBarLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-        colorBarLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        colorBarLibraryScrollArea->setFixedHeight(130);
-        colorBarLibraryScrollArea->setFixedWidth(500);
-	tableLayout->addWidget(colorBarLibraryScrollArea);	
-
-	// Setup pull plan scrolling library
-	QWidget* pullPlanLibraryWidget = new QWidget(centralWidget);
-	pullPlanLibraryLayout = new QHBoxLayout(pullPlanLibraryWidget);
-	pullPlanLibraryLayout->setSpacing(10);
-	pullPlanLibraryWidget->setLayout(pullPlanLibraryLayout);
-
-        QScrollArea* pullPlanLibraryScrollArea = new QScrollArea;
-        pullPlanLibraryScrollArea->setBackgroundRole(QPalette::Dark);
-        pullPlanLibraryScrollArea->setWidget(pullPlanLibraryWidget);
-        pullPlanLibraryScrollArea->setWidgetResizable(true);
-        pullPlanLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-        pullPlanLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        pullPlanLibraryScrollArea->setFixedHeight(130);
-        pullPlanLibraryScrollArea->setFixedWidth(500);
-	tableLayout->addWidget(pullPlanLibraryScrollArea);	
+	QHBoxLayout* newThingsLayout = new QHBoxLayout(centralWidget);
+	tableLayout->addLayout(newThingsLayout, 0);
+ 
+	newColorButton = new QPushButton("New Color");
+	newThingsLayout->addWidget(newColorButton);
 
 	newPullPlanButton = new QPushButton("New Pull Plan");
-	tableLayout->addWidget(newPullPlanButton);
-
-	// Setup pickup plan scrolling library
-	QWidget* pickupPlanLibraryWidget = new QWidget(centralWidget);
-	pickupPlanLibraryLayout = new QHBoxLayout(pickupPlanLibraryWidget);
-	pickupPlanLibraryLayout->setSpacing(10);
-	pickupPlanLibraryWidget->setLayout(pickupPlanLibraryLayout);
-
-        QScrollArea* pickupPlanLibraryScrollArea = new QScrollArea;
-        pickupPlanLibraryScrollArea->setBackgroundRole(QPalette::Dark);
-        pickupPlanLibraryScrollArea->setWidget(pickupPlanLibraryWidget);
-        pickupPlanLibraryScrollArea->setWidgetResizable(true);
-        pickupPlanLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-        pickupPlanLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        pickupPlanLibraryScrollArea->setFixedHeight(130);
-        pickupPlanLibraryScrollArea->setFixedWidth(500);
-	tableLayout->addWidget(pickupPlanLibraryScrollArea);	
+	newThingsLayout->addWidget(newPullPlanButton);
 
 	newPickupPlanButton = new QPushButton("New Pickup Plan");
-	tableLayout->addWidget(newPickupPlanButton);
-
-	// Setup piece scrolling library
-	QWidget* pieceLibraryWidget = new QWidget(centralWidget);
-	pieceLibraryLayout = new QHBoxLayout(pieceLibraryWidget);
-	pieceLibraryLayout->setSpacing(10);
-	pieceLibraryWidget->setLayout(pieceLibraryLayout);
-
-        QScrollArea* pieceLibraryScrollArea = new QScrollArea;
-        pieceLibraryScrollArea->setBackgroundRole(QPalette::Dark);
-        pieceLibraryScrollArea->setWidget(pieceLibraryWidget);
-        pieceLibraryScrollArea->setWidgetResizable(true);
-        pieceLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-        pieceLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        pieceLibraryScrollArea->setFixedHeight(130);
-        pieceLibraryScrollArea->setFixedWidth(500);
-	tableLayout->addWidget(pieceLibraryScrollArea);	
-
+	newThingsLayout->addWidget(newPickupPlanButton);
+        
 	newPieceButton = new QPushButton("New Piece");
-	tableLayout->addWidget(newPieceButton);
+	newThingsLayout->addWidget(newPieceButton);
+
+	QWidget* tableGridLibraryWidget = new QWidget(centralWidget);
+	tableGridLayout = new QGridLayout(tableGridLibraryWidget);
+	tableGridLayout->setSpacing(10);
+	tableGridLibraryWidget->setLayout(tableGridLayout);
+	colorBarCount = pullPlanCount = pickupPlanCount = pieceCount = 0;
+
+        QScrollArea* tableGridLibraryScrollArea = new QScrollArea;
+        tableGridLibraryScrollArea->setBackgroundRole(QPalette::Dark);
+        tableGridLibraryScrollArea->setWidget(tableGridLibraryWidget);
+        tableGridLibraryScrollArea->setWidgetResizable(true);
+        tableGridLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        tableGridLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        tableGridLibraryScrollArea->setFixedHeight(700);
+        tableGridLibraryScrollArea->setFixedWidth(500);
+	tableLayout->addWidget(tableGridLibraryScrollArea);	
 }
 
 void MainWindow :: setupEditors()
@@ -373,7 +342,8 @@ void MainWindow :: setupPieceEditor()
 	pieceEditorPlan = new Piece(WAVY_ONE_TEMPLATE);
 	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
 		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);
-        pieceLibraryLayout->addWidget(pieceEditorPlanLibraryWidget);
+	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 3);	
+	++pieceCount;
 
 	pieceEditorPage = new QWidget(editorStack);
 
@@ -394,10 +364,11 @@ void MainWindow :: setupPieceEditor()
 
 void MainWindow :: setupPickupPlanEditor()
 {
-	pickupPlanEditorPlan = new PickupPlan(TEN_HORIZONTALS_TEMPLATE);
+	pickupPlanEditorPlan = new PickupPlan(TWENTY_HORIZONTALS_TEMPLATE);
 	pickupPlanEditorPlanLibraryWidget = new PickupPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
 		QPixmap::fromImage(QImage("./duck.jpg")), pickupPlanEditorPlan);
-        pickupPlanLibraryLayout->addWidget(pickupPlanEditorPlanLibraryWidget);
+	tableGridLayout->addWidget(pickupPlanEditorPlanLibraryWidget, pickupPlanCount, 2);	
+	++pickupPlanCount;
 
 	pickupPlanEditorPage = new QWidget(editorStack);
 
@@ -428,7 +399,8 @@ void MainWindow :: setupPullPlanEditor()
 {
 	pullPlanEditorPlan = new PullPlan(LINE_THREE_CIRCLES_TEMPLATE, false, defaultColor);
 	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), QPixmap::fromImage(QImage("./duck.jpg")), pullPlanEditorPlan);
-	pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);	
+	tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);	
+	++pullPlanCount;
 
 	pullPlanEditorPage = new QWidget(editorStack);
 
@@ -557,7 +529,8 @@ void MainWindow :: newPiece()
 
 	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
 		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);
-	pieceLibraryLayout->addWidget(pieceEditorPlanLibraryWidget);	
+	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 3);
+	++pieceCount;
 
 	pieceEditorViewWidget->setPiece(pieceEditorPlan);
 	
@@ -570,12 +543,13 @@ void MainWindow :: newPiece()
 void MainWindow :: newPickupPlan()
 {
 	// Create the new plan
-	pickupPlanEditorPlan = new PickupPlan(TEN_HORIZONTALS_TEMPLATE);
+	pickupPlanEditorPlan = new PickupPlan(TWENTY_HORIZONTALS_TEMPLATE);
 
 	// Create the new library entry
 	pickupPlanEditorPlanLibraryWidget = new PickupPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
 		QPixmap::fromImage(QImage("./duck.jpg")), pickupPlanEditorPlan);
-	pickupPlanLibraryLayout->addWidget(pickupPlanEditorPlanLibraryWidget);	
+	tableGridLayout->addWidget(pickupPlanEditorPlanLibraryWidget, pickupPlanCount, 2);
+	++pickupPlanCount;
 
 	// Give the new plan to the editor
 	pickupPlanEditorViewWidget->setPickupPlan(pickupPlanEditorPlan);
@@ -595,7 +569,8 @@ void MainWindow :: newPullPlan()
 	// Create the new library entry
 	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
 		QPixmap::fromImage(QImage("./duck.jpg")), pullPlanEditorPlan);
-	pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);	
+	tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
+	++pullPlanCount;
 
 	// Give the new plan to the editor
 	pullPlanEditorViewWidget->setPullPlan(pullPlanEditorPlan);
