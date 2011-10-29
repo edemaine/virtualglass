@@ -560,6 +560,9 @@ void MainWindow :: newPiece()
 	pieceLibraryLayout->addWidget(pieceEditorPlanLibraryWidget);	
 
 	pieceEditorViewWidget->setPiece(pieceEditorPlan);
+	
+	// Load up the right editor
+	editorStack->setCurrentIndex(2);
 
 	emit someDataChanged();
 }
@@ -577,6 +580,9 @@ void MainWindow :: newPickupPlan()
 	// Give the new plan to the editor
 	pickupPlanEditorViewWidget->setPickupPlan(pickupPlanEditorPlan);
 
+	// Load up the right editor
+	editorStack->setCurrentIndex(1);
+
 	// Trigger GUI updates
 	emit someDataChanged();
 }
@@ -593,6 +599,9 @@ void MainWindow :: newPullPlan()
 
 	// Give the new plan to the editor
 	pullPlanEditorViewWidget->setPullPlan(pullPlanEditorPlan);
+
+	// Load up the right editor
+	editorStack->setCurrentIndex(0);
 
 	// Trigger GUI updates
 	emit someDataChanged();
