@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <vector>
 #include "pulltemplate.h"
+#include <QPixmap>
 
 class PullPlan;
 
@@ -19,12 +20,15 @@ class PullPlan
 
 		vector<PullPlan*> subplans;
 		float twist;
-		bool isBase;
+		bool isBase; // base color pull plan
 		Color color;
-	
+		const QPixmap* getEditorPixmap();
+		void updatePixmap(QPixmap editorPixmap);
+
 	private:
 		// Variables
 		PullTemplate* pullTemplate;
+		QPixmap editorPixmap;
 };
 
 #endif

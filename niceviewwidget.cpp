@@ -507,7 +507,7 @@ void NiceViewWidget :: paintWithoutDepthPeeling()
 {
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
-
+	glDisable(GL_DEPTH_TEST);
 	if (geometry) {
 		glEnable(GL_LIGHTING);
 		//Check that Vertex and Triangle have proper size:
@@ -522,7 +522,7 @@ void NiceViewWidget :: paintWithoutDepthPeeling()
 		for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
 			assert(g->pullplan);
 			Color c = g->pullplan->color;
-			glColor4f(c.r, c.g, c.b, 1.0);
+			glColor4f(c.r, c.g, c.b, c.a);
 			glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 						   GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
 		}
@@ -580,9 +580,9 @@ void NiceViewWidget :: setGLMatrices()
 
 	float w = viewport[2];
 	float h = viewport[3];
-	
+
 	gluPerspective(45.0, w / h, 0.01, 100.0);
-	
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	float eyeLoc[3];
@@ -667,7 +667,7 @@ void NiceViewWidget :: wheelEvent(QWheelEvent *e)
 	if (e->delta() > 0)
 	{
 		zoomIn();
-	} 
+	}
 	else if (e->delta() < 0)
 	{
 		zoomOut();
@@ -710,7 +710,7 @@ void NiceViewWidget :: setCameraMode(int m)
 			lookAtLoc[1] = 0.0;
 			lookAtLoc[2] = 0.0;
 			break;
-	}	
+	}
 
 	update();
 }
