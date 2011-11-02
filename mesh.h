@@ -11,12 +11,11 @@
 #include "subpickuptemplate.h"
 #include "piece.h"
 
-void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* casingPlan=NULL, int groupIndex = -1);
-void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* plan, uint32_t group_tag);
-
 void generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices);
-
 void generateMesh(Piece* piece, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices);
+void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* casingPlan=NULL, int groupIndex = -1);
+
+void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* plan, uint32_t group_tag);
 
 void applyMoveAndResizeTransform(Vertex* v, PullPlan* parentPlan, int subplan);
 void applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentPlan, int subplan);
@@ -28,11 +27,7 @@ Vertex applyTransforms(Vertex p, PullPlan** ancestors, int ancestorCount);
 
 void applyPickupTransform(Vertex* p, SubpickupTemplate* spt);
 
-void applyRollupTransform(Vertex* p);
-void applyWavyOneTransform(Vertex* p);
-void applyWavyTwoTransform(Vertex* p);
-void applyWavyThreeTransform(Vertex* p);
-void applyWavyFourTransform(Vertex* p);
+void applyTumblerTransform(Vertex* p);
 
 #endif
 

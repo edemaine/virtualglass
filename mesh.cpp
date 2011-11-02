@@ -84,51 +84,32 @@ void applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 	v->position.z = v->position.z + spt->location.y * 5.0;
 }
 
-void applyWavyFourTransform(Vertex* v)
+void applyTumblerTransform(Vertex* v, vector<int> parameterValues)
 {
-	float theta = atan2(v->position.y, v->position.x);
-	float r = length(v->position.xy);
+	// Do a rollup
 
-	v->position.x = r * (1.0 + 0.2 * cos(v->position.z)) * cos(theta + fabs(v->position.z) / 5.0);  
-	v->position.y = r * (1.2 - 0.2 * cos(v->position.z)) * sin(theta + fabs(v->position.z) / 5.0);  
-}
-
-void applyWavyThreeTransform(Vertex* v)
-{
-	float theta = atan2(v->position.y, v->position.x);
-	float r = length(v->position.xy);
-
-	v->position.x = r * (1.0 - 1.0 / (fabs(v->position.z) + 1.5)) * (0.8 - v->position.z / 10.0) * cos(theta + v->position.z / 7.0);  
-	v->position.y = r * (1.0 - 1.0 / (fabs(v->position.z) + 1.5)) * sin(theta + v->position.z / 7.0);  
-}
-
-void applyWavyTwoTransform(Vertex* v)
-{
-	float theta = atan2(v->position.y, v->position.x);
-	float r = length(v->position.xy);
-
-	v->position.x = r * (1.2 + 0.2 * cos(theta + PI/4) + 0.5 * sin(1.1 * v->position.z)) * cos(theta + v->position.z / 7.0);  
-	v->position.y = r * (0.9 + 0.4 * sin(theta + PI/6) + 0.1 * cos(1.6 * v->position.z)) * sin(theta + v->position.z / 7.0);
-}
-
-void applyWavyOneTransform(Vertex* v)
-{
-	float theta = atan2(v->position.y, v->position.x);
-	float r = length(v->position.xy);
-
-	v->position.x = r * (1.0 + 0.3 * cos(theta + PI/3) + 0.2 * sin(1.3 * v->position.z)) * cos(theta);  
-	v->position.y = r * (1.0 + 0.5 * sin(theta + PI/5) + 0.3 * cos(1.1 * v->position.z)) * sin(theta);
-}
-
-void applyRollupTransform(Vertex* v)
-{
 	// send x value to theta value 
 	// -5.0 goes to -PI, 5.0 goes to PI
 	// everything gets a base radius of 5.0
 	float theta = PI * v->position.x / 5.0;
 	float r = 5.0 / PI - v->position.y;
-	v->position.x = r * cos(theta);
-	v->position.y = r * sin(theta);
+
+	// Shape into a tumbler
+	float cutoff = -5.0 + 5.0 / PI + parameterValues[0] * 0.05;
+	if (v->position.z < cutoff)
+	{
+		float R = v->position.z - -5.0;
+		float offset = r - 5.0 / PI + 0.1;
+		v->position.x = R * cos(theta);
+		v->position.y = R * sin(theta);
+		v->position.z = cutoff + offset;
+	}
+	else
+	{
+		float R = cutoff - -5.0 + (r - 5.0 / PI) + parameterValues[1] * 0.01 * (v->position.z - cutoff);
+		v->position.x = R * cos(theta);
+		v->position.y = R * sin(theta);
+	}
 }
 
 Vertex applyTransforms(Vertex v, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
@@ -361,24 +342,9 @@ void generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*> ancestors,
 		v = &(geometry->vertices[i]);
 		switch (piece->getTemplate()->type)
 		{
-			case ROLLUP_TEMPLATE:
-				applyRollupTransform(v);
-				break;
-			case WAVY_ONE_TEMPLATE:
-				applyRollupTransform(v);
-				applyWavyOneTransform(v);
-				break;
-			case WAVY_TWO_TEMPLATE:
-				applyRollupTransform(v);
-				applyWavyTwoTransform(v);
-				break;
-			case WAVY_THREE_TEMPLATE:
-				applyRollupTransform(v);
-				applyWavyThreeTransform(v);
-				break;
-			case WAVY_FOUR_TEMPLATE:
-				applyRollupTransform(v);
-				applyWavyFourTransform(v);
+			case TUMBLER_TEMPLATE:
+			case BOWL_TEMPLATE:
+				applyTumblerTransform(v, piece->getTemplate()->parameterValues);
 				break;
 		}
 	}	

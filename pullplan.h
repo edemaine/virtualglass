@@ -25,6 +25,8 @@ class PullPlan
 		const QPixmap* getEditorPixmap();
 		void updatePixmap(QPixmap editorPixmap);
 
+		Color getColorAverage();
+
 	private:
 		// Variables
 		PullTemplate* pullTemplate;

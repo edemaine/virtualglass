@@ -109,9 +109,6 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 		}
 		else
 		{
-			painter.setBrush(Qt::NoBrush);
-			pen.setColor(Qt::white);
-			pen.setStyle(Qt::DotLine);
 			int rXG = (subpull->location.x - subpull->diameter/2.0) * width/2 + width/2 + 10;
 			int rYG = (subpull->location.y - subpull->diameter/2.0) * width/2 + height/2 + 10;
 			int rWidthG = subpull->diameter * width/2;

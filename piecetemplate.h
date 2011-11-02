@@ -6,11 +6,9 @@
 #include "primitives.h"
 #include "constants.h"
 
-#define WAVY_ONE_TEMPLATE 1
-#define WAVY_TWO_TEMPLATE 2
-#define WAVY_THREE_TEMPLATE 3
-#define WAVY_FOUR_TEMPLATE 4
-#define ROLLUP_TEMPLATE 5
+#define TUMBLER_TEMPLATE 1
+#define BOWL_TEMPLATE 2
+
 
 using std::vector;
 
@@ -19,6 +17,8 @@ class PieceTemplate
 	public:
 		PieceTemplate(int t);
 		int type;
+		vector<char*> parameterNames;
+		vector<int> parameterValues; 	
 };
 
 #endif

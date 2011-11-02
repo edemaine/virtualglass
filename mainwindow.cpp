@@ -280,6 +280,10 @@ void MainWindow :: setupConnections()
 	connect(pieceTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pieceTemplateComboBoxChanged(int)));	
 	connect(pieceEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(newPieceButton, SIGNAL(pressed()), this, SLOT(newPiece()));	
+	connect(pieceTemplateParameter1Slider, SIGNAL(valueChanged(int)), 
+		this, SLOT(pieceTemplateParameterSlider1Changed(int)));
+	connect(pieceTemplateParameter2Slider, SIGNAL(valueChanged(int)), 
+		this, SLOT(pieceTemplateParameterSlider2Changed(int)));
 }
 
 void MainWindow :: setupTable()
@@ -339,7 +343,7 @@ void MainWindow :: setupEditors()
 
 void MainWindow :: setupPieceEditor()
 {
-	pieceEditorPlan = new Piece(WAVY_ONE_TEMPLATE);
+	pieceEditorPlan = new Piece(TUMBLER_TEMPLATE);
 	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
 		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);
 	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 3);	
@@ -351,12 +355,31 @@ void MainWindow :: setupPieceEditor()
 	pieceEditorPage->setLayout(editorLayout);
 
 	pieceTemplateComboBox = new QComboBox(pieceEditorPage);
-	pieceTemplateComboBox->addItem("Wavy 1");
-	pieceTemplateComboBox->addItem("Wavy 2");
-	pieceTemplateComboBox->addItem("Wavy 3");
-	pieceTemplateComboBox->addItem("Wavy 4");
-	pieceTemplateComboBox->addItem("Rollup");
+	pieceTemplateComboBox->addItem("Tumbler");
+	pieceTemplateComboBox->addItem("Bowl");
 	editorLayout->addWidget(pieceTemplateComboBox, 0);	
+
+	pieceTemplateParameter1Label = new QLabel(pieceEditorPlan->getTemplate()->parameterNames[0]);
+	pieceTemplateParameter1Slider = new QSlider(Qt::Horizontal, pieceEditorPage);
+	pieceTemplateParameter1Slider->setRange(0, 100);
+	pieceTemplateParameter1Slider->setTickPosition(QSlider::TicksBothSides);
+	pieceTemplateParameter1Slider->setSliderPosition(0);
+
+	QHBoxLayout* parameter1Layout = new QHBoxLayout(pieceEditorPage);
+	editorLayout->addLayout(parameter1Layout);
+	parameter1Layout->addWidget(pieceTemplateParameter1Label);
+	parameter1Layout->addWidget(pieceTemplateParameter1Slider);
+
+	pieceTemplateParameter2Label = new QLabel(pieceEditorPlan->getTemplate()->parameterNames[1]);
+	pieceTemplateParameter2Slider = new QSlider(Qt::Horizontal, pieceEditorPage);
+	pieceTemplateParameter2Slider->setRange(0, 100);
+	pieceTemplateParameter2Slider->setTickPosition(QSlider::TicksBothSides);
+	pieceTemplateParameter2Slider->setSliderPosition(0);
+
+	QHBoxLayout* parameter2Layout = new QHBoxLayout(pieceEditorPage);
+	editorLayout->addLayout(parameter2Layout);
+	parameter2Layout->addWidget(pieceTemplateParameter2Label);
+	parameter2Layout->addWidget(pieceTemplateParameter2Slider);
 
 	pieceEditorViewWidget = new PieceEditorViewWidget(pieceEditorPlan, pieceEditorPage);
 	editorLayout->addWidget(pieceEditorViewWidget, 10); 	
@@ -509,6 +532,20 @@ void MainWindow :: pullPlanTwistSpinChanged(int)
 	someDataChanged();
 }
 
+void MainWindow :: pieceTemplateParameterSlider2Changed(int)
+{
+        int value = pieceTemplateParameter2Slider->sliderPosition();
+	pieceEditorPlan->getTemplate()->parameterValues[1] = value;
+	someDataChanged();
+}
+
+void MainWindow :: pieceTemplateParameterSlider1Changed(int)
+{
+        int value = pieceTemplateParameter1Slider->sliderPosition();
+	pieceEditorPlan->getTemplate()->parameterValues[0] = value;
+	someDataChanged();
+}
+
 void MainWindow :: pullTemplateCasingThicknessSliderChanged(int)
 {
         float thickness = pullTemplateCasingThicknessSlider->sliderPosition() / 100.0;
@@ -525,7 +562,7 @@ void MainWindow :: pullPlanTwistSliderChanged(int)
 
 void MainWindow :: newPiece()
 {
-	pieceEditorPlan = new Piece(WAVY_ONE_TEMPLATE);
+	pieceEditorPlan = new Piece(TUMBLER_TEMPLATE);
 
 	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
 		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);
@@ -607,8 +644,8 @@ void MainWindow :: updateLibrary()
 			break;
 		case PIECE_EDITOR:
 			pieceEditorPlanLibraryWidget->updatePixmaps(
-				QPixmap::grabWidget(pieceEditorViewWidget).scaled(100, 100),
-				QPixmap::grabWidget(pieceEditorViewWidget).scaled(100, 100));
+				QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100),
+				QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100));
 			break;
 	}
 }
@@ -671,6 +708,8 @@ void MainWindow :: pieceTemplateComboBoxChanged(int newIndex)
 	if (newIndex+1 != pieceEditorPlan->getTemplate()->type)
 	{
 		pieceEditorPlan->setTemplate(new PieceTemplate(newIndex+1));
+		pieceTemplateParameter1Label->setText(pieceEditorPlan->getTemplate()->parameterNames[0]);
+		pieceTemplateParameter2Label->setText(pieceEditorPlan->getTemplate()->parameterNames[1]);
 		emit someDataChanged();
 	}
 }
