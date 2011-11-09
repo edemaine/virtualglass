@@ -127,6 +127,10 @@ void MainWindow :: seedEverything()
 		pullTemplateLibraryLayout->addWidget(ptlw);
 	}
 
+	// Load final starting pull plan 
+	pullPlanEditorPlan->setTemplate(new PullTemplate(LINE_THREE_CIRCLES_TEMPLATE, 0.1));
+	emit someDataChanged();		
+
 	// Load pull template types
 	editorStack->setCurrentIndex(PICKUPPLAN_MODE);
 	emit someDataChanged();		
@@ -140,12 +144,20 @@ void MainWindow :: seedEverything()
 		pickupTemplateLibraryLayout->addWidget(ptlw);
 	}
 
-	// Load correct picture of piece
-	editorStack->setCurrentIndex(PIECE_MODE);
+	// Load final starting pickup plan
+	pickupPlanEditorPlan->setTemplate(new PickupTemplate(TWENTY_VERTICALS_TEMPLATE));	
+	for (unsigned int j = 0; j < pickupPlanEditorPlan->getTemplate()->subpulls.size(); ++j)
+	{
+		pickupPlanEditorPlan->subplans[j] = pullPlanEditorPlan;
+	}
 	emit someDataChanged();		
 
+	// Load correct picture of piece
+	pieceEditorPlan->pickup = pickupPlanEditorPlan;
+	editorStack->setCurrentIndex(PIECE_MODE);
+	emit someDataChanged();		
+	
 	editorStack->setCurrentIndex(PULLPLAN_MODE); // end in pull plan mode
-	pullPlanEditorPlan->setTemplate(new PullTemplate(LINE_THREE_CIRCLES_TEMPLATE, 0.0));
 	emit someDataChanged();		
 }
 
@@ -285,6 +297,13 @@ void MainWindow :: setupConnections()
 		this, SLOT(pieceTemplateParameterSlider1Changed(int)));
 	connect(pieceTemplateParameter2Slider, SIGNAL(valueChanged(int)), 
 		this, SLOT(pieceTemplateParameterSlider2Changed(int)));
+
+	connect(writeRawCheckBox, SIGNAL(stateChanged(int)), this, SLOT(writeRawCheckBoxChanged(int)));
+}
+
+void MainWindow :: writeRawCheckBoxChanged(int)
+{
+	updateNiceView(); // cause geometry to be updated correctly
 }
 
 void MainWindow :: setupTable()
@@ -345,7 +364,6 @@ void MainWindow :: setupEditors()
 void MainWindow :: setupPieceEditor()
 {
 	pieceEditorPlan = new Piece(TUMBLER_TEMPLATE);
-	pieceEditorPlan->pickup = pickupPlanEditorPlan;
 	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
 		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);
 	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 3);	
@@ -390,10 +408,6 @@ void MainWindow :: setupPieceEditor()
 void MainWindow :: setupPickupPlanEditor()
 {
 	pickupPlanEditorPlan = new PickupPlan(TWENTY_VERTICALS_TEMPLATE);
-	for (unsigned int j = 0; j < pickupPlanEditorPlan->getTemplate()->subpulls.size(); ++j)
-	{
-		pickupPlanEditorPlan->subplans[j] = pullPlanEditorPlan;
-	}
 	pickupPlanEditorPlanLibraryWidget = new PickupPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
 		QPixmap::fromImage(QImage("./duck.jpg")), pickupPlanEditorPlan);
 	tableGridLayout->addWidget(pickupPlanEditorPlanLibraryWidget, pickupPlanCount, 2);	

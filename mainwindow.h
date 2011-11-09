@@ -108,6 +108,7 @@ class MainWindow : public QMainWindow
 		void pullTemplateShapeButtonGroupChanged(int);
 		void pieceTemplateParameterSlider1Changed(int);
 		void pieceTemplateParameterSlider2Changed(int);
+		void writeRawCheckBoxChanged(int);
 };
 
 
