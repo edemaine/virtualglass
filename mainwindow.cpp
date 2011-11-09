@@ -113,13 +113,13 @@ void MainWindow :: seedEverything()
 	// setup the editor/3D view
 	emit someDataChanged();		
 
-	editorStack->setCurrentIndex(PULLPLAN_EDITOR);  
+	editorStack->setCurrentIndex(PULLPLAN_MODE);  
 	emit someDataChanged();		
 
 	// Load pull template types
 	for (int i = LINE_THREE_CIRCLES_TEMPLATE; i <= ONE_COLORED_CASING_TEMPLATE; ++i)
 	{
-		pullPlanEditorPlan->setTemplate(new PullTemplate(i, 0.0));
+		pullPlanEditorPlan->setTemplate(new PullTemplate(i, 0.1));
 		pullPlanEditorPlan->getTemplate()->shape = AMORPHOUS_SHAPE; // stop the border from being drawn
 		emit someDataChanged();
 		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
@@ -128,7 +128,7 @@ void MainWindow :: seedEverything()
 	}
 
 	// Load pull template types
-	editorStack->setCurrentIndex(PICKUPPLAN_EDITOR);
+	editorStack->setCurrentIndex(PICKUPPLAN_MODE);
 	emit someDataChanged();		
 	
 	for (int i = TWENTY_HORIZONTALS_TEMPLATE; i <= FOUR_SQUARES_OF_TEN_VERTICALS_TEMPLATE; ++i)
@@ -140,10 +140,11 @@ void MainWindow :: seedEverything()
 		pickupTemplateLibraryLayout->addWidget(ptlw);
 	}
 
-	editorStack->setCurrentIndex(PIECE_EDITOR);
+	// Load correct picture of piece
+	editorStack->setCurrentIndex(PIECE_MODE);
 	emit someDataChanged();		
 
-	editorStack->setCurrentIndex(PULLPLAN_EDITOR); // end in pull plan mode
+	editorStack->setCurrentIndex(PULLPLAN_MODE); // end in pull plan mode
 	pullPlanEditorPlan->setTemplate(new PullTemplate(LINE_THREE_CIRCLES_TEMPLATE, 0.0));
 	emit someDataChanged();		
 }
@@ -164,7 +165,7 @@ void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
 		pullPlanEditorPlanLibraryWidget = plplw;	
 		pullPlanEditorPlan = plplw->getPullPlan();
 		pullPlanEditorViewWidget->setPullPlan(pullPlanEditorPlan);
-		editorStack->setCurrentIndex(PULLPLAN_EDITOR);
+		editorStack->setCurrentIndex(PULLPLAN_MODE);
 		emit someDataChanged();
 	}
 	else if (pkplw != NULL)
@@ -172,7 +173,7 @@ void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
 		pickupPlanEditorPlanLibraryWidget = pkplw;	
 		pickupPlanEditorPlan = pkplw->getPickupPlan();
 		pickupPlanEditorViewWidget->setPickupPlan(pickupPlanEditorPlan);
-		editorStack->setCurrentIndex(PICKUPPLAN_EDITOR);
+		editorStack->setCurrentIndex(PICKUPPLAN_MODE);
 		emit someDataChanged();
 	}
 	else if (plw != NULL)
@@ -180,7 +181,7 @@ void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
 		pieceEditorPlanLibraryWidget = plw;	
 		pieceEditorPlan = plw->getPiece();
 		pieceEditorViewWidget->setPiece(pieceEditorPlan);
-		editorStack->setCurrentIndex(PIECE_EDITOR);
+		editorStack->setCurrentIndex(PIECE_MODE);
 		emit someDataChanged();
 	}
 	else if (ptlw != NULL)
@@ -344,6 +345,7 @@ void MainWindow :: setupEditors()
 void MainWindow :: setupPieceEditor()
 {
 	pieceEditorPlan = new Piece(TUMBLER_TEMPLATE);
+	pieceEditorPlan->pickup = pickupPlanEditorPlan;
 	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
 		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);
 	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 3);	
@@ -387,7 +389,11 @@ void MainWindow :: setupPieceEditor()
 
 void MainWindow :: setupPickupPlanEditor()
 {
-	pickupPlanEditorPlan = new PickupPlan(TWENTY_HORIZONTALS_TEMPLATE);
+	pickupPlanEditorPlan = new PickupPlan(TWENTY_VERTICALS_TEMPLATE);
+	for (unsigned int j = 0; j < pickupPlanEditorPlan->getTemplate()->subpulls.size(); ++j)
+	{
+		pickupPlanEditorPlan->subplans[j] = pullPlanEditorPlan;
+	}
 	pickupPlanEditorPlanLibraryWidget = new PickupPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
 		QPixmap::fromImage(QImage("./duck.jpg")), pickupPlanEditorPlan);
 	tableGridLayout->addWidget(pickupPlanEditorPlanLibraryWidget, pickupPlanCount, 2);	
@@ -572,7 +578,7 @@ void MainWindow :: newPiece()
 	pieceEditorViewWidget->setPiece(pieceEditorPlan);
 	
 	// Load up the right editor
-	editorStack->setCurrentIndex(PIECE_EDITOR);
+	editorStack->setCurrentIndex(PIECE_MODE);
 
 	emit someDataChanged();
 }
@@ -592,7 +598,7 @@ void MainWindow :: newPickupPlan()
 	pickupPlanEditorViewWidget->setPickupPlan(pickupPlanEditorPlan);
 
 	// Load up the right editor
-	editorStack->setCurrentIndex(PICKUPPLAN_EDITOR);
+	editorStack->setCurrentIndex(PICKUPPLAN_MODE);
 
 	// Trigger GUI updates
 	emit someDataChanged();
@@ -613,7 +619,7 @@ void MainWindow :: newPullPlan()
 	pullPlanEditorViewWidget->setPullPlan(pullPlanEditorPlan);
 
 	// Load up the right editor
-	editorStack->setCurrentIndex(PULLPLAN_EDITOR);
+	editorStack->setCurrentIndex(PULLPLAN_MODE);
 
 	// Trigger GUI updates
 	emit someDataChanged();
@@ -632,17 +638,17 @@ void MainWindow :: updateLibrary()
 {
 	switch (editorStack->currentIndex())
 	{
-		case PULLPLAN_EDITOR:
+		case PULLPLAN_MODE:
 			pullPlanEditorPlanLibraryWidget->updatePixmaps(
 				QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100), 
 				QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100));
 			break;
-		case PICKUPPLAN_EDITOR:
+		case PICKUPPLAN_MODE:
 			pickupPlanEditorPlanLibraryWidget->updatePixmaps(
 				QPixmap::grabWidget(pickupPlanEditorViewWidget).scaled(100, 100),
 				QPixmap::grabWidget(pickupPlanEditorViewWidget).scaled(100, 100));
 			break;
-		case PIECE_EDITOR:
+		case PIECE_MODE:
 			pieceEditorPlanLibraryWidget->updatePixmaps(
 				QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100),
 				QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100));
@@ -682,15 +688,15 @@ void MainWindow :: updateNiceView()
 
 	switch (editorStack->currentIndex())
 	{
-		case PULLPLAN_EDITOR:
+		case PULLPLAN_MODE:
  			geometry = model->getGeometry(pullPlanEditorPlan);
 			niceViewWidget->setCameraMode(PULLPLAN_MODE);
 			break;
-		case PICKUPPLAN_EDITOR:
+		case PICKUPPLAN_MODE:
  			geometry = model->getGeometry(pickupPlanEditorPlan);
 			niceViewWidget->setCameraMode(PICKUPPLAN_MODE);
 			break;
-		case PIECE_EDITOR:
+		case PIECE_MODE:
  			geometry = model->getGeometry(pieceEditorPlan);
 			niceViewWidget->setCameraMode(PIECE_MODE);
 			break;

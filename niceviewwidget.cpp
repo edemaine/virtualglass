@@ -680,8 +680,16 @@ void NiceViewWidget :: zoom(float z)
 	update();
 }
 
+int NiceViewWidget :: getCameraMode()
+{
+	return this->cameraMode;
+}
+
 void NiceViewWidget :: setCameraMode(int m)
 {
+	if (m == this->cameraMode)
+		return;
+
 	this->cameraMode = m;
 
 	switch (m)

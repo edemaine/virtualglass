@@ -9,7 +9,16 @@ using std::map;
 using std::make_pair;
 
 
-void applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentPlan, int subplan)
+Mesher :: Mesher()
+{
+        Color color;
+        color.r = color.g = color.b = 1.0;
+        color.a = 0.2;
+        circleCasing = new PullPlan(CIRCLE_BASE_TEMPLATE, true, color);
+        squareCasing = new PullPlan(SQUARE_BASE_TEMPLATE, true, color);
+}
+
+void Mesher :: applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentPlan, int subplan)
 {
 	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
 	{
@@ -17,7 +26,7 @@ void applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentPlan, int s
 	}
 }
 
-void applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int subplan)
+void Mesher :: applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int subplan)
 {
 	SubpullTemplate* subTemp = &(parentNode->getTemplate()->subpulls[subplan]);
 	Point locationInParent = subTemp->location;
@@ -34,7 +43,7 @@ void applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int subplan)
 	v->position.y += locationInParent.y;
 }
 
-void applyTwistTransform(Geometry* geometry, PullPlan* transformNode)
+void Mesher :: applyTwistTransform(Geometry* geometry, PullPlan* transformNode)
 {
 	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
 	{
@@ -42,7 +51,7 @@ void applyTwistTransform(Geometry* geometry, PullPlan* transformNode)
 	}
 }
 
-void applyTwistTransform(Vertex* v, PullPlan* transformNode)
+void Mesher :: applyTwistTransform(Vertex* v, PullPlan* transformNode)
 {
 	float twist = transformNode->twist;
 
@@ -55,7 +64,7 @@ void applyTwistTransform(Vertex* v, PullPlan* transformNode)
 	v->position.y = r * sin(postTheta);
 }
 
-void applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
+void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 {
 	// Shrink length to correct length
 	v->position.z = v->position.z * spt->length / 2.0;
@@ -84,7 +93,23 @@ void applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 	v->position.z = v->position.z + spt->location.y * 5.0;
 }
 
-void applyTumblerTransform(Vertex* v, vector<int> parameterValues)
+void Mesher :: applyBowlTransform(Vertex* v, vector<int> parameterValues)
+{
+	// Do a rollup
+
+	// send x value to theta value 
+	// -5.0 goes to -PI, 5.0 goes to PI
+	// everything gets a base radius of 5.0
+	float theta = PI * v->position.x / 5.0 + PI * v->position.z * parameterValues[1] / 500.0;
+	float r = (5.0 / PI - v->position.y * (1.0 - parameterValues[0] * 0.005));
+	float phi = ((v->position.z - -5.0) / 10.0) * ((0.5 + parameterValues[0] * 0.005) * PI) - PI/2; 	
+
+	v->position.x = r * cos(theta) * cos(phi);
+	v->position.y = r * sin(theta) * cos(phi);
+	v->position.z = r * sin(phi);
+}
+
+void Mesher :: applyTumblerTransform(Vertex* v, vector<int> parameterValues)
 {
 	// Do a rollup
 
@@ -112,7 +137,7 @@ void applyTumblerTransform(Vertex* v, vector<int> parameterValues)
 	}
 }
 
-Vertex applyTransforms(Vertex v, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
+Vertex Mesher :: applyTransforms(Vertex v, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
 {
 	for (int i = ancestors.size() - 2; i >= 0; --i)
 	{
@@ -125,7 +150,7 @@ Vertex applyTransforms(Vertex v, vector<PullPlan*> ancestors, vector<int> ancest
 typedef map< Vector2ui, Vector2ui > EdgeMap;
 typedef set< Vector2ui > EdgeSet;
 
-void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* plan, uint32_t group_tag)
+void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* plan, uint32_t group_tag)
 {
 	unsigned int angularResolution = 15;
 	unsigned int axialResolution = 40;
@@ -327,7 +352,7 @@ void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vect
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, plan, group_tag));
 }
 
-void generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
+void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
 {
 	if (piece == NULL)
 		return;
@@ -343,15 +368,17 @@ void generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*> ancestors,
 		switch (piece->getTemplate()->type)
 		{
 			case TUMBLER_TEMPLATE:
-			case BOWL_TEMPLATE:
 				applyTumblerTransform(v, piece->getTemplate()->parameterValues);
+				break;
+			case BOWL_TEMPLATE:
+				applyBowlTransform(v, piece->getTemplate()->parameterValues);
 				break;
 		}
 	}	
 	geometry->compute_normals_from_triangles();
 }
 
-void generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
+void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
 {
 	if (plan == NULL)
 		return;
@@ -361,7 +388,7 @@ void generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPlan*> ancest
 	{
 		ancestors.clear();
 		ancestorIndices.clear();
-		generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, NULL, i); 
+		generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, true, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
 		{
@@ -390,7 +417,7 @@ the transforms array is filled with with the transformations encountered at each
 leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
-void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* casingPlan, int groupIndex)
+void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, bool addCasing, int groupIndex)
 {
 	int passGroupIndex;
 
@@ -398,11 +425,25 @@ void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestor
 		return;
 
 	// Deal with casing first
-	if (casingPlan != NULL)
+	if (addCasing)
 	{
-		ancestors.push_back(casingPlan);
-		meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, casingPlan, 0);
-		ancestors.pop_back();
+		PullPlan* casingPlan = NULL;
+		switch (plan->getTemplate()->shape)
+		{
+			case CIRCLE_SHAPE:
+				casingPlan = circleCasing;
+				break;	
+			case SQUARE_SHAPE:
+				casingPlan = squareCasing;
+				break;	
+		}		
+		
+		if (casingPlan != NULL)
+		{	
+			ancestors.push_back(casingPlan); 
+			meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, casingPlan, groupIndex);
+			ancestors.pop_back();
+		}
 	}
 
 	// Make recursive calls depending on the type of the current node
@@ -427,7 +468,7 @@ void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestor
 				passGroupIndex = groupIndex;
 
 			ancestorIndices.push_back(i);
-			generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, NULL, passGroupIndex);
+			generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, false, passGroupIndex);
 			ancestorIndices.pop_back();
 		}
 	}

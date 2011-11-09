@@ -11,23 +11,32 @@
 #include "subpickuptemplate.h"
 #include "piece.h"
 
-void generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices);
-void generateMesh(Piece* piece, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices);
-void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* casingPlan=NULL, int groupIndex = -1);
+class Mesher
+{
 
-void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* plan, uint32_t group_tag);
+	public:
+		Mesher();
+		void generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices);
+		void generateMesh(Piece* piece, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices);
+		void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, 
+			bool addCasing = false, int groupIndex = -1);
 
-void applyMoveAndResizeTransform(Vertex* v, PullPlan* parentPlan, int subplan);
-void applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentPlan, int subplan);
+	private:
+		// Methods
+		void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, 
+			PullPlan* plan, uint32_t group_tag);
+		void applyMoveAndResizeTransform(Vertex* v, PullPlan* parentPlan, int subplan);
+		void applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentPlan, int subplan);
+		void applyTwistTransform(Vertex* v, PullPlan* p);
+		void applyTwistTransform(Geometry* geometry, PullPlan* p);
+		Vertex applyTransforms(Vertex p, vector<PullPlan*> ancestors, vector<int> ancestorIndices);
+		void applyPickupTransform(Vertex* p, SubpickupTemplate* spt);
+		void applyTumblerTransform(Vertex* p, vector<int> parameterValues);
+		void applyBowlTransform(Vertex* p, vector<int> parameterValues);
 
-void applyTwistTransform(Vertex* v, PullPlan* p);
-void applyTwistTransform(Geometry* geometry, PullPlan* p);
-
-Vertex applyTransforms(Vertex p, PullPlan** ancestors, int ancestorCount);
-
-void applyPickupTransform(Vertex* p, SubpickupTemplate* spt);
-
-void applyTumblerTransform(Vertex* p);
-
+		// Variables
+		PullPlan* circleCasing;
+		PullPlan* squareCasing;
+};
 #endif
 

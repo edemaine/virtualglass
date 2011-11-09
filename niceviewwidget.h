@@ -15,10 +15,6 @@
 #include "constants.h"
 #include "geometry.h"
 
-#define PULLPLAN_MODE 1
-#define PICKUPPLAN_MODE 2
-#define PIECE_MODE 3
-
 using namespace std;
 
 
@@ -31,6 +27,7 @@ public:
 	NiceViewWidget(QWidget* parent);
 	virtual ~NiceViewWidget();
 	void setCameraMode(int m);
+	int getCameraMode();
 	bool peelEnabled();
 	void setGeometry(Geometry* g);
 

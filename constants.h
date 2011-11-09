@@ -20,6 +20,11 @@
 #define PICKUP_PLAN_MIME 2
 #define PIECE_MIME 3
 
+// Editor/nice view modes
+#define PULLPLAN_MODE 0
+#define PICKUPPLAN_MODE 1
+#define PIECE_MODE 2
+
 #define PI 3.14159265358979323846f
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))

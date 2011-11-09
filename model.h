@@ -19,8 +19,7 @@ class Model
 
 	private:
 		Geometry* geometry;
-		PullPlan* circleCasing;
-		PullPlan* squareCasing;
+		Mesher* mesher;
 };
 
 #endif

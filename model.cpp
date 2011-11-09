@@ -4,11 +4,7 @@
 Model :: Model()
 {
 	geometry = new Geometry();
-	Color color;
-	color.r = color.g = color.b = 1.0;
-	color.a = 0.2;
-	circleCasing = new PullPlan(CIRCLE_BASE_TEMPLATE, true, color); 
-	squareCasing = new PullPlan(SQUARE_BASE_TEMPLATE, true, color); 
+	mesher = new Mesher();
 }
 
 Geometry* Model :: getGeometry(PullPlan* plan)
@@ -17,18 +13,7 @@ Geometry* Model :: getGeometry(PullPlan* plan)
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
 
-	switch (plan->getTemplate()->shape)
-	{
-		case CIRCLE_SHAPE:
-			generateMesh(plan, geometry, ancestors, ancestorIndices, circleCasing);
-			break;
-		case SQUARE_SHAPE:
-			generateMesh(plan, geometry, ancestors, ancestorIndices, squareCasing);
-			break;
-		default:
-			generateMesh(plan, geometry, ancestors, ancestorIndices);
-			break;
-	}
+	mesher->generateMesh(plan, geometry, ancestors, ancestorIndices, true);
 
 	return geometry; 
 }
@@ -39,7 +24,7 @@ Geometry* Model :: getGeometry(PickupPlan* plan)
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
 
-	generateMesh(plan, geometry, ancestors, ancestorIndices);
+	mesher->generateMesh(plan, geometry, ancestors, ancestorIndices);
 
 	return geometry;
 }
@@ -50,7 +35,7 @@ Geometry* Model :: getGeometry(Piece* piece)
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
 
-	generateMesh(piece, geometry, ancestors, ancestorIndices);
+	mesher->generateMesh(piece, geometry, ancestors, ancestorIndices);
 
 	return geometry;
 }

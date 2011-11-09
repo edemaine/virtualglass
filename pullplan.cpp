@@ -3,7 +3,7 @@
 
 PullPlan :: PullPlan(int pullTemplate, bool isBase, Color color)
 {
-	setTemplate(new PullTemplate(pullTemplate, 0.0));
+	setTemplate(new PullTemplate(pullTemplate, 0.1));
 	this->color = color;
 	this->isBase = isBase;
 	this->twist = 0.0;
