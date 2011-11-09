@@ -90,6 +90,12 @@ void PieceEditorViewWidget :: paintEvent(QPaintEvent *event)
                                 rWidth = sp->width;
                                 rHeight = sp->length;
                                 break;
+                        case MURRINE_ORIENTATION:
+                                ll.x = sp->location.x - sp->width/2;
+                                ll.y = sp->location.y - sp->width/2;
+                                rWidth = sp->width;
+                                rHeight = sp->width;
+                                break;
                         default:
                                 exit(1);
                 }

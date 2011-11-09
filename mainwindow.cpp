@@ -135,7 +135,7 @@ void MainWindow :: seedEverything()
 	editorStack->setCurrentIndex(PICKUPPLAN_MODE);
 	emit someDataChanged();		
 	
-	for (int i = TEN_VERTICALS_TEMPLATE; i <= FOUR_SQUARES_OF_TEN_VERTICALS_TEMPLATE; ++i)
+	for (int i = TEN_VERTICALS_TEMPLATE; i <= FOUR_COLUMNS_MURRINE_TEMPLATE; ++i)
 	{
 		pickupPlanEditorPlan->setTemplate(new PickupTemplate(i));
 		emit someDataChanged();

@@ -46,6 +46,12 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 				ur.x = sp->location.x + sp->width/2;	
 				ur.y = sp->location.y + sp->length;	
 				break;		
+			case MURRINE_ORIENTATION:
+				ll.x = sp->location.x - sp->width/2;	
+				ll.y = sp->location.y - sp->width/2;	
+				ur.x = sp->location.x + sp->width/2;	
+				ur.y = sp->location.y + sp->width/2;	
+				break;		
 		}	
 
 		// Scale to pixels
@@ -130,6 +136,12 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
                                 ll.y = sp->location.y;
 				rWidth = sp->width;
 				rHeight = sp->length;
+                                break;
+                        case MURRINE_ORIENTATION:
+                                ll.x = sp->location.x - sp->width/2;
+                                ll.y = sp->location.y - sp->width/2;
+				rWidth = sp->width;
+				rHeight = sp->width;
                                 break;
 			default:
 				exit(1);

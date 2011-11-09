@@ -11,10 +11,6 @@
 #define SQUARE_SHAPE 2
 #define AMORPHOUS_SHAPE 3
 
-// Pickup cane orientations
-#define HORIZONTAL_ORIENTATION 1
-#define VERTICAL_ORIENTATION 2
-
 // Types of MIME data
 #define PULL_PLAN_MIME 1
 #define PICKUP_PLAN_MIME 2

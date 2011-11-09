@@ -13,7 +13,7 @@ Geometry* Model :: getGeometry(PullPlan* plan)
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
 
-	mesher->generateMesh(plan, geometry, ancestors, ancestorIndices, true);
+	mesher->generateMesh(plan, geometry, ancestors, ancestorIndices, 0.0, 1.0, true);
 
 	return geometry; 
 }

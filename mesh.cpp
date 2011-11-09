@@ -86,6 +86,11 @@ void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 			break;
 		case VERTICAL_ORIENTATION:
 			break;
+		case MURRINE_ORIENTATION:
+			tmp = v->position.y;
+			v->position.y = v->position.z;
+			v->position.z = -tmp;
+			break;
 	}
 
 	// Offset by location
@@ -150,19 +155,20 @@ Vertex Mesher :: applyTransforms(Vertex v, vector<PullPlan*> ancestors, vector<i
 typedef map< Vector2ui, Vector2ui > EdgeMap;
 typedef set< Vector2ui > EdgeSet;
 
-void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* plan, uint32_t group_tag)
+/*
+start and end determine the length of cane created...they should be between 0.0 and 1.0.
+The resulting cane has length between 0.0 and 10.0, i.e. it is scaled by a factor of 10.
+*/
+void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* plan,
+	float start, float end, uint32_t group_tag)
 {
 	unsigned int angularResolution = 15;
-	unsigned int axialResolution = 40;
-	float meshLength = 10.0;
-
+	unsigned int axialResolution = 40 * (end - start);
+	
 	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
 	//need to remember the first triangle so we can tag it later
 	uint32_t first_triangle = geometry->triangles.size();
-
-	// Tiny offset for avoiding collinear triangles in different canes
-	float random_z_offset = 0.001 * rand() / RAND_MAX;
 
 	Vector2f p;
 	vector< Vector2f > points;
@@ -279,7 +285,7 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ances
 			{
 				Point p;
 				p.xy = points[(*loop)[j]];
-				p.z = meshLength * ((float) i) / ((axialResolution-1)) + random_z_offset;
+				p.z = 10.0 * (start + (end - start) * i / (axialResolution-1));
 				Point n;
 				//This is a terrible normal estimate, but I guess it gets re-estimated anyway.
 				n.x = p.x;
@@ -313,15 +319,18 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ances
 	*/
 	for (int side = 0; side <= 1; ++side) 
 	{
-		float z = meshLength * (side ? 1.0:0.0);
+		float z;
+		if (side)
+			z = 10.0 * end;
+		else
+			z = 10.0 * start;
 		float nz = (side ? 1.0:-1.0);
 		uint32_t base = geometry->vertices.size();
 		for (unsigned int j = 0; j < points.size(); ++j)
 		{
 			Point p;
 			p.xy = points[j];
-			// Put last point in general position
-			p.z = z + random_z_offset;
+			p.z = z;
 
 			Point n;
 			n.x = 0.0; n.y = 0.0; n.z = nz;
@@ -388,7 +397,8 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPla
 	{
 		ancestors.clear();
 		ancestorIndices.clear();
-		generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, true, i); 
+		generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, 0.0, 
+			plan->getTemplate()->subpulls[i].length / 2.0, true, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
 		{
@@ -417,7 +427,7 @@ the transforms array is filled with with the transformations encountered at each
 leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
-void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, bool addCasing, int groupIndex)
+void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, float start, float end, bool addCasing, int groupIndex)
 {
 	int passGroupIndex;
 
@@ -425,7 +435,7 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*
 		return;
 
 	// Deal with casing first
-	if (addCasing)
+	if (addCasing && !plan->isBase)
 	{
 		PullPlan* casingPlan = NULL;
 		switch (plan->getTemplate()->shape)
@@ -441,7 +451,8 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*
 		if (casingPlan != NULL)
 		{	
 			ancestors.push_back(casingPlan); 
-			meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, casingPlan, groupIndex);
+			meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, casingPlan, start - 0.01, 
+				end + 0.01, groupIndex);
 			ancestors.pop_back();
 		}
 	}
@@ -456,7 +467,7 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*
 		else
 			passGroupIndex = groupIndex;
 		
-		meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan, passGroupIndex);
+		meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan, start, end, passGroupIndex);
 	}
 	else 
 	{
@@ -468,7 +479,7 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*
 				passGroupIndex = groupIndex;
 
 			ancestorIndices.push_back(i);
-			generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, false, passGroupIndex);
+			generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, start, end, false, passGroupIndex);
 			ancestorIndices.pop_back();
 		}
 	}
