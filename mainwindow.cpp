@@ -119,7 +119,7 @@ void MainWindow :: seedEverything()
 	// Load pull template types
 	for (int i = LINE_THREE_CIRCLES_TEMPLATE; i <= ONE_COLORED_CASING_TEMPLATE; ++i)
 	{
-		pullPlanEditorPlan->setTemplate(new PullTemplate(i, 0.1));
+		pullPlanEditorPlan->setTemplate(new PullTemplate(i, 0.0));
 		pullPlanEditorPlan->getTemplate()->shape = AMORPHOUS_SHAPE; // stop the border from being drawn
 		emit someDataChanged();
 		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
@@ -128,14 +128,14 @@ void MainWindow :: seedEverything()
 	}
 
 	// Load final starting pull plan 
-	pullPlanEditorPlan->setTemplate(new PullTemplate(LINE_THREE_CIRCLES_TEMPLATE, 0.1));
+	pullPlanEditorPlan->setTemplate(new PullTemplate(LINE_THREE_CIRCLES_TEMPLATE, 0.0));
 	emit someDataChanged();		
 
 	// Load pull template types
 	editorStack->setCurrentIndex(PICKUPPLAN_MODE);
 	emit someDataChanged();		
 	
-	for (int i = TWENTY_HORIZONTALS_TEMPLATE; i <= FOUR_SQUARES_OF_TEN_VERTICALS_TEMPLATE; ++i)
+	for (int i = TEN_VERTICALS_TEMPLATE; i <= FOUR_SQUARES_OF_TEN_VERTICALS_TEMPLATE; ++i)
 	{
 		pickupPlanEditorPlan->setTemplate(new PickupTemplate(i));
 		emit someDataChanged();
@@ -145,7 +145,7 @@ void MainWindow :: seedEverything()
 	}
 
 	// Load final starting pickup plan
-	pickupPlanEditorPlan->setTemplate(new PickupTemplate(TWENTY_VERTICALS_TEMPLATE));	
+	pickupPlanEditorPlan->setTemplate(new PickupTemplate(TEN_VERTICALS_TEMPLATE));	
 	for (unsigned int j = 0; j < pickupPlanEditorPlan->getTemplate()->subpulls.size(); ++j)
 	{
 		pickupPlanEditorPlan->subplans[j] = pullPlanEditorPlan;
@@ -183,7 +183,7 @@ void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
 	else if (pkplw != NULL)
 	{
 		pickupPlanEditorPlanLibraryWidget = pkplw;	
-		pickupPlanEditorPlan = pkplw->getPickupPlan();
+		pickupPlanEditorPlan->setTemplate(pkplw->getPickupPlan()->getTemplate());
 		pickupPlanEditorViewWidget->setPickupPlan(pickupPlanEditorPlan);
 		editorStack->setCurrentIndex(PICKUPPLAN_MODE);
 		emit someDataChanged();
@@ -600,7 +600,7 @@ void MainWindow :: newPiece()
 void MainWindow :: newPickupPlan()
 {
 	// Create the new plan
-	pickupPlanEditorPlan = new PickupPlan(TWENTY_HORIZONTALS_TEMPLATE);
+	pickupPlanEditorPlan = new PickupPlan(TEN_VERTICALS_TEMPLATE);
 
 	// Create the new library entry
 	pickupPlanEditorPlanLibraryWidget = new PickupPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 

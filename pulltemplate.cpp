@@ -137,13 +137,13 @@ void PullTemplate :: initializeSubpulls()
 			this->shape = CIRCLE_SHAPE;
 			for (int i = 0; i < 5; ++i)
 			{
-				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.39, i % 2));
+				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.39, 0));
 			}
 			for (int i = 0; i < 5; ++i)
 			{
 				if (i == 2)
 					continue;
-				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.39, i % 2));
+				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.39, 0));
 			}
 			break;	
 		case ONE_COLORED_CASING_TEMPLATE:

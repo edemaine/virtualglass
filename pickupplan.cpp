@@ -3,39 +3,51 @@
 
 PickupPlan :: PickupPlan(int pickupTemplate)
 {
-	setTemplate(new PickupTemplate(pickupTemplate));
+	this->pickupTemplate = new PickupTemplate(pickupTemplate);
+	for (unsigned int i = 0; i < this->pickupTemplate->subpulls.size(); ++i)
+	{
+		Color color;
+		color.r = color.g = color.b = 1.0;
+		color.a = 0.4;
+		this->subplans.push_back(new PullPlan(ONE_COLORED_CASING_TEMPLATE, true, color));
+	}
 }
 
-void PickupPlan :: setTemplate(PickupTemplate* pt)
+void PickupPlan :: setTemplate(PickupTemplate* newTemplate)
 {
-	this->pickupTemplate = pt;
-	this->subplans.clear();
+	vector<PullPlan*> newSubplans;
 
-	// initialize the pickup plan's subplans to be something boring and base
-	
-	for (unsigned int i = 0; i < pt->subpulls.size(); ++i)
+	// For each new subpull, see if its group exists in the current template
+	for (unsigned int i = 0; i < newTemplate->subpulls.size(); ++i)
 	{
-                // Set color based on group, only support for 3 unique groups;
-                // Additional groups all show up grey
-                Color color;
-                color.r = color.g = color.b = 1.0;
-                color.a = 0.4;
-                switch (pt->subpulls[i].group)
-                {
-                        case 0:
-                                color.r = color.g = 0.4;
-                                break;
-                        case 1:
-                                color.r = color.b = 0.4;
-                                break;
-                        case 2:
-                                color.g = color.b = 0.4;
-                                break;
-                        default:
-                                break;
-                }
+		int group = newTemplate->subpulls[i].group;
+	
+		// Look for the group in the old template, copy the plan if found
+		bool matchFound = false;
+		for (unsigned int j = 0; j < this->pickupTemplate->subpulls.size(); ++j)
+		{
+			if (group == this->pickupTemplate->subpulls[j].group)
+			{
+				newSubplans.push_back(this->subplans[j]);
+				matchFound = true;
+				break;
+			}
+		}
 
-		subplans.push_back(new PullPlan(CIRCLE_BASE_TEMPLATE, true, color)); 
+		if (!matchFound)
+		{
+			Color color;
+			color.r = color.g = color.b = 1.0;
+			color.a = 0.4;
+			newSubplans.push_back(new PullPlan(ONE_COLORED_CASING_TEMPLATE, true, color));
+		}
+	}
+
+	this->pickupTemplate = newTemplate;
+	this->subplans.clear();
+	for (unsigned int i = 0; i < this->pickupTemplate->subpulls.size(); ++i)
+	{
+		subplans.push_back(newSubplans[i]);
 	}
 }
 

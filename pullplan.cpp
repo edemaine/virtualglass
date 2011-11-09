@@ -3,10 +3,13 @@
 
 PullPlan :: PullPlan(int pullTemplate, bool isBase, Color color)
 {
-	setTemplate(new PullTemplate(pullTemplate, 0.1));
+	// initialize all the variables
+	this->pullTemplate = new PullTemplate(CIRCLE_BASE_TEMPLATE, 0.0);
 	this->color = color;
 	this->isBase = isBase;
 	this->twist = 0.0;
+
+	this->setTemplate(new PullTemplate(pullTemplate, 0.0));
 }
 
 Color PullPlan :: getColorAverage()
@@ -29,45 +32,51 @@ Color PullPlan :: getColorAverage()
 	return avg;
 }
 
-void PullPlan :: setTemplate(PullTemplate* pt)
+void PullPlan :: setTemplate(PullTemplate* newTemplate)
 {
-	this->pullTemplate = pt;
-	this->subplans.clear();
+        vector<PullPlan*> newSubplans;
 
-	// initialize the pull plan's subplans to be something boring and base
-	for (unsigned int i = 0; i < pt->subpulls.size(); ++i)
-	{
-		// Set color based on group, only support for 3 unique groups;
-		// Additional groups all show up grey
-		Color color;
-		color.r = color.g = color.b = 1.0;
-		color.a = 0.4;
-		switch (pt->subpulls[i].group)
-		{
-			case 0:
-				color.r = color.g = 0.4;
-				break;
-			case 1:
-				color.r = color.b = 0.4;
-				break;
-			case 2:
-				color.g = color.b = 0.4;
-				break;
-			default:
-				break;
-		}
+        // For each new subpull, see if its group exists in the current template
+        for (unsigned int i = 0; i < newTemplate->subpulls.size(); ++i)
+        {
+                int group = newTemplate->subpulls[i].group;
 
-		switch (pt->subpulls[i].shape)
-		{
-			// this is a memory leak
-			case CIRCLE_SHAPE:
-				subplans.push_back(new PullPlan(CIRCLE_BASE_TEMPLATE, true, color));
-				break;
-			case SQUARE_SHAPE:
-				subplans.push_back(new PullPlan(SQUARE_BASE_TEMPLATE, true, color));
-				break;
-		}
-	}
+                // Look for the group in the old template, copy the plan if found
+                bool matchFound = false;
+                for (unsigned int j = 0; j < this->pullTemplate->subpulls.size(); ++j)
+                {
+                        if (group == this->pullTemplate->subpulls[j].group)
+                        {
+                                newSubplans.push_back(this->subplans[j]);
+                                matchFound = true;
+                                break;
+                        }
+                }
+
+                if (!matchFound)
+                {
+			Color color;
+			color.r = color.g = color.b = 1.0;
+			color.a = 0.4;
+			switch (newTemplate->subpulls[i].shape)
+			{
+				// this is a memory leak
+				case CIRCLE_SHAPE:
+					newSubplans.push_back(new PullPlan(CIRCLE_BASE_TEMPLATE, true, color));
+					break;
+				case SQUARE_SHAPE:
+					newSubplans.push_back(new PullPlan(SQUARE_BASE_TEMPLATE, true, color));
+					break;
+			}
+                }
+        }
+
+        this->pullTemplate = newTemplate;
+        this->subplans.clear();
+        for (unsigned int i = 0; i < this->pullTemplate->subpulls.size(); ++i)
+        {
+                subplans.push_back(newSubplans[i]);
+        }
 }
 
 PullTemplate* PullPlan :: getTemplate()
