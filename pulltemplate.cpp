@@ -22,6 +22,18 @@ void PullTemplate :: updateSubpulls()
 			subpulls[0].diameter = radius * 1.0; 
 			subpulls[1].diameter = radius * 1.99; 
 			break;	
+		case SQUARE_SIXTEEN_SQUARES_TEMPLATE:
+			for (int i = 0; i < 4; ++i)
+			{
+				for (int j = 0; j < 4; ++j)
+				{
+					p.x = radius * (-0.52 + 0.35 * i);
+					p.y = radius * (-0.52 + 0.35 * j);
+					subpulls[4*i + j].location = p;
+					subpulls[4*i + j].diameter = radius * 0.34; 
+				}
+			}
+			break;
 		case SQUARE_FOUR_SQUARES_TEMPLATE:
 			for (int i = 0; i < 2; ++i)
 			{
@@ -105,11 +117,18 @@ void PullTemplate :: initializeSubpulls()
 		case AMORPHOUS_BASE_TEMPLATE:
 			this->shape = AMORPHOUS_SHAPE;
 			break;
+		case SQUARE_SIXTEEN_SQUARES_TEMPLATE:
+			this->shape = CIRCLE_SHAPE;
+			for (int i = 0; i < 16; ++i)
+			{
+				subpulls.push_back(SubpullTemplate(SQUARE_SHAPE, p, 0.49, 0));
+			}
+			break;
 		case SQUARE_FOUR_SQUARES_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			for (int i = 0; i < 4; ++i)
 			{
-				subpulls.push_back(SubpullTemplate(SQUARE_SHAPE, p, 0.5, 0));
+				subpulls.push_back(SubpullTemplate(SQUARE_SHAPE, p, 0.49, 0));
 			}
 			break;
 		case LINE_THREE_CIRCLES_TEMPLATE:

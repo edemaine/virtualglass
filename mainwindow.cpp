@@ -117,7 +117,7 @@ void MainWindow :: seedEverything()
 	emit someDataChanged();		
 
 	// Load pull template types
-	for (int i = LINE_THREE_CIRCLES_TEMPLATE; i <= ONE_COLORED_CASING_TEMPLATE; ++i)
+	for (int i = LINE_THREE_CIRCLES_TEMPLATE; i <= SQUARE_SIXTEEN_SQUARES_TEMPLATE; ++i)
 	{
 		pullPlanEditorPlan->setTemplate(new PullTemplate(i, 0.0));
 		pullPlanEditorPlan->getTemplate()->shape = AMORPHOUS_SHAPE; // stop the border from being drawn
