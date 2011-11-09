@@ -56,13 +56,18 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 				}
 			}
 
-			// Fill in the entire group
-			int group = plan->getTemplate()->subpulls[i].group;
-			for (unsigned int j = 0; j < plan->getTemplate()->subpulls.size(); ++j)
-			{
-				if (plan->getTemplate()->subpulls[j].group == group)
-					plan->subplans[j] = droppedPlan;
+			// If the shift button is down, fill in the entire group
+			if (event->keyboardModifiers() & 0x02000000)
+			{	
+				int group = plan->getTemplate()->subpulls[i].group;
+				for (unsigned int j = 0; j < plan->getTemplate()->subpulls.size(); ++j)
+				{
+					if (plan->getTemplate()->subpulls[j].group == group)
+						plan->subplans[j] = droppedPlan;
+				}
 			}
+			else // Otherwise just fill in this one
+				plan->subplans[i] = droppedPlan;
 
 			emit someDataChanged();
 			return;
