@@ -67,7 +67,7 @@ void Mesher :: applyTwistTransform(Vertex* v, PullPlan* transformNode)
 void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 {
 	// Shrink length to correct length
-	v->position.z = v->position.z * spt->length / 2.0;
+	v->position.z = v->position.z * spt->length;
 
 	// Shrink width to correct width
 	float theta = atan2(v->position.y, v->position.x);
