@@ -509,7 +509,7 @@ void NiceViewWidget :: paintWithoutDepthPeeling()
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 	if (geometry) {
-		glEnable(GL_LIGHTING);
+		//glEnable(GL_LIGHTING);
 		//Check that Vertex and Triangle have proper size:
 		assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3));
 		assert(sizeof(Triangle) == sizeof(GLuint) * 3);
@@ -532,7 +532,7 @@ void NiceViewWidget :: paintWithoutDepthPeeling()
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_NORMAL_ARRAY);
 
-		glDisable(GL_LIGHTING);
+		//glDisable(GL_LIGHTING);
 	}
 
 	glDisable(GL_DEPTH_TEST);

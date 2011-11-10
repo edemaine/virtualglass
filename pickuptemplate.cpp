@@ -1,5 +1,6 @@
 
 #include "pickuptemplate.h"
+#include <stdio.h>
 
 PickupTemplate :: PickupTemplate(int t)
 {
@@ -10,17 +11,17 @@ PickupTemplate :: PickupTemplate(int t)
 	// set parameters
 	switch (this->type)
 	{
-		case VERTICALS_TEMPLATE:	
-                        tmp = new char[100];
-                        sprintf(tmp, "Count");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(10);
+		case VERTICALS_TEMPLATE:
+						tmp = new char[100];
+						sprintf(tmp, "Count");
+						parameterNames.push_back(tmp);
+						parameterValues.push_back(10);
 			break;
 		case MURRINE_SQUARE_TEMPLATE:
-                        tmp = new char[100];
-                        sprintf(tmp, "Count");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(4);
+						tmp = new char[100];
+						sprintf(tmp, "Count");
+						parameterNames.push_back(tmp);
+						parameterValues.push_back(4);
 			break;
 	}
 
@@ -37,7 +38,7 @@ void PickupTemplate :: computeSubpulls()
 	Point p;
 	float width;
 
-	// initialize SubpickupTemplates with the right data	
+	// initialize SubpickupTemplates with the right data
 	switch (this->type)
 	{
 		case MURRINE_SQUARE_TEMPLATE:
@@ -49,10 +50,10 @@ void PickupTemplate :: computeSubpulls()
 				{
 					p.x = -1.0 + width / 2 + width * i;
 					p.y = -1.0 + width / 2 + width * j;
-					subpulls.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, 0.4, 
+					subpulls.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, 0.4,
 						width - 0.001, 0));
-				}	
-			}	
+				}
+			}
 			break;
 		case VERTICALS_TEMPLATE:
 			p.x = p.y = p.z = 0.0;
