@@ -55,8 +55,10 @@ class MainWindow : public QMainWindow
 		// Variables
 		QLabel* pieceTemplateParameter1Label;
 		QLabel* pieceTemplateParameter2Label;
+		QLabel* pickupTemplateParameter1Label;
 		QSlider* pieceTemplateParameter1Slider;
 		QSlider* pieceTemplateParameter2Slider;
+		QSlider* pickupTemplateParameter1Slider;
 		QCheckBox* writeRawCheckBox;
 		QGridLayout* tableGridLayout;
 		int pullPlanCount; 
@@ -108,6 +110,7 @@ class MainWindow : public QMainWindow
 		void pullTemplateShapeButtonGroupChanged(int);
 		void pieceTemplateParameterSlider1Changed(int);
 		void pieceTemplateParameterSlider2Changed(int);
+		void pickupTemplateParameterSlider1Changed(int);
 		void writeRawCheckBoxChanged(int);
 };
 

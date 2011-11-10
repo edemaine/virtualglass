@@ -135,7 +135,7 @@ void MainWindow :: seedEverything()
 	editorStack->setCurrentIndex(PICKUPPLAN_MODE);
 	emit someDataChanged();		
 	
-	for (int i = TEN_VERTICALS_TEMPLATE; i <= FOUR_COLUMNS_MURRINE_TEMPLATE; ++i)
+	for (int i = VERTICALS_TEMPLATE; i <= MURRINE_SQUARE_TEMPLATE; ++i)
 	{
 		pickupPlanEditorPlan->setTemplate(new PickupTemplate(i));
 		emit someDataChanged();
@@ -145,7 +145,7 @@ void MainWindow :: seedEverything()
 	}
 
 	// Load final starting pickup plan
-	pickupPlanEditorPlan->setTemplate(new PickupTemplate(TEN_VERTICALS_TEMPLATE));	
+	pickupPlanEditorPlan->setTemplate(new PickupTemplate(VERTICALS_TEMPLATE));	
 	for (unsigned int j = 0; j < pickupPlanEditorPlan->getTemplate()->subpulls.size(); ++j)
 	{
 		pickupPlanEditorPlan->subplans[j] = pullPlanEditorPlan;
@@ -183,8 +183,9 @@ void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
 	else if (pkplw != NULL)
 	{
 		pickupPlanEditorPlanLibraryWidget = pkplw;	
-		pickupPlanEditorPlan->setTemplate(pkplw->getPickupPlan()->getTemplate());
-		pickupPlanEditorViewWidget->setPickupPlan(pickupPlanEditorPlan);
+		pickupPlanEditorViewWidget->setPickupPlan(pkplw->getPickupPlan());
+		pickupTemplateParameter1Label->setText(pickupPlanEditorPlan->getTemplate()->getParameterName(0));
+		pickupTemplateParameter1Slider->setSliderPosition(pickupPlanEditorPlan->getTemplate()->getParameter(0));
 		editorStack->setCurrentIndex(PICKUPPLAN_MODE);
 		emit someDataChanged();
 	}
@@ -203,8 +204,14 @@ void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
 	}
 	else if (pktlw != NULL)
 	{
-		pickupPlanEditorPlan->setTemplate(new PickupTemplate(pktlw->getPickupTemplateType()));
-		emit someDataChanged();
+                if (pktlw->getPickupTemplateType() != pickupPlanEditorPlan->getTemplate()->type)
+                {
+			pickupPlanEditorPlan->setTemplate(new PickupTemplate(pktlw->getPickupTemplateType()));
+                        pickupPlanEditorViewWidget->setPickupPlan(pickupPlanEditorPlan);
+                        pickupTemplateParameter1Label->setText(pickupPlanEditorPlan->getTemplate()->getParameterName(0));
+			pickupTemplateParameter1Slider->setSliderPosition(pickupPlanEditorPlan->getTemplate()->getParameter(0));
+			emit someDataChanged();
+                }
 	}
 }
 
@@ -289,6 +296,8 @@ void MainWindow :: setupConnections()
 
 	connect(pickupPlanEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(newPickupPlanButton, SIGNAL(pressed()), this, SLOT(newPickupPlan()));	
+	connect(pickupTemplateParameter1Slider, SIGNAL(valueChanged(int)), 
+		this, SLOT(pickupTemplateParameterSlider1Changed(int)));
 
 	connect(pieceTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pieceTemplateComboBoxChanged(int)));	
 	connect(pieceEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
@@ -407,7 +416,7 @@ void MainWindow :: setupPieceEditor()
 
 void MainWindow :: setupPickupPlanEditor()
 {
-	pickupPlanEditorPlan = new PickupPlan(TWENTY_VERTICALS_TEMPLATE);
+	pickupPlanEditorPlan = new PickupPlan(VERTICALS_TEMPLATE);
 	pickupPlanEditorPlanLibraryWidget = new PickupPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 
 		QPixmap::fromImage(QImage("./duck.jpg")), pickupPlanEditorPlan);
 	tableGridLayout->addWidget(pickupPlanEditorPlanLibraryWidget, pickupPlanCount, 2);	
@@ -433,6 +442,17 @@ void MainWindow :: setupPickupPlanEditor()
         pickupTemplateLibraryScrollArea->setFixedHeight(130);
         pickupTemplateLibraryScrollArea->setFixedWidth(520);
 	editorLayout->addWidget(pickupTemplateLibraryScrollArea);	
+
+        pickupTemplateParameter1Label = new QLabel(pickupPlanEditorPlan->getTemplate()->getParameterName(0));
+        pickupTemplateParameter1Slider = new QSlider(Qt::Horizontal, pickupPlanEditorPage);
+        pickupTemplateParameter1Slider->setRange(0, 100);
+        pickupTemplateParameter1Slider->setTickPosition(QSlider::TicksBothSides);
+        pickupTemplateParameter1Slider->setSliderPosition(0);
+
+        QHBoxLayout* parameter1Layout = new QHBoxLayout(pickupPlanEditorPage);
+        editorLayout->addLayout(parameter1Layout);
+        parameter1Layout->addWidget(pickupTemplateParameter1Label);
+        parameter1Layout->addWidget(pickupTemplateParameter1Slider);
 
 	pickupPlanEditorViewWidget = new PickupPlanEditorViewWidget(pickupPlanEditorPlan, pickupPlanEditorPage);
 	editorLayout->addWidget(pickupPlanEditorViewWidget, 10); 	
@@ -566,6 +586,14 @@ void MainWindow :: pieceTemplateParameterSlider1Changed(int)
 	someDataChanged();
 }
 
+void MainWindow :: pickupTemplateParameterSlider1Changed(int)
+{
+        int value = pickupTemplateParameter1Slider->sliderPosition();
+	pickupPlanEditorPlan->getTemplate()->setParameter(0, value);
+	pickupPlanEditorPlan->setTemplate(pickupPlanEditorPlan->getTemplate()); // just push changes through
+	someDataChanged();
+}
+
 void MainWindow :: pullTemplateCasingThicknessSliderChanged(int)
 {
         float thickness = pullTemplateCasingThicknessSlider->sliderPosition() / 100.0;
@@ -600,7 +628,7 @@ void MainWindow :: newPiece()
 void MainWindow :: newPickupPlan()
 {
 	// Create the new plan
-	pickupPlanEditorPlan = new PickupPlan(TEN_VERTICALS_TEMPLATE);
+	pickupPlanEditorPlan = new PickupPlan(VERTICALS_TEMPLATE);
 
 	// Create the new library entry
 	pickupPlanEditorPlanLibraryWidget = new PickupPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), 

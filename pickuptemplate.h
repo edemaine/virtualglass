@@ -13,12 +13,8 @@
 #define MURRINE_ORIENTATION 3
 
 // Pickup template types
-#define TEN_VERTICALS_TEMPLATE 1
-#define FIFTEEN_VERTICALS_TEMPLATE 2
-#define TWENTY_VERTICALS_TEMPLATE 3
-#define FOUR_SQUARES_OF_TEN_VERTICALS_TEMPLATE 4
-#define SIXTEEN_MURRINE_TEMPLATE 5
-#define FOUR_COLUMNS_MURRINE_TEMPLATE 6
+#define VERTICALS_TEMPLATE 1
+#define MURRINE_SQUARE_TEMPLATE 2
 
 using std::vector;
 
@@ -26,8 +22,16 @@ class PickupTemplate
 {
 	public:
 		PickupTemplate(int t);
-		vector<SubpickupTemplate> subpulls;
+		vector<SubpickupTemplate*> subpulls;
 		int type;
+		void setParameter(int param, int newValue);
+		int getParameter(int param);
+		char* getParameterName(int param);	
+
+	private:
+		vector<int> parameterValues; 
+		vector<char*> parameterNames;
+		void computeSubpulls();
 };
 
 #endif

@@ -20,13 +20,13 @@ void PickupPlan :: setTemplate(PickupTemplate* newTemplate)
 	// For each new subpull, see if its group exists in the current template
 	for (unsigned int i = 0; i < newTemplate->subpulls.size(); ++i)
 	{
-		int group = newTemplate->subpulls[i].group;
+		int group = newTemplate->subpulls[i]->group;
 	
 		// Look for the group in the old template, copy the plan if found
 		bool matchFound = false;
 		for (unsigned int j = 0; j < this->pickupTemplate->subpulls.size(); ++j)
 		{
-			if (group == this->pickupTemplate->subpulls[j].group)
+			if (group == this->pickupTemplate->subpulls[j]->group)
 			{
 				newSubplans.push_back(this->subplans[j]);
 				matchFound = true;

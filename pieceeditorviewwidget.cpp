@@ -73,7 +73,7 @@ void PieceEditorViewWidget :: paintEvent(QPaintEvent *event)
 		}
 		painter.setPen(pen);
 
-                SubpickupTemplate* sp = &(piece->pickup->getTemplate()->subpulls[i]);
+                SubpickupTemplate* sp = piece->pickup->getTemplate()->subpulls[i];
                 Point ll;
                 float rWidth, rHeight;
                 switch (sp->orientation)

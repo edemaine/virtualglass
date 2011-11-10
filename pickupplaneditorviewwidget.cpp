@@ -29,7 +29,7 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 
 	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
 	{
-		SubpickupTemplate* sp = &(plan->getTemplate()->subpulls[i]);
+		SubpickupTemplate* sp = plan->getTemplate()->subpulls[i];
 		Point ll, ur;
 
 		switch (sp->orientation)
@@ -77,10 +77,10 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		// If the shift button is down, fill in the entire group
 		if (event->keyboardModifiers() & 0x02000000)
 		{
-			int group = plan->getTemplate()->subpulls[i].group;
+			int group = plan->getTemplate()->subpulls[i]->group;
 			for (unsigned int j = 0; j < plan->getTemplate()->subpulls.size(); ++j)
 			{
-				if (plan->getTemplate()->subpulls[j].group == group)
+				if (plan->getTemplate()->subpulls[j]->group == group)
 					plan->subplans[j] = droppedPlan;
 			}
 		}
@@ -127,7 +127,7 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 		}
 		painter.setPen(pen);
 
-		SubpickupTemplate* sp = &(plan->getTemplate()->subpulls[i]);
+		SubpickupTemplate* sp = plan->getTemplate()->subpulls[i];
                 Point ll;
 		float rWidth, rHeight;
                 switch (sp->orientation)

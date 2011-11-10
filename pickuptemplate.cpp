@@ -3,98 +3,84 @@
 
 PickupTemplate :: PickupTemplate(int t)
 {
-	Point p;
+	char* tmp;
 
 	this->type = t;
 
-	switch (t)
+	// set parameters
+	switch (this->type)
 	{
-		case SIXTEEN_MURRINE_TEMPLATE:
+		case VERTICALS_TEMPLATE:	
+                        tmp = new char[100];
+                        sprintf(tmp, "Count");
+                        parameterNames.push_back(tmp);
+                        parameterValues.push_back(10);
+			break;
+		case MURRINE_SQUARE_TEMPLATE:
+                        tmp = new char[100];
+                        sprintf(tmp, "Count");
+                        parameterNames.push_back(tmp);
+                        parameterValues.push_back(4);
+			break;
+	}
+
+	computeSubpulls();
+}
+
+
+void PickupTemplate :: computeSubpulls()
+{
+	for (unsigned int i = 0; i < subpulls.size(); ++i)
+		delete subpulls[i];
+	subpulls.clear();
+
+	Point p;
+	float width;
+
+	// initialize SubpickupTemplates with the right data	
+	switch (this->type)
+	{
+		case MURRINE_SQUARE_TEMPLATE:
 			p.x = p.y = p.z = 0.0;
-			for (int i = 0; i < 4; ++i)
+			width = 2.0 / MAX(parameterValues[0], 1);
+			for (int i = 0; i < parameterValues[0]; ++i)
 			{
-				for (int j = 0; j < 4; ++j)
+				for (int j = 0; j < parameterValues[0]; ++j)
 				{
-					p.x = -0.75 + 0.5 * i;
-					p.y = -0.75 + 0.5 * j;
-					subpulls.push_back(SubpickupTemplate(p, MURRINE_ORIENTATION, 0.4, 0.49, 0));
+					p.x = -1.0 + width / 2 + width * i;
+					p.y = -1.0 + width / 2 + width * j;
+					subpulls.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, 0.4, 
+						width - 0.001, 0));
 				}	
 			}	
 			break;
-		case FOUR_COLUMNS_MURRINE_TEMPLATE:
+		case VERTICALS_TEMPLATE:
 			p.x = p.y = p.z = 0.0;
-			for (int i = 0; i < 4; ++i)
+			width = 2.0 / MAX(parameterValues[0], 1);
+			for (int i = 0; i < parameterValues[0]; ++i)
 			{
-				p.x = -0.9 + 0.5 * i;
+				p.x = -1.0 + width / 2 + width * i;
 				p.y = -0.99;
-				subpulls.push_back(SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.99, 0.19, 0));
-			}	
-			for (int i = 0; i < 4; ++i)
-			{
-				p.x = -0.65 + 0.5 * i;
-				for (int j = 0; j < 7; ++j)
-				{
-					p.y = -0.9 + 0.3 * j;
-					subpulls.push_back(SubpickupTemplate(p, MURRINE_ORIENTATION, 0.3, 0.29, 0));
-				}
-			}	
-			break;
-		case TEN_VERTICALS_TEMPLATE:
-			p.x = p.y = p.z = 0.0;
-			for (int i = 0; i < 10; ++i)
-			{
-				p.x = -0.9 + 0.2 * i;
-				p.y = -0.99;
-				subpulls.push_back(SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.99, 0.19, 0));
-			}
-			break;
-		case FIFTEEN_VERTICALS_TEMPLATE:
-			p.x = p.y = p.z = 0.0;
-			for (int i = 0; i < 15; ++i)
-			{
-				p.x = -0.9 + 0.1333 * i;
-				p.y = -0.99;
-				subpulls.push_back(SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.99, 0.13, 0));
-			}
-			break;
-		case TWENTY_VERTICALS_TEMPLATE:
-			p.x = p.y = p.z = 0.0;
-			for (int i = 0; i < 20; ++i)
-			{
-				p.x = -0.9 + 0.1 * i;
-				p.y = -0.99;
-				subpulls.push_back(SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.99, 0.09, 0));
-			}
-			break;
-		case FOUR_SQUARES_OF_TEN_VERTICALS_TEMPLATE:
-			for (int i = 0; i < 10; ++i)
-			{
-				p.x = -0.95 + 0.1 * i;
-				p.y = 0.01;
-				subpulls.push_back(SubpickupTemplate(p, VERTICAL_ORIENTATION, 0.99, 0.09, 0));
-			}
-			for (int i = 0; i < 10; ++i)
-			{
-				p.x = -0.95 + 0.1 * i;
-				p.y = -0.99;
-				subpulls.push_back(SubpickupTemplate(p, VERTICAL_ORIENTATION, 0.99, 0.09, 0));
-			}
-			for (int i = 0; i < 10; ++i)
-			{
-				p.x = 0.05 + 0.1 * i;
-				p.y = -0.99;
-				subpulls.push_back(SubpickupTemplate(p, VERTICAL_ORIENTATION, 0.99, 0.09, 0));
-			}
-			for (int i = 0; i < 10; ++i)
-			{
-				p.x = 0.05 + 0.1 * i;
-				p.y = 0.01;
-				subpulls.push_back(SubpickupTemplate(p, VERTICAL_ORIENTATION, 0.99, 0.09, 0));
+				subpulls.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.99, width - 0.001, 0));
 			}
 			break;
 	}
 }
 
+char* PickupTemplate :: getParameterName(int param)
+{
+	return parameterNames[param];
+}
 
+int PickupTemplate :: getParameter(int param)
+{
+	return parameterValues[param];
+}
+
+void PickupTemplate :: setParameter(int param, int newValue)
+{
+	parameterValues[param] = newValue;
+	computeSubpulls();
+}
 
 

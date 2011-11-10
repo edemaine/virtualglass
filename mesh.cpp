@@ -67,7 +67,7 @@ void Mesher :: applyTwistTransform(Vertex* v, PullPlan* transformNode)
 void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 {
 	// Shrink length to correct length
-	v->position.z = v->position.z * spt->length;
+	v->position.z = v->position.z * spt->length / 2.0;
 
 	// Shrink width to correct width
 	float theta = atan2(v->position.y, v->position.x);
@@ -398,7 +398,7 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPla
 		ancestors.clear();
 		ancestorIndices.clear();
 		generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, 0.0, 
-			plan->getTemplate()->subpulls[i].length / 2.0, true, i); 
+			plan->getTemplate()->subpulls[i]->length / 2.0, true, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
 		{
@@ -410,7 +410,7 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPla
 				for (uint32_t v = subpullGroup->vertex_begin; 
 					v < subpullGroup->vertex_begin + subpullGroup->vertex_size; ++v)
 				{
-					applyPickupTransform(&(geometry->vertices[v]), &(plan->getTemplate()->subpulls[i]));
+					applyPickupTransform(&(geometry->vertices[v]), plan->getTemplate()->subpulls[i]);
 				}
 			}
 		}
