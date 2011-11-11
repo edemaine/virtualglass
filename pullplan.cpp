@@ -12,6 +12,16 @@ PullPlan :: PullPlan(int pullTemplate, bool isBase, Color color)
 	this->setTemplate(new PullTemplate(pullTemplate, 0.0));
 }
 
+void PullPlan :: setLibraryWidget(PullPlanLibraryWidget* plplw)
+{
+	this->libraryWidget = plplw;
+}
+
+PullPlanLibraryWidget* PullPlan :: getLibraryWidget()
+{
+	return this->libraryWidget;
+}
+
 Color PullPlan :: getColorAverage()
 {
 	if (this->isBase)
@@ -19,7 +29,7 @@ Color PullPlan :: getColorAverage()
 
 	Color avg;
 	avg.r = avg.g = avg.b = avg.a = 0.0;
-	
+
 	for (unsigned int i = 0; i < this->subplans.size(); ++i)
 	{
 		Color spColor = this->subplans[i]->getColorAverage();
@@ -34,27 +44,27 @@ Color PullPlan :: getColorAverage()
 
 void PullPlan :: setTemplate(PullTemplate* newTemplate)
 {
-        vector<PullPlan*> newSubplans;
+		vector<PullPlan*> newSubplans;
 
-        // For each new subpull, see if its group exists in the current template
-        for (unsigned int i = 0; i < newTemplate->subpulls.size(); ++i)
-        {
-                int group = newTemplate->subpulls[i].group;
+		// For each new subpull, see if its group exists in the current template
+		for (unsigned int i = 0; i < newTemplate->subpulls.size(); ++i)
+		{
+				int group = newTemplate->subpulls[i].group;
 
-                // Look for the group in the old template, copy the plan if found
-                bool matchFound = false;
-                for (unsigned int j = 0; j < this->pullTemplate->subpulls.size(); ++j)
-                {
-                        if (group == this->pullTemplate->subpulls[j].group)
-                        {
-                                newSubplans.push_back(this->subplans[j]);
-                                matchFound = true;
-                                break;
-                        }
-                }
+				// Look for the group in the old template, copy the plan if found
+				bool matchFound = false;
+				for (unsigned int j = 0; j < this->pullTemplate->subpulls.size(); ++j)
+				{
+						if (group == this->pullTemplate->subpulls[j].group)
+						{
+								newSubplans.push_back(this->subplans[j]);
+								matchFound = true;
+								break;
+						}
+				}
 
-                if (!matchFound)
-                {
+				if (!matchFound)
+				{
 			Color color;
 			color.r = color.g = color.b = 1.0;
 			color.a = 0.4;
@@ -68,15 +78,15 @@ void PullPlan :: setTemplate(PullTemplate* newTemplate)
 					newSubplans.push_back(new PullPlan(SQUARE_BASE_TEMPLATE, true, color));
 					break;
 			}
-                }
-        }
+				}
+		}
 
-        this->pullTemplate = newTemplate;
-        this->subplans.clear();
-        for (unsigned int i = 0; i < this->pullTemplate->subpulls.size(); ++i)
-        {
-                subplans.push_back(newSubplans[i]);
-        }
+		this->pullTemplate = newTemplate;
+		this->subplans.clear();
+		for (unsigned int i = 0; i < this->pullTemplate->subpulls.size(); ++i)
+		{
+				subplans.push_back(newSubplans[i]);
+		}
 }
 
 PullTemplate* PullPlan :: getTemplate()

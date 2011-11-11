@@ -9,6 +9,16 @@ Piece :: Piece(int pickupTemplate)
 	this->pickup = new PickupPlan(VERTICALS_TEMPLATE);
 }
 
+void Piece :: setLibraryWidget(PieceLibraryWidget* plw)
+{
+	this->libraryWidget = plw;
+}
+
+PieceLibraryWidget* Piece :: getLibraryWidget()
+{
+	return this->libraryWidget;
+}
+
 void Piece :: setTemplate(PieceTemplate* pt)
 {
 	this->pieceTemplate = pt;

@@ -13,6 +13,16 @@ PickupPlan :: PickupPlan(int pickupTemplate)
 	}
 }
 
+void PickupPlan :: setLibraryWidget(PickupPlanLibraryWidget* pkplw)
+{
+	this->libraryWidget = pkplw;
+}
+
+PickupPlanLibraryWidget* PickupPlan :: getLibraryWidget()
+{
+	return this->libraryWidget;
+}
+
 void PickupPlan :: setTemplate(PickupTemplate* newTemplate)
 {
 	vector<PullPlan*> newSubplans;
@@ -21,7 +31,7 @@ void PickupPlan :: setTemplate(PickupTemplate* newTemplate)
 	for (unsigned int i = 0; i < newTemplate->subpulls.size(); ++i)
 	{
 		int group = newTemplate->subpulls[i]->group;
-	
+
 		// Look for the group in the old template, copy the plan if found
 		bool matchFound = false;
 		for (unsigned int j = 0; j < this->pickupTemplate->subpulls.size(); ++j)

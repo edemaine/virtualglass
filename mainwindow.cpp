@@ -4,6 +4,7 @@
 
 MainWindow :: MainWindow(Model* model)
 {
+	setupDone = false;
 	centralWidget = new QWidget(this);
 		this->setCentralWidget(centralWidget);
 	this->model = model;
@@ -16,6 +17,8 @@ MainWindow :: MainWindow(Model* model)
 
 		setWindowTitle(tr("Virtual Glass"));
 		move(0, 0);
+
+
 }
 
 void MainWindow :: seedEverything()
@@ -159,6 +162,8 @@ void MainWindow :: seedEverything()
 
 	editorStack->setCurrentIndex(PULLPLAN_MODE); // end in pull plan mode
 	emit someDataChanged();
+
+	setupDone = true;
 }
 
 void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
@@ -174,6 +179,7 @@ void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
 
 	if (plplw != NULL)
 	{
+		pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 		pullPlanEditorPlanLibraryWidget = plplw;
 		pullPlanEditorPlan = plplw->getPullPlan();
 		pullPlanEditorViewWidget->setPullPlan(pullPlanEditorPlan);
@@ -183,6 +189,7 @@ void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
 	}
 	else if (pkplw != NULL)
 	{
+		pickupPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 		pickupPlanEditorPlanLibraryWidget = pkplw;
 		pickupPlanEditorViewWidget->setPickupPlan(pkplw->getPickupPlan());
 		pickupTemplateParameter1Label->setText(pickupPlanEditorPlan->getTemplate()->getParameterName(0));
@@ -194,6 +201,7 @@ void MainWindow :: mouseDoubleClickEvent(QMouseEvent* event)
 	else if (plw != NULL)
 	{
 		//TODO
+		pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 		pieceEditorPlanLibraryWidget = plw;
 		pieceEditorPlan = plw->getPiece();
 		pieceEditorViewWidget->setPiece(pieceEditorPlan);
@@ -377,9 +385,13 @@ void MainWindow :: setupEditors()
 void MainWindow :: setupPieceEditor()
 {
 	pieceEditorPlan = new Piece(TUMBLER_TEMPLATE);
+
+	//if (pieceEditorPlanLibraryWidget && pieceEditorPlanLibraryWidget->graphicsEffect())
+	//	pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false); DO NOT WANT
+
 	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")),
 		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);
-	pieceEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
+	//pieceEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
 	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 3);
 	++pieceCount;
 
@@ -422,9 +434,13 @@ void MainWindow :: setupPieceEditor()
 void MainWindow :: setupPickupPlanEditor()
 {
 	pickupPlanEditorPlan = new PickupPlan(VERTICALS_TEMPLATE);
+
+	//if (pickupPlanEditorPlanLibraryWidget && pickupPlanEditorPlanLibraryWidget->graphicsEffect())
+	//	pickupPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false); DO NOT WANT
+
 	pickupPlanEditorPlanLibraryWidget = new PickupPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")),
 		QPixmap::fromImage(QImage("./duck.jpg")), pickupPlanEditorPlan);
-	pickupPlanEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
+	//pickupPlanEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
 	tableGridLayout->addWidget(pickupPlanEditorPlanLibraryWidget, pickupPlanCount, 2);
 	++pickupPlanCount;
 
@@ -467,8 +483,12 @@ void MainWindow :: setupPickupPlanEditor()
 void MainWindow :: setupPullPlanEditor()
 {
 	pullPlanEditorPlan = new PullPlan(LINE_THREE_CIRCLES_TEMPLATE, false, defaultColor);
+
+	//if (pullPlanEditorPlanLibraryWidget && pullPlanEditorPlanLibraryWidget->graphicsEffect())
+	//    pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false); DO NOT WANT
+
 	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), QPixmap::fromImage(QImage("./duck.jpg")), pullPlanEditorPlan);
-	pullPlanEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
+	//pullPlanEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
 	tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
 	++pullPlanCount;
 
@@ -619,12 +639,12 @@ void MainWindow :: newPiece()
 {
 	pieceEditorPlan = new Piece(TUMBLER_TEMPLATE);
 
-	if (pieceEditorPlanLibraryWidget)
-		pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
+	//if (pieceEditorPlanLibraryWidget && pieceEditorPlanLibraryWidget->graphicsEffect())
+	pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 
 	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")),
 		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);
-	pieceEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
+	//pieceEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
 	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 3);
 	++pieceCount;
 
@@ -642,12 +662,12 @@ void MainWindow :: newPickupPlan()
 	pickupPlanEditorPlan = new PickupPlan(VERTICALS_TEMPLATE);
 
 	// Create the new library entry
-	if (pickupPlanEditorPlanLibraryWidget)
-		pickupPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
+	//if (pickupPlanEditorPlanLibraryWidget && pickupPlanEditorPlanLibraryWidget->graphicsEffect())
+	pickupPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 
 	pickupPlanEditorPlanLibraryWidget = new PickupPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")),
 		QPixmap::fromImage(QImage("./duck.jpg")), pickupPlanEditorPlan);
-	pickupPlanEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
+	//pickupPlanEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
 	tableGridLayout->addWidget(pickupPlanEditorPlanLibraryWidget, pickupPlanCount, 2);
 	++pickupPlanCount;
 
@@ -667,11 +687,12 @@ void MainWindow :: newPullPlan()
 	pullPlanEditorPlan = new PullPlan(LINE_THREE_CIRCLES_TEMPLATE, false, defaultColor);
 
 	// Create the new library entry
-	if (pullPlanEditorPlanLibraryWidget)
-		pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
+	//if (pullPlanEditorPlanLibraryWidget && pullPlanEditorPlanLibraryWidget->graphicsEffect())
+	pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
+
 	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")),
 		QPixmap::fromImage(QImage("./duck.jpg")), pullPlanEditorPlan);
-	pullPlanEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
+	//pullPlanEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
 	tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
 	++pullPlanCount;
 
@@ -683,6 +704,49 @@ void MainWindow :: newPullPlan()
 
 	// Trigger GUI updates
 	emit someDataChanged();
+}
+
+void MainWindow :: highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw,bool highlight,bool setupDone) {
+	if (!plplw || !plplw->graphicsEffect())
+		return;
+	if (plplw->graphicsEffect()->isEnabled()==highlight)
+		return;
+	plplw->graphicsEffect()->setEnabled(highlight);
+	if (!setupDone)
+		return;
+	if (plplw->getPullPlan()->subplans.empty())
+		return;
+	for (unsigned int j=0;j<plplw->getPullPlan()->subplans.size();j++) {
+		if (plplw->getPullPlan()->subplans[j])
+			highlightPlanLibraryWidgets(plplw->getPullPlan()->subplans[j]->getLibraryWidget(),highlight,true);
+	}
+}
+
+void MainWindow :: highlightPlanLibraryWidgets(PickupPlanLibraryWidget* pkplw,bool highlight,bool setupDone) {
+	if (!pkplw || !pkplw->graphicsEffect())
+		return;
+	//if (pkplw->graphicsEffect()->isEnabled()==highlight)
+	//	return;
+	pkplw->graphicsEffect()->setEnabled(highlight);
+	if (!setupDone)
+		return;
+	if (pkplw->getPickupPlan()->subplans.empty())
+		return;
+	for (unsigned int j=0;j<pkplw->getPickupPlan()->subplans.size();j++) {
+		if (pkplw->getPickupPlan()->subplans[j])
+			highlightPlanLibraryWidgets(pkplw->getPickupPlan()->subplans[j]->getLibraryWidget(),highlight,true);
+	}
+}
+
+void MainWindow :: highlightPlanLibraryWidgets(PieceLibraryWidget* plw,bool highlight,bool setupDone) {
+	if (!plw || !plw->graphicsEffect())
+		return;
+	if (plw->graphicsEffect()->isEnabled()==highlight)
+		return;
+	plw->graphicsEffect()->setEnabled(highlight);
+	if (!setupDone)
+		return;
+	highlightPlanLibraryWidgets(plw->getPiece()->getLibraryWidget(),highlight,true);
 }
 
 void MainWindow :: updateEverything()
@@ -697,8 +761,10 @@ void MainWindow :: updateEverything()
 void MainWindow :: updateLibrary()
 {
 	pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
+	//highlightPlanLibraryWidgets(pullPlanEditorPlanLibraryWidget,false);
 	pickupPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 	pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
+
 	switch (editorStack->currentIndex())
 	{
 		case PULLPLAN_MODE:
@@ -706,18 +772,21 @@ void MainWindow :: updateLibrary()
 				QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100),
 				QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100));
 			pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(true);
+			//highlightPlanLibraryWidgets(pullPlanEditorPlanLibraryWidget,true,setupDone);
 			break;
 		case PICKUPPLAN_MODE:
 			pickupPlanEditorPlanLibraryWidget->updatePixmaps(
 				QPixmap::grabWidget(pickupPlanEditorViewWidget).scaled(100, 100),
 				QPixmap::grabWidget(pickupPlanEditorViewWidget).scaled(100, 100));
 			pickupPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(true);
+			//highlightPlanLibraryWidgets(pickupPlanEditorPlanLibraryWidget,true,setupDone);
 			break;
 		case PIECE_MODE:
 			pieceEditorPlanLibraryWidget->updatePixmaps(
 				QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100),
 				QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100));
 			pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(true);
+			//highlightPlanLibraryWidgets(pieceEditorPlanLibraryWidget,true,setupDone);
 			break;
 	}
 }

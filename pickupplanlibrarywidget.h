@@ -1,6 +1,8 @@
 #ifndef PICKUPPLANLIBRARYWIDGET_H
 #define PICKUPPLANLIBRARYWIDGET_H
 
+class PickupPlan;
+
 #include <QtGui>
 #include <QObject>
 #include "pickupplan.h"

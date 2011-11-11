@@ -1,7 +1,8 @@
 
 #include "pickupplanlibrarywidget.h"
+#include "pullplan.h"
 
-PickupPlanLibraryWidget :: PickupPlanLibraryWidget(QPixmap niceViewPixmap, QPixmap editorPixmap, PickupPlan* plan, 
+PickupPlanLibraryWidget :: PickupPlanLibraryWidget(QPixmap niceViewPixmap, QPixmap editorPixmap, PickupPlan* plan,
 	QWidget* parent): QLabel(parent)
 {
 	setBackgroundRole(QPalette::Base);
@@ -12,7 +13,10 @@ PickupPlanLibraryWidget :: PickupPlanLibraryWidget(QPixmap niceViewPixmap, QPixm
 	setPixmap(niceViewPixmap);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 	this->pickupPlan = plan;
+	this->pickupPlan->setLibraryWidget(this);
 	this->editorPixmap = editorPixmap;
+
+	setGraphicsEffect(new QGraphicsColorizeEffect());
 }
 
 PickupPlan* PickupPlanLibraryWidget :: getPickupPlan()
@@ -22,7 +26,7 @@ PickupPlan* PickupPlanLibraryWidget :: getPickupPlan()
 
 void PickupPlanLibraryWidget :: updatePixmaps(QPixmap niceViewPixmap, QPixmap editorPixmap)
 {
-        setPixmap(niceViewPixmap);
+		setPixmap(niceViewPixmap);
 	this->editorPixmap = editorPixmap;
 }
 

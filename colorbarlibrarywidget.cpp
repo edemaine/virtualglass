@@ -14,6 +14,8 @@ ColorBarLibraryWidget :: ColorBarLibraryWidget(Color color, QWidget* parent): QL
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
 	this->pullPlan = new PullPlan(AMORPHOUS_BASE_TEMPLATE, true, color);
+	setGraphicsEffect(new QGraphicsColorizeEffect());
+	graphicsEffect()->setEnabled(false);
 }
 
 PullPlan* ColorBarLibraryWidget :: getPullPlan()

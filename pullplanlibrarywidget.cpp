@@ -12,7 +12,10 @@ PullPlanLibraryWidget :: PullPlanLibraryWidget(QPixmap niceViewPixmap, QPixmap e
 	setPixmap(niceViewPixmap);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 	this->pullPlan = plan;
+	this->pullPlan->setLibraryWidget(this);
 	this->editorPixmap = editorPixmap;
+
+	setGraphicsEffect(new QGraphicsColorizeEffect());
 }
 
 PullPlan* PullPlanLibraryWidget :: getPullPlan()

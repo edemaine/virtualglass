@@ -1,6 +1,8 @@
 #ifndef PULLPLANLIBRARYWIDGET_H
 #define PULLPLANLIBRARYWIDGET_H
 
+class PullPlan;
+
 #include <QtGui>
 #include <QObject>
 #include "pullplan.h"

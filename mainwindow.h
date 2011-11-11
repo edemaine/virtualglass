@@ -52,6 +52,10 @@ class MainWindow : public QMainWindow
 		void updateNiceView();
 		void updateLibrary();
 
+		void highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw,bool highlight,bool setupDone);
+		void highlightPlanLibraryWidgets(PickupPlanLibraryWidget* pkplw,bool highlight,bool setupDone);
+		void highlightPlanLibraryWidgets(PieceLibraryWidget* plw,bool highlight,bool setupDone);
+
 		// Variables
 		QLabel* pieceTemplateParameter1Label;
 		QLabel* pieceTemplateParameter2Label;
@@ -65,6 +69,7 @@ class MainWindow : public QMainWindow
 		int pickupPlanCount;
 		int pieceCount;
 		int colorBarCount;
+		bool setupDone;
 		QButtonGroup* pullTemplateShapeButtonGroup;
 		QPoint dragStartPosition;
 		QStackedWidget* editorStack; //editorStack.currentIndex() gives with mode

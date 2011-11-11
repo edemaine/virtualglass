@@ -3,10 +3,13 @@
 #ifndef PULLPLAN_H
 #define PULLPLAN_H
 
+class PullPlanLibraryWidget;
+
 #include <stdlib.h>
 #include <vector>
 #include "pulltemplate.h"
 #include <QPixmap>
+#include "pullplanlibrarywidget.h"
 
 class PullPlan;
 
@@ -17,6 +20,9 @@ class PullPlan
 
 		void setTemplate(PullTemplate* pt);
 		PullTemplate* getTemplate();
+
+		void setLibraryWidget(PullPlanLibraryWidget* plplw);
+		PullPlanLibraryWidget* getLibraryWidget();
 
 		vector<PullPlan*> subplans;
 		float twist;
@@ -31,6 +37,7 @@ class PullPlan
 		// Variables
 		PullTemplate* pullTemplate;
 		QPixmap editorPixmap;
+		PullPlanLibraryWidget* libraryWidget;
 };
 
 #endif

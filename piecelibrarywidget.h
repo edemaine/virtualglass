@@ -1,6 +1,8 @@
 #ifndef PIECELIBRARYWIDGET_H
 #define PIECELIBRARYWIDGET_H
 
+class Piece;
+
 #include <QtGui>
 #include <QObject>
 #include "piece.h"
