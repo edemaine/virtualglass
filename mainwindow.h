@@ -40,7 +40,6 @@ class MainWindow : public QMainWindow
 	private:
 		// Methods
 		void setupTable();
-		void setupNiceView();
 		void setupEditors();
 		void setupEmptyPaneEditor();
 		void setupPullPlanEditor();
@@ -50,7 +49,6 @@ class MainWindow : public QMainWindow
 		void updatePullPlanEditor();
 		void updatePickupPlanEditor();
 		void updatePieceEditor();
-		void updateNiceView();
 		void updateLibrary();
 
 		void highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw,bool highlight,bool setupDone);
@@ -58,6 +56,7 @@ class MainWindow : public QMainWindow
 		void highlightPlanLibraryWidgets(PieceLibraryWidget* plw,bool highlight,bool setupDone);
 
 		// Variables
+		NiceViewWidget* pieceNiceViewWidget;
 		QLabel* pieceTemplateParameter1Label;
 		QLabel* pieceTemplateParameter2Label;
 		QLabel* pickupTemplateParameter1Label;
@@ -75,14 +74,12 @@ class MainWindow : public QMainWindow
 		QStackedWidget* editorStack; //editorStack.currentIndex() gives with mode
 		QWidget* emptyEditorPage;
 		QWidget* pullPlanEditorPage;
-		QWidget* pickupPlanEditorPage;
 		QWidget* pieceEditorPage;
 		PullPlan* pullPlanEditorPlan;
 		PickupPlan* pickupPlanEditorPlan;
 		Piece* pieceEditorPlan;
 		Color defaultColor;
 		PullPlanLibraryWidget* pullPlanEditorPlanLibraryWidget;
-		PickupPlanLibraryWidget* pickupPlanEditorPlanLibraryWidget;
 		PieceLibraryWidget* pieceEditorPlanLibraryWidget;
 		Model* model;
 		QWidget* centralWidget;
@@ -90,10 +87,6 @@ class MainWindow : public QMainWindow
 		QComboBox* pieceTemplateComboBox;
 		PullPlanEditorViewWidget* pullPlanEditorViewWidget;
 		PickupPlanEditorViewWidget* pickupPlanEditorViewWidget;
-		PieceEditorViewWidget* pieceEditorViewWidget;
-		QLabel* niceViewLabel;
-		QVBoxLayout* niceViewLayout;
-		NiceViewWidget* niceViewWidget;
 		QHBoxLayout* pullTemplateLibraryLayout;
 		QHBoxLayout* pickupTemplateLibraryLayout;
 		QSlider* pullPlanTwistSlider;
