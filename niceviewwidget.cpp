@@ -24,7 +24,7 @@ NiceViewWidget :: NiceViewWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::Alp
 	leftMouseDown = false;
 
 	bgColor = QColor(200, 200, 200);
-	setFixedSize(500, 800);
+	setFixedWidth(500); 
 
 	cameraMode = PULLPLAN_MODE;
 
@@ -702,6 +702,7 @@ void NiceViewWidget :: setCameraMode(int m)
 			lookAtLoc[1] = 0.0;
 			lookAtLoc[2] = 5.0;
 			break;
+#ifdef UNDEF
 		case PICKUPPLAN_MODE:
 			theta = -PI/2.0;
 			fee = PI/2;
@@ -710,6 +711,7 @@ void NiceViewWidget :: setCameraMode(int m)
 			lookAtLoc[1] = 0.0;
 			lookAtLoc[2] = 0.0;
 			break;
+#endif
 		case PIECE_MODE:
 			theta = -PI/2.0;
 			fee = PI/2;

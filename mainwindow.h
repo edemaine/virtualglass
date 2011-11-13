@@ -28,10 +28,10 @@ class MainWindow : public QMainWindow
 
 	public:
 		MainWindow(Model* model);
-			void mousePressEvent(QMouseEvent* event);
-			void mouseMoveEvent(QMouseEvent* event);
-		void mouseDoubleClickEvent(QMouseEvent* event);
-			void dragMoveEvent(QDragMoveEvent* event);
+		void mousePressEvent(QMouseEvent* event);
+		void mouseReleaseEvent(QMouseEvent* event);
+		void mouseMoveEvent(QMouseEvent* event);
+		void dragMoveEvent(QDragMoveEvent* event);
 		void seedEverything();
 
 	signals:
@@ -42,6 +42,7 @@ class MainWindow : public QMainWindow
 		void setupTable();
 		void setupNiceView();
 		void setupEditors();
+		void setupEmptyPaneEditor();
 		void setupPullPlanEditor();
 		void setupPickupPlanEditor();
 		void setupPieceEditor();
@@ -66,13 +67,13 @@ class MainWindow : public QMainWindow
 		QCheckBox* writeRawCheckBox;
 		QGridLayout* tableGridLayout;
 		int pullPlanCount;
-		int pickupPlanCount;
 		int pieceCount;
 		int colorBarCount;
 		bool setupDone;
 		QButtonGroup* pullTemplateShapeButtonGroup;
 		QPoint dragStartPosition;
 		QStackedWidget* editorStack; //editorStack.currentIndex() gives with mode
+		QWidget* emptyEditorPage;
 		QWidget* pullPlanEditorPage;
 		QWidget* pickupPlanEditorPage;
 		QWidget* pieceEditorPage;
@@ -99,7 +100,6 @@ class MainWindow : public QMainWindow
 		QSlider* pullTemplateCasingThicknessSlider;
 		QSpinBox* pullPlanTwistSpin;
 		QPushButton* newPullPlanButton;
-		QPushButton* newPickupPlanButton;
 		QPushButton* newPieceButton;
 		QPushButton* newColorButton;
 
@@ -107,7 +107,6 @@ class MainWindow : public QMainWindow
 		void updateEverything();
 		void pieceTemplateComboBoxChanged(int index);
 		void newPullPlan();
-		void newPickupPlan();
 		void newPiece();
 		void pullPlanTwistSliderChanged(int p);
 		void pullTemplateCasingThicknessSliderChanged(int p);

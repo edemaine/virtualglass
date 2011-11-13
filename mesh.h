@@ -33,10 +33,14 @@ class Mesher
 		void applyPickupTransform(Vertex* p, SubpickupTemplate* spt);
 		void applyTumblerTransform(Vertex* p, vector<int> parameterValues);
 		void applyBowlTransform(Vertex* p, vector<int> parameterValues);
+		float computeTotalCaneLength(Piece* piece);
+		float computeTotalCaneLength(PickupPlan* plan);
+		float computeTotalCaneLength(PullPlan* plan);
 
 		// Variables
 		PullPlan* circleCasing;
 		PullPlan* squareCasing;
+		float totalCaneLength;
 };
 #endif
 

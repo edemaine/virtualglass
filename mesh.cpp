@@ -18,6 +18,34 @@ Mesher :: Mesher()
         squareCasing = new PullPlan(SQUARE_BASE_TEMPLATE, true, color);
 }
 
+float Mesher :: computeTotalCaneLength(Piece* piece)
+{
+	return computeTotalCaneLength(piece->pickup);
+}
+
+float Mesher :: computeTotalCaneLength(PickupPlan* plan)
+{
+	float total = 0.0;
+	for (unsigned int i = 0; i < plan->subplans.size(); ++i)
+	{
+		total += computeTotalCaneLength(plan->subplans[i]) * plan->getTemplate()->subpulls[i]->length;
+	}
+	return total;
+}
+
+float Mesher :: computeTotalCaneLength(PullPlan* plan)
+{
+	if (plan->isBase)
+		return 1.0;
+	
+	float total = 0.0;
+	for (unsigned int i = 0; i < plan->subplans.size(); ++i)
+	{
+		total += computeTotalCaneLength(plan->subplans[i]);
+	}
+	return total;	
+}
+
 void Mesher :: applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentPlan, int subplan)
 {
 	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
@@ -96,6 +124,8 @@ void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 	// Offset by location
 	v->position.x = v->position.x + spt->location.x * 5.0;
 	v->position.z = v->position.z + spt->location.y * 5.0;
+	v->position.y = v->position.y * 0.2;
+
 }
 
 void Mesher :: applyBowlTransform(Vertex* v, vector<int> parameterValues)
@@ -107,7 +137,7 @@ void Mesher :: applyBowlTransform(Vertex* v, vector<int> parameterValues)
 	// everything gets a base radius of 5.0
 	float theta = PI * v->position.x / 5.0 + PI * v->position.z * parameterValues[1] / 500.0;
 	float r = (5.0 / PI - v->position.y * (1.0 - parameterValues[0] * 0.005));
-	float phi = ((v->position.z - -5.0) / 10.0) * ((0.5 + parameterValues[0] * 0.005) * PI) - PI/2; 	
+	float phi = ((v->position.z - -5.0) / 10.0) * ((0.2 + parameterValues[0] * 0.005) * PI) - PI/2; 	
 
 	v->position.x = r * cos(theta) * cos(phi);
 	v->position.y = r * sin(theta) * cos(phi);
@@ -416,7 +446,6 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPla
 		}
 	}
 	geometry->compute_normals_from_triangles();
-
 }
 
 
