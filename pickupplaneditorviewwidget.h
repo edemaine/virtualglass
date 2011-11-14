@@ -5,14 +5,17 @@
 #include <QtGui>
 #include "pickupplan.h"
 #include "constants.h"
+#include "niceviewwidget.h"
+#include "model.h"
 
 class PickupPlanEditorViewWidget : public QWidget
 {
 	Q_OBJECT
 
 	public:
-		PickupPlanEditorViewWidget(PickupPlan* plan, QWidget* parent=0);
+		PickupPlanEditorViewWidget(PickupPlan* plan, Model* model, QWidget* parent=0);
 		void setPickupPlan(PickupPlan* plan);
+		QPixmap getPixmap();
 	
 	signals:
 		void someDataChanged();
@@ -23,6 +26,8 @@ class PickupPlanEditorViewWidget : public QWidget
 		void paintEvent(QPaintEvent *event);
 
 	private:
+		Model* model;
+		NiceViewWidget* niceViewWidget;
 		PickupPlan* plan;
 		int width;
 		int height;	

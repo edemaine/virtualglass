@@ -1,7 +1,7 @@
 
 #include "pickupplaneditorviewwidget.h"
 
-PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* plan, QWidget* parent) : QWidget(parent)
+PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* plan, Model* model, QWidget* parent) : QWidget(parent)
 {
 	width = 500;
 	height = 500;	
@@ -10,6 +10,19 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* plan, QWidg
 	setFixedWidth(width + 20);
 	setFixedHeight(height + 20);
 	this->plan = plan;
+	this->model = model;
+	this->niceViewWidget = new NiceViewWidget(this);
+	this->niceViewWidget->setCameraMode(PICKUPPLAN_MODE);
+	this->niceViewWidget->setGeometry(model->getGeometry(this->plan));
+
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	this->setLayout(layout);
+	layout->addWidget(niceViewWidget);
+}
+
+QPixmap PickupPlanEditorViewWidget :: getPixmap()
+{
+	return QPixmap::fromImage(niceViewWidget->renderImage());
 }
 
 void PickupPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
@@ -96,14 +109,16 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 void PickupPlanEditorViewWidget :: setPickupPlan(PickupPlan* plan)
 {
 	this->plan = plan;
+	this->niceViewWidget->setGeometry(model->getGeometry(this->plan));
+	this->repaint();
 }
 
-void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
+void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 {
 	QPainter painter;
-	painter.begin(this);
+	painter.begin(this->niceViewWidget);
         painter.setRenderHint(QPainter::Antialiasing);
-	painter.fillRect(event->rect(), QColor(200, 200, 200));
+
 	QPen pen;
 	pen.setColor(Qt::white);
 	pen.setWidth(3);

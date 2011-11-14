@@ -25,6 +25,7 @@ NiceViewWidget :: NiceViewWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::Alp
 
 	bgColor = QColor(200, 200, 200);
 	setFixedWidth(500); 
+	setMinimumHeight(500); 
 
 	cameraMode = PULLPLAN_MODE;
 
@@ -636,6 +637,7 @@ part of the mode feature.
 */
 void NiceViewWidget :: mouseMoveEvent (QMouseEvent* e)
 {
+
 	float relX, relY;
 	float windowWidth, windowHeight;
 	int oldMouseLocX, oldMouseLocY;
@@ -651,13 +653,15 @@ void NiceViewWidget :: mouseMoveEvent (QMouseEvent* e)
 	mouseLocY = e->y();
 	relY = (mouseLocY - oldMouseLocY) / windowHeight;
 
+	if (cameraMode == PICKUPPLAN_MODE)
+		return;
+
 	if (leftMouseDown)
 	{
 		theta -= (relX * 100.0 * PI / 180.0);
 		if (cameraMode == PIECE_MODE)
 			fee -= (relY * 100.0 * PI / 180.0);
 		update();
-		return;
 	}
 
 }
@@ -676,6 +680,9 @@ void NiceViewWidget :: wheelEvent(QWheelEvent *e)
 
 void NiceViewWidget :: zoom(float z)
 {
+	if (cameraMode == PICKUPPLAN_MODE)
+		return;
+
 	this->rho+=z;
 	update();
 }
@@ -702,16 +709,14 @@ void NiceViewWidget :: setCameraMode(int m)
 			lookAtLoc[1] = 0.0;
 			lookAtLoc[2] = 5.0;
 			break;
-#ifdef UNDEF
 		case PICKUPPLAN_MODE:
 			theta = -PI/2.0;
 			fee = PI/2;
-			rho = 20.0;
+			rho = 12.5;
 			lookAtLoc[0] = 0.0;
 			lookAtLoc[1] = 0.0;
 			lookAtLoc[2] = 0.0;
 			break;
-#endif
 		case PIECE_MODE:
 			theta = -PI/2.0;
 			fee = PI/2;

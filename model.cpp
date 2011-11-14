@@ -3,41 +3,43 @@
 
 Model :: Model()
 {
-	geometry = new Geometry();
+	pullPlanGeometry = new Geometry();
+	pickupPlanGeometry = new Geometry();
+	pieceGeometry = new Geometry();
 	mesher = new Mesher();
 }
 
 Geometry* Model :: getGeometry(PullPlan* plan)
 {
-	geometry->clear();
+	pullPlanGeometry->clear();
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
 
-	mesher->generateMesh(plan, geometry, ancestors, ancestorIndices, 0.0, 1.0, true);
+	mesher->generateMesh(plan, pullPlanGeometry, ancestors, ancestorIndices, 0.0, 1.0, true);
 
-	return geometry; 
+	return pullPlanGeometry; 
 }
 
 Geometry* Model :: getGeometry(PickupPlan* plan)
 {
-	geometry->clear();
+	pickupPlanGeometry->clear();
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
 
-	mesher->generateMesh(plan, geometry, ancestors, ancestorIndices);
+	mesher->generateMesh(plan, pickupPlanGeometry, ancestors, ancestorIndices);
 
-	return geometry;
+	return pickupPlanGeometry;
 }
 
 Geometry* Model :: getGeometry(Piece* piece)
 {
-	geometry->clear();
+	pieceGeometry->clear();
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
 
-	mesher->generateMesh(piece, geometry, ancestors, ancestorIndices);
+	mesher->generateMesh(piece, pieceGeometry, ancestors, ancestorIndices);
 
-	return geometry;
+	return pieceGeometry;
 }
 
 

@@ -43,8 +43,9 @@ class MainWindow : public QMainWindow
 		void setupEditors();
 		void setupEmptyPaneEditor();
 		void setupPullPlanEditor();
-		void setupPickupPlanEditor();
 		void setupPieceEditor();
+		void setupPieceSubeditor1(QVBoxLayout* layout);
+		void setupPieceSubeditor2(QVBoxLayout* layout);
 		void setupConnections();
 		void updatePullPlanEditor();
 		void updatePickupPlanEditor();
@@ -56,6 +57,7 @@ class MainWindow : public QMainWindow
 		void highlightPlanLibraryWidgets(PieceLibraryWidget* plw,bool highlight,bool setupDone);
 
 		// Variables
+		NiceViewWidget* pullPlanNiceViewWidget;
 		NiceViewWidget* pieceNiceViewWidget;
 		QLabel* pieceTemplateParameter1Label;
 		QLabel* pieceTemplateParameter2Label;

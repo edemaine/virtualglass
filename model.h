@@ -18,7 +18,9 @@ class Model
 		Geometry* getGeometry(Piece* p);
 
 	private:
-		Geometry* geometry;
+		Geometry* pullPlanGeometry;
+		Geometry* pickupPlanGeometry;
+		Geometry* pieceGeometry;
 		Mesher* mesher;
 };
 

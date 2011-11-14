@@ -110,11 +110,7 @@ void MainWindow :: seedEverything()
 	tableGridLayout->addWidget(cblw, colorBarCount, 0);
 	++colorBarCount;
 
-	// setup the editor/3D view
-	emit someDataChanged();
-
 	editorStack->setCurrentIndex(PULLPLAN_MODE);
-	emit someDataChanged();
 
 	// Load pull template types
 	for (int i = LINE_THREE_CIRCLES_TEMPLATE; i <= SQUARE_SIXTEEN_SQUARES_TEMPLATE; ++i)
@@ -140,7 +136,7 @@ void MainWindow :: seedEverything()
 		pickupPlanEditorPlan->setTemplate(new PickupTemplate(i));
 		emit someDataChanged();
 		PickupTemplateLibraryWidget *ptlw = new PickupTemplateLibraryWidget(
-			QPixmap::grabWidget(pickupPlanEditorViewWidget).scaled(100, 100), i);
+			pickupPlanEditorViewWidget->getPixmap().scaled(100, 100), i);
 		pickupTemplateLibraryLayout->addWidget(ptlw);
 	}
 
@@ -360,68 +356,12 @@ void MainWindow :: setupEditors()
 	editorStack->addWidget(pieceEditorPage);
 }
 
-void MainWindow :: setupPieceEditor()
+void MainWindow :: setupPieceSubeditor1(QVBoxLayout* layout)
 {
-	pieceEditorPlan = new Piece(TUMBLER_TEMPLATE);
-
-	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")),
-		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);
-	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 2);
-	++pieceCount;
-
-	pieceEditorPage = new QWidget(editorStack);
-
-	QHBoxLayout* piecePageLayout = new QHBoxLayout(pieceEditorPage);
-	pieceEditorPage->setLayout(piecePageLayout);
-	QVBoxLayout* pickupPlanEditorLayout = new QVBoxLayout(pieceEditorPage);
-	piecePageLayout->addLayout(pickupPlanEditorLayout);
-	QVBoxLayout* pieceEditorLayout = new QVBoxLayout(pieceEditorPage);
-	piecePageLayout->addLayout(pieceEditorLayout);
-
-
-        pieceNiceViewWidget = new NiceViewWidget(pieceEditorPage);
-        pieceEditorLayout->addWidget(pieceNiceViewWidget, 10);
-
-        writeRawCheckBox = new QCheckBox("Write .raw file", pieceEditorPage);
-        writeRawCheckBox->setCheckState(Qt::Unchecked);
-        pieceEditorLayout->addWidget(writeRawCheckBox, 0);
-
-	pieceTemplateComboBox = new QComboBox(pieceEditorPage);
-	pieceTemplateComboBox->addItem("Tumbler");
-	pieceTemplateComboBox->addItem("Bowl");
-	pieceEditorLayout->addWidget(pieceTemplateComboBox, 0);
-
-	pieceTemplateParameter1Label = new QLabel(pieceEditorPlan->getTemplate()->parameterNames[0]);
-	pieceTemplateParameter1Slider = new QSlider(Qt::Horizontal, pieceEditorPage);
-	pieceTemplateParameter1Slider->setRange(0, 100);
-	pieceTemplateParameter1Slider->setTickPosition(QSlider::TicksBothSides);
-	pieceTemplateParameter1Slider->setSliderPosition(0);
-
-	QHBoxLayout* parameter1Layout = new QHBoxLayout(pieceEditorPage);
-	pieceEditorLayout->addLayout(parameter1Layout);
-	parameter1Layout->addWidget(pieceTemplateParameter1Label);
-	parameter1Layout->addWidget(pieceTemplateParameter1Slider);
-
-	pieceTemplateParameter2Label = new QLabel(pieceEditorPlan->getTemplate()->parameterNames[1]);
-	pieceTemplateParameter2Slider = new QSlider(Qt::Horizontal, pieceEditorPage);
-	pieceTemplateParameter2Slider->setRange(0, 100);
-	pieceTemplateParameter2Slider->setTickPosition(QSlider::TicksBothSides);
-	pieceTemplateParameter2Slider->setSliderPosition(0);
-
-	QHBoxLayout* parameter2Layout = new QHBoxLayout(pieceEditorPage);
-	pieceEditorLayout->addLayout(parameter2Layout);
-	parameter2Layout->addWidget(pieceTemplateParameter2Label);
-	parameter2Layout->addWidget(pieceTemplateParameter2Slider);
-
-	// Little description for the editor
-	QLabel* descriptionLabel = new QLabel("Piece editor - drag a pickup into the piece", pieceEditorPage);
-	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	pieceEditorLayout->addWidget(descriptionLabel, 0);	
-
 	pickupPlanEditorPlan = new PickupPlan(VERTICALS_TEMPLATE);
 
-	pickupPlanEditorViewWidget = new PickupPlanEditorViewWidget(pickupPlanEditorPlan, pieceEditorPage);
-	pickupPlanEditorLayout->addWidget(pickupPlanEditorViewWidget, 10);
+	pickupPlanEditorViewWidget = new PickupPlanEditorViewWidget(pickupPlanEditorPlan, model, pieceEditorPage);
+	layout->addWidget(pickupPlanEditorViewWidget, 10);
 
 	// Setup pickup template scrolling library
 	QWidget* pickupTemplateLibraryWidget = new QWidget(centralWidget);
@@ -437,7 +377,7 @@ void MainWindow :: setupPieceEditor()
 	pickupTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pickupTemplateLibraryScrollArea->setFixedHeight(130);
 	pickupTemplateLibraryScrollArea->setFixedWidth(520);
-	pickupPlanEditorLayout->addWidget(pickupTemplateLibraryScrollArea);
+	layout->addWidget(pickupTemplateLibraryScrollArea);
 
 	pickupTemplateParameter1Label = new QLabel(pickupPlanEditorPlan->getTemplate()->getParameterName(0));
 	pickupTemplateParameter1Slider = new QSlider(Qt::Horizontal, pieceEditorPage);
@@ -445,15 +385,78 @@ void MainWindow :: setupPieceEditor()
 	pickupTemplateParameter1Slider->setTickPosition(QSlider::TicksBothSides);
 	pickupTemplateParameter1Slider->setSliderPosition(0);
 
-	parameter1Layout = new QHBoxLayout(pieceEditorPage);
-	pickupPlanEditorLayout->addLayout(parameter1Layout);
+	QHBoxLayout* parameter1Layout = new QHBoxLayout(pieceEditorPage);
+	layout->addLayout(parameter1Layout);
 	parameter1Layout->addWidget(pickupTemplateParameter1Label);
 	parameter1Layout->addWidget(pickupTemplateParameter1Slider);
 
 	// Little description for the editor
-	descriptionLabel = new QLabel("Pickup editor - drag color or canes into the pickup\nor select a new template above", pieceEditorPage);
+	QLabel* descriptionLabel = new QLabel("Pickup editor - drag color or canes into the pickup\nor select a new template above", pieceEditorPage);
 	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	pickupPlanEditorLayout->addWidget(descriptionLabel, 0);	
+	layout->addWidget(descriptionLabel, 0);	
+}
+
+void MainWindow :: setupPieceSubeditor2(QVBoxLayout* layout)
+{
+	pieceEditorPlan = new Piece(TUMBLER_TEMPLATE);
+
+	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")),
+		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);
+	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 2);
+	++pieceCount;
+
+        pieceNiceViewWidget = new NiceViewWidget(pieceEditorPage);
+        layout->addWidget(pieceNiceViewWidget, 10);
+
+        writeRawCheckBox = new QCheckBox("Write .raw file", pieceEditorPage);
+        writeRawCheckBox->setCheckState(Qt::Unchecked);
+        layout->addWidget(writeRawCheckBox, 0);
+
+	pieceTemplateComboBox = new QComboBox(pieceEditorPage);
+	pieceTemplateComboBox->addItem("Tumbler");
+	pieceTemplateComboBox->addItem("Bowl");
+	layout->addWidget(pieceTemplateComboBox, 0);
+
+	pieceTemplateParameter1Label = new QLabel(pieceEditorPlan->getTemplate()->parameterNames[0]);
+	pieceTemplateParameter1Slider = new QSlider(Qt::Horizontal, pieceEditorPage);
+	pieceTemplateParameter1Slider->setRange(0, 100);
+	pieceTemplateParameter1Slider->setTickPosition(QSlider::TicksBothSides);
+	pieceTemplateParameter1Slider->setSliderPosition(0);
+
+	QHBoxLayout* parameter1Layout = new QHBoxLayout(pieceEditorPage);
+	layout->addLayout(parameter1Layout);
+	parameter1Layout->addWidget(pieceTemplateParameter1Label);
+	parameter1Layout->addWidget(pieceTemplateParameter1Slider);
+
+	pieceTemplateParameter2Label = new QLabel(pieceEditorPlan->getTemplate()->parameterNames[1]);
+	pieceTemplateParameter2Slider = new QSlider(Qt::Horizontal, pieceEditorPage);
+	pieceTemplateParameter2Slider->setRange(0, 100);
+	pieceTemplateParameter2Slider->setTickPosition(QSlider::TicksBothSides);
+	pieceTemplateParameter2Slider->setSliderPosition(0);
+
+	QHBoxLayout* parameter2Layout = new QHBoxLayout(pieceEditorPage);
+	layout->addLayout(parameter2Layout);
+	parameter2Layout->addWidget(pieceTemplateParameter2Label);
+	parameter2Layout->addWidget(pieceTemplateParameter2Slider);
+
+	// Little description for the editor
+	QLabel* descriptionLabel = new QLabel("Piece editor", pieceEditorPage);
+	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	layout->addWidget(descriptionLabel, 0);	
+}
+
+void MainWindow :: setupPieceEditor()
+{
+	pieceEditorPage = new QWidget(editorStack);
+	QHBoxLayout* piecePageLayout = new QHBoxLayout(pieceEditorPage);
+	pieceEditorPage->setLayout(piecePageLayout);
+	QVBoxLayout* pickupPlanEditorLayout = new QVBoxLayout(pieceEditorPage);
+	piecePageLayout->addLayout(pickupPlanEditorLayout);
+	QVBoxLayout* pieceEditorLayout = new QVBoxLayout(pieceEditorPage);
+	piecePageLayout->addLayout(pieceEditorLayout);
+
+	setupPieceSubeditor1(pickupPlanEditorLayout);
+	setupPieceSubeditor2(pieceEditorLayout);
 }
 
 void MainWindow :: setupEmptyPaneEditor()
@@ -477,8 +480,13 @@ void MainWindow :: setupPullPlanEditor()
 
 	// Setup the editor layout 
 	pullPlanEditorPage = new QWidget(editorStack);
+	QHBoxLayout* pageLayout = new QHBoxLayout(pullPlanEditorPage);
+	pullPlanEditorPage->setLayout(pageLayout);
 	QVBoxLayout* editorLayout = new QVBoxLayout(pullPlanEditorPage);
-	pullPlanEditorPage->setLayout(editorLayout);
+	pageLayout->addLayout(editorLayout);
+
+	pullPlanNiceViewWidget = new NiceViewWidget(pullPlanEditorPage);
+        pageLayout->addWidget(pullPlanNiceViewWidget, 10);
 
 	pullPlanEditorViewWidget = new PullPlanEditorViewWidget(pullPlanEditorPlan, pullPlanEditorPage);
 	editorLayout->addWidget(pullPlanEditorViewWidget, 10);
@@ -727,8 +735,6 @@ void MainWindow :: highlightPlanLibraryWidgets(PieceLibraryWidget* plw,bool high
 
 void MainWindow :: updateEverything()
 {
-	updateLibrary();
-
         switch (editorStack->currentIndex())
         {
                 case PULLPLAN_MODE:
@@ -741,6 +747,7 @@ void MainWindow :: updateEverything()
                         return;
         }
 
+	updateLibrary();
 }
 
 void MainWindow :: updateLibrary()
@@ -752,7 +759,7 @@ void MainWindow :: updateLibrary()
 	{
 		case PULLPLAN_MODE:
 			pullPlanEditorPlanLibraryWidget->updatePixmaps(
-				QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100), //niceViewWidget->renderImage()).scaled(100, 100),
+				QPixmap::fromImage(pullPlanNiceViewWidget->renderImage()).scaled(100, 100),
 				QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100));
 			pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(true);
 			break;
@@ -768,7 +775,8 @@ void MainWindow :: updateLibrary()
 void MainWindow :: updatePieceEditor()
 {
 	// update pickup stuff
-	pickupPlanEditorViewWidget->repaint();
+	pickupPlanEditorViewWidget->setPickupPlan(pickupPlanEditorPlan);
+	pieceTemplateComboBox->setCurrentIndex(pieceEditorPlan->getTemplate()->type-1);
 
 	// update piece stuff
         Geometry* geometry = model->getGeometry(pieceEditorPlan);
@@ -776,8 +784,6 @@ void MainWindow :: updatePieceEditor()
         pieceNiceViewWidget->setGeometry(geometry);
         if (writeRawCheckBox->checkState() == Qt::Checked)
                 geometry->save_raw_file("./cane.raw");
-
-	pieceTemplateComboBox->setCurrentIndex(pieceEditorPlan->getTemplate()->type-1);
 }
 
 void MainWindow :: updatePullPlanEditor()
@@ -794,6 +800,12 @@ void MainWindow :: updatePullPlanEditor()
 	pullPlanTwistSlider->setSliderPosition(twist);
 	pullPlanTwistSpin->setValue(twist);
 	pullPlanEditorViewWidget->repaint();
+
+        Geometry* geometry = model->getGeometry(pullPlanEditorPlan);
+        pullPlanNiceViewWidget->setCameraMode(PULLPLAN_MODE);
+        pullPlanNiceViewWidget->setGeometry(geometry);
+        if (writeRawCheckBox->checkState() == Qt::Checked)
+                geometry->save_raw_file("./cane.raw");
 }
 
 void MainWindow :: pieceTemplateComboBoxChanged(int newIndex)

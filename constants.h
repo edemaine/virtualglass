@@ -20,6 +20,7 @@
 #define EMPTY_MODE 0
 #define PULLPLAN_MODE 1
 #define PIECE_MODE 2
+#define PICKUPPLAN_MODE 3
 
 #define PI 3.14159265358979323846f
 

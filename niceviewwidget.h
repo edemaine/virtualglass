@@ -24,7 +24,7 @@ class NiceViewWidget : public QGLWidget
 	Q_OBJECT
 
 public:
-	NiceViewWidget(QWidget* parent);
+	NiceViewWidget(QWidget* parent=0);
 	virtual ~NiceViewWidget();
 	void setCameraMode(int m);
 	int getCameraMode();
