@@ -72,9 +72,10 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		ll.y = ll.y * height/2 + height/2 + 10;  
 		ur.x = ur.x * width/2 + width/2 + 10;  
 		ur.y = ur.y * height/2 + height/2 + 10;  
-	
+
+		// Need to invert event location, since upper left/lower left origins exist	
 		if (ll.x < event->pos().x() && event->pos().x() < ur.x 
-			&& ll.y < event->pos().y() && event->pos().y() < ur.y)
+			&& ll.y < (height + 10 - event->pos().y()) && (height + 10 - event->pos().y()) < ur.y)
 		{
 			event->accept();
 		}
@@ -115,6 +116,8 @@ void PickupPlanEditorViewWidget :: setPickupPlan(PickupPlan* plan)
 
 void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 {
+	return;
+
 	QPainter painter;
 	painter.begin(this->niceViewWidget);
         painter.setRenderHint(QPainter::Antialiasing);

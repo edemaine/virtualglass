@@ -485,8 +485,6 @@ void MainWindow :: setupPullPlanEditor()
 	QVBoxLayout* editorLayout = new QVBoxLayout(pullPlanEditorPage);
 	pageLayout->addLayout(editorLayout);
 
-	pullPlanNiceViewWidget = new NiceViewWidget(pullPlanEditorPage);
-        pageLayout->addWidget(pullPlanNiceViewWidget, 10);
 
 	pullPlanEditorViewWidget = new PullPlanEditorViewWidget(pullPlanEditorPlan, pullPlanEditorPage);
 	editorLayout->addWidget(pullPlanEditorViewWidget, 10);
@@ -506,7 +504,6 @@ void MainWindow :: setupPullPlanEditor()
 	pullTemplateLibraryScrollArea->setFixedHeight(130);
 	pullTemplateLibraryScrollArea->setFixedWidth(520);
 	editorLayout->addWidget(pullTemplateLibraryScrollArea);
-
 
 	QCheckBox* circleCheckBox = new QCheckBox("Circle");
 	QCheckBox* squareCheckBox = new QCheckBox("Square");
@@ -568,6 +565,9 @@ void MainWindow :: setupPullPlanEditor()
 		pullPlanEditorPage);
 	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	editorLayout->addWidget(descriptionLabel, 0);	
+
+	pullPlanNiceViewWidget = new NiceViewWidget(pullPlanEditorPage);
+        pageLayout->addWidget(pullPlanNiceViewWidget, 10);
 }
 
 void MainWindow :: pullTemplateShapeButtonGroupChanged(int)

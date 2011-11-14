@@ -20,6 +20,9 @@ class Mesher
 		void generateMesh(Piece* piece, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices);
 		void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, 
 			float start, float end, bool addCasing = false, int groupIndex = -1);
+		void updateTotalCaneLength(Piece* piece);
+		void updateTotalCaneLength(PickupPlan* plan);
+		void updateTotalCaneLength(PullPlan* plan);
 
 	private:
 		// Methods
@@ -38,9 +41,9 @@ class Mesher
 		float computeTotalCaneLength(PullPlan* plan);
 
 		// Variables
+		float totalCaneLength;
 		PullPlan* circleCasing;
 		PullPlan* squareCasing;
-		float totalCaneLength;
 };
 #endif
 
