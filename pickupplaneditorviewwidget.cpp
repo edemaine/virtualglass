@@ -109,6 +109,7 @@ void PickupPlanEditorViewWidget :: setPickupPlan(PickupPlan* plan)
 {
 	this->plan = plan;
 	this->niceViewWidget->setGeometry(model->getGeometry(this->plan));
+	this->niceViewWidget->repaint();
 	this->repaint();
 }
 

@@ -12,7 +12,7 @@ PieceTemplate :: PieceTemplate(int t)
 	{
 		case TUMBLER_TEMPLATE:
 			tmp = new char[100];
-			sprintf(tmp, "Height");
+			sprintf(tmp, "Width");
 			parameterNames.push_back(tmp);
 			tmp = new char[100];
 			sprintf(tmp, "Taper");

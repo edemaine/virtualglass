@@ -65,7 +65,7 @@ void MainWindow :: seedEverything()
 
 	for (int i = VERTICALS_TEMPLATE; i <= MURRINE_SQUARE_TEMPLATE; ++i)
 	{
-		pickupPlanEditorPlan->setTemplate(new PickupTemplate(i));
+		pieceEditorPlan->pickup->setTemplate(new PickupTemplate(i));
 		emit someDataChanged();
 		PickupTemplateLibraryWidget *ptlw = new PickupTemplateLibraryWidget(
 			pickupPlanEditorViewWidget->getPixmap().scaled(100, 100), i);
@@ -73,15 +73,14 @@ void MainWindow :: seedEverything()
 	}
 
 	// Load final starting pickup plan
-	pickupPlanEditorPlan->setTemplate(new PickupTemplate(VERTICALS_TEMPLATE));
-	for (unsigned int j = 0; j < pickupPlanEditorPlan->getTemplate()->subpulls.size(); ++j)
+	pieceEditorPlan->pickup->setTemplate(new PickupTemplate(VERTICALS_TEMPLATE));
+	for (unsigned int j = 0; j < pieceEditorPlan->pickup->getTemplate()->subpulls.size(); ++j)
 	{
-		pickupPlanEditorPlan->subplans[j] = pullPlanEditorPlan;
+		pieceEditorPlan->pickup->subplans[j] = pullPlanEditorPlan;
 	}
 	emit someDataChanged();
 
 	// Load correct picture of piece
-	pieceEditorPlan->pickup = pickupPlanEditorPlan;
 	editorStack->setCurrentIndex(PIECE_MODE);
 	emit someDataChanged();
 
@@ -128,12 +127,12 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	}
 	else if (pktlw != NULL)
 	{
-		if (pktlw->getPickupTemplateType() != pickupPlanEditorPlan->getTemplate()->type)
+		if (pktlw->getPickupTemplateType() != pieceEditorPlan->pickup->getTemplate()->type)
 		{
-			pickupPlanEditorPlan->setTemplate(new PickupTemplate(pktlw->getPickupTemplateType()));
-			pickupPlanEditorViewWidget->setPickupPlan(pickupPlanEditorPlan);
-			pickupTemplateParameter1Label->setText(pickupPlanEditorPlan->getTemplate()->getParameterName(0));
-			pickupTemplateParameter1Slider->setSliderPosition(pickupPlanEditorPlan->getTemplate()->getParameter(0));
+			pieceEditorPlan->pickup->setTemplate(new PickupTemplate(pktlw->getPickupTemplateType()));
+			pickupPlanEditorViewWidget->setPickupPlan(pieceEditorPlan->pickup);
+			pickupTemplateParameter1Label->setText(pieceEditorPlan->pickup->getTemplate()->getParameterName(0));
+			pickupTemplateParameter1SpinBox->setValue(pieceEditorPlan->pickup->getTemplate()->getParameter(0));
 			emit someDataChanged();
 		}
 	}
@@ -220,8 +219,8 @@ void MainWindow :: setupConnections()
 	connect(pullPlanTwistSpin, SIGNAL(valueChanged(int)), this, SLOT(pullPlanTwistSpinChanged(int)));
 
 	connect(pickupPlanEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
-	connect(pickupTemplateParameter1Slider, SIGNAL(valueChanged(int)),
-		this, SLOT(pickupTemplateParameterSlider1Changed(int)));
+	connect(pickupTemplateParameter1SpinBox, SIGNAL(valueChanged(int)),
+		this, SLOT(pickupTemplateParameter1SpinBoxChanged(int)));
 
 	connect(pieceTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pieceTemplateComboBoxChanged(int)));
 	connect(newPieceButton, SIGNAL(pressed()), this, SLOT(newPiece()));
@@ -290,9 +289,7 @@ void MainWindow :: setupEditors()
 
 void MainWindow :: setupPieceSubeditor1(QVBoxLayout* layout)
 {
-	pickupPlanEditorPlan = new PickupPlan(VERTICALS_TEMPLATE);
-
-	pickupPlanEditorViewWidget = new PickupPlanEditorViewWidget(pickupPlanEditorPlan, model, pieceEditorPage);
+	pickupPlanEditorViewWidget = new PickupPlanEditorViewWidget(pieceEditorPlan->pickup, model, pieceEditorPage);
 	layout->addWidget(pickupPlanEditorViewWidget, 10);
 
 	// Setup pickup template scrolling library
@@ -311,16 +308,17 @@ void MainWindow :: setupPieceSubeditor1(QVBoxLayout* layout)
 	pickupTemplateLibraryScrollArea->setFixedWidth(500);
 	layout->addWidget(pickupTemplateLibraryScrollArea);
 
-	pickupTemplateParameter1Label = new QLabel(pickupPlanEditorPlan->getTemplate()->getParameterName(0));
-	pickupTemplateParameter1Slider = new QSlider(Qt::Horizontal, pieceEditorPage);
-	pickupTemplateParameter1Slider->setRange(0, 100);
-	pickupTemplateParameter1Slider->setTickPosition(QSlider::TicksBothSides);
-	pickupTemplateParameter1Slider->setSliderPosition(0);
+	pickupTemplateParameter1Label = new QLabel(pieceEditorPlan->pickup->getTemplate()->getParameterName(0));
+	pickupTemplateParameter1SpinBox = new QSpinBox(pieceEditorPage);
+	pickupTemplateParameter1SpinBox->setRange(1, 20);
+	pickupTemplateParameter1SpinBox->setSingleStep(1);
+	pickupTemplateParameter1SpinBox->setValue(1);
 
 	QHBoxLayout* parameter1Layout = new QHBoxLayout(pieceEditorPage);
 	layout->addLayout(parameter1Layout);
-	parameter1Layout->addWidget(pickupTemplateParameter1Label);
-	parameter1Layout->addWidget(pickupTemplateParameter1Slider);
+	parameter1Layout->addWidget(pickupTemplateParameter1Label, 0);
+	parameter1Layout->addWidget(pickupTemplateParameter1SpinBox, 0);
+	parameter1Layout->addStretch(1);
 
 	// Little description for the editor
 	QLabel* descriptionLabel = new QLabel("Pickup editor - drag color or canes into the pickup\nor select a new template above", pieceEditorPage);
@@ -330,8 +328,6 @@ void MainWindow :: setupPieceSubeditor1(QVBoxLayout* layout)
 
 void MainWindow :: setupPieceSubeditor2(QVBoxLayout* layout)
 {
-	pieceEditorPlan = new Piece(TUMBLER_TEMPLATE);
-
 	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")),
 		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);
 	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 2);
@@ -387,6 +383,7 @@ void MainWindow :: setupPieceEditor()
 	QVBoxLayout* pieceEditorLayout = new QVBoxLayout(pieceEditorPage);
 	piecePageLayout->addLayout(pieceEditorLayout);
 
+	pieceEditorPlan = new Piece(TUMBLER_TEMPLATE);
 	setupPieceSubeditor1(pickupPlanEditorLayout);
 	setupPieceSubeditor2(pieceEditorLayout);
 }
@@ -531,6 +528,9 @@ void MainWindow :: pullPlanTwistSpinChanged(int)
 void MainWindow :: pieceTemplateParameterSlider2Changed(int)
 {
 	int value = pieceTemplateParameter2Slider->sliderPosition();
+
+	if (value == pieceEditorPlan->getTemplate()->parameterValues[1])
+		return;
 	pieceEditorPlan->getTemplate()->parameterValues[1] = value;
 	someDataChanged();
 }
@@ -538,15 +538,22 @@ void MainWindow :: pieceTemplateParameterSlider2Changed(int)
 void MainWindow :: pieceTemplateParameterSlider1Changed(int)
 {
 	int value = pieceTemplateParameter1Slider->sliderPosition();
+
+	if (value == pieceEditorPlan->getTemplate()->parameterValues[0])
+		return;
 	pieceEditorPlan->getTemplate()->parameterValues[0] = value;
 	someDataChanged();
 }
 
-void MainWindow :: pickupTemplateParameterSlider1Changed(int)
+void MainWindow :: pickupTemplateParameter1SpinBoxChanged(int)
 {
-	int value = pickupTemplateParameter1Slider->sliderPosition();
-	pickupPlanEditorPlan->getTemplate()->setParameter(0, value);
-	pickupPlanEditorPlan->setTemplate(pickupPlanEditorPlan->getTemplate()); // just push changes through
+	int value = pickupTemplateParameter1SpinBox->value();
+
+	if (value == pieceEditorPlan->pickup->getTemplate()->getParameter(0))
+		return;
+
+	pieceEditorPlan->pickup->getTemplate()->setParameter(0, value);
+	pieceEditorPlan->pickup->setTemplate(pieceEditorPlan->pickup->getTemplate()); // just push changes through
 	someDataChanged();
 }
 
@@ -567,7 +574,6 @@ void MainWindow :: pullPlanTwistSliderChanged(int)
 void MainWindow :: newPiece()
 {
 	pieceEditorPlan = new Piece(TUMBLER_TEMPLATE);
-	pickupPlanEditorPlan = new PickupPlan(VERTICALS_TEMPLATE);
 
 	pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")),
@@ -575,7 +581,7 @@ void MainWindow :: newPiece()
 	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 2);
 	++pieceCount;
 
-	pickupPlanEditorViewWidget->setPickupPlan(pickupPlanEditorPlan);
+	pickupPlanEditorViewWidget->setPickupPlan(pieceEditorPlan->pickup);
 
 	// Load up the right editor
 	editorStack->setCurrentIndex(PIECE_MODE);
@@ -707,8 +713,9 @@ void MainWindow :: updateLibrary()
 void MainWindow :: updatePieceEditor()
 {
 	// update pickup stuff
-	pickupPlanEditorViewWidget->setPickupPlan(pickupPlanEditorPlan);
-	pieceTemplateComboBox->setCurrentIndex(pieceEditorPlan->getTemplate()->type-1);
+	int value = pieceEditorPlan->pickup->getTemplate()->getParameter(0);
+	pickupTemplateParameter1SpinBox->setValue(value);
+	pickupPlanEditorViewWidget->setPickupPlan(pieceEditorPlan->pickup);
 
 	// update piece stuff
         Geometry* geometry = model->getGeometry(pieceEditorPlan);
@@ -716,6 +723,11 @@ void MainWindow :: updatePieceEditor()
         pieceNiceViewWidget->setGeometry(geometry);
         if (writeRawCheckBox->checkState() == Qt::Checked)
                 geometry->save_raw_file("./cane.raw");
+	pieceTemplateComboBox->setCurrentIndex(pieceEditorPlan->getTemplate()->type-1);
+	pieceTemplateParameter1Label->setText(pieceEditorPlan->getTemplate()->parameterNames[0]);
+	pieceTemplateParameter1Slider->setSliderPosition(pieceEditorPlan->getTemplate()->parameterValues[0]);
+	pieceTemplateParameter2Label->setText(pieceEditorPlan->getTemplate()->parameterNames[1]);
+	pieceTemplateParameter2Slider->setSliderPosition(pieceEditorPlan->getTemplate()->parameterValues[1]);
 }
 
 void MainWindow :: updatePullPlanEditor()

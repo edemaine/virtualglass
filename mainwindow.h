@@ -62,9 +62,9 @@ class MainWindow : public QMainWindow
 		QLabel* pieceTemplateParameter1Label;
 		QLabel* pieceTemplateParameter2Label;
 		QLabel* pickupTemplateParameter1Label;
+		QSpinBox* pickupTemplateParameter1SpinBox;
 		QSlider* pieceTemplateParameter1Slider;
 		QSlider* pieceTemplateParameter2Slider;
-		QSlider* pickupTemplateParameter1Slider;
 		QCheckBox* writeRawCheckBox;
 		QGridLayout* tableGridLayout;
 		int pullPlanCount;
@@ -78,7 +78,6 @@ class MainWindow : public QMainWindow
 		QWidget* pullPlanEditorPage;
 		QWidget* pieceEditorPage;
 		PullPlan* pullPlanEditorPlan;
-		PickupPlan* pickupPlanEditorPlan;
 		Piece* pieceEditorPlan;
 		Color defaultColor;
 		PullPlanLibraryWidget* pullPlanEditorPlanLibraryWidget;
@@ -109,7 +108,7 @@ class MainWindow : public QMainWindow
 		void pullTemplateShapeButtonGroupChanged(int);
 		void pieceTemplateParameterSlider1Changed(int);
 		void pieceTemplateParameterSlider2Changed(int);
-		void pickupTemplateParameterSlider1Changed(int);
+		void pickupTemplateParameter1SpinBoxChanged(int);
 		void writeRawCheckBoxChanged(int);
 };
 
