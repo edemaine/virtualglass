@@ -9,7 +9,7 @@ PickupPlan :: PickupPlan(int pickupTemplate)
 		Color color;
 		color.r = color.g = color.b = 1.0;
 		color.a = 0.4;
-		this->subplans.push_back(new PullPlan(ONE_COLORED_CASING_TEMPLATE, true, color));
+		this->subplans.push_back(new PullPlan(CASED_CIRCLE_TEMPLATE, true, color));
 	}
 }
 
@@ -49,7 +49,7 @@ void PickupPlan :: setTemplate(PickupTemplate* newTemplate)
 			Color color;
 			color.r = color.g = color.b = 1.0;
 			color.a = 0.4;
-			newSubplans.push_back(new PullPlan(ONE_COLORED_CASING_TEMPLATE, true, color));
+			newSubplans.push_back(new PullPlan(CASED_CIRCLE_TEMPLATE, true, color));
 		}
 	}
 
