@@ -29,8 +29,6 @@ class PickupPlanEditorViewWidget : public QWidget
 		Model* model;
 		NiceViewWidget* niceViewWidget;
 		PickupPlan* plan;
-		int width;
-		int height;	
 };
 
 

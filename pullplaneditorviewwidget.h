@@ -20,11 +20,10 @@ class PullPlanEditorViewWidget : public QWidget
 		void dragEnterEvent(QDragEnterEvent* dee);
 		void dropEvent(QDropEvent* de);
 		void paintEvent(QPaintEvent *event);
+		int heightForWidth(int w);
 
 	private:
 		PullPlan* plan;
-		int width;
-		int height;	
 };
 
 

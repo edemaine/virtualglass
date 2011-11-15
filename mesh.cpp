@@ -151,12 +151,16 @@ void Mesher :: applyBowlTransform(Vertex* v, vector<int> parameterValues)
 	// -5.0 goes to -PI, 5.0 goes to PI
 	// everything gets a base radius of 5.0
 	float theta = PI * v->position.x / 5.0 + PI * v->position.z * parameterValues[1] / 500.0;
-	float r = (5.0 / PI - v->position.y * (1.0 - parameterValues[0] * 0.005));
-	float phi = ((v->position.z - -5.0) / 10.0) * ((0.2 + parameterValues[0] * 0.005) * PI) - PI/2; 	
+
+	float totalR = 4.0 + parameterValues[0] * 0.1;
+	float totalPhi = 10.0 / totalR;
+
+	float r = totalR - v->position.y;
+	float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
 
 	v->position.x = r * cos(theta) * cos(phi);
 	v->position.y = r * sin(theta) * cos(phi);
-	v->position.z = r * sin(phi);
+	v->position.z = r * sin(phi) + (totalR - totalR * sin(totalPhi - PI / 2))/2.0;
 }
 
 void Mesher :: applyTumblerTransform(Vertex* v, vector<int> parameterValues)

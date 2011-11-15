@@ -3,12 +3,10 @@
 
 PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* plan, Model* model, QWidget* parent) : QWidget(parent)
 {
-	width = 500;
-	height = 500;	
-
 	setAcceptDrops(true);
-	setFixedWidth(width + 20);
-	setFixedHeight(height + 20);
+	setFixedWidth(500);
+	setFixedHeight(500);
+
 	this->plan = plan;
 	this->model = model;
 	this->niceViewWidget = new NiceViewWidget(this);
@@ -68,14 +66,14 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		}	
 
 		// Scale to pixels
-		ll.x = ll.x * width/2 + width/2 + 10;  
-		ll.y = ll.y * height/2 + height/2 + 10;  
-		ur.x = ur.x * width/2 + width/2 + 10;  
-		ur.y = ur.y * height/2 + height/2 + 10;  
+		ll.x = ll.x * width()/2 + width()/2 + 10;  
+		ll.y = ll.y * height()/2 + height()/2 + 10;  
+		ur.x = ur.x * width()/2 + width()/2 + 10;  
+		ur.y = ur.y * height()/2 + height()/2 + 10;  
 
 		// Need to invert event location, since upper left/lower left origins exist	
 		if (ll.x < event->pos().x() && event->pos().x() < ur.x 
-			&& ll.y < (height + 10 - event->pos().y()) && (height + 10 - event->pos().y()) < ur.y)
+			&& ll.y < (this->height() + 10 - event->pos().y()) && (this->height() + 10 - event->pos().y()) < ur.y)
 		{
 			event->accept();
 		}
@@ -171,10 +169,10 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
                 }
 
                 // Scale to pixels
-                ll.x = ll.x * width/2 + width/2 + 10;
-                ll.y = ll.y * height/2 + height/2 + 10;
-		rWidth *= width/2;
-		rHeight *= height/2;
+                ll.x = ll.x * width()/2 + width()/2 + 10;
+                ll.y = ll.y * height()/2 + height()/2 + 10;
+		rWidth *= width()/2;
+		rHeight *= height()/2;
 		
 		painter.drawRect(ll.x, ll.y, rWidth, rHeight);
 	}

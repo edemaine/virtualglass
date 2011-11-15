@@ -3,13 +3,15 @@
 
 PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
 {
-	width = 500;
-	height = 500;
-
 	setAcceptDrops(true);
-	setFixedWidth(width + 20);
-	setFixedHeight(height + 20);
+	setFixedWidth(500);
+	setFixedHeight(500);
 	this->plan = plan;
+}
+
+int PullPlanEditorViewWidget :: heightForWidth(int w)
+{
+	return w;
 }
 
 void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
@@ -30,11 +32,13 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	if (droppedPlan == plan) // don't allow circular DAGs
 		return;
 
+	int drawWidth = width() - 20;
+	//int drawHeight = height() - 20;
 	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
 	{
 		SubpullTemplate* subpull = &(plan->getTemplate()->subpulls[i]);
-		if (fabs(event->pos().x() - (width/2 * subpull->location.x + width/2 + 10))
-			+ fabs(event->pos().y() - (width/2 * subpull->location.y + width/2 + 10)) < (subpull->diameter/2.0)*width/2)
+		if (fabs(event->pos().x() - (drawWidth/2 * subpull->location.x + drawWidth/2 + 10))
+			+ fabs(event->pos().y() - (drawWidth/2 * subpull->location.y + drawWidth/2 + 10)) < (subpull->diameter/2.0)*drawWidth/2)
 		{
 			if (droppedPlan->getTemplate()->shape == AMORPHOUS_SHAPE
 				|| droppedPlan->getTemplate()->shape == plan->getTemplate()->subpulls[i].shape)
@@ -91,13 +95,15 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 	pen.setWidth(3);
 	painter.setPen(pen);
 
+	int drawWidth = width() - 20;
+	int drawHeight = height() - 20;
 	switch (plan->getTemplate()->shape)
 	{
 		case CIRCLE_SHAPE:
-			painter.drawEllipse(10, 10, width, height);
+			painter.drawEllipse(10, 10, drawWidth, drawHeight);
 			break;
 		case SQUARE_SHAPE:
-			painter.drawRect(10, 10, width, height);
+			painter.drawRect(10, 10, drawWidth, drawHeight);
 			break;
 	}
 
@@ -114,18 +120,18 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 		}
 		else
 		{
-			int rXG = (subpull->location.x - subpull->diameter/2.0) * width/2 + width/2 + 10;
-			int rYG = (subpull->location.y - subpull->diameter/2.0) * width/2 + height/2 + 10;
-			int rWidthG = subpull->diameter * width/2;
-			int rHeightG = subpull->diameter * height/2;
+			int rXG = (subpull->location.x - subpull->diameter/2.0) * drawWidth/2 + drawWidth/2 + 10;
+			int rYG = (subpull->location.y - subpull->diameter/2.0) * drawWidth/2 + drawHeight/2 + 10;
+			int rWidthG = subpull->diameter * drawWidth/2;
+			int rHeightG = subpull->diameter * drawHeight/2;
 			painter.drawPixmap(rXG,rYG,rWidthG,rHeightG,*plan->subplans[i]->getEditorPixmap());
 		}
 		painter.setPen(pen);
 
-		int rX = (subpull->location.x - subpull->diameter/2.0) * width/2 + width/2 + 10;
-		int rY = (subpull->location.y - subpull->diameter/2.0) * width/2 + height/2 + 10;
-		int rWidth = subpull->diameter * width/2;
-		int rHeight = subpull->diameter * height/2;
+		int rX = (subpull->location.x - subpull->diameter/2.0) * drawWidth/2 + drawWidth/2 + 10;
+		int rY = (subpull->location.y - subpull->diameter/2.0) * drawWidth/2 + drawHeight/2 + 10;
+		int rWidth = subpull->diameter * drawWidth/2;
+		int rHeight = subpull->diameter * drawHeight/2;
 
 		switch (subpull->shape)
 		{

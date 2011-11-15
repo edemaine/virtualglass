@@ -241,7 +241,7 @@ void MainWindow :: writeRawCheckBoxChanged(int)
 void MainWindow :: setupTable()
 {
 	QVBoxLayout* tableLayout = new QVBoxLayout(centralWidget);
-	centralLayout->addLayout(tableLayout);
+	centralLayout->addLayout(tableLayout, 1);
 
 	QWidget* tableGridLibraryWidget = new QWidget(centralWidget);
 	tableGridLayout = new QGridLayout(tableGridLibraryWidget);
@@ -276,7 +276,7 @@ void MainWindow :: setupEditors()
 	defaultColor.a = 0.4;
 
 	editorStack = new QStackedWidget(centralWidget);
-	centralLayout->addWidget(editorStack);
+	centralLayout->addWidget(editorStack, 2);
 
 	setupEmptyPaneEditor();
 	editorStack->addWidget(emptyEditorPage);
@@ -308,7 +308,7 @@ void MainWindow :: setupPieceSubeditor1(QVBoxLayout* layout)
 	pickupTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	pickupTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pickupTemplateLibraryScrollArea->setFixedHeight(130);
-	pickupTemplateLibraryScrollArea->setFixedWidth(520);
+	pickupTemplateLibraryScrollArea->setFixedWidth(500);
 	layout->addWidget(pickupTemplateLibraryScrollArea);
 
 	pickupTemplateParameter1Label = new QLabel(pickupPlanEditorPlan->getTemplate()->getParameterName(0));
