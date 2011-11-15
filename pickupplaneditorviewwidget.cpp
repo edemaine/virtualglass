@@ -126,8 +126,6 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 	pen.setColor(Qt::white);
 	pen.setWidth(3);
 	painter.setPen(pen);
-
-	painter.drawRect(10, 10, width, height);
 	
 	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
 	{

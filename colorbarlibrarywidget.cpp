@@ -8,9 +8,14 @@ ColorBarLibraryWidget :: ColorBarLibraryWidget(Color color, QWidget* parent): QL
 	setScaledContents(true);
 	setMouseTracking(true);
 
-	QPixmap image(100, 100);
-	image.fill(QColor(255*color.r, 255*color.g, 255*color.b, 255*color.a));
-	setPixmap(image);
+	QImage image("./checkerboard.png");
+
+	QPainter painter(&image);
+        painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+        painter.fillRect(image.rect(), QBrush(QColor(255*color.r, 255*color.g, 255*color.b, 255*color.a)));
+	painter.end();
+
+	setPixmap(QPixmap::fromImage(image.scaled(100, 100)));
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
 	this->pullPlan = new PullPlan(AMORPHOUS_BASE_TEMPLATE, true, color);

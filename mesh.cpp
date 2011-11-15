@@ -43,7 +43,7 @@ float Mesher :: computeTotalCaneLength(PickupPlan* plan)
 	float total = 0.0;
 	for (unsigned int i = 0; i < plan->subplans.size(); ++i)
 	{
-		total += computeTotalCaneLength(plan->subplans[i]) * plan->getTemplate()->subpulls[i]->length;
+		total += computeTotalCaneLength(plan->subplans[i]) * plan->getTemplate()->subpulls[i]->length / 2.0;
 	}
 	return total;
 }
@@ -207,8 +207,8 @@ The resulting cane has length between 0.0 and 10.0, i.e. it is scaled by a facto
 void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* plan,
 	float start, float end, uint32_t group_tag)
 {
-	unsigned int angularResolution = MAX(1000 / totalCaneLength, 4);
-	unsigned int axialResolution = 2500 / totalCaneLength * (end - start);
+	unsigned int angularResolution = 15;
+	unsigned int axialResolution = 40;
 	
 	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();

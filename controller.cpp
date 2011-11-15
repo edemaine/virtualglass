@@ -4,7 +4,7 @@
 Controller::Controller(int argc, char **argv)
 {
 	app = new QApplication(argc, argv);
-	app->setStartDragDistance(15);
+	app->setStartDragDistance(5);
 
 	model = new Model();
 	mainWindow = new MainWindow(model);
