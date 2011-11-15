@@ -181,7 +181,7 @@ void Mesher :: applyTumblerTransform(Vertex* v, vector<int> parameterValues)
 		float offset = r - 5.0 / PI + 0.1;
 		v->position.x = R * cos(theta);
 		v->position.y = R * sin(theta);
-		v->position.z = cutoff + offset;
+		v->position.z = cutoff + offset; 
 	}
 	else
 	{
@@ -189,6 +189,10 @@ void Mesher :: applyTumblerTransform(Vertex* v, vector<int> parameterValues)
 		v->position.x = R * cos(theta);
 		v->position.y = R * sin(theta);
 	}
+
+	// recenter the object about the origin
+	v->position.z -= (5.0 + cutoff) / 2;
+
 }
 
 Vertex Mesher :: applyTransforms(Vertex v, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
