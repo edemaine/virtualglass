@@ -21,95 +21,27 @@ MainWindow :: MainWindow(Model* model)
 void MainWindow :: seedEverything()
 {
 	// Sampling of Reichenbach colors from Kim's color file
+	//int rgba[][4] = {{255,255,255,102},{1,58,186,128},{222,205,1,126},{2,101,35,128},{253,122,56,128},{226,190,161,255},{50,102,54,255},{60,31,37,255},{131,149,201,255},{138,155,163,255},{255,255,255,10},{-1,-1,-1,-1}};
+	/* MARTY'S HAND SELECTION OF COLORS:
+	 * Clear, K141A Cherry Red, K210 Sari Blue, K212A Brilliant Gold, K228 Dark Heliotrope, K215A Gold Brown, K213 Brilliant Green;
+	 * White, Black, K070 Opal Green, K078A Canary Yellow, K086 Turquoise
+ 	 */
+	int rgba[][4] = {{255,255,255,102},{204,0,0,126},{0,112,179,126},{254,220,29,126},{164,116,184,126},{163,118,58,126},{153,204,51,126},
+		{255,255,255,255},{0,0,0,255},{0,140,0,255},{249,219,6,255},{121,190,196,255},
+		{-1,-1,-1,-1}};
 	Color color;
 	ColorBarLibraryWidget* cblw;
 
-	color.r = color.g = color.b = 1.0;
-	color.a = 0.4;
-	cblw = new ColorBarLibraryWidget(color);
-	tableGridLayout->addWidget(cblw, colorBarCount, 0);
-	++colorBarCount;
-
-	color.r = 1/255.0;
-	color.g = 58/255.0;
-	color.b = 186/255.0;
-	color.a = 128/255.0;
-	cblw = new ColorBarLibraryWidget(color);
-	tableGridLayout->addWidget(cblw, colorBarCount, 0);
-	++colorBarCount;
-
-	color.r = 222/255.0;
-	color.g = 205/255.0;
-	color.b = 1/255.0;
-	color.a = 126/255.0;
-	cblw = new ColorBarLibraryWidget(color);
-	tableGridLayout->addWidget(cblw, colorBarCount, 0);
-	++colorBarCount;
-
-	color.r = 2/255.0;
-	color.g = 101/255.0;
-	color.b = 35/255.0;
-	color.a = 128/255.0;
-	cblw = new ColorBarLibraryWidget(color);
-	tableGridLayout->addWidget(cblw, colorBarCount, 0);
-	++colorBarCount;
-
-	color.r = 253/255.0;
-	color.g = 122/255.0;
-	color.b = 56/255.0;
-	color.a = 128/255.0;
-	cblw = new ColorBarLibraryWidget(color);
-	tableGridLayout->addWidget(cblw, colorBarCount, 0);
-	++colorBarCount;
-
-	color.r = 226/255.0;
-	color.g = 190/255.0;
-	color.b = 161/255.0;
-	color.a = 255/255.0;
-	cblw = new ColorBarLibraryWidget(color);
-	tableGridLayout->addWidget(cblw, colorBarCount, 0);
-	++colorBarCount;
-
-	color.r = 50/255.0;
-	color.g = 102/255.0;
-	color.b = 54/255.0;
-	color.a = 255/255.0;
-	cblw = new ColorBarLibraryWidget(color);
-	tableGridLayout->addWidget(cblw, colorBarCount, 0);
-	++colorBarCount;
-
-	color.r = 60/255.0;
-	color.g = 31/255.0;
-	color.b = 37/255.0;
-	color.a = 255/255.0;
-	cblw = new ColorBarLibraryWidget(color);
-	tableGridLayout->addWidget(cblw, colorBarCount, 0);
-	++colorBarCount;
-
-	color.r = 131/255.0;
-	color.g = 149/255.0;
-	color.b = 201/255.0;
-	color.a = 255/255.0;
-	cblw = new ColorBarLibraryWidget(color);
-	tableGridLayout->addWidget(cblw, colorBarCount, 0);
-	++colorBarCount;
-
-	color.r = 138/255.0;
-	color.g = 155/255.0;
-	color.b = 163/255.0;
-	color.a = 255/255.0;
-	cblw = new ColorBarLibraryWidget(color);
-	tableGridLayout->addWidget(cblw, colorBarCount, 0);
-	++colorBarCount;
-
-	color.r = 255/255.0;
-	color.g = 255/255.0;
-	color.b = 255/255.0;
-	color.a = 10/255.0;
-	cblw = new ColorBarLibraryWidget(color);
-	tableGridLayout->addWidget(cblw, colorBarCount, 0);
-	++colorBarCount;
-
+	for (int i = 0; rgba[i][0] >= 0; ++i) {
+		color.r = rgba[i][0] / 255.0;
+		color.g = rgba[i][1] / 255.0;
+		color.b = rgba[i][2] / 255.0;
+		color.a = rgba[i][3] / 255.0;
+		cblw = new ColorBarLibraryWidget(color);
+		tableGridLayout->addWidget(cblw, colorBarCount, 0);
+		++colorBarCount;
+	}
+        
 	editorStack->setCurrentIndex(PULLPLAN_MODE);
 
 	// Load pull template types
