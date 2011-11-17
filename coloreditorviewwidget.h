@@ -3,7 +3,12 @@
 #define COLOREDITORVIEWWIDGET_H
 
 #include <QtGui>
+#include <string>
+#include <iostream>
 #include "pullplan.h"
+#include "purecolorlibrarywidget.h"
+
+using namespace std;
 
 class ColorEditorViewWidget : public QWidget
 {
@@ -16,8 +21,12 @@ class ColorEditorViewWidget : public QWidget
 	signals:
 		void someDataChanged();
 
+	protected:
+		void mouseReleaseEvent(QMouseEvent* event);
+
 	private:
 		PullPlan* plan;
+		QSlider* alphaSlider;
 };
 
 

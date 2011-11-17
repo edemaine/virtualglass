@@ -1,7 +1,7 @@
 
 #include "colorbarlibrarywidget.h"
 
-ColorBarLibraryWidget :: ColorBarLibraryWidget(PullPlan* plan, QWidget* parent): QLabel(parent)
+ColorBarLibraryWidget :: ColorBarLibraryWidget(QPixmap niceViewPixmap, PullPlan* plan, QWidget* parent): QLabel(parent)
 {
 	setBackgroundRole(QPalette::Base);
 	setFixedSize(100, 100);
@@ -12,7 +12,7 @@ ColorBarLibraryWidget :: ColorBarLibraryWidget(PullPlan* plan, QWidget* parent):
 
 	QPainter painter(&image);
         painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-        painter.fillRect(image.rect(), QBrush(QColor(255*plan->color.r, 255*plan->color.g, 255*plan->color.b, 255*plan->color.a)));
+        painter.drawPixmap(image.rect(), niceViewPixmap, niceViewPixmap.rect());
 	painter.end();
 
 	setPixmap(QPixmap::fromImage(image.scaled(100, 100)));
@@ -21,6 +21,11 @@ ColorBarLibraryWidget :: ColorBarLibraryWidget(PullPlan* plan, QWidget* parent):
 	this->pullPlan = plan;
 	setGraphicsEffect(new QGraphicsColorizeEffect());
 	graphicsEffect()->setEnabled(false);
+}
+
+void ColorBarLibraryWidget :: updatePixmap(QPixmap niceViewPixmap)
+{
+	setPixmap(niceViewPixmap);
 }
 
 PullPlan* ColorBarLibraryWidget :: getPullPlan()

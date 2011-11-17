@@ -9,7 +9,6 @@
 // Geometric shapes
 #define CIRCLE_SHAPE 1
 #define SQUARE_SHAPE 2
-#define AMORPHOUS_SHAPE 3
 
 // Types of MIME data
 #define PULL_PLAN_MIME 1

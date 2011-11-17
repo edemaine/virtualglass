@@ -80,12 +80,6 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		else
 			continue;
 
-		if (droppedPlan->getTemplate()->shape == AMORPHOUS_SHAPE) // if it's a color bar
-		{
-			// This is a memory leak, as every drag of a color bar makes a new pull plan
-			droppedPlan = new PullPlan(CIRCLE_BASE_TEMPLATE, true, droppedPlan->color);
-		}
-
 		// If the shift button is down, fill in the entire group
 		if (event->keyboardModifiers() & 0x02000000)
 		{

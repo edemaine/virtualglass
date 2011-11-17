@@ -42,20 +42,6 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		{
 			event->accept();
 
-			if (droppedPlan->getTemplate()->shape == AMORPHOUS_SHAPE) // if it's a color bar
-			{
-				switch (plan->getTemplate()->subpulls[i].shape)
-				{
-					// This is a memory leak, as every drag of a color bar makes a new pull plan
-					case CIRCLE_SHAPE:
-						droppedPlan = new PullPlan(CIRCLE_BASE_TEMPLATE, true, droppedPlan->color);
-						break;
-					case SQUARE_SHAPE:
-						droppedPlan = new PullPlan(SQUARE_BASE_TEMPLATE, true, droppedPlan->color);
-						break;
-				}
-			}
-
 			// If the shift button is down, fill in the entire group
 			if (event->keyboardModifiers() & 0x02000000)
 			{	

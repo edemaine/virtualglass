@@ -161,9 +161,6 @@ void PullTemplate :: initializeSubpulls()
 		case SQUARE_BASE_TEMPLATE:
 			this->shape = SQUARE_SHAPE;
 			break;
-		case AMORPHOUS_BASE_TEMPLATE:
-			this->shape = AMORPHOUS_SHAPE;
-			break;
 		case CASED_CIRCLE_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 1.99, 0));

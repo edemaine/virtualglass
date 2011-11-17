@@ -20,30 +20,9 @@ MainWindow :: MainWindow(Model* model)
 
 void MainWindow :: seedEverything()
 {
-	/* MARTY'S HAND SELECTION OF COLORS:
-	 * Clear, K141A Cherry Red, K210 Sari Blue, K212A Brilliant Gold, K228 Dark Heliotrope, K215A Gold Brown, K213 Brilliant Green;
-	 * White, Black, K070 Opal Green, K078A Canary Yellow, K086 Turquoise
- 	 */
-	int rgba[][4] = {{255, 255, 255, 0}, 
-		{255,255,255,102}, {204,0,0,126},{ 0,112,179,126},{254,220,29,126},
-		{164,116,184,126}, {163,118,58,126}, {153,204,51,126}, {255,255,255,255},
-		{0,0,0,255}, {0,140,0,255}, {249,219,6,255}, {121,190,196,255},
-		{-1,-1,-1,-1}};
-	ColorBarLibraryWidget* cblw;
-	Color color;
-
-	for (int i = 0; rgba[i][0] >= 0; ++i) {
-		color.r = rgba[i][0] / 255.0;
-		color.g = rgba[i][1] / 255.0;
-		color.b = rgba[i][2] / 255.0;
-		color.a = rgba[i][3] / 255.0;
-		colorEditorPlan = new PullPlan(CIRCLE_SHAPE, true, color);
-		colorEditorViewWidget->setPullPlan(colorEditorPlan);
-		cblw = new ColorBarLibraryWidget(colorEditorPlan);
-		tableGridLayout->addWidget(cblw, colorBarCount, 0);
-		++colorBarCount;
-	}
-        
+	editorStack->setCurrentIndex(COLORBAR_MODE);
+	emit someDataChanged();
+	
 	editorStack->setCurrentIndex(PULLPLAN_MODE);
 
 	// Load pull template types
@@ -108,6 +87,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 
 	if (cblw != NULL)
 	{
+		colorEditorPlanLibraryWidget = cblw;
 		colorEditorPlan = cblw->getPullPlan();	
 		colorEditorViewWidget->setPullPlan(colorEditorPlan);
 		editorStack->setCurrentIndex(COLORBAR_MODE);
@@ -220,6 +200,7 @@ void MainWindow :: dragMoveEvent(QDragMoveEvent* event)
 void MainWindow :: setupConnections()
 {
 	connect(newColorBarButton, SIGNAL(pressed()), this, SLOT(newColorBar()));
+	connect(colorEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 
 	connect(pullTemplateShapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(pullTemplateShapeButtonGroupChanged(int)));
 	connect(newPullPlanButton, SIGNAL(pressed()), this, SLOT(newPullPlan()));
@@ -417,8 +398,11 @@ void MainWindow :: setupColorEditor()
 {
 	Color color;
 	color.r = color.g = color.b = color.a = 1.0;
-	colorEditorPlan = new PullPlan(AMORPHOUS_SHAPE, true, color);
-	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(colorEditorPlan);	
+	colorEditorPlan = new PullPlan(CIRCLE_SHAPE, true, color);
+	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(
+		QPixmap::fromImage(QImage("./duck.jpg")), colorEditorPlan);	
+	tableGridLayout->addWidget(colorEditorPlanLibraryWidget, colorBarCount, 0);
+	++colorBarCount;
 
 	colorEditorPage = new QWidget(editorStack);
 	QHBoxLayout* pageLayout = new QHBoxLayout(colorEditorPage);		
@@ -631,7 +615,8 @@ void MainWindow :: newPiece()
 void MainWindow :: newColorBar()
 {
 	colorEditorPlan = new PullPlan(CIRCLE_SHAPE, true, defaultColor);
-	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(colorEditorPlan);	
+	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(
+		QPixmap::fromImage(QImage("./duck.jpg")), colorEditorPlan);	
 	tableGridLayout->addWidget(colorEditorPlanLibraryWidget, colorBarCount, 0);
 	++colorBarCount;
 
@@ -749,11 +734,17 @@ void MainWindow :: updateEverything()
 
 void MainWindow :: updateLibrary()
 {
+	colorEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 	pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 	pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 
 	switch (editorStack->currentIndex())
 	{
+		case COLORBAR_MODE:
+			colorEditorPlanLibraryWidget->updatePixmap(
+				QPixmap::fromImage(colorBarNiceViewWidget->renderImage()).scaled(100, 100));
+			colorEditorPlanLibraryWidget->graphicsEffect()->setEnabled(true);
+			break;
 		case PULLPLAN_MODE:
 			pullPlanEditorPlanLibraryWidget->updatePixmaps(
 				QPixmap::fromImage(pullPlanNiceViewWidget->renderImage()).scaled(100, 100),
@@ -801,9 +792,8 @@ void MainWindow :: updateColorEditor()
 void MainWindow :: updatePullPlanEditor()
 {
 	// Only attempt to set the shape if it's defined; it's undefined during loading
-	if (pullPlanEditorPlan->getTemplate()->shape < AMORPHOUS_SHAPE)
-		static_cast<QCheckBox*>(pullTemplateShapeButtonGroup->button(
-			pullPlanEditorPlan->getTemplate()->shape))->setCheckState(Qt::Checked);
+	static_cast<QCheckBox*>(pullTemplateShapeButtonGroup->button(
+		pullPlanEditorPlan->getTemplate()->shape))->setCheckState(Qt::Checked);
 
 	int thickness = (int) (pullPlanEditorPlan->getTemplate()->getCasingThickness() * 100);
 	pullTemplateCasingThicknessSlider->setSliderPosition(thickness);
