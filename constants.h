@@ -18,9 +18,10 @@
 
 // Editor/nice view modes
 #define EMPTY_MODE 0
-#define PULLPLAN_MODE 1
-#define PIECE_MODE 2
-#define PICKUPPLAN_MODE 3
+#define COLORBAR_MODE 1
+#define PULLPLAN_MODE 2
+#define PIECE_MODE 3
+#define PICKUPPLAN_MODE 4
 
 #define PI 3.14159265358979323846f
 

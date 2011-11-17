@@ -29,15 +29,17 @@ void MainWindow :: seedEverything()
 		{164,116,184,126}, {163,118,58,126}, {153,204,51,126}, {255,255,255,255},
 		{0,0,0,255}, {0,140,0,255}, {249,219,6,255}, {121,190,196,255},
 		{-1,-1,-1,-1}};
-	Color color;
 	ColorBarLibraryWidget* cblw;
+	Color color;
 
 	for (int i = 0; rgba[i][0] >= 0; ++i) {
 		color.r = rgba[i][0] / 255.0;
 		color.g = rgba[i][1] / 255.0;
 		color.b = rgba[i][2] / 255.0;
 		color.a = rgba[i][3] / 255.0;
-		cblw = new ColorBarLibraryWidget(color);
+		colorEditorPlan = new PullPlan(CIRCLE_SHAPE, true, color);
+		colorEditorViewWidget->setPullPlan(colorEditorPlan);
+		cblw = new ColorBarLibraryWidget(colorEditorPlan);
 		tableGridLayout->addWidget(cblw, colorBarCount, 0);
 		++colorBarCount;
 	}
@@ -98,12 +100,20 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 		return; 
 	}
 
+	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
 	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
 	PullTemplateLibraryWidget* ptlw = dynamic_cast<PullTemplateLibraryWidget*>(childAt(event->pos()));
 	PickupTemplateLibraryWidget* pktlw = dynamic_cast<PickupTemplateLibraryWidget*>(childAt(event->pos()));
 
-	if (plplw != NULL)
+	if (cblw != NULL)
+	{
+		colorEditorPlan = cblw->getPullPlan();	
+		colorEditorViewWidget->setPullPlan(colorEditorPlan);
+		editorStack->setCurrentIndex(COLORBAR_MODE);
+		emit someDataChanged();
+	}
+	else if (plplw != NULL)
 	{
 		pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 		pullPlanEditorPlanLibraryWidget = plplw;
@@ -209,6 +219,8 @@ void MainWindow :: dragMoveEvent(QDragMoveEvent* event)
 
 void MainWindow :: setupConnections()
 {
+	connect(newColorBarButton, SIGNAL(pressed()), this, SLOT(newColorBar()));
+
 	connect(pullTemplateShapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(pullTemplateShapeButtonGroupChanged(int)));
 	connect(newPullPlanButton, SIGNAL(pressed()), this, SLOT(newPullPlan()));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
@@ -248,10 +260,10 @@ void MainWindow :: setupTable()
 	tableGridLibraryWidget->setLayout(tableGridLayout);
 	colorBarCount = pullPlanCount = pieceCount = 1;
 
-	newColorButton = new QPushButton("New Color");
+	newColorBarButton = new QPushButton("New Color");
 	newPullPlanButton = new QPushButton("New Cane");
 	newPieceButton = new QPushButton("New Piece");
-	tableGridLayout->addWidget(newColorButton, 0, 0);
+	tableGridLayout->addWidget(newColorBarButton, 0, 0);
 	tableGridLayout->addWidget(newPullPlanButton, 0, 1);
 	tableGridLayout->addWidget(newPieceButton, 0, 2);
 
@@ -279,6 +291,9 @@ void MainWindow :: setupEditors()
 
 	setupEmptyPaneEditor();
 	editorStack->addWidget(emptyEditorPage);
+
+	setupColorEditor();
+	editorStack->addWidget(colorEditorPage);
 
 	setupPullPlanEditor();
 	editorStack->addWidget(pullPlanEditorPage);
@@ -398,6 +413,31 @@ void MainWindow :: setupEmptyPaneEditor()
 	editorLayout->addWidget(whatToDoLabel, 0);
 }
 
+void MainWindow :: setupColorEditor()
+{
+	Color color;
+	color.r = color.g = color.b = color.a = 1.0;
+	colorEditorPlan = new PullPlan(AMORPHOUS_SHAPE, true, color);
+	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(colorEditorPlan);	
+
+	colorEditorPage = new QWidget(editorStack);
+	QHBoxLayout* pageLayout = new QHBoxLayout(colorEditorPage);		
+	colorEditorPage->setLayout(pageLayout);
+	QVBoxLayout* editorLayout = new QVBoxLayout(colorEditorPage);
+	pageLayout->addLayout(editorLayout);
+
+	colorEditorViewWidget = new ColorEditorViewWidget(colorEditorPlan, colorEditorPage);
+	editorLayout->addWidget(colorEditorViewWidget, 10);
+
+	colorBarNiceViewWidget = new NiceViewWidget(colorEditorPage);
+        pageLayout->addWidget(colorBarNiceViewWidget);
+
+        // Little description for the editor
+        QLabel* descriptionLabel = new QLabel("Color editor", colorEditorPage);
+        descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+        editorLayout->addWidget(descriptionLabel, 0);
+}
+
 void MainWindow :: setupPullPlanEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
@@ -413,7 +453,6 @@ void MainWindow :: setupPullPlanEditor()
 	pullPlanEditorPage->setLayout(pageLayout);
 	QVBoxLayout* editorLayout = new QVBoxLayout(pullPlanEditorPage);
 	pageLayout->addLayout(editorLayout);
-
 
 	pullPlanEditorViewWidget = new PullPlanEditorViewWidget(pullPlanEditorPlan, pullPlanEditorPage);
 	editorLayout->addWidget(pullPlanEditorViewWidget, 10);
@@ -589,6 +628,23 @@ void MainWindow :: newPiece()
 	emit someDataChanged();
 }
 
+void MainWindow :: newColorBar()
+{
+	colorEditorPlan = new PullPlan(CIRCLE_SHAPE, true, defaultColor);
+	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(colorEditorPlan);	
+	tableGridLayout->addWidget(colorEditorPlanLibraryWidget, colorBarCount, 0);
+	++colorBarCount;
+
+	// Give the new plan to the editor
+	colorEditorViewWidget->setPullPlan(colorEditorPlan);
+
+	// Load up the right editor
+	editorStack->setCurrentIndex(COLORBAR_MODE);
+
+	// Trigger GUI updates
+	emit someDataChanged();
+}
+
 void MainWindow :: newPullPlan()
 {
 	// Create the new plan
@@ -675,6 +731,9 @@ void MainWindow :: updateEverything()
 {
         switch (editorStack->currentIndex())
         {
+                case COLORBAR_MODE:
+			updateColorEditor();
+                        break;
                 case PULLPLAN_MODE:
 			updatePullPlanEditor();
                         break;
@@ -728,6 +787,15 @@ void MainWindow :: updatePieceEditor()
 	pieceTemplateParameter1Slider->setSliderPosition(pieceEditorPlan->getTemplate()->parameterValues[0]);
 	pieceTemplateParameter2Label->setText(pieceEditorPlan->getTemplate()->parameterNames[1]);
 	pieceTemplateParameter2Slider->setSliderPosition(pieceEditorPlan->getTemplate()->parameterValues[1]);
+}
+
+void MainWindow :: updateColorEditor()
+{
+        Geometry* geometry = model->getGeometry(colorEditorPlan);
+        colorBarNiceViewWidget->setCameraMode(PULLPLAN_MODE);
+        colorBarNiceViewWidget->setGeometry(geometry);
+        if (writeRawCheckBox->checkState() == Qt::Checked)
+                geometry->save_raw_file("./cane.raw");
 }
 
 void MainWindow :: updatePullPlanEditor()

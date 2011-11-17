@@ -10,7 +10,7 @@ class ColorBarLibraryWidget : public QLabel
 	Q_OBJECT
 
 	public:
-		ColorBarLibraryWidget(Color color, QWidget* parent=0);
+		ColorBarLibraryWidget(PullPlan* plan, QWidget* parent=0);
 		PullPlan* getPullPlan();	
 
 	private:

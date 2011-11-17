@@ -13,6 +13,7 @@
 #include "colorbarlibrarywidget.h"
 #include "pulltemplate.h"
 #include "model.h"
+#include "coloreditorviewwidget.h"
 #include "pullplan.h"
 #include "pullplaneditorviewwidget.h"
 #include "pickupplan.h"
@@ -42,11 +43,13 @@ class MainWindow : public QMainWindow
 		void setupTable();
 		void setupEditors();
 		void setupEmptyPaneEditor();
+		void setupColorEditor();
 		void setupPullPlanEditor();
 		void setupPieceEditor();
 		void setupPieceSubeditor1(QVBoxLayout* layout);
 		void setupPieceSubeditor2(QVBoxLayout* layout);
 		void setupConnections();
+		void updateColorEditor();
 		void updatePullPlanEditor();
 		void updatePickupPlanEditor();
 		void updatePieceEditor();
@@ -57,6 +60,7 @@ class MainWindow : public QMainWindow
 		void highlightPlanLibraryWidgets(PieceLibraryWidget* plw,bool highlight,bool setupDone);
 
 		// Variables
+		NiceViewWidget* colorBarNiceViewWidget;
 		NiceViewWidget* pullPlanNiceViewWidget;
 		NiceViewWidget* pieceNiceViewWidget;
 		QLabel* pieceTemplateParameter1Label;
@@ -75,17 +79,21 @@ class MainWindow : public QMainWindow
 		QPoint dragStartPosition;
 		QStackedWidget* editorStack; //editorStack.currentIndex() gives with mode
 		QWidget* emptyEditorPage;
+		QWidget* colorEditorPage;
 		QWidget* pullPlanEditorPage;
 		QWidget* pieceEditorPage;
+		PullPlan* colorEditorPlan;
 		PullPlan* pullPlanEditorPlan;
 		Piece* pieceEditorPlan;
 		Color defaultColor;
+		ColorBarLibraryWidget* colorEditorPlanLibraryWidget;
 		PullPlanLibraryWidget* pullPlanEditorPlanLibraryWidget;
 		PieceLibraryWidget* pieceEditorPlanLibraryWidget;
 		Model* model;
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
 		QComboBox* pieceTemplateComboBox;
+		ColorEditorViewWidget* colorEditorViewWidget;
 		PullPlanEditorViewWidget* pullPlanEditorViewWidget;
 		PickupPlanEditorViewWidget* pickupPlanEditorViewWidget;
 		QHBoxLayout* pullTemplateLibraryLayout;
@@ -93,13 +101,14 @@ class MainWindow : public QMainWindow
 		QSlider* pullPlanTwistSlider;
 		QSlider* pullTemplateCasingThicknessSlider;
 		QSpinBox* pullPlanTwistSpin;
+		QPushButton* newColorBarButton;
 		QPushButton* newPullPlanButton;
 		QPushButton* newPieceButton;
-		QPushButton* newColorButton;
 
 	private slots:
 		void updateEverything();
 		void pieceTemplateComboBoxChanged(int index);
+		void newColorBar();
 		void newPullPlan();
 		void newPiece();
 		void pullPlanTwistSliderChanged(int p);
