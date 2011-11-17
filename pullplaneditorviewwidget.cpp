@@ -40,11 +40,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		if (fabs(event->pos().x() - (drawWidth/2 * subpull->location.x + drawWidth/2 + 10))
 			+ fabs(event->pos().y() - (drawWidth/2 * subpull->location.y + drawWidth/2 + 10)) < (subpull->diameter/2.0)*drawWidth/2)
 		{
-			if (droppedPlan->getTemplate()->shape == AMORPHOUS_SHAPE
-				|| droppedPlan->getTemplate()->shape == plan->getTemplate()->subpulls[i].shape)
-				event->accept();
-			else
-				continue;
+			event->accept();
 
 			if (droppedPlan->getTemplate()->shape == AMORPHOUS_SHAPE) // if it's a color bar
 			{
@@ -84,67 +80,64 @@ void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan)
 	this->plan = plan;
 }
 
+
+void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int drawHeight, PullPlan* plan, QPainter* painter)
+{
+	// Draw casing shape
+	painter->setBrush(Qt::NoBrush);
+	QPen pen;
+	pen.setWidth(5);
+	pen.setColor(Qt::black);
+	painter->setPen(pen);
+	switch (plan->getTemplate()->shape)
+	{
+		case CIRCLE_SHAPE:
+			painter->drawEllipse(x, y, drawWidth, drawHeight);
+			break;
+		case SQUARE_SHAPE:
+			painter->drawRect(x, y, drawWidth, drawHeight);
+			break;
+	}
+	
+	// If it's a base color, fill region with color
+	if (plan->isBase)
+	{
+		Color c = plan->color;
+		painter->setBrush(QColor(255*c.r, 255*c.g, 255*c.b, 255*c.a));
+		painter->setPen(Qt::NoPen);
+		switch (plan->getTemplate()->shape)
+		{
+			case CIRCLE_SHAPE:
+				painter->drawEllipse(x, y, drawWidth, drawHeight);
+				break;
+			case SQUARE_SHAPE:
+				painter->drawRect(x, y, drawWidth, drawHeight);
+				break;
+		}
+		return;
+	}
+
+	// Recurse 
+	for (unsigned int i = plan->getTemplate()->subpulls.size()-1; i < plan->getTemplate()->subpulls.size(); --i)
+	{
+		SubpullTemplate* subpull = &(plan->getTemplate()->subpulls[i]);
+		
+		int rX = x + (subpull->location.x - subpull->diameter/2.0) * drawWidth/2 + drawWidth/2;
+		int rY = y + (subpull->location.y - subpull->diameter/2.0) * drawWidth/2 + drawHeight/2;
+		int rWidth = subpull->diameter * drawWidth/2;
+		int rHeight = subpull->diameter * drawHeight/2;
+		
+		drawSubplan(rX, rY, rWidth, rHeight, plan->subplans[i], painter);
+	}	
+}
+
 void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 {
 	QPainter painter;
 	painter.begin(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 	painter.fillRect(event->rect(), QColor(200, 200, 200));
-	QPen pen;
-	pen.setColor(Qt::white);
-	pen.setWidth(3);
-	painter.setPen(pen);
-
-	int drawWidth = width() - 20;
-	int drawHeight = height() - 20;
-	switch (plan->getTemplate()->shape)
-	{
-		case CIRCLE_SHAPE:
-			painter.drawEllipse(10, 10, drawWidth, drawHeight);
-			break;
-		case SQUARE_SHAPE:
-			painter.drawRect(10, 10, drawWidth, drawHeight);
-			break;
-	}
-
-	// Draw back to front for subplans contained in other subplans,
-	// which are checked front to back.
-	for (unsigned int i = plan->getTemplate()->subpulls.size()-1; i < plan->getTemplate()->subpulls.size(); --i)
-	{
-		SubpullTemplate* subpull = &(plan->getTemplate()->subpulls[i]);
-		if (plan->subplans[i]->isBase)
-		{
-			Color c = plan->subplans[i]->color;
-			painter.setBrush(QColor(255*c.r, 255*c.g, 255*c.b, 255*c.a));
-			pen.setStyle(Qt::NoPen);
-		}
-		else
-		{
-			int rXG = (subpull->location.x - subpull->diameter/2.0) * drawWidth/2 + drawWidth/2 + 10;
-			int rYG = (subpull->location.y - subpull->diameter/2.0) * drawWidth/2 + drawHeight/2 + 10;
-			int rWidthG = subpull->diameter * drawWidth/2;
-			int rHeightG = subpull->diameter * drawHeight/2;
-			painter.drawPixmap(rXG,rYG,rWidthG,rHeightG,*plan->subplans[i]->getEditorPixmap());
-		}
-		painter.setPen(pen);
-
-		int rX = (subpull->location.x - subpull->diameter/2.0) * drawWidth/2 + drawWidth/2 + 10;
-		int rY = (subpull->location.y - subpull->diameter/2.0) * drawWidth/2 + drawHeight/2 + 10;
-		int rWidth = subpull->diameter * drawWidth/2;
-		int rHeight = subpull->diameter * drawHeight/2;
-
-		switch (subpull->shape)
-		{
-			case CIRCLE_SHAPE:
-				painter.drawEllipse(rX, rY, rWidth, rHeight);
-				break;
-			case SQUARE_SHAPE:
-				painter.drawRect(rX, rY, rWidth, rHeight);
-				break;
-		}
-
-	}
-
+	drawSubplan(10, 10, width() - 20, height() - 20, plan, &painter);
 	painter.end();
 }
 

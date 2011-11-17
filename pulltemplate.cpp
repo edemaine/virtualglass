@@ -22,9 +22,7 @@ void PullTemplate :: updateSubpulls()
 	switch (this->type)
 	{
 		case CASED_CIRCLE_TEMPLATE:
-		case CASED_SQUARE_TEMPLATE:
-			subpulls[0].diameter = radius * 1.0; 
-			subpulls[1].diameter = radius * 1.99; 
+			subpulls[0].diameter = radius * 1.90; 
 			break;	
 		case LINE_THREE_CIRCLES_TEMPLATE:
 			for (int i = 0; i < 3; ++i)
@@ -184,13 +182,7 @@ void PullTemplate :: initializeSubpulls()
 			break;
 		case CASED_CIRCLE_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
-			subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 1.0, 0));
-			subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 1.99, 1));
-			break;	
-		case CASED_SQUARE_TEMPLATE:
-			this->shape = SQUARE_SHAPE;
-			subpulls.push_back(SubpullTemplate(SQUARE_SHAPE, p, 1.0, 0));
-			subpulls.push_back(SubpullTemplate(SQUARE_SHAPE, p, 1.99, 1));
+			subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 1.99, 0));
 			break;	
 		case LINE_THREE_CIRCLES_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;

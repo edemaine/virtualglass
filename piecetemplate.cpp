@@ -22,7 +22,7 @@ PieceTemplate :: PieceTemplate(int t)
 			break;
 		case BOWL_TEMPLATE:
 			tmp = new char[100];
-			sprintf(tmp, "Shallowness");
+			sprintf(tmp, "Radius");
 			parameterNames.push_back(tmp);
 			tmp = new char[100];
 			sprintf(tmp, "Twist");

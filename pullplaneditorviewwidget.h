@@ -23,6 +23,7 @@ class PullPlanEditorViewWidget : public QWidget
 		int heightForWidth(int w);
 
 	private:
+		void drawSubplan(int x, int y, int width, int height, PullPlan* plan, QPainter* painter);
 		PullPlan* plan;
 };
 
