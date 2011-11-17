@@ -48,7 +48,7 @@ void MainWindow :: seedEverything()
 	for (int i = FIRST_TEMPLATE; i <= LAST_TEMPLATE; ++i)
 	{
 		pullPlanEditorPlan->setTemplate(new PullTemplate(i, 0.0));
-		pullPlanEditorPlan->getTemplate()->shape = AMORPHOUS_SHAPE; // stop the border from being drawn
+		pullPlanEditorPlan->getTemplate()->shape = CIRCLE_SHAPE;
 		emit someDataChanged();
 		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
 			QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100), i);
@@ -56,7 +56,7 @@ void MainWindow :: seedEverything()
 	}
 
 	// Load final starting pull plan
-	pullPlanEditorPlan->setTemplate(new PullTemplate(LINE_THREE_CIRCLES_TEMPLATE, 0.0));
+	pullPlanEditorPlan->setTemplate(new PullTemplate(LINE_THREE_TEMPLATE, 0.0));
 	emit someDataChanged();
 
 	// Load pickup template types
@@ -401,7 +401,7 @@ void MainWindow :: setupEmptyPaneEditor()
 void MainWindow :: setupPullPlanEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
-	pullPlanEditorPlan = new PullPlan(LINE_THREE_CIRCLES_TEMPLATE, false, defaultColor);
+	pullPlanEditorPlan = new PullPlan(LINE_THREE_TEMPLATE, false, defaultColor);
 
 	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), QPixmap::fromImage(QImage("./duck.jpg")), pullPlanEditorPlan);
 	tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
@@ -592,7 +592,7 @@ void MainWindow :: newPiece()
 void MainWindow :: newPullPlan()
 {
 	// Create the new plan
-	pullPlanEditorPlan = new PullPlan(LINE_THREE_CIRCLES_TEMPLATE, false, defaultColor);
+	pullPlanEditorPlan = new PullPlan(LINE_THREE_TEMPLATE, false, defaultColor);
 
 	// Create the new library entry
 	pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);

@@ -24,7 +24,7 @@ void PullTemplate :: updateSubpulls()
 		case CASED_CIRCLE_TEMPLATE:
 			subpulls[0].diameter = radius * 1.90; 
 			break;	
-		case LINE_THREE_CIRCLES_TEMPLATE:
+		case LINE_THREE_TEMPLATE:
 			for (int i = 0; i < 3; ++i)
 			{
 				p.x = radius * (-0.6666 + 0.6666 * i);
@@ -32,7 +32,7 @@ void PullTemplate :: updateSubpulls()
 				subpulls[i].diameter = radius * 0.65; 
 			}
 			break;	
-		case LINE_FIVE_CIRCLES_TEMPLATE:
+		case LINE_FIVE_TEMPLATE:
 			for (int i = 0; i < 5; ++i)
 			{
 				p.x = radius * (-0.8 + 0.4 * i);
@@ -40,23 +40,7 @@ void PullTemplate :: updateSubpulls()
 				subpulls[i].diameter = radius * 0.39; 
 			}
 			break;			
-		case LINE_THREE_SQUARES_TEMPLATE:
-			for (int i = 0; i < 3; ++i)
-			{
-				p.x = radius * (-0.6666 + 0.6666 * i) * 0.95;
-				subpulls[i].location = p;
-				subpulls[i].diameter = radius * 0.65 * 0.95; 
-			}
-			break;	
-		case LINE_FIVE_SQUARES_TEMPLATE:
-			for (int i = 0; i < 5; ++i)
-			{
-				p.x = radius * (-0.8 + 0.4 * i) * 0.975;
-				subpulls[i].location = p;
-				subpulls[i].diameter = radius * 0.39 * 0.975; 
-			}
-			break;			
-		case CIRCLE_FOUR_CIRCLES_TEMPLATE:
+		case CIRCLE_FOUR_TEMPLATE:
 			for (int i = 0; i < 2; ++i)
 			{
 				for (int j = 0; j < 2; ++j)
@@ -68,7 +52,7 @@ void PullTemplate :: updateSubpulls()
 				}
 			}
 			break;			
-		case CIRCLE_SIX_CIRCLES_TEMPLATE:
+		case CIRCLE_SIX_TEMPLATE:
 			for (int i = 0; i < 6; ++i)
 			{
 				p.x = radius * cos (2*pi*i/6) * 0.666;
@@ -81,7 +65,7 @@ void PullTemplate :: updateSubpulls()
 			subpulls[6].location = p;
 			subpulls[6].diameter = radius * 1 * 0.666;
 			break;			
-		case CIRCLE_TWELVE_CIRCLES_TEMPLATE:
+		case CIRCLE_TWELVE_TEMPLATE:
 			for (int i = 0; i < 12; ++i)
 			{
 				p.x = radius * cos (2*pi*i/12) * 0.79;
@@ -94,7 +78,7 @@ void PullTemplate :: updateSubpulls()
 			subpulls[12].location = p;
 			subpulls[12].diameter = radius * 1*1.5 * 0.79;
 			break;			
-		case SQUARE_FOUR_SQUARES_TEMPLATE:
+		case SQUARE_FOUR_TEMPLATE:
 			for (int i = 0; i < 2; ++i)
 			{
 				for (int j = 0; j < 2; ++j)
@@ -106,7 +90,7 @@ void PullTemplate :: updateSubpulls()
 				}
 			}
 			break;
-		case SQUARE_SIXTEEN_SQUARES_TEMPLATE:
+		case SQUARE_SIXTEEN_TEMPLATE:
 			for (int i = 0; i < 4; ++i)
 			{
 				for (int j = 0; j < 4; ++j)
@@ -118,7 +102,7 @@ void PullTemplate :: updateSubpulls()
 				}
 			}
 			break;
-		case BUNDLE_NINETEEN_CIRCLES_TEMPLATE:
+		case BUNDLE_NINETEEN_TEMPLATE:
 		{
 			int k = 0;
 			for (int i = -2; i <= 2; ++i)
@@ -137,7 +121,7 @@ void PullTemplate :: updateSubpulls()
 			}
 			break;
 		}
-		case X_NINE_CIRCLES_TEMPLATE:
+		case X_NINE_TEMPLATE:
 			for (int i = 0; i < 5; ++i)
 			{
 				p.x = radius * (-0.8 + 0.4 * i);
@@ -184,77 +168,63 @@ void PullTemplate :: initializeSubpulls()
 			this->shape = CIRCLE_SHAPE;
 			subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 1.99, 0));
 			break;	
-		case LINE_THREE_CIRCLES_TEMPLATE:
+		case LINE_THREE_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			for (int i = 0; i < 3; ++i)
 			{
 				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.60, 0));
 			}
 			break;	
-		case LINE_FIVE_CIRCLES_TEMPLATE:
+		case LINE_FIVE_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			for (int i = 0; i < 5; ++i)
 			{
 				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.39, 0));
 			}
 			break;			
-		case LINE_THREE_SQUARES_TEMPLATE:
-			this->shape = CIRCLE_SHAPE;
-			for (int i = 0; i < 3; ++i)
-			{
-				subpulls.push_back(SubpullTemplate(SQUARE_SHAPE, p, 0.60, 0));
-			}
-			break;	
-		case LINE_FIVE_SQUARES_TEMPLATE:
-			this->shape = CIRCLE_SHAPE;
-			for (int i = 0; i < 5; ++i)
-			{
-				subpulls.push_back(SubpullTemplate(SQUARE_SHAPE, p, 0.39, 0));
-			}
-			break;			
-		case CIRCLE_FOUR_CIRCLES_TEMPLATE:
+		case CIRCLE_FOUR_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			for (int i = 0; i < 4; ++i)
 			{
 				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.8, 0));
 			}
 			break;			
-		case CIRCLE_SIX_CIRCLES_TEMPLATE:
+		case CIRCLE_SIX_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			for (int i = 0; i <= 6; ++i)
 			{
 				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.8, 0));
 			}
 			break;			
-		case CIRCLE_TWELVE_CIRCLES_TEMPLATE:
+		case CIRCLE_TWELVE_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			for (int i = 0; i <= 12; ++i)
 			{
 				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.8, 0));
 			}
 			break;			
-		case SQUARE_SIXTEEN_SQUARES_TEMPLATE:
+		case SQUARE_SIXTEEN_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			for (int i = 0; i < 16; ++i)
 			{
 				subpulls.push_back(SubpullTemplate(SQUARE_SHAPE, p, 0.49, 0));
 			}
 			break;
-		case SQUARE_FOUR_SQUARES_TEMPLATE:
+		case SQUARE_FOUR_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			for (int i = 0; i < 4; ++i)
 			{
 				subpulls.push_back(SubpullTemplate(SQUARE_SHAPE, p, 0.49, 0));
 			}
 			break;
-		case BUNDLE_NINETEEN_CIRCLES_TEMPLATE:
+		case BUNDLE_NINETEEN_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			for (int i = 0; i < 19; ++i)
 			{
 				subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 0.49, 0));
 			}
 			break;
-		case X_NINE_CIRCLES_TEMPLATE:
+		case X_NINE_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			for (int i = 0; i < 5; ++i)
 			{
