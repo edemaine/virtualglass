@@ -8,23 +8,18 @@ QMAKE_CFLAGS_RELEASE += -static-libgcc
 TEMPLATE = app
 TARGET =
 DEPENDPATH += .
-INCLUDEPATH += . yaml-cpp/include/ yaml-cpp/util/ yaml-cpp/src/ yaml-cpp/test/
-INCLUDEPATH += glew-1.6.0/include
+INCLUDEPATH += . yaml-cpp/include/ yaml-cpp/util/ yaml-cpp/src/ yaml-cpp/test/ glew/
 QT += opengl
 
-LIBS += -L../src/glew-1.6.0/lib
-unix {
-	LIBS += -lGLEW
-}
 unix:!macx {
   QMAKE_CXXFLAGS += -std=gnu++0x
 }
 macx {
   QMAKE_CXXFLAGS += -DUNORDERED_MAP_WORKAROUND
+  ICON = virtualglass.incs
 }
 win32 {
   QMAKE_CXXFLAGS += -std=gnu++0x
-  LIBS += -lglew32
 }
 LIBS += -lexpat
 
@@ -33,6 +28,8 @@ QMAKE_CFLAGS_RELEASE += -Wall -Werror -g
 QMAKE_CXXFLAGS += -Wall -Werror -Wno-deprecated -g
 
 # Input
+HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
+
 HEADERS += primitives.h constants.h Vector.hpp \ 
 	pullplan.h pulltemplate.h subpulltemplate.h pickupplan.h \
 	piece.h piecetemplate.h \
@@ -66,7 +63,7 @@ HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
 	yaml-cpp/include/yaml-cpp/dll.h \
 	yaml-cpp/include/yaml-cpp/conversion.h \
 	yaml-cpp/include/yaml-cpp/anchor.h \
-	yaml-cpp/include/yaml-cpp/aliasmanager.h
+	yaml-cpp/include/yaml-cpp/aliasmanager.h \
 
 HEADERS += yaml-cpp/src/token.h \
 	yaml-cpp/src/tag.h \
@@ -90,7 +87,9 @@ HEADERS += yaml-cpp/src/token.h \
 	yaml-cpp/src/emitterutils.h \
 	yaml-cpp/src/emitterstate.h \
 	yaml-cpp/src/directives.h \
-	yaml-cpp/src/collectionstack.h
+	yaml-cpp/src/collectionstack.h \
+
+SOURCES += glew/glew.c \
 
 SOURCES += main.cpp \ 
 	pullplan.cpp pulltemplate.cpp subpulltemplate.cpp \
@@ -126,4 +125,4 @@ SOURCES += yaml-cpp/src/tag.cpp \
 	yaml-cpp/src/emitfromevents.cpp \
 	yaml-cpp/src/directives.cpp \
 	yaml-cpp/src/conversion.cpp \
-	yaml-cpp/src/aliasmanager.cpp
+	yaml-cpp/src/aliasmanager.cpp \

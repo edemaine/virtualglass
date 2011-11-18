@@ -8,14 +8,18 @@ PureColorLibraryWidget :: PureColorLibraryWidget(Color color, char* /*name*/, QW
 	setScaledContents(true);
 	setMouseTracking(true);
 
-	QImage image("./checkerboard.png");
-
+#ifdef UNDEf
         QPainter painter(&image);
 	painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 	painter.fillRect(image.rect(), QBrush(QColor(255*color.r, 255*color.g, 255*color.b, 255*color.a)));
         painter.end();
 
 	setPixmap(QPixmap::fromImage(image.scaled(100, 100)));
+#endif
+        QPixmap pixmap(100, 100);
+        pixmap.fill(QColor(255*color.r, 255*color.g, 255*color.b, 255*color.a));
+        setPixmap(pixmap);
+
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
 	this->color = color;

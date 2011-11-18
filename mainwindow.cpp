@@ -325,8 +325,9 @@ void MainWindow :: setupPieceSubeditor1(QVBoxLayout* layout)
 
 void MainWindow :: setupPieceSubeditor2(QVBoxLayout* layout)
 {
-	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")),
-		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);
+	QPixmap pixmap(100, 100);
+	pixmap.fill(Qt::white);
+	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(pixmap, pixmap, pieceEditorPlan);
 	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 2);
 	++pieceCount;
 
@@ -400,8 +401,9 @@ void MainWindow :: setupColorEditor()
 	Color color;
 	color.r = color.g = color.b = color.a = 1.0;
 	colorEditorPlan = new PullPlan(CIRCLE_SHAPE, true, color);
-	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(
-		QPixmap::fromImage(QImage("./duck.jpg")), colorEditorPlan);	
+	QPixmap pixmap(100, 100);
+	pixmap.fill(Qt::white);
+	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(pixmap,colorEditorPlan);	
 	tableGridLayout->addWidget(colorEditorPlanLibraryWidget, colorBarCount, 0);
 	++colorBarCount;
 
@@ -428,7 +430,9 @@ void MainWindow :: setupPullPlanEditor()
 	// Setup data objects - the current plan and library widget for this plan
 	pullPlanEditorPlan = new PullPlan(LINE_THREE_TEMPLATE, false, defaultColor);
 
-	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")), QPixmap::fromImage(QImage("./duck.jpg")), pullPlanEditorPlan);
+	QPixmap pixmap(100, 100);
+	pixmap.fill(Qt::white);
+	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(pixmap, pixmap, pullPlanEditorPlan);
 	tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
 	++pullPlanCount;
 
@@ -600,8 +604,9 @@ void MainWindow :: newPiece()
 	pieceEditorPlan = new Piece(TUMBLER_TEMPLATE);
 
 	pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
-	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")),
-		QPixmap::fromImage(QImage("./duck.jpg")), pieceEditorPlan);
+	QPixmap pixmap(100, 100);
+	pixmap.fill(Qt::white);
+	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(pixmap, pixmap, pieceEditorPlan);
 	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 2);
 	++pieceCount;
 
@@ -616,8 +621,9 @@ void MainWindow :: newPiece()
 void MainWindow :: newColorBar()
 {
 	colorEditorPlan = new PullPlan(CIRCLE_SHAPE, true, defaultColor);
-	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(
-		QPixmap::fromImage(QImage("./duck.jpg")), colorEditorPlan);	
+	QPixmap pixmap(100, 100);
+	pixmap.fill(Qt::white);
+	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(pixmap, colorEditorPlan);	
 	tableGridLayout->addWidget(colorEditorPlanLibraryWidget, colorBarCount, 0);
 	++colorBarCount;
 
@@ -639,8 +645,9 @@ void MainWindow :: newPullPlan()
 	// Create the new library entry
 	pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 
-	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(QPixmap::fromImage(QImage("./duck.jpg")),
-		QPixmap::fromImage(QImage("./duck.jpg")), pullPlanEditorPlan);
+	QPixmap pixmap(100, 100);
+	pixmap.fill(Qt::white);
+	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(pixmap, pixmap, pullPlanEditorPlan);
 	tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
 	++pullPlanCount;
 

@@ -8,14 +8,7 @@ ColorBarLibraryWidget :: ColorBarLibraryWidget(QPixmap niceViewPixmap, PullPlan*
 	setScaledContents(true);
 	setMouseTracking(true);
 
-	QImage image("./checkerboard.png");
-
-	QPainter painter(&image);
-        painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-        painter.drawPixmap(image.rect(), niceViewPixmap, niceViewPixmap.rect());
-	painter.end();
-
-	setPixmap(QPixmap::fromImage(image.scaled(100, 100)));
+	setPixmap(niceViewPixmap);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
 	this->pullPlan = plan;

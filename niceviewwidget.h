@@ -1,7 +1,8 @@
 #ifndef NICEVIEWWIDGET_H
 #define NICEVIEWWIDGET_H
 
-#include <GL/glew.h>
+//#include <GL/glew.h>
+#include "glew.h"
 
 #include <stdlib.h>
 #include <stdio.h>
