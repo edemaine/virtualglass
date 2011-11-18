@@ -98,6 +98,7 @@
 #define __gl_ATI_h_
 
 #if defined(_WIN32)
+#define GLEW_BUILD
 
 /*
  * GLEW does not include <windows.h> to avoid name space pollution.
