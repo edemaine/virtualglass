@@ -252,6 +252,7 @@ void MainWindow :: setupTable()
 	tableGridLibraryScrollArea->setBackgroundRole(QPalette::Dark);
 	tableGridLibraryScrollArea->setWidget(tableGridLibraryWidget);
 	tableGridLibraryScrollArea->setWidgetResizable(true);
+	tableGridLibraryScrollArea->setFixedWidth(380);
 	tableGridLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	tableGridLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	tableLayout->addWidget(tableGridLibraryScrollArea);
@@ -411,10 +412,10 @@ void MainWindow :: setupColorEditor()
 	pageLayout->addLayout(editorLayout);
 
 	colorEditorViewWidget = new ColorEditorViewWidget(colorEditorPlan, colorEditorPage);
-	editorLayout->addWidget(colorEditorViewWidget, 10);
+	editorLayout->addWidget(colorEditorViewWidget, 0);
 
 	colorBarNiceViewWidget = new NiceViewWidget(colorEditorPage);
-        pageLayout->addWidget(colorBarNiceViewWidget);
+        pageLayout->addWidget(colorBarNiceViewWidget, 10);
 
         // Little description for the editor
         QLabel* descriptionLabel = new QLabel("Color editor", colorEditorPage);

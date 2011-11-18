@@ -54,7 +54,23 @@ ColorEditorViewWidget :: ColorEditorViewWidget(PullPlan* plan, QWidget* parent) 
 		tableGridLayout->addWidget(pclw, i, 0);
 	}
 
+	alphaSlider = new QSlider(Qt::Horizontal, this);
+	alphaSlider->setRange(0, 255);
+	alphaSlider->setTickPosition(QSlider::TicksBothSides);
+	editorLayout->addWidget(alphaSlider);
+	
+	connect(alphaSlider, SIGNAL(valueChanged(int)), this, SLOT(alphaSliderPositionChanged(int)));	
+
 	this->plan = plan;
+}
+
+void ColorEditorViewWidget :: alphaSliderPositionChanged(int)
+{
+	if (alphaSlider->sliderPosition() != (int) (this->plan->color.a * 255))
+	{
+		this->plan->color.a = alphaSlider->sliderPosition() / 255.0;
+		emit someDataChanged();
+	} 
 }
 
 void ColorEditorViewWidget :: mouseReleaseEvent(QMouseEvent* event)
@@ -63,6 +79,7 @@ void ColorEditorViewWidget :: mouseReleaseEvent(QMouseEvent* event)
 	if (pclw != NULL)
 	{
 		this->plan->color = pclw->getColor();
+		this->alphaSlider->setSliderPosition((int) (plan->color.a * 255));
 		emit someDataChanged();	
 	}
 }
@@ -70,6 +87,7 @@ void ColorEditorViewWidget :: mouseReleaseEvent(QMouseEvent* event)
 void ColorEditorViewWidget :: setPullPlan(PullPlan* plan)
 {
 	this->plan = plan;
+	this->alphaSlider->setSliderPosition((int) (plan->color.a * 255));
 	emit someDataChanged();	
 }
 

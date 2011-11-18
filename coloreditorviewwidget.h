@@ -24,6 +24,9 @@ class ColorEditorViewWidget : public QWidget
 	protected:
 		void mouseReleaseEvent(QMouseEvent* event);
 
+	private slots:
+		void alphaSliderPositionChanged(int);
+
 	private:
 		PullPlan* plan;
 		QSlider* alphaSlider;
