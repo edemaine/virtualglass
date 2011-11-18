@@ -16,6 +16,33 @@ Mesher :: Mesher()
         color.a = 0.2;
         circleCasing = new PullPlan(CIRCLE_BASE_TEMPLATE, true, color);
         squareCasing = new PullPlan(SQUARE_BASE_TEMPLATE, true, color);
+	trigTableSize = 1000;	
+	for (int i = 0; i < trigTableSize; ++i)
+	{
+		cosTable.push_back(cos(TWO_PI * i / trigTableSize));
+	}
+	for (int i = 0; i < trigTableSize; ++i)
+	{
+		sinTable.push_back(sin(TWO_PI * i / trigTableSize));
+	}
+}
+
+float Mesher :: tableCos(float theta)
+{
+	if (theta < 0)
+		theta = TWO_PI - fmod(-theta, TWO_PI);	
+	else
+		theta = fmod(theta, TWO_PI);
+	return cosTable[trigTableSize * (theta / TWO_PI)];
+}
+
+float Mesher :: tableSin(float theta)
+{
+	if (theta < 0)
+		theta = TWO_PI - fmod(-theta, TWO_PI);	
+	else
+		theta = fmod(theta, TWO_PI);
+	return sinTable[trigTableSize * (theta / TWO_PI)];
 }
 
 void Mesher:: updateTotalCaneLength(Piece* piece)
@@ -78,8 +105,8 @@ void Mesher :: applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int 
 	// Adjust diameter
 	float theta = atan2(v->position.y, v->position.x);
 	float r = length(v->position.xy);
-	v->position.x = r * diameter / 2.0 * cos(theta); 
-	v->position.y = r * diameter / 2.0 * sin(theta); 
+	v->position.x = r * diameter / 2.0 * tableCos(theta);
+	v->position.y = r * diameter / 2.0 * tableSin(theta);
 
 	// Adjust to location in parent
 	v->position.x += locationInParent.x;
@@ -103,8 +130,8 @@ void Mesher :: applyTwistTransform(Vertex* v, PullPlan* transformNode)
 	float r = length(v->position.xy);
 	float transformTheta = twist / 10.0 * v->position.z;
 	float postTheta = preTheta + transformTheta;
-	v->position.x = r * cos(postTheta);
-	v->position.y = r * sin(postTheta);
+	v->position.x = r * tableCos(postTheta);
+	v->position.y = r * tableSin(postTheta);
 }
 
 void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
@@ -115,8 +142,8 @@ void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 	// Shrink width to correct width
 	float theta = atan2(v->position.y, v->position.x);
 	float r = length(v->position.xy); 
-	v->position.x = r * spt->width * 2.5 * cos(theta);	
-	v->position.y = r * spt->width * 2.5 * sin(theta);	
+	v->position.x = r * spt->width * 2.5 * tableCos(theta);	
+	v->position.y = r * spt->width * 2.5 * tableSin(theta);	
 
 	// Change orientation if needed
 	float tmp;
@@ -143,30 +170,34 @@ void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 
 }
 
-void Mesher :: applyBowlTransform(Vertex* v, vector<int> parameterValues)
+void Mesher :: applyBowlTransform(Vertex* v, vector<int>* parameterValues)
 {
-	// Do a rollup
+	int radius = (*parameterValues)[0];
+	int twist = (*parameterValues)[1];
 
+	// Do a rollup
 	// send x value to theta value 
 	// -5.0 goes to -PI, 5.0 goes to PI
 	// everything gets a base radius of 5.0
-	float theta = PI * v->position.x / 5.0 + PI * v->position.z * parameterValues[1] / 500.0;
+	float theta = PI * v->position.x / 5.0 + PI * v->position.z * twist / 500.0;
 
-	float totalR = 4.0 + parameterValues[0] * 0.1;
+	float totalR = 4.0 + radius * 0.1;
 	float totalPhi = 10.0 / totalR;
 
 	float r = totalR - v->position.y;
 	float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
 
-	v->position.x = r * cos(theta) * cos(phi);
-	v->position.y = r * sin(theta) * cos(phi);
-	v->position.z = r * sin(phi) + (totalR - totalR * sin(totalPhi - PI / 2))/2.0;
+	v->position.x = r * tableCos(theta) * tableCos(phi);
+	v->position.y = r * tableSin(theta) * tableCos(phi);
+	v->position.z = r * tableSin(phi) + (totalR - totalR * tableSin(totalPhi - PI / 2))/2.0;
 }
 
-void Mesher :: applyTumblerTransform(Vertex* v, vector<int> parameterValues)
+void Mesher :: applyTumblerTransform(Vertex* v, vector<int>* parameterValues)
 {
-	// Do a rollup
+	int width = (*parameterValues)[0];
+	int taper = (*parameterValues)[1];
 
+	// Do a rollup
 	// send x value to theta value 
 	// -5.0 goes to -PI, 5.0 goes to PI
 	// everything gets a base radius of 5.0
@@ -174,20 +205,20 @@ void Mesher :: applyTumblerTransform(Vertex* v, vector<int> parameterValues)
 	float r = 5.0 / PI - v->position.y;
 
 	// Shape into a tumbler
-	float cutoff = -5.0 + 5.0 / PI + parameterValues[0] * 0.05;
+	float cutoff = -5.0 + 5.0 / PI + width * 0.05;
 	if (v->position.z < cutoff)
 	{
 		float R = v->position.z - -5.0;
 		float offset = r - 5.0 / PI + 0.1;
-		v->position.x = R * cos(theta);
-		v->position.y = R * sin(theta);
+		v->position.x = R * tableCos(theta);
+		v->position.y = R * tableSin(theta);
 		v->position.z = cutoff + offset; 
 	}
 	else
 	{
-		float R = cutoff - -5.0 + (r - 5.0 / PI) + parameterValues[1] * 0.01 * (v->position.z - cutoff);
-		v->position.x = R * cos(theta);
-		v->position.y = R * sin(theta);
+		float R = cutoff - -5.0 + (r - 5.0 / PI) + taper * 0.01 * (v->position.z - cutoff);
+		v->position.x = R * tableCos(theta);
+		v->position.y = R * tableSin(theta);
 	}
 
 	// recenter the object about the origin
@@ -195,12 +226,12 @@ void Mesher :: applyTumblerTransform(Vertex* v, vector<int> parameterValues)
 
 }
 
-Vertex Mesher :: applyTransforms(Vertex v, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
+Vertex Mesher :: applyTransforms(Vertex v, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
 {
-	for (int i = ancestors.size() - 2; i >= 0; --i)
+	for (int i = ancestors->size() - 2; i >= 0; --i)
 	{
-		applyMoveAndResizeTransform(&v, ancestors[i], ancestorIndices[i]);
-		applyTwistTransform(&v, ancestors[i]);
+		applyMoveAndResizeTransform(&v, (*ancestors)[i], (*ancestorIndices)[i]);
+		applyTwistTransform(&v,(*ancestors)[i]);
 	}
 	return v;
 }
@@ -212,7 +243,7 @@ typedef set< Vector2ui > EdgeSet;
 start and end determine the length of cane created...they should be between 0.0 and 1.0.
 The resulting cane has length between 0.0 and 10.0, i.e. it is scaled by a factor of 10.
 */
-void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, PullPlan* plan,
+void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, PullPlan* plan,
 	float start, float end, uint32_t group_tag)
 {
 	unsigned int angularResolution = MIN(MAX(600 / totalCaneLength, 6), 40);
@@ -230,8 +261,8 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ances
 		case CIRCLE_SHAPE:
 			for (unsigned int i = 0; i < angularResolution; ++i)
 			{
-				p.x = cos(2 * PI * i / angularResolution);
-				p.y = sin(2 * PI * i / angularResolution);
+				p.x = tableCos(2 * PI * i / angularResolution);
+				p.y = tableSin(2 * PI * i / angularResolution);
 				points.push_back(p);
 			}
 			break;
@@ -414,7 +445,7 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*> ances
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, plan, group_tag));
 }
 
-void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
+void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
 {
 	if (piece == NULL)
 		return;
@@ -430,17 +461,17 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*> 
 		switch (piece->getTemplate()->type)
 		{
 			case TUMBLER_TEMPLATE:
-				applyTumblerTransform(v, piece->getTemplate()->parameterValues);
+				applyTumblerTransform(v, &(piece->getTemplate()->parameterValues));
 				break;
 			case BOWL_TEMPLATE:
-				applyBowlTransform(v, piece->getTemplate()->parameterValues);
+				applyBowlTransform(v, &(piece->getTemplate()->parameterValues));
 				break;
 		}
 	}	
 	geometry->compute_normals_from_triangles();
 }
 
-void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices)
+void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
 {
 	if (plan == NULL)
 		return;
@@ -448,8 +479,8 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPla
 	geometry->clear();
 	for (unsigned int i = 0; i < plan->subplans.size(); ++i)
 	{
-		ancestors.clear();
-		ancestorIndices.clear();
+		ancestors->clear();
+		ancestorIndices->clear();
 		generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, 0.0, 
 			plan->getTemplate()->subpulls[i]->length / 2.0, true, i); 
 
@@ -479,7 +510,8 @@ the transforms array is filled with with the transformations encountered at each
 leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
-void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*> ancestors, vector<int> ancestorIndices, float start, float end, bool addCasing, int groupIndex)
+void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
+	float start, float end, bool addCasing, int groupIndex)
 {
 	int passGroupIndex;
 
@@ -502,15 +534,15 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*
 		
 		if (casingPlan != NULL)
 		{	
-			ancestors.push_back(casingPlan); 
+			ancestors->push_back(casingPlan); 
 			meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, casingPlan, start - 0.01, 
 				end + 0.01, groupIndex);
-			ancestors.pop_back();
+			ancestors->pop_back();
 		}
 	}
 
 	// Make recursive calls depending on the type of the current node
-	ancestors.push_back(plan);
+	ancestors->push_back(plan);
 
 	if (plan->isBase)
 	{
@@ -530,12 +562,12 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*
 			else
 				passGroupIndex = groupIndex;
 
-			ancestorIndices.push_back(i);
+			ancestorIndices->push_back(i);
 			generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, start, end, false, passGroupIndex);
-			ancestorIndices.pop_back();
+			ancestorIndices->pop_back();
 		}
 	}
-	ancestors.pop_back();
+	ancestors->pop_back();
 }
 
 

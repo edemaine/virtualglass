@@ -23,6 +23,7 @@
 #define PICKUPPLAN_MODE 4
 
 #define PI 3.14159265358979323846f
+#define TWO_PI 6.2831853071795862f
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))

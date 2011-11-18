@@ -16,7 +16,7 @@ Geometry* Model :: getGeometry(PullPlan* plan)
 	vector<int> ancestorIndices;
 
 	mesher->updateTotalCaneLength(plan);
-	mesher->generateMesh(plan, pullPlanGeometry, ancestors, ancestorIndices, 0.0, 1.0, true);
+	mesher->generateMesh(plan, pullPlanGeometry, &ancestors, &ancestorIndices, 0.0, 1.0, true);
 
 	return pullPlanGeometry; 
 }
@@ -28,7 +28,7 @@ Geometry* Model :: getGeometry(PickupPlan* plan)
 	vector<int> ancestorIndices;
 
 	mesher->updateTotalCaneLength(plan);
-	mesher->generateMesh(plan, pickupPlanGeometry, ancestors, ancestorIndices);
+	mesher->generateMesh(plan, pickupPlanGeometry, &ancestors, &ancestorIndices);
 
 	return pickupPlanGeometry;
 }
@@ -40,7 +40,7 @@ Geometry* Model :: getGeometry(Piece* piece)
 	vector<int> ancestorIndices;
 
 	mesher->updateTotalCaneLength(piece);
-	mesher->generateMesh(piece, pieceGeometry, ancestors, ancestorIndices);
+	mesher->generateMesh(piece, pieceGeometry, &ancestors, &ancestorIndices);
 
 	return pieceGeometry;
 }
