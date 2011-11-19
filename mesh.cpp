@@ -103,10 +103,8 @@ void Mesher :: applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int 
 	float diameter = subTemp->diameter;
 
 	// Adjust diameter
-	float theta = atan2(v->position.y, v->position.x);
-	float r = length(v->position.xy);
-	v->position.x = r * diameter / 2.0 * tableCos(theta);
-	v->position.y = r * diameter / 2.0 * tableSin(theta);
+	v->position.x *= diameter / 2.0; 
+	v->position.y *= diameter / 2.0; 
 
 	// Adjust to location in parent
 	v->position.x += locationInParent.x;
@@ -140,10 +138,8 @@ void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 	v->position.z = v->position.z * spt->length / 2.0;
 
 	// Shrink width to correct width
-	float theta = atan2(v->position.y, v->position.x);
-	float r = length(v->position.xy); 
-	v->position.x = r * spt->width * 2.5 * tableCos(theta);	
-	v->position.y = r * spt->width * 2.5 * tableSin(theta);	
+	v->position.x *= spt->width * 2.5; 
+	v->position.y *= spt->width * 2.5; 
 
 	// Change orientation if needed
 	float tmp;
@@ -246,8 +242,8 @@ The resulting cane has length between 0.0 and 10.0, i.e. it is scaled by a facto
 void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, PullPlan* plan,
 	float start, float end, uint32_t group_tag)
 {
-	unsigned int angularResolution = MIN(MAX(600 / totalCaneLength, 6), 40);
-	unsigned int axialResolution = MIN(MAX(2000 / totalCaneLength, 20), 100);
+	unsigned int angularResolution = MIN(MAX(600 / totalCaneLength, 3), 40);
+	unsigned int axialResolution = MIN(MAX(2000 / totalCaneLength, 5), 100);
 	
 	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
