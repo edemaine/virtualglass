@@ -162,7 +162,7 @@ void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 	// Offset by location
 	v->position.x = v->position.x + spt->location.x * 5.0;
 	v->position.z = v->position.z + spt->location.y * 5.0;
-	v->position.y = v->position.y * 0.2;
+	//v->position.y = v->position.y * 0.2;
 
 }
 
@@ -257,8 +257,8 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 		case CIRCLE_SHAPE:
 			for (unsigned int i = 0; i < angularResolution; ++i)
 			{
-				p.x = tableCos(2 * PI * i / angularResolution);
-				p.y = tableSin(2 * PI * i / angularResolution);
+				p.x = tableCos(TWO_PI * i / angularResolution);
+				p.y = tableSin(TWO_PI * i / angularResolution);
 				points.push_back(p);
 			}
 			break;

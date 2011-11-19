@@ -22,7 +22,6 @@ void gl_errors(string const &where) {
 NiceViewWidget :: NiceViewWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent)
 {
 	leftMouseDown = false;
-	updatingOn = true;
 
 	setMinimumWidth(200);
 
@@ -37,7 +36,7 @@ NiceViewWidget :: NiceViewWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::Alp
 	lookAtLoc[2] = 5.0;
 
 	theta = -PI/2.0;
-	fee = PI/2;
+	phi = PI/2;
 	rho = 12.0;
 
 	mouseLocX = 0;
@@ -494,9 +493,6 @@ receives a pointer to this array.
 */
 void NiceViewWidget :: paintGL()
 {
-	if (!updatingOn)
-		return;
-
 	setGLMatrices();
 	this->qglClearColor(bgColor);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -592,9 +588,9 @@ void NiceViewWidget :: setGLMatrices()
 	glLoadIdentity();
 	float eyeLoc[3];
 
-	eyeLoc[0] = lookAtLoc[0] + rho*sin(fee)*cos(theta);
-	eyeLoc[1] = lookAtLoc[1] + rho*sin(fee)*sin(theta);
-	eyeLoc[2] = lookAtLoc[2] + rho*cos(fee);
+	eyeLoc[0] = lookAtLoc[0] + rho*sin(phi)*cos(theta);
+	eyeLoc[1] = lookAtLoc[1] + rho*sin(phi)*sin(theta);
+	eyeLoc[2] = lookAtLoc[2] + rho*cos(phi);
 
 	gluLookAt(eyeLoc[0], eyeLoc[1], eyeLoc[2],
 			  lookAtLoc[0], lookAtLoc[1], lookAtLoc[2],
@@ -664,7 +660,7 @@ void NiceViewWidget :: mouseMoveEvent (QMouseEvent* e)
 	{
 		theta -= (relX * 100.0 * PI / 180.0);
 		if (cameraMode == PIECE_MODE)
-			fee -= (relY * 100.0 * PI / 180.0);
+			phi = MIN(PI-0.0001, MAX(0.0001, phi - (relY * 100.0 * PI / 180.0)));
 		update();
 	}
 
@@ -672,6 +668,9 @@ void NiceViewWidget :: mouseMoveEvent (QMouseEvent* e)
 
 void NiceViewWidget :: wheelEvent(QWheelEvent *e)
 {
+	if (cameraMode == PICKUPPLAN_MODE)
+		return;
+
 	if (e->delta() > 0)
 	{
 		zoomIn();
@@ -707,7 +706,7 @@ void NiceViewWidget :: setCameraMode(int m)
 	{
 		case PULLPLAN_MODE:
 			theta = -PI/2.0;
-			fee = PI/2;
+			phi = PI/2;
 			rho = 11.0;
 			lookAtLoc[0] = 0.0;
 			lookAtLoc[1] = 0.0;
@@ -715,7 +714,7 @@ void NiceViewWidget :: setCameraMode(int m)
 			break;
 		case PICKUPPLAN_MODE:
 			theta = -PI/2.0;
-			fee = PI/2;
+			phi = PI/2;
 			rho = 13.0;
 			lookAtLoc[0] = 0.0;
 			lookAtLoc[1] = 0.0;
@@ -723,7 +722,7 @@ void NiceViewWidget :: setCameraMode(int m)
 			break;
 		case PIECE_MODE:
 			theta = -PI/2.0;
-			fee = PI/2;
+			phi = PI/2;
 			rho = 16.0;
 			lookAtLoc[0] = 0.0;
 			lookAtLoc[1] = 0.0;
