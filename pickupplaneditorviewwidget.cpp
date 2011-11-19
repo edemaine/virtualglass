@@ -4,9 +4,7 @@
 PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* plan, Model* model, QWidget* parent) : QWidget(parent)
 {
 	setAcceptDrops(true);
-	setFixedWidth(500);
-	setFixedHeight(500);
-
+	setFixedSize(400, 400);
 	this->plan = plan;
 	this->model = model;
 	this->niceViewWidget = new NiceViewWidget(this);
@@ -15,6 +13,7 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* plan, Model
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	this->setLayout(layout);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addWidget(niceViewWidget);
 }
 
@@ -109,6 +108,7 @@ void PickupPlanEditorViewWidget :: setPickupPlan(PickupPlan* plan)
 
 void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 {
+	this->niceViewWidget->repaint();
 	return;
 
 	QPainter painter;

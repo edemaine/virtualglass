@@ -4,8 +4,11 @@
 PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
 {
 	setAcceptDrops(true);
-	setFixedWidth(500);
-	setFixedHeight(500);
+	setFixedSize(400, 400);
+	//setMinimumWidth(200);
+	QSizePolicy policy; //(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	policy.setHeightForWidth(true);
+	this->setSizePolicy(policy);
 	this->plan = plan;
 }
 
@@ -69,22 +72,6 @@ void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan)
 
 void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int drawHeight, PullPlan* plan, QPainter* painter)
 {
-	// Draw casing shape
-	painter->setBrush(Qt::NoBrush);
-	QPen pen;
-	pen.setWidth(5);
-	pen.setColor(Qt::black);
-	painter->setPen(pen);
-	switch (plan->getTemplate()->shape)
-	{
-		case CIRCLE_SHAPE:
-			painter->drawEllipse(x, y, drawWidth, drawHeight);
-			break;
-		case SQUARE_SHAPE:
-			painter->drawRect(x, y, drawWidth, drawHeight);
-			break;
-	}
-	
 	// If it's a base color, fill region with color
 	if (plan->isBase)
 	{
@@ -100,8 +87,26 @@ void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int dr
 				painter->drawRect(x, y, drawWidth, drawHeight);
 				break;
 		}
-		return;
 	}
+	
+	// Draw casing shape
+	painter->setBrush(Qt::NoBrush);
+	QPen pen;
+	pen.setWidth(5);
+	pen.setColor(Qt::black);
+	painter->setPen(pen);
+	switch (plan->getTemplate()->shape)
+	{
+		case CIRCLE_SHAPE:
+			painter->drawEllipse(x, y, drawWidth, drawHeight);
+			break;
+		case SQUARE_SHAPE:
+			painter->drawRect(x, y, drawWidth, drawHeight);
+			break;
+	}
+
+	if (plan->isBase)
+		return;
 
 	// Recurse 
 	for (unsigned int i = plan->getTemplate()->subpulls.size()-1; i < plan->getTemplate()->subpulls.size(); --i)

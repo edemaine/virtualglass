@@ -31,6 +31,7 @@ public:
 	int getCameraMode();
 	bool peelEnabled();
 	void setGeometry(Geometry* g);
+	bool updatingOn;
 
 private:
 	bool leftMouseDown;

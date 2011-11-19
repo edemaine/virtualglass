@@ -12,6 +12,7 @@ class PullPlanEditorViewWidget : public QWidget
 	public:
 		PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent=0);
 		void setPullPlan(PullPlan* plan);
+		virtual int heightForWidth(int w);
 	
 	signals:
 		void someDataChanged();
@@ -20,7 +21,6 @@ class PullPlanEditorViewWidget : public QWidget
 		void dragEnterEvent(QDragEnterEvent* dee);
 		void dropEvent(QDropEvent* de);
 		void paintEvent(QPaintEvent *event);
-		int heightForWidth(int w);
 
 	private:
 		void drawSubplan(int x, int y, int width, int height, PullPlan* plan, QPainter* painter);

@@ -22,10 +22,11 @@ void gl_errors(string const &where) {
 NiceViewWidget :: NiceViewWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent)
 {
 	leftMouseDown = false;
+	updatingOn = true;
+
+	setMinimumWidth(200);
 
 	bgColor = QColor(200, 200, 200);
-	setMinimumWidth(400); 
-	setMinimumHeight(400); 
 
 	cameraMode = PULLPLAN_MODE;
 
@@ -493,6 +494,9 @@ receives a pointer to this array.
 */
 void NiceViewWidget :: paintGL()
 {
+	if (!updatingOn)
+		return;
+
 	setGLMatrices();
 	this->qglClearColor(bgColor);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

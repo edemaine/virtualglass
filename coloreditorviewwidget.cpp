@@ -24,6 +24,7 @@ ColorEditorViewWidget :: ColorEditorViewWidget(PullPlan* plan, QWidget* parent) 
          * Clear, K141A Cherry Red, K210 Sari Blue, K212A Brilliant Gold, K228 Dark Heliotrope, K215A Gold Brown, K213 Brilliant Green;
          * White, Black, K070 Opal Green, K078A Canary Yellow, K086 Turquoise
          */
+
 	char* names[] = {
 		(char*) "Cherry Red", 
 		(char*) "Sari Blue", 
@@ -38,10 +39,10 @@ ColorEditorViewWidget :: ColorEditorViewWidget(PullPlan* plan, QWidget* parent) 
 		(char*) "Canary Yellow", 
 		(char*) "Turqouise"};
         int rgba[][4] = {
-                {255,255,255,102}, {204,0,0,126},{ 0,112,179,126},{254,220,29,126},
-                {164,116,184,126}, {163,118,58,126}, {255, 255, 255, 0},
-		{153,204,51,126}, {255,255,255,255},
-                {0,0,0,255}, {0,140,0,255}, {249,219,6,255}, {121,190,196,255},
+              	{204,0,0,126}, {0,112,179,126}, {254,220,29,126},
+                {164,116,184,126}, {163,118,58,126}, {255, 255, 255, 0}, {153,204,51,126}, 
+		{255,255,255,255}, {0,0,0,255}, {0,140,0,255}, {249,219,6,255}, 
+		{121,190,196,255},
                 {-1,-1,-1,-1}};
         Color color;
         for (int i = 0; rgba[i][0] >= 0; ++i) 
@@ -50,7 +51,9 @@ ColorEditorViewWidget :: ColorEditorViewWidget(PullPlan* plan, QWidget* parent) 
                 color.g = rgba[i][1] / 255.0;
                 color.b = rgba[i][2] / 255.0;
                 color.a = rgba[i][3] / 255.0;
-		PureColorLibraryWidget* pclw = new PureColorLibraryWidget(color, names[i], this);
+		char* name = new char[100];
+		strcpy(name, names[i]);
+		PureColorLibraryWidget* pclw = new PureColorLibraryWidget(color, name, this);
 		tableGridLayout->addWidget(pclw, i, 0);
 	}
 
