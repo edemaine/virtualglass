@@ -8,6 +8,7 @@
 
 #define TUMBLER_TEMPLATE 1
 #define BOWL_TEMPLATE 2
+#define VASE_TEMPLATE 3
 
 
 using std::vector;

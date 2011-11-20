@@ -10,6 +10,16 @@ PieceTemplate :: PieceTemplate(int t)
 
 	switch (this->type)
 	{
+		case VASE_TEMPLATE:
+			tmp = new char[100];
+			sprintf(tmp, "Body width");
+			parameterNames.push_back(tmp);
+			tmp = new char[100];
+			sprintf(tmp, "Lip width");
+			parameterNames.push_back(tmp);
+			parameterValues.push_back(0);
+			parameterValues.push_back(0);
+			break;
 		case TUMBLER_TEMPLATE:
 			tmp = new char[100];
 			sprintf(tmp, "Width");

@@ -342,6 +342,7 @@ void MainWindow :: setupPieceEditor()
 	pieceTemplateComboBox = new QComboBox(pieceEditorPage);
 	pieceTemplateComboBox->addItem("Tumbler");
 	pieceTemplateComboBox->addItem("Bowl");
+	pieceTemplateComboBox->addItem("Vase");
 	leftLayout->addWidget(pieceTemplateComboBox, 0);
 
 	pieceTemplateParameter1Label = new QLabel(pieceEditorPlan->getTemplate()->parameterNames[0]);

@@ -40,7 +40,7 @@ private:
 	int cameraMode;
 	
 	float lookAtLoc[3];
-	float theta, fee, rho;
+	float theta, phi, rho;
 
 	int mouseLocX, mouseLocY;
 

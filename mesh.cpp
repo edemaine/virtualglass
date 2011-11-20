@@ -188,38 +188,47 @@ void Mesher :: applyBowlTransform(Vertex* v, vector<int>* parameterValues)
 	v->position.z = r * tableSin(phi) + (totalR - totalR * tableSin(totalPhi - PI / 2))/2.0;
 }
 
+float Mesher :: splineVal(float r1, float r2, float r3, float r4, float t)
+{
+	return pow((1.0 - t), 3) * r1 + 3 * pow(1.0 - t, 2) * t * r2 + 3 * pow(1.0 - t, 2) * t * r3 + pow(t, 3) * r4;
+}
+
+void Mesher :: applyVaseTransform(Vertex* v, vector<int>* parameterValues)
+{
+	// compute theta within a rollup, starting with pickup geometry
+	float theta = PI * v->position.x / 5.0;
+
+	// Deform into a spline-based vase
+	float body_radius = (*parameterValues)[0] * 0.1 + 1.0; 
+	float lip_radius = (*parameterValues)[1] * 0.05 + 0.5; 
+	float radius = 2.0 * splineVal(0.5, body_radius, 0.5, lip_radius, (v->position.z - -5.0)/10.0);
+	v->position.x = (radius - v->position.y / radius) * tableCos(theta); 
+	v->position.y = (radius - v->position.y / radius) * tableSin(theta); 
+}
+
 void Mesher :: applyTumblerTransform(Vertex* v, vector<int>* parameterValues)
 {
-	int width = (*parameterValues)[0];
-	int taper = (*parameterValues)[1];
+	// compute theta within a rollup, starting with pickup geometry
+	float pZ = (v->position.z - -5.0)/10.0;
+	float theta = PI * v->position.x / 5.0 + (*parameterValues)[1] * 0.05 * pZ;
+	float r = (*parameterValues)[0] * 0.05 + 1.0;
 
-	// Do a rollup
-	// send x value to theta value 
-	// -5.0 goes to -PI, 5.0 goes to PI
-	// everything gets a base radius of 5.0
-	float theta = PI * v->position.x / 5.0;
-	float r = 5.0 / PI - v->position.y;
-
-	// Shape into a tumbler
-	float cutoff = -5.0 + 5.0 / PI + width * 0.05;
-	if (v->position.z < cutoff)
+	float radius;
+	if (pZ < 0.05)
 	{
-		float R = v->position.z - -5.0;
-		float offset = r - 5.0 / PI + 0.1;
-		v->position.x = R * tableCos(theta);
-		v->position.y = R * tableSin(theta);
-		v->position.z = cutoff + offset; 
+		radius = 0.2 + (r - 0.2) * pZ / 0.05;
+		radius -= v->position.y * radius / 10;
+		radius = MAX(radius, 0.0001);
 	}
 	else
 	{
-		float R = cutoff - -5.0 + (r - 5.0 / PI) + taper * 0.01 * (v->position.z - cutoff);
-		v->position.x = R * tableCos(theta);
-		v->position.y = R * tableSin(theta);
+		radius = r * (1.0 + (pZ - 0.05) * 0.05);
+		radius -= v->position.y / radius;
 	}
 
-	// recenter the object about the origin
-	v->position.z -= (5.0 + cutoff) / 2;
-
+	//float radius = r * splineVal(0.1, 1.0, 1.0, 0.9, pZ);
+	v->position.x = radius * tableCos(theta); 
+	v->position.y = radius * tableSin(theta); 
 }
 
 Vertex Mesher :: applyTransforms(Vertex v, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
@@ -456,6 +465,9 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>*
 		v = &(geometry->vertices[i]);
 		switch (piece->getTemplate()->type)
 		{
+			case VASE_TEMPLATE:
+				applyVaseTransform(v, &(piece->getTemplate()->parameterValues));
+				break;
 			case TUMBLER_TEMPLATE:
 				applyTumblerTransform(v, &(piece->getTemplate()->parameterValues));
 				break;

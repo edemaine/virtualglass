@@ -28,6 +28,7 @@ class Mesher
 
 	private:
 		// Methods
+		float splineVal(float r1, float r2, float r3, float r4, float t);
 		float tableCos(float theta);
 		float tableSin(float theta);
 		void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
@@ -38,6 +39,7 @@ class Mesher
 		void applyTwistTransform(Geometry* geometry, PullPlan* p);
 		Vertex applyTransforms(Vertex p, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices);
 		void applyPickupTransform(Vertex* p, SubpickupTemplate* spt);
+		void applyVaseTransform(Vertex* p, vector<int>* parameterValues);
 		void applyTumblerTransform(Vertex* p, vector<int>* parameterValues);
 		void applyBowlTransform(Vertex* p, vector<int>* parameterValues);
 		float computeTotalCaneLength(Piece* piece);
