@@ -4,6 +4,7 @@
 PickupPlan :: PickupPlan(int pickupTemplate)
 {
 	this->pickupTemplate = new PickupTemplate(pickupTemplate);
+	this->libraryWidget = NULL;
 	for (unsigned int i = 0; i < this->pickupTemplate->subpulls.size(); ++i)
 	{
 		Color color;

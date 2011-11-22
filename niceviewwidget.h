@@ -38,7 +38,7 @@ private:
 	Geometry *geometry;
 
 	int cameraMode;
-	
+
 	float lookAtLoc[3];
 	float theta, phi, rho;
 

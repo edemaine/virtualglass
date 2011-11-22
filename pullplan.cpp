@@ -8,6 +8,8 @@ PullPlan :: PullPlan(int pullTemplate, bool isBase, Color color)
 	this->color = color;
 	this->isBase = isBase;
 	this->twist = 0.0;
+	this->libraryWidget = NULL;
+	this->colorLibraryWidget = NULL;
 
 	this->setTemplate(new PullTemplate(pullTemplate, 0.0));
 }
@@ -17,9 +19,19 @@ void PullPlan :: setLibraryWidget(PullPlanLibraryWidget* plplw)
 	this->libraryWidget = plplw;
 }
 
+void PullPlan :: setLibraryWidget(ColorBarLibraryWidget* cblw)
+{
+	this->colorLibraryWidget = cblw;
+}
+
 PullPlanLibraryWidget* PullPlan :: getLibraryWidget()
 {
 	return this->libraryWidget;
+}
+
+ColorBarLibraryWidget* PullPlan :: getColorLibraryWidget()
+{
+	return this->colorLibraryWidget;
 }
 
 Color PullPlan :: getColorAverage()

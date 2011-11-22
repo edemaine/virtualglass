@@ -4,7 +4,7 @@
 Piece :: Piece(int pickupTemplate)
 {
 	setTemplate(new PieceTemplate(pickupTemplate));
-
+	this->libraryWidget = NULL;
 	// initialize the piece's pickup pickup to be something boring and base
 	this->pickup = new PickupPlan(VERTICALS_TEMPLATE);
 }

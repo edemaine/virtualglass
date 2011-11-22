@@ -55,9 +55,11 @@ class MainWindow : public QMainWindow
 		void updatePieceEditor();
 		void updateLibrary();
 
+		void highlightPlanLibraryWidgets(ColorBarLibraryWidget* cblw,bool highlight,bool setupDone);
 		void highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw,bool highlight,bool setupDone);
 		void highlightPlanLibraryWidgets(PickupPlanLibraryWidget* pkplw,bool highlight,bool setupDone);
 		void highlightPlanLibraryWidgets(PieceLibraryWidget* plw,bool highlight,bool setupDone);
+		void unhighlightAllPlanLibraryWidgets(bool setupDone);
 
 		// Variables
 		NiceViewWidget* colorBarNiceViewWidget;
