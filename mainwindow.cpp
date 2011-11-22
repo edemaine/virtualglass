@@ -793,9 +793,9 @@ void MainWindow :: updateEverything()
 
 void MainWindow :: updateLibrary()
 {
-	//colorEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
-	//pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
-	//pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
+	colorEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
+	pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
+	pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 
 	switch (editorStack->currentIndex())
 	{
