@@ -15,6 +15,7 @@ class ColorBarLibraryWidget : public QLabel
 		void updatePixmap(QPixmap niceViewPixmap);
 
 	private:
+                QButtonGroup* colorBarTemplateShapeButtonGroup;
 		PullPlan* pullPlan;
 };
 

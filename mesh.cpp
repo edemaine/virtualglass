@@ -193,6 +193,11 @@ float Mesher :: splineVal(float r1, float r2, float r3, float r4, float t)
 	return pow((1.0 - t), 3) * r1 + 3 * pow(1.0 - t, 2) * t * r2 + 3 * pow(1.0 - t, 2) * t * r3 + pow(t, 3) * r4;
 }
 
+float Mesher :: splineVal(float r1, float r2, float r3, float t)
+{
+	return pow((1.0 - t), 2) * r1 + 2 * (1.0 - t) * t * r2 + pow(t, 2) * r3;
+}
+
 void Mesher :: applyVaseTransform(Vertex* v, vector<int>* parameterValues)
 {
 	// compute theta within a rollup, starting with pickup geometry
@@ -209,26 +214,15 @@ void Mesher :: applyVaseTransform(Vertex* v, vector<int>* parameterValues)
 void Mesher :: applyTumblerTransform(Vertex* v, vector<int>* parameterValues)
 {
 	// compute theta within a rollup, starting with pickup geometry
-	float pZ = (v->position.z - -5.0)/10.0;
-	float theta = PI * v->position.x / 5.0 + (*parameterValues)[1] * 0.05 * pZ;
-	float r = (*parameterValues)[0] * 0.05 + 1.0;
+	float theta = PI * v->position.x / 5.0;
 
-	float radius;
-	if (pZ < 0.05)
-	{
-		radius = 0.2 + (r - 0.2) * pZ / 0.05;
-		radius -= v->position.y * radius / 10;
-		radius = MAX(radius, 0.0001);
-	}
-	else
-	{
-		radius = r * (1.0 + (pZ - 0.05) * 0.05);
-		radius -= v->position.y / radius;
-	}
+	// Deform into a spline-based vase
+	float radius = (2.0 + (*parameterValues)[0]*0.01) 
+		* splineVal(0.5, 1.5, 0.5 + (*parameterValues)[1]*0.015, (v->position.z - -5.0)/10.0);
+	v->position.x = (radius - v->position.y / radius) * tableCos(theta); 
+	v->position.y = (radius - v->position.y / radius) * tableSin(theta); 
 
-	//float radius = r * splineVal(0.1, 1.0, 1.0, 0.9, pZ);
-	v->position.x = radius * tableCos(theta); 
-	v->position.y = radius * tableSin(theta); 
+	return;
 }
 
 Vertex Mesher :: applyTransforms(Vertex v, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)

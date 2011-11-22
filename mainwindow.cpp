@@ -543,13 +543,13 @@ void MainWindow :: pullTemplateShapeButtonGroupChanged(int)
 			if (pullPlanEditorPlan->getTemplate()->shape == CIRCLE_SHAPE)
 				return;
 			pullPlanEditorPlan->getTemplate()->shape = CIRCLE_SHAPE;
-			someDataChanged();
+			emit someDataChanged();
 			break;
 		case 2:
 			if (pullPlanEditorPlan->getTemplate()->shape == SQUARE_SHAPE)
 				return;
 			pullPlanEditorPlan->getTemplate()->shape = SQUARE_SHAPE;
-			someDataChanged();
+			emit someDataChanged();
 			break;
 	}
 }

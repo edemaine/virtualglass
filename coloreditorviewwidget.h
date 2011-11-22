@@ -26,10 +26,12 @@ class ColorEditorViewWidget : public QWidget
 
 	private slots:
 		void alphaSliderPositionChanged(int);
+		void colorBarTemplateShapeButtonGroupChanged(int);
 
 	private:
 		PullPlan* plan;
 		QSlider* alphaSlider;
+		QButtonGroup* colorBarTemplateShapeButtonGroup;
 };
 
 

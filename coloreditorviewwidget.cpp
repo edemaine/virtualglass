@@ -57,14 +57,54 @@ ColorEditorViewWidget :: ColorEditorViewWidget(PullPlan* plan, QWidget* parent) 
 		tableGridLayout->addWidget(pclw, i, 0);
 	}
 
+	QHBoxLayout* alphaLayout = new QHBoxLayout(this);
+        editorLayout->addLayout(alphaLayout);
+
+        QLabel* alphaLabel1 = new QLabel("Opacity:", this);
+        alphaLayout->addWidget(alphaLabel1, 0);
+        QLabel* alphaLabel2 = new QLabel("0%", this);
+        alphaLayout->addWidget(alphaLabel2, 0);
 	alphaSlider = new QSlider(Qt::Horizontal, this);
 	alphaSlider->setRange(0, 255);
-	alphaSlider->setTickPosition(QSlider::TicksBothSides);
-	editorLayout->addWidget(alphaSlider);
-	
+	alphaLayout->addWidget(alphaSlider);
+        QLabel* alphaLabel3 = new QLabel("100%", this);
+        alphaLayout->addWidget(alphaLabel3, 0);
 	connect(alphaSlider, SIGNAL(valueChanged(int)), this, SLOT(alphaSliderPositionChanged(int)));	
 
+        QLabel* casingLabel = new QLabel("Casing:");
+        QCheckBox* circleCheckBox = new QCheckBox("Circle");
+        QCheckBox* squareCheckBox = new QCheckBox("Square");
+        colorBarTemplateShapeButtonGroup = new QButtonGroup();
+        colorBarTemplateShapeButtonGroup->addButton(circleCheckBox, 1);
+        colorBarTemplateShapeButtonGroup->addButton(squareCheckBox, 2);
+        QHBoxLayout* colorBarShapeLayout = new QHBoxLayout(this);
+        colorBarShapeLayout->addWidget(casingLabel);
+        colorBarShapeLayout->addWidget(circleCheckBox);
+        colorBarShapeLayout->addWidget(squareCheckBox);
+        editorLayout->addLayout(colorBarShapeLayout, 0);
+        connect(colorBarTemplateShapeButtonGroup, SIGNAL(buttonClicked(int)), 
+		this, SLOT(colorBarTemplateShapeButtonGroupChanged(int)));
+
 	this->plan = plan;
+}
+
+void ColorEditorViewWidget :: colorBarTemplateShapeButtonGroupChanged(int)
+{
+        switch (colorBarTemplateShapeButtonGroup->checkedId())
+        {
+                case 1:
+                        if (plan->getTemplate()->shape == CIRCLE_SHAPE)
+                                return;
+                        plan->getTemplate()->shape = CIRCLE_SHAPE;
+                        emit someDataChanged();
+                        break;
+                case 2:
+                        if (plan->getTemplate()->shape == SQUARE_SHAPE)
+                                return;
+                        plan->getTemplate()->shape = SQUARE_SHAPE;
+                        emit someDataChanged();
+                        break;
+        }
 }
 
 void ColorEditorViewWidget :: alphaSliderPositionChanged(int)
@@ -91,6 +131,8 @@ void ColorEditorViewWidget :: setPullPlan(PullPlan* plan)
 {
 	this->plan = plan;
 	this->alphaSlider->setSliderPosition((int) (plan->color.a * 255));
+        static_cast<QCheckBox*>(colorBarTemplateShapeButtonGroup->button(
+                plan->getTemplate()->shape))->setCheckState(Qt::Checked);
 	emit someDataChanged();	
 }
 

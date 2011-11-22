@@ -22,10 +22,10 @@ PieceTemplate :: PieceTemplate(int t)
 			break;
 		case TUMBLER_TEMPLATE:
 			tmp = new char[100];
-			sprintf(tmp, "Width");
+			sprintf(tmp, "Size");
 			parameterNames.push_back(tmp);
 			tmp = new char[100];
-			sprintf(tmp, "Taper");
+			sprintf(tmp, "Openness");
 			parameterNames.push_back(tmp);
 			parameterValues.push_back(0);
 			parameterValues.push_back(0);
