@@ -11,9 +11,10 @@
 #define SQUARE_SHAPE 2
 
 // Types of MIME data
-#define PULL_PLAN_MIME 1
-#define PICKUP_PLAN_MIME 2
-#define PIECE_MIME 3
+#define COLOR_BAR_MIME 1
+#define PULL_PLAN_MIME 2
+#define PICKUP_PLAN_MIME 3
+#define PIECE_MIME 4
 
 // Editor/nice view modes
 #define EMPTY_MODE 0

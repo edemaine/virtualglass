@@ -61,8 +61,8 @@ void PieceEditorViewWidget :: paintEvent(QPaintEvent *event)
 	{
 		if (piece->pickup->subplans[i]->isBase)
 		{
-			Color c = piece->pickup->subplans[i]->color;
-			painter.setBrush(QColor(255*c.r, 255*c.g, 255*c.b, 255*c.a));
+			Color* c = piece->pickup->subplans[i]->color;
+			painter.setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
 			pen.setStyle(Qt::NoPen);
 		}
 		else

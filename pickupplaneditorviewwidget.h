@@ -7,14 +7,15 @@
 #include "constants.h"
 #include "niceviewwidget.h"
 #include "model.h"
+#include "piece.h"
 
 class PickupPlanEditorViewWidget : public QWidget
 {
 	Q_OBJECT
 
 	public:
-		PickupPlanEditorViewWidget(PickupPlan* plan, Model* model, QWidget* parent=0);
-		void setPickupPlan(PickupPlan* plan);
+		PickupPlanEditorViewWidget(Piece* piece, Model* model, QWidget* parent=0);
+		void setPiece(Piece* plan);
 		QPixmap getPixmap();
 	
 	signals:
@@ -28,7 +29,7 @@ class PickupPlanEditorViewWidget : public QWidget
 	private:
 		Model* model;
 		NiceViewWidget* niceViewWidget;
-		PickupPlan* plan;
+		Piece* piece;
 };
 
 

@@ -10,7 +10,7 @@ class PureColorLibraryWidget : public QLabel
 	Q_OBJECT
 
 	public:
-		PureColorLibraryWidget(Color color, char* name, QWidget* parent=0);
+		PureColorLibraryWidget(Color color, QString name, QWidget* parent=0);
 		Color getColor();
 		void setAlpha(float a);
 

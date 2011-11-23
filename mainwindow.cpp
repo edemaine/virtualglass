@@ -33,7 +33,7 @@ void MainWindow :: seedEverything()
 	}
 
 	// Load final starting pull plan
-	pullPlanEditorPlan->setTemplate(new PullTemplate(LINE_THREE_TEMPLATE, 0.0));
+	pullPlanEditorPlan->setTemplate(new PullTemplate(CASED_CIRCLE_TEMPLATE, 0.0));
 	emit someDataChanged();
 
 	// Load pickup template types
@@ -43,7 +43,7 @@ void MainWindow :: seedEverything()
 	for (int i = VERTICALS_TEMPLATE; i <= MURRINE_SQUARE_TEMPLATE; ++i)
 	{
 		pieceEditorPlan->pickup->setTemplate(new PickupTemplate(i));
-		pickupPlanEditorViewWidget->repaint();
+		emit someDataChanged();
 		PickupTemplateLibraryWidget *ptlw = new PickupTemplateLibraryWidget(
 			pickupPlanEditorViewWidget->getPixmap().scaled(100, 100), i);
 		pickupTemplateLibraryLayout->addWidget(ptlw);
@@ -63,6 +63,7 @@ void MainWindow :: seedEverything()
 
 	// InitLoad correct
 	editorStack->setCurrentIndex(COLORBAR_MODE);
+	colorEditorViewWidget->seedMartyColors();
 	emit someDataChanged();
 
 	editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
@@ -131,7 +132,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 		if (pktlw->getPickupTemplateType() != pieceEditorPlan->pickup->getTemplate()->type)
 		{
 			pieceEditorPlan->pickup->setTemplate(new PickupTemplate(pktlw->getPickupTemplateType()));
-			pickupPlanEditorViewWidget->setPickupPlan(pieceEditorPlan->pickup);
+			pickupPlanEditorViewWidget->setPiece(pieceEditorPlan);
 			pickupTemplateParameter1Label->setText(pieceEditorPlan->pickup->getTemplate()->getParameterName(0));
 			pickupTemplateParameter1SpinBox->setValue(pieceEditorPlan->pickup->getTemplate()->getParameter(0));
 			emit someDataChanged();
@@ -166,7 +167,7 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	{
 		plan = cblw->getPullPlan();
 		pixmap = *cblw->pixmap();
-		type = PULL_PLAN_MIME;
+		type = COLOR_BAR_MIME;
 	}
 	else if (plplw != NULL)
 	{
@@ -277,9 +278,6 @@ void MainWindow :: setupTable()
 
 void MainWindow :: setupEditors()
 {
-	defaultColor.r = defaultColor.g = defaultColor.b = 1.0;
-	defaultColor.a = 0.4;
-
 	editorStack = new QStackedWidget(centralWidget);
 	centralLayout->addWidget(editorStack, 2);
 
@@ -305,7 +303,7 @@ void MainWindow :: setupPieceEditor()
 
 	QVBoxLayout* leftLayout = new QVBoxLayout(pieceEditorPage);
 	piecePageLayout->addLayout(leftLayout);
-	pickupPlanEditorViewWidget = new PickupPlanEditorViewWidget(pieceEditorPlan->pickup, model, pieceEditorPage);
+	pickupPlanEditorViewWidget = new PickupPlanEditorViewWidget(pieceEditorPlan, model, pieceEditorPage);
 	leftLayout->addWidget(pickupPlanEditorViewWidget);
 
 	// Setup pickup template scrolling library
@@ -325,7 +323,7 @@ void MainWindow :: setupPieceEditor()
 
 	pickupTemplateParameter1Label = new QLabel(pieceEditorPlan->pickup->getTemplate()->getParameterName(0));
 	pickupTemplateParameter1SpinBox = new QSpinBox(pieceEditorPage);
-	pickupTemplateParameter1SpinBox->setRange(1, 20);
+	pickupTemplateParameter1SpinBox->setRange(6, 40);
 	pickupTemplateParameter1SpinBox->setSingleStep(1);
 	pickupTemplateParameter1SpinBox->setValue(1);
 
@@ -346,10 +344,6 @@ void MainWindow :: setupPieceEditor()
 	pieceEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
 	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 2);
 	++pieceCount;
-
-		writeRawCheckBox = new QCheckBox("Write .raw file", pieceEditorPage);
-		writeRawCheckBox->setCheckState(Qt::Unchecked);
-		leftLayout->addWidget(writeRawCheckBox, 0);
 
 	pieceTemplateComboBox = new QComboBox(pieceEditorPage);
 	pieceTemplateComboBox->addItem("Tumbler");
@@ -389,6 +383,10 @@ void MainWindow :: setupPieceEditor()
 		pieceNiceViewWidget = new NiceViewWidget(pieceEditorPage);
 		niceViewLayout->addWidget(pieceNiceViewWidget, 10);
 
+	writeRawCheckBox = new QCheckBox("Write .raw file", pieceEditorPage);
+        writeRawCheckBox->setCheckState(Qt::Unchecked);
+        niceViewLayout->addWidget(writeRawCheckBox, 0);
+
 	// Little description for the editor
 	QLabel* niceViewDescriptionLabel = new QLabel("3D view of piece.",
 		pullPlanEditorPage);
@@ -409,8 +407,8 @@ void MainWindow :: setupEmptyPaneEditor()
 
 void MainWindow :: setupColorEditor()
 {
-	Color color;
-	color.r = color.g = color.b = color.a = 1.0;
+	Color* color = new Color();
+	color->r = color->g = color->b = color->a = 1.0;
 	colorEditorPlan = new PullPlan(CIRCLE_SHAPE, true, color);
 	QPixmap pixmap(100, 100);
 	pixmap.fill(Qt::white);
@@ -429,18 +427,20 @@ void MainWindow :: setupColorEditor()
 	editorLayout->addWidget(colorEditorViewWidget, 0);
 
 	colorBarNiceViewWidget = new NiceViewWidget(colorEditorPage);
-		pageLayout->addWidget(colorBarNiceViewWidget, 10);
+	pageLayout->addWidget(colorBarNiceViewWidget, 10);
 
-		// Little description for the editor
-		QLabel* descriptionLabel = new QLabel("Color editor", colorEditorPage);
-		descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-		editorLayout->addWidget(descriptionLabel, 0);
+	// Little description for the editor
+	QLabel* descriptionLabel = new QLabel("Color editor", colorEditorPage);
+	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	editorLayout->addWidget(descriptionLabel, 0);
 }
 
 void MainWindow :: setupPullPlanEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
-	pullPlanEditorPlan = new PullPlan(LINE_THREE_TEMPLATE, false, defaultColor);
+	Color* newColor = new Color();
+	newColor->r = newColor->g = newColor->b = newColor->a = 1.0;
+	pullPlanEditorPlan = new PullPlan(CASED_CIRCLE_TEMPLATE, false, newColor);
 
 	QPixmap pixmap(100, 100);
 	pixmap.fill(Qt::white);
@@ -634,7 +634,7 @@ void MainWindow :: newPiece()
 	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 2);
 	++pieceCount;
 
-	pickupPlanEditorViewWidget->setPickupPlan(pieceEditorPlan->pickup);
+	pickupPlanEditorViewWidget->setPiece(pieceEditorPlan);
 
 	// Load up the right editor
 	editorStack->setCurrentIndex(PIECE_MODE);
@@ -644,7 +644,9 @@ void MainWindow :: newPiece()
 
 void MainWindow :: newColorBar()
 {
-	colorEditorPlan = new PullPlan(CIRCLE_SHAPE, true, defaultColor);
+	Color* newColor = new Color();
+	newColor->r = newColor->g = newColor->b = newColor->a = 1.0;
+	colorEditorPlan = new PullPlan(CIRCLE_SHAPE, true, newColor);
 	//colorEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 	unhighlightAllPlanLibraryWidgets(setupDone);
 	QPixmap pixmap(100, 100);
@@ -667,7 +669,9 @@ void MainWindow :: newColorBar()
 void MainWindow :: newPullPlan()
 {
 	// Create the new plan
-	pullPlanEditorPlan = new PullPlan(LINE_THREE_TEMPLATE, false, defaultColor);
+	Color* newColor = new Color();
+	newColor->r = newColor->g = newColor->b = newColor->a = 1.0;
+	pullPlanEditorPlan = new PullPlan(CASED_CIRCLE_TEMPLATE, false, newColor);
 
 	// Create the new library entry
 	//pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
@@ -773,20 +777,20 @@ void MainWindow :: highlightPlanLibraryWidgets(PieceLibraryWidget* plw,bool high
 
 void MainWindow :: updateEverything()
 {
-		switch (editorStack->currentIndex())
-		{
-				case COLORBAR_MODE:
+	switch (editorStack->currentIndex())
+	{
+		case COLORBAR_MODE:
 			updateColorEditor();
-						break;
-				case PULLPLAN_MODE:
+			break;
+		case PULLPLAN_MODE:
 			updatePullPlanEditor();
-						break;
-				case PIECE_MODE:
+			break;
+		case PIECE_MODE:
 			updatePieceEditor();
-						break;
-				default:
-						return;
-		}
+			break;
+		default:
+			return;
+	}
 
 	updateLibrary();
 }
@@ -824,14 +828,14 @@ void MainWindow :: updatePieceEditor()
 	// update pickup stuff
 	int value = pieceEditorPlan->pickup->getTemplate()->getParameter(0);
 	pickupTemplateParameter1SpinBox->setValue(value);
-	pickupPlanEditorViewWidget->setPickupPlan(pieceEditorPlan->pickup);
+	pickupPlanEditorViewWidget->setPiece(pieceEditorPlan);
 
 	// update piece stuff
-		Geometry* geometry = model->getGeometry(pieceEditorPlan);
+	Geometry* geometry = model->getGeometry(pieceEditorPlan);
 	pieceNiceViewWidget->setCameraMode(PIECE_MODE);
-		pieceNiceViewWidget->setGeometry(geometry);
-		if (writeRawCheckBox->checkState() == Qt::Checked)
-				geometry->save_raw_file("./cane.raw");
+	pieceNiceViewWidget->setGeometry(geometry);
+	if (writeRawCheckBox->checkState() == Qt::Checked)
+		geometry->save_raw_file("./cane.raw");
 	pieceTemplateComboBox->setCurrentIndex(pieceEditorPlan->getTemplate()->type-1);
 	pieceTemplateParameter1Label->setText(pieceEditorPlan->getTemplate()->parameterNames[0]);
 	pieceTemplateParameter1Slider->setSliderPosition(pieceEditorPlan->getTemplate()->parameterValues[0]);
@@ -841,11 +845,11 @@ void MainWindow :: updatePieceEditor()
 
 void MainWindow :: updateColorEditor()
 {
-		Geometry* geometry = model->getGeometry(colorEditorPlan);
-		colorBarNiceViewWidget->setCameraMode(PULLPLAN_MODE);
-		colorBarNiceViewWidget->setGeometry(geometry);
-		if (writeRawCheckBox->checkState() == Qt::Checked)
-				geometry->save_raw_file("./cane.raw");
+	Geometry* geometry = model->getGeometry(colorEditorPlan);
+	colorBarNiceViewWidget->setCameraMode(PULLPLAN_MODE);
+	colorBarNiceViewWidget->setGeometry(geometry);
+	if (writeRawCheckBox->checkState() == Qt::Checked)
+		geometry->save_raw_file("./cane.raw");
 }
 
 void MainWindow :: updatePullPlanEditor()
@@ -862,11 +866,11 @@ void MainWindow :: updatePullPlanEditor()
 	pullPlanTwistSpin->setValue(twist);
 	pullPlanEditorViewWidget->repaint();
 
-		Geometry* geometry = model->getGeometry(pullPlanEditorPlan);
-		pullPlanNiceViewWidget->setCameraMode(PULLPLAN_MODE);
-		pullPlanNiceViewWidget->setGeometry(geometry);
-		if (writeRawCheckBox->checkState() == Qt::Checked)
-				geometry->save_raw_file("./cane.raw");
+	Geometry* geometry = model->getGeometry(pullPlanEditorPlan);
+	pullPlanNiceViewWidget->setCameraMode(PULLPLAN_MODE);
+	pullPlanNiceViewWidget->setGeometry(geometry);
+	if (writeRawCheckBox->checkState() == Qt::Checked)
+		geometry->save_raw_file("./cane.raw");
 }
 
 void MainWindow :: pieceTemplateComboBoxChanged(int newIndex)

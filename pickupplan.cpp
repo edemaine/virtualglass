@@ -7,9 +7,9 @@ PickupPlan :: PickupPlan(int pickupTemplate)
 	this->libraryWidget = NULL;
 	for (unsigned int i = 0; i < this->pickupTemplate->subpulls.size(); ++i)
 	{
-		Color color;
-		color.r = color.g = color.b = 1.0;
-		color.a = 0.4;
+		Color* color = new Color();
+		color->r = color->g = color->b = 1.0;
+		color->a = 0.4;
 		this->subplans.push_back(new PullPlan(CASED_CIRCLE_TEMPLATE, true, color));
 	}
 }
@@ -47,9 +47,9 @@ void PickupPlan :: setTemplate(PickupTemplate* newTemplate)
 
 		if (!matchFound)
 		{
-			Color color;
-			color.r = color.g = color.b = 1.0;
-			color.a = 0.4;
+			Color* color = new Color();
+			color->r = color->g = color->b = 1.0;
+			color->a = 0.4;
 			newSubplans.push_back(new PullPlan(CASED_CIRCLE_TEMPLATE, true, color));
 		}
 	}

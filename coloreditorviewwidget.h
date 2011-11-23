@@ -17,6 +17,8 @@ class ColorEditorViewWidget : public QWidget
 	public:
 		ColorEditorViewWidget(PullPlan* plan, QWidget* parent=0);
 		void setPullPlan(PullPlan* plan);
+		void seedMartyColors();
+		void seedBrandColors();
 	
 	signals:
 		void someDataChanged();
@@ -26,12 +28,12 @@ class ColorEditorViewWidget : public QWidget
 
 	private slots:
 		void alphaSliderPositionChanged(int);
-		void colorBarTemplateShapeButtonGroupChanged(int);
 
 	private:
 		PullPlan* plan;
 		QSlider* alphaSlider;
-		QButtonGroup* colorBarTemplateShapeButtonGroup;
+		QVBoxLayout* colorLibraryLayout;
+
 };
 
 

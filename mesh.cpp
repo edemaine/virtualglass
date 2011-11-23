@@ -14,8 +14,6 @@ Mesher :: Mesher()
         Color color;
         color.r = color.g = color.b = 1.0;
         color.a = 0.2;
-        circleCasing = new PullPlan(CIRCLE_BASE_TEMPLATE, true, color);
-        squareCasing = new PullPlan(SQUARE_BASE_TEMPLATE, true, color);
 	trigTableSize = 1000;	
 	for (int i = 0; i < trigTableSize; ++i)
 	{
@@ -246,7 +244,7 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 	float start, float end, uint32_t group_tag)
 {
 	unsigned int angularResolution = MIN(MAX(400 / totalCaneLength, 6), 60);
-	unsigned int axialResolution = MIN(MAX(1500 / totalCaneLength * (end - start), 5), 100);
+	unsigned int axialResolution = MIN(MAX(2500 / totalCaneLength * (end - start), 5), 100);
 	
 	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
@@ -440,7 +438,6 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 	{
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorIndices);
 	}
-	geometry->compute_normals_from_triangles();
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, plan, group_tag));
 }
 
@@ -470,7 +467,6 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>*
 				break;
 		}
 	}	
-	geometry->compute_normals_from_triangles();
 }
 
 void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
@@ -484,7 +480,7 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPla
 		ancestors->clear();
 		ancestorIndices->clear();
 		generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, 0.0, 
-			plan->getTemplate()->subpulls[i]->length / 2.0, true, i); 
+			plan->getTemplate()->subpulls[i]->length / 2.0, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
 		{
@@ -501,9 +497,35 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPla
 			}
 		}
 	}
+}
+
+
+void Mesher :: generateMesh(Piece* piece, Geometry* geometry)
+{
+	totalCaneLength = computeTotalCaneLength(piece);
+        vector<PullPlan*> ancestors;
+        vector<int> ancestorIndices;
+	generateMesh(piece, geometry, &ancestors, &ancestorIndices);
 	geometry->compute_normals_from_triangles();
 }
 
+void Mesher :: generateMesh(PickupPlan* plan, Geometry* geometry)
+{
+	totalCaneLength = computeTotalCaneLength(plan);
+        vector<PullPlan*> ancestors;
+        vector<int> ancestorIndices;
+	generateMesh(plan, geometry, &ancestors, &ancestorIndices);
+	geometry->compute_normals_from_triangles();
+}
+
+void Mesher :: generateMesh(PullPlan* plan, Geometry* geometry)
+{
+	totalCaneLength = computeTotalCaneLength(plan);
+        vector<PullPlan*> ancestors;
+        vector<int> ancestorIndices;
+	generateMesh(plan, geometry, &ancestors, &ancestorIndices, 0.0, 1.0);
+	geometry->compute_normals_from_triangles();
+}
 
 /*
 generateMesh() is the top-level function for turning a cane into
@@ -513,35 +535,17 @@ leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
 void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
-	float start, float end, bool addCasing, int groupIndex)
+	float start, float end, int groupIndex)
 {
 	int passGroupIndex;
 
 	if (plan == NULL)
 		return;
 
-	// Deal with casing first
-	if (addCasing && !plan->isBase)
-	{
-		PullPlan* casingPlan = NULL;
-		switch (plan->getTemplate()->shape)
-		{
-			case CIRCLE_SHAPE:
-				casingPlan = circleCasing;
-				break;	
-			case SQUARE_SHAPE:
-				casingPlan = squareCasing;
-				break;	
-		}		
-		
-		if (casingPlan != NULL)
-		{	
-			ancestors->push_back(casingPlan); 
-			meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, casingPlan, start - 0.01, 
-				end + 0.01, groupIndex);
-			ancestors->pop_back();
-		}
-	}
+	ancestors->push_back(plan); 
+	meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan, start - 0.01, 
+		end + 0.01, groupIndex);
+	ancestors->pop_back();
 
 	// Make recursive calls depending on the type of the current node
 	ancestors->push_back(plan);
@@ -565,7 +569,7 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*
 				passGroupIndex = groupIndex;
 
 			ancestorIndices->push_back(i);
-			generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, start, end, false, passGroupIndex);
+			generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, start, end, passGroupIndex);
 			ancestorIndices->pop_back();
 		}
 	}

@@ -1,15 +1,15 @@
 
 #include "pickupplaneditorviewwidget.h"
 
-PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* plan, Model* model, QWidget* parent) : QWidget(parent)
+PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(Piece* piece, Model* model, QWidget* parent) : QWidget(parent)
 {
 	setAcceptDrops(true);
 	setFixedSize(400, 400);
-	this->plan = plan;
+	this->piece = piece;
 	this->model = model;
 	this->niceViewWidget = new NiceViewWidget(this);
 	this->niceViewWidget->setCameraMode(PICKUPPLAN_MODE);
-	this->niceViewWidget->setGeometry(model->getGeometry(this->plan));
+	this->niceViewWidget->setGeometry(model->getGeometry(piece->pickup));
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	this->setLayout(layout);
@@ -37,9 +37,9 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
         if (type != PULL_PLAN_MIME) // if the thing passed isn't a pull plan 
                 return;  
 
-	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
+	for (unsigned int i = 0; i < piece->pickup->getTemplate()->subpulls.size(); ++i)
 	{
-		SubpickupTemplate* sp = plan->getTemplate()->subpulls[i];
+		SubpickupTemplate* sp = piece->pickup->getTemplate()->subpulls[i];
 		Point ll, ur;
 
 		switch (sp->orientation)
@@ -82,15 +82,15 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		// If the shift button is down, fill in the entire group
 		if (event->keyboardModifiers() & 0x02000000)
 		{
-			int group = plan->getTemplate()->subpulls[i]->group;
-			for (unsigned int j = 0; j < plan->getTemplate()->subpulls.size(); ++j)
+			int group = piece->pickup->getTemplate()->subpulls[i]->group;
+			for (unsigned int j = 0; j < piece->pickup->getTemplate()->subpulls.size(); ++j)
 			{
-				if (plan->getTemplate()->subpulls[j]->group == group)
-					plan->subplans[j] = droppedPlan;
+				if (piece->pickup->getTemplate()->subpulls[j]->group == group)
+					piece->pickup->subplans[j] = droppedPlan;
 			}
 		}
 		else // Otherwise just fill in this one
-			plan->subplans[i] = droppedPlan;
+			piece->pickup->subplans[i] = droppedPlan;
 
 	
 		emit someDataChanged();
@@ -98,34 +98,29 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	} 
 }
 
-void PickupPlanEditorViewWidget :: setPickupPlan(PickupPlan* plan)
+void PickupPlanEditorViewWidget :: setPiece(Piece* piece)
 {
-	this->plan = plan;
-	this->niceViewWidget->setGeometry(model->getGeometry(this->plan));
-	this->niceViewWidget->repaint();
-	this->repaint();
+	this->piece = piece;
+	this->niceViewWidget->setGeometry(model->getGeometry(piece->pickup));
 }
 
 void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 {
-	this->niceViewWidget->repaint();
-	return;
-
 	QPainter painter;
 	painter.begin(this->niceViewWidget);
         painter.setRenderHint(QPainter::Antialiasing);
 
 	QPen pen;
-	pen.setColor(Qt::white);
+	pen.setColor(Qt::black);
 	pen.setWidth(3);
 	painter.setPen(pen);
 	
-	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
+	for (unsigned int i = 0; i < piece->pickup->getTemplate()->subpulls.size(); ++i)
 	{
-		if (plan->subplans[i]->isBase)
+		if (piece->pickup->subplans[i]->isBase)
 		{
-			Color c = plan->subplans[i]->color;
-			painter.setBrush(QColor(255*c.r, 255*c.g, 255*c.b, 255*c.a));
+			Color* c = piece->pickup->subplans[i]->color;
+			painter.setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
 			pen.setStyle(Qt::NoPen);
 		}
 		else
@@ -136,7 +131,7 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 		}
 		painter.setPen(pen);
 
-		SubpickupTemplate* sp = plan->getTemplate()->subpulls[i];
+		SubpickupTemplate* sp = piece->pickup->getTemplate()->subpulls[i];
                 Point ll;
 		float rWidth, rHeight;
                 switch (sp->orientation)

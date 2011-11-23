@@ -87,7 +87,6 @@ class MainWindow : public QMainWindow
 		PullPlan* colorEditorPlan;
 		PullPlan* pullPlanEditorPlan;
 		Piece* pieceEditorPlan;
-		Color defaultColor;
 		ColorBarLibraryWidget* colorEditorPlanLibraryWidget;
 		PullPlanLibraryWidget* pullPlanEditorPlanLibraryWidget;
 		PieceLibraryWidget* pieceEditorPlanLibraryWidget;

@@ -29,21 +29,46 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	PullPlan* droppedPlan;
 	int type;
 	sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &droppedPlan, &type);
-	if (type != PULL_PLAN_MIME) // if the thing passed isn't a pull plan (no, you can't put a piece in your pull plan)
+	if (!(type == COLOR_BAR_MIME || type == PULL_PLAN_MIME)) 
 		return;
 
 	if (droppedPlan == plan) // don't allow circular DAGs
 		return;
 
-	int drawWidth = width() - 20;
-	//int drawHeight = height() - 20;
+	int drawSize = width() - 20;
+	// check to see if the drop was in a subpull
 	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
 	{
 		SubpullTemplate* subpull = &(plan->getTemplate()->subpulls[i]);
-		if (fabs(event->pos().x() - (drawWidth/2 * subpull->location.x + drawWidth/2 + 10))
-			+ fabs(event->pos().y() - (drawWidth/2 * subpull->location.y + drawWidth/2 + 10)) < (subpull->diameter/2.0)*drawWidth/2)
+		if (fabs(event->pos().x() - (drawSize/2 * subpull->location.x + drawSize/2 + 10))
+			+ fabs(event->pos().y() - (drawSize/2 * subpull->location.y + drawSize/2 + 10)) < (subpull->diameter/2.0)*drawSize/2)
 		{
+			// If the dropped plan is a complex plan and its casing shape doesn't match the shape of the 
+			// subplan, reject
+			if (type == PULL_PLAN_MIME)
+			{
+				if (subpull->shape != droppedPlan->getTemplate()->shape)
+				{
+					continue;
+				}
+			}	
+
 			event->accept();
+
+			// If a color has been dropped in, make a new simple can with the same color
+			// This is a memory leak, as every color drop make a new cane
+			if (type == COLOR_BAR_MIME)
+			{
+				switch (subpull->shape)
+				{
+					case CIRCLE_SHAPE:
+						droppedPlan = new PullPlan(CIRCLE_BASE_TEMPLATE, true, droppedPlan->color); 
+						break;
+					case SQUARE_SHAPE:
+						droppedPlan = new PullPlan(SQUARE_BASE_TEMPLATE, true, droppedPlan->color); 
+						break;
+				}
+			}
 
 			// If the shift button is down, fill in the entire group
 			if (event->keyboardModifiers() & 0x02000000)
@@ -62,6 +87,35 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			return;
 		}
 	}
+
+
+	// don't allow complex pulls to be casing
+	if (type == PULL_PLAN_MIME)
+		return;
+
+	float distanceFromCenter;
+	switch (plan->getTemplate()->shape)
+	{
+		case CIRCLE_SHAPE:
+			distanceFromCenter = sqrt(pow(event->pos().x() - drawSize/2 + 10, 2) + pow(event->pos().y() - drawSize/2 + 10, 2));
+			if (distanceFromCenter <= drawSize/2)
+			{
+				event->accept();				
+				plan->color = droppedPlan->color;	
+				emit someDataChanged();
+				return;
+			}
+			break;
+		case SQUARE_SHAPE:
+			if (10 <= event->pos().x() && event->pos().x() <= drawSize && 10 <= event->pos().y() && event->pos().y() <= drawSize)
+			{
+				event->accept();				
+				plan->color = droppedPlan->color;	
+				emit someDataChanged();
+				return;
+			}
+			break;
+	}
 }
 
 void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan)
@@ -72,12 +126,27 @@ void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan)
 
 void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int drawHeight, PullPlan* plan, QPainter* painter)
 {
+	// Fill the subplan area with some `cleared out' color
+	painter->setBrush(QColor(200, 200, 200));
+	painter->setPen(Qt::NoPen);
+	switch (plan->getTemplate()->shape)
+	{
+		case CIRCLE_SHAPE:
+			painter->drawEllipse(x, y, drawWidth, drawHeight);
+			break;
+		case SQUARE_SHAPE:
+			painter->drawRect(x, y, drawWidth, drawHeight);
+			break;
+	}
+
+
 	// If it's a base color, fill region with color
 	if (plan->isBase)
 	{
-		Color c = plan->color;
-		painter->setBrush(QColor(255*c.r, 255*c.g, 255*c.b, 255*c.a));
+		Color* c = plan->color;
+		painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
 		painter->setPen(Qt::NoPen);
+
 		switch (plan->getTemplate()->shape)
 		{
 			case CIRCLE_SHAPE:
@@ -95,6 +164,7 @@ void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int dr
 	pen.setWidth(5);
 	pen.setColor(Qt::black);
 	painter->setPen(pen);
+	painter->setBrush(QColor(255*plan->color->r, 255*plan->color->g, 255*plan->color->b, 255*plan->color->a));
 	switch (plan->getTemplate()->shape)
 	{
 		case CIRCLE_SHAPE:
