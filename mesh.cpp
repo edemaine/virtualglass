@@ -11,9 +11,6 @@ using std::make_pair;
 
 Mesher :: Mesher()
 {
-        Color color;
-        color.r = color.g = color.b = 1.0;
-        color.a = 0.2;
 	trigTableSize = 1000;	
 	for (int i = 0; i < trigTableSize; ++i)
 	{
@@ -243,6 +240,9 @@ The resulting cane has length between 0.0 and 10.0, i.e. it is scaled by a facto
 void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, PullPlan* plan,
 	float start, float end, uint32_t group_tag)
 {
+	if (plan->color->a < 0.0001)
+		return;
+
 	unsigned int angularResolution = MIN(MAX(400 / totalCaneLength, 6), 60);
 	unsigned int axialResolution = MIN(MAX(2500 / totalCaneLength * (end - start), 5), 100);
 	
@@ -253,7 +253,7 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 
 	Vector2f p;
 	vector< Vector2f > points;
-	switch (plan->getTemplate()->shape)
+	switch (plan->getTemplate()->getShape())
 	{
 		case CIRCLE_SHAPE:
 			for (unsigned int i = 0; i < angularResolution; ++i)
@@ -543,8 +543,7 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*
 		return;
 
 	ancestors->push_back(plan); 
-	meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan, start - 0.01, 
-		end + 0.01, groupIndex);
+	meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan, start, end, groupIndex);
 	ancestors->pop_back();
 
 	// Make recursive calls depending on the type of the current node
@@ -556,8 +555,6 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*
 			passGroupIndex = 0;
 		else
 			passGroupIndex = groupIndex;
-		
-		meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan, start, end, passGroupIndex);
 	}
 	else 
 	{
@@ -569,7 +566,7 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*
 				passGroupIndex = groupIndex;
 
 			ancestorIndices->push_back(i);
-			generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, start, end, passGroupIndex);
+			generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, start + 0.01, end - 0.01, passGroupIndex);
 			ancestorIndices->pop_back();
 		}
 	}

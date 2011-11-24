@@ -47,7 +47,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			// subplan, reject
 			if (type == PULL_PLAN_MIME)
 			{
-				if (subpull->shape != droppedPlan->getTemplate()->shape)
+				if (subpull->shape != droppedPlan->getTemplate()->getShape())
 				{
 					continue;
 				}
@@ -94,7 +94,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		return;
 
 	float distanceFromCenter;
-	switch (plan->getTemplate()->shape)
+	switch (plan->getTemplate()->getShape())
 	{
 		case CIRCLE_SHAPE:
 			distanceFromCenter = sqrt(pow(event->pos().x() - drawSize/2 + 10, 2) + pow(event->pos().y() - drawSize/2 + 10, 2));
@@ -129,7 +129,7 @@ void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int dr
 	// Fill the subplan area with some `cleared out' color
 	painter->setBrush(QColor(200, 200, 200));
 	painter->setPen(Qt::NoPen);
-	switch (plan->getTemplate()->shape)
+	switch (plan->getTemplate()->getShape())
 	{
 		case CIRCLE_SHAPE:
 			painter->drawEllipse(x, y, drawWidth, drawHeight);
@@ -147,7 +147,7 @@ void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int dr
 		painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
 		painter->setPen(Qt::NoPen);
 
-		switch (plan->getTemplate()->shape)
+		switch (plan->getTemplate()->getShape())
 		{
 			case CIRCLE_SHAPE:
 				painter->drawEllipse(x, y, drawWidth, drawHeight);
@@ -165,7 +165,7 @@ void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int dr
 	pen.setColor(Qt::black);
 	painter->setPen(pen);
 	painter->setBrush(QColor(255*plan->color->r, 255*plan->color->g, 255*plan->color->b, 255*plan->color->a));
-	switch (plan->getTemplate()->shape)
+	switch (plan->getTemplate()->getShape())
 	{
 		case CIRCLE_SHAPE:
 			painter->drawEllipse(x, y, drawWidth, drawHeight);

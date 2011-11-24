@@ -13,6 +13,17 @@ PullTemplate :: PullTemplate(int type, float casingThickness)
 	updateSubpulls(); // need to change locations of subpulls, but nothing else
 }
 
+int PullTemplate :: getShape()
+{
+	return this->shape;
+}
+
+void PullTemplate :: setShape(int s)
+{
+	this->shape = s;
+	updateSubpulls();
+}
+
 void PullTemplate :: updateSubpulls()
 {
 	Point p;
@@ -22,7 +33,14 @@ void PullTemplate :: updateSubpulls()
 	switch (this->type)
 	{
 		case CASED_CIRCLE_TEMPLATE:
-			subpulls[0].diameter = radius * 1.90; 
+			subpulls[0].diameter = radius * 1.99; 
+			break;	
+		case CASED_SQUARE_TEMPLATE:
+			if (this->shape == CIRCLE_SHAPE)
+			{
+				radius *= 1.0 / pow(2, 0.5);		
+			}			
+			subpulls[0].diameter = radius * 1.99; 
 			break;	
 		case LINE_THREE_TEMPLATE:
 			for (int i = 0; i < 3; ++i)
@@ -41,14 +59,16 @@ void PullTemplate :: updateSubpulls()
 			}
 			break;			
 		case CIRCLE_FOUR_TEMPLATE:
+			if (this->shape == CIRCLE_SHAPE)
+				radius *= 0.8;
 			for (int i = 0; i < 2; ++i)
 			{
 				for (int j = 0; j < 2; ++j)
 				{
-					p.x = radius * (-0.5 + 1 * i) * 0.8;
-					p.y = radius * (-0.5 + 1 * j) * 0.8;
+					p.x = radius * (-0.5 + 1 * i);
+					p.y = radius * (-0.5 + 1 * j);
 					subpulls[2*i + j].location = p;
-					subpulls[2*i + j].diameter = radius * 1 * 0.8; 
+					subpulls[2*i + j].diameter = radius;
 				}
 			}
 			break;			
@@ -79,31 +99,37 @@ void PullTemplate :: updateSubpulls()
 			subpulls[12].diameter = radius * 1*1.5 * 0.79;
 			break;			
 		case SQUARE_FOUR_TEMPLATE:
+			if (this->shape == CIRCLE_SHAPE)
+				radius *= 1 / pow(2, 0.5);
 			for (int i = 0; i < 2; ++i)
 			{
 				for (int j = 0; j < 2; ++j)
 				{
-					p.x = radius * (-0.35 + 0.7 * i);
-					p.y = radius * (-0.35 + 0.7 * j);
+					p.x = radius * (-0.5 + i);
+					p.y = radius * (-0.5 + j);
 					subpulls[2*i + j].location = p;
-					subpulls[2*i + j].diameter = radius * 0.67; 
+					subpulls[2*i + j].diameter = radius;
 				}
 			}
 			break;
 		case SQUARE_SIXTEEN_TEMPLATE:
+			if (this->shape == CIRCLE_SHAPE)
+				radius *= 1 / pow(2, 0.5);
 			for (int i = 0; i < 4; ++i)
 			{
 				for (int j = 0; j < 4; ++j)
 				{
-					p.x = radius * (-0.52 + 0.35 * i);
-					p.y = radius * (-0.52 + 0.35 * j);
+					p.x = radius * (-0.75 + 0.5 * i);
+					p.y = radius * (-0.75 + 0.5 * j);
 					subpulls[4*i + j].location = p;
-					subpulls[4*i + j].diameter = radius * 0.34; 
+					subpulls[4*i + j].diameter = radius*0.49; 
 				}
 			}
 			break;
 		case BUNDLE_NINETEEN_TEMPLATE:
 		{
+			if (this->shape == SQUARE_SHAPE)
+				radius *= pow(2, 0.5);
 			int k = 0;
 			for (int i = -2; i <= 2; ++i)
 			{
@@ -164,6 +190,10 @@ void PullTemplate :: initializeSubpulls()
 		case CASED_CIRCLE_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 1.99, 0));
+			break;	
+		case CASED_SQUARE_TEMPLATE:
+			this->shape = CIRCLE_SHAPE;
+			subpulls.push_back(SubpullTemplate(SQUARE_SHAPE, p, 1.99, 0));
 			break;	
 		case LINE_THREE_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;

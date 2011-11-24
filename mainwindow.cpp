@@ -25,7 +25,7 @@ void MainWindow :: seedEverything()
 	for (int i = FIRST_TEMPLATE; i <= LAST_TEMPLATE; ++i)
 	{
 		pullPlanEditorPlan->setTemplate(new PullTemplate(i, 0.0));
-		pullPlanEditorPlan->getTemplate()->shape = CIRCLE_SHAPE;
+		pullPlanEditorPlan->getTemplate()->setShape(CIRCLE_SHAPE);
 		pullPlanEditorViewWidget->repaint();
 		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
 			QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100), i);
@@ -438,9 +438,7 @@ void MainWindow :: setupColorEditor()
 void MainWindow :: setupPullPlanEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
-	Color* newColor = new Color();
-	newColor->r = newColor->g = newColor->b = newColor->a = 1.0;
-	pullPlanEditorPlan = new PullPlan(CASED_CIRCLE_TEMPLATE, false, newColor);
+	pullPlanEditorPlan = new PullPlan(CASED_CIRCLE_TEMPLATE, false, colorEditorPlan->color);
 
 	QPixmap pixmap(100, 100);
 	pixmap.fill(Qt::white);
@@ -554,15 +552,15 @@ void MainWindow :: pullTemplateShapeButtonGroupChanged(int)
 	switch (pullTemplateShapeButtonGroup->checkedId())
 	{
 		case 1:
-			if (pullPlanEditorPlan->getTemplate()->shape == CIRCLE_SHAPE)
+			if (pullPlanEditorPlan->getTemplate()->getShape() == CIRCLE_SHAPE)
 				return;
-			pullPlanEditorPlan->getTemplate()->shape = CIRCLE_SHAPE;
+			pullPlanEditorPlan->getTemplate()->setShape(CIRCLE_SHAPE);
 			emit someDataChanged();
 			break;
 		case 2:
-			if (pullPlanEditorPlan->getTemplate()->shape == SQUARE_SHAPE)
+			if (pullPlanEditorPlan->getTemplate()->getShape() == SQUARE_SHAPE)
 				return;
-			pullPlanEditorPlan->getTemplate()->shape = SQUARE_SHAPE;
+			pullPlanEditorPlan->getTemplate()->setShape(SQUARE_SHAPE);
 			emit someDataChanged();
 			break;
 	}
@@ -668,10 +666,17 @@ void MainWindow :: newColorBar()
 
 void MainWindow :: newPullPlan()
 {
+	PullPlan* oldEditorPlan = pullPlanEditorPlan;
+
 	// Create the new plan
-	Color* newColor = new Color();
-	newColor->r = newColor->g = newColor->b = newColor->a = 1.0;
-	pullPlanEditorPlan = new PullPlan(CASED_CIRCLE_TEMPLATE, false, newColor);
+	pullPlanEditorPlan = new PullPlan(oldEditorPlan->getTemplate()->type, oldEditorPlan->isBase, oldEditorPlan->color);
+	pullPlanEditorPlan->getTemplate()->setCasingThickness(oldEditorPlan->getTemplate()->getCasingThickness());
+	pullPlanEditorPlan->twist = oldEditorPlan->twist;
+	for (unsigned int i = 0; i < oldEditorPlan->subplans.size(); ++i)
+	{
+		pullPlanEditorPlan->subplans[i] = oldEditorPlan->subplans[i];
+	}
+
 
 	// Create the new library entry
 	//pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
@@ -856,7 +861,7 @@ void MainWindow :: updatePullPlanEditor()
 {
 	// Only attempt to set the shape if it's defined; it's undefined during loading
 	static_cast<QCheckBox*>(pullTemplateShapeButtonGroup->button(
-		pullPlanEditorPlan->getTemplate()->shape))->setCheckState(Qt::Checked);
+		pullPlanEditorPlan->getTemplate()->getShape()))->setCheckState(Qt::Checked);
 
 	int thickness = (int) (pullPlanEditorPlan->getTemplate()->getCasingThickness() * 100);
 	pullTemplateCasingThicknessSlider->setSliderPosition(thickness);
