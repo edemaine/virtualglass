@@ -243,8 +243,8 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 	if (plan->color->a < 0.0001)
 		return;
 
-	unsigned int angularResolution = MIN(MAX(400 / totalCaneLength, 6), 60);
-	unsigned int axialResolution = MIN(MAX(2500 / totalCaneLength * (end - start), 5), 100);
+	unsigned int angularResolution = MIN(MAX(1200 / totalCaneLength, 10), 60);
+	unsigned int axialResolution = MIN(MAX(5000 / totalCaneLength * (end - start), 20), 100);
 	
 	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();

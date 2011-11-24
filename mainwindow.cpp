@@ -25,7 +25,6 @@ void MainWindow :: seedEverything()
 	for (int i = FIRST_TEMPLATE; i <= LAST_TEMPLATE; ++i)
 	{
 		pullPlanEditorPlan->setTemplate(new PullTemplate(i, 0.0));
-		pullPlanEditorPlan->getTemplate()->setShape(CIRCLE_SHAPE);
 		pullPlanEditorViewWidget->repaint();
 		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
 			QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100), i);

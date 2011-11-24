@@ -7,6 +7,9 @@
 #include "primitives.h"
 #include "pullplan.h"
 
+// Commented out to turn off validity checks of geometry
+// #define GEOMETRY_DEBUG
+
 // Mesh stuff
 class Vertex
 {
@@ -57,6 +60,9 @@ public:
 	}
 	bool valid() const
 	{
+#ifndef GEOMETRY_DEBUG
+		return true;
+#endif
 		for (std::vector< Triangle >::const_iterator t = triangles.begin(); t != triangles.end(); ++t) {
 			if (t->v1 >= vertices.size()) return false;
 			if (t->v2 >= vertices.size()) return false;
