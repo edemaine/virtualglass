@@ -20,8 +20,15 @@ MainWindow :: MainWindow(Model* model)
 
 void MainWindow :: seedEverything()
 {
+	// Load color stuff
+	editorStack->setCurrentIndex(COLORBAR_MODE);
+	colorEditorViewWidget->seedMartyColors();
+	colorEditorViewWidget->seedBrandColors();
+	emit someDataChanged();
+
 	// Load pull template types
 	editorStack->setCurrentIndex(PULLPLAN_MODE);
+	emit someDataChanged();
 	for (int i = FIRST_TEMPLATE; i <= LAST_TEMPLATE; ++i)
 	{
 		pullPlanEditorPlan->setTemplate(new PullTemplate(i, 0.0));
@@ -30,10 +37,6 @@ void MainWindow :: seedEverything()
 			QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100), i);
 		pullTemplateLibraryLayout->addWidget(ptlw);
 	}
-
-	// Load final starting pull plan
-	pullPlanEditorPlan->setTemplate(new PullTemplate(CASED_CIRCLE_TEMPLATE, 0.0));
-	emit someDataChanged();
 
 	// Load pickup template types
 	editorStack->setCurrentIndex(PIECE_MODE);
@@ -47,23 +50,6 @@ void MainWindow :: seedEverything()
 			pickupPlanEditorViewWidget->getPixmap().scaled(100, 100), i);
 		pickupTemplateLibraryLayout->addWidget(ptlw);
 	}
-
-	// Load final starting pickup plan
-	pieceEditorPlan->pickup->setTemplate(new PickupTemplate(VERTICALS_TEMPLATE));
-	for (unsigned int j = 0; j < pieceEditorPlan->pickup->getTemplate()->subpulls.size(); ++j)
-	{
-		pieceEditorPlan->pickup->subplans[j] = pullPlanEditorPlan;
-	}
-	emit someDataChanged();
-
-	// Load correct picture of piece
-	editorStack->setCurrentIndex(PIECE_MODE);
-	emit someDataChanged();
-
-	// InitLoad correct
-	editorStack->setCurrentIndex(COLORBAR_MODE);
-	colorEditorViewWidget->seedMartyColors();
-	emit someDataChanged();
 
 	editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
 	emit someDataChanged();
@@ -437,7 +423,10 @@ void MainWindow :: setupColorEditor()
 void MainWindow :: setupPullPlanEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
-	pullPlanEditorPlan = new PullPlan(CASED_CIRCLE_TEMPLATE, false, colorEditorPlan->color);
+	Color* color = new Color();
+	color->r = color->g = color->b = 1.0;
+	color->a = 0.0;
+	pullPlanEditorPlan = new PullPlan(CIRCLE_BASE_TEMPLATE, false, color);
 
 	QPixmap pixmap(100, 100);
 	pixmap.fill(Qt::white);
@@ -642,7 +631,7 @@ void MainWindow :: newPiece()
 void MainWindow :: newColorBar()
 {
 	Color* newColor = new Color();
-	newColor->r = newColor->g = newColor->b = newColor->a = 1.0;
+        newColor->r = newColor->g = newColor->b = newColor->a = 1.0;
 	colorEditorPlan = new PullPlan(CIRCLE_SHAPE, true, newColor);
 	//colorEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 	unhighlightAllPlanLibraryWidgets(setupDone);

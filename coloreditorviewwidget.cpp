@@ -16,6 +16,7 @@ ColorEditorViewWidget :: ColorEditorViewWidget(PullPlan* plan, QWidget* parent) 
         colorLibraryScrollArea->setBackgroundRole(QPalette::Dark);
         colorLibraryScrollArea->setWidget(colorLibraryWidget);
         colorLibraryScrollArea->setWidgetResizable(true);
+	colorLibraryScrollArea->setMinimumWidth(320);
         colorLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         colorLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
         editorLayout->addWidget(colorLibraryScrollArea);
@@ -121,6 +122,8 @@ void ColorEditorViewWidget :: seedBrandColors()
  
         for (int i = 0; i < caneColorList.size(); ++i)
         {
+		if (caneNameList[i][0] != 'R') // Only load reichenbach colors for now, bug if list is too large
+			break;
 		QString name(caneNameList[i]);
                 PureColorLibraryWidget* pclw = new PureColorLibraryWidget(caneColorList[i], name, this);
                 colorLibraryLayout->addWidget(pclw, 1);
