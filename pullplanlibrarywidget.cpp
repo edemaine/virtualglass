@@ -1,5 +1,6 @@
 
 #include "pullplanlibrarywidget.h"
+#include "qgraphicshighlighteffect.h"
 
 PullPlanLibraryWidget :: PullPlanLibraryWidget(QPixmap niceViewPixmap, QPixmap editorPixmap, PullPlan* plan,
 	QWidget* parent): QLabel(parent)
@@ -15,7 +16,7 @@ PullPlanLibraryWidget :: PullPlanLibraryWidget(QPixmap niceViewPixmap, QPixmap e
 	this->pullPlan->setLibraryWidget(this);
 	this->editorPixmap = editorPixmap;
 
-	setGraphicsEffect(new QGraphicsColorizeEffect());
+	setGraphicsEffect(new QGraphicsHighlightEffect());
 }
 
 PullPlan* PullPlanLibraryWidget :: getPullPlan()

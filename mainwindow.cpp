@@ -326,7 +326,7 @@ void MainWindow :: setupPieceEditor()
 	QPixmap pixmap(100, 100);
 	pixmap.fill(Qt::white);
 	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(pixmap, pixmap, pieceEditorPlan);
-	pieceEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
+	//pieceEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
 	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 2);
 	++pieceCount;
 
@@ -369,8 +369,8 @@ void MainWindow :: setupPieceEditor()
 		niceViewLayout->addWidget(pieceNiceViewWidget, 10);
 
 	writeRawCheckBox = new QCheckBox("Write .raw file", pieceEditorPage);
-        writeRawCheckBox->setCheckState(Qt::Unchecked);
-        niceViewLayout->addWidget(writeRawCheckBox, 0);
+		writeRawCheckBox->setCheckState(Qt::Unchecked);
+		niceViewLayout->addWidget(writeRawCheckBox, 0);
 
 	// Little description for the editor
 	QLabel* niceViewDescriptionLabel = new QLabel("3D view of piece.",
@@ -398,7 +398,7 @@ void MainWindow :: setupColorEditor()
 	QPixmap pixmap(100, 100);
 	pixmap.fill(Qt::white);
 	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(pixmap,colorEditorPlan);
-	colorEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
+	//colorEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
 	tableGridLayout->addWidget(colorEditorPlanLibraryWidget, colorBarCount, 0);
 	++colorBarCount;
 
@@ -431,7 +431,7 @@ void MainWindow :: setupPullPlanEditor()
 	QPixmap pixmap(100, 100);
 	pixmap.fill(Qt::white);
 	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(pixmap, pixmap, pullPlanEditorPlan);
-	pullPlanEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
+	//pullPlanEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
 	tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
 	++pullPlanCount;
 
@@ -616,7 +616,7 @@ void MainWindow :: newPiece()
 	QPixmap pixmap(100, 100);
 	pixmap.fill(Qt::white);
 	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(pixmap, pixmap, pieceEditorPlan);
-	pieceEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
+	//pieceEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
 	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 2);
 	++pieceCount;
 
@@ -631,14 +631,14 @@ void MainWindow :: newPiece()
 void MainWindow :: newColorBar()
 {
 	Color* newColor = new Color();
-        newColor->r = newColor->g = newColor->b = newColor->a = 1.0;
+		newColor->r = newColor->g = newColor->b = newColor->a = 1.0;
 	colorEditorPlan = new PullPlan(CIRCLE_SHAPE, true, newColor);
 	//colorEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 	unhighlightAllPlanLibraryWidgets(setupDone);
 	QPixmap pixmap(100, 100);
 	pixmap.fill(Qt::white);
 	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(pixmap, colorEditorPlan);
-	colorEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
+	//colorEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
 	tableGridLayout->addWidget(colorEditorPlanLibraryWidget, colorBarCount, 0);
 	++colorBarCount;
 
@@ -673,7 +673,7 @@ void MainWindow :: newPullPlan()
 	QPixmap pixmap(100, 100);
 	pixmap.fill(Qt::white);
 	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(pixmap, pixmap, pullPlanEditorPlan);
-	pullPlanEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
+	//pullPlanEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
 	tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
 	++pullPlanCount;
 

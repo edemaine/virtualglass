@@ -29,6 +29,7 @@ QMAKE_CXXFLAGS += -Wall -Werror -Wno-deprecated -g
 
 # Input
 HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
+    qgraphicshighlighteffect.h
 
 HEADERS += primitives.h constants.h Vector.hpp \ 
 	pullplan.h pulltemplate.h subpulltemplate.h pickupplan.h \
@@ -90,6 +91,7 @@ HEADERS += yaml-cpp/src/token.h \
 	yaml-cpp/src/collectionstack.h \
 
 SOURCES += glew/glew.c \
+    qgraphicshighlighteffect.cpp
 
 SOURCES += main.cpp \ 
 	pullplan.cpp pulltemplate.cpp subpulltemplate.cpp \

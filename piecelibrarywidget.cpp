@@ -1,5 +1,6 @@
 
 #include "piecelibrarywidget.h"
+#include "qgraphicshighlighteffect.h"
 
 PieceLibraryWidget :: PieceLibraryWidget(QPixmap niceViewPixmap, QPixmap editorPixmap, Piece* piece,
 	QWidget* parent): QLabel(parent)
@@ -15,7 +16,7 @@ PieceLibraryWidget :: PieceLibraryWidget(QPixmap niceViewPixmap, QPixmap editorP
 	this->piece->setLibraryWidget(this);
 	this->editorPixmap = editorPixmap;
 
-	setGraphicsEffect(new QGraphicsColorizeEffect());
+	setGraphicsEffect(new QGraphicsHighlightEffect());
 }
 
 Piece* PieceLibraryWidget :: getPiece()

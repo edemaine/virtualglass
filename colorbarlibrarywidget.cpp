@@ -1,5 +1,6 @@
 
 #include "colorbarlibrarywidget.h"
+#include "qgraphicshighlighteffect.h"
 
 ColorBarLibraryWidget :: ColorBarLibraryWidget(QPixmap niceViewPixmap, PullPlan* plan, QWidget* parent): QLabel(parent)
 {
@@ -13,7 +14,7 @@ ColorBarLibraryWidget :: ColorBarLibraryWidget(QPixmap niceViewPixmap, PullPlan*
 
 	this->pullPlan = plan;
 	this->pullPlan->setLibraryWidget(this);
-	setGraphicsEffect(new QGraphicsColorizeEffect());
+	setGraphicsEffect(new QGraphicsHighlightEffect());
 	//graphicsEffect()->setEnabled(false);
 }
 
