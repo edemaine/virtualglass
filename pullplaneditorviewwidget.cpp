@@ -29,7 +29,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	PullPlan* droppedPlan;
 	int type;
 	sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &droppedPlan, &type);
-	if (!(type == COLOR_BAR_MIME || type == PULL_PLAN_MIME)) 
+	if (!(type == COLOR_BAR_MIME || type == PULL_PLAN_MIME))
 		return;
 
 	if (droppedPlan == plan) // don't allow circular DAGs
@@ -43,7 +43,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		if (fabs(event->pos().x() - (drawSize/2 * subpull->location.x + drawSize/2 + 10))
 			+ fabs(event->pos().y() - (drawSize/2 * subpull->location.y + drawSize/2 + 10)) < (subpull->diameter/2.0)*drawSize/2)
 		{
-			// If the dropped plan is a complex plan and its casing shape doesn't match the shape of the 
+			// If the dropped plan is a complex plan and its casing shape doesn't match the shape of the
 			// subplan, reject
 			if (type == PULL_PLAN_MIME)
 			{
@@ -51,7 +51,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 				{
 					continue;
 				}
-			}	
+			}
 
 			event->accept();
 
@@ -59,20 +59,23 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			// This is a memory leak, as every color drop make a new cane
 			if (type == COLOR_BAR_MIME)
 			{
+				ColorBarLibraryWidget* cblw = droppedPlan->getColorLibraryWidget();
 				switch (subpull->shape)
 				{
 					case CIRCLE_SHAPE:
-						droppedPlan = new PullPlan(CIRCLE_BASE_TEMPLATE, true, droppedPlan->color); 
+						droppedPlan = new PullPlan(CIRCLE_BASE_TEMPLATE, true, droppedPlan->color);
 						break;
 					case SQUARE_SHAPE:
-						droppedPlan = new PullPlan(SQUARE_BASE_TEMPLATE, true, droppedPlan->color); 
+						droppedPlan = new PullPlan(SQUARE_BASE_TEMPLATE, true, droppedPlan->color);
 						break;
 				}
+				droppedPlan->setColorLibraryWidget(cblw);
+				cblw->addPullPlan(droppedPlan);
 			}
 
 			// If the shift button is down, fill in the entire group
 			if (event->keyboardModifiers() & 0x02000000)
-			{	
+			{
 				int group = plan->getTemplate()->subpulls[i].group;
 				for (unsigned int j = 0; j < plan->getTemplate()->subpulls.size(); ++j)
 				{
@@ -100,8 +103,8 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			distanceFromCenter = sqrt(pow(event->pos().x() - drawSize/2 + 10, 2) + pow(event->pos().y() - drawSize/2 + 10, 2));
 			if (distanceFromCenter <= drawSize/2)
 			{
-				event->accept();				
-				plan->color = droppedPlan->color;	
+				event->accept();
+				plan->color = droppedPlan->color;
 				emit someDataChanged();
 				return;
 			}
@@ -109,8 +112,8 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		case SQUARE_SHAPE:
 			if (10 <= event->pos().x() && event->pos().x() <= drawSize && 10 <= event->pos().y() && event->pos().y() <= drawSize)
 			{
-				event->accept();				
-				plan->color = droppedPlan->color;	
+				event->accept();
+				plan->color = droppedPlan->color;
 				emit someDataChanged();
 				return;
 			}
@@ -157,7 +160,7 @@ void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int dr
 				break;
 		}
 	}
-	
+
 	// Draw casing shape
 	painter->setBrush(Qt::NoBrush);
 	QPen pen;
@@ -178,18 +181,18 @@ void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int dr
 	if (plan->isBase)
 		return;
 
-	// Recurse 
+	// Recurse
 	for (unsigned int i = plan->getTemplate()->subpulls.size()-1; i < plan->getTemplate()->subpulls.size(); --i)
 	{
 		SubpullTemplate* subpull = &(plan->getTemplate()->subpulls[i]);
-		
+
 		int rX = x + (subpull->location.x - subpull->diameter/2.0) * drawWidth/2 + drawWidth/2;
 		int rY = y + (subpull->location.y - subpull->diameter/2.0) * drawWidth/2 + drawHeight/2;
 		int rWidth = subpull->diameter * drawWidth/2;
 		int rHeight = subpull->diameter * drawHeight/2;
-		
+
 		drawSubplan(rX, rY, rWidth, rHeight, plan->subplans[i], painter);
-	}	
+	}
 }
 
 void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)

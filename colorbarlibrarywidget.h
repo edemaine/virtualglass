@@ -11,11 +11,13 @@ class ColorBarLibraryWidget : public QLabel
 
 	public:
 		ColorBarLibraryWidget(QPixmap niceViewPixmap, PullPlan* plan, QWidget* parent=0);
-		PullPlan* getPullPlan();	
+		PullPlan* getPullPlan();
 		void updatePixmap(QPixmap niceViewPixmap);
+		void addPullPlan(PullPlan* plan);
+		vector<PullPlan*> pullPlans;
 
 	private:
-                QButtonGroup* colorBarTemplateShapeButtonGroup;
+		QButtonGroup* colorBarTemplateShapeButtonGroup;
 		PullPlan* pullPlan;
 };
 

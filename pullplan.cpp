@@ -17,7 +17,7 @@ void PullPlan :: setLibraryWidget(PullPlanLibraryWidget* plplw)
 	this->libraryWidget = plplw;
 }
 
-void PullPlan :: setLibraryWidget(ColorBarLibraryWidget* cblw)
+void PullPlan :: setColorLibraryWidget(ColorBarLibraryWidget* cblw)
 {
 	this->colorLibraryWidget = cblw;
 }
@@ -37,7 +37,7 @@ void PullPlan :: setTemplate(PullTemplate* newTemplate)
 	Color* color = new Color();
 	color->r = color->g = color->b = 1.0;
 	color->a = 0.0;
-	
+
 	this->color = color;
 
 	// create the new subplans based on template
@@ -49,10 +49,10 @@ void PullPlan :: setTemplate(PullTemplate* newTemplate)
 		{
 			case CIRCLE_SHAPE:
 				subplans.push_back(new PullPlan(CIRCLE_BASE_TEMPLATE, true, color));
-				break; 
+				break;
 			case SQUARE_SHAPE:
 				subplans.push_back(new PullPlan(SQUARE_BASE_TEMPLATE, true, color));
-				break; 
+				break;
 		}
 	}
 }

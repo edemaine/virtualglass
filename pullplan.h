@@ -24,7 +24,7 @@ class PullPlan
 		PullTemplate* getTemplate();
 
 		void setLibraryWidget(PullPlanLibraryWidget* plplw);
-		void setLibraryWidget(ColorBarLibraryWidget* plplw);
+		void setColorLibraryWidget(ColorBarLibraryWidget* plplw);
 		PullPlanLibraryWidget* getLibraryWidget();
 		ColorBarLibraryWidget* getColorLibraryWidget();
 

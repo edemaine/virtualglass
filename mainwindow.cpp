@@ -662,9 +662,9 @@ void MainWindow :: newPullPlan()
 	pullPlanEditorPlan->twist = oldEditorPlan->twist;
 	for (unsigned int i = 0; i < oldEditorPlan->subplans.size(); ++i)
 	{
-		pullPlanEditorPlan->subplans[i] = oldEditorPlan->subplans[i];
+		//pullPlanEditorPlan->subplans[i] = oldEditorPlan->subplans[i];
+		pullPlanEditorPlan->subplans.push_back(oldEditorPlan->subplans[i]);
 	}
-
 
 	// Create the new library entry
 	//pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
@@ -689,8 +689,15 @@ void MainWindow :: newPullPlan()
 
 void MainWindow :: highlightPlanLibraryWidgets(ColorBarLibraryWidget* cblw,bool highlight,bool setupDone) {
 
+	if (!setupDone)
+		return;
+	QMessageBox box;
+	box.setText(QString("hi2"));
+	//box.exec();
 	if (cblw==NULL || cblw->graphicsEffect()==NULL)
 		return;
+	box.setText(QString("hi"));
+	//box.exec();
 	if (cblw->graphicsEffect()->isEnabled() == highlight)
 		return;
 
@@ -698,14 +705,31 @@ void MainWindow :: highlightPlanLibraryWidgets(ColorBarLibraryWidget* cblw,bool 
 
 	if (!setupDone)
 		return;
-	if (cblw->getPullPlan()->subplans.empty())
-		return;
 
-	for (unsigned int j = 0; j < cblw->getPullPlan()->subplans.size(); j++)
+	//if (cblw->getPullPlan()->subplans.empty() && cblw->pullPlans.empty())
+	//	return;
+	if (!cblw->getPullPlan()->subplans.empty())
 	{
-		if (cblw->getPullPlan()->subplans[j])
-			highlightPlanLibraryWidgets(cblw->getPullPlan()->subplans[j]->getColorLibraryWidget(),highlight,true);
+		for (unsigned int j = 0; j < cblw->getPullPlan()->subplans.size(); j++)
+		{
+			if (cblw->getPullPlan()->subplans[j])
+				highlightPlanLibraryWidgets(cblw->getPullPlan()->subplans[j]->getColorLibraryWidget(),highlight,true);
+		}
 	}
+	/*if (!cblw->pullPlans.empty())
+	{
+		for (unsigned int j = 0; j < cblw->pullPlans.size(); j++)
+		{
+			if (cblw->pullPlans[j])
+			{
+				for (unsigned int k = 0; k < cblw->pullPlans[j]->subplans.size(); k++)
+				{
+					if (cblw->pullPlans[j]->subplans[k])
+						highlightPlanLibraryWidgets(cblw->pullPlans[j]->subplans[k]->getColorLibraryWidget(),highlight,true);
+				}
+			}
+		}
+	}*/
 }
 
 
@@ -722,10 +746,15 @@ void MainWindow :: highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw,bool
 	if (plplw->getPullPlan()->subplans.empty())
 		return;
 
+	QMessageBox box;
+	box.setText(QString("hi %1").arg(plplw->getPullPlan()->subplans.size()));
+	//box.exec();
+
 	for (unsigned int j = 0; j < plplw->getPullPlan()->subplans.size(); j++)
 	{
 		if (plplw->getPullPlan()->subplans[j])
 		{
+			//box.exec();
 			highlightPlanLibraryWidgets(plplw->getPullPlan()->subplans.at(j)->getColorLibraryWidget(),highlight,true);
 			highlightPlanLibraryWidgets(plplw->getPullPlan()->subplans.at(j)->getLibraryWidget(),highlight,true);
 		}
@@ -790,6 +819,11 @@ void MainWindow :: updateEverything()
 
 void MainWindow :: updateLibrary()
 {
+	//highlightPlanLibraryWidgets(colorEditorPlanLibraryWidget,false,setupDone);
+	//highlightPlanLibraryWidgets(pullPlanEditorPlanLibraryWidget,false,setupDone);
+	//highlightPlanLibraryWidgets(pieceEditorPlanLibraryWidget,false,setupDone);
+	unhighlightAllPlanLibraryWidgets(setupDone);
+
 	colorEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 	pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 	pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
@@ -811,7 +845,8 @@ void MainWindow :: updateLibrary()
 			pieceEditorPlanLibraryWidget->updatePixmaps(
 				QPixmap::fromImage(pieceNiceViewWidget->renderImage()).scaled(100, 100),
 				QPixmap::fromImage(pieceNiceViewWidget->renderImage()).scaled(100, 100));
-			pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(true);
+			highlightPlanLibraryWidgets(pieceEditorPlanLibraryWidget,true,setupDone);
+			//pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(true);
 			break;
 	}
 }

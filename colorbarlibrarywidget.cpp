@@ -13,7 +13,7 @@ ColorBarLibraryWidget :: ColorBarLibraryWidget(QPixmap niceViewPixmap, PullPlan*
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
 	this->pullPlan = plan;
-	this->pullPlan->setLibraryWidget(this);
+	this->pullPlan->setColorLibraryWidget(this);
 	setGraphicsEffect(new QGraphicsHighlightEffect());
 	//graphicsEffect()->setEnabled(false);
 }
@@ -28,4 +28,7 @@ PullPlan* ColorBarLibraryWidget :: getPullPlan()
 	return pullPlan;
 }
 
-
+void ColorBarLibraryWidget :: addPullPlan(PullPlan *plan)
+{
+	pullPlans.push_back(plan);
+}
