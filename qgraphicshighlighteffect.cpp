@@ -9,11 +9,21 @@ QGraphicsHighlightEffect::QGraphicsHighlightEffect( qreal offset ) : QGraphicsEf
 	mColor( 255, 255, 0, 255 ),  // yellow, semi-transparent
 	mOffset( offset, offset )
 {
+	isActive = false;
 }
 
 QRectF QGraphicsHighlightEffect::boundingRectFor( const QRectF &sourceRect) const
 {
 	return sourceRect.adjusted( -mOffset.x(), -mOffset.y(), mOffset.x(), mOffset.y() );
+}
+
+void QGraphicsHighlightEffect::setActiveMain(bool active)
+{
+	if (!active && this->isActive)
+		mColor = QColor(255,255,0,255);
+	else if (active && !this->isActive)
+		mColor = QColor(0,0,255,255);
+	this->isActive=active;
 }
 
 void QGraphicsHighlightEffect::draw( QPainter *painter )

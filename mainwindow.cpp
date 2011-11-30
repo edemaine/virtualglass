@@ -1,6 +1,7 @@
 
 
 #include "mainwindow.h"
+#include "qgraphicshighlighteffect.h"
 
 MainWindow :: MainWindow(Model* model)
 {
@@ -691,23 +692,23 @@ void MainWindow :: highlightPlanLibraryWidgets(ColorBarLibraryWidget* cblw,bool 
 
 	if (!setupDone)
 		return;
-	QMessageBox box;
-	box.setText(QString("hi2"));
-	//box.exec();
+
 	if (cblw==NULL || cblw->graphicsEffect()==NULL)
 		return;
-	box.setText(QString("hi"));
-	//box.exec();
+
 	if (cblw->graphicsEffect()->isEnabled() == highlight)
 		return;
+
+	if (cblw == colorEditorPlanLibraryWidget && editorStack->currentIndex() == COLORBAR_MODE)
+		((QGraphicsHighlightEffect*) cblw->graphicsEffect())->setActiveMain(true);
+	else
+		((QGraphicsHighlightEffect*) cblw->graphicsEffect())->setActiveMain(false);
 
 	cblw->graphicsEffect()->setEnabled(highlight);
 
 	if (!setupDone)
 		return;
 
-	//if (cblw->getPullPlan()->subplans.empty() && cblw->pullPlans.empty())
-	//	return;
 	if (!cblw->getPullPlan()->subplans.empty())
 	{
 		for (unsigned int j = 0; j < cblw->getPullPlan()->subplans.size(); j++)
@@ -716,20 +717,6 @@ void MainWindow :: highlightPlanLibraryWidgets(ColorBarLibraryWidget* cblw,bool 
 				highlightPlanLibraryWidgets(cblw->getPullPlan()->subplans[j]->getColorLibraryWidget(),highlight,true);
 		}
 	}
-	/*if (!cblw->pullPlans.empty())
-	{
-		for (unsigned int j = 0; j < cblw->pullPlans.size(); j++)
-		{
-			if (cblw->pullPlans[j])
-			{
-				for (unsigned int k = 0; k < cblw->pullPlans[j]->subplans.size(); k++)
-				{
-					if (cblw->pullPlans[j]->subplans[k])
-						highlightPlanLibraryWidgets(cblw->pullPlans[j]->subplans[k]->getColorLibraryWidget(),highlight,true);
-				}
-			}
-		}
-	}*/
 }
 
 
@@ -738,6 +725,12 @@ void MainWindow :: highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw,bool
 		return;
 	if (plplw->graphicsEffect()->isEnabled() == highlight)
 		return;
+
+	if (plplw == pullPlanEditorPlanLibraryWidget && editorStack->currentIndex() == PULLPLAN_MODE)
+		((QGraphicsHighlightEffect*) plplw->graphicsEffect())->setActiveMain(true);
+	else
+		((QGraphicsHighlightEffect*) plplw->graphicsEffect())->setActiveMain(false);
+
 	plplw->graphicsEffect()->setEnabled(highlight);
 
 	if (!setupDone)
@@ -746,15 +739,10 @@ void MainWindow :: highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw,bool
 	if (plplw->getPullPlan()->subplans.empty())
 		return;
 
-	QMessageBox box;
-	box.setText(QString("hi %1").arg(plplw->getPullPlan()->subplans.size()));
-	//box.exec();
-
 	for (unsigned int j = 0; j < plplw->getPullPlan()->subplans.size(); j++)
 	{
 		if (plplw->getPullPlan()->subplans[j])
 		{
-			//box.exec();
 			highlightPlanLibraryWidgets(plplw->getPullPlan()->subplans.at(j)->getColorLibraryWidget(),highlight,true);
 			highlightPlanLibraryWidgets(plplw->getPullPlan()->subplans.at(j)->getLibraryWidget(),highlight,true);
 		}
@@ -788,6 +776,10 @@ void MainWindow :: highlightPlanLibraryWidgets(PieceLibraryWidget* plw,bool high
 
 	if (plw->graphicsEffect()->isEnabled()==highlight)
 		return;
+	if (plw == pieceEditorPlanLibraryWidget && editorStack->currentIndex() == PIECE_MODE)
+		((QGraphicsHighlightEffect*) plw->graphicsEffect())->setActiveMain(true);
+	else
+		((QGraphicsHighlightEffect*) plw->graphicsEffect())->setActiveMain(false);
 
 	plw->graphicsEffect()->setEnabled(highlight);
 
