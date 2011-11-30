@@ -25,7 +25,7 @@ PieceTemplate :: PieceTemplate(int t)
 			sprintf(tmp, "Size");
 			parameterNames.push_back(tmp);
 			tmp = new char[100];
-			sprintf(tmp, "Openness");
+			sprintf(tmp, "Roundedness");
 			parameterNames.push_back(tmp);
 			parameterValues.push_back(0);
 			parameterValues.push_back(0);

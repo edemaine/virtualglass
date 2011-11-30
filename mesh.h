@@ -31,6 +31,7 @@ class Mesher
 			vector<int>* ancestorIndices);
 		void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*>* ancestors, 
 			vector<int>* ancestorIndices, float start, float end, int groupIndex = -1);
+		float asymptoteVal(float s, float t);
 		float splineVal(float r1, float r2, float r3, float t);
 		float splineVal(float r1, float r2, float r3, float r4, float t);
 		float tableCos(float theta);

@@ -201,9 +201,23 @@ void Mesher :: applyVaseTransform(Vertex* v, vector<int>* parameterValues)
 	// Deform into a spline-based vase
 	float body_radius = (*parameterValues)[0] * 0.1 + 1.0; 
 	float lip_radius = (*parameterValues)[1] * 0.05 + 0.5; 
-	float radius = 2.0 * splineVal(0.5, body_radius, 0.5, lip_radius, (v->position.z - -5.0)/10.0);
-	v->position.x = (radius - v->position.y / radius) * tableCos(theta); 
-	v->position.y = (radius - v->position.y / radius) * tableSin(theta); 
+	float radius = 2.0 * splineVal(0.1, body_radius, 0.5, lip_radius, (v->position.z - -5.0)/10.0);
+
+	if (radius < 1.0)
+	{
+		v->position.x = (radius - v->position.y * radius) * tableCos(theta); 
+		v->position.y = (radius - v->position.y * radius) * tableSin(theta); 
+	}
+	else
+	{
+		v->position.x = (radius - v->position.y / radius) * tableCos(theta); 
+		v->position.y = (radius - v->position.y / radius) * tableSin(theta); 
+	}
+}
+
+float Mesher :: asymptoteVal(float s, float t)
+{
+	return 1 - (s / (t + s)); 
 }
 
 void Mesher :: applyTumblerTransform(Vertex* v, vector<int>* parameterValues)
@@ -212,12 +226,18 @@ void Mesher :: applyTumblerTransform(Vertex* v, vector<int>* parameterValues)
 	float theta = PI * v->position.x / 5.0;
 
 	// Deform into a spline-based vase
-	float radius = (2.0 + (*parameterValues)[0]*0.01) 
-		* splineVal(0.5, 1.5, 0.5 + (*parameterValues)[1]*0.015, (v->position.z - -5.0)/10.0);
-	v->position.x = (radius - v->position.y / radius) * tableCos(theta); 
-	v->position.y = (radius - v->position.y / radius) * tableSin(theta); 
+	float radius = (((*parameterValues)[0] + 40) * 0.05) * asymptoteVal(0.01 * ((*parameterValues)[1]*0.1 + 1), (v->position.z - -5.0)/10.0);
 
-	return;
+	if (radius < 1.0)
+	{
+		v->position.x = (radius - v->position.y * radius) * tableCos(theta); 
+		v->position.y = (radius - v->position.y * radius) * tableSin(theta); 
+	}
+	else
+	{
+		v->position.x = (radius - v->position.y / radius) * tableCos(theta); 
+		v->position.y = (radius - v->position.y / radius) * tableSin(theta); 
+	}
 }
 
 Vertex Mesher :: applyTransforms(Vertex v, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
