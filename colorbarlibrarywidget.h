@@ -19,6 +19,12 @@ class ColorBarLibraryWidget : public QLabel
 	private:
 		QButtonGroup* colorBarTemplateShapeButtonGroup;
 		PullPlan* pullPlan;
+
+	signals:
+		void styleSheetString(QString string);
+
+	public slots:
+		void setStyleSheet(bool enableBorder);
 };
 
 #endif

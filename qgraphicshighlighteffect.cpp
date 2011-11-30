@@ -17,6 +17,14 @@ QRectF QGraphicsHighlightEffect::boundingRectFor( const QRectF &sourceRect) cons
 	return sourceRect.adjusted( -mOffset.x(), -mOffset.y(), mOffset.x(), mOffset.y() );
 }
 
+void QGraphicsHighlightEffect :: setStyleSheet(bool enableBorder)
+{
+	if (enableBorder)
+		emit styleSheetString("border: 1px solid "+color().name()+";");
+	else
+		emit styleSheetString("border: 0px solid "+color().name()+";");
+}
+
 void QGraphicsHighlightEffect::setActiveMain(bool active)
 {
 	if (!active && this->isActive)

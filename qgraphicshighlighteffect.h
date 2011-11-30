@@ -26,9 +26,9 @@ private:
 	QPointF mOffset;
 
 signals:
-
+	void styleSheetString(QString string);
 public slots:
-
+	void setStyleSheet(bool enableBorder);
 };
 
 #endif // QGRAPHICSHIGHLIGHTEFFECT_H
