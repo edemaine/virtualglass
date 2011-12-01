@@ -13,8 +13,7 @@
 // Types of MIME data
 #define COLOR_BAR_MIME 1
 #define PULL_PLAN_MIME 2
-#define PICKUP_PLAN_MIME 3
-#define PIECE_MIME 4
+#define PIECE_MIME 3
 
 // Editor/nice view modes
 #define EMPTY_MODE 0

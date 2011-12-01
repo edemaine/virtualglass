@@ -36,14 +36,17 @@ class Cane;
 class Group
 {
 public:
-	Group(uint32_t _triangle_begin, uint32_t _triangle_size, uint32_t _vertex_begin, uint32_t _vertex_size, PullPlan *_pullplan, uint32_t _tag)
-		: triangle_begin(_triangle_begin), triangle_size(_triangle_size), vertex_begin(_vertex_begin), vertex_size(_vertex_size), pullplan(_pullplan), tag(_tag) {
+	Group(uint32_t _triangle_begin, uint32_t _triangle_size, uint32_t _vertex_begin, uint32_t _vertex_size, 
+		PullPlan *_pullplan, bool _ensureVisible, uint32_t _tag)
+		: triangle_begin(_triangle_begin), triangle_size(_triangle_size), vertex_begin(_vertex_begin), 
+		vertex_size(_vertex_size), pullplan(_pullplan), ensureVisible(_ensureVisible), tag(_tag) {
 	}
 	uint32_t triangle_begin;
 	uint32_t triangle_size;
 	uint32_t vertex_begin;
 	uint32_t vertex_size;
 	PullPlan* pullplan;
+	bool ensureVisible;
 	uint32_t tag;
 };
 

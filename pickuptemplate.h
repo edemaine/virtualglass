@@ -15,6 +15,10 @@
 // Pickup template types
 #define VERTICALS_TEMPLATE 1
 #define MURRINE_SQUARE_TEMPLATE 2
+#define MURRINE_COLUMN_TEMPLATE 3
+
+#define FIRST_PICKUP_TEMPLATE VERTICALS_TEMPLATE
+#define LAST_PICKUP_TEMPLATE MURRINE_COLUMN_TEMPLATE 
 
 using std::vector;
 
@@ -27,6 +31,7 @@ class PickupTemplate
 		void setParameter(int param, int newValue);
 		int getParameter(int param);
 		char* getParameterName(int param);	
+		PickupTemplate* copy();
 
 	private:
 		vector<int> parameterValues; 

@@ -30,14 +30,14 @@ class Mesher
 		void generateMesh(Piece* piece, Geometry *geometry, vector<PullPlan*>* ancestors, 
 			vector<int>* ancestorIndices);
 		void generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*>* ancestors, 
-			vector<int>* ancestorIndices, float start, float end, int groupIndex = -1);
+			vector<int>* ancestorIndices, float start, float end, bool ensureVisible=false, int groupIndex = -1);
 		float asymptoteVal(float s, float t);
 		float splineVal(float r1, float r2, float r3, float t);
 		float splineVal(float r1, float r2, float r3, float r4, float t);
 		float tableCos(float theta);
 		float tableSin(float theta);
 		void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
-			PullPlan* plan, float start, float end, uint32_t group_tag);
+			PullPlan* plan, float start, float end, bool ensureVisible, uint32_t group_tag);
 		void applyMoveAndResizeTransform(Vertex* v, PullPlan* parentPlan, int subplan);
 		void applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentPlan, int subplan);
 		void applyTwistTransform(Vertex* v, PullPlan* p);

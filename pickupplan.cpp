@@ -3,25 +3,21 @@
 
 PickupPlan :: PickupPlan(int pickupTemplate)
 {
-	this->pickupTemplate = new PickupTemplate(pickupTemplate);
-	this->libraryWidget = NULL;
-	for (unsigned int i = 0; i < this->pickupTemplate->subpulls.size(); ++i)
+	setTemplate(new PickupTemplate(pickupTemplate));
+}
+
+PickupPlan* PickupPlan :: copy()
+{
+	PickupPlan* c = new PickupPlan(this->pickupTemplate->type);
+
+	c->pickupTemplate = this->pickupTemplate->copy();
+	c->subplans.clear();
+	for (unsigned int i = 0; i < this->subplans.size(); ++i)
 	{
-		Color* color = new Color();
-		color->r = color->g = color->b = 1.0;
-		color->a = 0.4;
-		this->subplans.push_back(new PullPlan(CIRCLE_BASE_TEMPLATE, true, color));
+		c->subplans.push_back(this->subplans[i]);
 	}
-}
 
-void PickupPlan :: setLibraryWidget(PickupPlanLibraryWidget* pkplw)
-{
-	this->libraryWidget = pkplw;
-}
-
-PickupPlanLibraryWidget* PickupPlan :: getLibraryWidget()
-{
-	return this->libraryWidget;
+	return c;
 }
 
 void PickupPlan :: setTemplate(PickupTemplate* newTemplate)
@@ -34,7 +30,15 @@ void PickupPlan :: setTemplate(PickupTemplate* newTemplate)
                 Color* color = new Color();
                 color->r = color->g = color->b = 1.0;
                 color->a = 0.4;
-                subplans.push_back(new PullPlan(CIRCLE_BASE_TEMPLATE, true, color));
+		switch (this->pickupTemplate->subpulls[i]->shape)
+		{
+			case CIRCLE_SHAPE:
+				this->subplans.push_back(new PullPlan(CIRCLE_BASE_TEMPLATE, true, color));
+				break;
+			case SQUARE_SHAPE:
+				this->subplans.push_back(new PullPlan(SQUARE_BASE_TEMPLATE, true, color));
+				break;
+		}
         }
 }
 

@@ -43,7 +43,7 @@ void MainWindow :: seedEverything()
 	editorStack->setCurrentIndex(PIECE_MODE);
 	emit someDataChanged();
 
-	for (int i = VERTICALS_TEMPLATE; i <= MURRINE_SQUARE_TEMPLATE; ++i)
+	for (int i = FIRST_PICKUP_TEMPLATE; i <= LAST_PICKUP_TEMPLATE; ++i)
 	{
 		pieceEditorPlan->pickup->setTemplate(new PickupTemplate(i));
 		emit someDataChanged();
@@ -146,7 +146,6 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 
 	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
-	PickupPlanLibraryWidget* pkplw = dynamic_cast<PickupPlanLibraryWidget*>(childAt(event->pos()));
 	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
 	int type;
 	if (cblw != NULL)
@@ -160,12 +159,6 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 		plan = plplw->getPullPlan();
 		pixmap = *plplw->getEditorPixmap();
 		type = PULL_PLAN_MIME;
-	}
-	else if (pkplw != NULL)
-	{
-		plan = pkplw->getPickupPlan();
-		pixmap = *pkplw->getEditorPixmap();
-		type = PICKUP_PLAN_MIME;
 	}
 	else if (plw != NULL)
 	{
@@ -610,14 +603,13 @@ void MainWindow :: pullPlanTwistSliderChanged(int)
 
 void MainWindow :: newPiece()
 {
-	pieceEditorPlan = new Piece(TUMBLER_TEMPLATE);
+	pieceEditorPlan = pieceEditorPlan->copy();
 
-	//pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 	unhighlightAllPlanLibraryWidgets(setupDone);
 	QPixmap pixmap(100, 100);
 	pixmap.fill(Qt::white);
 	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(pixmap, pixmap, pieceEditorPlan);
-	//pieceEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
+	pieceEditorPlan->setLibraryWidget(pieceEditorPlanLibraryWidget);
 	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 2);
 	++pieceCount;
 
@@ -632,7 +624,7 @@ void MainWindow :: newPiece()
 void MainWindow :: newColorBar()
 {
 	Color* newColor = new Color();
-		newColor->r = newColor->g = newColor->b = newColor->a = 1.0;
+	newColor->r = newColor->g = newColor->b = newColor->a = 1.0;
 	colorEditorPlan = new PullPlan(CIRCLE_SHAPE, true, newColor);
 	//colorEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 	unhighlightAllPlanLibraryWidgets(setupDone);
@@ -663,7 +655,6 @@ void MainWindow :: newPullPlan()
 	pullPlanEditorPlan->twist = oldEditorPlan->twist;
 	for (unsigned int i = 0; i < oldEditorPlan->subplans.size(); ++i)
 	{
-		//pullPlanEditorPlan->subplans[i] = oldEditorPlan->subplans[i];
 		pullPlanEditorPlan->subplans.push_back(oldEditorPlan->subplans[i]);
 	}
 
@@ -746,26 +737,6 @@ void MainWindow :: highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw,bool
 			highlightPlanLibraryWidgets(plplw->getPullPlan()->subplans.at(j)->getColorLibraryWidget(),highlight,true);
 			highlightPlanLibraryWidgets(plplw->getPullPlan()->subplans.at(j)->getLibraryWidget(),highlight,true);
 		}
-	}
-}
-
-void MainWindow :: highlightPlanLibraryWidgets(PickupPlanLibraryWidget* pkplw,bool highlight,bool setupDone) {
-
-	if (!pkplw || !pkplw->graphicsEffect())
-		return;
-
-	pkplw->graphicsEffect()->setEnabled(highlight);
-
-	if (!setupDone)
-		return;
-
-	if (pkplw->getPickupPlan()->subplans.empty())
-		return;
-
-	for (unsigned int j = 0; j < pkplw->getPickupPlan()->subplans.size(); j++)
-	{
-		if (pkplw->getPickupPlan()->subplans[j])
-			highlightPlanLibraryWidgets(pkplw->getPickupPlan()->subplans[j]->getLibraryWidget(),highlight,true);
 	}
 }
 

@@ -13,21 +13,40 @@ PickupTemplate :: PickupTemplate(int t)
 	{
 		case VERTICALS_TEMPLATE:
 			tmp = new char[100];
-			sprintf(tmp, "Count");
+			sprintf(tmp, "Column count");
 			parameterNames.push_back(tmp);
-			parameterValues.push_back(10);
+			parameterValues.push_back(14);
+			break;
+		case MURRINE_COLUMN_TEMPLATE:
+			tmp = new char[100];
+			sprintf(tmp, "Column count");
+			parameterNames.push_back(tmp);
+			parameterValues.push_back(14);
 			break;
 		case MURRINE_SQUARE_TEMPLATE:
 			tmp = new char[100];
-			sprintf(tmp, "Count");
+			sprintf(tmp, "Column count");
 			parameterNames.push_back(tmp);
-			parameterValues.push_back(4);
+			parameterValues.push_back(14);
 			break;
 	}
 
 	computeSubpulls();
 }
 
+PickupTemplate* PickupTemplate :: copy()
+{
+	PickupTemplate* c = new PickupTemplate(this->type);
+
+	c->parameterValues.clear();
+	for (unsigned int i = 0; i < this->parameterValues.size(); ++i)
+	{
+		c->parameterValues.push_back(this->parameterValues[i]);
+	}
+	c->computeSubpulls();
+
+	return c;
+}
 
 void PickupTemplate :: computeSubpulls()
 {
@@ -41,25 +60,25 @@ void PickupTemplate :: computeSubpulls()
 	// initialize SubpickupTemplates with the right data
 	switch (this->type)
 	{
-		case MURRINE_SQUARE_TEMPLATE:
+		case MURRINE_COLUMN_TEMPLATE:
 			p.x = p.y = p.z = 0.0;
 			width = 2.0 / MAX(parameterValues[0], 1);
 			for (int i = 0; i < parameterValues[0]-1; ++i)
 			{
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = -0.99;
-				subpulls.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.99, width - 0.001, 0));
+				subpulls.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.99, width - 0.001, 
+					CIRCLE_SHAPE, 0));
 			}
 			for (int i = 0; i < parameterValues[0]; ++i)
 			{
 				p.x = 1.0 - width / 2;
 				p.y = -0.99 + width / 2 + width * i;
-				subpulls.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, 0.2, width - 0.001, 1));
+				subpulls.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, 0.4, width - 0.001, 
+					SQUARE_SHAPE, 1));
 			}
 			break;
-
-
-			p.x = p.y = p.z = 0.0;
+		case MURRINE_SQUARE_TEMPLATE:
 			width = 2.0 / MAX(parameterValues[0], 1);
 			for (int i = 0; i < parameterValues[0]; ++i)
 			{
@@ -67,8 +86,8 @@ void PickupTemplate :: computeSubpulls()
 				{
 					p.x = -1.0 + width / 2 + width * i;
 					p.y = -1.0 + width / 2 + width * j;
-					subpulls.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, 0.2,
-						width - 0.001, 0));
+					subpulls.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, 0.4,
+						width - 0.01, SQUARE_SHAPE, 0));
 				}
 			}
 			break;
@@ -79,7 +98,8 @@ void PickupTemplate :: computeSubpulls()
 			{
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = -0.99;
-				subpulls.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.99, width - 0.001, 0));
+				subpulls.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.99, width - 0.001, 
+					SQUARE_SHAPE, 0));
 			}
 			break;
 	}

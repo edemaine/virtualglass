@@ -257,10 +257,10 @@ typedef set< Vector2ui > EdgeSet;
 start and end determine the length of cane created...they should be between 0.0 and 1.0.
 The resulting cane has length between 0.0 and 10.0, i.e. it is scaled by a factor of 10.
 */
-void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, PullPlan* plan,
-	float start, float end, uint32_t group_tag)
+void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
+	PullPlan* plan, float start, float end, bool ensureVisible, uint32_t group_tag)
 {
-	if (plan->color->a < 0.0001)
+	if (plan->color->a < 0.0001 && !ensureVisible)
 		return;
 
 	unsigned int angularResolution = MIN(MAX(1200 / totalCaneLength, 10), 60);
@@ -458,7 +458,7 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 	{
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorIndices);
 	}
-	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, plan, group_tag));
+	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, plan, ensureVisible, group_tag));
 }
 
 void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
@@ -500,7 +500,7 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPla
 		ancestors->clear();
 		ancestorIndices->clear();
 		generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, 0.0, 
-			plan->getTemplate()->subpulls[i]->length / 2.0, i); 
+			plan->getTemplate()->subpulls[i]->length / 2.0, true, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
 		{
@@ -543,7 +543,7 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry* geometry)
 	totalCaneLength = computeTotalCaneLength(plan);
         vector<PullPlan*> ancestors;
         vector<int> ancestorIndices;
-	generateMesh(plan, geometry, &ancestors, &ancestorIndices, 0.0, 1.0);
+	generateMesh(plan, geometry, &ancestors, &ancestorIndices, 0.0, 1.0, true);
 	geometry->compute_normals_from_triangles();
 }
 
@@ -555,7 +555,7 @@ leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
 void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
-	float start, float end, int groupIndex)
+	float start, float end, bool ensureVisible, int groupIndex)
 {
 	int passGroupIndex;
 
@@ -563,7 +563,7 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*
 		return;
 
 	ancestors->push_back(plan); 
-	meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan, start, end, groupIndex);
+	meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan, start, end, ensureVisible, groupIndex);
 	ancestors->pop_back();
 
 	// Make recursive calls depending on the type of the current node
@@ -586,7 +586,7 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*
 				passGroupIndex = groupIndex;
 
 			ancestorIndices->push_back(i);
-			generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, start + 0.01, end - 0.01, passGroupIndex);
+			generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, start + 0.01, end - 0.01, false, passGroupIndex);
 			ancestorIndices->pop_back();
 		}
 	}

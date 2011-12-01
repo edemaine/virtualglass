@@ -36,9 +36,9 @@ HEADERS += primitives.h constants.h Vector.hpp \
 	piece.h piecetemplate.h \
 	pickuptemplate.h subpickuptemplate.h pickupplaneditorviewwidget.h \ 
 	coloreditorviewwidget.h purecolorlibrarywidget.h \
-	mainwindow.h niceviewwidget.h pickupplanlibrarywidget.h pullplanlibrarywidget.h piecelibrarywidget.h \
+	mainwindow.h niceviewwidget.h pullplanlibrarywidget.h piecelibrarywidget.h \
 	pulltemplatelibrarywidget.h pickuptemplatelibrarywidget.h \
-	pullplaneditorviewwidget.h colorbarlibrarywidget.h pieceeditorviewwidget.h \
+	pullplaneditorviewwidget.h colorbarlibrarywidget.h \
 	controller.h model.h geometry.h mesh.h \ 
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
@@ -91,7 +91,7 @@ HEADERS += yaml-cpp/src/token.h \
 	yaml-cpp/src/collectionstack.h \
 
 SOURCES += glew/glew.c \
-    qgraphicshighlighteffect.cpp
+    qgraphicshighlighteffect.cpp \
 
 SOURCES += main.cpp \ 
 	pullplan.cpp pulltemplate.cpp subpulltemplate.cpp \
@@ -99,9 +99,9 @@ SOURCES += main.cpp \
 	pickupplan.cpp pickuptemplate.cpp subpickuptemplate.cpp pickupplaneditorviewwidget.cpp \
 	coloreditorviewwidget.cpp purecolorlibrarywidget.cpp \
 	model.cpp controller.cpp geometry.cpp mesh.cpp \
-	mainwindow.cpp niceviewwidget.cpp pullplanlibrarywidget.cpp pickupplanlibrarywidget.cpp piecelibrarywidget.cpp \
+	mainwindow.cpp niceviewwidget.cpp pullplanlibrarywidget.cpp piecelibrarywidget.cpp \
 	pulltemplatelibrarywidget.cpp pickuptemplatelibrarywidget.cpp \
-	pullplaneditorviewwidget.cpp colorbarlibrarywidget.cpp pieceeditorviewwidget.cpp 
+	pullplaneditorviewwidget.cpp colorbarlibrarywidget.cpp \ 
 
 
 SOURCES += yaml-cpp/src/tag.cpp \

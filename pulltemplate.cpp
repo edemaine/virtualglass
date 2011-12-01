@@ -188,11 +188,13 @@ void PullTemplate :: initializeSubpulls()
 			this->shape = SQUARE_SHAPE;
 			break;
 		case CASED_CIRCLE_TEMPLATE:
-			this->shape = SQUARE_SHAPE;
+			this->shape = CIRCLE_SHAPE;
+			this->casingThickness = 0.2;
 			subpulls.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 1.99, 0));
 			break;	
 		case CASED_SQUARE_TEMPLATE:
-			this->shape = CIRCLE_SHAPE;
+			this->shape = SQUARE_SHAPE;
+			this->casingThickness = 0.2;
 			subpulls.push_back(SubpullTemplate(SQUARE_SHAPE, p, 1.99, 0));
 			break;	
 		case LINE_THREE_TEMPLATE:
@@ -231,14 +233,14 @@ void PullTemplate :: initializeSubpulls()
 			}
 			break;			
 		case SQUARE_SIXTEEN_TEMPLATE:
-			this->shape = CIRCLE_SHAPE;
+			this->shape = SQUARE_SHAPE;
 			for (int i = 0; i < 16; ++i)
 			{
 				subpulls.push_back(SubpullTemplate(SQUARE_SHAPE, p, 0.49, 0));
 			}
 			break;
 		case SQUARE_FOUR_TEMPLATE:
-			this->shape = CIRCLE_SHAPE;
+			this->shape = SQUARE_SHAPE;
 			for (int i = 0; i < 4; ++i)
 			{
 				subpulls.push_back(SubpullTemplate(SQUARE_SHAPE, p, 0.49, 0));

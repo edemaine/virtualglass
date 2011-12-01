@@ -8,7 +8,6 @@
 #include "constants.h"
 #include "niceviewwidget.h"
 #include "piecelibrarywidget.h"
-#include "pickupplanlibrarywidget.h"
 #include "pullplanlibrarywidget.h"
 #include "colorbarlibrarywidget.h"
 #include "pulltemplate.h"
@@ -19,7 +18,6 @@
 #include "pickupplan.h"
 #include "pickupplaneditorviewwidget.h"
 #include "piece.h"
-#include "pieceeditorviewwidget.h"
 #include "pulltemplatelibrarywidget.h"
 #include "pickuptemplatelibrarywidget.h"
 
@@ -57,7 +55,6 @@ class MainWindow : public QMainWindow
 
 		void highlightPlanLibraryWidgets(ColorBarLibraryWidget* cblw,bool highlight,bool setupDone);
 		void highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw,bool highlight,bool setupDone);
-		void highlightPlanLibraryWidgets(PickupPlanLibraryWidget* pkplw,bool highlight,bool setupDone);
 		void highlightPlanLibraryWidgets(PieceLibraryWidget* plw,bool highlight,bool setupDone);
 		void unhighlightAllPlanLibraryWidgets(bool setupDone);
 

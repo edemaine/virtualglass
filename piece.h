@@ -22,8 +22,9 @@ class Piece
 		void setTemplate(PieceTemplate* pt);
 		PieceTemplate* getTemplate();
 
+		Piece* copy();
 		PickupPlan* pickup;
-
+		
 	private:
 		// Variables
 		PieceTemplate* pieceTemplate;

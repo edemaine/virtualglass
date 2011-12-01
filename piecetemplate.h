@@ -20,6 +20,7 @@ class PieceTemplate
 		int type;
 		vector<char*> parameterNames;
 		vector<int> parameterValues; 	
+		PieceTemplate* copy();
 };
 
 #endif

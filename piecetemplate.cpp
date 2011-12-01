@@ -43,6 +43,17 @@ PieceTemplate :: PieceTemplate(int t)
 	}
 }
 
+PieceTemplate* PieceTemplate :: copy()
+{
+	PieceTemplate* c = new PieceTemplate(this->type);
 
+	c->parameterValues.clear();
+        for (unsigned int i = 0; i < this->parameterValues.size(); ++i)
+        {
+                c->parameterValues.push_back(this->parameterValues[i]);
+        }
+
+	return c;
+}
 
 
