@@ -21,10 +21,10 @@ class ColorBarLibraryWidget : public QLabel
 		PullPlan* pullPlan;
 
 	signals:
-		void styleSheetString(QString string);
+//		void styleSheetString(QString string);
 
 	public slots:
-		void setStyleSheet(bool enableBorder);
+//		void setStyleSheet(bool enableBorder);
 };
 
 #endif

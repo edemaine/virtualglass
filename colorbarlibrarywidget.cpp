@@ -15,18 +15,17 @@ ColorBarLibraryWidget :: ColorBarLibraryWidget(QPixmap niceViewPixmap, PullPlan*
 	this->pullPlan = plan;
 	this->pullPlan->setColorLibraryWidget(this);
 	setGraphicsEffect(new QGraphicsHighlightEffect());
-	connect(graphicsEffect(),SIGNAL(enabledChanged(bool)),this,SLOT(setStyleSheet(bool)));
-
-	connect(this,SIGNAL(styleSheetString(QString)),this,SLOT(setStyleSheet(QString)));
+	connect(graphicsEffect(),SIGNAL(enabledChanged(bool)),graphicsEffect(),SLOT(setStyleSheet(bool)));
+	connect(graphicsEffect(),SIGNAL(styleSheetString(QString)),this,SLOT(setStyleSheet(QString)));
 }
 
-void ColorBarLibraryWidget :: setStyleSheet(bool enableBorder)
+/*void ColorBarLibraryWidget :: setStyleSheet(bool enableBorder)
 {
 	if (enableBorder)
 		emit styleSheetString("border: 1px solid "+((QGraphicsHighlightEffect*)graphicsEffect())->color().name()+";");
 	else
 		emit styleSheetString("border: 0px solid "+((QGraphicsHighlightEffect*)graphicsEffect())->color().name()+";");
-}
+}*/
 
 void ColorBarLibraryWidget :: updatePixmap(QPixmap niceViewPixmap)
 {
