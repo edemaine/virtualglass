@@ -65,14 +65,14 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		}	
 
 		// Scale to pixels
-		ll.x = ll.x * width()/2 + width()/2 + 10;  
-		ll.y = ll.y * height()/2 + height()/2 + 10;  
-		ur.x = ur.x * width()/2 + width()/2 + 10;  
-		ur.y = ur.y * height()/2 + height()/2 + 10;  
+		ll.x = ll.x * (width() - 20)/2 + (width() - 20)/2 + 10;  
+		ll.y = ll.y * (height() - 20)/2 + (height() - 20)/2 + 10;  
+		ur.x = ur.x * (width() - 20)/2 + (width() - 20)/2 + 10;  
+		ur.y = ur.y * (height() - 20)/2 + (height() - 20)/2 + 10;  
 
 		// Need to invert event location, since upper left/lower left origins exist	
 		if (ll.x < event->pos().x() && event->pos().x() < ur.x 
-			&& ll.y < (this->height() + 10 - event->pos().y()) && (this->height() + 10 - event->pos().y()) < ur.y)
+			&& ll.y < (height() + 10 - event->pos().y()) && (height() + 10 - event->pos().y()) < ur.y)
 		{
 			event->accept();
 		}
@@ -92,7 +92,6 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		else // Otherwise just fill in this one
 			piece->pickup->subplans[i] = droppedPlan;
 
-	
 		emit someDataChanged();
 		return;	
 	} 
@@ -106,6 +105,8 @@ void PickupPlanEditorViewWidget :: setPiece(Piece* piece)
 
 void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 {
+	this->niceViewWidget->repaint();
+
 	QPainter painter;
 	painter.begin(this->niceViewWidget);
         painter.setRenderHint(QPainter::Antialiasing);
