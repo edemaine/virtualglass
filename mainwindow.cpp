@@ -30,7 +30,7 @@ void MainWindow :: seedEverything()
 	// Load pull template types
 	editorStack->setCurrentIndex(PULLPLAN_MODE);
 	emit someDataChanged();
-	for (int i = FIRST_TEMPLATE; i <= LAST_TEMPLATE; ++i)
+	for (int i = FIRST_PULL_TEMPLATE; i <= LAST_PULL_TEMPLATE; ++i)
 	{
 		pullPlanEditorPlan->setTemplate(new PullTemplate(i, 0.0));
 		pullPlanEditorViewWidget->repaint();
