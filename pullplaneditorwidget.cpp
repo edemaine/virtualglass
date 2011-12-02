@@ -116,6 +116,25 @@ void PullPlanEditorWidget :: setupLayout()
         QLabel* twistLabel3 = new QLabel("50", this);
         twistLayout->addWidget(twistLabel3);
 
+	// Parameter spin stuff
+	QHBoxLayout* paramLayout = new QHBoxLayout(this);
+	paramLabels.push_back(new QLabel("Param 1:", this));
+	paramLabels.push_back(new QLabel("Param 2:", this));
+	paramLabels.push_back(new QLabel("Param 3:", this));
+	paramSpins.push_back(new QSpinBox(this));
+	paramSpins.push_back(new QSpinBox(this));
+	paramSpins.push_back(new QSpinBox(this));
+	for (unsigned int i = 0; i < paramLabels.size(); ++i)
+	{
+		paramLayout->addWidget(paramLabels[i], 0);
+		paramLayout->addWidget(paramSpins[i], 0);
+		paramSpins[i]->setRange(2, 16);
+		paramSpins[i]->setSingleStep(1);
+		paramLabels[i]->hide();
+		paramSpins[i]->hide();
+	}
+	editorLayout->addLayout(paramLayout);	
+
         // Little description for the editor
         QLabel* descriptionLabel = new QLabel("Cane editor - drag color or other canes into the cane to edit.", this);
         descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
@@ -138,8 +157,25 @@ void PullPlanEditorWidget :: setupConnections()
                 this, SLOT(casingThicknessSliderChanged(int)));
         connect(twistSlider, SIGNAL(valueChanged(int)), this, SLOT(twistSliderChanged(int)));
         connect(twistSpin, SIGNAL(valueChanged(int)), this, SLOT(twistSpinChanged(int)));
+
+	for (unsigned int i = 0; i < paramSpins.size(); ++i)
+	{
+		connect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
+	}
+
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+}
+
+void PullPlanEditorWidget :: paramSpinChanged(int)
+{
+	// update template
+	for (unsigned int i = 0; i < plan->getTemplate()->getParameterCount(); ++i)
+	{
+		plan->getTemplate()->setParameter(i, paramSpins[i]->value());
+	}
+	plan->setTemplate(plan->getTemplate()); // a hack to propogate the possibly changed number of subtemplates
+	emit someDataChanged();
 }
 
 void PullPlanEditorWidget :: casingThicknessSliderChanged(int)
@@ -200,6 +236,19 @@ void PullPlanEditorWidget :: setPlanTwist(int twist)
 void PullPlanEditorWidget :: setPlanTemplate(PullTemplate* t)
 {
 	plan->setTemplate(t);
+	unsigned int i = 0;
+	for (; i < t->getParameterCount(); ++i)
+	{
+		paramLabels[i]->setText(t->getParameterName(i));
+		paramLabels[i]->show();
+		paramSpins[i]->setValue(t->getParameter(i));
+		paramSpins[i]->show();
+	}
+	for (; i < paramLabels.size(); ++i)
+	{
+		paramLabels[i]->hide();
+		paramSpins[i]->hide();
+	}
 	emit someDataChanged();	
 }
 

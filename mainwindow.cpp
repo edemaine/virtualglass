@@ -645,8 +645,6 @@ void MainWindow :: updateEverything()
 		case PIECE_MODE:
 			updatePieceEditor();
 			break;
-		default:
-			return;
 	}
 
 	updateLibrary();

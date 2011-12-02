@@ -34,6 +34,7 @@ class PullTemplate
                 void setParameter(int param, int newValue);
                 int getParameter(int param);
                 char* getParameterName(int param);
+		unsigned int getParameterCount();
 		int getShape();
 		void setShape(int s);
 		float getCasingThickness();
@@ -42,7 +43,7 @@ class PullTemplate
 
 	private:
 		// Methods
-		void initializeSubtemps();
+		void initializeTemplate();
 		void updateSubtemps();
 
 		// Variables
