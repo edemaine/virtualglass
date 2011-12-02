@@ -4,6 +4,7 @@
 #include <QtGui>
 #include <QApplication>
 #include <QObject>
+#include <QtGlobal>
 #include "mainwindow.h"
 #include "model.h"
 

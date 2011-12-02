@@ -5,6 +5,7 @@ Controller::Controller(int argc, char **argv)
 {
 	app = new QApplication(argc, argv);
 	app->setStartDragDistance(5);
+	qsrand(QDateTime::currentDateTime().toTime_t());
 
 	model = new Model();
 	mainWindow = new MainWindow(model);

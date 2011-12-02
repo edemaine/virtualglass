@@ -51,10 +51,66 @@ void MainWindow :: seedEverything()
 		pickupTemplateLibraryLayout->addWidget(ptlw);
 	}
 
+	initializeRandomPiece();
+
 	editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
 	emit someDataChanged();
 
 	setupDone = true;
+}
+
+// Too weird to live; too strange to die
+void MainWindow :: initializeRandomPiece()
+{
+	// Setup colors	
+	editorStack->setCurrentIndex(COLORBAR_MODE); // end in pull plan mode
+	Color* opaqueColor = colorEditorPlan->color;
+	newColorBar();
+	Color* transparentColor = colorEditorPlan->color;
+	transparentColor->r = (qrand() % 255) / 255.0;
+	transparentColor->g = (qrand() % 255) / 255.0;
+	transparentColor->b = (qrand() % 255) / 255.0;
+	transparentColor->a = (qrand() % 128 + 70) / 255.0;
+	emit someDataChanged();
+
+	// Setup cane 
+	editorStack->setCurrentIndex(PULLPLAN_MODE); // end in pull plan mode
+	pullPlanEditorPlan->setTemplate(new PullTemplate(qrand() % (LAST_PULL_TEMPLATE - 3) + 3, 
+		(qrand() % 50 + 25) / 100.0));
+	pullPlanEditorPlan->subplans.clear();
+	for (unsigned int i = 0; i < pullPlanEditorPlan->getTemplate()->subpulls.size(); ++i)
+	{
+                switch (pullPlanEditorPlan->getTemplate()->subpulls[i].shape)
+                {
+                        case CIRCLE_SHAPE:
+                                pullPlanEditorPlan->subplans.push_back(
+					new PullPlan(CIRCLE_BASE_TEMPLATE, true, opaqueColor));
+                                break;
+                        case SQUARE_SHAPE:
+                                pullPlanEditorPlan->subplans.push_back(
+					new PullPlan(SQUARE_BASE_TEMPLATE, true, opaqueColor));
+                                break;
+                }
+	}
+	pullPlanEditorPlan->color = transparentColor;
+	pullPlanEditorPlan->twist = 20;
+	emit someDataChanged();
+		
+	// Setup piece
+	editorStack->setCurrentIndex(PIECE_MODE); // end in pull plan mode
+	pieceEditorPlan->setTemplate(new PieceTemplate(qrand() % (LAST_PIECE_TEMPLATE - FIRST_PIECE_TEMPLATE + 1) + 1));
+	for (unsigned int i = 0; i < pieceEditorPlan->getTemplate()->parameterValues.size(); ++i)
+	{
+		pieceEditorPlan->getTemplate()->parameterValues[i] = qrand() % 100;
+	}
+	pieceEditorPlan->pickup->setTemplate(new PickupTemplate(VERTICALS_TEMPLATE));
+	pieceEditorPlan->pickup->getTemplate()->setParameter(0, 14 + qrand() % 20); // set number of subpulls
+	pieceEditorPlan->pickup->subplans.clear();
+	for (unsigned int i = 0; i < pieceEditorPlan->pickup->getTemplate()->subpulls.size(); ++i)
+	{
+		pieceEditorPlan->pickup->subplans.push_back(pullPlanEditorPlan);
+	}
+	emit someDataChanged();
 }
 
 void MainWindow :: unhighlightAllPlanLibraryWidgets(bool setupDone)

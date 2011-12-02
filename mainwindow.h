@@ -52,6 +52,7 @@ class MainWindow : public QMainWindow
 		void updatePickupPlanEditor();
 		void updatePieceEditor();
 		void updateLibrary();
+		void initializeRandomPiece();
 
 		void highlightPlanLibraryWidgets(ColorBarLibraryWidget* cblw,bool highlight,bool setupDone);
 		void highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw,bool highlight,bool setupDone);
