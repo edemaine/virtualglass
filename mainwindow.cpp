@@ -23,7 +23,6 @@ void MainWindow :: seedEverything()
 {
 	// Load color stuff
 	editorStack->setCurrentIndex(COLORBAR_MODE);
-	colorEditorViewWidget->seedMartyColors();
 	colorEditorViewWidget->seedBrandColors();
 	emit someDataChanged();
 

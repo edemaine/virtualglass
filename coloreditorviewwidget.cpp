@@ -6,20 +6,34 @@ ColorEditorViewWidget :: ColorEditorViewWidget(PullPlan* plan, QWidget* parent) 
 	QVBoxLayout* editorLayout = new QVBoxLayout(this);
 	this->setLayout(editorLayout);
 
-        QWidget* colorLibraryWidget = new QWidget(this);
-        colorLibraryLayout = new QVBoxLayout(colorLibraryWidget);
-        colorLibraryLayout->setSpacing(10);
-        colorLibraryWidget->setLayout(colorLibraryLayout);
+	QTabWidget* tabs = new QTabWidget(this);
+	editorLayout->addWidget(tabs);
 
-        // Setup pickup template scrolling library
-        QScrollArea* colorLibraryScrollArea = new QScrollArea;
-        colorLibraryScrollArea->setBackgroundRole(QPalette::Dark);
-        colorLibraryScrollArea->setWidget(colorLibraryWidget);
-        colorLibraryScrollArea->setWidgetResizable(true);
-	colorLibraryScrollArea->setMinimumWidth(320);
-        colorLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        colorLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-        editorLayout->addWidget(colorLibraryScrollArea);
+        QWidget* colorLibrary1Widget = new QWidget(tabs);
+        colorLibrary1Layout = new QVBoxLayout(colorLibrary1Widget);
+        colorLibrary1Layout->setSpacing(10);
+        colorLibrary1Widget->setLayout(colorLibrary1Layout);
+        QScrollArea* colorLibrary1ScrollArea = new QScrollArea;
+        colorLibrary1ScrollArea->setBackgroundRole(QPalette::Dark);
+        colorLibrary1ScrollArea->setWidget(colorLibrary1Widget);
+        colorLibrary1ScrollArea->setWidgetResizable(true);
+	colorLibrary1ScrollArea->setMinimumWidth(320);
+        colorLibrary1ScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        colorLibrary1ScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	tabs->addTab(colorLibrary1ScrollArea, "Reichenbach Transparents");
+
+        QWidget* colorLibrary2Widget = new QWidget(tabs);
+        colorLibrary2Layout = new QVBoxLayout(colorLibrary2Widget);
+        colorLibrary2Layout->setSpacing(10);
+        colorLibrary2Widget->setLayout(colorLibrary2Layout);
+        QScrollArea* colorLibrary2ScrollArea = new QScrollArea;
+        colorLibrary2ScrollArea->setBackgroundRole(QPalette::Dark);
+        colorLibrary2ScrollArea->setWidget(colorLibrary2Widget);
+        colorLibrary2ScrollArea->setWidgetResizable(true);
+	colorLibrary2ScrollArea->setMinimumWidth(320);
+        colorLibrary2ScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        colorLibrary2ScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	tabs->addTab(colorLibrary2ScrollArea, "Reichenbach Opaques");
 
 	QHBoxLayout* alphaLayout = new QHBoxLayout(this);
         editorLayout->addLayout(alphaLayout);
@@ -72,17 +86,18 @@ void ColorEditorViewWidget :: seedMartyColors()
                 color.a = rgba[i][3] / 255.0;
 		QString name(names[i]);
                 PureColorLibraryWidget* pclw = new PureColorLibraryWidget(color, name, this);
-                colorLibraryLayout->addWidget(pclw);
+		if (rgba[i][3] != 255)
+			colorLibrary1Layout->addWidget(pclw);
+		else
+			colorLibrary2Layout->addWidget(pclw);
         }
 
 }
 
 void ColorEditorViewWidget :: seedBrandColors()
 { 
-        QList<Color> caneColorList;
-        QStringList caneNameList;
-	QStringList caneBrandList;
-	QString currentBrand = "";
+	Color caneColor;
+	QString caneName;
 
         QFile file("../src/Colors1.txt");
         file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -98,37 +113,28 @@ void ColorEditorViewWidget :: seedBrandColors()
                         line.remove(0,1);
                         line.remove(line.lastIndexOf(']'),1);
                         line = line.trimmed();
-                        caneNameList.append(line);
-                        caneBrandList.append(currentBrand);
+			caneName = line;
+			if (caneName[0] != 'R') // Only load reichenbach colors for now, bug if list is too large
+				break;
                 }
                 else if (line.at(0) == '-')
                 {
                         line.remove(0,1);
                         line = line.trimmed();
                         QList<QByteArray> colorData = line.split(',');
-			Color c;
-			c.r = colorData[0].toInt() / 255.0;
-			c.g = colorData[1].toInt() / 255.0;
-			c.b = colorData[2].toInt() / 255.0;
-			c.a = colorData[3].toInt() / 255.0;
-			caneColorList.append(c);
-                }
-                else
-                {
-			currentBrand = line;
+			caneColor.r = colorData[0].toInt() / 255.0;
+			caneColor.g = colorData[1].toInt() / 255.0;
+			caneColor.b = colorData[2].toInt() / 255.0;
+			caneColor.a = colorData[3].toInt() / 255.0;
+
+	                PureColorLibraryWidget* pclw = new PureColorLibraryWidget(caneColor, caneName, this);
+			if (colorData[3].toInt() != 255)
+				colorLibrary1Layout->addWidget(pclw);
+			else
+				colorLibrary2Layout->addWidget(pclw);
                 }
         }
 	file.close();      
- 
-        for (int i = 0; i < caneColorList.size(); ++i)
-        {
-		if (caneNameList[i][0] != 'R') // Only load reichenbach colors for now, bug if list is too large
-			break;
-		QString name(caneNameList[i]);
-                PureColorLibraryWidget* pclw = new PureColorLibraryWidget(caneColorList[i], name, this);
-                colorLibraryLayout->addWidget(pclw, 1);
-        }
-
 }
 
 void ColorEditorViewWidget :: alphaSliderPositionChanged(int)

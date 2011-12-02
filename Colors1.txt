@@ -295,6 +295,8 @@ Reichenbach Opaques
 
 Reichenbach Transparents
 
+[R-100 Lead Crystal (Clear)] 	
+- 255,255,255,0
 [R-2 Gold Ruby]
 - 183,14,13,126
 [R-3 Dark Gold Pink]
@@ -403,8 +405,6 @@ Reichenbach Transparents
 - 75,80,53,126
 [R-60 Opaline] 	
 - 247,239,220,126
-[R-100 Lead Crystal] 	
-- 255,255,255,126
 [R-102 Silver Crystal (reduces)]
 - 220,209,179,126
 [R-118 Smoky Topaz] 	

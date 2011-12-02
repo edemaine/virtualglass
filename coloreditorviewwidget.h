@@ -32,7 +32,8 @@ class ColorEditorViewWidget : public QWidget
 	private:
 		PullPlan* plan;
 		QSlider* alphaSlider;
-		QVBoxLayout* colorLibraryLayout;
+		QVBoxLayout* colorLibrary1Layout;
+		QVBoxLayout* colorLibrary2Layout;
 
 };
 
