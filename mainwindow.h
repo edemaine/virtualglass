@@ -84,10 +84,10 @@ class MainWindow : public QMainWindow
 		QWidget* pieceEditorPage;
 		PullPlan* colorEditorPlan;
 		PullPlan* pullPlanEditorPlan;
-		Piece* pieceEditorPlan;
+		Piece* pieceEditorPiece;
 		ColorBarLibraryWidget* colorEditorPlanLibraryWidget;
 		PullPlanLibraryWidget* pullPlanEditorPlanLibraryWidget;
-		PieceLibraryWidget* pieceEditorPlanLibraryWidget;
+		PieceLibraryWidget* pieceEditorPieceLibraryWidget;
 		Model* model;
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;

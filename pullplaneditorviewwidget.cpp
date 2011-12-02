@@ -37,9 +37,9 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 
 	int drawSize = width() - 20;
 	// check to see if the drop was in a subpull
-	for (unsigned int i = 0; i < plan->getTemplate()->subpulls.size(); ++i)
+	for (unsigned int i = 0; i < plan->getTemplate()->subtemps.size(); ++i)
 	{
-		SubpullTemplate* subpull = &(plan->getTemplate()->subpulls[i]);
+		SubpullTemplate* subpull = &(plan->getTemplate()->subtemps[i]);
 		if (fabs(event->pos().x() - (drawSize/2 * subpull->location.x + drawSize/2 + 10))
 			+ fabs(event->pos().y() - (drawSize/2 * subpull->location.y + drawSize/2 + 10)) < (subpull->diameter/2.0)*drawSize/2)
 		{
@@ -76,10 +76,10 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			// If the shift button is down, fill in the entire group
 			if (event->keyboardModifiers() & 0x02000000)
 			{
-				int group = plan->getTemplate()->subpulls[i].group;
-				for (unsigned int j = 0; j < plan->getTemplate()->subpulls.size(); ++j)
+				int group = plan->getTemplate()->subtemps[i].group;
+				for (unsigned int j = 0; j < plan->getTemplate()->subtemps.size(); ++j)
 				{
-					if (plan->getTemplate()->subpulls[j].group == group)
+					if (plan->getTemplate()->subtemps[j].group == group)
 						plan->subplans[j] = droppedPlan;
 				}
 			}
@@ -182,9 +182,9 @@ void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int dr
 		return;
 
 	// Recurse
-	for (unsigned int i = plan->getTemplate()->subpulls.size()-1; i < plan->getTemplate()->subpulls.size(); --i)
+	for (unsigned int i = plan->getTemplate()->subtemps.size()-1; i < plan->getTemplate()->subtemps.size(); --i)
 	{
-		SubpullTemplate* subpull = &(plan->getTemplate()->subpulls[i]);
+		SubpullTemplate* subpull = &(plan->getTemplate()->subtemps[i]);
 
 		int rX = x + (subpull->location.x - subpull->diameter/2.0) * drawWidth/2 + drawWidth/2;
 		int rY = y + (subpull->location.y - subpull->diameter/2.0) * drawWidth/2 + drawHeight/2;

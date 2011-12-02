@@ -32,7 +32,7 @@ class PullTemplate
 {
 	public:
 		PullTemplate(int type, float casingThickness);
-		vector<SubpullTemplate> subpulls;
+		vector<SubpullTemplate> subtemps;
 		int type;
 		void setCasingThickness(float t);
 		float getCasingThickness();
@@ -41,8 +41,8 @@ class PullTemplate
 
 	private:
 		// Methods
-		void initializeSubpulls();
-		void updateSubpulls();
+		void initializeSubtemps();
+		void updateSubtemps();
 
 		// Variables
 		float casingThickness;

@@ -43,9 +43,9 @@ void PullPlan :: setTemplate(PullTemplate* newTemplate)
 	// create the new subplans based on template
 	this->pullTemplate = newTemplate;
 	this->subplans.clear();
-	for (unsigned int i = 0; i < newTemplate->subpulls.size(); ++i)
+	for (unsigned int i = 0; i < newTemplate->subtemps.size(); ++i)
 	{
-		switch (newTemplate->subpulls[i].shape)
+		switch (newTemplate->subtemps[i].shape)
 		{
 			case CIRCLE_SHAPE:
 				subplans.push_back(new PullPlan(CIRCLE_BASE_TEMPLATE, true, color));

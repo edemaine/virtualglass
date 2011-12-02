@@ -26,7 +26,7 @@ class PickupTemplate
 {
 	public:
 		PickupTemplate(int t);
-		vector<SubpickupTemplate*> subpulls;
+		vector<SubpickupTemplate*> subtemps;
 		int type;
 		void setParameter(int param, int newValue);
 		int getParameter(int param);
@@ -36,7 +36,7 @@ class PickupTemplate
 	private:
 		vector<int> parameterValues; 
 		vector<char*> parameterNames;
-		void computeSubpulls();
+		void computeSubtemps();
 };
 
 #endif

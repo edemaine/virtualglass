@@ -37,9 +37,9 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
         if (type != PULL_PLAN_MIME) // if the thing passed isn't a pull plan 
                 return;  
 
-	for (unsigned int i = 0; i < piece->pickup->getTemplate()->subpulls.size(); ++i)
+	for (unsigned int i = 0; i < piece->pickup->getTemplate()->subtemps.size(); ++i)
 	{
-		SubpickupTemplate* sp = piece->pickup->getTemplate()->subpulls[i];
+		SubpickupTemplate* sp = piece->pickup->getTemplate()->subtemps[i];
 		Point ll, ur;
 
 		switch (sp->orientation)
@@ -82,10 +82,10 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		// If the shift button is down, fill in the entire group
 		if (event->keyboardModifiers() & 0x02000000)
 		{
-			int group = piece->pickup->getTemplate()->subpulls[i]->group;
-			for (unsigned int j = 0; j < piece->pickup->getTemplate()->subpulls.size(); ++j)
+			int group = piece->pickup->getTemplate()->subtemps[i]->group;
+			for (unsigned int j = 0; j < piece->pickup->getTemplate()->subtemps.size(); ++j)
 			{
-				if (piece->pickup->getTemplate()->subpulls[j]->group == group)
+				if (piece->pickup->getTemplate()->subtemps[j]->group == group)
 					piece->pickup->subplans[j] = droppedPlan;
 			}
 		}
@@ -116,7 +116,7 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 	pen.setWidth(3);
 	painter.setPen(pen);
 	
-	for (unsigned int i = 0; i < piece->pickup->getTemplate()->subpulls.size(); ++i)
+	for (unsigned int i = 0; i < piece->pickup->getTemplate()->subtemps.size(); ++i)
 	{
 		if (piece->pickup->subplans[i]->isBase)
 		{
@@ -132,7 +132,7 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 		}
 		painter.setPen(pen);
 
-		SubpickupTemplate* sp = piece->pickup->getTemplate()->subpulls[i];
+		SubpickupTemplate* sp = piece->pickup->getTemplate()->subtemps[i];
                 Point ll;
 		float rWidth, rHeight;
                 switch (sp->orientation)

@@ -31,7 +31,7 @@ PickupTemplate :: PickupTemplate(int t)
 			break;
 	}
 
-	computeSubpulls();
+	computeSubtemps();
 }
 
 PickupTemplate* PickupTemplate :: copy()
@@ -43,16 +43,16 @@ PickupTemplate* PickupTemplate :: copy()
 	{
 		c->parameterValues.push_back(this->parameterValues[i]);
 	}
-	c->computeSubpulls();
+	c->computeSubtemps();
 
 	return c;
 }
 
-void PickupTemplate :: computeSubpulls()
+void PickupTemplate :: computeSubtemps()
 {
-	for (unsigned int i = 0; i < subpulls.size(); ++i)
-		delete subpulls[i];
-	subpulls.clear();
+	for (unsigned int i = 0; i < subtemps.size(); ++i)
+		delete subtemps[i];
+	subtemps.clear();
 
 	Point p;
 	float width;
@@ -67,14 +67,14 @@ void PickupTemplate :: computeSubpulls()
 			{
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = -0.99;
-				subpulls.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.99, width - 0.001, 
+				subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.99, width - 0.001, 
 					CIRCLE_SHAPE, 0));
 			}
 			for (int i = 0; i < parameterValues[0]; ++i)
 			{
 				p.x = 1.0 - width / 2;
 				p.y = -0.99 + width / 2 + width * i;
-				subpulls.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, 0.4, width - 0.001, 
+				subtemps.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, 0.4, width - 0.001, 
 					SQUARE_SHAPE, 1));
 			}
 			break;
@@ -86,7 +86,7 @@ void PickupTemplate :: computeSubpulls()
 				{
 					p.x = -1.0 + width / 2 + width * i;
 					p.y = -1.0 + width / 2 + width * j;
-					subpulls.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, 0.4,
+					subtemps.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, 0.4,
 						width - 0.01, SQUARE_SHAPE, 0));
 				}
 			}
@@ -98,7 +98,7 @@ void PickupTemplate :: computeSubpulls()
 			{
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = -0.99;
-				subpulls.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.99, width - 0.001, 
+				subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.99, width - 0.001, 
 					SQUARE_SHAPE, 0));
 			}
 			break;
@@ -118,7 +118,7 @@ int PickupTemplate :: getParameter(int param)
 void PickupTemplate :: setParameter(int param, int newValue)
 {
 	parameterValues[param] = newValue;
-	computeSubpulls();
+	computeSubtemps();
 }
 
 

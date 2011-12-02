@@ -44,7 +44,7 @@ void MainWindow :: seedEverything()
 
 	for (int i = FIRST_PICKUP_TEMPLATE; i <= LAST_PICKUP_TEMPLATE; ++i)
 	{
-		pieceEditorPlan->pickup->setTemplate(new PickupTemplate(i));
+		pieceEditorPiece->pickup->setTemplate(new PickupTemplate(i));
 		emit someDataChanged();
 		PickupTemplateLibraryWidget *ptlw = new PickupTemplateLibraryWidget(
 			pickupPlanEditorViewWidget->getPixmap().scaled(100, 100), i);
@@ -78,9 +78,9 @@ void MainWindow :: initializeRandomPiece()
 	pullPlanEditorPlan->setTemplate(new PullTemplate(qrand() % (LAST_PULL_TEMPLATE - 3) + 3, 
 		(qrand() % 50 + 25) / 100.0));
 	pullPlanEditorPlan->subplans.clear();
-	for (unsigned int i = 0; i < pullPlanEditorPlan->getTemplate()->subpulls.size(); ++i)
+	for (unsigned int i = 0; i < pullPlanEditorPlan->getTemplate()->subtemps.size(); ++i)
 	{
-                switch (pullPlanEditorPlan->getTemplate()->subpulls[i].shape)
+                switch (pullPlanEditorPlan->getTemplate()->subtemps[i].shape)
                 {
                         case CIRCLE_SHAPE:
                                 pullPlanEditorPlan->subplans.push_back(
@@ -98,17 +98,17 @@ void MainWindow :: initializeRandomPiece()
 		
 	// Setup piece
 	editorStack->setCurrentIndex(PIECE_MODE); // end in pull plan mode
-	pieceEditorPlan->setTemplate(new PieceTemplate(qrand() % (LAST_PIECE_TEMPLATE - FIRST_PIECE_TEMPLATE + 1) + 1));
-	for (unsigned int i = 0; i < pieceEditorPlan->getTemplate()->parameterValues.size(); ++i)
+	pieceEditorPiece->setTemplate(new PieceTemplate(qrand() % (LAST_PIECE_TEMPLATE - FIRST_PIECE_TEMPLATE + 1) + 1));
+	for (unsigned int i = 0; i < pieceEditorPiece->getTemplate()->parameterValues.size(); ++i)
 	{
-		pieceEditorPlan->getTemplate()->parameterValues[i] = qrand() % 100;
+		pieceEditorPiece->getTemplate()->parameterValues[i] = qrand() % 100;
 	}
-	pieceEditorPlan->pickup->setTemplate(new PickupTemplate(VERTICALS_TEMPLATE));
-	pieceEditorPlan->pickup->getTemplate()->setParameter(0, 14 + qrand() % 20); // set number of subpulls
-	pieceEditorPlan->pickup->subplans.clear();
-	for (unsigned int i = 0; i < pieceEditorPlan->pickup->getTemplate()->subpulls.size(); ++i)
+	pieceEditorPiece->pickup->setTemplate(new PickupTemplate(VERTICALS_TEMPLATE));
+	pieceEditorPiece->pickup->getTemplate()->setParameter(0, 14 + qrand() % 20); // set number of subpulls
+	pieceEditorPiece->pickup->subplans.clear();
+	for (unsigned int i = 0; i < pieceEditorPiece->pickup->getTemplate()->subtemps.size(); ++i)
 	{
-		pieceEditorPlan->pickup->subplans.push_back(pullPlanEditorPlan);
+		pieceEditorPiece->pickup->subplans.push_back(pullPlanEditorPlan);
 	}
 	emit someDataChanged();
 }
@@ -117,7 +117,7 @@ void MainWindow :: unhighlightAllPlanLibraryWidgets(bool setupDone)
 {
 	highlightPlanLibraryWidgets(colorEditorPlanLibraryWidget,false,setupDone);
 	highlightPlanLibraryWidgets(pullPlanEditorPlanLibraryWidget,false,setupDone);
-	highlightPlanLibraryWidgets(pieceEditorPlanLibraryWidget,false,setupDone);
+	highlightPlanLibraryWidgets(pieceEditorPieceLibraryWidget,false,setupDone);
 }
 
 
@@ -156,10 +156,10 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	}
 	else if (plw != NULL)
 	{
-		//pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
+		//pieceEditorPieceLibraryWidget->graphicsEffect()->setEnabled(false);
 		unhighlightAllPlanLibraryWidgets(setupDone);
-		pieceEditorPlanLibraryWidget = plw;
-		pieceEditorPlan = plw->getPiece();
+		pieceEditorPieceLibraryWidget = plw;
+		pieceEditorPiece = plw->getPiece();
 		editorStack->setCurrentIndex(PIECE_MODE);
 		emit someDataChanged();
 	}
@@ -170,12 +170,12 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	}
 	else if (pktlw != NULL)
 	{
-		if (pktlw->getPickupTemplateType() != pieceEditorPlan->pickup->getTemplate()->type)
+		if (pktlw->getPickupTemplateType() != pieceEditorPiece->pickup->getTemplate()->type)
 		{
-			pieceEditorPlan->pickup->setTemplate(new PickupTemplate(pktlw->getPickupTemplateType()));
-			pickupPlanEditorViewWidget->setPiece(pieceEditorPlan);
-			pickupTemplateParameter1Label->setText(pieceEditorPlan->pickup->getTemplate()->getParameterName(0));
-			pickupTemplateParameter1SpinBox->setValue(pieceEditorPlan->pickup->getTemplate()->getParameter(0));
+			pieceEditorPiece->pickup->setTemplate(new PickupTemplate(pktlw->getPickupTemplateType()));
+			pickupPlanEditorViewWidget->setPiece(pieceEditorPiece);
+			pickupTemplateParameter1Label->setText(pieceEditorPiece->pickup->getTemplate()->getParameterName(0));
+			pickupTemplateParameter1SpinBox->setValue(pieceEditorPiece->pickup->getTemplate()->getParameter(0));
 			emit someDataChanged();
 		}
 	}
@@ -333,11 +333,11 @@ void MainWindow :: setupPieceEditor()
 	pieceEditorPage = new QWidget(editorStack);
 	QHBoxLayout* piecePageLayout = new QHBoxLayout(pieceEditorPage);
 	pieceEditorPage->setLayout(piecePageLayout);
-	pieceEditorPlan = new Piece(TUMBLER_TEMPLATE);
+	pieceEditorPiece = new Piece(TUMBLER_TEMPLATE);
 
 	QVBoxLayout* leftLayout = new QVBoxLayout(pieceEditorPage);
 	piecePageLayout->addLayout(leftLayout);
-	pickupPlanEditorViewWidget = new PickupPlanEditorViewWidget(pieceEditorPlan, model, pieceEditorPage);
+	pickupPlanEditorViewWidget = new PickupPlanEditorViewWidget(pieceEditorPiece, model, pieceEditorPage);
 	leftLayout->addWidget(pickupPlanEditorViewWidget);
 
 	// Setup pickup template scrolling library
@@ -355,7 +355,7 @@ void MainWindow :: setupPieceEditor()
 	pickupTemplateLibraryScrollArea->setFixedHeight(130);
 	leftLayout->addWidget(pickupTemplateLibraryScrollArea, 0);
 
-	pickupTemplateParameter1Label = new QLabel(pieceEditorPlan->pickup->getTemplate()->getParameterName(0));
+	pickupTemplateParameter1Label = new QLabel(pieceEditorPiece->pickup->getTemplate()->getParameterName(0));
 	pickupTemplateParameter1SpinBox = new QSpinBox(pieceEditorPage);
 	pickupTemplateParameter1SpinBox->setRange(6, 40);
 	pickupTemplateParameter1SpinBox->setSingleStep(1);
@@ -374,9 +374,9 @@ void MainWindow :: setupPieceEditor()
 
 	QPixmap pixmap(100, 100);
 	pixmap.fill(Qt::white);
-	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(pixmap, pixmap, pieceEditorPlan);
-	//pieceEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
-	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 2);
+	pieceEditorPieceLibraryWidget = new PieceLibraryWidget(pixmap, pixmap, pieceEditorPiece);
+	//pieceEditorPieceLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
+	tableGridLayout->addWidget(pieceEditorPieceLibraryWidget, pieceCount, 2);
 	++pieceCount;
 
 	pieceTemplateComboBox = new QComboBox(pieceEditorPage);
@@ -385,7 +385,7 @@ void MainWindow :: setupPieceEditor()
 	pieceTemplateComboBox->addItem("Vase");
 	leftLayout->addWidget(pieceTemplateComboBox, 0);
 
-	pieceTemplateParameter1Label = new QLabel(pieceEditorPlan->getTemplate()->parameterNames[0]);
+	pieceTemplateParameter1Label = new QLabel(pieceEditorPiece->getTemplate()->parameterNames[0]);
 	pieceTemplateParameter1Slider = new QSlider(Qt::Horizontal, pieceEditorPage);
 	pieceTemplateParameter1Slider->setRange(0, 100);
 	pieceTemplateParameter1Slider->setTickPosition(QSlider::TicksBothSides);
@@ -396,7 +396,7 @@ void MainWindow :: setupPieceEditor()
 	pieceParameter1Layout->addWidget(pieceTemplateParameter1Label);
 	pieceParameter1Layout->addWidget(pieceTemplateParameter1Slider);
 
-	pieceTemplateParameter2Label = new QLabel(pieceEditorPlan->getTemplate()->parameterNames[1]);
+	pieceTemplateParameter2Label = new QLabel(pieceEditorPiece->getTemplate()->parameterNames[1]);
 	pieceTemplateParameter2Slider = new QSlider(Qt::Horizontal, pieceEditorPage);
 	pieceTemplateParameter2Slider->setRange(0, 100);
 	pieceTemplateParameter2Slider->setTickPosition(QSlider::TicksBothSides);
@@ -614,9 +614,9 @@ void MainWindow :: pieceTemplateParameterSlider2Changed(int)
 {
 	int value = pieceTemplateParameter2Slider->sliderPosition();
 
-	if (value == pieceEditorPlan->getTemplate()->parameterValues[1])
+	if (value == pieceEditorPiece->getTemplate()->parameterValues[1])
 		return;
-	pieceEditorPlan->getTemplate()->parameterValues[1] = value;
+	pieceEditorPiece->getTemplate()->parameterValues[1] = value;
 	someDataChanged();
 }
 
@@ -624,9 +624,9 @@ void MainWindow :: pieceTemplateParameterSlider1Changed(int)
 {
 	int value = pieceTemplateParameter1Slider->sliderPosition();
 
-	if (value == pieceEditorPlan->getTemplate()->parameterValues[0])
+	if (value == pieceEditorPiece->getTemplate()->parameterValues[0])
 		return;
-	pieceEditorPlan->getTemplate()->parameterValues[0] = value;
+	pieceEditorPiece->getTemplate()->parameterValues[0] = value;
 	someDataChanged();
 }
 
@@ -634,11 +634,11 @@ void MainWindow :: pickupTemplateParameter1SpinBoxChanged(int)
 {
 	int value = pickupTemplateParameter1SpinBox->value();
 
-	if (value == pieceEditorPlan->pickup->getTemplate()->getParameter(0))
+	if (value == pieceEditorPiece->pickup->getTemplate()->getParameter(0))
 		return;
 
-	pieceEditorPlan->pickup->getTemplate()->setParameter(0, value);
-	pieceEditorPlan->pickup->setTemplate(pieceEditorPlan->pickup->getTemplate()); // just push changes through
+	pieceEditorPiece->pickup->getTemplate()->setParameter(0, value);
+	pieceEditorPiece->pickup->setTemplate(pieceEditorPiece->pickup->getTemplate()); // just push changes through
 	someDataChanged();
 }
 
@@ -658,17 +658,17 @@ void MainWindow :: pullPlanTwistSliderChanged(int)
 
 void MainWindow :: newPiece()
 {
-	pieceEditorPlan = pieceEditorPlan->copy();
+	pieceEditorPiece = pieceEditorPiece->copy();
 
 	unhighlightAllPlanLibraryWidgets(setupDone);
 	QPixmap pixmap(100, 100);
 	pixmap.fill(Qt::white);
-	pieceEditorPlanLibraryWidget = new PieceLibraryWidget(pixmap, pixmap, pieceEditorPlan);
-	pieceEditorPlan->setLibraryWidget(pieceEditorPlanLibraryWidget);
-	tableGridLayout->addWidget(pieceEditorPlanLibraryWidget, pieceCount, 2);
+	pieceEditorPieceLibraryWidget = new PieceLibraryWidget(pixmap, pixmap, pieceEditorPiece);
+	pieceEditorPiece->setLibraryWidget(pieceEditorPieceLibraryWidget);
+	tableGridLayout->addWidget(pieceEditorPieceLibraryWidget, pieceCount, 2);
 	++pieceCount;
 
-	pickupPlanEditorViewWidget->setPiece(pieceEditorPlan);
+	pickupPlanEditorViewWidget->setPiece(pieceEditorPiece);
 
 	// Load up the right editor
 	editorStack->setCurrentIndex(PIECE_MODE);
@@ -802,7 +802,7 @@ void MainWindow :: highlightPlanLibraryWidgets(PieceLibraryWidget* plw,bool high
 
 	if (plw->graphicsEffect()->isEnabled()==highlight)
 		return;
-	if (plw == pieceEditorPlanLibraryWidget && editorStack->currentIndex() == PIECE_MODE)
+	if (plw == pieceEditorPieceLibraryWidget && editorStack->currentIndex() == PIECE_MODE)
 		((QGraphicsHighlightEffect*) plw->graphicsEffect())->setActiveMain(true);
 	else
 		((QGraphicsHighlightEffect*) plw->graphicsEffect())->setActiveMain(false);
@@ -839,12 +839,12 @@ void MainWindow :: updateLibrary()
 {
 	//highlightPlanLibraryWidgets(colorEditorPlanLibraryWidget,false,setupDone);
 	//highlightPlanLibraryWidgets(pullPlanEditorPlanLibraryWidget,false,setupDone);
-	//highlightPlanLibraryWidgets(pieceEditorPlanLibraryWidget,false,setupDone);
+	//highlightPlanLibraryWidgets(pieceEditorPieceLibraryWidget,false,setupDone);
 	unhighlightAllPlanLibraryWidgets(setupDone);
 
 	colorEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 	pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
-	pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
+	pieceEditorPieceLibraryWidget->graphicsEffect()->setEnabled(false);
 
 	switch (editorStack->currentIndex())
 	{
@@ -860,11 +860,11 @@ void MainWindow :: updateLibrary()
 			highlightPlanLibraryWidgets(pullPlanEditorPlanLibraryWidget,true,setupDone);
 			break;
 		case PIECE_MODE:
-			pieceEditorPlanLibraryWidget->updatePixmaps(
+			pieceEditorPieceLibraryWidget->updatePixmaps(
 				QPixmap::fromImage(pieceNiceViewWidget->renderImage()).scaled(100, 100),
 				QPixmap::fromImage(pieceNiceViewWidget->renderImage()).scaled(100, 100));
-			highlightPlanLibraryWidgets(pieceEditorPlanLibraryWidget,true,setupDone);
-			//pieceEditorPlanLibraryWidget->graphicsEffect()->setEnabled(true);
+			highlightPlanLibraryWidgets(pieceEditorPieceLibraryWidget,true,setupDone);
+			//pieceEditorPieceLibraryWidget->graphicsEffect()->setEnabled(true);
 			break;
 	}
 }
@@ -872,21 +872,21 @@ void MainWindow :: updateLibrary()
 void MainWindow :: updatePieceEditor()
 {
 	// update pickup stuff
-	int value = pieceEditorPlan->pickup->getTemplate()->getParameter(0);
+	int value = pieceEditorPiece->pickup->getTemplate()->getParameter(0);
 	pickupTemplateParameter1SpinBox->setValue(value);
-	pickupPlanEditorViewWidget->setPiece(pieceEditorPlan);
+	pickupPlanEditorViewWidget->setPiece(pieceEditorPiece);
 
 	// update piece stuff
-	Geometry* geometry = model->getGeometry(pieceEditorPlan);
+	Geometry* geometry = model->getGeometry(pieceEditorPiece);
 	pieceNiceViewWidget->setCameraMode(PIECE_MODE);
 	pieceNiceViewWidget->setGeometry(geometry);
 	if (writeRawCheckBox->checkState() == Qt::Checked)
 		geometry->save_raw_file("./cane.raw");
-	pieceTemplateComboBox->setCurrentIndex(pieceEditorPlan->getTemplate()->type-1);
-	pieceTemplateParameter1Label->setText(pieceEditorPlan->getTemplate()->parameterNames[0]);
-	pieceTemplateParameter1Slider->setSliderPosition(pieceEditorPlan->getTemplate()->parameterValues[0]);
-	pieceTemplateParameter2Label->setText(pieceEditorPlan->getTemplate()->parameterNames[1]);
-	pieceTemplateParameter2Slider->setSliderPosition(pieceEditorPlan->getTemplate()->parameterValues[1]);
+	pieceTemplateComboBox->setCurrentIndex(pieceEditorPiece->getTemplate()->type-1);
+	pieceTemplateParameter1Label->setText(pieceEditorPiece->getTemplate()->parameterNames[0]);
+	pieceTemplateParameter1Slider->setSliderPosition(pieceEditorPiece->getTemplate()->parameterValues[0]);
+	pieceTemplateParameter2Label->setText(pieceEditorPiece->getTemplate()->parameterNames[1]);
+	pieceTemplateParameter2Slider->setSliderPosition(pieceEditorPiece->getTemplate()->parameterValues[1]);
 }
 
 void MainWindow :: updateColorEditor()
@@ -921,11 +921,11 @@ void MainWindow :: updatePullPlanEditor()
 
 void MainWindow :: pieceTemplateComboBoxChanged(int newIndex)
 {
-	if (newIndex+1 != pieceEditorPlan->getTemplate()->type)
+	if (newIndex+1 != pieceEditorPiece->getTemplate()->type)
 	{
-		pieceEditorPlan->setTemplate(new PieceTemplate(newIndex+1));
-		pieceTemplateParameter1Label->setText(pieceEditorPlan->getTemplate()->parameterNames[0]);
-		pieceTemplateParameter2Label->setText(pieceEditorPlan->getTemplate()->parameterNames[1]);
+		pieceEditorPiece->setTemplate(new PieceTemplate(newIndex+1));
+		pieceTemplateParameter1Label->setText(pieceEditorPiece->getTemplate()->parameterNames[0]);
+		pieceTemplateParameter2Label->setText(pieceEditorPiece->getTemplate()->parameterNames[1]);
 		emit someDataChanged();
 	}
 }

@@ -65,7 +65,7 @@ float Mesher :: computeTotalCaneLength(PickupPlan* plan)
 	float total = 0.0;
 	for (unsigned int i = 0; i < plan->subplans.size(); ++i)
 	{
-		total += computeTotalCaneLength(plan->subplans[i]) * plan->getTemplate()->subpulls[i]->length / 2.0;
+		total += computeTotalCaneLength(plan->subplans[i]) * plan->getTemplate()->subtemps[i]->length / 2.0;
 	}
 	return total;
 }
@@ -93,7 +93,7 @@ void Mesher :: applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentP
 
 void Mesher :: applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int subplan)
 {
-	SubpullTemplate* subTemp = &(parentNode->getTemplate()->subpulls[subplan]);
+	SubpullTemplate* subTemp = &(parentNode->getTemplate()->subtemps[subplan]);
 	Point locationInParent = subTemp->location;
 	float diameter = subTemp->diameter;
 
@@ -500,7 +500,7 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPla
 		ancestors->clear();
 		ancestorIndices->clear();
 		generateMesh(plan->subplans[i], geometry, ancestors, ancestorIndices, 0.0, 
-			plan->getTemplate()->subpulls[i]->length / 2.0, true, i); 
+			plan->getTemplate()->subtemps[i]->length / 2.0, true, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
 		{
@@ -512,7 +512,7 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPla
 				for (uint32_t v = subpullGroup->vertex_begin; 
 					v < subpullGroup->vertex_begin + subpullGroup->vertex_size; ++v)
 				{
-					applyPickupTransform(&(geometry->vertices[v]), plan->getTemplate()->subpulls[i]);
+					applyPickupTransform(&(geometry->vertices[v]), plan->getTemplate()->subtemps[i]);
 				}
 			}
 		}
