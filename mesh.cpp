@@ -72,7 +72,7 @@ float Mesher :: computeTotalCaneLength(PickupPlan* plan)
 
 float Mesher :: computeTotalCaneLength(PullPlan* plan)
 {
-	if (plan->isBase)
+	if (plan->getTemplate()->isBase())
 		return 1.0;
 	
 	float total = 0.0;
@@ -569,7 +569,7 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*
 	// Make recursive calls depending on the type of the current node
 	ancestors->push_back(plan);
 
-	if (plan->isBase)
+	if (plan->getTemplate()->isBase())
 	{
 		if (groupIndex == -1)
 			passGroupIndex = 0;

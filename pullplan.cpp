@@ -1,12 +1,11 @@
 
 #include "pullplan.h"
 
-PullPlan :: PullPlan(int pullTemplate, bool isBase, Color* color)
+PullPlan :: PullPlan(int pullTemplate, Color* color)
 {
 	// initialize all the variables
-	this->pullTemplate = new PullTemplate(pullTemplate, 0.0);
+	this->pullTemplate = new PullTemplate(pullTemplate);
 	this->color = color;
-	this->isBase = isBase;
 	this->twist = 0.0;
 	this->libraryWidget = NULL;
 	this->colorLibraryWidget = NULL;
@@ -48,10 +47,10 @@ void PullPlan :: setTemplate(PullTemplate* newTemplate)
 		switch (newTemplate->subtemps[i].shape)
 		{
 			case CIRCLE_SHAPE:
-				subplans.push_back(new PullPlan(CIRCLE_BASE_TEMPLATE, true, color));
+				subplans.push_back(new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color));
 				break;
 			case SQUARE_SHAPE:
-				subplans.push_back(new PullPlan(SQUARE_BASE_TEMPLATE, true, color));
+				subplans.push_back(new PullPlan(SQUARE_BASE_PULL_TEMPLATE, color));
 				break;
 		}
 	}

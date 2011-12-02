@@ -14,7 +14,7 @@
 #include "model.h"
 #include "coloreditorviewwidget.h"
 #include "pullplan.h"
-#include "pullplaneditorviewwidget.h"
+#include "pullplaneditorwidget.h"
 #include "pickupplan.h"
 #include "pickupplaneditorviewwidget.h"
 #include "piece.h"
@@ -48,7 +48,6 @@ class MainWindow : public QMainWindow
 		void setupPieceSubeditor2(QVBoxLayout* layout);
 		void setupConnections();
 		void updateColorEditor();
-		void updatePullPlanEditor();
 		void updatePickupPlanEditor();
 		void updatePieceEditor();
 		void updateLibrary();
@@ -61,7 +60,6 @@ class MainWindow : public QMainWindow
 
 		// Variables
 		NiceViewWidget* colorBarNiceViewWidget;
-		NiceViewWidget* pullPlanNiceViewWidget;
 		NiceViewWidget* pieceNiceViewWidget;
 		QLabel* pieceTemplateParameter1Label;
 		QLabel* pieceTemplateParameter2Label;
@@ -75,15 +73,12 @@ class MainWindow : public QMainWindow
 		int pieceCount;
 		int colorBarCount;
 		bool setupDone;
-		QButtonGroup* pullTemplateShapeButtonGroup;
 		QPoint dragStartPosition;
 		QStackedWidget* editorStack; //editorStack.currentIndex() gives with mode
 		QWidget* emptyEditorPage;
 		QWidget* colorEditorPage;
-		QWidget* pullPlanEditorPage;
 		QWidget* pieceEditorPage;
 		PullPlan* colorEditorPlan;
-		PullPlan* pullPlanEditorPlan;
 		Piece* pieceEditorPiece;
 		ColorBarLibraryWidget* colorEditorPlanLibraryWidget;
 		PullPlanLibraryWidget* pullPlanEditorPlanLibraryWidget;
@@ -93,13 +88,10 @@ class MainWindow : public QMainWindow
 		QHBoxLayout* centralLayout;
 		QComboBox* pieceTemplateComboBox;
 		ColorEditorViewWidget* colorEditorViewWidget;
-		PullPlanEditorViewWidget* pullPlanEditorViewWidget;
+		PullPlanEditorWidget* pullPlanEditorWidget;
 		PickupPlanEditorViewWidget* pickupPlanEditorViewWidget;
 		QHBoxLayout* pullTemplateLibraryLayout;
 		QHBoxLayout* pickupTemplateLibraryLayout;
-		QSlider* pullPlanTwistSlider;
-		QSlider* pullTemplateCasingThicknessSlider;
-		QSpinBox* pullPlanTwistSpin;
 		QPushButton* newColorBarButton;
 		QPushButton* newPullPlanButton;
 		QPushButton* newPieceButton;
@@ -110,10 +102,6 @@ class MainWindow : public QMainWindow
 		void newColorBar();
 		void newPullPlan();
 		void newPiece();
-		void pullPlanTwistSliderChanged(int p);
-		void pullTemplateCasingThicknessSliderChanged(int p);
-		void pullPlanTwistSpinChanged(int p);
-		void pullTemplateShapeButtonGroupChanged(int);
 		void pieceTemplateParameterSlider1Changed(int);
 		void pieceTemplateParameterSlider2Changed(int);
 		void pickupTemplateParameter1SpinBoxChanged(int);

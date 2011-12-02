@@ -2,7 +2,7 @@
 #include "pullplanlibrarywidget.h"
 #include "qgraphicshighlighteffect.h"
 
-PullPlanLibraryWidget :: PullPlanLibraryWidget(QPixmap niceViewPixmap, QPixmap editorPixmap, PullPlan* plan,
+PullPlanLibraryWidget :: PullPlanLibraryWidget(PullPlan* plan,
 	QWidget* parent): QLabel(parent)
 {
 	setBackgroundRole(QPalette::Base);
@@ -10,11 +10,14 @@ PullPlanLibraryWidget :: PullPlanLibraryWidget(QPixmap niceViewPixmap, QPixmap e
 	setScaledContents(true);
 	setMouseTracking(true);
 
-	setPixmap(niceViewPixmap);
+        QPixmap pixmap(100, 100);
+        pixmap.fill(Qt::white);
+
+	setPixmap(pixmap);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 	this->pullPlan = plan;
 	this->pullPlan->setLibraryWidget(this);
-	this->editorPixmap = editorPixmap;
+	this->editorPixmap = pixmap;
 
 	setGraphicsEffect(new QGraphicsHighlightEffect());
 	connect(graphicsEffect(),SIGNAL(enabledChanged(bool)),graphicsEffect(),SLOT(setStyleSheet(bool)));

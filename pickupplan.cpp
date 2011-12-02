@@ -33,10 +33,10 @@ void PickupPlan :: setTemplate(PickupTemplate* newTemplate)
 		switch (this->pickupTemplate->subtemps[i]->shape)
 		{
 			case CIRCLE_SHAPE:
-				this->subplans.push_back(new PullPlan(CIRCLE_BASE_TEMPLATE, true, color));
+				this->subplans.push_back(new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color));
 				break;
 			case SQUARE_SHAPE:
-				this->subplans.push_back(new PullPlan(SQUARE_BASE_TEMPLATE, true, color));
+				this->subplans.push_back(new PullPlan(SQUARE_BASE_PULL_TEMPLATE, color));
 				break;
 		}
         }

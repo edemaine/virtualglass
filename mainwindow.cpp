@@ -29,14 +29,7 @@ void MainWindow :: seedEverything()
 	// Load pull template types
 	editorStack->setCurrentIndex(PULLPLAN_MODE);
 	emit someDataChanged();
-	for (int i = FIRST_PULL_TEMPLATE; i <= LAST_PULL_TEMPLATE; ++i)
-	{
-		pullPlanEditorPlan->setTemplate(new PullTemplate(i, 0.0));
-		pullPlanEditorViewWidget->repaint();
-		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
-			QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100), i);
-		pullTemplateLibraryLayout->addWidget(ptlw);
-	}
+	pullPlanEditorWidget->seedTemplates();
 
 	// Load pickup template types
 	editorStack->setCurrentIndex(PIECE_MODE);
@@ -51,7 +44,7 @@ void MainWindow :: seedEverything()
 		pickupTemplateLibraryLayout->addWidget(ptlw);
 	}
 
-	initializeRandomPiece();
+	//initializeRandomPiece();
 
 	editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
 	emit someDataChanged();
@@ -75,25 +68,11 @@ void MainWindow :: initializeRandomPiece()
 
 	// Setup cane 
 	editorStack->setCurrentIndex(PULLPLAN_MODE); // end in pull plan mode
-	pullPlanEditorPlan->setTemplate(new PullTemplate(qrand() % (LAST_PULL_TEMPLATE - 3) + 3, 
-		(qrand() % 50 + 25) / 100.0));
-	pullPlanEditorPlan->subplans.clear();
-	for (unsigned int i = 0; i < pullPlanEditorPlan->getTemplate()->subtemps.size(); ++i)
-	{
-                switch (pullPlanEditorPlan->getTemplate()->subtemps[i].shape)
-                {
-                        case CIRCLE_SHAPE:
-                                pullPlanEditorPlan->subplans.push_back(
-					new PullPlan(CIRCLE_BASE_TEMPLATE, true, opaqueColor));
-                                break;
-                        case SQUARE_SHAPE:
-                                pullPlanEditorPlan->subplans.push_back(
-					new PullPlan(SQUARE_BASE_TEMPLATE, true, opaqueColor));
-                                break;
-                }
-	}
-	pullPlanEditorPlan->color = transparentColor;
-	pullPlanEditorPlan->twist = 20;
+	pullPlanEditorWidget->setPlanTemplate(new PullTemplate(qrand() % (LAST_PULL_TEMPLATE - 3) + 3));
+	pullPlanEditorWidget->setPlanTemplateCasingThickness((qrand() % 50 + 25) / 100.0);
+	pullPlanEditorWidget->setPlanSubplans(opaqueColor);
+	pullPlanEditorWidget->setPlanColor(transparentColor);
+	pullPlanEditorWidget->setPlanTwist(20);
 	emit someDataChanged();
 		
 	// Setup piece
@@ -108,7 +87,7 @@ void MainWindow :: initializeRandomPiece()
 	pieceEditorPiece->pickup->subplans.clear();
 	for (unsigned int i = 0; i < pieceEditorPiece->pickup->getTemplate()->subtemps.size(); ++i)
 	{
-		pieceEditorPiece->pickup->subplans.push_back(pullPlanEditorPlan);
+		pieceEditorPiece->pickup->subplans.push_back(pullPlanEditorWidget->getPlan());
 	}
 	emit someDataChanged();
 }
@@ -149,10 +128,8 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 		//pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 		unhighlightAllPlanLibraryWidgets(setupDone);
 		pullPlanEditorPlanLibraryWidget = plplw;
-		pullPlanEditorPlan = plplw->getPullPlan();
-		pullPlanEditorViewWidget->setPullPlan(pullPlanEditorPlan);
+		pullPlanEditorWidget->setPlan(plplw->getPullPlan());
 		editorStack->setCurrentIndex(PULLPLAN_MODE);
-		emit someDataChanged();
 	}
 	else if (plw != NULL)
 	{
@@ -165,8 +142,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	}
 	else if (ptlw != NULL)
 	{
-		pullPlanEditorPlan->setTemplate(new PullTemplate(ptlw->getPullTemplateType(), 0.0));
-		emit someDataChanged();
+		pullPlanEditorWidget->setPlanTemplate(new PullTemplate(ptlw->getPullTemplateType()));
 	}
 	else if (pktlw != NULL)
 	{
@@ -248,14 +224,9 @@ void MainWindow :: setupConnections()
 	connect(newColorBarButton, SIGNAL(pressed()), this, SLOT(newColorBar()));
 	connect(colorEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 
-	connect(pullTemplateShapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(pullTemplateShapeButtonGroupChanged(int)));
 	connect(newPullPlanButton, SIGNAL(pressed()), this, SLOT(newPullPlan()));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
-	connect(pullPlanEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
-	connect(pullTemplateCasingThicknessSlider, SIGNAL(valueChanged(int)),
-		this, SLOT(pullTemplateCasingThicknessSliderChanged(int)));
-	connect(pullPlanTwistSlider, SIGNAL(valueChanged(int)), this, SLOT(pullPlanTwistSliderChanged(int)));
-	connect(pullPlanTwistSpin, SIGNAL(valueChanged(int)), this, SLOT(pullPlanTwistSpinChanged(int)));
+	connect(pullPlanEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 
 	connect(pickupPlanEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(pickupTemplateParameter1SpinBox, SIGNAL(valueChanged(int)),
@@ -322,7 +293,7 @@ void MainWindow :: setupEditors()
 	editorStack->addWidget(colorEditorPage);
 
 	setupPullPlanEditor();
-	editorStack->addWidget(pullPlanEditorPage);
+	editorStack->addWidget(pullPlanEditorWidget);
 
 	setupPieceEditor();
 	editorStack->addWidget(pieceEditorPage);
@@ -341,12 +312,12 @@ void MainWindow :: setupPieceEditor()
 	leftLayout->addWidget(pickupPlanEditorViewWidget);
 
 	// Setup pickup template scrolling library
-	QWidget* pickupTemplateLibraryWidget = new QWidget(centralWidget);
+	QWidget* pickupTemplateLibraryWidget = new QWidget(pieceEditorPage);
 	pickupTemplateLibraryLayout = new QHBoxLayout(pickupTemplateLibraryWidget);
 	pickupTemplateLibraryLayout->setSpacing(10);
-	pickupTemplateLibraryWidget->setLayout(pullTemplateLibraryLayout);
+	pickupTemplateLibraryWidget->setLayout(pickupTemplateLibraryLayout);
 
-	QScrollArea* pickupTemplateLibraryScrollArea = new QScrollArea(centralWidget);
+	QScrollArea* pickupTemplateLibraryScrollArea = new QScrollArea(pieceEditorPage);
 	pickupTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
 	pickupTemplateLibraryScrollArea->setWidget(pickupTemplateLibraryWidget);
 	pickupTemplateLibraryScrollArea->setWidgetResizable(true);
@@ -412,7 +383,7 @@ void MainWindow :: setupPieceEditor()
 	pieceEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	leftLayout->addWidget(pieceEditorDescriptionLabel, 0);
 
-	QVBoxLayout* niceViewLayout = new QVBoxLayout(pullPlanEditorPage);
+	QVBoxLayout* niceViewLayout = new QVBoxLayout(pieceEditorPage);
 	piecePageLayout->addLayout(niceViewLayout, 1);
 		pieceNiceViewWidget = new NiceViewWidget(pieceEditorPage);
 		niceViewLayout->addWidget(pieceNiceViewWidget, 10);
@@ -423,7 +394,7 @@ void MainWindow :: setupPieceEditor()
 
 	// Little description for the editor
 	QLabel* niceViewDescriptionLabel = new QLabel("3D view of piece.",
-		pullPlanEditorPage);
+		pieceEditorPage);
 	niceViewDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	niceViewLayout->addWidget(niceViewDescriptionLabel, 0);
 }
@@ -443,7 +414,7 @@ void MainWindow :: setupColorEditor()
 {
 	Color* color = new Color();
 	color->r = color->g = color->b = color->a = 1.0;
-	colorEditorPlan = new PullPlan(CIRCLE_SHAPE, true, color);
+	colorEditorPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
 	QPixmap pixmap(100, 100);
 	pixmap.fill(Qt::white);
 	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(pixmap,colorEditorPlan);
@@ -472,142 +443,11 @@ void MainWindow :: setupColorEditor()
 void MainWindow :: setupPullPlanEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
-	Color* color = new Color();
-	color->r = color->g = color->b = 1.0;
-	color->a = 0.0;
-	pullPlanEditorPlan = new PullPlan(CIRCLE_BASE_TEMPLATE, false, color);
-
-	QPixmap pixmap(100, 100);
-	pixmap.fill(Qt::white);
-	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(pixmap, pixmap, pullPlanEditorPlan);
-	//pullPlanEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
+	pullPlanEditorWidget = new PullPlanEditorWidget(editorStack);
+	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(pullPlanEditorWidget->getPlan());
+	pullPlanEditorWidget->updateLibraryWidgetPixmaps(pullPlanEditorPlanLibraryWidget);
 	tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
 	++pullPlanCount;
-
-	// Setup the editor layout
-	pullPlanEditorPage = new QWidget(editorStack);
-	QHBoxLayout* pageLayout = new QHBoxLayout(pullPlanEditorPage);
-	pullPlanEditorPage->setLayout(pageLayout);
-	QVBoxLayout* editorLayout = new QVBoxLayout(pullPlanEditorPage);
-	pageLayout->addLayout(editorLayout);
-
-	pullPlanEditorViewWidget = new PullPlanEditorViewWidget(pullPlanEditorPlan, pullPlanEditorPage);
-	editorLayout->addWidget(pullPlanEditorViewWidget, 10);
-
-	// Setup pull template scrolling library
-	QWidget* pullTemplateLibraryWidget = new QWidget(centralWidget);
-	pullTemplateLibraryLayout = new QHBoxLayout(pullTemplateLibraryWidget);
-	pullTemplateLibraryLayout->setSpacing(10);
-	pullTemplateLibraryWidget->setLayout(pullTemplateLibraryLayout);
-
-	QScrollArea* pullTemplateLibraryScrollArea = new QScrollArea(centralWidget);
-	pullTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
-	pullTemplateLibraryScrollArea->setWidget(pullTemplateLibraryWidget);
-	pullTemplateLibraryScrollArea->setWidgetResizable(true);
-	pullTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	pullTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	pullTemplateLibraryScrollArea->setFixedHeight(130);
-	editorLayout->addWidget(pullTemplateLibraryScrollArea, 0);
-
-	QLabel* casingLabel = new QLabel("Casing:");
-	QCheckBox* circleCheckBox = new QCheckBox("Circle");
-	QCheckBox* squareCheckBox = new QCheckBox("Square");
-	pullTemplateShapeButtonGroup = new QButtonGroup();
-	pullTemplateShapeButtonGroup->addButton(circleCheckBox, 1);
-	pullTemplateShapeButtonGroup->addButton(squareCheckBox, 2);
-	QHBoxLayout* pullTemplateShapeLayout = new QHBoxLayout(pullPlanEditorPage);
-	pullTemplateShapeLayout->addWidget(casingLabel);
-	pullTemplateShapeLayout->addWidget(circleCheckBox);
-	pullTemplateShapeLayout->addWidget(squareCheckBox);
-	editorLayout->addLayout(pullTemplateShapeLayout, 0);
-
-	// Casing thickness slider stuff
-	QHBoxLayout* casingThicknessLayout = new QHBoxLayout(pullPlanEditorPage);
-	editorLayout->addLayout(casingThicknessLayout);
-
-	QLabel* casingLabel1 = new QLabel("Casing Thickness:", pullPlanEditorPage);
-	casingThicknessLayout->addWidget(casingLabel1, 0);
-
-	QLabel* casingLabel2 = new QLabel("0%", pullPlanEditorPage);
-	casingThicknessLayout->addWidget(casingLabel2, 0);
-
-	pullTemplateCasingThicknessSlider = new QSlider(Qt::Horizontal, pullPlanEditorPage);
-	pullTemplateCasingThicknessSlider->setRange(0, 100);
-	//pullTemplateCasingThicknessSlider->setTickInterval(0.1);
-	pullTemplateCasingThicknessSlider->setTickPosition(QSlider::TicksBothSides);
-	pullTemplateCasingThicknessSlider->setSliderPosition(0);
-	casingThicknessLayout->addWidget(pullTemplateCasingThicknessSlider, 10);
-
-	QLabel* casingLabel3 = new QLabel("100%", pullPlanEditorPage);
-	casingThicknessLayout->addWidget(casingLabel3, 0);
-
-	// Twist slider stuff
-	QHBoxLayout* twistLayout = new QHBoxLayout(pullPlanEditorPage);
-	editorLayout->addLayout(twistLayout);
-
-	QLabel* twistLabel1 = new QLabel("Twist:", pullPlanEditorPage);
-	twistLayout->addWidget(twistLabel1);
-
-	pullPlanTwistSpin = new QSpinBox(pullPlanEditorPage);
-	pullPlanTwistSpin->setRange(-50, 50);
-	pullPlanTwistSpin->setSingleStep(1);
-	twistLayout->addWidget(pullPlanTwistSpin, 1);
-
-	QLabel* twistLabel2 = new QLabel("-50", pullPlanEditorPage);
-	twistLayout->addWidget(twistLabel2);
-
-	pullPlanTwistSlider = new QSlider(Qt::Horizontal, pullPlanEditorPage);
-	pullPlanTwistSlider->setRange(-50, 50);
-	pullPlanTwistSlider->setTickInterval(5);
-	pullPlanTwistSlider->setTickPosition(QSlider::TicksBothSides);
-	pullPlanTwistSlider->setSliderPosition(0);
-	twistLayout->addWidget(pullPlanTwistSlider, 10);
-
-	QLabel* twistLabel3 = new QLabel("50", pullPlanEditorPage);
-	twistLayout->addWidget(twistLabel3);
-
-	// Little description for the editor
-	QLabel* descriptionLabel = new QLabel("Cane editor - drag color or other canes into the cane to edit.",
-		pullPlanEditorPage);
-	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	editorLayout->addWidget(descriptionLabel, 0);
-
-	QVBoxLayout* niceViewLayout = new QVBoxLayout(pullPlanEditorPage);
-	pageLayout->addLayout(niceViewLayout, 1);
-	pullPlanNiceViewWidget = new NiceViewWidget(pullPlanEditorPage);
-		niceViewLayout->addWidget(pullPlanNiceViewWidget, 10);
-
-	// Little description for the editor
-	QLabel* niceViewDescriptionLabel = new QLabel("3D view of cane.",
-		pullPlanEditorPage);
-	niceViewDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	niceViewLayout->addWidget(niceViewDescriptionLabel, 0);
-}
-
-void MainWindow :: pullTemplateShapeButtonGroupChanged(int)
-{
-	switch (pullTemplateShapeButtonGroup->checkedId())
-	{
-		case 1:
-			if (pullPlanEditorPlan->getTemplate()->getShape() == CIRCLE_SHAPE)
-				return;
-			pullPlanEditorPlan->getTemplate()->setShape(CIRCLE_SHAPE);
-			emit someDataChanged();
-			break;
-		case 2:
-			if (pullPlanEditorPlan->getTemplate()->getShape() == SQUARE_SHAPE)
-				return;
-			pullPlanEditorPlan->getTemplate()->setShape(SQUARE_SHAPE);
-			emit someDataChanged();
-			break;
-	}
-}
-
-void MainWindow :: pullPlanTwistSpinChanged(int)
-{
-	int tick = pullPlanTwistSpin->value();
-	pullPlanTwistSlider->setSliderPosition(tick);
-	someDataChanged();
 }
 
 void MainWindow :: pieceTemplateParameterSlider2Changed(int)
@@ -642,20 +482,6 @@ void MainWindow :: pickupTemplateParameter1SpinBoxChanged(int)
 	someDataChanged();
 }
 
-void MainWindow :: pullTemplateCasingThicknessSliderChanged(int)
-{
-	float thickness = pullTemplateCasingThicknessSlider->sliderPosition() / 100.0;
-	pullPlanEditorPlan->getTemplate()->setCasingThickness(thickness);
-	someDataChanged();
-}
-
-void MainWindow :: pullPlanTwistSliderChanged(int)
-{
-	float twist = pullPlanTwistSlider->sliderPosition();
-	pullPlanEditorPlan->twist = twist;
-	someDataChanged();
-}
-
 void MainWindow :: newPiece()
 {
 	pieceEditorPiece = pieceEditorPiece->copy();
@@ -680,7 +506,7 @@ void MainWindow :: newColorBar()
 {
 	Color* newColor = new Color();
 	newColor->r = newColor->g = newColor->b = newColor->a = 1.0;
-	colorEditorPlan = new PullPlan(CIRCLE_SHAPE, true, newColor);
+	colorEditorPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, newColor);
 	//colorEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 	unhighlightAllPlanLibraryWidgets(setupDone);
 	QPixmap pixmap(100, 100);
@@ -702,36 +528,30 @@ void MainWindow :: newColorBar()
 
 void MainWindow :: newPullPlan()
 {
-	PullPlan* oldEditorPlan = pullPlanEditorPlan;
+	PullPlan* oldEditorPlan = pullPlanEditorWidget->getPlan();
 
 	// Create the new plan
-	pullPlanEditorPlan = new PullPlan(oldEditorPlan->getTemplate()->type, oldEditorPlan->isBase, oldEditorPlan->color);
-	pullPlanEditorPlan->getTemplate()->setCasingThickness(oldEditorPlan->getTemplate()->getCasingThickness());
-	pullPlanEditorPlan->twist = oldEditorPlan->twist;
+	PullPlan* newEditorPlan = new PullPlan(oldEditorPlan->getTemplate()->type, oldEditorPlan->color);
+	newEditorPlan->getTemplate()->setCasingThickness(oldEditorPlan->getTemplate()->getCasingThickness());
+	newEditorPlan->twist = oldEditorPlan->twist;
 	for (unsigned int i = 0; i < oldEditorPlan->subplans.size(); ++i)
 	{
-		pullPlanEditorPlan->subplans.push_back(oldEditorPlan->subplans[i]);
+		newEditorPlan->subplans.push_back(oldEditorPlan->subplans[i]);
 	}
 
 	// Create the new library entry
-	//pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 	unhighlightAllPlanLibraryWidgets(setupDone);
-
-	QPixmap pixmap(100, 100);
-	pixmap.fill(Qt::white);
-	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(pixmap, pixmap, pullPlanEditorPlan);
-	//pullPlanEditorPlanLibraryWidget->setGraphicsEffect(new QGraphicsColorizeEffect());
+	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(pullPlanEditorWidget->getPlan());
 	tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
 	++pullPlanCount;
 
 	// Give the new plan to the editor
-	pullPlanEditorViewWidget->setPullPlan(pullPlanEditorPlan);
+	pullPlanEditorWidget->setPlan(newEditorPlan);
 
 	// Load up the right editor
 	editorStack->setCurrentIndex(PULLPLAN_MODE);
 
-	// Trigger GUI updates
-	emit someDataChanged();
+	updateLibrary();
 }
 
 void MainWindow :: highlightPlanLibraryWidgets(ColorBarLibraryWidget* cblw,bool highlight,bool setupDone) {
@@ -822,9 +642,6 @@ void MainWindow :: updateEverything()
 		case COLORBAR_MODE:
 			updateColorEditor();
 			break;
-		case PULLPLAN_MODE:
-			updatePullPlanEditor();
-			break;
 		case PIECE_MODE:
 			updatePieceEditor();
 			break;
@@ -854,9 +671,7 @@ void MainWindow :: updateLibrary()
 			highlightPlanLibraryWidgets(colorEditorPlanLibraryWidget,true,setupDone);
 			break;
 		case PULLPLAN_MODE:
-			pullPlanEditorPlanLibraryWidget->updatePixmaps(
-				QPixmap::fromImage(pullPlanNiceViewWidget->renderImage()).scaled(100, 100),
-				QPixmap::grabWidget(pullPlanEditorViewWidget).scaled(100, 100));
+			pullPlanEditorWidget->updateLibraryWidgetPixmaps(pullPlanEditorPlanLibraryWidget);
 			highlightPlanLibraryWidgets(pullPlanEditorPlanLibraryWidget,true,setupDone);
 			break;
 		case PIECE_MODE:
@@ -894,27 +709,6 @@ void MainWindow :: updateColorEditor()
 	Geometry* geometry = model->getGeometry(colorEditorPlan);
 	colorBarNiceViewWidget->setCameraMode(PULLPLAN_MODE);
 	colorBarNiceViewWidget->setGeometry(geometry);
-	if (writeRawCheckBox->checkState() == Qt::Checked)
-		geometry->save_raw_file("./cane.raw");
-}
-
-void MainWindow :: updatePullPlanEditor()
-{
-	// Only attempt to set the shape if it's defined; it's undefined during loading
-	static_cast<QCheckBox*>(pullTemplateShapeButtonGroup->button(
-		pullPlanEditorPlan->getTemplate()->getShape()))->setCheckState(Qt::Checked);
-
-	int thickness = (int) (pullPlanEditorPlan->getTemplate()->getCasingThickness() * 100);
-	pullTemplateCasingThicknessSlider->setSliderPosition(thickness);
-
-	int twist = pullPlanEditorPlan->twist;
-	pullPlanTwistSlider->setSliderPosition(twist);
-	pullPlanTwistSpin->setValue(twist);
-	pullPlanEditorViewWidget->repaint();
-
-	Geometry* geometry = model->getGeometry(pullPlanEditorPlan);
-	pullPlanNiceViewWidget->setCameraMode(PULLPLAN_MODE);
-	pullPlanNiceViewWidget->setGeometry(geometry);
 	if (writeRawCheckBox->checkState() == Qt::Checked)
 		geometry->save_raw_file("./cane.raw");
 }

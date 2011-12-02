@@ -18,7 +18,7 @@ class PullPlan;
 class PullPlan
 {
 	public:
-		PullPlan(int pullTemplate, bool isBase, Color* color);
+		PullPlan(int pullTemplate, Color* color);
 
 		void setTemplate(PullTemplate* pt);
 		PullTemplate* getTemplate();
@@ -30,7 +30,6 @@ class PullPlan
 
 		vector<PullPlan*> subplans;
 		float twist;
-		bool isBase; // base color pull plan
 		Color* color;
 		const QPixmap* getEditorPixmap();
 		void updatePixmap(QPixmap editorPixmap);

@@ -12,7 +12,6 @@ class PullPlanEditorViewWidget : public QWidget
 	public:
 		PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent=0);
 		void setPullPlan(PullPlan* plan);
-		virtual int heightForWidth(int w);
 	
 	signals:
 		void someDataChanged();

@@ -3,18 +3,10 @@
 
 PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
 {
+	// setup draw widget
 	setAcceptDrops(true);
 	setFixedSize(400, 400);
-	//setMinimumWidth(200);
-	QSizePolicy policy; //(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	policy.setHeightForWidth(true);
-	this->setSizePolicy(policy);
 	this->plan = plan;
-}
-
-int PullPlanEditorViewWidget :: heightForWidth(int w)
-{
-	return w;
 }
 
 void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
@@ -63,10 +55,10 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 				switch (subpull->shape)
 				{
 					case CIRCLE_SHAPE:
-						droppedPlan = new PullPlan(CIRCLE_BASE_TEMPLATE, true, droppedPlan->color);
+						droppedPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, droppedPlan->color);
 						break;
 					case SQUARE_SHAPE:
-						droppedPlan = new PullPlan(SQUARE_BASE_TEMPLATE, true, droppedPlan->color);
+						droppedPlan = new PullPlan(SQUARE_BASE_PULL_TEMPLATE, droppedPlan->color);
 						break;
 				}
 				droppedPlan->setColorLibraryWidget(cblw);
@@ -100,7 +92,8 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	switch (plan->getTemplate()->getShape())
 	{
 		case CIRCLE_SHAPE:
-			distanceFromCenter = sqrt(pow(event->pos().x() - drawSize/2 + 10, 2) + pow(event->pos().y() - drawSize/2 + 10, 2));
+			distanceFromCenter = sqrt(pow(event->pos().x() - drawSize/2 + 10, 2) 
+				+ pow(event->pos().y() - drawSize/2 + 10, 2));
 			if (distanceFromCenter <= drawSize/2)
 			{
 				event->accept();
@@ -110,7 +103,8 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			}
 			break;
 		case SQUARE_SHAPE:
-			if (10 <= event->pos().x() && event->pos().x() <= drawSize && 10 <= event->pos().y() && event->pos().y() <= drawSize)
+			if (10 <= event->pos().x() && event->pos().x() <= drawSize 
+				&& 10 <= event->pos().y() && event->pos().y() <= drawSize)
 			{
 				event->accept();
 				plan->color = droppedPlan->color;
@@ -144,7 +138,7 @@ void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int dr
 
 
 	// If it's a base color, fill region with color
-	if (plan->isBase)
+	if (plan->getTemplate()->isBase())
 	{
 		Color* c = plan->color;
 		painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
@@ -178,7 +172,7 @@ void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int dr
 			break;
 	}
 
-	if (plan->isBase)
+	if (plan->getTemplate()->isBase())
 		return;
 
 	// Recurse

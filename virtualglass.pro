@@ -38,7 +38,7 @@ HEADERS += primitives.h constants.h Vector.hpp \
 	coloreditorviewwidget.h purecolorlibrarywidget.h \
 	mainwindow.h niceviewwidget.h pullplanlibrarywidget.h piecelibrarywidget.h \
 	pulltemplatelibrarywidget.h pickuptemplatelibrarywidget.h \
-	pullplaneditorviewwidget.h colorbarlibrarywidget.h \
+	pullplaneditorviewwidget.h pullplaneditorwidget.h colorbarlibrarywidget.h \
 	controller.h model.h geometry.h mesh.h \ 
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
@@ -101,7 +101,7 @@ SOURCES += main.cpp \
 	model.cpp controller.cpp geometry.cpp mesh.cpp \
 	mainwindow.cpp niceviewwidget.cpp pullplanlibrarywidget.cpp piecelibrarywidget.cpp \
 	pulltemplatelibrarywidget.cpp pickuptemplatelibrarywidget.cpp \
-	pullplaneditorviewwidget.cpp colorbarlibrarywidget.cpp \ 
+	pullplaneditorviewwidget.cpp pullplaneditorwidget.cpp colorbarlibrarywidget.cpp \ 
 
 
 SOURCES += yaml-cpp/src/tag.cpp \
