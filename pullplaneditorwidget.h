@@ -27,6 +27,7 @@ class PullPlanEditorWidget : public QWidget
 		void setPlanTwist(int t);
 		void setPlanTemplate(PullTemplate* t);
 		void setPlanTemplateCasingThickness(float t);
+		void mousePressEvent(QMouseEvent*);
 
 	signals:
 		void someDataChanged();

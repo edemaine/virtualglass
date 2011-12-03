@@ -44,7 +44,7 @@ void MainWindow :: seedEverything()
 		pickupTemplateLibraryLayout->addWidget(ptlw);
 	}
 
-	//initializeRandomPiece();
+	initializeRandomPiece();
 
 	editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
 	emit someDataChanged();
@@ -102,7 +102,8 @@ void MainWindow :: unhighlightAllPlanLibraryWidgets(bool setupDone)
 
 void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 {
-	if (!((event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance()))
+	// If this is a drag and not the end of a click, don't process (dropEvent will do it instead)
+	if ((event->pos() - dragStartPosition).manhattanLength() > QApplication::startDragDistance())
 	{
 		return;
 	}
@@ -110,7 +111,6 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
 	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
-	PullTemplateLibraryWidget* ptlw = dynamic_cast<PullTemplateLibraryWidget*>(childAt(event->pos()));
 	PickupTemplateLibraryWidget* pktlw = dynamic_cast<PickupTemplateLibraryWidget*>(childAt(event->pos()));
 
 	if (cblw != NULL)
@@ -139,10 +139,6 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 		pieceEditorPiece = plw->getPiece();
 		editorStack->setCurrentIndex(PIECE_MODE);
 		emit someDataChanged();
-	}
-	else if (ptlw != NULL)
-	{
-		pullPlanEditorWidget->setPlanTemplate(new PullTemplate(ptlw->getPullTemplateType()));
 	}
 	else if (pktlw != NULL)
 	{

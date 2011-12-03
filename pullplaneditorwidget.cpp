@@ -30,6 +30,20 @@ void PullPlanEditorWidget :: updateEverything()
         twistSpin->setValue(twist);
         viewWidget->repaint();
 
+	unsigned int i = 0;
+	for (; i < plan->getTemplate()->getParameterCount(); ++i)
+	{
+		paramLabels[i]->setText(plan->getTemplate()->getParameterName(i));
+		paramLabels[i]->show();
+		paramSpins[i]->setValue(plan->getTemplate()->getParameter(i));
+		paramSpins[i]->show();
+	}
+	for (; i < paramLabels.size(); ++i)
+	{
+		paramLabels[i]->hide();
+		paramSpins[i]->hide();
+	}
+
         geometry.clear();
         mesher.generateMesh(plan, &geometry);
         niceViewWidget->repaint();
@@ -150,6 +164,17 @@ void PullPlanEditorWidget :: setupLayout()
         niceViewLayout->addWidget(niceViewDescriptionLabel, 0);
 }
 
+void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
+{
+	PullTemplateLibraryWidget* ptlw = dynamic_cast<PullTemplateLibraryWidget*>(childAt(event->pos()));
+
+	if (ptlw != NULL)
+        {
+                plan->setTemplate(new PullTemplate(ptlw->getPullTemplateType()));
+		emit someDataChanged();
+        }
+}
+
 void PullPlanEditorWidget :: setupConnections()
 {
         connect(shapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(shapeButtonGroupChanged(int)));
@@ -236,19 +261,6 @@ void PullPlanEditorWidget :: setPlanTwist(int twist)
 void PullPlanEditorWidget :: setPlanTemplate(PullTemplate* t)
 {
 	plan->setTemplate(t);
-	unsigned int i = 0;
-	for (; i < t->getParameterCount(); ++i)
-	{
-		paramLabels[i]->setText(t->getParameterName(i));
-		paramLabels[i]->show();
-		paramSpins[i]->setValue(t->getParameter(i));
-		paramSpins[i]->show();
-	}
-	for (; i < paramLabels.size(); ++i)
-	{
-		paramLabels[i]->hide();
-		paramSpins[i]->hide();
-	}
 	emit someDataChanged();	
 }
 
