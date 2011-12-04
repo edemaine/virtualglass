@@ -13,6 +13,7 @@ ColorBarLibraryWidget :: ColorBarLibraryWidget(PullPlan* plan, QWidget* parent):
         pixmap.fill(Qt::white);
 	setPixmap(pixmap);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
+        this->editorPixmap = pixmap;
 
 	this->pullPlan = plan;
 	this->pullPlan->setColorLibraryWidget(this);
@@ -21,17 +22,15 @@ ColorBarLibraryWidget :: ColorBarLibraryWidget(PullPlan* plan, QWidget* parent):
 	connect(graphicsEffect(),SIGNAL(styleSheetString(QString)),this,SLOT(setStyleSheet(QString)));
 }
 
-/*void ColorBarLibraryWidget :: setStyleSheet(bool enableBorder)
+const QPixmap* ColorBarLibraryWidget :: getEditorPixmap()
 {
-	if (enableBorder)
-		emit styleSheetString("border: 1px solid "+((QGraphicsHighlightEffect*)graphicsEffect())->color().name()+";");
-	else
-		emit styleSheetString("border: 0px solid "+((QGraphicsHighlightEffect*)graphicsEffect())->color().name()+";");
-}*/
+        return &(this->editorPixmap);
+}
 
-void ColorBarLibraryWidget :: updatePixmap(QPixmap niceViewPixmap)
+void ColorBarLibraryWidget :: updatePixmaps(QPixmap niceViewPixmap, QPixmap editorPixmap)
 {
 	setPixmap(niceViewPixmap);
+	this->editorPixmap = editorPixmap;
 }
 
 PullPlan* ColorBarLibraryWidget :: getPullPlan()
@@ -43,3 +42,6 @@ void ColorBarLibraryWidget :: addPullPlan(PullPlan *plan)
 {
 	pullPlans.push_back(plan);
 }
+
+
+

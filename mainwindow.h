@@ -53,10 +53,10 @@ class MainWindow : public QMainWindow
 		void updateLibrary();
 		void initializeRandomPiece();
 
-		void highlightPlanLibraryWidgets(ColorBarLibraryWidget* cblw,bool highlight,bool setupDone);
-		void highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw,bool highlight,bool setupDone);
-		void highlightPlanLibraryWidgets(PieceLibraryWidget* plw,bool highlight,bool setupDone);
-		void unhighlightAllPlanLibraryWidgets(bool setupDone);
+		void highlightPlanLibraryWidgets(ColorBarLibraryWidget* cblw, bool highlight);
+		void highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw, bool highlight);
+		void highlightPlanLibraryWidgets(PieceLibraryWidget* plw, bool highlight);
+		void unhighlightAllPlanLibraryWidgets();
 
 		// Variables
 		NiceViewWidget* colorBarNiceViewWidget;
@@ -67,7 +67,6 @@ class MainWindow : public QMainWindow
 		QSpinBox* pickupTemplateParameter1SpinBox;
 		QSlider* pieceTemplateParameter1Slider;
 		QSlider* pieceTemplateParameter2Slider;
-		QCheckBox* writeRawCheckBox;
 		QGridLayout* tableGridLayout;
 		int pullPlanCount;
 		int pieceCount;
@@ -105,7 +104,6 @@ class MainWindow : public QMainWindow
 		void pieceTemplateParameterSlider1Changed(int);
 		void pieceTemplateParameterSlider2Changed(int);
 		void pickupTemplateParameter1SpinBoxChanged(int);
-		void writeRawCheckBoxChanged(int);
 };
 
 

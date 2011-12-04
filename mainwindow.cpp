@@ -17,6 +17,8 @@ MainWindow :: MainWindow(Model* model)
 
 	setWindowTitle(tr("Virtual Glass"));
 	move(0, 0);
+
+	setupDone = true;
 }
 
 void MainWindow :: seedEverything()
@@ -48,8 +50,6 @@ void MainWindow :: seedEverything()
 
 	editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
 	emit someDataChanged();
-
-	setupDone = true;
 }
 
 // Too weird to live; too strange to die
@@ -92,11 +92,11 @@ void MainWindow :: initializeRandomPiece()
 	emit someDataChanged();
 }
 
-void MainWindow :: unhighlightAllPlanLibraryWidgets(bool setupDone)
+void MainWindow :: unhighlightAllPlanLibraryWidgets()
 {
-	highlightPlanLibraryWidgets(colorEditorPlanLibraryWidget,false,setupDone);
-	highlightPlanLibraryWidgets(pullPlanEditorPlanLibraryWidget,false,setupDone);
-	highlightPlanLibraryWidgets(pieceEditorPieceLibraryWidget,false,setupDone);
+	highlightPlanLibraryWidgets(colorEditorPlanLibraryWidget, false);
+	highlightPlanLibraryWidgets(pullPlanEditorPlanLibraryWidget, false);
+	highlightPlanLibraryWidgets(pieceEditorPieceLibraryWidget, false);
 }
 
 void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
@@ -114,7 +114,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 
 	if (cblw != NULL)
 	{
-		unhighlightAllPlanLibraryWidgets(setupDone);
+		unhighlightAllPlanLibraryWidgets();
 		colorEditorPlanLibraryWidget = cblw;
 		colorEditorPlan = cblw->getPullPlan();
 		colorEditorViewWidget->setPullPlan(colorEditorPlan);
@@ -123,7 +123,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	}
 	else if (plplw != NULL)
 	{
-		unhighlightAllPlanLibraryWidgets(setupDone);
+		unhighlightAllPlanLibraryWidgets();
 		pullPlanEditorPlanLibraryWidget = plplw;
 		pullPlanEditorWidget->setPlan(plplw->getPullPlan());
 		editorStack->setCurrentIndex(PULLPLAN_MODE);
@@ -131,8 +131,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	}
 	else if (plw != NULL)
 	{
-		//pieceEditorPieceLibraryWidget->graphicsEffect()->setEnabled(false);
-		unhighlightAllPlanLibraryWidgets(setupDone);
+		unhighlightAllPlanLibraryWidgets();
 		pieceEditorPieceLibraryWidget = plw;
 		pieceEditorPiece = plw->getPiece();
 		editorStack->setCurrentIndex(PIECE_MODE);
@@ -176,7 +175,7 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	if (cblw != NULL)
 	{
 		plan = cblw->getPullPlan();
-		pixmap = *cblw->pixmap();
+		pixmap = *cblw->getEditorPixmap();
 		type = COLOR_BAR_MIME;
 	}
 	else if (plplw != NULL)
@@ -232,13 +231,6 @@ void MainWindow :: setupConnections()
 		this, SLOT(pieceTemplateParameterSlider1Changed(int)));
 	connect(pieceTemplateParameter2Slider, SIGNAL(valueChanged(int)),
 		this, SLOT(pieceTemplateParameterSlider2Changed(int)));
-
-	connect(writeRawCheckBox, SIGNAL(stateChanged(int)), this, SLOT(writeRawCheckBoxChanged(int)));
-}
-
-void MainWindow :: writeRawCheckBoxChanged(int)
-{
-	updatePieceEditor(); // cause geometry to be updated correctly
 }
 
 void MainWindow :: setupTable()
@@ -381,10 +373,6 @@ void MainWindow :: setupPieceEditor()
 		pieceNiceViewWidget = new NiceViewWidget(pieceEditorPage);
 		niceViewLayout->addWidget(pieceNiceViewWidget, 10);
 
-	writeRawCheckBox = new QCheckBox("Write .raw file", pieceEditorPage);
-		writeRawCheckBox->setCheckState(Qt::Unchecked);
-		niceViewLayout->addWidget(writeRawCheckBox, 0);
-
 	// Little description for the editor
 	QLabel* niceViewDescriptionLabel = new QLabel("3D view of piece.",
 		pieceEditorPage);
@@ -477,7 +465,7 @@ void MainWindow :: newPiece()
 {
 	pieceEditorPiece = pieceEditorPiece->copy();
 
-	unhighlightAllPlanLibraryWidgets(setupDone);
+	unhighlightAllPlanLibraryWidgets();
 	pieceEditorPieceLibraryWidget = new PieceLibraryWidget(pieceEditorPiece);
 	pieceEditorPiece->setLibraryWidget(pieceEditorPieceLibraryWidget);
 	tableGridLayout->addWidget(pieceEditorPieceLibraryWidget, pieceCount, 2);
@@ -503,7 +491,7 @@ void MainWindow :: newColorBar()
 	colorEditorPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
 
 	// Create the new library entry
-	unhighlightAllPlanLibraryWidgets(setupDone);
+	unhighlightAllPlanLibraryWidgets();
 	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(colorEditorPlan);
 	tableGridLayout->addWidget(colorEditorPlanLibraryWidget, colorBarCount, 0);
 	++colorBarCount;
@@ -532,7 +520,7 @@ void MainWindow :: newPullPlan()
 	}
 
 	// Create the new library entry
-	unhighlightAllPlanLibraryWidgets(setupDone);
+	unhighlightAllPlanLibraryWidgets();
 	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(newEditorPlan);
 	tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
 	++pullPlanCount;
@@ -548,12 +536,11 @@ void MainWindow :: newPullPlan()
 	emit someDataChanged();
 }
 
-void MainWindow :: highlightPlanLibraryWidgets(ColorBarLibraryWidget* cblw,bool highlight,bool setupDone) {
-
-	if (!setupDone)
-		return;
-
-	if (cblw==NULL || cblw->graphicsEffect()==NULL)
+void MainWindow :: highlightPlanLibraryWidgets(ColorBarLibraryWidget* cblw, bool highlight) 
+{
+	if (!setupDone 
+		|| cblw == NULL 
+		|| cblw->graphicsEffect() == NULL)
 		return;
 
 	if (cblw == colorEditorPlanLibraryWidget && editorStack->currentIndex() == COLORBAR_MODE)
@@ -562,21 +549,14 @@ void MainWindow :: highlightPlanLibraryWidgets(ColorBarLibraryWidget* cblw,bool 
 		((QGraphicsHighlightEffect*) cblw->graphicsEffect())->setActiveMain(false);
 
 	cblw->graphicsEffect()->setEnabled(highlight);
-
-	for (unsigned int j = 0; j < cblw->getPullPlan()->subplans.size(); j++)
-	{
-		if (cblw->getPullPlan()->subplans[j])
-			highlightPlanLibraryWidgets(cblw->getPullPlan()->subplans[j]->getColorLibraryWidget(),highlight,true);
-	}
 }
 
 
-void MainWindow :: highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw, bool highlight, bool setupDone) {
-
-	if (!setupDone)
-		return;
-
-	if (!plplw || !plplw->graphicsEffect())
+void MainWindow :: highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw, bool highlight) 
+{
+	if (!setupDone
+		|| !plplw 
+		|| !plplw->graphicsEffect())
 		return;
 
 	plplw->graphicsEffect()->setEnabled(highlight);
@@ -587,23 +567,13 @@ void MainWindow :: highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw, boo
 		((QGraphicsHighlightEffect*) plplw->graphicsEffect())->setActiveMain(false);
 
 	plplw->graphicsEffect()->setEnabled(highlight);
-
-	for (unsigned int j = 0; j < plplw->getPullPlan()->subplans.size(); j++)
-	{
-		if (plplw->getPullPlan()->subplans[j])
-		{
-			highlightPlanLibraryWidgets(plplw->getPullPlan()->subplans.at(j)->getColorLibraryWidget(),highlight,true);
-			highlightPlanLibraryWidgets(plplw->getPullPlan()->subplans.at(j)->getLibraryWidget(),highlight,true);
-		}
-	}
 }
 
-void MainWindow :: highlightPlanLibraryWidgets(PieceLibraryWidget* plw,bool highlight,bool setupDone) {
-
-	if (!setupDone)
-		return;
-
-	if (!plw || !plw->graphicsEffect())
+void MainWindow :: highlightPlanLibraryWidgets(PieceLibraryWidget* plw, bool highlight) 
+{
+	if (!setupDone
+		|| !plw 
+		|| !plw->graphicsEffect())
 		return;
 
 	if (plw == pieceEditorPieceLibraryWidget && editorStack->currentIndex() == PIECE_MODE)
@@ -634,7 +604,7 @@ void MainWindow :: updateEverything()
 
 void MainWindow :: updateLibrary()
 {
-	unhighlightAllPlanLibraryWidgets(setupDone);
+	unhighlightAllPlanLibraryWidgets();
 
 	colorEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
 	pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
@@ -643,19 +613,27 @@ void MainWindow :: updateLibrary()
 	switch (editorStack->currentIndex())
 	{
 		case COLORBAR_MODE:
-			colorEditorPlanLibraryWidget->updatePixmap(
-				QPixmap::fromImage(colorBarNiceViewWidget->renderImage()).scaled(100, 100));
-			highlightPlanLibraryWidgets(colorEditorPlanLibraryWidget,true,setupDone);
+		{
+			QPixmap editorPixmap(100, 100);
+			editorPixmap.fill(QColor(255*colorEditorPlan->color->r, 
+				255*colorEditorPlan->color->g,
+				255*colorEditorPlan->color->b,
+				255*colorEditorPlan->color->a));
+			colorEditorPlanLibraryWidget->updatePixmaps(
+				QPixmap::fromImage(colorBarNiceViewWidget->renderImage()).scaled(100, 100),
+				editorPixmap);
+			highlightPlanLibraryWidgets(colorEditorPlanLibraryWidget, true);
 			break;
+		}
 		case PULLPLAN_MODE:
 			pullPlanEditorWidget->updateLibraryWidgetPixmaps(pullPlanEditorPlanLibraryWidget);
-			highlightPlanLibraryWidgets(pullPlanEditorPlanLibraryWidget,true,setupDone);
+			highlightPlanLibraryWidgets(pullPlanEditorPlanLibraryWidget, true);
 			break;
 		case PIECE_MODE:
 			pieceEditorPieceLibraryWidget->updatePixmaps(
 				QPixmap::fromImage(pieceNiceViewWidget->renderImage()).scaled(100, 100),
 				QPixmap::fromImage(pieceNiceViewWidget->renderImage()).scaled(100, 100));
-			highlightPlanLibraryWidgets(pieceEditorPieceLibraryWidget,true,setupDone);
+			highlightPlanLibraryWidgets(pieceEditorPieceLibraryWidget, true);
 			break;
 	}
 }
@@ -671,8 +649,6 @@ void MainWindow :: updatePieceEditor()
 	Geometry* geometry = model->getGeometry(pieceEditorPiece);
 	pieceNiceViewWidget->setCameraMode(PIECE_MODE);
 	pieceNiceViewWidget->setGeometry(geometry);
-	if (writeRawCheckBox->checkState() == Qt::Checked)
-		geometry->save_raw_file("./cane.raw");
 	pieceTemplateComboBox->setCurrentIndex(pieceEditorPiece->getTemplate()->type-1);
 	pieceTemplateParameter1Label->setText(pieceEditorPiece->getTemplate()->parameterNames[0]);
 	pieceTemplateParameter1Slider->setSliderPosition(pieceEditorPiece->getTemplate()->parameterValues[0]);
@@ -685,8 +661,6 @@ void MainWindow :: updateColorEditor()
 	Geometry* geometry = model->getGeometry(colorEditorPlan);
 	colorBarNiceViewWidget->setCameraMode(PULLPLAN_MODE);
 	colorBarNiceViewWidget->setGeometry(geometry);
-	if (writeRawCheckBox->checkState() == Qt::Checked)
-		geometry->save_raw_file("./cane.raw");
 }
 
 void MainWindow :: pieceTemplateComboBoxChanged(int newIndex)
