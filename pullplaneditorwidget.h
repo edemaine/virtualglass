@@ -32,12 +32,14 @@ class PullPlanEditorWidget : public QWidget
 	signals:
 		void someDataChanged();
 
+	public slots:
+		void updateEverything();
+
 	private slots:
 		void shapeButtonGroupChanged(int);
 		void twistSpinChanged(int);
 		void twistSliderChanged(int);
 		void casingThicknessSliderChanged(int);
-		void updateEverything();
 		void paramSpinChanged(int);
 
 	private:

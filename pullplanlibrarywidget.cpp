@@ -20,8 +20,8 @@ PullPlanLibraryWidget :: PullPlanLibraryWidget(PullPlan* plan,
 	this->editorPixmap = pixmap;
 
 	setGraphicsEffect(new QGraphicsHighlightEffect());
-	connect(graphicsEffect(),SIGNAL(enabledChanged(bool)),graphicsEffect(),SLOT(setStyleSheet(bool)));
-	connect(graphicsEffect(),SIGNAL(styleSheetString(QString)),this,SLOT(setStyleSheet(QString)));
+	connect(graphicsEffect(), SIGNAL(enabledChanged(bool)), graphicsEffect(), SLOT(setStyleSheet(bool)));
+	connect(graphicsEffect(), SIGNAL(styleSheetString(QString)), this, SLOT(setStyleSheet(QString)));
 }
 
 PullPlan* PullPlanLibraryWidget :: getPullPlan()

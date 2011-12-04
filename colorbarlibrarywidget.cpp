@@ -2,14 +2,16 @@
 #include "colorbarlibrarywidget.h"
 #include "qgraphicshighlighteffect.h"
 
-ColorBarLibraryWidget :: ColorBarLibraryWidget(QPixmap niceViewPixmap, PullPlan* plan, QWidget* parent): QLabel(parent)
+ColorBarLibraryWidget :: ColorBarLibraryWidget(PullPlan* plan, QWidget* parent): QLabel(parent)
 {
 	setBackgroundRole(QPalette::Base);
 	setFixedSize(100, 100);
 	setScaledContents(true);
 	setMouseTracking(true);
 
-	setPixmap(niceViewPixmap);
+        QPixmap pixmap(100, 100);
+        pixmap.fill(Qt::white);
+	setPixmap(pixmap);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
 	this->pullPlan = plan;

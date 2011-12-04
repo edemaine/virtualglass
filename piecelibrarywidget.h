@@ -12,7 +12,7 @@ class PieceLibraryWidget : public QLabel
 	Q_OBJECT
 
 	public:
-		PieceLibraryWidget(QPixmap niceViewPixmap, QPixmap editorPixmap, Piece* piece, QWidget* parent=0);
+		PieceLibraryWidget(Piece* piece, QWidget* parent=0);
 		Piece* getPiece();
 		const QPixmap* getEditorPixmap();
 		void updatePixmaps(QPixmap niceViewPixmap, QPixmap editorPixmap);
