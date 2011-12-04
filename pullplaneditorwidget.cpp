@@ -28,6 +28,8 @@ void PullPlanEditorWidget :: updateEverything()
         int twist = plan->twist;
         twistSlider->setSliderPosition(twist);
         twistSpin->setValue(twist);
+
+	viewWidget->setPullPlan(plan);
         viewWidget->repaint();
 
 	unsigned int i = 0;
