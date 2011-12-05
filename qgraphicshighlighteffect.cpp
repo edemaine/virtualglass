@@ -1,15 +1,9 @@
 #include "qgraphicshighlighteffect.h"
 
-/*QGraphicsHighlightEffect::QGraphicsHighlightEffect(QObject *parent) :
-	QGraphicsEffect(parent)
-{
-}*/
-
 QGraphicsHighlightEffect::QGraphicsHighlightEffect( qreal offset ) : QGraphicsEffect(),
 	mColor( 255, 255, 0, 255 ),  // yellow, semi-transparent
 	mOffset( offset, offset )
 {
-	isActive = false;
 }
 
 QRectF QGraphicsHighlightEffect::boundingRectFor( const QRectF &sourceRect) const
@@ -25,13 +19,20 @@ void QGraphicsHighlightEffect :: setStyleSheet(bool enableBorder)
 		emit styleSheetString("border: 0px solid "+color().name()+";");
 }
 
-void QGraphicsHighlightEffect::setActiveMain(bool active)
+void QGraphicsHighlightEffect::setHighlightType(int dependancy)
 {
-	if (!active && this->isActive)
-		mColor = QColor(255,255,0,255);
-	else if (active && !this->isActive)
-		mColor = QColor(0,0,255,255);
-	this->isActive=active;
+	switch (dependancy)
+	{
+		case IS_DEPENDANCY:
+			mColor = QColor(0, 0, 255,255);
+			break;
+		case USES_DEPENDANCY:
+			mColor = QColor(255, 0, 0,255);
+			break;
+		case IS_USED_BY_DEPENDANCY:
+			mColor = QColor(0, 255, 0,255);
+			break;
+	}
 }
 
 void QGraphicsHighlightEffect::draw( QPainter *painter )

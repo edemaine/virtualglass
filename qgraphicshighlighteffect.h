@@ -3,6 +3,7 @@
 
 #include <QGraphicsEffect>
 #include <QtGui>
+#include "constants.h"
 
 class QGraphicsHighlightEffect : public QGraphicsEffect
 {
@@ -15,10 +16,9 @@ public:
 	virtual QRectF boundingRectFor(const QRectF &sourceRect) const;
 	QColor color() const { return mColor;}
 	void setColor(QColor &color) {mColor = color;}
-	void setActiveMain(bool active);
+	void setHighlightType(int dependancy);
 	QPointF offset() const { return mOffset;}
 	void setOffset( QPointF offset ) { mOffset = offset;}
-	bool isActive;
 protected:
 	virtual void draw( QPainter *painter ); // , QGraphicsEffectSource *source );
 private:

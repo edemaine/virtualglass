@@ -11,7 +11,7 @@ MainWindow :: MainWindow(Model* model)
 	this->model = model;
 
 	centralLayout = new QHBoxLayout(centralWidget);
-	setupTable();
+	setupLibrary();
 	setupEditors();
 	setupConnections();
 
@@ -92,11 +92,30 @@ void MainWindow :: initializeRandomPiece()
 	emit someDataChanged();
 }
 
-void MainWindow :: unhighlightAllPlanLibraryWidgets()
+void MainWindow :: unhighlightAllLibraryWidgets()
 {
-	highlightPlanLibraryWidgets(colorEditorPlanLibraryWidget, false);
-	highlightPlanLibraryWidgets(pullPlanEditorPlanLibraryWidget, false);
-	highlightPlanLibraryWidgets(pieceEditorPieceLibraryWidget, false);
+	if (!setupDone)
+		return;
+
+	QLayoutItem* w;
+	for (int j = 0; j < colorBarCount; ++j)
+	{
+		w = tableGridLayout->itemAtPosition(j , 0); 	
+		if(dynamic_cast<QWidgetItem *>(w))       
+			unhighlightLibraryWidget(dynamic_cast<ColorBarLibraryWidget*>(w->widget()));
+	}
+	for (int j = 0; j < pullPlanCount; ++j)
+	{
+		w = tableGridLayout->itemAtPosition(j , 1); 	
+		if(dynamic_cast<QWidgetItem *>(w))       
+			unhighlightLibraryWidget(dynamic_cast<PullPlanLibraryWidget*>(w->widget()));
+	}
+	for (int j = 0; j < pieceCount; ++j)
+	{
+		w = tableGridLayout->itemAtPosition(j , 2); 	
+		if(dynamic_cast<QWidgetItem *>(w))       
+			unhighlightLibraryWidget(dynamic_cast<PieceLibraryWidget*>(w->widget()));
+	}
 }
 
 void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
@@ -114,7 +133,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 
 	if (cblw != NULL)
 	{
-		unhighlightAllPlanLibraryWidgets();
+		unhighlightAllLibraryWidgets();
 		colorEditorPlanLibraryWidget = cblw;
 		colorEditorPlan = cblw->getPullPlan();
 		colorEditorViewWidget->setPullPlan(colorEditorPlan);
@@ -123,7 +142,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	}
 	else if (plplw != NULL)
 	{
-		unhighlightAllPlanLibraryWidgets();
+		unhighlightAllLibraryWidgets();
 		pullPlanEditorPlanLibraryWidget = plplw;
 		pullPlanEditorWidget->setPlan(plplw->getPullPlan());
 		editorStack->setCurrentIndex(PULLPLAN_MODE);
@@ -131,7 +150,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	}
 	else if (plw != NULL)
 	{
-		unhighlightAllPlanLibraryWidgets();
+		unhighlightAllLibraryWidgets();
 		pieceEditorPieceLibraryWidget = plw;
 		pieceEditorPiece = plw->getPiece();
 		editorStack->setCurrentIndex(PIECE_MODE);
@@ -233,7 +252,7 @@ void MainWindow :: setupConnections()
 		this, SLOT(pieceTemplateParameterSlider2Changed(int)));
 }
 
-void MainWindow :: setupTable()
+void MainWindow :: setupLibrary()
 {
 	QVBoxLayout* tableLayout = new QVBoxLayout(centralWidget);
 	centralLayout->addLayout(tableLayout, 1);
@@ -465,7 +484,7 @@ void MainWindow :: newPiece()
 {
 	pieceEditorPiece = pieceEditorPiece->copy();
 
-	unhighlightAllPlanLibraryWidgets();
+	unhighlightAllLibraryWidgets();
 	pieceEditorPieceLibraryWidget = new PieceLibraryWidget(pieceEditorPiece);
 	pieceEditorPiece->setLibraryWidget(pieceEditorPieceLibraryWidget);
 	tableGridLayout->addWidget(pieceEditorPieceLibraryWidget, pieceCount, 2);
@@ -491,7 +510,7 @@ void MainWindow :: newColorBar()
 	colorEditorPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
 
 	// Create the new library entry
-	unhighlightAllPlanLibraryWidgets();
+	unhighlightAllLibraryWidgets();
 	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(colorEditorPlan);
 	tableGridLayout->addWidget(colorEditorPlanLibraryWidget, colorBarCount, 0);
 	++colorBarCount;
@@ -520,7 +539,7 @@ void MainWindow :: newPullPlan()
 	}
 
 	// Create the new library entry
-	unhighlightAllPlanLibraryWidgets();
+	unhighlightAllLibraryWidgets();
 	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(newEditorPlan);
 	tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
 	++pullPlanCount;
@@ -536,52 +555,57 @@ void MainWindow :: newPullPlan()
 	emit someDataChanged();
 }
 
-void MainWindow :: highlightPlanLibraryWidgets(ColorBarLibraryWidget* cblw, bool highlight) 
+
+void MainWindow :: unhighlightLibraryWidget(ColorBarLibraryWidget* w)
 {
-	if (!setupDone 
-		|| cblw == NULL 
-		|| cblw->graphicsEffect() == NULL)
+	if (!setupDone || w == NULL)
+		return;
+	w->graphicsEffect()->setEnabled(false);
+}
+
+void MainWindow :: unhighlightLibraryWidget(PullPlanLibraryWidget* w)
+{
+	if (!setupDone || w == NULL)
+		return;
+	w->graphicsEffect()->setEnabled(false);
+}
+
+void MainWindow :: unhighlightLibraryWidget(PieceLibraryWidget* w)
+{
+	if (!setupDone || w == NULL)
+		return;
+	w->graphicsEffect()->setEnabled(false);
+}
+
+void MainWindow :: highlightLibraryWidget(ColorBarLibraryWidget* w, int dependancy) 
+{
+	if (!setupDone) 
 		return;
 
-	if (cblw == colorEditorPlanLibraryWidget && editorStack->currentIndex() == COLORBAR_MODE)
-		((QGraphicsHighlightEffect*) cblw->graphicsEffect())->setActiveMain(true);
-	else
-		((QGraphicsHighlightEffect*) cblw->graphicsEffect())->setActiveMain(false);
-
-	cblw->graphicsEffect()->setEnabled(highlight);
+	w->graphicsEffect()->setEnabled(false);
+	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(dependancy);
+	w->graphicsEffect()->setEnabled(true);
 }
 
 
-void MainWindow :: highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw, bool highlight) 
+void MainWindow :: highlightLibraryWidget(PullPlanLibraryWidget* w, int dependancy)
 {
-	if (!setupDone
-		|| !plplw 
-		|| !plplw->graphicsEffect())
+	if (!setupDone)
 		return;
 
-	plplw->graphicsEffect()->setEnabled(highlight);
-
-	if (plplw == pullPlanEditorPlanLibraryWidget && editorStack->currentIndex() == PULLPLAN_MODE)
-		((QGraphicsHighlightEffect*) plplw->graphicsEffect())->setActiveMain(true);
-	else
-		((QGraphicsHighlightEffect*) plplw->graphicsEffect())->setActiveMain(false);
-
-	plplw->graphicsEffect()->setEnabled(highlight);
+	w->graphicsEffect()->setEnabled(false);
+	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(dependancy);
+	w->graphicsEffect()->setEnabled(true);
 }
 
-void MainWindow :: highlightPlanLibraryWidgets(PieceLibraryWidget* plw, bool highlight) 
+void MainWindow :: highlightLibraryWidget(PieceLibraryWidget* w, int dependancy) 
 {
-	if (!setupDone
-		|| !plw 
-		|| !plw->graphicsEffect())
+	if (!setupDone)
 		return;
 
-	if (plw == pieceEditorPieceLibraryWidget && editorStack->currentIndex() == PIECE_MODE)
-		((QGraphicsHighlightEffect*) plw->graphicsEffect())->setActiveMain(true);
-	else
-		((QGraphicsHighlightEffect*) plw->graphicsEffect())->setActiveMain(false);
-
-	plw->graphicsEffect()->setEnabled(highlight);
+	w->graphicsEffect()->setEnabled(false);
+	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(dependancy);
+	w->graphicsEffect()->setEnabled(true);
 }
 
 void MainWindow :: updateEverything()
@@ -604,11 +628,7 @@ void MainWindow :: updateEverything()
 
 void MainWindow :: updateLibrary()
 {
-	unhighlightAllPlanLibraryWidgets();
-
-	colorEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
-	pullPlanEditorPlanLibraryWidget->graphicsEffect()->setEnabled(false);
-	pieceEditorPieceLibraryWidget->graphicsEffect()->setEnabled(false);
+	unhighlightAllLibraryWidgets();
 
 	switch (editorStack->currentIndex())
 	{
@@ -622,18 +642,18 @@ void MainWindow :: updateLibrary()
 			colorEditorPlanLibraryWidget->updatePixmaps(
 				QPixmap::fromImage(colorBarNiceViewWidget->renderImage()).scaled(100, 100),
 				editorPixmap);
-			highlightPlanLibraryWidgets(colorEditorPlanLibraryWidget, true);
+			highlightLibraryWidget(colorEditorPlanLibraryWidget, IS_DEPENDANCY);
 			break;
 		}
 		case PULLPLAN_MODE:
 			pullPlanEditorWidget->updateLibraryWidgetPixmaps(pullPlanEditorPlanLibraryWidget);
-			highlightPlanLibraryWidgets(pullPlanEditorPlanLibraryWidget, true);
+			highlightLibraryWidget(pullPlanEditorPlanLibraryWidget, IS_DEPENDANCY);
 			break;
 		case PIECE_MODE:
 			pieceEditorPieceLibraryWidget->updatePixmaps(
 				QPixmap::fromImage(pieceNiceViewWidget->renderImage()).scaled(100, 100),
 				QPixmap::fromImage(pieceNiceViewWidget->renderImage()).scaled(100, 100));
-			highlightPlanLibraryWidgets(pieceEditorPieceLibraryWidget, true);
+			highlightLibraryWidget(pieceEditorPieceLibraryWidget, IS_DEPENDANCY);
 			break;
 	}
 }

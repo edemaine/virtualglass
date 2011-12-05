@@ -38,7 +38,7 @@ class MainWindow : public QMainWindow
 
 	private:
 		// Methods
-		void setupTable();
+		void setupLibrary();
 		void setupEditors();
 		void setupEmptyPaneEditor();
 		void setupColorEditor();
@@ -53,10 +53,13 @@ class MainWindow : public QMainWindow
 		void updateLibrary();
 		void initializeRandomPiece();
 
-		void highlightPlanLibraryWidgets(ColorBarLibraryWidget* cblw, bool highlight);
-		void highlightPlanLibraryWidgets(PullPlanLibraryWidget* plplw, bool highlight);
-		void highlightPlanLibraryWidgets(PieceLibraryWidget* plw, bool highlight);
-		void unhighlightAllPlanLibraryWidgets();
+		void unhighlightLibraryWidget(ColorBarLibraryWidget* w);
+		void unhighlightLibraryWidget(PullPlanLibraryWidget* w);
+		void unhighlightLibraryWidget(PieceLibraryWidget* w);
+		void highlightLibraryWidget(ColorBarLibraryWidget* w, int dependancy);
+		void highlightLibraryWidget(PullPlanLibraryWidget* w, int dependancy);
+		void highlightLibraryWidget(PieceLibraryWidget* w, int dependancy);
+		void unhighlightAllLibraryWidgets();
 
 		// Variables
 		NiceViewWidget* colorBarNiceViewWidget;

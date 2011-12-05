@@ -29,7 +29,7 @@ Piece* PieceLibraryWidget :: getPiece()
 
 void PieceLibraryWidget :: updatePixmaps(QPixmap niceViewPixmap, QPixmap editorPixmap)
 {
-		setPixmap(niceViewPixmap);
+	setPixmap(niceViewPixmap);
 	this->editorPixmap = editorPixmap;
 }
 
