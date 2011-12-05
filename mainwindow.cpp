@@ -68,7 +68,7 @@ void MainWindow :: initializeRandomPiece()
 
 	// Setup cane 
 	editorStack->setCurrentIndex(PULLPLAN_MODE); // end in pull plan mode
-	pullPlanEditorWidget->setPlanTemplate(new PullTemplate(qrand() % (LAST_PULL_TEMPLATE - 3) + 3));
+	pullPlanEditorWidget->setPlanTemplate(new PullTemplate(qrand() % 4 + 4));
 	pullPlanEditorWidget->setPlanTemplateCasingThickness((qrand() % 50 + 25) / 100.0);
 	pullPlanEditorWidget->setPlanSubplans(opaqueColor);
 	pullPlanEditorWidget->setPlanColor(transparentColor);
