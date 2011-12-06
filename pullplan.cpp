@@ -11,6 +11,46 @@ PullPlan :: PullPlan(int pullTemplate, Color* color)
 	this->colorLibraryWidget = NULL;
 }
 
+bool PullPlan :: hasDependencyOn(PullPlan* plan)
+{
+	if (this == plan)
+		return true;
+	if (this->pullTemplate->isBase())
+		return false;
+
+        bool childrenAreDependent = false;
+        for (unsigned int i = 0; i < subplans.size(); ++i)
+        {
+                if (subplans[i]->hasDependencyOn(plan))
+                {
+                        childrenAreDependent = true;
+                        break;
+                }
+        }	
+
+	return childrenAreDependent;
+}
+
+bool PullPlan :: hasDependencyOn(Color* color)
+{
+	if (this->color == color) 
+		return true;
+	if (this->pullTemplate->isBase())
+		return false;
+
+	bool childrenAreDependent = false;
+	for (unsigned int i = 0; i < subplans.size(); ++i)
+	{
+		if (subplans[i]->hasDependencyOn(color))
+		{
+			childrenAreDependent = true;
+			break;
+		}
+	}
+	
+	return childrenAreDependent;
+}
+
 void PullPlan :: setLibraryWidget(PullPlanLibraryWidget* plplw)
 {
 	this->libraryWidget = plplw;

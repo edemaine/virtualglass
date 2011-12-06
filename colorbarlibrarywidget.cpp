@@ -38,10 +38,6 @@ PullPlan* ColorBarLibraryWidget :: getPullPlan()
 	return pullPlan;
 }
 
-void ColorBarLibraryWidget :: addPullPlan(PullPlan *plan)
-{
-	pullPlans.push_back(plan);
-}
 
 
 

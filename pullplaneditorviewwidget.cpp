@@ -62,7 +62,6 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 						break;
 				}
 				droppedPlan->setColorLibraryWidget(cblw);
-				cblw->addPullPlan(droppedPlan);
 			}
 
 			// If the shift button is down, fill in the entire group

@@ -9,6 +9,39 @@ Piece :: Piece(int pickupTemplate)
 	this->pickup = new PickupPlan(VERTICALS_TEMPLATE);
 }
 
+bool Piece :: hasDependencyOn(PullPlan* plan)
+{
+        bool pickupPlansDependOn = false;
+
+        for (unsigned int i = 0; i < this->pickup->subplans.size(); ++i)
+        {
+                if (this->pickup->subplans[i]->hasDependencyOn(plan))
+                {
+                        pickupPlansDependOn = true;
+                        break;
+                }
+        }
+
+        return pickupPlansDependOn;
+}
+
+
+bool Piece :: hasDependencyOn(Color* color)
+{
+	bool pickupPlansDependOn = false;
+
+	for (unsigned int i = 0; i < this->pickup->subplans.size(); ++i)
+	{
+		if (this->pickup->subplans[i]->hasDependencyOn(color))
+		{
+			pickupPlansDependOn = true;		
+			break;
+		}
+	}
+
+	return pickupPlansDependOn;
+}
+
 /*
 copy() is intended to be a copy at the correct depth consistent with
 a Piece as represented in the GUI: it is a shape and a pickup plan, 

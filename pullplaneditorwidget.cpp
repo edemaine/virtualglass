@@ -191,7 +191,12 @@ void PullPlanEditorWidget :: setupConnections()
 	}
 
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
-	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(viewWidgetDataChanged()));
+}
+
+void PullPlanEditorWidget :: viewWidgetDataChanged()
+{
+	emit someDataChanged();
 }
 
 void PullPlanEditorWidget :: paramSpinChanged(int)

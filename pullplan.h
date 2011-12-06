@@ -33,6 +33,8 @@ class PullPlan
 		Color* color;
 		const QPixmap* getEditorPixmap();
 		void updatePixmap(QPixmap editorPixmap);
+		bool hasDependencyOn(Color* color);
+		bool hasDependencyOn(PullPlan* pullPlan);
 
 	private:
 		// Variables

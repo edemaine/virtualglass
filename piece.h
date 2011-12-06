@@ -24,6 +24,8 @@ class Piece
 
 		Piece* copy();
 		PickupPlan* pickup;
+		bool hasDependencyOn(Color* color);
+		bool hasDependencyOn(PullPlan* pullPlan);
 		
 	private:
 		// Variables

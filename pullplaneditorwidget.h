@@ -36,6 +36,7 @@ class PullPlanEditorWidget : public QWidget
 		void updateEverything();
 
 	private slots:
+		void viewWidgetDataChanged();
 		void shapeButtonGroupChanged(int);
 		void twistSpinChanged(int);
 		void twistSliderChanged(int);

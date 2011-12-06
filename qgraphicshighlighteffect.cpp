@@ -14,9 +14,14 @@ QRectF QGraphicsHighlightEffect::boundingRectFor( const QRectF &sourceRect) cons
 void QGraphicsHighlightEffect :: setStyleSheet(bool enableBorder)
 {
 	if (enableBorder)
-		emit styleSheetString("border: 1px solid "+color().name()+";");
+	{
+		if (mColor.blue() == 255) // if it's blue, meaning `currently edited'
+			emit styleSheetString("border: 4px solid "+color().name()+";");
+		else
+			emit styleSheetString("border: 1px solid "+color().name()+";");
+	}
 	else
-		emit styleSheetString("border: 0px solid "+color().name()+";");
+		emit styleSheetString("border: 0px solid");
 }
 
 void QGraphicsHighlightEffect::setHighlightType(int dependancy)
