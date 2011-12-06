@@ -91,15 +91,15 @@ void PullTemplate :: updateSubtemps()
 		}
 		case HORIZONTAL_LINE_SQUARE_PULL_TEMPLATE:
 		{
+			if (this->shape == CIRCLE_SHAPE)
+				radius *= 0.9;
+
 			int count = parameterValues[0];
 			for (int i = 0; i < count; ++i)
 			{
 				float littleRadius = (2 * radius / count) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
-				if (i == 0 || i == count - 1)
-					subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2.0, 0));
-				else
-					subtemps.push_back(SubpullTemplate(SQUARE_SHAPE, p, littleRadius * 2.0, 0));
+				subtemps.push_back(SubpullTemplate(SQUARE_SHAPE, p, littleRadius * 2.0, 0));
 			}
 			break;	
 		}

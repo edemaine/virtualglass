@@ -305,18 +305,14 @@ void PullPlanEditorWidget :: setPlanSubplans(Color* c)
 
 void PullPlanEditorWidget :: seedTemplates()
 {
+        char filename[100];
         for (int i = FIRST_PULL_TEMPLATE; i <= LAST_PULL_TEMPLATE; ++i)
         {
-                plan->setTemplate(new PullTemplate(i));
-		emit someDataChanged();	
-                PullTemplateLibraryWidget *ptlw = getTemplateLibraryWidget();
+                sprintf(filename, "./images/pulltemplate%d.png", i - FIRST_PULL_TEMPLATE + 1);
+                PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
+                        QPixmap::fromImage(QImage(filename)), i);
                 templateLibraryLayout->addWidget(ptlw);
         }
-}
-
-PullTemplateLibraryWidget* PullPlanEditorWidget :: getTemplateLibraryWidget()
-{
-	return new PullTemplateLibraryWidget(QPixmap::grabWidget(this->viewWidget).scaled(100, 100), plan->getTemplate()->type);
 }
 
 void PullPlanEditorWidget :: updateLibraryWidgetPixmaps(PullPlanLibraryWidget* w)

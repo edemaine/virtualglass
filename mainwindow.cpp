@@ -34,12 +34,9 @@ void MainWindow :: seedEverything()
 	pullPlanEditorWidget->seedTemplates();
 
 	// Load pickup template types
-	editorStack->setCurrentIndex(PIECE_MODE);
-
 	char filename[100];
 	for (int i = FIRST_PICKUP_TEMPLATE; i <= LAST_PICKUP_TEMPLATE; ++i)
 	{
-		pieceEditorPiece->pickup->setTemplate(new PickupTemplate(i));
 		sprintf(filename, "./images/pickuptemplate%d.png", i);
 		PickupTemplateLibraryWidget *ptlw = new PickupTemplateLibraryWidget(
 			QPixmap::fromImage(QImage(filename)), i);
@@ -83,7 +80,7 @@ void MainWindow :: initializeRandomPiece()
 		pieceEditorPiece->getTemplate()->parameterValues[i] = qrand() % 100;
 	}
 	pieceEditorPiece->pickup->setTemplate(new PickupTemplate(VERTICALS_TEMPLATE));
-	pieceEditorPiece->pickup->getTemplate()->setParameter(0, 14 + qrand() % 20); // set number of subpulls
+	pieceEditorPiece->pickup->getTemplate()->setParameter(0, 14); // set number of subpulls
 	pieceEditorPiece->pickup->subplans.clear();
 	for (unsigned int i = 0; i < pieceEditorPiece->pickup->getTemplate()->subtemps.size(); ++i)
 	{
