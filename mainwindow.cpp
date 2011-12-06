@@ -35,14 +35,14 @@ void MainWindow :: seedEverything()
 
 	// Load pickup template types
 	editorStack->setCurrentIndex(PIECE_MODE);
-	emit someDataChanged();
 
+	char filename[100];
 	for (int i = FIRST_PICKUP_TEMPLATE; i <= LAST_PICKUP_TEMPLATE; ++i)
 	{
 		pieceEditorPiece->pickup->setTemplate(new PickupTemplate(i));
-		emit someDataChanged();
+		sprintf(filename, "./images/pickuptemplate%d.png", i);
 		PickupTemplateLibraryWidget *ptlw = new PickupTemplateLibraryWidget(
-			pickupPlanEditorViewWidget->getPixmap().scaled(100, 100), i);
+			QPixmap::fromImage(QImage(filename)), i);
 		pickupTemplateLibraryLayout->addWidget(ptlw);
 	}
 
@@ -94,9 +94,6 @@ void MainWindow :: initializeRandomPiece()
 
 void MainWindow :: unhighlightAllLibraryWidgets()
 {
-	if (!setupDone)
-		return;
-
 	QLayoutItem* w;
 	for (int j = 1; j <= colorBarCount; ++j)
 	{
@@ -558,30 +555,21 @@ void MainWindow :: newPullPlan()
 
 void MainWindow :: unhighlightLibraryWidget(ColorBarLibraryWidget* w)
 {
-	if (!setupDone)
-		return;
 	w->graphicsEffect()->setEnabled(false);
 }
 
 void MainWindow :: unhighlightLibraryWidget(PullPlanLibraryWidget* w)
 {
-	if (!setupDone)
-		return;
 	w->graphicsEffect()->setEnabled(false);
 }
 
 void MainWindow :: unhighlightLibraryWidget(PieceLibraryWidget* w)
 {
-	if (!setupDone)
-		return;
 	w->graphicsEffect()->setEnabled(false);
 }
 
 void MainWindow :: highlightLibraryWidget(ColorBarLibraryWidget* w, int dependancy) 
 {
-	if (!setupDone) 
-		return;
-
 	w->graphicsEffect()->setEnabled(false);
 	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(dependancy);
 	w->graphicsEffect()->setEnabled(true);
@@ -590,9 +578,6 @@ void MainWindow :: highlightLibraryWidget(ColorBarLibraryWidget* w, int dependan
 
 void MainWindow :: highlightLibraryWidget(PullPlanLibraryWidget* w, int dependancy)
 {
-	if (!setupDone)
-		return;
-
 	w->graphicsEffect()->setEnabled(false);
 	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(dependancy);
 	w->graphicsEffect()->setEnabled(true);
@@ -600,9 +585,6 @@ void MainWindow :: highlightLibraryWidget(PullPlanLibraryWidget* w, int dependan
 
 void MainWindow :: highlightLibraryWidget(PieceLibraryWidget* w, int dependancy) 
 {
-	if (!setupDone)
-		return;
-
 	w->graphicsEffect()->setEnabled(false);
 	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(dependancy);
 	w->graphicsEffect()->setEnabled(true);
