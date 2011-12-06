@@ -78,7 +78,7 @@ void PullTemplate :: updateSubtemps()
 			}			
                         subtemps.push_back(SubpullTemplate(SQUARE_SHAPE, p, radius * 2.0, 0));
 			break;	
-		case HORIZONTAL_LINE_PULL_TEMPLATE:
+		case HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE:
 		{
 			int count = parameterValues[0];
 			for (int i = 0; i < count; ++i)
@@ -86,6 +86,20 @@ void PullTemplate :: updateSubtemps()
 				float littleRadius = (2 * radius / count) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
 				subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2.0, 0));
+			}
+			break;	
+		}
+		case HORIZONTAL_LINE_SQUARE_PULL_TEMPLATE:
+		{
+			int count = parameterValues[0];
+			for (int i = 0; i < count; ++i)
+			{
+				float littleRadius = (2 * radius / count) / 2;
+				p.x = -radius + littleRadius + i * 2 * littleRadius;
+				if (i == 0 || i == count - 1)
+					subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2.0, 0));
+				else
+					subtemps.push_back(SubpullTemplate(SQUARE_SHAPE, p, littleRadius * 2.0, 0));
 			}
 			break;	
 		}
@@ -101,22 +115,30 @@ void PullTemplate :: updateSubtemps()
 				p.y = (1.0 - k) * radius * sin(TWO_PI / count * i);
 				subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 2 * k * radius, 0));
 			}
-			break;			
-		}
-		case SURROUND_CIRCLE_PULL_TEMPLATE:
-                {
-                        int count = parameterValues[0];
-                        float theta = TWO_PI / count;
-                        float k = sin(theta/2) / (1 + sin(theta/2));
-
-                        for (int i = 0; i < count; ++i)
-                        {
-                                p.x = (1.0 - k) * radius * cos(TWO_PI / count * i);
-                                p.y = (1.0 - k) * radius * sin(TWO_PI / count * i);
-                                subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 2 * k * radius, 0));
-                        }
 			p.x = p.y = 0.0;
 			subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, (1 - 2 * k) * 2 * radius, 0));
+			break;			
+		}
+		case CROSS_PULL_TEMPLATE:
+                {
+                        int count = parameterValues[0] * 2 + 1;
+                       
+                        for (int i = 0; i < count; ++i)
+                        {
+                                float littleRadius = (2 * radius / count) / 2;
+                                p.x = -radius + littleRadius + i * 2 * littleRadius;
+				p.y = 0.0;
+                                subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2.0, 0));
+                        }
+                        for (int i = 0; i < count; ++i)
+                        {
+				if (i == (count - 1)/2)
+					continue;
+                                float littleRadius = (2 * radius / count) / 2;
+				p.x = 0.0;
+                                p.y = -radius + littleRadius + i * 2 * littleRadius;
+                                subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2.0, 0));
+                        }
                         break;
                 }
 		case SQUARE_PULL_TEMPLATE:
@@ -158,26 +180,6 @@ void PullTemplate :: updateSubtemps()
 			}
 			break;
 		}
-		case X_NINE_TEMPLATE:
-			for (int i = 0; i < 5; ++i)
-			{
-				p.x = radius * (-0.8 + 0.4 * i);
-				p.y = 0.0;
-				subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, radius * 0.4, 0));
-			}
-			for (int i = 0; i < 2; ++i)
-			{
-				p.x = 0.0;
-				p.y = radius * (-0.8 + 0.4 * i);
-				subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, radius * 0.4, 0));
-			}
-			for (int i = 3; i < 5; ++i)
-			{
-				p.x = 0.0;
-				p.y = radius * (-0.8 + 0.4 * i);
-				subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, radius * 0.4, 0));
-			}
-			break;
 	}	
 }
 
@@ -208,7 +210,15 @@ void PullTemplate :: initializeTemplate()
 			this->base = false;
 			this->casingThickness = 0.2;
 			break;	
-		case HORIZONTAL_LINE_PULL_TEMPLATE:
+		case HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE:
+			this->shape = CIRCLE_SHAPE;
+			this->base = false;
+                        tmp = new char[100];
+                        sprintf(tmp, "Count");
+			this->parameterNames.push_back(tmp);
+			this->parameterValues.push_back(3);
+			break;	
+		case HORIZONTAL_LINE_SQUARE_PULL_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			this->base = false;
                         tmp = new char[100];
@@ -224,12 +234,12 @@ void PullTemplate :: initializeTemplate()
 			this->parameterValues.push_back(4);
 			this->base = false;
 			break;			
-		case SURROUND_CIRCLE_PULL_TEMPLATE:
+		case CROSS_PULL_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
                         tmp = new char[100];
                         sprintf(tmp, "Count");
 			this->parameterNames.push_back(tmp);
-			this->parameterValues.push_back(8);
+			this->parameterValues.push_back(2);
 			this->base = false;
 			break;			
 		case SQUARE_PULL_TEMPLATE:
@@ -244,10 +254,6 @@ void PullTemplate :: initializeTemplate()
 			this->shape = CIRCLE_SHAPE;
 			this->base = false;
 			break;
-		case X_NINE_TEMPLATE:
-			this->shape = CIRCLE_SHAPE;
-			this->base = false;
-			break;	
 	}
 }
 

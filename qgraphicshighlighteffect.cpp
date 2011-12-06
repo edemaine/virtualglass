@@ -15,10 +15,10 @@ void QGraphicsHighlightEffect :: setStyleSheet(bool enableBorder)
 {
 	if (enableBorder)
 	{
-		if (mColor.blue() == 255) // if it's blue, meaning `currently edited'
-			emit styleSheetString("border: 4px solid "+color().name()+";");
+		if (dependancy == IS_DEPENDANCY)
+			emit styleSheetString("border: 4px solid " + color().name() + ";");
 		else
-			emit styleSheetString("border: 1px solid "+color().name()+";");
+			emit styleSheetString("border: 2px dashed " + color().name() + ";");
 	}
 	else
 		emit styleSheetString("border: 0px solid");
@@ -26,16 +26,18 @@ void QGraphicsHighlightEffect :: setStyleSheet(bool enableBorder)
 
 void QGraphicsHighlightEffect::setHighlightType(int dependancy)
 {
+	this->dependancy = dependancy;
+
 	switch (dependancy)
 	{
 		case IS_DEPENDANCY:
-			mColor = QColor(0, 0, 255,255);
+			mColor = QColor(0, 0, 255, 255);
 			break;
 		case USES_DEPENDANCY:
-			mColor = QColor(255, 0, 0,255);
+			mColor = QColor(255, 127, 0, 255);
 			break;
 		case IS_USED_BY_DEPENDANCY:
-			mColor = QColor(0, 255, 0,255);
+			mColor = QColor(0, 139, 69, 255);
 			break;
 	}
 }

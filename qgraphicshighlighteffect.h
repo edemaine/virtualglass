@@ -24,6 +24,7 @@ protected:
 private:
 	QColor mColor;
 	QPointF mOffset;
+	int dependancy;	
 
 signals:
 	void styleSheetString(QString string);
