@@ -683,7 +683,7 @@ void MainWindow :: updateLibrary()
                         {
                                 plw = dynamic_cast<PieceLibraryWidget*>(
                                         dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 2))->widget());
-                                if (plw->getPiece()->hasDependencyOn(pullPlanEditorWidget->getPlan()->color))
+                                if (plw->getPiece()->hasDependencyOn(pullPlanEditorWidget->getPlan()))
                                         highlightLibraryWidget(plw, USES_DEPENDANCY);
                         }
 
