@@ -154,8 +154,7 @@ void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 	// Offset by location
 	v->position.x = v->position.x + spt->location.x * 5.0;
 	v->position.z = v->position.z + spt->location.y * 5.0;
-	//v->position.y = v->position.y * 0.2;
-
+	v->position.y = v->position.y + spt->location.z * 5.0;
 }
 
 void Mesher :: applyBowlTransform(Vertex* v, vector<int>* parameterValues)

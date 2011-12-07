@@ -80,7 +80,8 @@ void PickupTemplate :: computeSubtemps()
 			{
 				p.x = 1.0 - width / 2;
 				p.y = -0.99 + width / 2 + width * i;
-				subtemps.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, 0.4, width - 0.001, 
+				p.z = -width/2;
+				subtemps.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, width, width - 0.001, 
 					SQUARE_SHAPE, 1));
 			}
 			break;
@@ -92,7 +93,8 @@ void PickupTemplate :: computeSubtemps()
 				{
 					p.x = -1.0 + width / 2 + width * i;
 					p.y = -1.0 + width / 2 + width * j;
-					subtemps.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, 0.4,
+					p.z = width / 2;
+					subtemps.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, 0.2,
 						width - 0.01, SQUARE_SHAPE, 0));
 				}
 			}
