@@ -51,7 +51,6 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			// This is a memory leak, as every color drop make a new cane
 			if (type == COLOR_BAR_MIME)
 			{
-				ColorBarLibraryWidget* cblw = droppedPlan->getColorLibraryWidget();
 				switch (subpull->shape)
 				{
 					case CIRCLE_SHAPE:
@@ -61,7 +60,6 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 						droppedPlan = new PullPlan(SQUARE_BASE_PULL_TEMPLATE, droppedPlan->color);
 						break;
 				}
-				droppedPlan->setColorLibraryWidget(cblw);
 			}
 
 			// If the shift button is down, fill in the entire group

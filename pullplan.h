@@ -24,9 +24,7 @@ class PullPlan
 		PullTemplate* getTemplate();
 
 		void setLibraryWidget(PullPlanLibraryWidget* plplw);
-		void setColorLibraryWidget(ColorBarLibraryWidget* plplw);
 		PullPlanLibraryWidget* getLibraryWidget();
-		ColorBarLibraryWidget* getColorLibraryWidget();
 
 		vector<PullPlan*> subplans;
 		float twist;
@@ -41,7 +39,6 @@ class PullPlan
 		PullTemplate* pullTemplate;
 		QPixmap editorPixmap;
 		PullPlanLibraryWidget* libraryWidget;
-		ColorBarLibraryWidget* colorLibraryWidget;
 };
 
 #endif

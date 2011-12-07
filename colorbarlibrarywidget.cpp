@@ -16,7 +16,6 @@ ColorBarLibraryWidget :: ColorBarLibraryWidget(PullPlan* plan, QWidget* parent):
         this->editorPixmap = pixmap;
 
 	this->pullPlan = plan;
-	this->pullPlan->setColorLibraryWidget(this);
 	setGraphicsEffect(new QGraphicsHighlightEffect());
 	connect(graphicsEffect(), SIGNAL(enabledChanged(bool)), graphicsEffect(), SLOT(setStyleSheet(bool)));
 	connect(graphicsEffect(), SIGNAL(styleSheetString(QString)), this, SLOT(setStyleSheet(QString)));
