@@ -199,8 +199,8 @@ void Mesher :: applyVaseTransform(Vertex* v, vector<int>* parameterValues)
 	float theta = PI * v->position.x / 5.0;
 
 	// Deform into a spline-based vase
-	float body_radius = (*parameterValues)[0] * 0.1 + 1.0; 
-	float lip_radius = (*parameterValues)[1] * 0.05 + 0.5; 
+	float body_radius = (*parameterValues)[0] * 0.03 + 1.0; 
+	float lip_radius = (*parameterValues)[1] * 0.03 + 0.5; 
 	float radius = 2.0 * splineVal(0.1, body_radius, 0.5, lip_radius, (v->position.z - -5.0)/10.0);
 
 	if (radius < 1.0)

@@ -11,6 +11,12 @@ PickupTemplate :: PickupTemplate(int t)
 	// set parameters
 	switch (this->type)
 	{
+		case VERTICALS_AND_HORIZONTALS_TEMPLATE:
+			tmp = new char[100];
+			sprintf(tmp, "Column count");
+			parameterNames.push_back(tmp);
+			parameterValues.push_back(14);
+			break;
 		case VERTICALS_TEMPLATE:
 			tmp = new char[100];
 			sprintf(tmp, "Column count");
@@ -100,6 +106,24 @@ void PickupTemplate :: computeSubtemps()
 				p.y = -1.0;
 				subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.99, width - 0.01, 
 					SQUARE_SHAPE, 0));
+			}
+			break;
+		case VERTICALS_AND_HORIZONTALS_TEMPLATE:
+			p.x = p.y = p.z = 0.0;
+			width = 2.0 / MAX(parameterValues[0], 1);
+			for (int i = 0; i < parameterValues[0]; ++i)
+			{
+				p.x = -1.0 + width / 2 + width * i;
+				p.y = -1.0;
+				subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.4, width - 0.01, 
+					SQUARE_SHAPE, 0));
+			}
+			for (int i = 0; i < parameterValues[0]/2; ++i)
+			{
+				p.x = -1.0;
+				p.y = width / 2 + width * i;
+				subtemps.push_back(new SubpickupTemplate(p, HORIZONTAL_ORIENTATION, 1.99, width - 0.01, 
+					SQUARE_SHAPE, 1));
 			}
 			break;
 	}
