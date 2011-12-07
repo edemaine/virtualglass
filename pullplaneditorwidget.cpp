@@ -49,6 +49,29 @@ void PullPlanEditorWidget :: updateEverything()
         geometry.clear();
         mesher.generateMesh(plan, &geometry);
         niceViewWidget->repaint();
+
+	// Highlight correct pull template
+	for (int i = 0; i < templateLibraryLayout->count(); ++i)
+	{
+		if (i + FIRST_PULL_TEMPLATE == plan->getTemplate()->type)
+			highlightLibraryWidget(dynamic_cast<PullTemplateLibraryWidget*>(
+				dynamic_cast<QWidgetItem *>(templateLibraryLayout->itemAt(i))->widget()));
+		else
+			unhighlightLibraryWidget(dynamic_cast<PullTemplateLibraryWidget*>(
+				dynamic_cast<QWidgetItem *>(templateLibraryLayout->itemAt(i))->widget()));
+	}
+}
+
+void PullPlanEditorWidget :: unhighlightLibraryWidget(PullTemplateLibraryWidget* w)
+{
+        w->graphicsEffect()->setEnabled(false);
+}
+
+void PullPlanEditorWidget :: highlightLibraryWidget(PullTemplateLibraryWidget* w)
+{
+        w->graphicsEffect()->setEnabled(false);
+        ((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
+        w->graphicsEffect()->setEnabled(true);
 }
 
 void PullPlanEditorWidget :: setupLayout()

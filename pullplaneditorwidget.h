@@ -6,6 +6,7 @@
 #include "pullplan.h"
 #include "pullplaneditorviewwidget.h"
 #include "pulltemplatelibrarywidget.h"
+#include "qgraphicshighlighteffect.h"
 #include "pullplanlibrarywidget.h"
 #include "niceviewwidget.h"
 #include "geometry.h"
@@ -58,6 +59,8 @@ class PullPlanEditorWidget : public QWidget
 
 		void setupLayout();
 		void setupConnections();
+		void highlightLibraryWidget(PullTemplateLibraryWidget* w);
+		void unhighlightLibraryWidget(PullTemplateLibraryWidget* w);
 };
 
 
