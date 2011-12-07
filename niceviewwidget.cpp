@@ -23,7 +23,7 @@ NiceViewWidget :: NiceViewWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::Alp
 {
 	leftMouseDown = false;
 
-	setMinimumWidth(200);
+	setMinimumWidth(400);
 
 	bgColor = QColor(200, 200, 200);
 

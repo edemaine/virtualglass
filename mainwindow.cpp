@@ -5,7 +5,6 @@
 
 MainWindow :: MainWindow(Model* model)
 {
-	setupDone = false;
 	centralWidget = new QWidget(this);
 	this->setCentralWidget(centralWidget);
 	this->model = model;
@@ -18,7 +17,6 @@ MainWindow :: MainWindow(Model* model)
 	setWindowTitle(tr("Virtual Glass"));
 	move(0, 0);
 
-	setupDone = true;
 }
 
 void MainWindow :: seedEverything()
@@ -47,6 +45,8 @@ void MainWindow :: seedEverything()
 
 	editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
 	emit someDataChanged();
+
+	whatToDoLabel->setText("Click a library item at left to modify it.");
 }
 
 // Too weird to live; too strange to die
@@ -399,7 +399,7 @@ void MainWindow :: setupEmptyPaneEditor()
 	emptyEditorPage = new QWidget(editorStack);
 	QHBoxLayout* editorLayout = new QHBoxLayout(emptyEditorPage);
 	emptyEditorPage->setLayout(editorLayout);
-	QLabel* whatToDoLabel = new QLabel("Click a library item at left to modify it.", emptyEditorPage);
+	whatToDoLabel = new QLabel("Loading...", emptyEditorPage);
 	whatToDoLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	editorLayout->addWidget(whatToDoLabel, 0);
 }

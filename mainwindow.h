@@ -64,6 +64,7 @@ class MainWindow : public QMainWindow
 		void unhighlightAllLibraryWidgets();
 
 		// Variables
+		QLabel* whatToDoLabel;
 		NiceViewWidget* colorBarNiceViewWidget;
 		NiceViewWidget* pieceNiceViewWidget;
 		QLabel* pieceTemplateParameter1Label;
@@ -76,7 +77,6 @@ class MainWindow : public QMainWindow
 		int pullPlanCount;
 		int pieceCount;
 		int colorBarCount;
-		bool setupDone;
 		QPoint dragStartPosition;
 		QStackedWidget* editorStack; //editorStack.currentIndex() gives with mode
 		QWidget* emptyEditorPage;
