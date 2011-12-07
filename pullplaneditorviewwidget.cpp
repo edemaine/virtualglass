@@ -47,21 +47,6 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 
 			event->accept();
 
-			// If a color has been dropped in, make a new simple can with the same color
-			// This is a memory leak, as every color drop make a new cane
-			if (type == COLOR_BAR_MIME)
-			{
-				switch (subpull->shape)
-				{
-					case CIRCLE_SHAPE:
-						droppedPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, droppedPlan->color);
-						break;
-					case SQUARE_SHAPE:
-						droppedPlan = new PullPlan(SQUARE_BASE_PULL_TEMPLATE, droppedPlan->color);
-						break;
-				}
-			}
-
 			// If the shift button is down, fill in the entire group
 			if (event->keyboardModifiers() & 0x02000000)
 			{
@@ -85,6 +70,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	if (type == PULL_PLAN_MIME)
 		return;
 
+	// Deal w/casing
 	float distanceFromCenter;
 	switch (plan->getTemplate()->getShape())
 	{
@@ -118,12 +104,13 @@ void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan)
 }
 
 
-void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int drawHeight, PullPlan* plan, QPainter* painter)
+void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int drawHeight, PullPlan* plan, int mandatedShape, 
+	QPainter* painter)
 {
 	// Fill the subplan area with some `cleared out' color
 	painter->setBrush(QColor(200, 200, 200));
 	painter->setPen(Qt::NoPen);
-	switch (plan->getTemplate()->getShape())
+	switch (mandatedShape)
 	{
 		case CIRCLE_SHAPE:
 			painter->drawEllipse(x, y, drawWidth, drawHeight);
@@ -141,7 +128,7 @@ void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int dr
 		painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
 		painter->setPen(Qt::NoPen);
 
-		switch (plan->getTemplate()->getShape())
+		switch (mandatedShape)
 		{
 			case CIRCLE_SHAPE:
 				painter->drawEllipse(x, y, drawWidth, drawHeight);
@@ -159,7 +146,7 @@ void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int dr
 	pen.setColor(Qt::black);
 	painter->setPen(pen);
 	painter->setBrush(QColor(255*plan->color->r, 255*plan->color->g, 255*plan->color->b, 255*plan->color->a));
-	switch (plan->getTemplate()->getShape())
+	switch (mandatedShape)
 	{
 		case CIRCLE_SHAPE:
 			painter->drawEllipse(x, y, drawWidth, drawHeight);
@@ -182,7 +169,7 @@ void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int dr
 		int rWidth = subpull->diameter * drawWidth/2;
 		int rHeight = subpull->diameter * drawHeight/2;
 
-		drawSubplan(rX, rY, rWidth, rHeight, plan->subplans[i], painter);
+		drawSubplan(rX, rY, rWidth, rHeight, plan->subplans[i], plan->getTemplate()->subtemps[i].shape, painter);
 	}
 }
 
@@ -192,7 +179,7 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 	painter.begin(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 	painter.fillRect(event->rect(), QColor(200, 200, 200));
-	drawSubplan(10, 10, width() - 20, height() - 20, plan, &painter);
+	drawSubplan(10, 10, width() - 20, height() - 20, plan, plan->getTemplate()->getShape(), &painter);
 	painter.end();
 }
 

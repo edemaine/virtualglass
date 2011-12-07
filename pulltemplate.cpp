@@ -200,6 +200,10 @@ void PullTemplate :: initializeTemplate()
 			this->shape = SQUARE_SHAPE;
 			this->base = true;
 			break;
+                case AMORPHOUS_BASE_PULL_TEMPLATE:
+                        this->shape = AMORPHOUS_SHAPE;
+                        this->base = true;
+                        break;
 		case CASED_CIRCLE_PULL_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			this->base = false;

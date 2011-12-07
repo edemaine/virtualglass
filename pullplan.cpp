@@ -73,7 +73,12 @@ void PullPlan :: setTemplate(PullTemplate* newTemplate)
 
 	for (unsigned int i = 0; i < MIN(pullTemplate->subtemps.size(), subplans.size()); ++i)
 	{
-		if (this->pullTemplate->subtemps[i].shape == CIRCLE_SHAPE
+		if (subplans[i]->getTemplate()->type == AMORPHOUS_BASE_PULL_TEMPLATE)
+		{
+			circlePullPlan = subplans[i];
+			squarePullPlan = subplans[i];
+		}
+		else if (this->pullTemplate->subtemps[i].shape == CIRCLE_SHAPE
 			&& (circlePullPlan->color->a < 0.0001 || circlePullPlan == NULL))
 			circlePullPlan = this->subplans[i];
 		else if (this->pullTemplate->subtemps[i].shape == SQUARE_SHAPE

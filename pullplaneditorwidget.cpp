@@ -306,22 +306,30 @@ void PullPlanEditorWidget :: setPlanTemplateCasingThickness(float t)
 	emit someDataChanged();	
 }
 
-void PullPlanEditorWidget :: setPlanSubplans(Color* c)
+void PullPlanEditorWidget :: setPlanSubplans(PullPlan* sp)
 {
 	plan->subplans.clear();
         for (unsigned int i = 0; i < plan->getTemplate()->subtemps.size(); ++i)
         {
-                switch (plan->getTemplate()->subtemps[i].shape)
+                if (plan->getTemplate()->subtemps[i].shape == sp->getTemplate()->getShape()
+			|| sp->getTemplate()->type == AMORPHOUS_BASE_PULL_TEMPLATE)
                 {
-                        case CIRCLE_SHAPE:
-                                plan->subplans.push_back(
-                                        new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, c));
-                                break;
-                        case SQUARE_SHAPE:
-                                plan->subplans.push_back(
-                                        new PullPlan(SQUARE_BASE_PULL_TEMPLATE, c));
-                                break;
+			plan->subplans.push_back(sp);
                 }
+		else
+		{
+			switch(plan->getTemplate()->subtemps[i].shape)
+			{
+				case CIRCLE_SHAPE:
+					plan->subplans.push_back(
+						new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, sp->color));
+					break;
+				case SQUARE_SHAPE:
+					plan->subplans.push_back(
+						new PullPlan(SQUARE_BASE_PULL_TEMPLATE, sp->color));
+					break;
+			}
+		}
         }
 	emit someDataChanged();	
 }

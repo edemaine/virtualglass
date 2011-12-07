@@ -7,8 +7,10 @@
 // conversions from menu items to constants simple.
 
 // Geometric shapes
+#define UNSPECIFIED_SHAPE 0
 #define CIRCLE_SHAPE 1
 #define SQUARE_SHAPE 2
+#define AMORPHOUS_SHAPE 3
 
 // Types of MIME data
 #define COLOR_BAR_MIME 1

@@ -54,21 +54,21 @@ void MainWindow :: initializeRandomPiece()
 {
 	// Setup colors	
 	editorStack->setCurrentIndex(COLORBAR_MODE); // end in pull plan mode
-	Color* opaqueColor = colorEditorPlan->color;
+	PullPlan* opaqueColorBar = colorEditorPlan;
 	newColorBar();
-	Color* transparentColor = colorEditorPlan->color;
-	transparentColor->r = (qrand() % 255) / 255.0;
-	transparentColor->g = (qrand() % 255) / 255.0;
-	transparentColor->b = (qrand() % 255) / 255.0;
-	transparentColor->a = (qrand() % 128 + 70) / 255.0;
+	PullPlan* transparentColorBar = colorEditorPlan;
+	transparentColorBar->color->r = (qrand() % 255) / 255.0;
+	transparentColorBar->color->g = (qrand() % 255) / 255.0;
+	transparentColorBar->color->b = (qrand() % 255) / 255.0;
+	transparentColorBar->color->a = (qrand() % 128 + 70) / 255.0;
 	emit someDataChanged();
 
 	// Setup cane 
 	editorStack->setCurrentIndex(PULLPLAN_MODE); // end in pull plan mode
 	pullPlanEditorWidget->setPlanTemplate(new PullTemplate(qrand() % 4 + 4));
 	pullPlanEditorWidget->setPlanTemplateCasingThickness((qrand() % 50 + 25) / 100.0);
-	pullPlanEditorWidget->setPlanSubplans(opaqueColor);
-	pullPlanEditorWidget->setPlanColor(transparentColor);
+	pullPlanEditorWidget->setPlanSubplans(opaqueColorBar);
+	pullPlanEditorWidget->setPlanColor(transparentColorBar->color);
 	pullPlanEditorWidget->setPlanTwist(20);
 	emit someDataChanged();
 		
@@ -408,7 +408,7 @@ void MainWindow :: setupColorEditor()
 {
 	Color* color = new Color();
 	color->r = color->g = color->b = color->a = 1.0;
-	colorEditorPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
+	colorEditorPlan = new PullPlan(AMORPHOUS_BASE_PULL_TEMPLATE, color);
 	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(colorEditorPlan);
 	++colorBarCount;
 	tableGridLayout->addWidget(colorEditorPlanLibraryWidget, colorBarCount, 0);
@@ -501,7 +501,7 @@ void MainWindow :: newColorBar()
 	color->a = colorEditorPlan->color->a;
 
 	// Create the new plan
-	colorEditorPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
+	colorEditorPlan = new PullPlan(AMORPHOUS_BASE_PULL_TEMPLATE, color);
 
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();
