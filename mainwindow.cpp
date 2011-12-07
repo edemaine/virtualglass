@@ -550,6 +550,11 @@ void MainWindow :: newPullPlan()
 }
 
 
+void MainWindow :: unhighlightLibraryWidget(PickupTemplateLibraryWidget* w)
+{
+	w->graphicsEffect()->setEnabled(false);
+}
+
 void MainWindow :: unhighlightLibraryWidget(ColorBarLibraryWidget* w)
 {
 	w->graphicsEffect()->setEnabled(false);
@@ -565,13 +570,19 @@ void MainWindow :: unhighlightLibraryWidget(PieceLibraryWidget* w)
 	w->graphicsEffect()->setEnabled(false);
 }
 
+void MainWindow :: highlightLibraryWidget(PickupTemplateLibraryWidget* w)
+{
+        w->graphicsEffect()->setEnabled(false);
+        ((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
+        w->graphicsEffect()->setEnabled(true);
+}
+
 void MainWindow :: highlightLibraryWidget(ColorBarLibraryWidget* w, int dependancy) 
 {
 	w->graphicsEffect()->setEnabled(false);
 	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(dependancy);
 	w->graphicsEffect()->setEnabled(true);
 }
-
 
 void MainWindow :: highlightLibraryWidget(PullPlanLibraryWidget* w, int dependancy)
 {
@@ -714,6 +725,17 @@ void MainWindow :: updatePieceEditor()
 	pieceTemplateParameter1Slider->setSliderPosition(pieceEditorPiece->getTemplate()->parameterValues[0]);
 	pieceTemplateParameter2Label->setText(pieceEditorPiece->getTemplate()->parameterNames[1]);
 	pieceTemplateParameter2Slider->setSliderPosition(pieceEditorPiece->getTemplate()->parameterValues[1]);
+
+	// update template stuff
+	for (int i = 0; i < pickupTemplateLibraryLayout->count(); ++i)
+      	{
+		if (i + FIRST_PICKUP_TEMPLATE == pieceEditorPiece->pickup->getTemplate()->type)
+			highlightLibraryWidget(dynamic_cast<PickupTemplateLibraryWidget*>(
+                                dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget()));
+		else
+			unhighlightLibraryWidget(dynamic_cast<PickupTemplateLibraryWidget*>(
+                                dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget()));
+	} 
 }
 
 void MainWindow :: updateColorEditor()

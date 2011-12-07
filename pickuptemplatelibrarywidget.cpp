@@ -11,7 +11,13 @@ PickupTemplateLibraryWidget :: PickupTemplateLibraryWidget(QPixmap view, int typ
 	setPixmap(view);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 	this->pickupTemplateType = type;
+
+        setGraphicsEffect(new QGraphicsHighlightEffect());
+        connect(graphicsEffect(), SIGNAL(enabledChanged(bool)), graphicsEffect(), SLOT(setStyleSheet(bool)));
+        connect(graphicsEffect(), SIGNAL(styleSheetString(QString)), this, SLOT(setStyleSheet(QString)));
 }
+
+
 
 int PickupTemplateLibraryWidget :: getPickupTemplateType()
 {

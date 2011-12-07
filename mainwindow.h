@@ -53,9 +53,11 @@ class MainWindow : public QMainWindow
 		void updateLibrary();
 		void initializeRandomPiece();
 
+		void unhighlightLibraryWidget(PickupTemplateLibraryWidget* w);
 		void unhighlightLibraryWidget(ColorBarLibraryWidget* w);
 		void unhighlightLibraryWidget(PullPlanLibraryWidget* w);
 		void unhighlightLibraryWidget(PieceLibraryWidget* w);
+		void highlightLibraryWidget(PickupTemplateLibraryWidget* w);
 		void highlightLibraryWidget(ColorBarLibraryWidget* w, int dependancy);
 		void highlightLibraryWidget(PullPlanLibraryWidget* w, int dependancy);
 		void highlightLibraryWidget(PieceLibraryWidget* w, int dependancy);
