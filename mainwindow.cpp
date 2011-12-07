@@ -674,6 +674,8 @@ void MainWindow :: updateLibrary()
                                         dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 1))->widget());
                                 if (pullPlanEditorWidget->getPlan()->hasDependencyOn(pplw->getPullPlan()))
                                         highlightLibraryWidget(pplw, IS_USED_BY_DEPENDANCY);
+                                else if (pplw->getPullPlan()->hasDependencyOn(pullPlanEditorWidget->getPlan()))
+                                        highlightLibraryWidget(pplw, USES_DEPENDANCY);
                         }
 
                         PieceLibraryWidget* plw;

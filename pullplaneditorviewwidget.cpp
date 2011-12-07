@@ -24,7 +24,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	if (!(type == COLOR_BAR_MIME || type == PULL_PLAN_MIME))
 		return;
 
-	if (droppedPlan == plan) // don't allow circular DAGs
+	if (droppedPlan->hasDependencyOn(plan)) // don't allow circular DAGs
 		return;
 
 	int drawSize = width() - 20;
