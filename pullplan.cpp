@@ -61,6 +61,12 @@ PullPlanLibraryWidget* PullPlan :: getLibraryWidget()
 	return this->libraryWidget;
 }
 
+/*
+The key to setting the new template in an `intuitive way' is
+to carry over properties of the old one, and create a new set of subplans
+that is a natural mapping from the old subplans, even though
+they may have different shape, number, etc.
+*/
 void PullPlan :: setTemplate(PullTemplate* newTemplate)
 {
 	// Find reference circular and square subcanes
@@ -87,6 +93,7 @@ void PullPlan :: setTemplate(PullTemplate* newTemplate)
 	}
 
 	// create the new subplans based on template
+	newTemplate->setCasingThickness(this->pullTemplate->getCasingThickness());
 	this->pullTemplate = newTemplate;
 	this->subplans.clear();
 	for (unsigned int i = 0; i < newTemplate->subtemps.size(); ++i)
