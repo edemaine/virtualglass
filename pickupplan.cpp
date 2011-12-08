@@ -22,23 +22,23 @@ PickupPlan* PickupPlan :: copy()
 
 void PickupPlan :: setTemplate(PickupTemplate* newTemplate)
 {
-        // load these into the pull plan
+	PullPlan* representativeSubplan;
+
+	if (this->subplans.size() == 0)
+	{
+		Color* color;
+		color = new Color();
+		color->r = color->g = color->b = 1.0;
+		color->a = 0.0;
+		representativeSubplan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
+	}
+	else
+		representativeSubplan = this->subplans[0];
         this->pickupTemplate = newTemplate;
         this->subplans.clear();
         for (unsigned int i = 0; i < this->getTemplate()->subtemps.size(); ++i)
         {
-                Color* color = new Color();
-                color->r = color->g = color->b = 1.0;
-                color->a = 0.4;
-		switch (this->pickupTemplate->subtemps[i]->shape)
-		{
-			case CIRCLE_SHAPE:
-				this->subplans.push_back(new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color));
-				break;
-			case SQUARE_SHAPE:
-				this->subplans.push_back(new PullPlan(SQUARE_BASE_PULL_TEMPLATE, color));
-				break;
-		}
+		this->subplans.push_back(representativeSubplan);			
         }
 }
 
