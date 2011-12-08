@@ -183,7 +183,6 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 
 	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
-	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
 	int type;
 	if (cblw != NULL)
 	{
@@ -196,12 +195,6 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 		plan = plplw->getPullPlan();
 		pixmap = *plplw->getEditorPixmap();
 		type = PULL_PLAN_MIME;
-	}
-	else if (plw != NULL)
-	{
-		plan = plw->getPiece();
-		pixmap = *plw->getEditorPixmap();
-		type = PIECE_MIME;
 	}
 	else
 		return;
