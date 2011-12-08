@@ -10,7 +10,7 @@ PieceTemplate :: PieceTemplate(int t)
 
 	switch (this->type)
 	{
-		case VASE_TEMPLATE:
+		case VASE_PIECE_TEMPLATE:
 			tmp = new char[100];
 			sprintf(tmp, "Body width");
 			parameterNames.push_back(tmp);
@@ -20,7 +20,7 @@ PieceTemplate :: PieceTemplate(int t)
 			parameterValues.push_back(0);
 			parameterValues.push_back(0);
 			break;
-		case TUMBLER_TEMPLATE:
+		case TUMBLER_PIECE_TEMPLATE:
 			tmp = new char[100];
 			sprintf(tmp, "Size");
 			parameterNames.push_back(tmp);
@@ -30,7 +30,7 @@ PieceTemplate :: PieceTemplate(int t)
 			parameterValues.push_back(0);
 			parameterValues.push_back(0);
 			break;
-		case BOWL_TEMPLATE:
+		case BOWL_PIECE_TEMPLATE:
 			tmp = new char[100];
 			sprintf(tmp, "Radius");
 			parameterNames.push_back(tmp);

@@ -471,13 +471,13 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>*
 		v = &(geometry->vertices[i]);
 		switch (piece->getTemplate()->type)
 		{
-			case VASE_TEMPLATE:
+			case VASE_PIECE_TEMPLATE:
 				applyVaseTransform(v, &(piece->getTemplate()->parameterValues));
 				break;
-			case TUMBLER_TEMPLATE:
+			case TUMBLER_PIECE_TEMPLATE:
 				applyTumblerTransform(v, &(piece->getTemplate()->parameterValues));
 				break;
-			case BOWL_TEMPLATE:
+			case BOWL_PIECE_TEMPLATE:
 				applyBowlTransform(v, &(piece->getTemplate()->parameterValues));
 				break;
 		}

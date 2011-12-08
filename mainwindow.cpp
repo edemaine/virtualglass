@@ -74,7 +74,7 @@ void MainWindow :: initializeRandomPiece()
 		
 	// Setup piece
 	editorStack->setCurrentIndex(PIECE_MODE); // end in pull plan mode
-	pieceEditorPiece->setTemplate(new PieceTemplate(qrand() % (LAST_PIECE_TEMPLATE - FIRST_PIECE_TEMPLATE + 1) + 1));
+	pieceEditorPiece->setTemplate(new PieceTemplate((qrand() % (LAST_PIECE_TEMPLATE - FIRST_PIECE_TEMPLATE + 1)) + FIRST_PIECE_TEMPLATE));
 	for (unsigned int i = 0; i < pieceEditorPiece->getTemplate()->parameterValues.size(); ++i)
 	{
 		pieceEditorPiece->getTemplate()->parameterValues[i] = qrand() % 100;
@@ -296,7 +296,7 @@ void MainWindow :: setupPieceEditor()
 	pieceEditorPage = new QWidget(editorStack);
 	QHBoxLayout* piecePageLayout = new QHBoxLayout(pieceEditorPage);
 	pieceEditorPage->setLayout(piecePageLayout);
-	pieceEditorPiece = new Piece(TUMBLER_TEMPLATE);
+	pieceEditorPiece = new Piece(TUMBLER_PIECE_TEMPLATE);
 
 	QVBoxLayout* leftLayout = new QVBoxLayout(pieceEditorPage);
 	piecePageLayout->addLayout(leftLayout);
