@@ -11,6 +11,9 @@
 #include "subpickuptemplate.h"
 #include "piece.h"
 
+#define TOTAL_ANGULAR_RESOLUTION 800
+#define TOTAL_AXIAL_RESOLUTION 3500
+
 class Mesher
 {
 
