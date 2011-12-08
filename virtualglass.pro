@@ -10,6 +10,8 @@ TARGET =
 DEPENDPATH += .
 INCLUDEPATH += . yaml-cpp/include/ yaml-cpp/util/ yaml-cpp/src/ yaml-cpp/test/ glew/
 QT += opengl
+RESOURCES = virtualglass.qrc
+
 
 unix:!macx {
   QMAKE_CXXFLAGS += -std=gnu++0x

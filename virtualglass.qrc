@@ -1,0 +1,15 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+	<file>images/pickuptemplate1.png</file>
+	<file>images/pickuptemplate2.png</file>
+	<file>images/pickuptemplate3.png</file>
+	<file>images/pickuptemplate4.png</file>
+	<file>images/pulltemplate1.png</file>
+	<file>images/pulltemplate2.png</file>
+	<file>images/pulltemplate3.png</file>
+	<file>images/pulltemplate4.png</file>
+	<file>images/pulltemplate5.png</file>
+	<file>images/pulltemplate6.png</file>
+	<file>images/pulltemplate7.png</file>
+</qresource>
+</RCC>

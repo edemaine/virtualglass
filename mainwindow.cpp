@@ -35,7 +35,7 @@ void MainWindow :: seedEverything()
 	char filename[100];
 	for (int i = FIRST_PICKUP_TEMPLATE; i <= LAST_PICKUP_TEMPLATE; ++i)
 	{
-		sprintf(filename, "./images/pickuptemplate%d.png", i);
+		sprintf(filename, ":/images/pickuptemplate%d.png", i);
 		PickupTemplateLibraryWidget *ptlw = new PickupTemplateLibraryWidget(
 			QPixmap::fromImage(QImage(filename)), i);
 		pickupTemplateLibraryLayout->addWidget(ptlw);
