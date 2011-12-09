@@ -142,7 +142,8 @@ void PullTemplate :: updateSubtemps()
 						}
 						break;
 				}
-		case SQUARE_PULL_TEMPLATE:
+		case SQUARE_OF_CIRCLES_PULL_TEMPLATE:
+		case SQUARE_OF_SQUARES_PULL_TEMPLATE:
 		{
 			if (this->shape == CIRCLE_SHAPE)
 				radius *= 1 / SQRT_TWO* 1.17;
@@ -156,7 +157,10 @@ void PullTemplate :: updateSubtemps()
 				{
 					p.x = -radius + littleRadius + 2 * littleRadius * i;
 					p.y = -radius + littleRadius + 2 * littleRadius * j;
-					subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 2 * littleRadius, 0));
+					if (this->type == SQUARE_OF_CIRCLES_PULL_TEMPLATE)
+						subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 2 * littleRadius, 0));
+					else
+						subtemps.push_back(SubpullTemplate(SQUARE_SHAPE, p, 2 * littleRadius, 0));
 				}
 			}
 			break;
@@ -224,7 +228,7 @@ void PullTemplate :: initializeTemplate()
 			this->parameterValues.push_back(3);
 			break;
 		case HORIZONTAL_LINE_SQUARE_PULL_TEMPLATE:
-			this->shape = CIRCLE_SHAPE;
+			this->shape = SQUARE_SHAPE;
 			this->base = false;
 						tmp = new char[100];
 						sprintf(tmp, "Count");
@@ -236,7 +240,7 @@ void PullTemplate :: initializeTemplate()
 						tmp = new char[100];
 						sprintf(tmp, "Count");
 			this->parameterNames.push_back(tmp);
-			this->parameterValues.push_back(4);
+			this->parameterValues.push_back(8);
 			this->base = false;
 			break;
 		case CROSS_PULL_TEMPLATE:
@@ -247,12 +251,13 @@ void PullTemplate :: initializeTemplate()
 			this->parameterValues.push_back(2);
 			this->base = false;
 			break;
-		case SQUARE_PULL_TEMPLATE:
+		case SQUARE_OF_SQUARES_PULL_TEMPLATE:
+		case SQUARE_OF_CIRCLES_PULL_TEMPLATE:
 			this->shape = SQUARE_SHAPE;
 						tmp = new char[100];
 						sprintf(tmp, "Count");
 			this->parameterNames.push_back(tmp);
-			this->parameterValues.push_back(2);
+			this->parameterValues.push_back(4);
 			this->base = false;
 			break;
 		case BUNDLE_NINETEEN_TEMPLATE:
