@@ -193,7 +193,7 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	if ((event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
 		return;
 
-	statusBar->showMessage("Press SHIFT to fill",3000);
+	statusBar->showMessage("Press SHIFT to auto-fill",3000);
 
 	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
