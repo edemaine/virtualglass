@@ -54,7 +54,12 @@ void MainWindow :: initializeRandomPiece()
 {
 	// Setup colors	
 	editorStack->setCurrentIndex(COLORBAR_MODE); // end in pull plan mode
+	PullPlan* clearColorBar = colorEditorPlan;
+	newColorBar();	
 	PullPlan* opaqueColorBar = colorEditorPlan;
+	opaqueColorBar->color->r = opaqueColorBar->color->g = opaqueColorBar->color->b = 1.0;
+	opaqueColorBar->color->a = 1.0;
+	emit someDataChanged();
 	newColorBar();
 	PullPlan* transparentColorBar = colorEditorPlan;
 	transparentColorBar->color->r = (qrand() % 255) / 255.0;
@@ -65,9 +70,15 @@ void MainWindow :: initializeRandomPiece()
 
 	// Setup cane 
 	editorStack->setCurrentIndex(PULLPLAN_MODE); // end in pull plan mode
-	pullPlanEditorWidget->setPlanTemplate(new PullTemplate(qrand() % 4 + 4));
-	pullPlanEditorWidget->setPlanTemplateCasingThickness((qrand() % 50 + 25) / 100.0);
+	pullPlanEditorWidget->setPlanTemplate(new PullTemplate(CASED_CIRCLE_PULL_TEMPLATE));
+	pullPlanEditorWidget->setPlanTemplateCasingThickness(0.5);
 	pullPlanEditorWidget->setPlanSubplans(opaqueColorBar);
+	pullPlanEditorWidget->setPlanColor(clearColorBar->color);
+	PullPlan* subplan = pullPlanEditorWidget->getPlan();
+	newPullPlan();
+	pullPlanEditorWidget->setPlanTemplate(new PullTemplate(HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE));
+	pullPlanEditorWidget->setPlanTemplateCasingThickness((qrand() % 50 + 25) / 100.0);
+	pullPlanEditorWidget->setPlanSubplans(subplan);
 	pullPlanEditorWidget->setPlanColor(transparentColorBar->color);
 	pullPlanEditorWidget->setPlanTwist(20);
 	emit someDataChanged();
@@ -400,7 +411,8 @@ void MainWindow :: setupEmptyPaneEditor()
 void MainWindow :: setupColorEditor()
 {
 	Color* color = new Color();
-	color->r = color->g = color->b = color->a = 1.0;
+	color->r = color->g = color->b = 1.0;
+	color->a = 0.0;
 	colorEditorPlan = new PullPlan(AMORPHOUS_BASE_PULL_TEMPLATE, color);
 	colorEditorPlanLibraryWidget = new ColorBarLibraryWidget(colorEditorPlan);
 	++colorBarCount;
