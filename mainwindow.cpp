@@ -77,7 +77,7 @@ void MainWindow :: initializeRandomPiece()
 	PullPlan* subplan = pullPlanEditorWidget->getPlan();
 	newPullPlan();
 	pullPlanEditorWidget->setPlanTemplate(new PullTemplate(HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE));
-	pullPlanEditorWidget->setPlanTemplateCasingThickness((qrand() % 50 + 25) / 100.0);
+	pullPlanEditorWidget->setPlanTemplateCasingThickness((qrand() % 30 + 40) / 100.0);
 	pullPlanEditorWidget->setPlanSubplans(subplan);
 	pullPlanEditorWidget->setPlanColor(transparentColorBar->color);
 	pullPlanEditorWidget->setPlanTwist(20);
