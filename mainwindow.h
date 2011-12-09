@@ -39,6 +39,7 @@ class MainWindow : public QMainWindow
 	private:
 		// Methods
 		void setupLibrary();
+		void setupStatusBar();
 		void setupEditors();
 		void setupEmptyPaneEditor();
 		void setupColorEditor();
@@ -65,6 +66,7 @@ class MainWindow : public QMainWindow
 
 		// Variables
 		QLabel* whatToDoLabel;
+		QStatusBar* statusBar;
 		NiceViewWidget* colorBarNiceViewWidget;
 		NiceViewWidget* pieceNiceViewWidget;
 		QLabel* pieceTemplateParameter1Label;
