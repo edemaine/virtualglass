@@ -27,7 +27,7 @@ PickupTemplate :: PickupTemplate(int t)
 			tmp = new char[100];
 			sprintf(tmp, "Column count");
 			parameterNames.push_back(tmp);
-			parameterValues.push_back(14);
+			parameterValues.push_back(10);
 			break;
 		case MURRINE_SQUARE_TEMPLATE:
 			tmp = new char[100];
@@ -116,14 +116,14 @@ void PickupTemplate :: computeSubtemps()
 			for (int i = 0; i < parameterValues[0]; ++i)
 			{
 				p.x = -1.0 + width / 2 + width * i;
-				p.y = -1.0;
+				p.y = 0.0;
 				subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.0, width - 0.01, 
 					SQUARE_SHAPE, 0));
 			}
 			for (int i = 0; i < parameterValues[0]/2; ++i)
 			{
 				p.x = -1.0;
-				p.y = width / 2 + width * i;
+				p.y = -1.0 + width / 2 + width * i;
 				subtemps.push_back(new SubpickupTemplate(p, HORIZONTAL_ORIENTATION, 1.99, width - 0.01, 
 					SQUARE_SHAPE, 1));
 			}

@@ -585,7 +585,7 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 
 			ancestorIndices->push_back(i);
 			generateMesh(plan->subplans[i], plan->getTemplate()->subtemps[i].shape, geometry, ancestors, 
-				ancestorIndices, length - 0.01, false, passGroupIndex);
+				ancestorIndices, length + 0.001, false, passGroupIndex);
 			ancestorIndices->pop_back();
 		}
 	}

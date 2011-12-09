@@ -167,7 +167,7 @@ void PullPlanEditorWidget :: setupLayout()
 	{
 		paramLayout->addWidget(paramLabels[i], 0);
 		paramLayout->addWidget(paramSpins[i], 0);
-		paramSpins[i]->setRange(2, 16);
+		paramSpins[i]->setRange(2, 30);
 		paramSpins[i]->setSingleStep(1);
 		paramLabels[i]->hide();
 		paramSpins[i]->hide();
