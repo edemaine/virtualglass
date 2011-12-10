@@ -32,37 +32,53 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	for (unsigned int i = 0; i < plan->getTemplate()->subtemps.size(); ++i)
 	{
 		SubpullTemplate* subpull = &(plan->getTemplate()->subtemps[i]);
-		if (fabs(event->pos().x() - (drawSize/2 * subpull->location.x + drawSize/2 + 10))
-			+ fabs(event->pos().y() - (drawSize/2 * subpull->location.y + drawSize/2 + 10)) < (subpull->diameter/2.0)*drawSize/2)
+
+		// Determine if drop hit the subplan
+		bool hit = false;
+		float dx = fabs(event->pos().x() - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
+		float dy = fabs(event->pos().y() - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
+		switch (subpull->shape)
 		{
-			// If the dropped plan is a complex plan and its casing shape doesn't match the shape of the
-			// subplan, reject
-			if (type == PULL_PLAN_MIME)
-			{
-				if (subpull->shape != droppedPlan->getTemplate()->getShape())
-				{
-					continue;
-				}
-			}
-
-			event->accept();
-
-			// If the shift button is down, fill in the entire group
-			if (event->keyboardModifiers() & 0x02000000)
-			{
-				int group = plan->getTemplate()->subtemps[i].group;
-				for (unsigned int j = 0; j < plan->getTemplate()->subtemps.size(); ++j)
-				{
-					if (plan->getTemplate()->subtemps[j].group == group)
-						plan->subplans[j] = droppedPlan;
-				}
-			}
-			else // Otherwise just fill in this one
-				plan->subplans[i] = droppedPlan;
-
-			emit someDataChanged();
-			return;
+			case CIRCLE_SHAPE:
+				if (pow(dx*dx + dy*dy, 0.5) < (subpull->diameter/2.0)*drawSize/2)
+					hit = true;
+				break;
+			case SQUARE_SHAPE:
+				if (MAX(dx, dy) < (subpull->diameter/2.0)*drawSize/2)
+					hit = true;
+				break;	
 		}
+		
+		if (!hit)
+			continue;
+
+		// If the dropped plan is a complex plan and its casing shape doesn't match the shape of the
+		// subplan, reject
+		if (type == PULL_PLAN_MIME)
+		{
+			if (subpull->shape != droppedPlan->getTemplate()->getShape())
+			{
+				continue;
+			}
+		}
+
+		event->accept();
+
+		// If the shift button is down, fill in the entire group
+		if (event->keyboardModifiers() & 0x02000000)
+		{
+			int group = plan->getTemplate()->subtemps[i].group;
+			for (unsigned int j = 0; j < plan->getTemplate()->subtemps.size(); ++j)
+			{
+				if (plan->getTemplate()->subtemps[j].group == group)
+					plan->subplans[j] = droppedPlan;
+			}
+		}
+		else // Otherwise just fill in this one
+			plan->subplans[i] = droppedPlan;
+
+		emit someDataChanged();
+		return;
 	}
 
 
