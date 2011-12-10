@@ -104,8 +104,8 @@ void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan)
 }
 
 
-void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int drawHeight, PullPlan* plan, int mandatedShape, 
-	QPainter* painter)
+void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, float drawHeight, 
+	PullPlan* plan, int mandatedShape, QPainter* painter)
 {
 	// Fill the subplan area with some `cleared out' color
 	painter->setBrush(QColor(200, 200, 200));
@@ -164,10 +164,10 @@ void PullPlanEditorViewWidget :: drawSubplan(int x, int y, int drawWidth, int dr
 	{
 		SubpullTemplate* subpull = &(plan->getTemplate()->subtemps[i]);
 
-		int rX = x + (subpull->location.x - subpull->diameter/2.0) * drawWidth/2 + drawWidth/2;
-		int rY = y + (subpull->location.y - subpull->diameter/2.0) * drawWidth/2 + drawHeight/2;
-		int rWidth = subpull->diameter * drawWidth/2;
-		int rHeight = subpull->diameter * drawHeight/2;
+		float rX = x + (subpull->location.x - subpull->diameter/2.0) * drawWidth/2 + drawWidth/2;
+		float rY = y + (subpull->location.y - subpull->diameter/2.0) * drawWidth/2 + drawHeight/2;
+		float rWidth = subpull->diameter * drawWidth/2;
+		float rHeight = subpull->diameter * drawHeight/2;
 
 		drawSubplan(rX, rY, rWidth, rHeight, plan->subplans[i], plan->getTemplate()->subtemps[i].shape, painter);
 	}
