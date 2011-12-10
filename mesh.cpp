@@ -11,33 +11,6 @@ using std::make_pair;
 
 Mesher :: Mesher()
 {
-	trigTableSize = 1000;	
-	for (int i = 0; i < trigTableSize; ++i)
-	{
-		cosTable.push_back(cos(TWO_PI * i / trigTableSize));
-	}
-	for (int i = 0; i < trigTableSize; ++i)
-	{
-		sinTable.push_back(sin(TWO_PI * i / trigTableSize));
-	}
-}
-
-float Mesher :: tableCos(float theta)
-{
-	if (theta < 0)
-		theta = TWO_PI - fmod(-theta, TWO_PI);	
-	else
-		theta = fmod(theta, TWO_PI);
-	return cosTable[trigTableSize * (theta / TWO_PI)];
-}
-
-float Mesher :: tableSin(float theta)
-{
-	if (theta < 0)
-		theta = TWO_PI - fmod(-theta, TWO_PI);	
-	else
-		theta = fmod(theta, TWO_PI);
-	return sinTable[trigTableSize * (theta / TWO_PI)];
 }
 
 void Mesher:: updateTotalCaneLength(Piece* piece)
@@ -123,8 +96,8 @@ void Mesher :: applyTwistTransform(Vertex* v, PullPlan* transformNode)
 	float r = length(v->position.xy);
 	float transformTheta = twist / 10.0 * v->position.z;
 	float postTheta = preTheta + transformTheta;
-	v->position.x = r * tableCos(postTheta);
-	v->position.y = r * tableSin(postTheta);
+	v->position.x = r * cos(postTheta);
+	v->position.y = r * sin(postTheta);
 }
 
 void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
@@ -174,9 +147,9 @@ void Mesher :: applyBowlTransform(Vertex* v, vector<int>* parameterValues)
 	float r = totalR - v->position.y;
 	float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
 
-	v->position.x = r * tableCos(theta) * tableCos(phi);
-	v->position.y = r * tableSin(theta) * tableCos(phi);
-	v->position.z = r * tableSin(phi) + (totalR - totalR * tableSin(totalPhi - PI / 2))/2.0;
+	v->position.x = r * cos(theta) * cos(phi);
+	v->position.y = r * sin(theta) * cos(phi);
+	v->position.z = r * sin(phi) + (totalR - totalR * sin(totalPhi - PI / 2))/2.0;
 }
 
 float Mesher :: splineVal(float r1, float r2, float r3, float r4, float t)
@@ -201,13 +174,13 @@ void Mesher :: applyVaseTransform(Vertex* v, vector<int>* parameterValues)
 
 	if (radius < 1.0)
 	{
-		v->position.x = (radius - v->position.y * radius) * tableCos(theta); 
-		v->position.y = (radius - v->position.y * radius) * tableSin(theta); 
+		v->position.x = (radius - v->position.y * radius) * cos(theta); 
+		v->position.y = (radius - v->position.y * radius) * sin(theta); 
 	}
 	else
 	{
-		v->position.x = (radius - v->position.y / radius) * tableCos(theta); 
-		v->position.y = (radius - v->position.y / radius) * tableSin(theta); 
+		v->position.x = (radius - v->position.y / radius) * cos(theta); 
+		v->position.y = (radius - v->position.y / radius) * sin(theta); 
 	}
 }
 
@@ -226,13 +199,13 @@ void Mesher :: applyTumblerTransform(Vertex* v, vector<int>* parameterValues)
 
 	if (radius < 1.0)
 	{
-		v->position.x = (radius - v->position.y * radius) * tableCos(theta); 
-		v->position.y = (radius - v->position.y * radius) * tableSin(theta); 
+		v->position.x = (radius - v->position.y * radius) * cos(theta); 
+		v->position.y = (radius - v->position.y * radius) * sin(theta); 
 	}
 	else
 	{
-		v->position.x = (radius - v->position.y / radius) * tableCos(theta); 
-		v->position.y = (radius - v->position.y / radius) * tableSin(theta); 
+		v->position.x = (radius - v->position.y / radius) * cos(theta); 
+		v->position.y = (radius - v->position.y / radius) * sin(theta); 
 	}
 }
 
@@ -273,8 +246,8 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 		case CIRCLE_SHAPE:
 			for (unsigned int i = 0; i < angularResolution; ++i)
 			{
-				p.x = tableCos(TWO_PI * i / angularResolution);
-				p.y = tableSin(TWO_PI * i / angularResolution);
+				p.x = cos(TWO_PI * i / angularResolution);
+				p.y = sin(TWO_PI * i / angularResolution);
 				points.push_back(p);
 			}
 			break;

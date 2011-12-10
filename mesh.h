@@ -37,8 +37,6 @@ class Mesher
 		float asymptoteVal(float s, float t);
 		float splineVal(float r1, float r2, float r3, float t);
 		float splineVal(float r1, float r2, float r3, float r4, float t);
-		float tableCos(float theta);
-		float tableSin(float theta);
 		void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
 			PullPlan* plan, float length, bool ensureVisible, uint32_t group_tag);
 		void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
@@ -57,9 +55,6 @@ class Mesher
 		float computeTotalCaneLength(PullPlan* plan);
 
 		// Variables
-		int trigTableSize;
-		vector<float> cosTable;
-		vector<float> sinTable;
 		float totalCaneLength;
 };
 #endif
