@@ -287,10 +287,13 @@ void MainWindow :: setupLibrary()
 	// make three qlabels for a legend
 	QGridLayout* legendLayout = new QGridLayout(centralWidget);
 	QLabel* l1 = new QLabel("Used By Current");
+	l1->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	l1->setStyleSheet("border: 2px dashed" + QColor(0, 139, 69, 255).name() + ";");
 	QLabel* l2 = new QLabel("Current Selection");
+	l2->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	l2->setStyleSheet("border: 4px solid " + QColor(0, 0, 255, 255).name() + ";");
 	QLabel* l3 = new QLabel("Uses Current");
+	l3->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	l3->setStyleSheet("border: 2px dashed" + QColor(255, 127, 0, 255).name() + ";");
 	legendLayout->addWidget(l1,0,1);
 	legendLayout->addWidget(l2,0,2);
