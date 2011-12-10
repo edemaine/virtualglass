@@ -20,6 +20,7 @@
 #include "piece.h"
 #include "pulltemplatelibrarywidget.h"
 #include "pickuptemplatelibrarywidget.h"
+#include "qgraphicshighlighteffect.h"
 
 class MainWindow : public QMainWindow
 {

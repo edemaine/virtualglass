@@ -18,7 +18,6 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 
 void PullPlanEditorWidget :: updateEverything()
 {
-        // Only attempt to set the shape if it's defined; it's undefined during loading
         static_cast<QCheckBox*>(shapeButtonGroup->button(
                 plan->getTemplate()->getShape()))->setCheckState(Qt::Checked);
 
@@ -225,12 +224,21 @@ void PullPlanEditorWidget :: viewWidgetDataChanged()
 void PullPlanEditorWidget :: paramSpinChanged(int)
 {
 	// update template
+	bool valueChanged = false;
 	for (unsigned int i = 0; i < plan->getTemplate()->getParameterCount(); ++i)
 	{
-		plan->getTemplate()->setParameter(i, paramSpins[i]->value());
+		if (plan->getTemplate()->getParameter(i) != paramSpins[i]->value())
+		{
+			valueChanged = true;
+			plan->getTemplate()->setParameter(i, paramSpins[i]->value());
+		}
 	}
-	plan->setTemplate(plan->getTemplate()); // a hack to propogate the possibly changed number of subtemplates
-	emit someDataChanged();
+
+	if (valueChanged)
+	{
+		plan->setTemplate(plan->getTemplate()); // a hack to propogate the possibly changed number of subtemplates
+		emit someDataChanged();
+	}
 }
 
 void PullPlanEditorWidget :: casingThicknessSliderChanged(int)
