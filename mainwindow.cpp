@@ -258,12 +258,22 @@ void MainWindow :: setupConnections()
 
 void MainWindow :: setupLibrary()
 {
-	QVBoxLayout* tableLayout = new QVBoxLayout(centralWidget);
-	centralLayout->addLayout(tableLayout, 1);
+	QWidget* tableWidget = new QWidget(centralWidget);
+	centralLayout->addWidget(tableWidget);
+	QVBoxLayout* tableLayout = new QVBoxLayout(tableWidget);
+	tableWidget->setLayout(tableLayout);
 
-	QWidget* tableGridLibraryWidget = new QWidget(centralWidget);
+	QScrollArea* tableGridLibraryScrollArea = new QScrollArea(tableWidget);
+	tableGridLibraryScrollArea->setBackgroundRole(QPalette::Dark);
+	tableGridLibraryScrollArea->setWidgetResizable(true);
+	tableGridLibraryScrollArea->setFixedWidth(370);
+	tableGridLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	tableGridLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	tableLayout->addWidget(tableGridLibraryScrollArea, 1);
+
+	QWidget* tableGridLibraryWidget = new QWidget(tableWidget);
+	tableGridLibraryScrollArea->setWidget(tableGridLibraryWidget);
 	tableGridLayout = new QGridLayout(tableGridLibraryWidget);
-	tableGridLayout->setSpacing(10);
 	tableGridLibraryWidget->setLayout(tableGridLayout);
 	colorBarCount = pullPlanCount = pieceCount = 0;
 
@@ -275,33 +285,24 @@ void MainWindow :: setupLibrary()
 	tableGridLayout->addWidget(newPullPlanButton, 0, 1);
 	tableGridLayout->addWidget(newPieceButton, 0, 2);
 
-	QScrollArea* tableGridLibraryScrollArea = new QScrollArea;
-	tableGridLibraryScrollArea->setBackgroundRole(QPalette::Dark);
-	tableGridLibraryScrollArea->setWidget(tableGridLibraryWidget);
-	tableGridLibraryScrollArea->setWidgetResizable(true);
-	tableGridLibraryScrollArea->setFixedWidth(380);
-	tableGridLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	tableGridLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	tableLayout->addWidget(tableGridLibraryScrollArea);
-
 	// make three qlabels for a legend
-	QGridLayout* legendLayout = new QGridLayout(centralWidget);
+	QGridLayout* legendLayout = new QGridLayout(tableWidget);
 	QLabel* l1 = new QLabel("Used By Current");
 	l1->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	l1->setStyleSheet("border: 2px dashed" + QColor(0, 139, 69, 255).name() + ";");
+	l1->setStyleSheet("border: 2px dashed " + QColor(0, 139, 69, 255).name() + ";");
 	QLabel* l2 = new QLabel("Current Selection");
 	l2->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	l2->setStyleSheet("border: 4px solid " + QColor(0, 0, 255, 255).name() + ";");
+	l2->setStyleSheet("border: 3px solid " + QColor(0, 0, 255, 255).name() + ";");
 	QLabel* l3 = new QLabel("Uses Current");
 	l3->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	l3->setStyleSheet("border: 2px dashed" + QColor(255, 127, 0, 255).name() + ";");
+	l3->setStyleSheet("border: 2px dotted " + QColor(200, 100, 0, 255).name() + ";");
 	legendLayout->addWidget(l1,0,1);
 	legendLayout->addWidget(l2,0,2);
 	legendLayout->addWidget(l3,0,3);
 	tableLayout->addLayout(legendLayout, 0);
 
 	QLabel* descriptionLabel = new QLabel("Library - click to edit or drag into edited item.",
-		centralWidget);
+		tableWidget);
 	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	tableLayout->addWidget(descriptionLabel, 0);
 }
@@ -409,6 +410,7 @@ void MainWindow :: setupPieceEditor()
 	parameter2Layout->addWidget(pieceTemplateParameter2Slider);
 
 	// Little description for the editor
+        leftLayout->addStretch(1);
 	QLabel* pieceEditorDescriptionLabel = new QLabel("Piece editor", pieceEditorPage);
 	pieceEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	leftLayout->addWidget(pieceEditorDescriptionLabel, 0);

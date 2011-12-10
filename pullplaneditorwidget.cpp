@@ -81,7 +81,7 @@ void PullPlanEditorWidget :: setupLayout()
         QVBoxLayout* editorLayout = new QVBoxLayout(this);
         pageLayout->addLayout(editorLayout);
 
-        editorLayout->addWidget(viewWidget, 10);
+        editorLayout->addWidget(viewWidget, 0);
 
         // Setup pull template scrolling library
         QWidget* templateLibraryWidget = new QWidget(this);
@@ -133,7 +133,7 @@ void PullPlanEditorWidget :: setupLayout()
 
         // Twist slider stuff
         QHBoxLayout* twistLayout = new QHBoxLayout(this);
-        editorLayout->addLayout(twistLayout);
+        editorLayout->addLayout(twistLayout, 0);
 
         QLabel* twistLabel1 = new QLabel("Twist:", this);
         twistLayout->addWidget(twistLabel1);
@@ -173,9 +173,10 @@ void PullPlanEditorWidget :: setupLayout()
 		paramLabels[i]->hide();
 		paramSpins[i]->hide();
 	}
-	editorLayout->addLayout(paramLayout);	
+	editorLayout->addLayout(paramLayout, 0);	
 
         // Little description for the editor
+	editorLayout->addStretch(1);
         QLabel* descriptionLabel = new QLabel("Cane editor - drag color or other canes into the cane to edit.", this);
         descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
         editorLayout->addWidget(descriptionLabel, 0);

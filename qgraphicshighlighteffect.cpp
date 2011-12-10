@@ -15,10 +15,18 @@ void QGraphicsHighlightEffect :: setStyleSheet(bool enableBorder)
 {
 	if (enableBorder)
 	{
-		if (dependancy == IS_DEPENDANCY)
-			emit styleSheetString("border: 4px solid " + color().name() + ";");
-		else
-			emit styleSheetString("border: 2px dashed " + color().name() + ";");
+		switch (dependancy)
+		{
+			case IS_DEPENDANCY:	
+				emit styleSheetString("border: 3px solid " + color().name() + ";");
+				break;
+			case USES_DEPENDANCY:
+				emit styleSheetString("border: 2px dotted " + color().name() + ";");
+				break;
+			case IS_USED_BY_DEPENDANCY:
+				emit styleSheetString("border: 2px dashed " + color().name() + ";");
+				break;
+		}
 	}
 	else
 		emit styleSheetString("border: 0px solid");
@@ -34,7 +42,7 @@ void QGraphicsHighlightEffect::setHighlightType(int dependancy)
 			mColor = QColor(0, 0, 255, 255);
 			break;
 		case USES_DEPENDANCY:
-			mColor = QColor(255, 127, 0, 255);
+			mColor = QColor(200, 100, 0, 255);
 			break;
 		case IS_USED_BY_DEPENDANCY:
 			mColor = QColor(0, 139, 69, 255);
