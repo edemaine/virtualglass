@@ -106,7 +106,7 @@ void PickupTemplate :: computeSubtemps()
 			{
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = -1.0;
-				subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 2.0, width-0.00001, 
+				subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 2.0, width-0.0001, 
 					SQUARE_SHAPE, 0));
 			}
 			break;

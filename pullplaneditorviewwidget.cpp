@@ -165,7 +165,13 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		painter->setPen(pen);
 	}
 	else
-		painter->setPen(Qt::NoPen);
+	{
+		QPen pen;
+		pen.setWidth(2);
+		pen.setColor(Qt::black);
+		pen.setStyle(Qt::DotLine);
+		painter->setPen(pen);
+	}
 	painter->setBrush(QColor(255*plan->color->r, 255*plan->color->g, 255*plan->color->b, 255*plan->color->a));
 	switch (mandatedShape)
 	{
