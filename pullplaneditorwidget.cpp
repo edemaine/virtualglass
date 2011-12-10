@@ -177,7 +177,7 @@ void PullPlanEditorWidget :: setupLayout()
 
         // Little description for the editor
 	editorLayout->addStretch(1);
-        QLabel* descriptionLabel = new QLabel("Cane editor - drag color or other canes into the cane to edit.", this);
+        QLabel* descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", this);
         descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
         editorLayout->addWidget(descriptionLabel, 0);
 

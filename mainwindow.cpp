@@ -192,7 +192,7 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	if ((event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
 		return;
 
-	statusBar->showMessage("Press SHIFT to auto-fill",3000);
+	statusBar->showMessage("Hold shift to fill all subcanes at once.", 3000);
 
 	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
@@ -301,7 +301,7 @@ void MainWindow :: setupLibrary()
 	legendLayout->addWidget(l3,0,3);
 	tableLayout->addLayout(legendLayout, 0);
 
-	QLabel* descriptionLabel = new QLabel("Library - click to edit or drag into edited item.",
+	QLabel* descriptionLabel = new QLabel("Library - click to edit or drag to add.",
 		tableWidget);
 	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	tableLayout->addWidget(descriptionLabel, 0);
@@ -411,7 +411,7 @@ void MainWindow :: setupPieceEditor()
 
 	// Little description for the editor
         leftLayout->addStretch(1);
-	QLabel* pieceEditorDescriptionLabel = new QLabel("Piece editor", pieceEditorPage);
+	QLabel* pieceEditorDescriptionLabel = new QLabel("Piece editor - drag canes in.", pieceEditorPage);
 	pieceEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	leftLayout->addWidget(pieceEditorDescriptionLabel, 0);
 
