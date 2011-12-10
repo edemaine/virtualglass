@@ -105,7 +105,7 @@ void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan)
 
 
 void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, float drawHeight, 
-	PullPlan* plan, int mandatedShape, QPainter* painter)
+	PullPlan* plan, int mandatedShape, int borderLevels, QPainter* painter)
 {
 	// Fill the subplan area with some `cleared out' color
 	painter->setBrush(QColor(200, 200, 200));
@@ -141,10 +141,15 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 
 	// Draw casing shape
 	painter->setBrush(Qt::NoBrush);
-	QPen pen;
-	pen.setWidth(5);
-	pen.setColor(Qt::black);
-	painter->setPen(pen);
+	if (borderLevels > 0)
+	{
+		QPen pen;
+		pen.setWidth(borderLevels*2+1);
+		pen.setColor(Qt::black);
+		painter->setPen(pen);
+	}
+	else
+		painter->setPen(Qt::NoPen);
 	painter->setBrush(QColor(255*plan->color->r, 255*plan->color->g, 255*plan->color->b, 255*plan->color->a));
 	switch (mandatedShape)
 	{
@@ -169,7 +174,8 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		float rWidth = subpull->diameter * drawWidth/2;
 		float rHeight = subpull->diameter * drawHeight/2;
 
-		drawSubplan(rX, rY, rWidth, rHeight, plan->subplans[i], plan->getTemplate()->subtemps[i].shape, painter);
+		drawSubplan(rX, rY, rWidth, rHeight, plan->subplans[i], plan->getTemplate()->subtemps[i].shape, 
+			borderLevels-1, painter);
 	}
 }
 
@@ -179,7 +185,7 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 	painter.begin(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 	painter.fillRect(event->rect(), QColor(200, 200, 200));
-	drawSubplan(10, 10, width() - 20, height() - 20, plan, plan->getTemplate()->getShape(), &painter);
+	drawSubplan(10, 10, width() - 20, height() - 20, plan, plan->getTemplate()->getShape(), 2, &painter);
 	painter.end();
 }
 

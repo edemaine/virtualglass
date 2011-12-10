@@ -46,7 +46,7 @@ void MainWindow :: seedEverything()
 	editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
 	emit someDataChanged();
 
-	whatToDoLabel->setText("Click a library item at left to modify it.");
+	whatToDoLabel->setText("Click a library item at left to edit/view.");
 }
 
 // Too weird to live; too strange to die
@@ -287,13 +287,13 @@ void MainWindow :: setupLibrary()
 
 	// make three qlabels for a legend
 	QGridLayout* legendLayout = new QGridLayout(tableWidget);
-	QLabel* l1 = new QLabel("Used By Current");
+	QLabel* l1 = new QLabel("Used By Selected");
 	l1->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	l1->setStyleSheet("border: 2px dashed " + QColor(0, 139, 69, 255).name() + ";");
-	QLabel* l2 = new QLabel("Current Selection");
+	QLabel* l2 = new QLabel("Selected");
 	l2->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	l2->setStyleSheet("border: 3px solid " + QColor(0, 0, 255, 255).name() + ";");
-	QLabel* l3 = new QLabel("Uses Current");
+	QLabel* l3 = new QLabel("Uses Selected");
 	l3->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	l3->setStyleSheet("border: 2px dotted " + QColor(200, 100, 0, 255).name() + ";");
 	legendLayout->addWidget(l1,0,1);
