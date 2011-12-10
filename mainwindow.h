@@ -108,6 +108,7 @@ class MainWindow : public QMainWindow
 		void pieceTemplateComboBoxChanged(int index);
 		void newColorBar();
 		void newPullPlan();
+		void newPullPlan(PullPlan* p);
 		void newPiece();
 		void pieceTemplateParameterSlider1Changed(int);
 		void pieceTemplateParameterSlider2Changed(int);

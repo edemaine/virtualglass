@@ -240,6 +240,7 @@ void MainWindow :: setupConnections()
 	connect(newPullPlanButton, SIGNAL(pressed()), this, SLOT(newPullPlan()));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(pullPlanEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+	connect(pullPlanEditorWidget, SIGNAL(newPullPlan(PullPlan*)), this, SLOT(newPullPlan(PullPlan*)));
 
 	connect(pickupPlanEditorViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(pickupTemplateParameter1SpinBox, SIGNAL(valueChanged(int)),
@@ -576,6 +577,24 @@ void MainWindow :: newPullPlan()
 
 	// Trigger GUI updates
 	emit someDataChanged();
+}
+
+void MainWindow :: newPullPlan(PullPlan* newPlan)
+{
+        unhighlightAllLibraryWidgets();
+        pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(newPlan);
+        ++pullPlanCount;
+        tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
+        newPlan->setLibraryWidget(pullPlanEditorPlanLibraryWidget);
+
+        // Give the new plan to the editor
+        pullPlanEditorWidget->setPlan(newPlan);
+
+        // Load up the right editor
+        editorStack->setCurrentIndex(PULLPLAN_MODE);
+
+        // Trigger GUI updates
+        emit someDataChanged();
 }
 
 

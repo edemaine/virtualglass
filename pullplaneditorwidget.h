@@ -31,11 +31,13 @@ class PullPlanEditorWidget : public QWidget
 
 	signals:
 		void someDataChanged();
+		void newPullPlan(PullPlan* p);
 
 	public slots:
 		void updateEverything();
 
 	private slots:
+		void addCasingButtonPressed();
 		void viewWidgetDataChanged();
 		void shapeButtonGroupChanged(int);
 		void twistSpinChanged(int);
@@ -56,6 +58,7 @@ class PullPlanEditorWidget : public QWidget
                 QButtonGroup* shapeButtonGroup;
 		QSlider* casingThicknessSlider;
         	QHBoxLayout* templateLibraryLayout;
+		QPushButton* addCasingButton;
 
 		void setupLayout();
 		void setupConnections();

@@ -101,6 +101,7 @@ void PullPlanEditorWidget :: setupLayout()
         QLabel* casingLabel = new QLabel("Casing:");
         QCheckBox* circleCheckBox = new QCheckBox("Circle");
         QCheckBox* squareCheckBox = new QCheckBox("Square");
+	addCasingButton = new QPushButton("Add Casing");
         shapeButtonGroup = new QButtonGroup();
         shapeButtonGroup->addButton(circleCheckBox, 1);
         shapeButtonGroup->addButton(squareCheckBox, 2);
@@ -108,6 +109,7 @@ void PullPlanEditorWidget :: setupLayout()
         pullTemplateShapeLayout->addWidget(casingLabel);
         pullTemplateShapeLayout->addWidget(circleCheckBox);
         pullTemplateShapeLayout->addWidget(squareCheckBox);
+        pullTemplateShapeLayout->addWidget(addCasingButton);
         editorLayout->addLayout(pullTemplateShapeLayout, 0);
 
         // Casing thickness slider stuff
@@ -199,8 +201,30 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
         }
 }
 
+void PullPlanEditorWidget :: addCasingButtonPressed()
+{
+	PullPlan* superplan;
+
+	switch (plan->getTemplate()->getShape())
+	{
+		case CIRCLE_SHAPE:
+			superplan =  new PullPlan(CASED_CIRCLE_PULL_TEMPLATE, plan->color);
+			break;
+		case SQUARE_SHAPE:
+			superplan =  new PullPlan(CASED_SQUARE_PULL_TEMPLATE, plan->color);
+			break;
+		default:
+			exit(0);
+	}
+	
+	superplan->subplans.clear();
+	superplan->subplans.push_back(plan);
+	emit newPullPlan(superplan);
+}
+
 void PullPlanEditorWidget :: setupConnections()
 {
+	connect(addCasingButton, SIGNAL(pressed()), this, SLOT(addCasingButtonPressed()));
         connect(shapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(shapeButtonGroupChanged(int)));
         connect(casingThicknessSlider, SIGNAL(valueChanged(int)),
                 this, SLOT(casingThicknessSliderChanged(int)));
