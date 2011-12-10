@@ -157,7 +157,11 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 
 	// Draw casing shape
 	painter->setBrush(Qt::NoBrush);
-	if (borderLevels > 0)
+	if (MIN(drawWidth, drawHeight) < 10)
+	{
+                painter->setPen(Qt::NoPen);
+	}
+	else if (borderLevels > 0)
 	{
 		QPen pen;
 		pen.setWidth(borderLevels*2+1);
