@@ -73,7 +73,7 @@ void PickupTemplate :: computeSubtemps()
 			{
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = -1.0;
-				subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 2.0, width-0.00001, 
+				subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 2.0, width-0.0001, 
 					CIRCLE_SHAPE, 0));
 			}
 			for (int i = 0; i < parameterValues[0]; ++i)
@@ -81,11 +81,12 @@ void PickupTemplate :: computeSubtemps()
 				p.x = 1.0 - width / 2;
 				p.y = -1.0 + width / 2 + width * i;
 				p.z = -width/2;
-				subtemps.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, width-0.00001, width-0.00001, 
+				subtemps.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, 0.2, width-0.0001, 
 					SQUARE_SHAPE, 1));
 			}
 			break;
 		case MURRINE_SQUARE_TEMPLATE:
+                        p.x = p.y = p.z = 0.0;
 			width = 2.0 / MAX(parameterValues[0], 1);
 			for (int i = 0; i < parameterValues[0]; ++i)
 			{
@@ -93,8 +94,8 @@ void PickupTemplate :: computeSubtemps()
 				{
 					p.x = -1.0 + width / 2 + width * i;
 					p.y = -1.0 + width / 2 + width * j;
-					p.z = width / 2;
-					subtemps.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, 0.2,
+					p.z = -width / 2;
+					subtemps.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, width-0.0001,
 						width-0.00001, SQUARE_SHAPE, 0));
 				}
 			}
@@ -117,14 +118,14 @@ void PickupTemplate :: computeSubtemps()
 			{
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = 0.0;
-				subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.0, width-0.00001, 
+				subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.0, width-0.0001, 
 					SQUARE_SHAPE, 0));
 			}
 			for (int i = 0; i < parameterValues[0]/2; ++i)
 			{
 				p.x = -1.0;
 				p.y = -1.0 + width / 2 + width * i;
-				subtemps.push_back(new SubpickupTemplate(p, HORIZONTAL_ORIENTATION, 2.0, width-0.00001, 
+				subtemps.push_back(new SubpickupTemplate(p, HORIZONTAL_ORIENTATION, 2.0, width-0.0001, 
 					SQUARE_SHAPE, 1));
 			}
 			break;

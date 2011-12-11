@@ -226,7 +226,7 @@ typedef set< Vector2ui > EdgeSet;
 The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
 */
 void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
-	PullPlan* plan, int mandatedShape, float length, bool ensureVisible, uint32_t group_tag)
+	PullPlan* plan, int mandatedShape, float offset, float length, bool ensureVisible, uint32_t group_tag)
 {
 	if (plan->color->a < 0.0001 && !ensureVisible)
 		return;
@@ -354,7 +354,10 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 			{
 				Point p;
 				p.xy = points[(*loop)[j]];
-				p.z = 5.0 * length * i / (axialResolution-1);
+				if (i == 0)
+					p.z = 5.0 * offset;
+				else
+					p.z = 5.0 * length * i / (axialResolution-1);
 				Point n;
 				//This is a terrible normal estimate, but I guess it gets re-estimated anyway.
 				n.x = p.x;
@@ -392,7 +395,7 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 		if (side)
 			z = 5.0 * length;
 		else
-			z = 0.0;
+			z = 5.0 * offset;
 		float nz = (side ? 1.0:-1.0);
 		uint32_t base = geometry->vertices.size();
 		for (unsigned int j = 0; j < points.size(); ++j)
@@ -467,8 +470,8 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPla
 	{
 		ancestors->clear();
 		ancestorIndices->clear();
-		generateMesh(plan->subplans[i], plan->getTemplate()->subtemps[i]->shape, geometry, ancestors, ancestorIndices,  
-			plan->getTemplate()->subtemps[i]->length, true, i); 
+		generateMesh(plan->subplans[i], plan->subplans[i]->getTemplate()->getShape(), geometry, 
+			ancestors, ancestorIndices, 0.0, plan->getTemplate()->subtemps[i]->length, true, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
 		{
@@ -512,9 +515,9 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry* geometry)
         vector<PullPlan*> ancestors;
         vector<int> ancestorIndices;
 	if (plan->getTemplate()->type == AMORPHOUS_BASE_PULL_TEMPLATE)
-		generateMesh(plan, CIRCLE_SHAPE, geometry, &ancestors, &ancestorIndices, 2.0, true);
+		generateMesh(plan, CIRCLE_SHAPE, geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 	else
-		generateMesh(plan, plan->getTemplate()->getShape(), geometry, &ancestors, &ancestorIndices, 2.0, true);
+		generateMesh(plan, plan->getTemplate()->getShape(), geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 	geometry->compute_normals_from_triangles();
 }
 
@@ -526,7 +529,7 @@ leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
 void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometry, vector<PullPlan*>* ancestors, 
-	vector<int>* ancestorIndices, float length, bool ensureVisible, int groupIndex)
+	vector<int>* ancestorIndices, float offset, float length, bool ensureVisible, int groupIndex)
 {
 	int passGroupIndex;
 
@@ -534,7 +537,7 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 		return;
 
 	ancestors->push_back(plan); 
-	meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan, mandatedShape, length, ensureVisible, groupIndex);
+	meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan, mandatedShape, offset, length, ensureVisible, groupIndex);
 	ancestors->pop_back();
 
 	// Make recursive calls depending on the type of the current node
@@ -558,7 +561,7 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 
 			ancestorIndices->push_back(i);
 			generateMesh(plan->subplans[i], plan->getTemplate()->subtemps[i].shape, geometry, ancestors, 
-				ancestorIndices, length + 0.001, false, passGroupIndex);
+				ancestorIndices, offset - 0.001, length + 0.001, false, passGroupIndex);
 			ancestorIndices->pop_back();
 		}
 	}
