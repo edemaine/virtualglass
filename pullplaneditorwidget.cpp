@@ -381,7 +381,7 @@ void PullPlanEditorWidget :: seedTemplates()
 
 void PullPlanEditorWidget :: updateLibraryWidgetPixmaps(PullPlanLibraryWidget* w)
 {
-        w->updatePixmaps(
+	w->updatePixmaps(
 		QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100),
 		QPixmap::grabWidget(viewWidget).scaled(100, 100));
 }

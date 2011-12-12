@@ -143,9 +143,8 @@ void NiceViewWidget :: initializeGL()
 	gl_errors("NiceViewWidget::initializeGL");
 }
 
-
 QImage NiceViewWidget :: renderImage() {
-        if (!initializeGLCalled) {
+	if (!initializeGLCalled) {
 		initializeGL();
 	}
 	makeCurrent();

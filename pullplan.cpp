@@ -115,8 +115,15 @@ PullTemplate* PullPlan :: getTemplate()
 	return this->pullTemplate;
 }
 
+const QPixmap* PullPlan :: getEditorPixmap()
+{
+	return &(this->editorPixmap);
+}
 
-
+void PullPlan :: updatePixmap(QPixmap editorPixmap)
+{
+	this->editorPixmap = editorPixmap;
+}
 
 
 
