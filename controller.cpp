@@ -14,9 +14,9 @@ Controller::Controller(int argc, char **argv)
 int Controller::startUp()
 {
 	QDir pluginsDir = QDir(app->applicationDirPath());
-	#if defined(Q_OS_WIN)
-	if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-		pluginsDir.cdUp();
+        #if defined(Q_OS_WIN)
+        if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+                pluginsDir.cdUp();
 	#elif defined(Q_OS_MAC)
 	if (pluginsDir.dirName() == "MacOS") 
 	{
@@ -25,8 +25,6 @@ int Controller::startUp()
 		pluginsDir.cdUp();
 	}
 	#endif
-	mainWindow->show(); 
-	mainWindow->seedEverything();
 	return app->exec();
 }
 

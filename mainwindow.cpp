@@ -15,8 +15,14 @@ MainWindow :: MainWindow(Model* model)
 	setupConnections();
 
 	setWindowTitle(tr("Virtual Glass"));
-	move(0, 0);
+        move(0, 0);
+        show();
 
+        seedEverything();
+        initializeRandomPiece();
+        editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
+        emit someDataChanged();
+        whatToDoLabel->setText("Click a library item at left to edit/view.");
 }
 
 void MainWindow :: seedEverything()
@@ -40,13 +46,6 @@ void MainWindow :: seedEverything()
 			QPixmap::fromImage(QImage(filename)), i);
 		pickupTemplateLibraryLayout->addWidget(ptlw);
 	}
-
-	initializeRandomPiece();
-
-	editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
-	emit someDataChanged();
-
-	whatToDoLabel->setText("Click a library item at left to edit/view.");
 }
 
 // Too weird to live; too strange to die
@@ -472,7 +471,6 @@ void MainWindow :: setupPullPlanEditor()
 	pullPlanEditorWidget = new PullPlanEditorWidget(editorStack);
 	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(pullPlanEditorWidget->getPlan());
 	pullPlanEditorWidget->getPlan()->setLibraryWidget(pullPlanEditorPlanLibraryWidget);
-	pullPlanEditorWidget->updateLibraryWidgetPixmaps(pullPlanEditorPlanLibraryWidget);
 	++pullPlanCount;
 	tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
 }
