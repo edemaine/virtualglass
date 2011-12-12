@@ -192,7 +192,7 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	if ((event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
 		return;
 
-	statusBar->showMessage("Hold shift to fill all subcanes at once.", 3000);
+	statusBar->showMessage("Hold Shift to fill all subcanes at once, Alt to fill every other subcane.", 3000);
 
 	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));

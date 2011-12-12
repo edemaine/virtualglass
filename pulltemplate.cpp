@@ -70,14 +70,14 @@ void PullTemplate :: updateSubtemps()
 	switch (this->type)
 	{
 		case CASED_CIRCLE_PULL_TEMPLATE:
-						subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, radius * 2.0, 0));
+			subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, radius * 2.0, 0));
 			break;
 		case CASED_SQUARE_PULL_TEMPLATE:
 			if (this->shape == CIRCLE_SHAPE)
 			{
 				radius *= 1.0 / pow(2, 0.5);
 			}
-						subtemps.push_back(SubpullTemplate(SQUARE_SHAPE, p, radius * 2.0, 0));
+			subtemps.push_back(SubpullTemplate(SQUARE_SHAPE, p, radius * 2.0, 0));
 			break;
 		case HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE:
 		{
@@ -121,27 +121,27 @@ void PullTemplate :: updateSubtemps()
 			break;
 		}
 		case CROSS_PULL_TEMPLATE:
-				{
-						int count = parameterValues[0] * 2 + 1;
+		{
+			int count = parameterValues[0] * 2 + 1;
 
-						for (int i = 0; i < count; ++i)
-						{
-								float littleRadius = (2 * radius / count) / 2;
-								p.x = -radius + littleRadius + i * 2 * littleRadius;
+			for (int i = 0; i < count; ++i)
+			{
+				float littleRadius = (2 * radius / count) / 2;
+				p.x = -radius + littleRadius + i * 2 * littleRadius;
 				p.y = 0.0;
-								subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2.0, 0));
-						}
-						for (int i = 0; i < count; ++i)
-						{
+				subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2.0, 0));
+			}
+			for (int i = 0; i < count; ++i)
+			{
 				if (i == (count - 1)/2)
 					continue;
-								float littleRadius = (2 * radius / count) / 2;
+				float littleRadius = (2 * radius / count) / 2;
 				p.x = 0.0;
-								p.y = -radius + littleRadius + i * 2 * littleRadius;
-								subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2.0, 0));
-						}
-						break;
-				}
+				p.y = -radius + littleRadius + i * 2 * littleRadius;
+				subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2.0, 0));
+			}
+			break;
+		}
 		case SQUARE_OF_CIRCLES_PULL_TEMPLATE:
 		case SQUARE_OF_SQUARES_PULL_TEMPLATE:
 		{

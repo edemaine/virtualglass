@@ -89,6 +89,26 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 					piece->pickup->subplans[j] = droppedPlan;
 			}
 		}
+                // If the alt button is down, fill alternating elements in the group
+                else if (event->keyboardModifiers() & 0x08000000)
+                {
+                        int group = piece->pickup->getTemplate()->subtemps[i]->group;
+                        bool parity = true;
+                        unsigned int subtempCount = piece->pickup->getTemplate()->subtemps.size();
+                        unsigned int j = i;
+                        do
+                        {
+                                if (piece->pickup->getTemplate()->subtemps[j]->group == group)
+				{
+					if (parity)
+						piece->pickup->subplans[j] = droppedPlan;
+					parity = !parity;
+				}
+                                ++j;
+                                j = j % subtempCount;
+                        }
+                        while ((j != ((i-1 + subtempCount) % subtempCount)) && (j != i));
+                }
 		else // Otherwise just fill in this one
 			piece->pickup->subplans[i] = droppedPlan;
 

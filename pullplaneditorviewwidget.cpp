@@ -74,6 +74,26 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 					plan->subplans[j] = droppedPlan;
 			}
 		}
+		// If the alt button is down, fill alternating elements in the group
+		else if (event->keyboardModifiers() & 0x08000000)
+		{
+			int group = plan->getTemplate()->subtemps[i].group;
+			bool parity = true;
+			unsigned int subtempCount = plan->getTemplate()->subtemps.size();
+			unsigned int j = i;
+			do
+			{
+				if (plan->getTemplate()->subtemps[j].group == group)
+				{
+					if (parity)
+						plan->subplans[j] = droppedPlan;
+					parity = !parity;
+				}
+				++j;
+				j = j % subtempCount;
+			}
+			while ((j != ((i-1 + subtempCount) % subtempCount)) && (j != i));
+		}
 		else // Otherwise just fill in this one
 			plan->subplans[i] = droppedPlan;
 

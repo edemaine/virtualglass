@@ -33,7 +33,7 @@ PickupTemplate :: PickupTemplate(int t)
 			tmp = new char[100];
 			sprintf(tmp, "Column count");
 			parameterNames.push_back(tmp);
-			parameterValues.push_back(14);
+			parameterValues.push_back(10);
 			break;
 	}
 
