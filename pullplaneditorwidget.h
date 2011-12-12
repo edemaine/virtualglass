@@ -20,7 +20,7 @@ class PullPlanEditorWidget : public QWidget
 		PullPlanEditorWidget(QWidget* parent=0);
 		PullPlan* getPlan();
 		void setPlan(PullPlan* p);
-		void updateLibraryWidgetPixmaps(PullPlanLibraryWidget* w);
+                void updateLibraryWidgetPixmaps(PullPlanLibraryWidget* w);
 		void seedTemplates();
 		void setPlanSubplans(PullPlan* plan);
 		void setPlanColor(Color* c);

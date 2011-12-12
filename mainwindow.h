@@ -21,6 +21,7 @@
 #include "pulltemplatelibrarywidget.h"
 #include "pickuptemplatelibrarywidget.h"
 #include "qgraphicshighlighteffect.h"
+#include "geometry.h"
 
 class MainWindow : public QMainWindow
 {
@@ -32,14 +33,15 @@ class MainWindow : public QMainWindow
 		void mouseReleaseEvent(QMouseEvent* event);
 		void mouseMoveEvent(QMouseEvent* event);
 		void dragMoveEvent(QDragMoveEvent* event);
-		void seedEverything();
 
 	signals:
 		void someDataChanged();
 
 	private:
 		// Methods
-		void setupLibrary();
+                void setupRandomPiece();
+                void setupData();
+                void setupLibrary();
 		void setupStatusBar();
 		void setupEditors();
 		void setupEmptyPaneEditor();
@@ -53,7 +55,6 @@ class MainWindow : public QMainWindow
 		void updatePickupPlanEditor();
 		void updatePieceEditor();
 		void updateLibrary();
-		void initializeRandomPiece();
 
 		void unhighlightLibraryWidget(PickupTemplateLibraryWidget* w);
 		void unhighlightLibraryWidget(ColorBarLibraryWidget* w);
@@ -66,7 +67,9 @@ class MainWindow : public QMainWindow
 		void unhighlightAllLibraryWidgets();
 
 		// Variables
-		QLabel* whatToDoLabel;
+                Mesher mesher;
+                Geometry colorBarGeometry;
+                QLabel* whatToDoLabel;
 		QStatusBar* statusBar;
 		NiceViewWidget* colorBarNiceViewWidget;
 		NiceViewWidget* pieceNiceViewWidget;

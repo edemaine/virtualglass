@@ -25,8 +25,6 @@ int Controller::startUp()
 		pluginsDir.cdUp();
 	}
 	#endif
-	mainWindow->show(); 
-	mainWindow->seedEverything();
 	return app->exec();
 }
 

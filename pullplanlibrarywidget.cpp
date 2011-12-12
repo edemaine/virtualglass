@@ -33,7 +33,6 @@ void PullPlanLibraryWidget :: updatePixmaps(QPixmap niceViewPixmap, QPixmap edit
 {
 	setPixmap(niceViewPixmap);
 	this->editorPixmap = editorPixmap;
-	getPullPlan()->updatePixmap(editorPixmap);
 }
 
 const QPixmap* PullPlanLibraryWidget :: getEditorPixmap()
