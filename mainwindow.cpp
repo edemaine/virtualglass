@@ -679,7 +679,7 @@ void MainWindow :: updateLibrary()
 			editorPixmap.fill(QColor(255*colorEditorPlan->color->r,
 				255*colorEditorPlan->color->g,
 				255*colorEditorPlan->color->b,
-				255*colorEditorPlan->color->a));
+				MAX(255*colorEditorPlan->color->a, 255*0.05)));
 			colorEditorPlanLibraryWidget->updatePixmaps(
 				QPixmap::fromImage(colorBarNiceViewWidget->renderImage()).scaled(100, 100),
 				editorPixmap);
