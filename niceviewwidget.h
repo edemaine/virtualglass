@@ -25,10 +25,8 @@ class NiceViewWidget : public QGLWidget
 	Q_OBJECT
 
 public:
-	NiceViewWidget(QWidget* parent=0);
+	NiceViewWidget(int cameraMode, QWidget* parent=0);
 	virtual ~NiceViewWidget();
-	void setCameraMode(int m);
-	int getCameraMode();
 	bool peelEnabled();
 	void setGeometry(Geometry* g);
 

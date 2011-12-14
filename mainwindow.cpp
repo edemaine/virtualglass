@@ -16,7 +16,7 @@ MainWindow :: MainWindow(Model* model)
 
 	setWindowTitle(tr("Virtual Glass"));
         move(0, 0);
-        show();
+        showMaximized();
 
         seedEverything();
         initializeRandomPiece();
@@ -416,8 +416,8 @@ void MainWindow :: setupPieceEditor()
 
 	QVBoxLayout* niceViewLayout = new QVBoxLayout(pieceEditorPage);
 	piecePageLayout->addLayout(niceViewLayout, 1);
-		pieceNiceViewWidget = new NiceViewWidget(pieceEditorPage);
-		niceViewLayout->addWidget(pieceNiceViewWidget, 10);
+	pieceNiceViewWidget = new NiceViewWidget(PIECE_MODE, pieceEditorPage);
+	niceViewLayout->addWidget(pieceNiceViewWidget, 10);
 
 	// Little description for the editor
 	QLabel* niceViewDescriptionLabel = new QLabel("3D view of piece.",
@@ -456,7 +456,7 @@ void MainWindow :: setupColorEditor()
 	colorEditorViewWidget = new ColorEditorViewWidget(colorEditorPlan, colorEditorPage);
 	editorLayout->addWidget(colorEditorViewWidget, 0);
 
-	colorBarNiceViewWidget = new NiceViewWidget(colorEditorPage);
+	colorBarNiceViewWidget = new NiceViewWidget(PULLPLAN_MODE, colorEditorPage);
 	pageLayout->addWidget(colorBarNiceViewWidget, 10);
 
 	// Little description for the editor
@@ -693,14 +693,14 @@ void MainWindow :: updateLibrary()
 					highlightLibraryWidget(pplw, USES_DEPENDANCY);
 			}
 
-						PieceLibraryWidget* plw;
-						for (int i = 1; i <= pieceCount; ++i)
-						{
-								plw = dynamic_cast<PieceLibraryWidget*>(
-										dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 2))->widget());
-								if (plw->getPiece()->hasDependencyOn(colorEditorPlanLibraryWidget->getPullPlan()->color))
-										highlightLibraryWidget(plw, USES_DEPENDANCY);
-						}
+			PieceLibraryWidget* plw;
+			for (int i = 1; i <= pieceCount; ++i)
+			{
+				plw = dynamic_cast<PieceLibraryWidget*>(
+					dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 2))->widget());
+				if (plw->getPiece()->hasDependencyOn(colorEditorPlanLibraryWidget->getPullPlan()->color))
+					highlightLibraryWidget(plw, USES_DEPENDANCY);
+			}
 
 			highlightLibraryWidget(colorEditorPlanLibraryWidget, IS_DEPENDANCY);
 			break;
@@ -709,34 +709,34 @@ void MainWindow :: updateLibrary()
 		{
 			pullPlanEditorWidget->updateLibraryWidgetPixmaps(pullPlanEditorPlanLibraryWidget);
 
-						ColorBarLibraryWidget* cblw;
-						for (int i = 1; i <= colorBarCount; ++i)
-						{
-								cblw = dynamic_cast<ColorBarLibraryWidget*>(
-										dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 0))->widget());
-								if (pullPlanEditorWidget->getPlan()->hasDependencyOn(cblw->getPullPlan()->color))
-										highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
-						}
+			ColorBarLibraryWidget* cblw;
+			for (int i = 1; i <= colorBarCount; ++i)
+			{
+				cblw = dynamic_cast<ColorBarLibraryWidget*>(
+					dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 0))->widget());
+				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(cblw->getPullPlan()->color))
+					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
+			}
 
-						PullPlanLibraryWidget* pplw;
-						for (int i = 1; i <= pullPlanCount; ++i)
-						{
-								pplw = dynamic_cast<PullPlanLibraryWidget*>(
-										dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 1))->widget());
-								if (pullPlanEditorWidget->getPlan()->hasDependencyOn(pplw->getPullPlan()))
-										highlightLibraryWidget(pplw, IS_USED_BY_DEPENDANCY);
-								else if (pplw->getPullPlan()->hasDependencyOn(pullPlanEditorWidget->getPlan()))
-										highlightLibraryWidget(pplw, USES_DEPENDANCY);
-						}
+			PullPlanLibraryWidget* pplw;
+			for (int i = 1; i <= pullPlanCount; ++i)
+			{
+				pplw = dynamic_cast<PullPlanLibraryWidget*>(
+						dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 1))->widget());
+				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(pplw->getPullPlan()))
+						highlightLibraryWidget(pplw, IS_USED_BY_DEPENDANCY);
+				else if (pplw->getPullPlan()->hasDependencyOn(pullPlanEditorWidget->getPlan()))
+						highlightLibraryWidget(pplw, USES_DEPENDANCY);
+			}
 
-						PieceLibraryWidget* plw;
-						for (int i = 1; i <= pieceCount; ++i)
-						{
-								plw = dynamic_cast<PieceLibraryWidget*>(
-										dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 2))->widget());
-								if (plw->getPiece()->hasDependencyOn(pullPlanEditorWidget->getPlan()))
-										highlightLibraryWidget(plw, USES_DEPENDANCY);
-						}
+			PieceLibraryWidget* plw;
+			for (int i = 1; i <= pieceCount; ++i)
+			{
+				plw = dynamic_cast<PieceLibraryWidget*>(
+					dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 2))->widget());
+				if (plw->getPiece()->hasDependencyOn(pullPlanEditorWidget->getPlan()))
+					highlightLibraryWidget(plw, USES_DEPENDANCY);
+			}
 
 			highlightLibraryWidget(pullPlanEditorPlanLibraryWidget, IS_DEPENDANCY);
 			break;
@@ -747,14 +747,14 @@ void MainWindow :: updateLibrary()
 				QPixmap::fromImage(pieceNiceViewWidget->renderImage()).scaled(100, 100),
 				QPixmap::fromImage(pieceNiceViewWidget->renderImage()).scaled(100, 100));
 
-						ColorBarLibraryWidget* cblw;
-						for (int i = 1; i <= colorBarCount; ++i)
-						{
-								cblw = dynamic_cast<ColorBarLibraryWidget*>(
-										dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 0))->widget());
-								if (pieceEditorPiece->hasDependencyOn(cblw->getPullPlan()->color))
-										highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
-						}
+			ColorBarLibraryWidget* cblw;
+			for (int i = 1; i <= colorBarCount; ++i)
+			{
+				cblw = dynamic_cast<ColorBarLibraryWidget*>(
+					dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 0))->widget());
+				if (pieceEditorPiece->hasDependencyOn(cblw->getPullPlan()->color))
+					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
+			}
 
 			PullPlanLibraryWidget* pplw;
 			for (int i = 1; i <= pullPlanCount; ++i)
@@ -780,7 +780,6 @@ void MainWindow :: updatePieceEditor()
 
 	// update piece stuff
 	Geometry* geometry = model->getGeometry(pieceEditorPiece);
-	pieceNiceViewWidget->setCameraMode(PIECE_MODE);
 	pieceNiceViewWidget->setGeometry(geometry);
 	pieceTemplateComboBox->setCurrentIndex(pieceEditorPiece->getTemplate()->type-1);
 	pieceTemplateParameter1Label->setText(pieceEditorPiece->getTemplate()->parameterNames[0]);
@@ -790,20 +789,19 @@ void MainWindow :: updatePieceEditor()
 
 	// update template stuff
 	for (int i = 0; i < pickupTemplateLibraryLayout->count(); ++i)
-		{
+	{
 		if (i + FIRST_PICKUP_TEMPLATE == pieceEditorPiece->pickup->getTemplate()->type)
 			highlightLibraryWidget(dynamic_cast<PickupTemplateLibraryWidget*>(
-								dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget()));
+				dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget()));
 		else
 			unhighlightLibraryWidget(dynamic_cast<PickupTemplateLibraryWidget*>(
-								dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget()));
+				dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget()));
 	}
 }
 
 void MainWindow :: updateColorEditor()
 {
 	Geometry* geometry = model->getGeometry(colorEditorPlan);
-	colorBarNiceViewWidget->setCameraMode(PULLPLAN_MODE);
 	colorBarNiceViewWidget->setGeometry(geometry);
 }
 

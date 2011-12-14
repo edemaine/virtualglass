@@ -8,8 +8,7 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 	this->plan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
 
 	this->viewWidget = new PullPlanEditorViewWidget(plan, this);	
-	this->niceViewWidget = new NiceViewWidget(this);
-        niceViewWidget->setCameraMode(PULLPLAN_MODE);
+	this->niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);
 	niceViewWidget->setGeometry(&geometry);
 
 	setupLayout();

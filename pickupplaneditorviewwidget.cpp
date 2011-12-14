@@ -7,8 +7,7 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(Piece* piece, Model* mo
 	setFixedSize(400, 400);
 	this->piece = piece;
 	this->model = model;
-	this->niceViewWidget = new NiceViewWidget(this);
-	this->niceViewWidget->setCameraMode(PICKUPPLAN_MODE);
+	this->niceViewWidget = new NiceViewWidget(PICKUPPLAN_MODE, this);
 	this->niceViewWidget->setGeometry(model->getGeometry(piece->pickup));
 
 	QVBoxLayout* layout = new QVBoxLayout(this);

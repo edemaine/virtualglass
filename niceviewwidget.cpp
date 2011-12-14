@@ -19,25 +19,41 @@ void gl_errors(string const &where) {
 
 
 
-NiceViewWidget :: NiceViewWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent)
+NiceViewWidget :: NiceViewWidget(int cameraMode, QWidget *parent) : QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent)
 {
 	leftMouseDown = false;
-
 	setMinimumWidth(400);
-
 	bgColor = QColor(200, 200, 200);
-
-	cameraMode = PULLPLAN_MODE;
-
 	geometry = NULL;
+        this->cameraMode = cameraMode;
 
-	lookAtLoc[0] = 0.0;
-	lookAtLoc[1] = 0.0;
-	lookAtLoc[2] = 5.0;
-
-	theta = -PI/2.0;
-	phi = PI/2;
-	rho = 12.0;
+        switch (cameraMode)
+        {
+                case PULLPLAN_MODE:
+                        theta = -PI/2.0;
+                        phi = PI/2;
+                        rho = 11.0;
+                        lookAtLoc[0] = 0.0;
+                        lookAtLoc[1] = 0.0;
+                        lookAtLoc[2] = 5.0;
+                        break;
+                case PICKUPPLAN_MODE:
+                        theta = -PI/2.0;
+                        phi = PI/2;
+                        rho = 11.5;
+                        lookAtLoc[0] = 0.0;
+                        lookAtLoc[1] = 0.0;
+                        lookAtLoc[2] = 0.0;
+                        break;
+                case PIECE_MODE:
+                        theta = -PI/2.0;
+                        phi = PI/2;
+                        rho = 16.0;
+                        lookAtLoc[0] = 0.0;
+                        lookAtLoc[1] = 0.0;
+                        lookAtLoc[2] = 0.0;
+                        break;
+        }
 
 	mouseLocX = 0;
 	mouseLocY = 0;
@@ -584,7 +600,38 @@ void NiceViewWidget :: setGLMatrices()
 	float w = viewport[2];
 	float h = viewport[3];
 
-	gluPerspective(45.0, w / h, 0.01, 100.0);
+	if (cameraMode == PIECE_MODE)
+	{
+		gluPerspective(45.0, w / h, 0.01, 100.0);
+	}
+	else if (cameraMode == PULLPLAN_MODE) 
+	{
+		float a;
+                if (width() > height()) 
+		{
+			a = float(height()) / (1.5 * width());
+                } 
+		else 
+		{
+                        a = float(1.5 * width()) / height();
+                }
+		float s = 2.2f / rho;
+		glScalef(a * s, s,-0.01);
+	}
+	else // pickup plan mode
+	{
+		float a;
+                if (width() > height()) 
+		{
+			a = float(height()) / (width());
+                } 
+		else 
+		{
+                        a = float(width()) / height();
+                }
+		float s = 2.2f / rho;
+		glScalef(a * s, s,-0.01);
+	}
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -595,8 +642,8 @@ void NiceViewWidget :: setGLMatrices()
 	eyeLoc[2] = lookAtLoc[2] + rho*cos(phi);
 
 	gluLookAt(eyeLoc[0], eyeLoc[1], eyeLoc[2],
-			  lookAtLoc[0], lookAtLoc[1], lookAtLoc[2],
-			  0.0, 0.0, 1.0);
+		  lookAtLoc[0], lookAtLoc[1], lookAtLoc[2],
+		  0.0, 0.0, 1.0);
 }
 
 /*
@@ -639,7 +686,6 @@ part of the mode feature.
 */
 void NiceViewWidget :: mouseMoveEvent (QMouseEvent* e)
 {
-
 	float relX, relY;
 	float windowWidth, windowHeight;
 	int oldMouseLocX, oldMouseLocY;
@@ -670,7 +716,7 @@ void NiceViewWidget :: mouseMoveEvent (QMouseEvent* e)
 
 void NiceViewWidget :: wheelEvent(QWheelEvent *e)
 {
-	if (cameraMode == PICKUPPLAN_MODE)
+	if (cameraMode == PICKUPPLAN_MODE || cameraMode == PULLPLAN_MODE)
 		return;
 
 	if (e->delta() > 0)
@@ -689,49 +735,6 @@ void NiceViewWidget :: zoom(float z)
 		return;
 
 	this->rho+=z;
-	update();
-}
-
-int NiceViewWidget :: getCameraMode()
-{
-	return this->cameraMode;
-}
-
-void NiceViewWidget :: setCameraMode(int m)
-{
-	if (m == this->cameraMode)
-		return;
-
-	this->cameraMode = m;
-
-	switch (m)
-	{
-		case PULLPLAN_MODE:
-			theta = -PI/2.0;
-			phi = PI/2;
-			rho = 11.0;
-			lookAtLoc[0] = 0.0;
-			lookAtLoc[1] = 0.0;
-			lookAtLoc[2] = 5.0;
-			break;
-		case PICKUPPLAN_MODE:
-			theta = -PI/2.0;
-			phi = PI/2;
-			rho = 13.0;
-			lookAtLoc[0] = 0.0;
-			lookAtLoc[1] = 0.0;
-			lookAtLoc[2] = 0.0;
-			break;
-		case PIECE_MODE:
-			theta = -PI/2.0;
-			phi = PI/2;
-			rho = 16.0;
-			lookAtLoc[0] = 0.0;
-			lookAtLoc[1] = 0.0;
-			lookAtLoc[2] = 0.0;
-			break;
-	}
-
 	update();
 }
 
