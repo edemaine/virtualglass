@@ -70,8 +70,8 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		ur.y = ur.y * (height() - 20)/2 + (height() - 20)/2 + 10;  
 
 		// Need to invert event location, since upper left/lower left origins exist	
-		if (ll.x < event->pos().x() && event->pos().x() < ur.x 
-			&& ll.y < (height() + 10 - event->pos().y()) && (height() + 10 - event->pos().y()) < ur.y)
+                if (ll.x < event->pos().x() && event->pos().x() < ur.x
+                        && ll.y < (height() - event->pos().y()) && (height() - event->pos().y()) < ur.y)
 		{
 			event->accept();
 		}
