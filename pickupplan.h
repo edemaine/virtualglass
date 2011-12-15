@@ -12,6 +12,7 @@ class PickupPlan
 {
 	public:
 		PickupPlan(int pickupTemplate);
+		PickupPlan();
 
 		void setTemplate(PickupTemplate* pt);
 		PickupTemplate* getTemplate();

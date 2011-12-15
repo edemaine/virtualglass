@@ -1,6 +1,11 @@
 
 #include "pickupplan.h"
 
+
+PickupPlan :: PickupPlan()
+{
+}
+
 PickupPlan :: PickupPlan(int pickupTemplate)
 {
 	setTemplate(new PickupTemplate(pickupTemplate));
@@ -8,10 +13,9 @@ PickupPlan :: PickupPlan(int pickupTemplate)
 
 PickupPlan* PickupPlan :: copy()
 {
-	PickupPlan* c = new PickupPlan(this->pickupTemplate->type);
+	PickupPlan* c = new PickupPlan();
 
 	c->pickupTemplate = this->pickupTemplate->copy();
-	c->subplans.clear();
 	for (unsigned int i = 0; i < this->subplans.size(); ++i)
 	{
 		c->subplans.push_back(this->subplans[i]);
