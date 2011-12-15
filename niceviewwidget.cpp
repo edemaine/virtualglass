@@ -606,21 +606,13 @@ void NiceViewWidget :: setGLMatrices()
 	}
 	else if (cameraMode == PULLPLAN_MODE) 
 	{
-		float a = 500.0 / w;
+		float a = h / w;
 		float s = 2.2f / rho;
 		glScalef(a * s, s,-0.01);
 	}
 	else // pickup plan mode
 	{
-		float a;
-                if (width() > height()) 
-		{
-			a = float(height()) / (width());
-                } 
-		else 
-		{
-                        a = float(width()) / height();
-                }
+		float a = h / w;
 		float s = 2.2f / rho;
 		glScalef(a * s, s,-0.01);
 	}
