@@ -4,12 +4,10 @@
 #define PULLPLAN_H
 
 class PullPlanLibraryWidget;
-class ColorBarLibraryWidget;
 
 #include <stdlib.h>
 #include <vector>
 #include "pulltemplate.h"
-#include <QPixmap>
 #include "pullplanlibrarywidget.h"
 #include "colorbarlibrarywidget.h"
 
@@ -18,6 +16,7 @@ class PullPlan;
 class PullPlan
 {
 	public:
+		PullPlan();
 		PullPlan(int pullTemplate, Color* color);
 
 		void setTemplate(PullTemplate* pt);
@@ -26,18 +25,17 @@ class PullPlan
 		void setLibraryWidget(PullPlanLibraryWidget* plplw);
 		PullPlanLibraryWidget* getLibraryWidget();
 
+		PullPlan* copy();
+
 		vector<PullPlan*> subplans;
 		float twist;
 		Color* color;
-		const QPixmap* getEditorPixmap();
-		void updatePixmap(QPixmap editorPixmap);
 		bool hasDependencyOn(Color* color);
 		bool hasDependencyOn(PullPlan* pullPlan);
 
 	private:
 		// Variables
 		PullTemplate* pullTemplate;
-		QPixmap editorPixmap;
 		PullPlanLibraryWidget* libraryWidget;
 };
 

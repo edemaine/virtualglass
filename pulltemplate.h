@@ -41,6 +41,7 @@ class PullTemplate
 		float getCasingThickness();
 		void setCasingThickness(float t);
 		bool isBase();
+		PullTemplate* copy();
 
 	private:
 		// Methods

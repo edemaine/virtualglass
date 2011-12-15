@@ -1,6 +1,11 @@
 
 #include "pullplan.h"
 
+
+PullPlan :: PullPlan()
+{
+}
+
 PullPlan :: PullPlan(int pullTemplate, Color* color)
 {
 	// initialize all the variables
@@ -8,6 +13,23 @@ PullPlan :: PullPlan(int pullTemplate, Color* color)
 	this->color = color;
 	this->twist = 0.0;
 	this->libraryWidget = NULL;
+}
+
+PullPlan* PullPlan :: copy()
+{
+	PullPlan* c = new PullPlan();
+
+	c->color = this->color;
+	c->twist = this->twist;
+	c->pullTemplate = this->pullTemplate->copy();		
+	c->subplans.clear();
+	for (unsigned int i = 0; i < this->subplans.size(); ++i)
+	{
+		c->subplans.push_back(this->subplans[i]);
+	}
+	c->libraryWidget = this->libraryWidget;
+
+	return c;
 }
 
 bool PullPlan :: hasDependencyOn(PullPlan* plan)
@@ -113,16 +135,6 @@ void PullPlan :: setTemplate(PullTemplate* newTemplate)
 PullTemplate* PullPlan :: getTemplate()
 {
 	return this->pullTemplate;
-}
-
-const QPixmap* PullPlan :: getEditorPixmap()
-{
-	return &(this->editorPixmap);
-}
-
-void PullPlan :: updatePixmap(QPixmap editorPixmap)
-{
-	this->editorPixmap = editorPixmap;
 }
 
 

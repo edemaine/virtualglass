@@ -14,7 +14,7 @@ MainWindow :: MainWindow(Model* model)
 	setupEditors();
 	setupConnections();
 
-	setWindowTitle(tr("Virtual Glass"));
+	setWindowTitle(tr("VirtualGlass"));
         move(0, 0);
         showMaximized();
 
@@ -557,13 +557,7 @@ void MainWindow :: newPullPlan()
 	PullPlan* oldEditorPlan = pullPlanEditorWidget->getPlan();
 
 	// Create the new plan
-	PullPlan* newEditorPlan = new PullPlan(oldEditorPlan->getTemplate()->type, oldEditorPlan->color);
-	newEditorPlan->getTemplate()->setCasingThickness(oldEditorPlan->getTemplate()->getCasingThickness());
-	newEditorPlan->twist = oldEditorPlan->twist;
-	for (unsigned int i = 0; i < oldEditorPlan->subplans.size(); ++i)
-	{
-		newEditorPlan->subplans.push_back(oldEditorPlan->subplans[i]);
-	}
+	PullPlan* newEditorPlan = oldEditorPlan->copy();
 
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();

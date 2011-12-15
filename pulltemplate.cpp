@@ -11,6 +11,19 @@ PullTemplate :: PullTemplate(int type)
 	updateSubtemps(); // need to change locations of subtemps, but nothing else
 }
 
+PullTemplate* PullTemplate :: copy()
+{
+	PullTemplate* c = new PullTemplate(this->type);
+	c->setShape(this->shape);
+	c->setCasingThickness(this->casingThickness);	
+	for (unsigned int i = 0; i < this->parameterNames.size(); ++i)
+	{
+		c->setParameter(i, this->parameterValues[i]);
+	} 
+
+	return c;
+}
+
 void PullTemplate :: setParameter(int p, int v)
 {
 	parameterValues[p] = v;
