@@ -42,10 +42,19 @@ void MainWindow :: seedEverything()
 	for (int i = FIRST_PICKUP_TEMPLATE; i <= LAST_PICKUP_TEMPLATE; ++i)
 	{
 		sprintf(filename, ":/images/pickuptemplate%d.png", i);
-		PickupTemplateLibraryWidget *ptlw = new PickupTemplateLibraryWidget(
+		PickupTemplateLibraryWidget *pktlw = new PickupTemplateLibraryWidget(
 			QPixmap::fromImage(QImage(filename)), i);
-		pickupTemplateLibraryLayout->addWidget(ptlw);
+		pickupTemplateLibraryLayout->addWidget(pktlw);
 	}
+
+        // Load pickup template types
+        for (int i = FIRST_PIECE_TEMPLATE; i <= LAST_PIECE_TEMPLATE; ++i)
+        {
+                sprintf(filename, ":/images/piecetemplate%d.png", i);
+                PieceTemplateLibraryWidget *ptlw = new PieceTemplateLibraryWidget(
+                        QPixmap::fromImage(QImage(filename)), i);
+                pieceTemplateLibraryLayout->addWidget(ptlw);
+        }
 }
 
 // Too weird to live; too strange to die
@@ -134,6 +143,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
 	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
 	PickupTemplateLibraryWidget* pktlw = dynamic_cast<PickupTemplateLibraryWidget*>(childAt(event->pos()));
+	PieceTemplateLibraryWidget* ptlw = dynamic_cast<PieceTemplateLibraryWidget*>(childAt(event->pos()));
 
 	if (cblw != NULL)
 	{
@@ -168,6 +178,16 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 			pickupPlanEditorViewWidget->setPiece(pieceEditorPiece);
 			pickupTemplateParameter1Label->setText(pieceEditorPiece->pickup->getTemplate()->getParameterName(0));
 			pickupTemplateParameter1SpinBox->setValue(pieceEditorPiece->pickup->getTemplate()->getParameter(0));
+			emit someDataChanged();
+		}
+	}
+	else if (ptlw != NULL)
+	{
+		if (ptlw->getPieceTemplateType() != pieceEditorPiece->getTemplate()->type)
+		{
+			pieceEditorPiece->setTemplate(new PieceTemplate(ptlw->getPieceTemplateType()));
+			pieceTemplateParameter1Label->setText(pieceEditorPiece->getTemplate()->parameterNames[0]);
+			pieceTemplateParameter2Label->setText(pieceEditorPiece->getTemplate()->parameterNames[1]);
 			emit someDataChanged();
 		}
 	}
@@ -245,7 +265,6 @@ void MainWindow :: setupConnections()
 	connect(pickupTemplateParameter1SpinBox, SIGNAL(valueChanged(int)),
 		this, SLOT(pickupTemplateParameter1SpinBoxChanged(int)));
 
-	connect(pieceTemplateComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(pieceTemplateComboBoxChanged(int)));
 	connect(newPieceButton, SIGNAL(pressed()), this, SLOT(newPiece()));
 	connect(pieceTemplateParameter1Slider, SIGNAL(valueChanged(int)),
 		this, SLOT(pieceTemplateParameterSlider1Changed(int)));
@@ -369,22 +388,36 @@ void MainWindow :: setupPieceEditor()
 	parameter1Layout->addWidget(pickupTemplateParameter1SpinBox, 0);
 	parameter1Layout->addStretch(1);
 
-	// Little description for the editor
-	QLabel* descriptionLabel = new QLabel("Pickup editor - drag in canes or change templates.", pieceEditorPage);
-	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	leftLayout->addWidget(descriptionLabel, 0);
-
 	QPixmap pixmap(100, 100);
 	pixmap.fill(Qt::white);
 	pieceEditorPieceLibraryWidget = new PieceLibraryWidget(pieceEditorPiece);
 	++pieceCount;
 	tableGridLayout->addWidget(pieceEditorPieceLibraryWidget, pieceCount, 2);
 
-	pieceTemplateComboBox = new QComboBox(pieceEditorPage);
-	pieceTemplateComboBox->addItem("Tumbler");
-	pieceTemplateComboBox->addItem("Bowl");
-	pieceTemplateComboBox->addItem("Vase");
-	leftLayout->addWidget(pieceTemplateComboBox, 0);
+        leftLayout->addStretch(1);
+	QLabel* pieceEditorDescriptionLabel = new QLabel("Piece editor - drag canes in.", pieceEditorPage);
+	pieceEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	leftLayout->addWidget(pieceEditorDescriptionLabel, 0);
+
+	// Right layout
+	QVBoxLayout* rightLayout = new QVBoxLayout(pieceEditorPage);
+	piecePageLayout->addLayout(rightLayout, 1);
+	pieceNiceViewWidget = new NiceViewWidget(PIECE_MODE, pieceEditorPage);
+	rightLayout->addWidget(pieceNiceViewWidget, 10);
+
+	QWidget* pieceTemplateLibraryWidget = new QWidget(pieceEditorPage);
+        pieceTemplateLibraryLayout = new QHBoxLayout(pieceTemplateLibraryWidget);
+        pieceTemplateLibraryLayout->setSpacing(10);
+        pieceTemplateLibraryWidget->setLayout(pieceTemplateLibraryLayout);
+
+        QScrollArea* pieceTemplateLibraryScrollArea = new QScrollArea(pieceEditorPage);
+        pieceTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
+        pieceTemplateLibraryScrollArea->setWidget(pieceTemplateLibraryWidget);
+        pieceTemplateLibraryScrollArea->setWidgetResizable(true);
+        pieceTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        pieceTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        pieceTemplateLibraryScrollArea->setFixedHeight(130);
+        rightLayout->addWidget(pieceTemplateLibraryScrollArea, 0);
 
 	pieceTemplateParameter1Label = new QLabel(pieceEditorPiece->getTemplate()->parameterNames[0]);
 	pieceTemplateParameter1Slider = new QSlider(Qt::Horizontal, pieceEditorPage);
@@ -393,7 +426,7 @@ void MainWindow :: setupPieceEditor()
 	pieceTemplateParameter1Slider->setSliderPosition(0);
 
 	QHBoxLayout* pieceParameter1Layout = new QHBoxLayout(pieceEditorPage);
-	leftLayout->addLayout(pieceParameter1Layout);
+	rightLayout->addLayout(pieceParameter1Layout);
 	pieceParameter1Layout->addWidget(pieceTemplateParameter1Label);
 	pieceParameter1Layout->addWidget(pieceTemplateParameter1Slider);
 
@@ -404,26 +437,14 @@ void MainWindow :: setupPieceEditor()
 	pieceTemplateParameter2Slider->setSliderPosition(0);
 
 	QHBoxLayout* parameter2Layout = new QHBoxLayout(pieceEditorPage);
-	leftLayout->addLayout(parameter2Layout);
+	rightLayout->addLayout(parameter2Layout);
 	parameter2Layout->addWidget(pieceTemplateParameter2Label);
 	parameter2Layout->addWidget(pieceTemplateParameter2Slider);
 
-	// Little description for the editor
-        leftLayout->addStretch(1);
-	QLabel* pieceEditorDescriptionLabel = new QLabel("Piece editor - drag canes in.", pieceEditorPage);
-	pieceEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	leftLayout->addWidget(pieceEditorDescriptionLabel, 0);
-
-	QVBoxLayout* niceViewLayout = new QVBoxLayout(pieceEditorPage);
-	piecePageLayout->addLayout(niceViewLayout, 1);
-	pieceNiceViewWidget = new NiceViewWidget(PIECE_MODE, pieceEditorPage);
-	niceViewLayout->addWidget(pieceNiceViewWidget, 10);
-
-	// Little description for the editor
 	QLabel* niceViewDescriptionLabel = new QLabel("3D view of piece.",
 		pieceEditorPage);
 	niceViewDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	niceViewLayout->addWidget(niceViewDescriptionLabel, 0);
+	rightLayout->addWidget(niceViewDescriptionLabel, 0);
 }
 
 
@@ -595,6 +616,11 @@ void MainWindow :: newPullPlan(PullPlan* newPlan)
 }
 
 
+void MainWindow :: unhighlightLibraryWidget(PieceTemplateLibraryWidget* w)
+{
+	w->graphicsEffect()->setEnabled(false);
+}
+
 void MainWindow :: unhighlightLibraryWidget(PickupTemplateLibraryWidget* w)
 {
 	w->graphicsEffect()->setEnabled(false);
@@ -615,11 +641,18 @@ void MainWindow :: unhighlightLibraryWidget(PieceLibraryWidget* w)
 	w->graphicsEffect()->setEnabled(false);
 }
 
+void MainWindow :: highlightLibraryWidget(PieceTemplateLibraryWidget* w)
+{
+	w->graphicsEffect()->setEnabled(false);
+	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
+	w->graphicsEffect()->setEnabled(true);
+}
+
 void MainWindow :: highlightLibraryWidget(PickupTemplateLibraryWidget* w)
 {
-		w->graphicsEffect()->setEnabled(false);
-		((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
-		w->graphicsEffect()->setEnabled(true);
+	w->graphicsEffect()->setEnabled(false);
+	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
+	w->graphicsEffect()->setEnabled(true);
 }
 
 void MainWindow :: highlightLibraryWidget(ColorBarLibraryWidget* w, int dependancy)
@@ -772,16 +805,7 @@ void MainWindow :: updatePieceEditor()
 	pickupTemplateParameter1SpinBox->setValue(value);
 	pickupPlanEditorViewWidget->setPiece(pieceEditorPiece);
 
-	// update piece stuff
-	Geometry* geometry = model->getGeometry(pieceEditorPiece);
-	pieceNiceViewWidget->setGeometry(geometry);
-	pieceTemplateComboBox->setCurrentIndex(pieceEditorPiece->getTemplate()->type-1);
-	pieceTemplateParameter1Label->setText(pieceEditorPiece->getTemplate()->parameterNames[0]);
-	pieceTemplateParameter1Slider->setSliderPosition(pieceEditorPiece->getTemplate()->parameterValues[0]);
-	pieceTemplateParameter2Label->setText(pieceEditorPiece->getTemplate()->parameterNames[1]);
-	pieceTemplateParameter2Slider->setSliderPosition(pieceEditorPiece->getTemplate()->parameterValues[1]);
-
-	// update template stuff
+	// update pickup stuff
 	for (int i = 0; i < pickupTemplateLibraryLayout->count(); ++i)
 	{
 		if (i + FIRST_PICKUP_TEMPLATE == pieceEditorPiece->pickup->getTemplate()->type)
@@ -791,6 +815,25 @@ void MainWindow :: updatePieceEditor()
 			unhighlightLibraryWidget(dynamic_cast<PickupTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget()));
 	}
+
+	// update piece stuff
+	Geometry* geometry = model->getGeometry(pieceEditorPiece);
+	pieceNiceViewWidget->setGeometry(geometry);
+	pieceTemplateParameter1Label->setText(pieceEditorPiece->getTemplate()->parameterNames[0]);
+	pieceTemplateParameter1Slider->setSliderPosition(pieceEditorPiece->getTemplate()->parameterValues[0]);
+	pieceTemplateParameter2Label->setText(pieceEditorPiece->getTemplate()->parameterNames[1]);
+	pieceTemplateParameter2Slider->setSliderPosition(pieceEditorPiece->getTemplate()->parameterValues[1]);
+
+	// update pickup stuff
+	for (int i = 0; i < pieceTemplateLibraryLayout->count(); ++i)
+	{
+		if (i + FIRST_PIECE_TEMPLATE == pieceEditorPiece->getTemplate()->type)
+			highlightLibraryWidget(dynamic_cast<PieceTemplateLibraryWidget*>(
+				dynamic_cast<QWidgetItem *>(pieceTemplateLibraryLayout->itemAt(i))->widget()));
+		else
+			unhighlightLibraryWidget(dynamic_cast<PieceTemplateLibraryWidget*>(
+				dynamic_cast<QWidgetItem *>(pieceTemplateLibraryLayout->itemAt(i))->widget()));
+	}
 }
 
 void MainWindow :: updateColorEditor()
@@ -798,17 +841,5 @@ void MainWindow :: updateColorEditor()
 	Geometry* geometry = model->getGeometry(colorEditorPlan);
 	colorBarNiceViewWidget->setGeometry(geometry);
 }
-
-void MainWindow :: pieceTemplateComboBoxChanged(int newIndex)
-{
-	if (newIndex+1 != pieceEditorPiece->getTemplate()->type)
-	{
-		pieceEditorPiece->setTemplate(new PieceTemplate(newIndex+1));
-		pieceTemplateParameter1Label->setText(pieceEditorPiece->getTemplate()->parameterNames[0]);
-		pieceTemplateParameter2Label->setText(pieceEditorPiece->getTemplate()->parameterNames[1]);
-		emit someDataChanged();
-	}
-}
-
 
 

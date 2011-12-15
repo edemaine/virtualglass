@@ -20,6 +20,7 @@
 #include "piece.h"
 #include "pulltemplatelibrarywidget.h"
 #include "pickuptemplatelibrarywidget.h"
+#include "piecetemplatelibrarywidget.h"
 #include "qgraphicshighlighteffect.h"
 
 class MainWindow : public QMainWindow
@@ -55,10 +56,12 @@ class MainWindow : public QMainWindow
 		void updateLibrary();
 		void initializeRandomPiece();
 
+		void unhighlightLibraryWidget(PieceTemplateLibraryWidget* w);
 		void unhighlightLibraryWidget(PickupTemplateLibraryWidget* w);
 		void unhighlightLibraryWidget(ColorBarLibraryWidget* w);
 		void unhighlightLibraryWidget(PullPlanLibraryWidget* w);
 		void unhighlightLibraryWidget(PieceLibraryWidget* w);
+		void highlightLibraryWidget(PieceTemplateLibraryWidget* w);
 		void highlightLibraryWidget(PickupTemplateLibraryWidget* w);
 		void highlightLibraryWidget(ColorBarLibraryWidget* w, int dependancy);
 		void highlightLibraryWidget(PullPlanLibraryWidget* w, int dependancy);
@@ -99,13 +102,13 @@ class MainWindow : public QMainWindow
 		PickupPlanEditorViewWidget* pickupPlanEditorViewWidget;
 		QHBoxLayout* pullTemplateLibraryLayout;
 		QHBoxLayout* pickupTemplateLibraryLayout;
+		QHBoxLayout* pieceTemplateLibraryLayout;
 		QPushButton* newColorBarButton;
 		QPushButton* newPullPlanButton;
 		QPushButton* newPieceButton;
 
 	private slots:
 		void updateEverything();
-		void pieceTemplateComboBoxChanged(int index);
 		void newColorBar();
 		void newPullPlan();
 		void newPullPlan(PullPlan* p);

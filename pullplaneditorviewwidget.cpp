@@ -5,7 +5,7 @@ PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* pa
 {
 	// setup draw widget
 	setAcceptDrops(true);
-	setFixedSize(400, 400);
+	setFixedSize(500, 500);
 	this->plan = plan;
 }
 

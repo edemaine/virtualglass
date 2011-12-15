@@ -4,7 +4,7 @@
 PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(Piece* piece, Model* model, QWidget* parent) : QWidget(parent)
 {
 	setAcceptDrops(true);
-	setFixedSize(400, 400);
+	setFixedSize(500, 500);
 	this->piece = piece;
 	this->model = model;
 	this->niceViewWidget = new NiceViewWidget(PICKUPPLAN_MODE, this);

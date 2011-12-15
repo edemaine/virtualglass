@@ -606,15 +606,7 @@ void NiceViewWidget :: setGLMatrices()
 	}
 	else if (cameraMode == PULLPLAN_MODE) 
 	{
-		float a;
-                if (width() > height()) 
-		{
-			a = float(height()) / (1.5 * width());
-                } 
-		else 
-		{
-                        a = float(1.5 * width()) / height();
-                }
+		float a = 500.0 / w;
 		float s = 2.2f / rho;
 		glScalef(a * s, s,-0.01);
 	}
