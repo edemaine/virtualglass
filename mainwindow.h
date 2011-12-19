@@ -96,7 +96,6 @@ class MainWindow : public QMainWindow
 		Model* model;
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
-		QComboBox* pieceTemplateComboBox;
 		ColorEditorViewWidget* colorEditorViewWidget;
 		PullPlanEditorWidget* pullPlanEditorWidget;
 		PickupPlanEditorViewWidget* pickupPlanEditorViewWidget;

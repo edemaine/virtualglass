@@ -99,7 +99,7 @@ void ColorEditorViewWidget :: seedBrandColors()
 	Color caneColor;
 	QString caneName;
 
-        QFile file("../src/Colors1.txt");
+        QFile file(":/Colors1.txt");
         file.open(QIODevice::ReadOnly | QIODevice::Text);
         while (!file.atEnd())
         {

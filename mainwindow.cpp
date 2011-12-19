@@ -395,7 +395,7 @@ void MainWindow :: setupPieceEditor()
 	tableGridLayout->addWidget(pieceEditorPieceLibraryWidget, pieceCount, 2);
 
         leftLayout->addStretch(1);
-	QLabel* pieceEditorDescriptionLabel = new QLabel("Piece editor - drag canes in.", pieceEditorPage);
+	QLabel* pieceEditorDescriptionLabel = new QLabel("Pickup editor - drag canes in.", pieceEditorPage);
 	pieceEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	leftLayout->addWidget(pieceEditorDescriptionLabel, 0);
 
@@ -441,7 +441,7 @@ void MainWindow :: setupPieceEditor()
 	parameter2Layout->addWidget(pieceTemplateParameter2Label);
 	parameter2Layout->addWidget(pieceTemplateParameter2Slider);
 
-	QLabel* niceViewDescriptionLabel = new QLabel("3D view of piece.",
+	QLabel* niceViewDescriptionLabel = new QLabel("Piece editor.",
 		pieceEditorPage);
 	niceViewDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	rightLayout->addWidget(niceViewDescriptionLabel, 0);
