@@ -6,7 +6,6 @@
 #include <QObject>
 #include <QtGlobal>
 #include "mainwindow.h"
-#include "model.h"
 
 class Controller : public QObject
 {
@@ -18,7 +17,6 @@ class Controller : public QObject
 
 	private:
 		MainWindow* mainWindow;
-		Model* model;
 		QApplication* app;
 };
 

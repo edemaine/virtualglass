@@ -6,16 +6,17 @@
 #include "pickupplan.h"
 #include "constants.h"
 #include "niceviewwidget.h"
-#include "model.h"
-#include "piece.h"
+#include "mesh.h"
+#include "geometry.h"
+#include "pickupplan.h"
 
 class PickupPlanEditorViewWidget : public QWidget
 {
 	Q_OBJECT
 
 	public:
-		PickupPlanEditorViewWidget(Piece* piece, Model* model, QWidget* parent=0);
-		void setPiece(Piece* plan);
+		PickupPlanEditorViewWidget(PickupPlan* pickup, QWidget* parent=0);
+		void setPickup(PickupPlan* p);
 		QPixmap getPixmap();
 	
 	signals:
@@ -27,9 +28,10 @@ class PickupPlanEditorViewWidget : public QWidget
 		void paintEvent(QPaintEvent *event);
 
 	private:
-		Model* model;
+		Mesher mesher;
+		Geometry geometry;
 		NiceViewWidget* niceViewWidget;
-		Piece* piece;
+		PickupPlan* pickup;
 };
 
 

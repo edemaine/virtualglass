@@ -31,7 +31,6 @@ QMAKE_CXXFLAGS += -Wall -Werror -Wno-deprecated -g
 
 # Input
 HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
-    qgraphicshighlighteffect.h
 
 HEADERS += primitives.h constants.h Vector.hpp \ 
 	pullplan.h pulltemplate.h subpulltemplate.h pickupplan.h \
@@ -41,7 +40,9 @@ HEADERS += primitives.h constants.h Vector.hpp \
 	mainwindow.h niceviewwidget.h pullplanlibrarywidget.h piecelibrarywidget.h \
 	pulltemplatelibrarywidget.h pickuptemplatelibrarywidget.h piecetemplatelibrarywidget.h \
 	pullplaneditorviewwidget.h pullplaneditorwidget.h colorbarlibrarywidget.h \
+	pieceeditorwidget.h coloreditorwidget.h \
 	controller.h model.h geometry.h mesh.h \ 
+	qgraphicshighlighteffect.h \
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
 	yaml-cpp/include/yaml-cpp/traits.h \
@@ -93,7 +94,6 @@ HEADERS += yaml-cpp/src/token.h \
 	yaml-cpp/src/collectionstack.h \
 
 SOURCES += glew/glew.c \
-    qgraphicshighlighteffect.cpp \
 
 SOURCES += main.cpp \ 
 	pullplan.cpp pulltemplate.cpp subpulltemplate.cpp \
@@ -104,6 +104,8 @@ SOURCES += main.cpp \
 	mainwindow.cpp niceviewwidget.cpp pullplanlibrarywidget.cpp piecelibrarywidget.cpp \
 	pulltemplatelibrarywidget.cpp pickuptemplatelibrarywidget.cpp piecetemplatelibrarywidget.cpp \
 	pullplaneditorviewwidget.cpp pullplaneditorwidget.cpp colorbarlibrarywidget.cpp \ 
+	qgraphicshighlighteffect.cpp \
+	pieceeditorwidget.cpp coloreditorwidget.cpp \
 
 
 SOURCES += yaml-cpp/src/tag.cpp \

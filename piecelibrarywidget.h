@@ -15,11 +15,10 @@ class PieceLibraryWidget : public QLabel
 		PieceLibraryWidget(Piece* piece, QWidget* parent=0);
 		Piece* getPiece();
 		const QPixmap* getEditorPixmap();
-		void updatePixmaps(QPixmap niceViewPixmap, QPixmap editorPixmap);
+		void updatePixmap(QPixmap pixmap);
 
 	private:
 		Piece* piece;
-		QPixmap editorPixmap;
 };
 
 #endif

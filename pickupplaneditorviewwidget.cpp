@@ -1,14 +1,15 @@
 
 #include "pickupplaneditorviewwidget.h"
 
-PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(Piece* piece, Model* model, QWidget* parent) : QWidget(parent)
+PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWidget* parent) : QWidget(parent)
 {
 	setAcceptDrops(true);
 	setFixedSize(500, 500);
-	this->piece = piece;
-	this->model = model;
+	this->pickup = pickup;
 	this->niceViewWidget = new NiceViewWidget(PICKUPPLAN_MODE, this);
-	this->niceViewWidget->setGeometry(model->getGeometry(piece->pickup));
+	mesher.generateMesh(pickup, &geometry);
+	this->niceViewWidget->setGeometry(&geometry);
+	this->niceViewWidget->repaint();
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	this->setLayout(layout);
@@ -36,9 +37,9 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
         if (type != PULL_PLAN_MIME) // if the thing passed isn't a pull plan 
                 return;  
 
-	for (unsigned int i = 0; i < piece->pickup->getTemplate()->subtemps.size(); ++i)
+	for (unsigned int i = 0; i < pickup->getTemplate()->subtemps.size(); ++i)
 	{
-		SubpickupTemplate* sp = piece->pickup->getTemplate()->subtemps[i];
+		SubpickupTemplate* sp = pickup->getTemplate()->subtemps[i];
 		Point ll, ur;
 
 		switch (sp->orientation)
@@ -81,26 +82,26 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		// If the shift button is down, fill in the entire group
 		if (event->keyboardModifiers() & 0x02000000)
 		{
-			int group = piece->pickup->getTemplate()->subtemps[i]->group;
-			for (unsigned int j = 0; j < piece->pickup->getTemplate()->subtemps.size(); ++j)
+			int group = pickup->getTemplate()->subtemps[i]->group;
+			for (unsigned int j = 0; j < pickup->getTemplate()->subtemps.size(); ++j)
 			{
-				if (piece->pickup->getTemplate()->subtemps[j]->group == group)
-					piece->pickup->subplans[j] = droppedPlan;
+				if (pickup->getTemplate()->subtemps[j]->group == group)
+					pickup->subplans[j] = droppedPlan;
 			}
 		}
                 // If the alt button is down, fill alternating elements in the group
                 else if (event->keyboardModifiers() & 0x08000000)
                 {
-                        int group = piece->pickup->getTemplate()->subtemps[i]->group;
+                        int group = pickup->getTemplate()->subtemps[i]->group;
                         bool parity = true;
-                        unsigned int subtempCount = piece->pickup->getTemplate()->subtemps.size();
+                        unsigned int subtempCount = pickup->getTemplate()->subtemps.size();
                         unsigned int j = i;
                         do
                         {
-                                if (piece->pickup->getTemplate()->subtemps[j]->group == group)
+                                if (pickup->getTemplate()->subtemps[j]->group == group)
 				{
 					if (parity)
-						piece->pickup->subplans[j] = droppedPlan;
+						pickup->subplans[j] = droppedPlan;
 					parity = !parity;
 				}
                                 ++j;
@@ -109,17 +110,18 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
                         while ((j != ((i-1 + subtempCount) % subtempCount)) && (j != i));
                 }
 		else // Otherwise just fill in this one
-			piece->pickup->subplans[i] = droppedPlan;
+			pickup->subplans[i] = droppedPlan;
 
 		emit someDataChanged();
 		return;	
 	} 
 }
 
-void PickupPlanEditorViewWidget :: setPiece(Piece* piece)
+void PickupPlanEditorViewWidget :: setPickup(PickupPlan* pickup)
 {
-	this->piece = piece;
-	this->niceViewWidget->setGeometry(model->getGeometry(piece->pickup));
+	this->pickup = pickup;
+	mesher.generateMesh(pickup, &geometry);
+	this->niceViewWidget->repaint();
 }
 
 void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
@@ -135,11 +137,11 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 	pen.setWidth(3);
 	painter.setPen(pen);
 	
-	for (unsigned int i = 0; i < piece->pickup->getTemplate()->subtemps.size(); ++i)
+	for (unsigned int i = 0; i < pickup->getTemplate()->subtemps.size(); ++i)
 	{
-		if (piece->pickup->subplans[i]->getTemplate()->isBase())
+		if (pickup->subplans[i]->getTemplate()->isBase())
 		{
-			Color* c = piece->pickup->subplans[i]->color;
+			Color* c = pickup->subplans[i]->color;
 			painter.setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
 			pen.setStyle(Qt::NoPen);
 		}
@@ -151,7 +153,7 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 		}
 		painter.setPen(pen);
 
-		SubpickupTemplate* sp = piece->pickup->getTemplate()->subtemps[i];
+		SubpickupTemplate* sp = pickup->getTemplate()->subtemps[i];
                 Point ll;
 		float rWidth, rHeight;
                 switch (sp->orientation)

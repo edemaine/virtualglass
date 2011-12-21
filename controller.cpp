@@ -7,8 +7,7 @@ Controller::Controller(int argc, char **argv)
 	app->setStartDragDistance(3);
 	qsrand(QDateTime::currentDateTime().toTime_t());
 
-	model = new Model();
-	mainWindow = new MainWindow(model);
+	mainWindow = new MainWindow();
 }
 
 int Controller::startUp()

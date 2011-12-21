@@ -14,8 +14,6 @@ PieceLibraryWidget :: PieceLibraryWidget(Piece* piece, QWidget* parent): QLabel(
 	setPixmap(pixmap);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 	this->piece = piece;
-	this->piece->setLibraryWidget(this);
-	this->editorPixmap = pixmap;
 
 	setGraphicsEffect(new QGraphicsHighlightEffect());
 	connect(graphicsEffect(),SIGNAL(enabledChanged(bool)),graphicsEffect(),SLOT(setStyleSheet(bool)));
@@ -27,14 +25,8 @@ Piece* PieceLibraryWidget :: getPiece()
 	return piece;
 }
 
-void PieceLibraryWidget :: updatePixmaps(QPixmap niceViewPixmap, QPixmap editorPixmap)
+void PieceLibraryWidget :: updatePixmap(QPixmap pixmap)
 {
-	setPixmap(niceViewPixmap);
-	this->editorPixmap = editorPixmap;
-}
-
-const QPixmap* PieceLibraryWidget :: getEditorPixmap()
-{
-	return &(this->editorPixmap);
+	setPixmap(pixmap);
 }
 

@@ -8,8 +8,6 @@ class PullPlanLibraryWidget;
 #include <stdlib.h>
 #include <vector>
 #include "pulltemplate.h"
-#include "pullplanlibrarywidget.h"
-#include "colorbarlibrarywidget.h"
 
 class PullPlan;
 
@@ -22,9 +20,6 @@ class PullPlan
 		void setTemplate(PullTemplate* pt);
 		PullTemplate* getTemplate();
 
-		void setLibraryWidget(PullPlanLibraryWidget* plplw);
-		PullPlanLibraryWidget* getLibraryWidget();
-
 		PullPlan* copy();
 
 		vector<PullPlan*> subplans;
@@ -36,7 +31,6 @@ class PullPlan
 	private:
 		// Variables
 		PullTemplate* pullTemplate;
-		PullPlanLibraryWidget* libraryWidget;
 };
 
 #endif

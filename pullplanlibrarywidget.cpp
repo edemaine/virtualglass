@@ -16,7 +16,6 @@ PullPlanLibraryWidget :: PullPlanLibraryWidget(PullPlan* plan,
 	setPixmap(pixmap);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 	this->pullPlan = plan;
-	this->pullPlan->setLibraryWidget(this);
 	this->editorPixmap = pixmap;
 
 	setGraphicsEffect(new QGraphicsHighlightEffect());

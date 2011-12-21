@@ -12,7 +12,6 @@ PullPlan :: PullPlan(int pullTemplate, Color* color)
 	this->pullTemplate = new PullTemplate(pullTemplate);
 	this->color = color;
 	this->twist = 0.0;
-	this->libraryWidget = NULL;
 }
 
 PullPlan* PullPlan :: copy()
@@ -27,7 +26,6 @@ PullPlan* PullPlan :: copy()
 	{
 		c->subplans.push_back(this->subplans[i]);
 	}
-	c->libraryWidget = this->libraryWidget;
 
 	return c;
 }
@@ -70,17 +68,6 @@ bool PullPlan :: hasDependencyOn(Color* color)
 	}
 	
 	return childrenAreDependent;
-}
-
-
-void PullPlan :: setLibraryWidget(PullPlanLibraryWidget* plplw)
-{
-	this->libraryWidget = plplw;
-}
-
-PullPlanLibraryWidget* PullPlan :: getLibraryWidget()
-{
-	return this->libraryWidget;
 }
 
 /*

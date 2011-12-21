@@ -47,7 +47,7 @@ void PullPlanEditorWidget :: updateEverything()
         geometry.clear();
         mesher.generateMesh(plan, &geometry);
         niceViewWidget->repaint();
-	geometry.save_raw_file("./cane.raw");
+	//geometry.save_raw_file("./cane.raw");
 
 	// Highlight correct pull template
 	for (int i = 0; i < templateLibraryLayout->count(); ++i)
