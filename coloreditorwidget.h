@@ -35,15 +35,27 @@ class ColorEditorWidget : public QWidget
 	public slots:
 		void updateEverything();
                 void alphaSliderPositionChanged(int);
+		void sourceComboBoxChanged(int);		
 
 	private:
 		Geometry geometry;
 		Mesher mesher;
+		QComboBox* sourceComboBox;
+		QScrollArea* colorLibrary1ScrollArea;
+		QScrollArea* colorLibrary2ScrollArea;
+		QScrollArea* colorLibrary3ScrollArea;
+		QScrollArea* colorLibrary4ScrollArea;
+		QScrollArea* colorLibrary5ScrollArea;
+		QScrollArea* colorLibrary6ScrollArea;
 		PullPlan* colorBar;	
 		NiceViewWidget* niceViewWidget;
                 QSlider* alphaSlider;
                 QVBoxLayout* colorLibrary1Layout;
                 QVBoxLayout* colorLibrary2Layout;
+                QVBoxLayout* colorLibrary3Layout;
+                QVBoxLayout* colorLibrary4Layout;
+                QVBoxLayout* colorLibrary5Layout;
+                QVBoxLayout* colorLibrary6Layout;
 
 		void setupLayout();
 		void setupConnections();
