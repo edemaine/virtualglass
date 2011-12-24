@@ -204,32 +204,26 @@ void ColorEditorWidget :: updateEverything()
 	for (int j = 0; j < colorLibrary1Layout->count(); ++j)
         {
                 w = colorLibrary1Layout->itemAt(j);
-                if(dynamic_cast<QWidgetItem *>(w))
-		{
-			pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-			pColor = colorBar->color;
-			if (pclw->getColor().r == pColor->r &&
-				pclw->getColor().g == pColor->g &&
-				pclw->getColor().b == pColor->b) 
-				highlightLibraryWidget(pclw);
-			else
-				unhighlightLibraryWidget(pclw);
-		}
+		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
+		pColor = colorBar->color;
+		if (pclw->getColor().r == pColor->r &&
+			pclw->getColor().g == pColor->g &&
+			pclw->getColor().b == pColor->b) 
+			highlightLibraryWidget(pclw);
+		else
+			unhighlightLibraryWidget(pclw);
 	}
 	for (int j = 0; j < colorLibrary2Layout->count(); ++j)
         {
                 w = colorLibrary2Layout->itemAt(j);
-                if(dynamic_cast<QWidgetItem *>(w))
-		{
-			pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-			pColor = colorBar->color;
-			if (pclw->getColor().r == pColor->r &&
-				pclw->getColor().g == pColor->g &&
-				pclw->getColor().b == pColor->b) 
-				highlightLibraryWidget(pclw);
-			else
-				unhighlightLibraryWidget(pclw);
-		}
+		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
+		pColor = colorBar->color;
+		if (pclw->getColor().r == pColor->r &&
+			pclw->getColor().g == pColor->g &&
+			pclw->getColor().b == pColor->b) 
+			highlightLibraryWidget(pclw);
+		else
+			unhighlightLibraryWidget(pclw);
         }
 }
 

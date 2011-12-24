@@ -86,24 +86,107 @@ void MainWindow :: initializeRandomPiece()
 void MainWindow :: unhighlightAllLibraryWidgets()
 {
 	QLayoutItem* w;
-	for (int j = 1; j <= colorBarCount; ++j)
+	for (int j = 0; j < colorBarLibraryLayout->count(); ++j)
 	{
-		w = tableGridLayout->itemAtPosition(j , 0);
-		if(dynamic_cast<QWidgetItem *>(w))
-			unhighlightLibraryWidget(dynamic_cast<ColorBarLibraryWidget*>(w->widget()));
+		w = colorBarLibraryLayout->itemAt(j);
+		unhighlightLibraryWidget(dynamic_cast<ColorBarLibraryWidget*>(w->widget()));
 	}
-	for (int j = 1; j <= pullPlanCount; ++j)
+	for (int j = 0; j < pullPlanLibraryLayout->count(); ++j)
 	{
-		w = tableGridLayout->itemAtPosition(j , 1);
-		if(dynamic_cast<QWidgetItem *>(w))
-			unhighlightLibraryWidget(dynamic_cast<PullPlanLibraryWidget*>(w->widget()));
+		w = pullPlanLibraryLayout->itemAt(j);
+		unhighlightLibraryWidget(dynamic_cast<PullPlanLibraryWidget*>(w->widget()));
 	}
-	for (int j = 1; j <= pieceCount; ++j)
+	for (int j = 0; j < pieceLibraryLayout->count(); ++j)
 	{
-		w = tableGridLayout->itemAtPosition(j , 2);
-		if(dynamic_cast<QWidgetItem *>(w))
-			unhighlightLibraryWidget(dynamic_cast<PieceLibraryWidget*>(w->widget()));
+		w = pieceLibraryLayout->itemAt(j);
+		unhighlightLibraryWidget(dynamic_cast<PieceLibraryWidget*>(w->widget()));
 	}
+}
+
+void MainWindow :: keyPressEvent(QKeyEvent* e)
+{
+	if (!(e->key() == Qt::Key_Backspace || e->key() == Qt::Key_Delete))
+		return;
+
+	deleteCurrentEditingObject();
+}
+
+void MainWindow :: deleteCurrentEditingObject()
+{
+	QLayoutItem* w;
+
+	switch (editorStack->currentIndex())
+	{
+		case COLORBAR_MODE:
+		{
+			if (colorBarLibraryLayout->count() == 0)
+				return;
+
+			for (int j = 0; j < colorBarLibraryLayout->count(); ++j)
+			{
+				w = colorBarLibraryLayout->itemAt(j);
+				PullPlan* p = dynamic_cast<ColorBarLibraryWidget*>(w->widget())->getPullPlan();
+				if (p == colorEditorWidget->getColorBar())
+				{
+					// this may be a memory leak, the library widget is never explicitly deleted
+					w = colorBarLibraryLayout->takeAt(j); 
+					delete w->widget();
+					delete w;
+					editorStack->setCurrentIndex(EMPTY_MODE); 
+					emit someDataChanged();
+					return;
+				}
+			}
+			break;
+		}
+		case PULLPLAN_MODE:
+		{
+			if (pullPlanLibraryLayout->count() == 0)
+				return;
+
+                        for (int j = 0; j < pullPlanLibraryLayout->count(); ++j)
+                        {
+                                w = pullPlanLibraryLayout->itemAt(j);
+                                PullPlan* p = dynamic_cast<PullPlanLibraryWidget*>(w->widget())->getPullPlan();
+                                if (p == pullPlanEditorWidget->getPlan())
+                                {
+                                        // this may be a memory leak, the library widget is never explicitly deleted
+                                        w = pullPlanLibraryLayout->takeAt(j);
+                                        delete w->widget();
+                                        delete w;
+                                        editorStack->setCurrentIndex(EMPTY_MODE);
+                                        emit someDataChanged();
+                                        return;
+                                }
+                        }
+
+			break;
+		}
+		case PIECE_MODE:
+		{
+			if (pieceLibraryLayout->count() == 0)
+				return;
+
+                        for (int j = 0; j < pieceLibraryLayout->count(); ++j)
+                        {
+                                w = pieceLibraryLayout->itemAt(j);
+                                Piece* p = dynamic_cast<PieceLibraryWidget*>(w->widget())->getPiece();
+                                if (p == pieceEditorWidget->getPiece())
+                                {
+                                        // this may be a memory leak, the library widget is never explicitly deleted
+                                        w = pieceLibraryLayout->takeAt(j);
+                                        delete w->widget();
+                                        delete w;
+                                        editorStack->setCurrentIndex(EMPTY_MODE);
+                                        emit someDataChanged();
+                                        return;
+                                }
+                        }
+
+			break;
+		}
+	}
+	
 }
 
 void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
@@ -218,35 +301,39 @@ void MainWindow :: setupConnections()
 
 void MainWindow :: setupLibrary()
 {
-	QWidget* tableWidget = new QWidget(centralWidget);
-	centralLayout->addWidget(tableWidget);
-	QVBoxLayout* tableLayout = new QVBoxLayout(tableWidget);
-	tableWidget->setLayout(tableLayout);
+	QVBoxLayout* libraryAreaLayout = new QVBoxLayout(centralWidget);
+	centralLayout->addLayout(libraryAreaLayout);
 
-	QScrollArea* tableGridLibraryScrollArea = new QScrollArea(tableWidget);
-	tableGridLibraryScrollArea->setBackgroundRole(QPalette::Dark);
-	tableGridLibraryScrollArea->setWidgetResizable(true);
-	tableGridLibraryScrollArea->setFixedWidth(370);
-	tableGridLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	tableGridLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	tableLayout->addWidget(tableGridLibraryScrollArea, 1);
+	QScrollArea* libraryScrollArea = new QScrollArea(centralWidget);
+	libraryAreaLayout->addWidget(libraryScrollArea, 1);
+	libraryScrollArea->setBackgroundRole(QPalette::Dark);
+	libraryScrollArea->setWidgetResizable(true);
+	libraryScrollArea->setFixedWidth(370);
+	libraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	libraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
-	QWidget* tableGridLibraryWidget = new QWidget(tableWidget);
-	tableGridLibraryScrollArea->setWidget(tableGridLibraryWidget);
-	tableGridLayout = new QGridLayout(tableGridLibraryWidget);
-	tableGridLibraryWidget->setLayout(tableGridLayout);
-	colorBarCount = pullPlanCount = pieceCount = 0;
+	QWidget* libraryWidget = new QWidget(libraryScrollArea);
+	libraryScrollArea->setWidget(libraryWidget);
 
-	newColorBarButton = new QPushButton("New Color");
-	newPullPlanButton = new QPushButton("New Cane");
-	newPieceButton = new QPushButton("New Piece");
-	tableGridLayout->setAlignment(Qt::AlignTop);
-	tableGridLayout->addWidget(newColorBarButton, 0, 0);
-	tableGridLayout->addWidget(newPullPlanButton, 0, 1);
-	tableGridLayout->addWidget(newPieceButton, 0, 2);
+	QGridLayout* superlibraryLayout = new QGridLayout(libraryWidget);
+	libraryWidget->setLayout(superlibraryLayout);
+
+	newColorBarButton = new QPushButton("New Color", libraryWidget);
+	newPullPlanButton = new QPushButton("New Cane", libraryWidget);
+	newPieceButton = new QPushButton("New Piece", libraryWidget);
+	superlibraryLayout->addWidget(newColorBarButton, 0, 0);
+	superlibraryLayout->addWidget(newPullPlanButton, 0, 1);
+	superlibraryLayout->addWidget(newPieceButton, 0, 2);
+
+	colorBarLibraryLayout = new QVBoxLayout(libraryWidget);
+	pullPlanLibraryLayout = new QVBoxLayout(libraryWidget);
+	pieceLibraryLayout = new QVBoxLayout(libraryWidget);
+	superlibraryLayout->addLayout(colorBarLibraryLayout, 1, 0, Qt::AlignTop);
+	superlibraryLayout->addLayout(pullPlanLibraryLayout, 1, 1, Qt::AlignTop);
+	superlibraryLayout->addLayout(pieceLibraryLayout, 1, 2, Qt::AlignTop);
 
 	// make three qlabels for a legend
-	QGridLayout* legendLayout = new QGridLayout(tableWidget);
+	QGridLayout* legendLayout = new QGridLayout(libraryWidget);
 	QLabel* l1 = new QLabel("Used By Selected");
 	l1->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	l1->setStyleSheet("border: 2px dashed " + QColor(0, 139, 69, 255).name() + ";");
@@ -259,12 +346,12 @@ void MainWindow :: setupLibrary()
 	legendLayout->addWidget(l1,0,1);
 	legendLayout->addWidget(l2,0,2);
 	legendLayout->addWidget(l3,0,3);
-	tableLayout->addLayout(legendLayout, 0);
+	libraryAreaLayout->addLayout(legendLayout, 0);
 
 	QLabel* descriptionLabel = new QLabel("Library - click to edit or drag to add.",
-		tableWidget);
+		libraryWidget);
 	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	tableLayout->addWidget(descriptionLabel, 0);
+	libraryAreaLayout->addWidget(descriptionLabel, 0);
 }
 
 void MainWindow :: setupStatusBar()
@@ -296,8 +383,7 @@ void MainWindow :: setupPieceEditor()
         // Setup data objects - the current plan and library widget for this plan
         pieceEditorWidget = new PieceEditorWidget(editorStack);
         pieceEditorPieceLibraryWidget = new PieceLibraryWidget(pieceEditorWidget->getPiece());
-        ++pieceCount;
-        tableGridLayout->addWidget(pieceEditorPieceLibraryWidget, pieceCount, 2);
+        pieceLibraryLayout->addWidget(pieceEditorPieceLibraryWidget);
 }
 
 void MainWindow :: setupEmptyPaneEditor()
@@ -315,8 +401,7 @@ void MainWindow :: setupColorEditor()
 	// Setup data objects - the current plan and library widget for this plan
 	colorEditorWidget = new ColorEditorWidget(editorStack);
 	colorEditorBarLibraryWidget = new ColorBarLibraryWidget(colorEditorWidget->getColorBar());
-	++colorBarCount;
-	tableGridLayout->addWidget(colorEditorBarLibraryWidget, colorBarCount, 0);
+	colorBarLibraryLayout->addWidget(colorEditorBarLibraryWidget);
 }
 
 void MainWindow :: setupPullPlanEditor()
@@ -324,8 +409,7 @@ void MainWindow :: setupPullPlanEditor()
 	// Setup data objects - the current plan and library widget for this plan
 	pullPlanEditorWidget = new PullPlanEditorWidget(editorStack);
 	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(pullPlanEditorWidget->getPlan());
-	++pullPlanCount;
-	tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
+	pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);
 }
 
 void MainWindow :: newPiece()
@@ -338,8 +422,7 @@ void MainWindow :: newPiece()
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();
 	pieceEditorPieceLibraryWidget = new PieceLibraryWidget(newEditorPiece);
-	++pieceCount;
-	tableGridLayout->addWidget(pieceEditorPieceLibraryWidget, pieceCount, 2);
+	pieceLibraryLayout->addWidget(pieceEditorPieceLibraryWidget);
 
 	pieceEditorWidget->setPiece(newEditorPiece);
 
@@ -362,8 +445,7 @@ void MainWindow :: newColorBar()
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();
 	colorEditorBarLibraryWidget = new ColorBarLibraryWidget(newEditorBar);
-	++colorBarCount;
-	tableGridLayout->addWidget(colorEditorBarLibraryWidget, colorBarCount, 0);
+	colorBarLibraryLayout->addWidget(colorEditorBarLibraryWidget);
 
 	// Give the new plan to the editor
 	colorEditorWidget->setColorBar(newEditorBar);
@@ -385,8 +467,7 @@ void MainWindow :: newPullPlan()
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();
 	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(newEditorPlan);
-	++pullPlanCount;
-	tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
+	pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);
 
 	// Give the new plan to the editor
 	pullPlanEditorWidget->setPlan(newEditorPlan);
@@ -402,8 +483,7 @@ void MainWindow :: newPullPlan(PullPlan* newPlan)
 {
         unhighlightAllLibraryWidgets();
         pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(newPlan);
-        ++pullPlanCount;
-        tableGridLayout->addWidget(pullPlanEditorPlanLibraryWidget, pullPlanCount, 1);
+        pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);
 
         // Give the new plan to the editor
         pullPlanEditorWidget->setPlan(newPlan);
@@ -505,19 +585,19 @@ void MainWindow :: updateLibrary()
 			colorEditorWidget->updateLibraryWidgetPixmaps(colorEditorBarLibraryWidget);
 
 			PullPlanLibraryWidget* pplw;
-			for (int i = 1; i <= pullPlanCount; ++i)
+			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 			{
 				pplw = dynamic_cast<PullPlanLibraryWidget*>(
-					dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 1))->widget());
+					dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 				if (pplw->getPullPlan()->hasDependencyOn(colorEditorBarLibraryWidget->getPullPlan()->color))
 					highlightLibraryWidget(pplw, USES_DEPENDANCY);
 			}
 
 			PieceLibraryWidget* plw;
-			for (int i = 1; i <= pieceCount; ++i)
+			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
 			{
 				plw = dynamic_cast<PieceLibraryWidget*>(
-					dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 2))->widget());
+					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 				if (plw->getPiece()->hasDependencyOn(colorEditorBarLibraryWidget->getPullPlan()->color))
 					highlightLibraryWidget(plw, USES_DEPENDANCY);
 			}
@@ -530,19 +610,19 @@ void MainWindow :: updateLibrary()
 			pullPlanEditorWidget->updateLibraryWidgetPixmaps(pullPlanEditorPlanLibraryWidget);
 
 			ColorBarLibraryWidget* cblw;
-			for (int i = 1; i <= colorBarCount; ++i)
+			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
 				cblw = dynamic_cast<ColorBarLibraryWidget*>(
-					dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 0))->widget());
+					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(cblw->getPullPlan()->color))
 					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
 			}
 
 			PullPlanLibraryWidget* pplw;
-			for (int i = 1; i <= pullPlanCount; ++i)
+			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 			{
 				pplw = dynamic_cast<PullPlanLibraryWidget*>(
-						dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 1))->widget());
+						dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(pplw->getPullPlan()))
 						highlightLibraryWidget(pplw, IS_USED_BY_DEPENDANCY);
 				else if (pplw->getPullPlan()->hasDependencyOn(pullPlanEditorWidget->getPlan()))
@@ -550,10 +630,10 @@ void MainWindow :: updateLibrary()
 			}
 
 			PieceLibraryWidget* plw;
-			for (int i = 1; i <= pieceCount; ++i)
+			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
 			{
 				plw = dynamic_cast<PieceLibraryWidget*>(
-					dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 2))->widget());
+					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 				if (plw->getPiece()->hasDependencyOn(pullPlanEditorWidget->getPlan()))
 					highlightLibraryWidget(plw, USES_DEPENDANCY);
 			}
@@ -566,19 +646,19 @@ void MainWindow :: updateLibrary()
 			pieceEditorWidget->updateLibraryWidgetPixmaps(pieceEditorPieceLibraryWidget);
 
 			ColorBarLibraryWidget* cblw;
-			for (int i = 1; i <= colorBarCount; ++i)
+			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
 				cblw = dynamic_cast<ColorBarLibraryWidget*>(
-					dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 0))->widget());
+					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 				if (pieceEditorWidget->getPiece()->hasDependencyOn(cblw->getPullPlan()->color))
 					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
 			}
 
 			PullPlanLibraryWidget* pplw;
-			for (int i = 1; i <= pullPlanCount; ++i)
+			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 			{
 				pplw = dynamic_cast<PullPlanLibraryWidget*>(
-					dynamic_cast<QWidgetItem *>(tableGridLayout->itemAtPosition(i , 1))->widget());
+					dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 				if (pieceEditorWidget->getPiece()->hasDependencyOn(pplw->getPullPlan()))
 					highlightLibraryWidget(pplw, IS_USED_BY_DEPENDANCY);
 			}

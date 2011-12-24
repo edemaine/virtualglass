@@ -31,6 +31,7 @@ class MainWindow : public QMainWindow
 		void mouseMoveEvent(QMouseEvent* event);
 		void dragMoveEvent(QDragMoveEvent* event);
 		void seedEverything();
+		void keyPressEvent(QKeyEvent* e);
 
 	signals:
 		void someDataChanged();
@@ -47,6 +48,7 @@ class MainWindow : public QMainWindow
 		void setupConnections();
 		void updateLibrary();
 		void initializeRandomPiece();
+		void deleteCurrentEditingObject();
 
 		void unhighlightLibraryWidget(PieceTemplateLibraryWidget* w);
 		void unhighlightLibraryWidget(PickupTemplateLibraryWidget* w);
@@ -64,10 +66,9 @@ class MainWindow : public QMainWindow
 		QLabel* whatToDoLabel;
 		QStatusBar* statusBar;
 		NiceViewWidget* colorBarNiceViewWidget;
-		QGridLayout* tableGridLayout;
-		int pullPlanCount;
-		int pieceCount;
-		int colorBarCount;
+		QVBoxLayout* colorBarLibraryLayout;
+		QVBoxLayout* pullPlanLibraryLayout;
+		QVBoxLayout* pieceLibraryLayout;
 		QPoint dragStartPosition;
 		QStackedWidget* editorStack; //editorStack.currentIndex() gives with mode
 		QWidget* emptyEditorPage;
