@@ -301,10 +301,13 @@ void MainWindow :: setupConnections()
 
 void MainWindow :: setupLibrary()
 {
-	QVBoxLayout* libraryAreaLayout = new QVBoxLayout(centralWidget);
-	centralLayout->addLayout(libraryAreaLayout);
+	QWidget* bigOleLibraryWidget = new QWidget(centralWidget);
+	centralLayout->addWidget(bigOleLibraryWidget);
 
-	QScrollArea* libraryScrollArea = new QScrollArea(centralWidget);
+	QVBoxLayout* libraryAreaLayout = new QVBoxLayout(bigOleLibraryWidget);
+	bigOleLibraryWidget->setLayout(libraryAreaLayout);
+
+	QScrollArea* libraryScrollArea = new QScrollArea(bigOleLibraryWidget);
 	libraryAreaLayout->addWidget(libraryScrollArea, 1);
 	libraryScrollArea->setBackgroundRole(QPalette::Dark);
 	libraryScrollArea->setWidgetResizable(true);
