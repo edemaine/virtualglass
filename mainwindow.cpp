@@ -119,71 +119,84 @@ void MainWindow :: deleteCurrentEditingObject()
 	{
 		case COLORBAR_MODE:
 		{
-			if (colorBarLibraryLayout->count() == 0)
+			if (colorBarLibraryLayout->count() == 1)
 				return;
 
-			for (int j = 0; j < colorBarLibraryLayout->count(); ++j)
+			int i;
+			for (i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
-				w = colorBarLibraryLayout->itemAt(j);
+				w = colorBarLibraryLayout->itemAt(i);
 				PullPlan* p = dynamic_cast<ColorBarLibraryWidget*>(w->widget())->getPullPlan();
 				if (p == colorEditorWidget->getColorBar())
 				{
 					// this may be a memory leak, the library widget is never explicitly deleted
-					w = colorBarLibraryLayout->takeAt(j); 
+					w = colorBarLibraryLayout->takeAt(i); 
 					delete w->widget();
 					delete w;
-					editorStack->setCurrentIndex(EMPTY_MODE); 
-					emit someDataChanged();
-					return;
+					break;	
 				}
 			}
+
+			colorEditorBarLibraryWidget = dynamic_cast<ColorBarLibraryWidget*>(
+								colorBarLibraryLayout->itemAt(
+									MIN(colorBarLibraryLayout->count()-1, i))->widget());
+			colorEditorWidget->setColorBar(colorEditorBarLibraryWidget->getPullPlan());
+			emit someDataChanged();
 			break;
 		}
 		case PULLPLAN_MODE:
 		{
-			if (pullPlanLibraryLayout->count() == 0)
+			if (pullPlanLibraryLayout->count() == 1)
 				return;
 
-                        for (int j = 0; j < pullPlanLibraryLayout->count(); ++j)
+                        int i;
+                        for (i = 0; i < pullPlanLibraryLayout->count(); ++i)
                         {
-                                w = pullPlanLibraryLayout->itemAt(j);
+                                w = pullPlanLibraryLayout->itemAt(i);
                                 PullPlan* p = dynamic_cast<PullPlanLibraryWidget*>(w->widget())->getPullPlan();
                                 if (p == pullPlanEditorWidget->getPlan())
                                 {
                                         // this may be a memory leak, the library widget is never explicitly deleted
-                                        w = pullPlanLibraryLayout->takeAt(j);
+                                        w = pullPlanLibraryLayout->takeAt(i);
                                         delete w->widget();
                                         delete w;
-                                        editorStack->setCurrentIndex(EMPTY_MODE);
-                                        emit someDataChanged();
-                                        return;
+                                        break;
                                 }
                         }
 
-			break;
+                        pullPlanEditorPlanLibraryWidget = dynamic_cast<PullPlanLibraryWidget*>(
+                                                          	pullPlanLibraryLayout->itemAt(
+                                                                        MIN(pullPlanLibraryLayout->count()-1, i))->widget());
+                        pullPlanEditorWidget->setPlan(pullPlanEditorPlanLibraryWidget->getPullPlan());
+                        emit someDataChanged();
+                        break;
 		}
 		case PIECE_MODE:
 		{
-			if (pieceLibraryLayout->count() == 0)
+			if (pieceLibraryLayout->count() == 1)
 				return;
 
-                        for (int j = 0; j < pieceLibraryLayout->count(); ++j)
+                        int i;
+                        for (i = 0; i < pieceLibraryLayout->count(); ++i)
                         {
-                                w = pieceLibraryLayout->itemAt(j);
+                                w = pieceLibraryLayout->itemAt(i);
                                 Piece* p = dynamic_cast<PieceLibraryWidget*>(w->widget())->getPiece();
                                 if (p == pieceEditorWidget->getPiece())
                                 {
                                         // this may be a memory leak, the library widget is never explicitly deleted
-                                        w = pieceLibraryLayout->takeAt(j);
+                                        w = pieceLibraryLayout->takeAt(i);
                                         delete w->widget();
                                         delete w;
-                                        editorStack->setCurrentIndex(EMPTY_MODE);
-                                        emit someDataChanged();
-                                        return;
+                                        break;
                                 }
                         }
 
-			break;
+                        pieceEditorPieceLibraryWidget = dynamic_cast<PieceLibraryWidget*>(
+                                                                pieceLibraryLayout->itemAt(
+                                                                        MIN(pieceLibraryLayout->count()-1, i))->widget());
+                        pieceEditorWidget->setPiece(pieceEditorPieceLibraryWidget->getPiece());
+                        emit someDataChanged();
+                        break;
 		}
 	}
 	
