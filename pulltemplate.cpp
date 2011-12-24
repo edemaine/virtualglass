@@ -159,7 +159,7 @@ void PullTemplate :: updateSubtemps()
 		case SQUARE_OF_SQUARES_PULL_TEMPLATE:
 		{
 			if (this->shape == CIRCLE_SHAPE)
-				radius *= 1 / SQRT_TWO* 1.17;
+				radius *= 1 / SQRT_TWO;
 
 			int count = parameterValues[0];
 			float littleRadius = radius / count;
@@ -215,60 +215,60 @@ void PullTemplate :: initializeTemplate()
 			this->base = true;
 			break;
 		case SQUARE_BASE_PULL_TEMPLATE:
-			this->shape = SQUARE_SHAPE;
+			this->shape = CIRCLE_SHAPE;
 			this->base = true;
 			break;
-				case AMORPHOUS_BASE_PULL_TEMPLATE:
-						this->shape = AMORPHOUS_SHAPE;
-						this->base = true;
-						break;
+		case AMORPHOUS_BASE_PULL_TEMPLATE:
+			this->shape = AMORPHOUS_SHAPE;
+			this->base = true;
+			break;
 		case CASED_CIRCLE_PULL_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			this->base = false;
 			this->casingThickness = 0.2;
 			break;
 		case CASED_SQUARE_PULL_TEMPLATE:
-			this->shape = SQUARE_SHAPE;
+			this->shape = CIRCLE_SHAPE;
 			this->base = false;
 			this->casingThickness = 0.2;
 			break;
 		case HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			this->base = false;
-						tmp = new char[100];
-						sprintf(tmp, "Count");
+			tmp = new char[100];
+			sprintf(tmp, "Count");
 			this->parameterNames.push_back(tmp);
 			this->parameterValues.push_back(3);
 			break;
 		case HORIZONTAL_LINE_SQUARE_PULL_TEMPLATE:
-			this->shape = SQUARE_SHAPE;
+			this->shape = CIRCLE_SHAPE;
 			this->base = false;
-						tmp = new char[100];
-						sprintf(tmp, "Count");
+			tmp = new char[100];
+			sprintf(tmp, "Count");
 			this->parameterNames.push_back(tmp);
 			this->parameterValues.push_back(3);
 			break;
 		case CIRCLE_PULL_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
-						tmp = new char[100];
-						sprintf(tmp, "Count");
+			tmp = new char[100];
+			sprintf(tmp, "Count");
 			this->parameterNames.push_back(tmp);
 			this->parameterValues.push_back(8);
 			this->base = false;
 			break;
 		case CROSS_PULL_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
-						tmp = new char[100];
-						sprintf(tmp, "Count");
+			tmp = new char[100];
+			sprintf(tmp, "Count");
 			this->parameterNames.push_back(tmp);
 			this->parameterValues.push_back(2);
 			this->base = false;
 			break;
 		case SQUARE_OF_SQUARES_PULL_TEMPLATE:
 		case SQUARE_OF_CIRCLES_PULL_TEMPLATE:
-			this->shape = SQUARE_SHAPE;
-						tmp = new char[100];
-						sprintf(tmp, "Count");
+			this->shape = CIRCLE_SHAPE;
+			tmp = new char[100];
+			sprintf(tmp, "Count");
 			this->parameterNames.push_back(tmp);
 			this->parameterValues.push_back(4);
 			this->base = false;

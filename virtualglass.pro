@@ -36,7 +36,7 @@ HEADERS += primitives.h constants.h Vector.hpp \
 	pullplan.h pulltemplate.h subpulltemplate.h pickupplan.h \
 	piece.h piecetemplate.h \
 	pickuptemplate.h subpickuptemplate.h pickupplaneditorviewwidget.h \ 
-	coloreditorviewwidget.h purecolorlibrarywidget.h \
+	purecolorlibrarywidget.h \
 	mainwindow.h niceviewwidget.h pullplanlibrarywidget.h piecelibrarywidget.h \
 	pulltemplatelibrarywidget.h pickuptemplatelibrarywidget.h piecetemplatelibrarywidget.h \
 	pullplaneditorviewwidget.h pullplaneditorwidget.h colorbarlibrarywidget.h \
@@ -99,7 +99,7 @@ SOURCES += main.cpp \
 	pullplan.cpp pulltemplate.cpp subpulltemplate.cpp \
 	piece.cpp piecetemplate.cpp \
 	pickupplan.cpp pickuptemplate.cpp subpickuptemplate.cpp pickupplaneditorviewwidget.cpp \
-	coloreditorviewwidget.cpp purecolorlibrarywidget.cpp \
+	purecolorlibrarywidget.cpp \
 	model.cpp controller.cpp geometry.cpp mesh.cpp \
 	mainwindow.cpp niceviewwidget.cpp pullplanlibrarywidget.cpp piecelibrarywidget.cpp \
 	pulltemplatelibrarywidget.cpp pickuptemplatelibrarywidget.cpp piecetemplatelibrarywidget.cpp \

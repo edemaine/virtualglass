@@ -8,8 +8,8 @@
 #include "niceviewwidget.h"
 #include "geometry.h"
 #include "mesh.h"
-#include "coloreditorviewwidget.h"
 #include "colorbarlibrarywidget.h"
+#include "purecolorlibrarywidget.h"
 
 class ColorEditorWidget : public QWidget
 {
@@ -27,16 +27,23 @@ class ColorEditorWidget : public QWidget
 	signals:
 		void someDataChanged();
 
+	protected:
+		void mousePressEvent(QMouseEvent* event);
+                void highlightLibraryWidget(PureColorLibraryWidget* w);
+                void unhighlightLibraryWidget(PureColorLibraryWidget* w);
+
 	public slots:
 		void updateEverything();
-		void viewWidgetDataChanged();
+                void alphaSliderPositionChanged(int);
 
 	private:
 		Geometry geometry;
 		Mesher mesher;
 		PullPlan* colorBar;	
 		NiceViewWidget* niceViewWidget;
-		ColorEditorViewWidget* viewWidget;
+                QSlider* alphaSlider;
+                QVBoxLayout* colorLibrary1Layout;
+                QVBoxLayout* colorLibrary2Layout;
 
 		void setupLayout();
 		void setupConnections();

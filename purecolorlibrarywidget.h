@@ -4,6 +4,7 @@
 #include <QtGui>
 #include <QObject>
 #include "pullplan.h"
+#include "qgraphicshighlighteffect.h"
 
 class PureColorLibraryWidget : public QLabel
 {

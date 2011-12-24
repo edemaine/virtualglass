@@ -20,6 +20,9 @@ PureColorLibraryWidget :: PureColorLibraryWidget(Color color, QString name, QWid
         setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
 	this->color = color;
+        setGraphicsEffect(new QGraphicsHighlightEffect());
+        connect(graphicsEffect(), SIGNAL(enabledChanged(bool)), graphicsEffect(), SLOT(setStyleSheet(bool)));
+        connect(graphicsEffect(), SIGNAL(styleSheetString(QString)), this, SLOT(setStyleSheet(QString)));
 }
 
 void PureColorLibraryWidget :: setAlpha(float a)
