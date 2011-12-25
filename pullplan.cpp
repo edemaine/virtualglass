@@ -83,8 +83,8 @@ void PullPlan :: setTemplate(PullTemplate* newTemplate)
 	color = new Color();
 	color->r = color->g = color->b = 1.0;
 	color->a = 0.0;
-	PullPlan* circlePullPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
-	PullPlan* squarePullPlan = new PullPlan(SQUARE_BASE_PULL_TEMPLATE, color);
+	PullPlan* circlePullPlan = NULL;
+	PullPlan* squarePullPlan = NULL;
 
 	for (unsigned int i = 0; i < MIN(pullTemplate->subtemps.size(), subplans.size()); ++i)
 	{
@@ -94,12 +94,17 @@ void PullPlan :: setTemplate(PullTemplate* newTemplate)
 			squarePullPlan = subplans[i];
 		}
 		else if (this->pullTemplate->subtemps[i].shape == CIRCLE_SHAPE
-			&& (circlePullPlan->color->a < 0.0001 || circlePullPlan == NULL))
+			&& (circlePullPlan == NULL || circlePullPlan->color->a < 0.0001))
 			circlePullPlan = this->subplans[i];
 		else if (this->pullTemplate->subtemps[i].shape == SQUARE_SHAPE
-			&& (squarePullPlan->color->a < 0.0001 || squarePullPlan == NULL))
+			&& (squarePullPlan == NULL || squarePullPlan->color->a < 0.0001))
 			squarePullPlan = this->subplans[i];
 	}
+
+	if (circlePullPlan == NULL)
+		circlePullPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
+	if (squarePullPlan == NULL)
+		squarePullPlan = new PullPlan(SQUARE_BASE_PULL_TEMPLATE, color);
 
 	// create the new subplans based on template
 	newTemplate->setCasingThickness(this->pullTemplate->getCasingThickness());

@@ -6,7 +6,7 @@ ColorEditorWidget :: ColorEditorWidget(QWidget* parent) : QWidget(parent)
 	Color* color = new Color;
 	color->r = color->g = color->b = 1.0;
 	color->a = 0.0;
-        this->colorBar = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
+        this->colorBar = new PullPlan(AMORPHOUS_BASE_PULL_TEMPLATE, color);
 	this->niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);
 	mesher.generateMesh(colorBar, &geometry);
 	niceViewWidget->setGeometry(&geometry);
@@ -312,24 +312,9 @@ void ColorEditorWidget :: updateEverything()
         QLayoutItem* w;
 	PureColorLibraryWidget* pclw;
 	Color* pColor;
-	for (int j = 0; j < colorLibrary1Layout->count(); ++j)
+        for (int j = 0; j < colorLibrary6Layout->count(); ++j)
         {
-                w = colorLibrary1Layout->itemAt(j);
-		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-		pColor = colorBar->color;
-		if (pclw->getColor().r == pColor->r &&
-			pclw->getColor().g == pColor->g &&
-			pclw->getColor().b == pColor->b) 
-		{
-			highlightLibraryWidget(pclw);
-			sourceComboBox->setCurrentIndex(0);
-		}
-		else
-			unhighlightLibraryWidget(pclw);
-	}
-        for (int j = 0; j < colorLibrary2Layout->count(); ++j)
-        {
-                w = colorLibrary2Layout->itemAt(j);
+                w = colorLibrary6Layout->itemAt(j);
                 pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
                 pColor = colorBar->color;
                 if (pclw->getColor().r == pColor->r &&
@@ -337,37 +322,7 @@ void ColorEditorWidget :: updateEverything()
                         pclw->getColor().b == pColor->b)
 		{
 			highlightLibraryWidget(pclw);
-			sourceComboBox->setCurrentIndex(1);
-		}
-                else
-                        unhighlightLibraryWidget(pclw);
-        }
-        for (int j = 0; j < colorLibrary3Layout->count(); ++j)
-        {
-                w = colorLibrary3Layout->itemAt(j);
-                pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-                pColor = colorBar->color;
-                if (pclw->getColor().r == pColor->r &&
-                        pclw->getColor().g == pColor->g &&
-                        pclw->getColor().b == pColor->b)
-		{
-			highlightLibraryWidget(pclw);
-			sourceComboBox->setCurrentIndex(2);
-		}
-                else
-                        unhighlightLibraryWidget(pclw);
-        }
-        for (int j = 0; j < colorLibrary4Layout->count(); ++j)
-        {
-                w = colorLibrary4Layout->itemAt(j);
-                pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-                pColor = colorBar->color;
-                if (pclw->getColor().r == pColor->r &&
-                        pclw->getColor().g == pColor->g &&
-                        pclw->getColor().b == pColor->b)
-		{
-			highlightLibraryWidget(pclw);
-			sourceComboBox->setCurrentIndex(3);
+			sourceComboBox->setCurrentIndex(5);
 		}
                 else
                         unhighlightLibraryWidget(pclw);
@@ -387,9 +342,9 @@ void ColorEditorWidget :: updateEverything()
 		else
 			unhighlightLibraryWidget(pclw);
         }
-        for (int j = 0; j < colorLibrary6Layout->count(); ++j)
+        for (int j = 0; j < colorLibrary4Layout->count(); ++j)
         {
-                w = colorLibrary6Layout->itemAt(j);
+                w = colorLibrary4Layout->itemAt(j);
                 pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
                 pColor = colorBar->color;
                 if (pclw->getColor().r == pColor->r &&
@@ -397,11 +352,56 @@ void ColorEditorWidget :: updateEverything()
                         pclw->getColor().b == pColor->b)
 		{
 			highlightLibraryWidget(pclw);
-			sourceComboBox->setCurrentIndex(5);
+			sourceComboBox->setCurrentIndex(3);
 		}
                 else
                         unhighlightLibraryWidget(pclw);
         }
+        for (int j = 0; j < colorLibrary3Layout->count(); ++j)
+        {
+                w = colorLibrary3Layout->itemAt(j);
+                pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
+                pColor = colorBar->color;
+                if (pclw->getColor().r == pColor->r &&
+                        pclw->getColor().g == pColor->g &&
+                        pclw->getColor().b == pColor->b)
+		{
+			highlightLibraryWidget(pclw);
+			sourceComboBox->setCurrentIndex(2);
+		}
+                else
+                        unhighlightLibraryWidget(pclw);
+        }
+        for (int j = 0; j < colorLibrary2Layout->count(); ++j)
+        {
+                w = colorLibrary2Layout->itemAt(j);
+                pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
+                pColor = colorBar->color;
+                if (pclw->getColor().r == pColor->r &&
+                        pclw->getColor().g == pColor->g &&
+                        pclw->getColor().b == pColor->b)
+		{
+			highlightLibraryWidget(pclw);
+			sourceComboBox->setCurrentIndex(1);
+		}
+                else
+                        unhighlightLibraryWidget(pclw);
+        }
+	for (int j = 0; j < colorLibrary1Layout->count(); ++j)
+        {
+                w = colorLibrary1Layout->itemAt(j);
+		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
+		pColor = colorBar->color;
+		if (pclw->getColor().r == pColor->r &&
+			pclw->getColor().g == pColor->g &&
+			pclw->getColor().b == pColor->b) 
+		{
+			highlightLibraryWidget(pclw);
+			sourceComboBox->setCurrentIndex(0);
+		}
+		else
+			unhighlightLibraryWidget(pclw);
+	}
 }
 
 
