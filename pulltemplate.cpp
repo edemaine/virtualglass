@@ -236,7 +236,7 @@ void PullTemplate :: initializeTemplate()
 			this->shape = CIRCLE_SHAPE;
 			this->base = false;
 			tmp = new char[100];
-			sprintf(tmp, "Count");
+			sprintf(tmp, "Row count:");
 			this->parameterNames.push_back(tmp);
 			this->parameterValues.push_back(3);
 			break;
@@ -244,14 +244,14 @@ void PullTemplate :: initializeTemplate()
 			this->shape = CIRCLE_SHAPE;
 			this->base = false;
 			tmp = new char[100];
-			sprintf(tmp, "Count");
+			sprintf(tmp, "Row count:");
 			this->parameterNames.push_back(tmp);
 			this->parameterValues.push_back(3);
 			break;
 		case CIRCLE_PULL_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			tmp = new char[100];
-			sprintf(tmp, "Count");
+			sprintf(tmp, "Count:");
 			this->parameterNames.push_back(tmp);
 			this->parameterValues.push_back(8);
 			this->base = false;
@@ -259,7 +259,7 @@ void PullTemplate :: initializeTemplate()
 		case CROSS_PULL_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			tmp = new char[100];
-			sprintf(tmp, "Count");
+			sprintf(tmp, "Radial count:");
 			this->parameterNames.push_back(tmp);
 			this->parameterValues.push_back(2);
 			this->base = false;
@@ -268,7 +268,7 @@ void PullTemplate :: initializeTemplate()
 		case SQUARE_OF_CIRCLES_PULL_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			tmp = new char[100];
-			sprintf(tmp, "Count");
+			sprintf(tmp, "Row count:");
 			this->parameterNames.push_back(tmp);
 			this->parameterValues.push_back(4);
 			this->base = false;

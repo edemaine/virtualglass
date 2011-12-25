@@ -13,25 +13,25 @@ PickupTemplate :: PickupTemplate(int t)
 	{
 		case VERTICALS_AND_HORIZONTALS_TEMPLATE:
 			tmp = new char[100];
-			sprintf(tmp, "Column count");
+			sprintf(tmp, "Column count:");
 			parameterNames.push_back(tmp);
 			parameterValues.push_back(14);
 			break;
 		case VERTICALS_TEMPLATE:
 			tmp = new char[100];
-			sprintf(tmp, "Column count");
+			sprintf(tmp, "Column count:");
 			parameterNames.push_back(tmp);
 			parameterValues.push_back(14);
 			break;
 		case MURRINE_COLUMN_TEMPLATE:
 			tmp = new char[100];
-			sprintf(tmp, "Column count");
+			sprintf(tmp, "Column count:");
 			parameterNames.push_back(tmp);
                         parameterValues.push_back(14);
 			break;
 		case MURRINE_SQUARE_TEMPLATE:
 			tmp = new char[100];
-			sprintf(tmp, "Column count");
+			sprintf(tmp, "Column count:");
 			parameterNames.push_back(tmp);
                         parameterValues.push_back(14);
 			break;

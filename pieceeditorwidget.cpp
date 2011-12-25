@@ -78,8 +78,6 @@ void PieceEditorWidget :: highlightLibraryWidget(PickupTemplateLibraryWidget* w)
         w->graphicsEffect()->setEnabled(true);
 }
 
-
-
 void PieceEditorWidget :: pieceTemplateParameterSlider2Changed(int)
 {
         int value = pieceTemplateParameter2Slider->sliderPosition();
@@ -233,6 +231,7 @@ void PieceEditorWidget :: setupConnections()
                 this, SLOT(pieceTemplateParameterSlider2Changed(int)));
 
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+	connect(pickupViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }
 
 void PieceEditorWidget :: seedTemplates()

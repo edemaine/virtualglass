@@ -105,10 +105,10 @@ void MainWindow :: unhighlightAllLibraryWidgets()
 
 void MainWindow :: keyPressEvent(QKeyEvent* e)
 {
-	if (!(e->key() == Qt::Key_Backspace || e->key() == Qt::Key_Delete))
-		return;
-
-	deleteCurrentEditingObject();
+	if (e->key() == Qt::Key_Backspace || e->key() == Qt::Key_Delete)
+		deleteCurrentEditingObject();
+	//else
+	//	e->setAccepted(false);
 }
 
 void MainWindow :: deleteCurrentEditingObject()
