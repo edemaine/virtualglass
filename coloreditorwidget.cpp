@@ -152,7 +152,7 @@ void ColorEditorWidget :: setupLayout()
 
         QHBoxLayout* alphaLayout = new QHBoxLayout(this);
         editorLayout->addLayout(alphaLayout);
-	QLabel* alphaLabel1 = new QLabel("Opacity:", this);
+	QLabel* alphaLabel1 = new QLabel("Transparency:", this);
         alphaLayout->addWidget(alphaLabel1, 0);
         QLabel* alphaLabel2 = new QLabel("0%", this);
         alphaLayout->addWidget(alphaLabel2, 0);
@@ -267,7 +267,7 @@ void ColorEditorWidget :: alphaSliderPositionChanged(int)
 {
 	if (alphaSlider->sliderPosition() != (int) (colorBar->color->a * 255))
 	{
-		colorBar->color->a = alphaSlider->sliderPosition() / 255.0;
+		colorBar->color->a = (255 - alphaSlider->sliderPosition()) / 255.0;
 		emit someDataChanged();
 	} 
 }
@@ -278,7 +278,7 @@ void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 	if (pclw != NULL)
 	{
 		*(colorBar->color) = pclw->getColor();
-		this->alphaSlider->setSliderPosition((int) (colorBar->color->a * 255));
+		this->alphaSlider->setSliderPosition(255 - (int) (colorBar->color->a * 255));
 		emit someDataChanged();	
 	}
 }
@@ -307,7 +307,7 @@ void ColorEditorWidget :: updateEverything()
         mesher.generateMesh(colorBar, &geometry);
         niceViewWidget->repaint();
 
-	this->alphaSlider->setSliderPosition((int) (colorBar->color->a * 255));
+	this->alphaSlider->setSliderPosition(255 - (int) (colorBar->color->a * 255));
 
         QLayoutItem* w;
 	PureColorLibraryWidget* pclw;
