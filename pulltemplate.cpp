@@ -117,7 +117,7 @@ void PullTemplate :: updateSubtemps()
 			}
 			break;
 		}
-		case CIRCLE_PULL_TEMPLATE:
+		case SURROUNDING_CIRCLE_PULL_TEMPLATE:
 		{
 			int count = parameterValues[0];
 			float theta = TWO_PI / count;
@@ -135,7 +135,7 @@ void PullTemplate :: updateSubtemps()
 		}
 		case CROSS_PULL_TEMPLATE:
 		{
-			int count = parameterValues[0] * 2 + 1;
+			int count = parameterValues[0] * 2 - 1;
 
 			for (int i = 0; i < count; ++i)
 			{
@@ -178,24 +178,26 @@ void PullTemplate :: updateSubtemps()
 			}
 			break;
 		}
-		case BUNDLE_NINETEEN_TEMPLATE:
+		case TRIPOD_PULL_TEMPLATE:
 		{
-			if (this->shape == SQUARE_SHAPE)
-				radius *= pow(2, 0.5);
-			int k = 0;
-			for (int i = -2; i <= 2; ++i)
+			int count = parameterValues[0];
+			float littleRadius = radius / (2 * count - 1);
+
+			p.x = p.y = 0.0;
+			subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 2 * littleRadius, 0));
+			for (int theta = 0; theta < 3; ++theta)
 			{
-				for (int j = -2; j <= 2; ++j)
+				for (int i = 1; i < count; ++i)
 				{
-					int absj = (j < 0 ? -j : j);
-					p.x = radius * (i + (absj%2)*0.5) * 0.4;
-					p.y = radius * (j * SQRT_THREE/2) * 0.4;
-					if (p.x*p.x+p.y*p.y >= 1) continue;
-					if (k >= 19) continue;
-					subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, radius * 0.4, 0));
-					++k;
+					p.x = (littleRadius * 2 * i) * cos(TWO_PI / 3 * theta);
+					p.y = (littleRadius * 2 * i) * sin(TWO_PI / 3 * theta); 
+					subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2, 0));
 				}
 			}
+			break;
+		}
+		case SURROUNDING_SQUARE_PULL_TEMPLATE:
+		{	
 			break;
 		}
 	}
@@ -248,7 +250,7 @@ void PullTemplate :: initializeTemplate()
 			this->parameterNames.push_back(tmp);
 			this->parameterValues.push_back(3);
 			break;
-		case CIRCLE_PULL_TEMPLATE:
+		case SURROUNDING_CIRCLE_PULL_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
 			tmp = new char[100];
 			sprintf(tmp, "Count:");
@@ -261,7 +263,7 @@ void PullTemplate :: initializeTemplate()
 			tmp = new char[100];
 			sprintf(tmp, "Radial count:");
 			this->parameterNames.push_back(tmp);
-			this->parameterValues.push_back(2);
+			this->parameterValues.push_back(3);
 			this->base = false;
 			break;
 		case SQUARE_OF_SQUARES_PULL_TEMPLATE:
@@ -273,8 +275,12 @@ void PullTemplate :: initializeTemplate()
 			this->parameterValues.push_back(4);
 			this->base = false;
 			break;
-		case BUNDLE_NINETEEN_TEMPLATE:
+		case TRIPOD_PULL_TEMPLATE:
 			this->shape = CIRCLE_SHAPE;
+			tmp = new char[100];
+			sprintf(tmp, "Radial count:");
+			this->parameterNames.push_back(tmp);
+			this->parameterValues.push_back(3);
 			this->base = false;
 			break;
 	}
