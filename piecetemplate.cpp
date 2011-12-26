@@ -40,6 +40,16 @@ PieceTemplate :: PieceTemplate(int t)
 			parameterValues.push_back(0);
 			parameterValues.push_back(0);
 			break;
+		case POT_PIECE_TEMPLATE:
+			tmp = new char[100];
+			sprintf(tmp, "Body radius");
+			parameterNames.push_back(tmp);
+			tmp = new char[100];
+			sprintf(tmp, "Lip radius");
+			parameterNames.push_back(tmp);
+			parameterValues.push_back(0);
+			parameterValues.push_back(0);
+			break;
 	}
 }
 

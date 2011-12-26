@@ -48,6 +48,7 @@ class Mesher
 		void applyVaseTransform(Vertex* p, vector<int>* parameterValues);
 		void applyTumblerTransform(Vertex* p, vector<int>* parameterValues);
 		void applyBowlTransform(Vertex* p, vector<int>* parameterValues);
+		void applyPotTransform(Vertex* p, vector<int>* parameterValues);
 		float computeTotalCaneLength(Piece* piece);
 		float computeTotalCaneLength(PickupPlan* plan);
 		float computeTotalCaneLength(PullPlan* plan);
