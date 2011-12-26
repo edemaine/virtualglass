@@ -339,8 +339,11 @@ void MainWindow :: setupLibrary()
 	superlibraryLayout->addWidget(newPieceButton, 0, 2);
 
 	colorBarLibraryLayout = new QVBoxLayout(libraryWidget);
+	colorBarLibraryLayout->setDirection(QBoxLayout::BottomToTop);
 	pullPlanLibraryLayout = new QVBoxLayout(libraryWidget);
+	pullPlanLibraryLayout->setDirection(QBoxLayout::BottomToTop);
 	pieceLibraryLayout = new QVBoxLayout(libraryWidget);
+	pieceLibraryLayout->setDirection(QBoxLayout::BottomToTop);
 	superlibraryLayout->addLayout(colorBarLibraryLayout, 1, 0, Qt::AlignTop);
 	superlibraryLayout->addLayout(pullPlanLibraryLayout, 1, 1, Qt::AlignTop);
 	superlibraryLayout->addLayout(pieceLibraryLayout, 1, 2, Qt::AlignTop);
