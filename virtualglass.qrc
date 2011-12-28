@@ -8,6 +8,8 @@
 	<file>images/pickuptemplate2.png</file>
 	<file>images/pickuptemplate3.png</file>
 	<file>images/pickuptemplate4.png</file>
+	<file>images/pickuptemplate5.png</file>
+	<file>images/pickuptemplate6.png</file>
 	<file>images/pulltemplate1.png</file>
 	<file>images/pulltemplate2.png</file>
 	<file>images/pulltemplate3.png</file>
@@ -17,6 +19,7 @@
 	<file>images/pulltemplate7.png</file>
 	<file>images/pulltemplate8.png</file>
 	<file>images/pulltemplate9.png</file>
+	<file>images/pulltemplate10.png</file>
 	<file>Colors1.txt</file>
 </qresource>
 </RCC>

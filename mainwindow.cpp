@@ -77,7 +77,7 @@ void MainWindow :: initializeRandomPiece()
 	editorStack->setCurrentIndex(PIECE_MODE); 
 	pieceEditorWidget->setPieceTemplate(
 		new PieceTemplate((qrand() % (LAST_PIECE_TEMPLATE - FIRST_PIECE_TEMPLATE + 1)) + FIRST_PIECE_TEMPLATE));
-	pieceEditorWidget->setPickupTemplate(new PickupTemplate(VERTICALS_TEMPLATE));
+	pieceEditorWidget->setPickupTemplate(new PickupTemplate(VERTICALS_PICKUP_TEMPLATE));
 	pieceEditorWidget->setPickupTemplateParameter(0, 14); // set number of subpulls
 	pieceEditorWidget->setPickupSubplans(pullPlanEditorWidget->getPlan());
 	emit someDataChanged();

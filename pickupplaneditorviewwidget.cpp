@@ -37,6 +37,8 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
         if (type != PULL_PLAN_MIME) // if the thing passed isn't a pull plan 
                 return;  
 
+	int hitIndex = -1;
+	float hitDepth = -100.0;
 	for (unsigned int i = 0; i < pickup->getTemplate()->subtemps.size(); ++i)
 	{
 		SubpickupTemplate* sp = pickup->getTemplate()->subtemps[i];
@@ -74,47 +76,60 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
                 if (ll.x < event->pos().x() && event->pos().x() < ur.x
                         && ll.y < (height() - event->pos().y()) && (height() - event->pos().y()) < ur.y)
 		{
-			event->accept();
-		}
-		else
-			continue;
-
-		// If the shift button is down, fill in the entire group
-		if (event->keyboardModifiers() & 0x02000000)
-		{
-			int group = pickup->getTemplate()->subtemps[i]->group;
-			for (unsigned int j = 0; j < pickup->getTemplate()->subtemps.size(); ++j)
+			if (hitIndex == -1)
 			{
-				if (pickup->getTemplate()->subtemps[j]->group == group)
-					pickup->subplans[j] = droppedPlan;
+				hitIndex = i;
+				hitDepth = pickup->getTemplate()->subtemps[i]->location.z;
+			}
+			else if (hitDepth > pickup->getTemplate()->subtemps[i]->location.z)
+			{
+				hitIndex = i;
+				hitDepth = pickup->getTemplate()->subtemps[i]->location.z;
 			}
 		}
-                // If the alt button is down, fill alternating elements in the group
-                else if (event->keyboardModifiers() & 0x08000000)
-                {
-                        int group = pickup->getTemplate()->subtemps[i]->group;
-                        bool parity = true;
-                        unsigned int subtempCount = pickup->getTemplate()->subtemps.size();
-                        unsigned int j = i;
-                        do
-                        {
-                                if (pickup->getTemplate()->subtemps[j]->group == group)
-				{
-					if (parity)
-						pickup->subplans[j] = droppedPlan;
-					parity = !parity;
-				}
-                                ++j;
-                                j = j % subtempCount;
-                        }
-                        while ((j != ((i-1 + subtempCount) % subtempCount)) && (j != i));
-                }
-		else // Otherwise just fill in this one
-			pickup->subplans[i] = droppedPlan;
+	}
 
-		emit someDataChanged();
-		return;	
-	} 
+	if (hitIndex != -1)
+		event->accept();
+	else
+		return;
+
+	// If the shift button is down, fill in the entire group
+	if (event->keyboardModifiers() & 0x02000000)
+	{
+		int group = pickup->getTemplate()->subtemps[hitIndex]->group;
+		for (unsigned int j = 0; j < pickup->getTemplate()->subtemps.size(); ++j)
+		{
+			if (pickup->getTemplate()->subtemps[j]->group == group)
+				pickup->subplans[j] = droppedPlan;
+		}
+	}
+	// If the alt button is down, fill alternating elements in the group
+	else if (event->keyboardModifiers() & 0x08000000)
+	{
+		int group = pickup->getTemplate()->subtemps[hitIndex]->group;
+		bool parity = true;
+		unsigned int subtempCount = pickup->getTemplate()->subtemps.size();
+		unsigned int j = hitIndex;
+		unsigned int unsgnHitIndex = hitIndex;
+		do
+		{
+			if (pickup->getTemplate()->subtemps[j]->group == group)
+			{
+				if (parity)
+					pickup->subplans[j] = droppedPlan;
+				parity = !parity;
+			}
+			++j;
+			j = j % subtempCount;
+		}
+		while ((j != ((unsgnHitIndex-1 + subtempCount) % subtempCount)) && (j != unsgnHitIndex));
+	}
+	else // Otherwise just fill in this one
+		pickup->subplans[hitIndex] = droppedPlan;
+
+	emit someDataChanged();
+	return;	
 }
 
 void PickupPlanEditorViewWidget :: setPickup(PickupPlan* pickup)

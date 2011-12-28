@@ -198,6 +198,26 @@ void PullTemplate :: updateSubtemps()
 		}
 		case SURROUNDING_SQUARE_PULL_TEMPLATE:
 		{	
+                        if (this->shape == CIRCLE_SHAPE)
+                                radius *= 1 / SQRT_TWO;
+
+			int count = parameterValues[0];
+			float littleRadius = radius / (count + 2);			
+
+			p.x = p.y = 0.0;
+			subtemps.push_back(SubpullTemplate(SQUARE_SHAPE, p, 2 * littleRadius * count, 0));
+			for (int i = 0; i < count + 2; ++i)
+			{
+				for (int j = 0; j < count + 2; ++j)
+				{
+					if (i != 0 && j != 0 && i != count + 1 && j != count + 1)
+						continue;
+					p.x = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * i;
+					p.y = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * j;
+					subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 2 * littleRadius, 1));
+				}
+			}
+
 			break;
 		}
 	}
@@ -283,6 +303,14 @@ void PullTemplate :: initializeTemplate()
 			this->parameterValues.push_back(3);
 			this->base = false;
 			break;
+		case SURROUNDING_SQUARE_PULL_TEMPLATE:
+                        this->shape = CIRCLE_SHAPE;
+                        tmp = new char[100];
+                        sprintf(tmp, "Column count:");
+                        this->parameterNames.push_back(tmp);
+                        this->parameterValues.push_back(2);
+                        this->base = false;
+                        break;
 	}
 }
 

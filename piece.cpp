@@ -5,7 +5,7 @@ Piece :: Piece(int pickupTemplate)
 {
 	setTemplate(new PieceTemplate(pickupTemplate));
 	// initialize the piece's pickup to be something boring and base
-	this->pickup = new PickupPlan(VERTICALS_TEMPLATE);
+	this->pickup = new PickupPlan(VERTICALS_PICKUP_TEMPLATE);
 }
 
 bool Piece :: hasDependencyOn(PullPlan* plan)

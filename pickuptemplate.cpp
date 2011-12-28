@@ -11,30 +11,42 @@ PickupTemplate :: PickupTemplate(int t)
 	// set parameters
 	switch (this->type)
 	{
-		case VERTICALS_AND_HORIZONTALS_TEMPLATE:
+		case VERTICALS_AND_HORIZONTALS_PICKUP_TEMPLATE:
 			tmp = new char[100];
 			sprintf(tmp, "Column count:");
 			parameterNames.push_back(tmp);
 			parameterValues.push_back(14);
 			break;
-		case VERTICALS_TEMPLATE:
+		case VERTICALS_PICKUP_TEMPLATE:
 			tmp = new char[100];
 			sprintf(tmp, "Column count:");
 			parameterNames.push_back(tmp);
 			parameterValues.push_back(14);
 			break;
-		case MURRINE_COLUMN_TEMPLATE:
+		case MURRINE_COLUMN_PICKUP_TEMPLATE:
 			tmp = new char[100];
 			sprintf(tmp, "Column count:");
 			parameterNames.push_back(tmp);
                         parameterValues.push_back(14);
 			break;
-		case MURRINE_SQUARE_TEMPLATE:
+		case RETICELLO_VERTICAL_HORIZONTAL_PICKUP_TEMPLATE:
 			tmp = new char[100];
 			sprintf(tmp, "Column count:");
 			parameterNames.push_back(tmp);
                         parameterValues.push_back(14);
 			break;
+                case VERTICAL_HORIZONTAL_VERTICAL_PICKUP_TEMPLATE:
+                        tmp = new char[100];
+                        sprintf(tmp, "Column count:");
+                        parameterNames.push_back(tmp);
+                        parameterValues.push_back(14);
+                        break;
+                case VERTICAL_WITH_LIP_WRAP_PICKUP_TEMPLATE:
+                        tmp = new char[100];
+                        sprintf(tmp, "Column count:");
+                        parameterNames.push_back(tmp);
+                        parameterValues.push_back(14);
+                        break;
 	}
 
 	computeSubtemps();
@@ -66,7 +78,7 @@ void PickupTemplate :: computeSubtemps()
 	// initialize SubpickupTemplates with the right data
 	switch (this->type)
 	{
-		case MURRINE_COLUMN_TEMPLATE:
+		case MURRINE_COLUMN_PICKUP_TEMPLATE:
 			p.x = p.y = p.z = 0.0;
 			width = 2.0 / MAX(parameterValues[0], 1);
 			for (int i = 0; i < parameterValues[0]-1; ++i)
@@ -85,29 +97,28 @@ void PickupTemplate :: computeSubtemps()
 					SQUARE_SHAPE, 1));
 			}
 			break;
-		case MURRINE_SQUARE_TEMPLATE:
+                case RETICELLO_VERTICAL_HORIZONTAL_PICKUP_TEMPLATE:
                         p.x = p.y = p.z = 0.0;
-			width = 2.0 / MAX(parameterValues[0], 1);
-                        for (int i = 0; i < (parameterValues[0]+1)/2; ++i)
+                        width = 2.0 / MAX(parameterValues[0], 1);
+                        for (int i = 0; i < parameterValues[0]; ++i)
                         {
-                                p.x = -1.0 + width / 2 + 2 * width * i;
+                                p.x = -1.0 + width / 2 + width * i;
                                 p.y = -1.0;
                                 subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 2.0, width-0.0001,
-                                        CIRCLE_SHAPE, 0));
+                                        SQUARE_SHAPE, 0));
                         }
-			for (int i = 0; i < parameterValues[0]/2; ++i)
-			{
-				for (int j = 0; j < parameterValues[0]; ++j)
-				{
-					p.x = -1.0 + 3 * width / 2 + 2 * width * i;
-					p.y = -1.0 + width / 2 + width * j;
-					p.z = -width / 2;
-					subtemps.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, width-0.001,
-						width-0.001, SQUARE_SHAPE, i+1));
-				}
-			}
+                        p.x = p.y = p.z = 0.0;
+                        width = 2.0 / MAX(parameterValues[0], 1);
+                        for (int i = 0; i < parameterValues[0]-1; ++i)
+                        {
+                                p.x = -1.0;
+                                p.y = -1.0 + width / 2 + width * i;
+				p.z = -width/2;
+                                subtemps.push_back(new SubpickupTemplate(p, HORIZONTAL_ORIENTATION, 2.0, width-0.0001,
+                                        SQUARE_SHAPE, 1));
+                        }
 			break;
-		case VERTICALS_TEMPLATE:
+		case VERTICALS_PICKUP_TEMPLATE:
 			p.x = p.y = p.z = 0.0;
 			width = 2.0 / MAX(parameterValues[0], 1);
 			for (int i = 0; i < parameterValues[0]; ++i)
@@ -118,7 +129,21 @@ void PickupTemplate :: computeSubtemps()
 					SQUARE_SHAPE, 0));
 			}
 			break;
-		case VERTICALS_AND_HORIZONTALS_TEMPLATE:
+                case VERTICAL_WITH_LIP_WRAP_PICKUP_TEMPLATE:
+                        p.x = p.y = p.z = 0.0;
+                        width = 2.0 / MAX(parameterValues[0], 1);
+			p.x = -1.0;
+			p.y = 0.975;
+			subtemps.push_back(new SubpickupTemplate(p, HORIZONTAL_ORIENTATION, 2.0, 0.05, SQUARE_SHAPE, 0));
+                        for (int i = 0; i < parameterValues[0]; ++i)
+                        {
+                                p.x = -1.0 + width / 2 + width * i;
+                                p.y = -1.0;
+                                subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 1.95, width-0.0001,
+                                        SQUARE_SHAPE, 1));
+                        }
+                        break;
+		case VERTICALS_AND_HORIZONTALS_PICKUP_TEMPLATE:
 			p.x = p.y = p.z = 0.0;
 			width = 2.0 / MAX(parameterValues[0], 1);
 			for (int i = 0; i < parameterValues[0]; ++i)
@@ -136,6 +161,32 @@ void PickupTemplate :: computeSubtemps()
 					SQUARE_SHAPE, 1));
 			}
 			break;
+		case VERTICAL_HORIZONTAL_VERTICAL_PICKUP_TEMPLATE:
+                        p.x = p.y = p.z = 0.0;
+                        width = 2.0 / MAX(parameterValues[0], 1);
+                        for (int i = 0; i < parameterValues[0]; ++i)
+                        {
+                                p.x = -1.0 + width / 2 + width * i;
+                                p.y = -1.0;
+                                subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 0.75, width-0.0001,
+                                        SQUARE_SHAPE, 0));
+                        }
+                        for (int i = 0; i < parameterValues[0]; ++i)
+                        {
+                                p.x = -1.0 + width / 2 + width * i;
+                                p.y = 0.25;
+                                subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 0.75, width-0.0001,
+                                        SQUARE_SHAPE, 2));
+                        }
+                        width = 0.5 / MAX(parameterValues[0]/3, 1);
+                        for (int i = 0; i < parameterValues[0]/3; ++i)
+                        {
+                                p.x = -1.0;
+                                p.y = -0.25 + width / 2 + width * i;
+                                subtemps.push_back(new SubpickupTemplate(p, HORIZONTAL_ORIENTATION, 2.0, width-0.0001,
+                                        SQUARE_SHAPE, 1));
+                        }
+			break;			
 	}
 }
 
