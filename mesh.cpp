@@ -162,6 +162,31 @@ float Mesher :: splineVal(float r1, float r2, float r3, float t)
 	return pow((1.0 - t), 2) * r1 + 2 * (1.0 - t) * t * r2 + pow(t, 2) * r3;
 }
 
+void Mesher :: applyWavyPlateTransform(Vertex* v, vector<int>* parameterValues)
+{
+        // Do a rollup
+        // send x value to theta value 
+        // -5.0 goes to -PI, 5.0 goes to PI
+        // everything gets a base radius of 5.0
+        float theta = PI * v->position.x / 5.0;
+
+        float totalR = 4.0 + 100 * 0.1;
+        float totalPhi = 10.0 / totalR;
+
+        float r = totalR - v->position.y;
+        float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
+
+	int waveCount = (*parameterValues)[0] / 10;
+	float waveSize = (*parameterValues)[1] / 30.0;
+
+	float waveAdjust = cos(waveCount * theta) * waveSize * (phi + PI/2);
+
+        v->position.x = (r + waveAdjust) * cos(theta) * cos(phi);
+        v->position.y = (r + waveAdjust) * sin(theta) * cos(phi);
+        v->position.z = (r + waveAdjust) * sin(phi) + (totalR - totalR * sin(totalPhi - PI / 2))/2.0;
+
+}
+
 void Mesher :: applyPotTransform(Vertex* v, vector<int>* parameterValues)
 {
         // compute theta within a rollup, starting with pickup geometry
@@ -480,6 +505,9 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>*
 				break;
 			case POT_PIECE_TEMPLATE:
 				applyPotTransform(v, &(piece->getTemplate()->parameterValues));
+				break;
+			case WAVY_PLATE_PIECE_TEMPLATE:
+				applyWavyPlateTransform(v, &(piece->getTemplate()->parameterValues));
 				break;
 		}
 	}	

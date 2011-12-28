@@ -50,6 +50,16 @@ PieceTemplate :: PieceTemplate(int t)
 			parameterValues.push_back(0);
 			parameterValues.push_back(0);
 			break;
+		case WAVY_PLATE_PIECE_TEMPLATE:
+			tmp = new char[100];
+			sprintf(tmp, "Wave count");
+			parameterNames.push_back(tmp);
+			tmp = new char[100];
+			sprintf(tmp, "Wave depth");
+			parameterNames.push_back(tmp);
+			parameterValues.push_back(0);
+			parameterValues.push_back(0);
+			break;
 	}
 }
 
