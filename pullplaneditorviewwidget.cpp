@@ -40,7 +40,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		switch (subpull->shape)
 		{
 			case CIRCLE_SHAPE:
-				if (pow(dx*dx + dy*dy, 0.5) < (subpull->diameter/2.0)*drawSize/2)
+				if (pow(double(dx*dx + dy*dy), 0.5) < (subpull->diameter/2.0)*drawSize/2)
 					hit = true;
 				break;
 			case SQUARE_SHAPE:
@@ -111,8 +111,8 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	switch (plan->getTemplate()->getShape())
 	{
 		case CIRCLE_SHAPE:
-			distanceFromCenter = sqrt(pow(event->pos().x() - drawSize/2 + 10, 2) 
-				+ pow(event->pos().y() - drawSize/2 + 10, 2));
+			distanceFromCenter = sqrt(pow(double(event->pos().x() - drawSize/2 + 10), 2.0) 
+				+ pow(double(event->pos().y() - drawSize/2 + 10), 2.0));
 			if (distanceFromCenter <= drawSize/2)
 			{
 				event->accept();

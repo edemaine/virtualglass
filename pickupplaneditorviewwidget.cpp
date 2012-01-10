@@ -63,7 +63,14 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 				ll.y = sp->location.y - sp->width/2;	
 				ur.x = sp->location.x + sp->width/2;	
 				ur.y = sp->location.y + sp->width/2;	
-				break;		
+				break;
+			default:
+				//some sort of "safe"-ish default.
+				ll.x = 0.0;
+				ll.y = 0.0;
+				ur.x = 0.0;
+				ur.y = 0.0;
+				break;
 		}	
 
 		// Scale to pixels

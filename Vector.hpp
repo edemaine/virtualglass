@@ -419,6 +419,7 @@ inline Vector< NUM, SIZE > lerp( Vector< NUM, SIZE > a, Vector< NUM, SIZE > cons
 	return a;
 }
 
+/*
 template< typename NUM, int SIZE >
 inline Vector< NUM, SIZE > min(Vector< NUM , SIZE > const &a, Vector< NUM, SIZE > const &b) {
 	Vector< NUM, SIZE > ret = a;
@@ -436,6 +437,7 @@ inline Vector< NUM, SIZE > max(Vector< NUM , SIZE > const &a, Vector< NUM, SIZE 
 	}
 	return ret;
 }
+*/
 
 template< int SIZE >
 inline Vector< float, SIZE > abs(Vector< float, SIZE > const &a) {

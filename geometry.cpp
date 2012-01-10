@@ -2,7 +2,9 @@
 #include "geometry.h"
 #include <iostream>
 #include <fstream>
+#ifndef MSVC
 #include <unistd.h>
+#endif
 
 using std::vector;
 
