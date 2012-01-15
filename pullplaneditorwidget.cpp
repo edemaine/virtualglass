@@ -4,8 +4,9 @@
 PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 {
 	Color* color = new Color;
-	color->r = color->g = color->b = color->a = 1.0;
+	*color = make_vector(1.0f, 1.0f, 1.0f, 0.0f); //clear
 	this->plan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
+	this->plan->setTemplate(new PullTemplate(CASED_CIRCLE_PULL_TEMPLATE));
 
 	this->viewWidget = new PullPlanEditorViewWidget(plan, this);	
 	this->niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);

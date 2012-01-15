@@ -14,12 +14,14 @@ MainWindow :: MainWindow()
 	setupConnections();
 
 	setWindowTitle(tr("VirtualGlass"));
-        move(0, 0);
-        showMaximized();
+	//HACK for video recording:
+	//setFixedSize(1600,900);
+        //move(-8, 0);
+        show();
 
         seedEverything();
-        initializeRandomPiece();
-        editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
+        //initializeRandomPiece();
+        //editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
         emit someDataChanged();
         whatToDoLabel->setText("Click a library item at left to edit/view.");
 }
@@ -430,10 +432,8 @@ void MainWindow :: setupPullPlanEditor()
 
 void MainWindow :: newPiece()
 {
-	Piece* oldEditorPiece = pieceEditorWidget->getPiece();
-	
 	// Create the new piece
-	Piece* newEditorPiece = oldEditorPiece->copy();
+	Piece* newEditorPiece = new Piece(TUMBLER_PIECE_TEMPLATE);
 
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();
@@ -454,8 +454,10 @@ void MainWindow :: newColorBar()
 
 	PullPlan* newEditorBar = oldEditorBar->copy();
 
+	//new color is always clear:
 	Color* newColor = new Color;
-	*(newColor) = *(oldEditorBar->color);
+	*newColor = make_vector(1.0f, 1.0f, 1.0f, 0.0f);
+	//*(newColor) = *(oldEditorBar->color);
 	newEditorBar->color = newColor;
 
 	// Create the new library entry
@@ -475,24 +477,20 @@ void MainWindow :: newColorBar()
 
 void MainWindow :: newPullPlan()
 {
-	PullPlan* oldEditorPlan = pullPlanEditorWidget->getPlan();
+	/*
+	 This (old) code duplicates the current cane:
+	 PullPlan* oldEditorPlan = pullPlanEditorWidget->getPlan();
+	 // Create the new plan
+	 PullPlan* newEditorPlan = oldEditorPlan->copy();
+	*/
 
-	// Create the new plan
-	PullPlan* newEditorPlan = oldEditorPlan->copy();
+	Color* color = new Color;
+	*color = make_vector(1.0f, 1.0f, 1.0f, 0.0f); //clear
+	PullPlan *newEditorPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
 
-	// Create the new library entry
-	unhighlightAllLibraryWidgets();
-	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(newEditorPlan);
-	pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);
+	newEditorPlan->setTemplate(new PullTemplate(CASED_CIRCLE_PULL_TEMPLATE));
 
-	// Give the new plan to the editor
-	pullPlanEditorWidget->setPlan(newEditorPlan);
-
-	// Load up the right editor
-	editorStack->setCurrentIndex(PULLPLAN_MODE);
-
-	// Trigger GUI updates
-	emit someDataChanged();
+	newPullPlan(newEditorPlan);
 }
 
 void MainWindow :: newPullPlan(PullPlan* newPlan)

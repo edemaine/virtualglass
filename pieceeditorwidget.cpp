@@ -3,8 +3,6 @@
 
 PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 {
-	Color* color = new Color;
-	color->r = color->g = color->b = color->a = 1.0;
 	this->piece = new Piece(TUMBLER_PIECE_TEMPLATE);
 
 	this->pickupViewWidget = new PickupPlanEditorViewWidget(piece->pickup, this);	

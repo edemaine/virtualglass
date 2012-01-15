@@ -65,7 +65,7 @@ public:
 	{
 #ifndef GEOMETRY_DEBUG
 		return true;
-#endif
+#else
 		for (std::vector< Triangle >::const_iterator t = triangles.begin(); t != triangles.end(); ++t) {
 			if (t->v1 >= vertices.size()) return false;
 			if (t->v2 >= vertices.size()) return false;
@@ -79,6 +79,7 @@ public:
 			if (g->vertex_begin + g->vertex_size > vertices.size()) return false;
 		}
 		return true;
+#endif
 	}
 	void compute_normals_from_triangles();
 	void save_obj_file(std::string const &filename) const;
