@@ -15,8 +15,8 @@ MainWindow :: MainWindow()
 
 	setWindowTitle(tr("VirtualGlass"));
 	//HACK for video recording:
-	//setFixedSize(1600,900);
-        //move(-8, 0);
+	setFixedSize(1600,900);
+        move(-8, 0);
         show();
 
         seedEverything();
