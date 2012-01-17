@@ -42,6 +42,7 @@ class PullPlanEditorWidget : public QWidget
 		void shapeButtonGroupChanged(int);
 		void twistSpinChanged(int);
 		void twistSliderChanged(int);
+		void casingThicknessSpinChanged(int);
 		void casingThicknessSliderChanged(int);
 		void paramSpinChanged(int);
 
@@ -51,12 +52,13 @@ class PullPlanEditorWidget : public QWidget
 		PullPlan* plan;
 		PullPlanEditorViewWidget* viewWidget;	
 		NiceViewWidget* niceViewWidget;
+		QSpinBox* casingThicknessSpin;
+		QSlider* casingThicknessSlider;
 		QSpinBox* twistSpin;
 		QSlider* twistSlider;
 		vector<QLabel*> paramLabels;
 		vector<QSpinBox*> paramSpins;
                 QButtonGroup* shapeButtonGroup;
-		QSlider* casingThicknessSlider;
         	QHBoxLayout* templateLibraryLayout;
 		QPushButton* addCasingButton;
 

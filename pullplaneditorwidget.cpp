@@ -23,6 +23,7 @@ void PullPlanEditorWidget :: updateEverything()
 
         int thickness = (int) (plan->getTemplate()->getCasingThickness() * 100);
         casingThicknessSlider->setSliderPosition(thickness);
+        casingThicknessSpin->setValue(thickness);
 
         int twist = plan->twist;
         twistSlider->setSliderPosition(twist);
@@ -120,6 +121,11 @@ void PullPlanEditorWidget :: setupLayout()
         QLabel* casingLabel1 = new QLabel("Casing Thickness:", this);
         casingThicknessLayout->addWidget(casingLabel1, 0);
 
+        casingThicknessSpin = new QSpinBox(this);
+        casingThicknessSpin->setRange(1, 99);
+        casingThicknessSpin->setSingleStep(1);
+        casingThicknessLayout->addWidget(casingThicknessSpin, 1);
+
         QLabel* casingLabel2 = new QLabel("0%", this);
         casingThicknessLayout->addWidget(casingLabel2, 0);
 
@@ -140,21 +146,21 @@ void PullPlanEditorWidget :: setupLayout()
         twistLayout->addWidget(twistLabel1);
 
         twistSpin = new QSpinBox(this);
-        twistSpin->setRange(-50, 50);
+        twistSpin->setRange(0, 100);
         twistSpin->setSingleStep(1);
         twistLayout->addWidget(twistSpin, 1);
 
-        QLabel* twistLabel2 = new QLabel("-50", this);
+        QLabel* twistLabel2 = new QLabel("0", this);
         twistLayout->addWidget(twistLabel2);
 
         twistSlider = new QSlider(Qt::Horizontal, this);
-        twistSlider->setRange(-50, 50);
+        twistSlider->setRange(0, 100);
         twistSlider->setTickInterval(5);
         twistSlider->setTickPosition(QSlider::TicksBothSides);
         twistSlider->setSliderPosition(0);
         twistLayout->addWidget(twistSlider, 10);
 
-        QLabel* twistLabel3 = new QLabel("50", this);
+        QLabel* twistLabel3 = new QLabel("100", this);
         twistLayout->addWidget(twistLabel3);
 
 	// Parameter spin stuff
@@ -230,6 +236,8 @@ void PullPlanEditorWidget :: setupConnections()
         connect(shapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(shapeButtonGroupChanged(int)));
         connect(casingThicknessSlider, SIGNAL(valueChanged(int)),
                 this, SLOT(casingThicknessSliderChanged(int)));
+        connect(casingThicknessSpin, SIGNAL(valueChanged(int)),
+                this, SLOT(casingThicknessSpinChanged(int)));
         connect(twistSlider, SIGNAL(valueChanged(int)), this, SLOT(twistSliderChanged(int)));
         connect(twistSpin, SIGNAL(valueChanged(int)), this, SLOT(twistSpinChanged(int)));
 
@@ -277,6 +285,16 @@ void PullPlanEditorWidget :: casingThicknessSliderChanged(int)
         emit someDataChanged();
 }
 
+void PullPlanEditorWidget :: casingThicknessSpinChanged(int)
+{
+        float thickness = casingThicknessSpin->value() / 100.0;
+
+	if (thickness == plan->getTemplate()->getCasingThickness())
+		return;
+        plan->getTemplate()->setCasingThickness(thickness);
+        emit someDataChanged();
+}
+
 void PullPlanEditorWidget :: twistSliderChanged(int)
 {
         float twist = twistSlider->sliderPosition();
@@ -289,13 +307,14 @@ void PullPlanEditorWidget :: twistSliderChanged(int)
 
 void PullPlanEditorWidget :: twistSpinChanged(int)
 {
-        int twist = twistSpin->value();
+        float twist = twistSpin->value();
 
 	if (twist == plan->twist)
 		return;
-        twistSlider->setSliderPosition(twist);
+        plan->twist = twist;
         emit someDataChanged();
 }
+
 
 void PullPlanEditorWidget :: shapeButtonGroupChanged(int)
 {
