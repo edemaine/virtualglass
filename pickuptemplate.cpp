@@ -163,11 +163,11 @@ void PickupTemplate :: computeSubtemps()
 			break;
                 case VERTICAL_WITH_LIP_WRAP_PICKUP_TEMPLATE:
                         p.x = p.y = p.z = 0.0;
-                        width = 2.0 / MAX(parameterValues[0]-1, 1);
+                        width = 2.0 / MAX(parameterValues[0], 1);
 			p.x = -1.0;
 			p.y = 1.0 - width/2;
 			subtemps.push_back(new SubpickupTemplate(p, HORIZONTAL_ORIENTATION, 2.0, width, SQUARE_SHAPE, 0));
-                        for (int i = 0; i < parameterValues[0]-1; ++i)
+                        for (int i = 0; i < parameterValues[0]; ++i)
                         {
                                 p.x = -1.0 + width / 2 + width * i;
                                 p.y = -1.0;
