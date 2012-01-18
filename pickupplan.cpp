@@ -11,6 +11,29 @@ PickupPlan :: PickupPlan(int pickupTemplate)
 	setTemplate(new PickupTemplate(pickupTemplate));
 }
 
+void PickupPlan :: updateSubplans()
+{
+	// This fixes the subplans to correspond to a change in the pickup template
+	// Eventually, template changes should go through a function in the 
+	// pickup plan to ensure the changes are made no matter what. So it goes.
+	if (this->subplans.size() > this->pickupTemplate->subtemps.size())
+	{
+		while (this->subplans.size() > this->pickupTemplate->subtemps.size())
+		{
+			this->subplans.pop_back();
+		}
+		return;
+	} 
+	else if (this->subplans.size() < this->pickupTemplate->subtemps.size())
+	{
+		while (this->subplans.size() < this->pickupTemplate->subtemps.size())
+		{
+			this->subplans.push_back(this->subplans.back());
+		}
+		return;
+	}
+}
+
 PickupPlan* PickupPlan :: copy()
 {
 	PickupPlan* c = new PickupPlan();

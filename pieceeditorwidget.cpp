@@ -104,7 +104,7 @@ void PieceEditorWidget :: pickupTemplateParameter1SpinBoxChanged(int)
                 return;
 
         piece->pickup->getTemplate()->setParameter(0, value);
-        piece->pickup->setTemplate(piece->pickup->getTemplate()); // just push changes through
+	piece->pickup->updateSubplans();	
         emit someDataChanged();
 }
 

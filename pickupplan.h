@@ -16,6 +16,7 @@ class PickupPlan
 
 		void setTemplate(PickupTemplate* pt);
 		PickupTemplate* getTemplate();
+		void updateSubplans();
 
 		PickupPlan* copy();
 
