@@ -161,9 +161,9 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 	
 	for (unsigned int i = 0; i < pickup->getTemplate()->subtemps.size(); ++i)
 	{
-		if (pickup->subplans[i]->getTemplate()->isBase())
+		if (pickup->subplans[i]->isBase())
 		{
-			Color* c = pickup->subplans[i]->color;
+			Color* c = pickup->subplans[i]->getColor();
 			painter.setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
 			pen.setStyle(Qt::NoPen);
 		}

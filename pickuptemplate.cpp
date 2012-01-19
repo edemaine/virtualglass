@@ -85,23 +85,25 @@ void PickupTemplate :: computeSubtemps()
 	switch (this->type)
 	{
 		case MURRINE_COLUMN_PICKUP_TEMPLATE:
-			p.x = p.y = p.z = 0.0;
 			width = 2.0 / MAX(parameterValues[0], 1);
 			for (int i = 0; i < parameterValues[0]-1; ++i)
 			{
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = -1.0;
+				p.z = 0.0;
 				subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 2.0, width-0.0001, 
 					CIRCLE_SHAPE, 0));
-			}
-			for (int i = 0; i < parameterValues[0]; ++i)
-			{
 				p.x = 1.0 - width / 2;
-				p.y = -1.0 + width / 2 + width * i;
+				p.y = -1.0 + width / 2 + width * (parameterValues[0]- 1 - i);
 				p.z = -width/2;
 				subtemps.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, width, width-0.0001, 
 					SQUARE_SHAPE, 1));
 			}
+			p.x = 1.0 - width / 2;
+			p.y = -1.0 + width / 2 + width * (parameterValues[0]-1);
+			p.z = -width/2;
+			subtemps.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, width, width-0.0001, 
+				SQUARE_SHAPE, 1));
 			break;
                 case MURRINE_ROW_PICKUP_TEMPLATE:
                         p.x = p.y = p.z = 0.0;

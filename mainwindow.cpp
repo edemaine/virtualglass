@@ -20,7 +20,6 @@ MainWindow :: MainWindow()
         show();
 
         seedEverything();
-        //initializeRandomPiece();
         //editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
         emit someDataChanged();
         whatToDoLabel->setText("Click a library item at left to edit/view.");
@@ -42,47 +41,6 @@ void MainWindow :: seedEverything()
 	editorStack->setCurrentIndex(PIECE_MODE);
 	emit someDataChanged();
 	pieceEditorWidget->seedTemplates();
-}
-
-// Too weird to live; too strange to die
-void MainWindow :: initializeRandomPiece()
-{
-	// Setup colors
-	editorStack->setCurrentIndex(COLORBAR_MODE); 
-	PullPlan* clearColorBar = colorEditorWidget->getColorBar();
-	newColorBar();
-	colorEditorWidget->setColor(1.0, 1.0, 1.0, 1.0);
-	PullPlan* opaqueColorBar = colorEditorWidget->getColorBar();
-	newColorBar();
-	PullPlan* transparentColorBar = colorEditorWidget->getColorBar();
-	colorEditorWidget->setColor((qrand() % 255) / 255.0,
-		(qrand() % 255) / 255.0, 
-		(qrand() % 255) / 255.0,
-		(qrand() % 128 + 70) / 255.0);
-
-	// Setup cane
-	editorStack->setCurrentIndex(PULLPLAN_MODE); 
-	pullPlanEditorWidget->setPlanTemplate(new PullTemplate(CASED_CIRCLE_PULL_TEMPLATE));
-	pullPlanEditorWidget->setPlanTemplateCasingThickness(0.5);
-	pullPlanEditorWidget->setPlanSubplans(opaqueColorBar);
-	pullPlanEditorWidget->setPlanColor(clearColorBar->color);
-	PullPlan* subplan = pullPlanEditorWidget->getPlan();
-	newPullPlan();
-	pullPlanEditorWidget->setPlanTemplate(new PullTemplate(HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE));
-	pullPlanEditorWidget->setPlanTemplateCasingThickness((qrand() % 30 + 40) / 100.0);
-	pullPlanEditorWidget->setPlanSubplans(subplan);
-	pullPlanEditorWidget->setPlanColor(transparentColorBar->color);
-	pullPlanEditorWidget->setPlanTwist(20);
-	emit someDataChanged();
-
-	// Setup piece
-	editorStack->setCurrentIndex(PIECE_MODE); 
-	pieceEditorWidget->setPieceTemplate(
-		new PieceTemplate((qrand() % (LAST_PIECE_TEMPLATE - FIRST_PIECE_TEMPLATE + 1)) + FIRST_PIECE_TEMPLATE));
-	pieceEditorWidget->setPickupTemplate(new PickupTemplate(VERTICALS_PICKUP_TEMPLATE));
-	pieceEditorWidget->setPickupTemplateParameter(0, 14); // set number of subpulls
-	pieceEditorWidget->setPickupSubplans(pullPlanEditorWidget->getPlan());
-	emit someDataChanged();
 }
 
 void MainWindow :: unhighlightAllLibraryWidgets()
@@ -458,7 +416,7 @@ void MainWindow :: newColorBar()
 	Color* newColor = new Color;
 	*newColor = make_vector(1.0f, 1.0f, 1.0f, 0.0f);
 	//*(newColor) = *(oldEditorBar->color);
-	newEditorBar->color = newColor;
+	newEditorBar->setColor(newColor);
 
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();
@@ -487,10 +445,8 @@ void MainWindow :: newPullPlan()
 	Color* color = new Color;
 	*color = make_vector(1.0f, 1.0f, 1.0f, 0.0f); //clear
 	PullPlan *newEditorPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
-
-	newEditorPlan->setTemplate(new PullTemplate(CASED_CIRCLE_PULL_TEMPLATE));
-
-	newPullPlan(newEditorPlan);
+	newEditorPlan->setTemplateType(CASED_CIRCLE_PULL_TEMPLATE);
+	emit newPullPlan(newEditorPlan);
 }
 
 void MainWindow :: newPullPlan(PullPlan* newPlan)
@@ -603,7 +559,7 @@ void MainWindow :: updateLibrary()
 			{
 				pplw = dynamic_cast<PullPlanLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
-				if (pplw->getPullPlan()->hasDependencyOn(colorEditorBarLibraryWidget->getPullPlan()->color))
+				if (pplw->getPullPlan()->hasDependencyOn(colorEditorBarLibraryWidget->getPullPlan()->getColor()))
 					highlightLibraryWidget(pplw, USES_DEPENDANCY);
 			}
 
@@ -612,7 +568,7 @@ void MainWindow :: updateLibrary()
 			{
 				plw = dynamic_cast<PieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
-				if (plw->getPiece()->hasDependencyOn(colorEditorBarLibraryWidget->getPullPlan()->color))
+				if (plw->getPiece()->hasDependencyOn(colorEditorBarLibraryWidget->getPullPlan()->getColor()))
 					highlightLibraryWidget(plw, USES_DEPENDANCY);
 			}
 
@@ -628,7 +584,7 @@ void MainWindow :: updateLibrary()
 			{
 				cblw = dynamic_cast<ColorBarLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
-				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(cblw->getPullPlan()->color))
+				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(cblw->getPullPlan()->getColor()))
 					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
 			}
 
@@ -664,7 +620,7 @@ void MainWindow :: updateLibrary()
 			{
 				cblw = dynamic_cast<ColorBarLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
-				if (pieceEditorWidget->getPiece()->hasDependencyOn(cblw->getPullPlan()->color))
+				if (pieceEditorWidget->getPiece()->hasDependencyOn(cblw->getPullPlan()->getColor()))
 					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
 			}
 

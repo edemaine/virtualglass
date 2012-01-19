@@ -25,37 +25,6 @@
 #define FIRST_PULL_TEMPLATE CASED_CIRCLE_PULL_TEMPLATE
 #define LAST_PULL_TEMPLATE SURROUNDING_SQUARE_PULL_TEMPLATE 
 
-using std::vector;
-
-class PullTemplate
-{
-	public:
-		PullTemplate(int type);
-		vector<SubpullTemplate> subtemps;
-		int type;
-                void setParameter(int param, int newValue);
-                int getParameter(int param);
-                char* getParameterName(int param);
-		unsigned int getParameterCount();
-		int getShape();
-		void setShape(int s);
-		float getCasingThickness();
-		void setCasingThickness(float t);
-		bool isBase();
-		PullTemplate* copy();
-
-	private:
-		// Methods
-		void initializeTemplate();
-		void updateSubtemps();
-
-		// Variables
-		bool base;
-		float casingThickness;
-		int shape;	
-		vector<int> parameterValues;
-		vector<char*> parameterNames;
-};
 
 #endif
 

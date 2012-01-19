@@ -45,7 +45,7 @@ float Mesher :: computeTotalCaneLength(PickupPlan* plan)
 
 float Mesher :: computeTotalCaneLength(PullPlan* plan)
 {
-	if (plan->getTemplate()->isBase())
+	if (plan->isBase())
 		return 1.0;
 	
 	float total = 0.0;
@@ -66,7 +66,7 @@ void Mesher :: applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentP
 
 void Mesher :: applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int subplan)
 {
-	SubpullTemplate* subTemp = &(parentNode->getTemplate()->subtemps[subplan]);
+	SubpullTemplate* subTemp = &(parentNode->subtemps[subplan]);
 	Point locationInParent = subTemp->location;
 	float diameter = subTemp->diameter;
 
@@ -89,7 +89,7 @@ void Mesher :: applyTwistTransform(Geometry* geometry, PullPlan* transformNode)
 
 void Mesher :: applyTwistTransform(Vertex* v, PullPlan* transformNode)
 {
-	float twist = transformNode->twist;
+	float twist = transformNode->getTwist();
 
 	// Apply twist
 	float preTheta = atan2(v->position.y, v->position.x);
@@ -275,7 +275,7 @@ The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 
 void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
 	PullPlan* plan, int mandatedShape, float offset, float length, bool ensureVisible, uint32_t group_tag)
 {
-	if (plan->color->a < 0.0001 && !ensureVisible)
+	if (plan->getColor()->a < 0.0001 && !ensureVisible)
 		return;
 
 	unsigned int angularResolution = MIN(MAX(TOTAL_ANGULAR_RESOLUTION / totalCaneLength, 10), 15);
@@ -523,7 +523,7 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPla
 	{
 		ancestors->clear();
 		ancestorIndices->clear();
-		generateMesh(plan->subplans[i], plan->subplans[i]->getTemplate()->getShape(), geometry, 
+		generateMesh(plan->subplans[i], plan->subplans[i]->getShape(), geometry, 
 			ancestors, ancestorIndices, 0.0, plan->getTemplate()->subtemps[i]->length, true, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
@@ -567,10 +567,10 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry* geometry)
 	totalCaneLength = computeTotalCaneLength(plan);
         vector<PullPlan*> ancestors;
         vector<int> ancestorIndices;
-	if (plan->getTemplate()->type == AMORPHOUS_BASE_PULL_TEMPLATE)
+	if (plan->getTemplateType() == AMORPHOUS_BASE_PULL_TEMPLATE)
 		generateMesh(plan, CIRCLE_SHAPE, geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 	else
-		generateMesh(plan, plan->getTemplate()->getShape(), geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
+		generateMesh(plan, plan->getShape(), geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 	geometry->compute_normals_from_triangles();
 }
 
@@ -596,7 +596,7 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 	// Make recursive calls depending on the type of the current node
 	ancestors->push_back(plan);
 
-	if (plan->getTemplate()->isBase())
+	if (plan->isBase())
 	{
 		if (groupIndex == -1)
 			passGroupIndex = 0;
@@ -613,7 +613,7 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 				passGroupIndex = groupIndex;
 
 			ancestorIndices->push_back(i);
-			generateMesh(plan->subplans[i], plan->getTemplate()->subtemps[i].shape, geometry, ancestors, 
+			generateMesh(plan->subplans[i], plan->subtemps[i].shape, geometry, ancestors, 
 				ancestorIndices, offset - 0.001, length + 0.001, false, passGroupIndex);
 			ancestorIndices->pop_back();
 		}

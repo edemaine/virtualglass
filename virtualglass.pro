@@ -110,7 +110,7 @@ HEADERS += yaml-cpp/src/token.h \
 SOURCES += glew/glew.c \
 
 SOURCES += main.cpp \ 
-	pullplan.cpp pulltemplate.cpp subpulltemplate.cpp \
+	pullplan.cpp subpulltemplate.cpp \
 	piece.cpp piecetemplate.cpp \
 	pickupplan.cpp pickuptemplate.cpp subpickuptemplate.cpp pickupplaneditorviewwidget.cpp \
 	purecolorlibrarywidget.cpp \

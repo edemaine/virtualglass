@@ -29,9 +29,9 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 
 	int drawSize = width() - 20;
 	// check to see if the drop was in a subpull
-	for (unsigned int i = 0; i < plan->getTemplate()->subtemps.size(); ++i)
+	for (unsigned int i = 0; i < plan->subtemps.size(); ++i)
 	{
-		SubpullTemplate* subpull = &(plan->getTemplate()->subtemps[i]);
+		SubpullTemplate* subpull = &(plan->subtemps[i]);
 
 		// Determine if drop hit the subplan
 		bool hit = false;
@@ -56,7 +56,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		// subplan, reject
 		if (type == PULL_PLAN_MIME)
 		{
-			if (subpull->shape != droppedPlan->getTemplate()->getShape())
+			if (subpull->shape != droppedPlan->getShape())
 			{
 				continue;
 			}
@@ -67,23 +67,23 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		// If the shift button is down, fill in the entire group
 		if (event->keyboardModifiers() & 0x02000000)
 		{
-			int group = plan->getTemplate()->subtemps[i].group;
-			for (unsigned int j = 0; j < plan->getTemplate()->subtemps.size(); ++j)
+			int group = plan->subtemps[i].group;
+			for (unsigned int j = 0; j < plan->subtemps.size(); ++j)
 			{
-				if (plan->getTemplate()->subtemps[j].group == group)
+				if (plan->subtemps[j].group == group)
 					plan->subplans[j] = droppedPlan;
 			}
 		}
 		// If the alt button is down, fill alternating elements in the group
 		else if (event->keyboardModifiers() & 0x08000000)
 		{
-			int group = plan->getTemplate()->subtemps[i].group;
+			int group = plan->subtemps[i].group;
 			bool parity = true;
-			unsigned int subtempCount = plan->getTemplate()->subtemps.size();
+			unsigned int subtempCount = plan->subtemps.size();
 			unsigned int j = i;
 			do
 			{
-				if (plan->getTemplate()->subtemps[j].group == group)
+				if (plan->subtemps[j].group == group)
 				{
 					if (parity)
 						plan->subplans[j] = droppedPlan;
@@ -108,7 +108,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 
 	// Deal w/casing
 	float distanceFromCenter;
-	switch (plan->getTemplate()->getShape())
+	switch (plan->getShape())
 	{
 		case CIRCLE_SHAPE:
 			distanceFromCenter = sqrt(pow(double(event->pos().x() - drawSize/2 + 10), 2.0) 
@@ -116,7 +116,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			if (distanceFromCenter <= drawSize/2)
 			{
 				event->accept();
-				plan->color = droppedPlan->color;
+				plan->setColor(droppedPlan->getColor());
 				emit someDataChanged();
 				return;
 			}
@@ -126,7 +126,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 				&& 10 <= event->pos().y() && event->pos().y() <= drawSize)
 			{
 				event->accept();
-				plan->color = droppedPlan->color;
+				plan->setColor(droppedPlan->getColor());
 				emit someDataChanged();
 				return;
 			}
@@ -158,9 +158,9 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 
 
 	// If it's a base color, fill region with color
-	if (plan->getTemplate()->isBase())
+	if (plan->isBase())
 	{
-		Color* c = plan->color;
+		Color* c = plan->getColor();
 		painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
 		painter->setPen(Qt::NoPen);
 
@@ -196,7 +196,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		pen.setStyle(Qt::DotLine);
 		painter->setPen(pen);
 	}
-	painter->setBrush(QColor(255*plan->color->r, 255*plan->color->g, 255*plan->color->b, 255*plan->color->a));
+	painter->setBrush(QColor(255*plan->getColor()->r, 255*plan->getColor()->g, 255*plan->getColor()->b, 255*plan->getColor()->a));
 	switch (mandatedShape)
 	{
 		case CIRCLE_SHAPE:
@@ -207,20 +207,20 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 			break;
 	}
 
-	if (plan->getTemplate()->isBase())
+	if (plan->isBase())
 		return;
 
 	// Recurse
-	for (unsigned int i = plan->getTemplate()->subtemps.size()-1; i < plan->getTemplate()->subtemps.size(); --i)
+	for (unsigned int i = plan->subtemps.size()-1; i < plan->subtemps.size(); --i)
 	{
-		SubpullTemplate* subpull = &(plan->getTemplate()->subtemps[i]);
+		SubpullTemplate* subpull = &(plan->subtemps[i]);
 
 		float rX = x + (subpull->location.x - subpull->diameter/2.0) * drawWidth/2 + drawWidth/2;
 		float rY = y + (subpull->location.y - subpull->diameter/2.0) * drawWidth/2 + drawHeight/2;
 		float rWidth = subpull->diameter * drawWidth/2;
 		float rHeight = subpull->diameter * drawHeight/2;
 
-		drawSubplan(rX, rY, rWidth, rHeight, plan->subplans[i], plan->getTemplate()->subtemps[i].shape, 
+		drawSubplan(rX, rY, rWidth, rHeight, plan->subplans[i], plan->subtemps[i].shape, 
 			borderLevels-1, painter);
 	}
 }
@@ -231,7 +231,7 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 	painter.begin(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 	painter.fillRect(event->rect(), QColor(200, 200, 200));
-	drawSubplan(10, 10, width() - 20, height() - 20, plan, plan->getTemplate()->getShape(), 2, &painter);
+	drawSubplan(10, 10, width() - 20, height() - 20, plan, plan->getShape(), 2, &painter);
 	painter.end();
 }
 

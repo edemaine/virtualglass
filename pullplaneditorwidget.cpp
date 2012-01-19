@@ -6,7 +6,7 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 	Color* color = new Color;
 	*color = make_vector(1.0f, 1.0f, 1.0f, 0.0f); //clear
 	this->plan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
-	this->plan->setTemplate(new PullTemplate(CASED_CIRCLE_PULL_TEMPLATE));
+	this->plan->setTemplateType(CASED_CIRCLE_PULL_TEMPLATE);
 
 	this->viewWidget = new PullPlanEditorViewWidget(plan, this);	
 	this->niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);
@@ -19,13 +19,13 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 void PullPlanEditorWidget :: updateEverything()
 {
         static_cast<QCheckBox*>(shapeButtonGroup->button(
-                plan->getTemplate()->getShape()))->setCheckState(Qt::Checked);
+                plan->getShape()))->setCheckState(Qt::Checked);
 
-        int thickness = (int) (plan->getTemplate()->getCasingThickness() * 100);
+        int thickness = (int) (plan->getCasingThickness() * 100);
         casingThicknessSlider->setSliderPosition(thickness);
         casingThicknessSpin->setValue(thickness);
 
-        int twist = plan->twist;
+        int twist = plan->getTwist();
         twistSlider->setSliderPosition(twist);
         twistSpin->setValue(twist);
 
@@ -33,11 +33,11 @@ void PullPlanEditorWidget :: updateEverything()
         viewWidget->repaint();
 
 	unsigned int i = 0;
-	for (; i < plan->getTemplate()->getParameterCount(); ++i)
+	for (; i < plan->getParameterCount(); ++i)
 	{
-		paramLabels[i]->setText(plan->getTemplate()->getParameterName(i));
+		paramLabels[i]->setText(plan->getParameterName(i));
 		paramLabels[i]->show();
-		paramSpins[i]->setValue(plan->getTemplate()->getParameter(i));
+		paramSpins[i]->setValue(plan->getParameter(i));
 		paramSpins[i]->show();
 	}
 	for (; i < paramLabels.size(); ++i)
@@ -54,7 +54,7 @@ void PullPlanEditorWidget :: updateEverything()
 	// Highlight correct pull template
 	for (int i = 0; i < templateLibraryLayout->count(); ++i)
 	{
-		if (i + FIRST_PULL_TEMPLATE == plan->getTemplate()->type)
+		if (i + FIRST_PULL_TEMPLATE == plan->getTemplateType())
 			highlightLibraryWidget(dynamic_cast<PullTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(templateLibraryLayout->itemAt(i))->widget()));
 		else
@@ -204,7 +204,7 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 	if (ptlw != NULL)
         {
-                plan->setTemplate(new PullTemplate(ptlw->getPullTemplateType()));
+                plan->setTemplateType(ptlw->getPullTemplateType());
 		emit someDataChanged();
         }
 }
@@ -213,13 +213,13 @@ void PullPlanEditorWidget :: addCasingButtonPressed()
 {
 	PullPlan* superplan;
 
-	switch (plan->getTemplate()->getShape())
+	switch (plan->getShape())
 	{
 		case CIRCLE_SHAPE:
-			superplan =  new PullPlan(CASED_CIRCLE_PULL_TEMPLATE, plan->color);
+			superplan =  new PullPlan(CASED_CIRCLE_PULL_TEMPLATE, plan->getColor());
 			break;
 		case SQUARE_SHAPE:
-			superplan =  new PullPlan(CASED_SQUARE_PULL_TEMPLATE, plan->color);
+			superplan =  new PullPlan(CASED_SQUARE_PULL_TEMPLATE, plan->getColor());
 			break;
 		default:
 			exit(0);
@@ -258,20 +258,13 @@ void PullPlanEditorWidget :: viewWidgetDataChanged()
 void PullPlanEditorWidget :: paramSpinChanged(int)
 {
 	// update template
-	bool valueChanged = false;
-	for (unsigned int i = 0; i < plan->getTemplate()->getParameterCount(); ++i)
+	for (unsigned int i = 0; i < plan->getParameterCount(); ++i)
 	{
-		if (plan->getTemplate()->getParameter(i) != paramSpins[i]->value())
+		if (plan->getParameter(i) != paramSpins[i]->value())
 		{
-			valueChanged = true;
-			plan->getTemplate()->setParameter(i, paramSpins[i]->value());
+			plan->setParameter(i, paramSpins[i]->value());
+			emit someDataChanged();
 		}
-	}
-
-	if (valueChanged)
-	{
-		plan->setTemplate(plan->getTemplate()); // a hack to propogate the possibly changed number of subtemplates
-		emit someDataChanged();
 	}
 }
 
@@ -279,9 +272,9 @@ void PullPlanEditorWidget :: casingThicknessSliderChanged(int)
 {
         float thickness = casingThicknessSlider->sliderPosition() / 100.0;
 
-	if (thickness == plan->getTemplate()->getCasingThickness())
+	if (thickness == plan->getCasingThickness())
 		return;
-        plan->getTemplate()->setCasingThickness(thickness);
+        plan->setCasingThickness(thickness);
         emit someDataChanged();
 }
 
@@ -289,9 +282,9 @@ void PullPlanEditorWidget :: casingThicknessSpinChanged(int)
 {
         float thickness = casingThicknessSpin->value() / 100.0;
 
-	if (thickness == plan->getTemplate()->getCasingThickness())
+	if (thickness == plan->getCasingThickness())
 		return;
-        plan->getTemplate()->setCasingThickness(thickness);
+        plan->setCasingThickness(thickness);
         emit someDataChanged();
 }
 
@@ -299,9 +292,9 @@ void PullPlanEditorWidget :: twistSliderChanged(int)
 {
         float twist = twistSlider->sliderPosition();
 
-	if (twist == plan->twist)
+	if (twist == plan->getTwist())
 		return;
-        plan->twist = twist;
+        plan->setTwist(twist);
         emit someDataChanged();
 }
 
@@ -309,9 +302,9 @@ void PullPlanEditorWidget :: twistSpinChanged(int)
 {
         float twist = twistSpin->value();
 
-	if (twist == plan->twist)
+	if (twist == plan->getTwist())
 		return;
-        plan->twist = twist;
+        plan->setTwist(twist);
         emit someDataChanged();
 }
 
@@ -321,16 +314,16 @@ void PullPlanEditorWidget :: shapeButtonGroupChanged(int)
         switch (shapeButtonGroup->checkedId())
         {
                 case 1:
-                        if (plan->getTemplate()->getShape() == CIRCLE_SHAPE)
+                        if (plan->getShape() == CIRCLE_SHAPE)
                                 return;
-                        plan->getTemplate()->setShape(CIRCLE_SHAPE);
+                        plan->setShape(CIRCLE_SHAPE);
                        	emit someDataChanged(); 
                         break;
                 case 2:
-                        if (plan->getTemplate()->getShape() == SQUARE_SHAPE)
+                        if (plan->getShape() == SQUARE_SHAPE)
                                 return;
-                        plan->getTemplate()->setShape(SQUARE_SHAPE);
-			plan->twist = 0.0; // reset twist to zero because square casing can't be twisted
+                        plan->setShape(SQUARE_SHAPE);
+			plan->setTwist(0.0); // reset twist to zero because square casing can't be twisted
                         emit someDataChanged();
                         break;
         }
@@ -338,49 +331,49 @@ void PullPlanEditorWidget :: shapeButtonGroupChanged(int)
 
 void PullPlanEditorWidget :: setPlanTwist(int twist)
 {
-	plan->twist = twist;
+	plan->setTwist(twist);
 	emit someDataChanged();	
 }
 
-void PullPlanEditorWidget :: setPlanTemplate(PullTemplate* t)
+void PullPlanEditorWidget :: setPlanTemplate(int templateType)
 {
-	plan->setTemplate(t);
+	plan->setTemplateType(templateType);
 	emit someDataChanged();	
 }
 
 void PullPlanEditorWidget :: setPlanColor(Color* c)
 {
-	plan->color = c;
+	plan->setColor(c);
 	emit someDataChanged();	
 }
 
 void PullPlanEditorWidget :: setPlanTemplateCasingThickness(float t)
 {
-	plan->getTemplate()->setCasingThickness(t);
+	plan->setCasingThickness(t);
 	emit someDataChanged();	
 }
 
 void PullPlanEditorWidget :: setPlanSubplans(PullPlan* sp)
 {
 	plan->subplans.clear();
-        for (unsigned int i = 0; i < plan->getTemplate()->subtemps.size(); ++i)
+        for (unsigned int i = 0; i < plan->subtemps.size(); ++i)
         {
-                if (plan->getTemplate()->subtemps[i].shape == sp->getTemplate()->getShape()
-			|| sp->getTemplate()->type == AMORPHOUS_BASE_PULL_TEMPLATE)
+                if (plan->subtemps[i].shape == sp->getShape()
+			|| sp->getTemplateType() == AMORPHOUS_BASE_PULL_TEMPLATE)
                 {
 			plan->subplans.push_back(sp);
                 }
 		else
 		{
-			switch(plan->getTemplate()->subtemps[i].shape)
+			switch(plan->subtemps[i].shape)
 			{
 				case CIRCLE_SHAPE:
 					plan->subplans.push_back(
-						new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, sp->color));
+						new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, sp->getColor()));
 					break;
 				case SQUARE_SHAPE:
 					plan->subplans.push_back(
-						new PullPlan(SQUARE_BASE_PULL_TEMPLATE, sp->color));
+						new PullPlan(SQUARE_BASE_PULL_TEMPLATE, sp->getColor()));
 					break;
 			}
 		}

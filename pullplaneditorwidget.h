@@ -25,7 +25,7 @@ class PullPlanEditorWidget : public QWidget
 		void setPlanSubplans(PullPlan* plan);
 		void setPlanColor(Color* c);
 		void setPlanTwist(int t);
-		void setPlanTemplate(PullTemplate* t);
+		void setPlanTemplate(int templateType);
 		void setPlanTemplateCasingThickness(float t);
 		void mousePressEvent(QMouseEvent*);
 
