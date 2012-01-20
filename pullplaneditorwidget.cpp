@@ -131,7 +131,6 @@ void PullPlanEditorWidget :: setupLayout()
 
         casingThicknessSlider = new QSlider(Qt::Horizontal, this);
         casingThicknessSlider->setRange(1, 99);
-        casingThicknessSlider->setTickPosition(QSlider::TicksBothSides);
         casingThicknessSlider->setSliderPosition(0);
         casingThicknessLayout->addWidget(casingThicknessSlider, 10);
 
@@ -155,8 +154,6 @@ void PullPlanEditorWidget :: setupLayout()
 
         twistSlider = new QSlider(Qt::Horizontal, this);
         twistSlider->setRange(0, 100);
-        twistSlider->setTickInterval(5);
-        twistSlider->setTickPosition(QSlider::TicksBothSides);
         twistSlider->setSliderPosition(0);
         twistLayout->addWidget(twistSlider, 10);
 
