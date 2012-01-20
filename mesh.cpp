@@ -133,18 +133,13 @@ void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 void Mesher :: applyBowlTransform(Vertex* v, vector<int>* parameterValues)
 {
 	int radius = (*parameterValues)[0];
-	int twist = (*parameterValues)[1];
+	float size = 1.0 + 0.01 * (*parameterValues)[1];
+	int twist = (*parameterValues)[2];
 
-	// Do a rollup
-	// send x value to theta value 
-	// -5.0 goes to -PI, 5.0 goes to PI
-	// everything gets a base radius of 5.0
 	float theta = PI * v->position.x / 5.0 + PI * v->position.z * twist / 500.0;
-
 	float totalR = 4.0 + radius * 0.1;
 	float totalPhi = 10.0 / totalR;
-
-	float r = totalR - v->position.y;
+	float r = totalR*size - v->position.y/size;
 	float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
 
 	v->position.x = r * cos(theta) * cos(phi);
@@ -215,19 +210,20 @@ void Mesher :: applyVaseTransform(Vertex* v, vector<int>* parameterValues)
 	float theta = PI * v->position.x / 5.0;
 
 	// Deform into a spline-based vase
-	float body_radius = (*parameterValues)[0] * 0.03 + 1.0; 
-	float lip_radius = (*parameterValues)[1] * 0.03 + 0.5; 
+	float lip_radius = (*parameterValues)[0] * 0.03 + 0.5; 
+	float body_radius = (*parameterValues)[1] * 0.03 + 1.0; 
+	float twist_theta = PI * v->position.z * (*parameterValues)[2] / 500.0; 
 	float radius = 2.0 * splineVal(0.1, body_radius, 0.5, lip_radius, (v->position.z - -5.0)/10.0);
 
 	if (radius < 1.0)
 	{
-		v->position.x = (radius - v->position.y * radius) * cos(theta); 
-		v->position.y = (radius - v->position.y * radius) * sin(theta); 
+		v->position.x = (radius - v->position.y * radius) * cos(theta + twist_theta); 
+		v->position.y = (radius - v->position.y * radius) * sin(theta + twist_theta); 
 	}
 	else
 	{
-		v->position.x = (radius - v->position.y / radius) * cos(theta); 
-		v->position.y = (radius - v->position.y / radius) * sin(theta); 
+		v->position.x = (radius - v->position.y / radius) * cos(theta + twist_theta); 
+		v->position.y = (radius - v->position.y / radius) * sin(theta + twist_theta); 
 	}
 }
 

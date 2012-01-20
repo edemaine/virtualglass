@@ -39,6 +39,7 @@ class PieceEditorWidget : public QWidget
 	private slots:
                 void pieceTemplateParameterSlider1Changed(int);
                 void pieceTemplateParameterSlider2Changed(int);
+                void pieceTemplateParameterSlider3Changed(int);
                 void pickupParameter1SpinBoxChanged(int);
                 void pickupParameter1SliderChanged(int);
 
@@ -48,18 +49,23 @@ class PieceEditorWidget : public QWidget
 		Piece* piece;
 		PickupPlanEditorViewWidget* pickupViewWidget;	
 		NiceViewWidget* niceViewWidget;
-                QLabel* pieceTemplateParameter1Label;
-                QLabel* pieceTemplateParameter2Label;
+
                 QLabel* pickupTemplateParameter1Label;
                 QSpinBox* pickupParameter1SpinBox;
                 QSlider* pickupParameter1Slider;
                 QSlider* pickupTemplateParameter1Slider;
+
+                QLabel* pieceTemplateParameter1Label;
+                QLabel* pieceTemplateParameter2Label;
+                QLabel* pieceTemplateParameter3Label;
                 QSlider* pieceTemplateParameter1Slider;
                 QSlider* pieceTemplateParameter2Slider;
+                QSlider* pieceTemplateParameter3Slider;
+		vector<QLabel*> pieceParamLabels;
+		vector<QSlider*> pieceParamSliders;
+
                 QHBoxLayout* pickupTemplateLibraryLayout;
                 QHBoxLayout* pieceTemplateLibraryLayout;
-		vector<QLabel*> paramLabels;
-		vector<QSpinBox*> paramSpins;
                 QButtonGroup* shapeButtonGroup;
 		QSlider* casingThicknessSlider;
         	QHBoxLayout* templateLibraryLayout;
