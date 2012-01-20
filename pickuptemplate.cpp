@@ -94,13 +94,13 @@ void PickupTemplate :: computeSubtemps()
 				subtemps.push_back(new SubpickupTemplate(p, VERTICAL_ORIENTATION, 2.0, width-0.0001, 
 					CIRCLE_SHAPE, 0));
 				p.x = 1.0 - width / 2;
-				p.y = -1.0 + width / 2 + width * (parameterValues[0]- 1 - i);
+				p.y = -1.0 + width / 2 + width * (parameterValues[0] - 1 - i);
 				p.z = -width/2;
 				subtemps.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, width, width-0.0001, 
 					SQUARE_SHAPE, 1));
 			}
 			p.x = 1.0 - width / 2;
-			p.y = -1.0 + width / 2 + width * (parameterValues[0]-1);
+			p.y = -1.0 + width / 2;
 			p.z = -width/2;
 			subtemps.push_back(new SubpickupTemplate(p, MURRINE_ORIENTATION, width, width-0.0001, 
 				SQUARE_SHAPE, 1));

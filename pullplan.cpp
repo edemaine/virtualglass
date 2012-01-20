@@ -15,7 +15,6 @@ PullPlan :: PullPlan(int templateType, Color* color)
 PullPlan* PullPlan :: copy()
 {
 	PullPlan* c = new PullPlan(this->templateType, this->color);
-	c->templateType = this->templateType;
 	c->shape = this->shape;
 	c->casingThickness = this->casingThickness;
 	c->twist = this->twist;
@@ -173,8 +172,8 @@ void PullPlan :: setTemplateType(int templateType)
 		defaultColor = new Color();
 		defaultColor->r = defaultColor->g = defaultColor->b = 1.0;
 		defaultColor->a = 0.0;
-		defaultCircleSubplan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
-		defaultSquareSubplan = new PullPlan(SQUARE_BASE_PULL_TEMPLATE, color);
+		defaultCircleSubplan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, defaultColor);
+		defaultSquareSubplan = new PullPlan(SQUARE_BASE_PULL_TEMPLATE, defaultColor);
 	}
 
 	// create the new subplans based on template

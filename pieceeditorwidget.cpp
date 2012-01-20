@@ -16,14 +16,14 @@ PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 void PieceEditorWidget :: updateEverything()
 {
         // update pickup stuff
-        int value = piece->pickup->getTemplate()->getParameter(0);
+        int value = piece->pickup->getParameter(0);
         pickupTemplateParameter1SpinBox->setValue(value);
         pickupViewWidget->setPickup(piece->pickup);
 
         // update pickup stuff
         for (int i = 0; i < pickupTemplateLibraryLayout->count(); ++i)
         {
-                if (i + FIRST_PICKUP_TEMPLATE == piece->pickup->getTemplate()->type)
+                if (i + FIRST_PICKUP_TEMPLATE == piece->pickup->getTemplateType())
                         highlightLibraryWidget(dynamic_cast<PickupTemplateLibraryWidget*>(
                                 dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget()));
                 else
@@ -100,11 +100,10 @@ void PieceEditorWidget :: pickupTemplateParameter1SpinBoxChanged(int)
 {
         int value = pickupTemplateParameter1SpinBox->value();
 
-        if (value == piece->pickup->getTemplate()->getParameter(0))
+        if (value == piece->pickup->getParameter(0))
                 return;
 
-        piece->pickup->getTemplate()->setParameter(0, value);
-	piece->pickup->updateSubplans();	
+        piece->pickup->setParameter(0, value);
         emit someDataChanged();
 }
 
@@ -132,7 +131,7 @@ void PieceEditorWidget :: setupLayout()
         pickupTemplateLibraryScrollArea->setFixedHeight(130);
         leftLayout->addWidget(pickupTemplateLibraryScrollArea, 0);
 
-        pickupTemplateParameter1Label = new QLabel(piece->pickup->getTemplate()->getParameterName(0));
+        pickupTemplateParameter1Label = new QLabel(piece->pickup->getParameterName(0));
         pickupTemplateParameter1SpinBox = new QSpinBox(this);
         pickupTemplateParameter1SpinBox->setRange(6, 40);
         pickupTemplateParameter1SpinBox->setSingleStep(1);
@@ -203,9 +202,9 @@ void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 	if (pktlw != NULL)
         {
-                if (pktlw->getPickupTemplateType() != piece->pickup->getTemplate()->type)
+                if (pktlw->getPickupTemplateType() != piece->pickup->getTemplateType())
                 {
-			piece->pickup->setTemplate(new PickupTemplate(pktlw->getPickupTemplateType()));
+			piece->pickup->setTemplateType(pktlw->getPickupTemplateType());
 			emit someDataChanged();
 		}
         }
@@ -257,16 +256,16 @@ void PieceEditorWidget :: updateLibraryWidgetPixmaps(PieceLibraryWidget* w)
 	w->updatePixmap(QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100));
 }
 
-void PieceEditorWidget :: setPickupTemplateParameter(int param, int value)
+void PieceEditorWidget :: setPickupParameter(int param, int value)
 {
-	piece->pickup->getTemplate()->setParameter(param, value);
+	piece->pickup->setParameter(param, value);
 	emit someDataChanged();
 }
 
 void PieceEditorWidget :: setPickupSubplans(PullPlan* s)
 {
 	piece->pickup->subplans.clear();
-        for (unsigned int i = 0; i < piece->pickup->getTemplate()->subtemps.size(); ++i)
+        for (unsigned int i = 0; i < piece->pickup->subtemps.size(); ++i)
         {
                 piece->pickup->subplans.push_back(s);
         }
@@ -280,9 +279,9 @@ void PieceEditorWidget :: setPieceTemplate(PieceTemplate* t)
 	emit someDataChanged();
 }
 
-void PieceEditorWidget :: setPickupTemplate(PickupTemplate* t)
+void PieceEditorWidget :: setPickupTemplateType(int templateType)
 {
-	piece->pickup->setTemplate(t);
+	piece->pickup->setTemplateType(templateType);
 	emit someDataChanged();
 }
 

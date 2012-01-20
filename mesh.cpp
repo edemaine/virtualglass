@@ -38,7 +38,7 @@ float Mesher :: computeTotalCaneLength(PickupPlan* plan)
 	float total = 0.0;
 	for (unsigned int i = 0; i < plan->subplans.size(); ++i)
 	{
-		total += computeTotalCaneLength(plan->subplans[i]) * plan->getTemplate()->subtemps[i]->length / 2.0;
+		total += computeTotalCaneLength(plan->subplans[i]) * plan->subtemps[i]->length / 2.0;
 	}
 	return total;
 }
@@ -524,7 +524,7 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPla
 		ancestors->clear();
 		ancestorIndices->clear();
 		generateMesh(plan->subplans[i], plan->subplans[i]->getShape(), geometry, 
-			ancestors, ancestorIndices, 0.0, plan->getTemplate()->subtemps[i]->length, true, i); 
+			ancestors, ancestorIndices, 0.0, plan->subtemps[i]->length, true, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
 		{
@@ -536,7 +536,7 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPla
 				for (uint32_t v = subpullGroup->vertex_begin; 
 					v < subpullGroup->vertex_begin + subpullGroup->vertex_size; ++v)
 				{
-					applyPickupTransform(&(geometry->vertices[v]), plan->getTemplate()->subtemps[i]);
+					applyPickupTransform(&(geometry->vertices[v]), plan->subtemps[i]);
 				}
 			}
 		}

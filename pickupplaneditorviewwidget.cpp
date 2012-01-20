@@ -39,9 +39,9 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 
 	int hitIndex = -1;
 	float hitDepth = -100.0;
-	for (unsigned int i = 0; i < pickup->getTemplate()->subtemps.size(); ++i)
+	for (unsigned int i = 0; i < pickup->subtemps.size(); ++i)
 	{
-		SubpickupTemplate* sp = pickup->getTemplate()->subtemps[i];
+		SubpickupTemplate* sp = pickup->subtemps[i];
 		Point ll, ur;
 
 		switch (sp->orientation)
@@ -86,12 +86,12 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			if (hitIndex == -1)
 			{
 				hitIndex = i;
-				hitDepth = pickup->getTemplate()->subtemps[i]->location.z;
+				hitDepth = pickup->subtemps[i]->location.z;
 			}
-			else if (hitDepth > pickup->getTemplate()->subtemps[i]->location.z)
+			else if (hitDepth > pickup->subtemps[i]->location.z)
 			{
 				hitIndex = i;
-				hitDepth = pickup->getTemplate()->subtemps[i]->location.z;
+				hitDepth = pickup->subtemps[i]->location.z;
 			}
 		}
 	}
@@ -104,24 +104,24 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	// If the shift button is down, fill in the entire group
 	if (event->keyboardModifiers() & 0x02000000)
 	{
-		int group = pickup->getTemplate()->subtemps[hitIndex]->group;
-		for (unsigned int j = 0; j < pickup->getTemplate()->subtemps.size(); ++j)
+		int group = pickup->subtemps[hitIndex]->group;
+		for (unsigned int j = 0; j < pickup->subtemps.size(); ++j)
 		{
-			if (pickup->getTemplate()->subtemps[j]->group == group)
+			if (pickup->subtemps[j]->group == group)
 				pickup->subplans[j] = droppedPlan;
 		}
 	}
 	// If the alt button is down, fill alternating elements in the group
 	else if (event->keyboardModifiers() & 0x08000000)
 	{
-		int group = pickup->getTemplate()->subtemps[hitIndex]->group;
+		int group = pickup->subtemps[hitIndex]->group;
 		bool parity = true;
-		unsigned int subtempCount = pickup->getTemplate()->subtemps.size();
+		unsigned int subtempCount = pickup->subtemps.size();
 		unsigned int j = hitIndex;
 		unsigned int unsgnHitIndex = hitIndex;
 		do
 		{
-			if (pickup->getTemplate()->subtemps[j]->group == group)
+			if (pickup->subtemps[j]->group == group)
 			{
 				if (parity)
 					pickup->subplans[j] = droppedPlan;
@@ -159,7 +159,7 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 	pen.setWidth(3);
 	painter.setPen(pen);
 	
-	for (unsigned int i = 0; i < pickup->getTemplate()->subtemps.size(); ++i)
+	for (unsigned int i = 0; i < pickup->subtemps.size(); ++i)
 	{
 		if (pickup->subplans[i]->isBase())
 		{
@@ -175,7 +175,7 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 		}
 		painter.setPen(pen);
 
-		SubpickupTemplate* sp = pickup->getTemplate()->subtemps[i];
+		SubpickupTemplate* sp = pickup->subtemps[i];
                 Point ll;
 		float rWidth, rHeight;
                 switch (sp->orientation)

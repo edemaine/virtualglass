@@ -24,24 +24,5 @@
 #define FIRST_PICKUP_TEMPLATE VERTICALS_PICKUP_TEMPLATE
 #define LAST_PICKUP_TEMPLATE MURRINE_ROW_PICKUP_TEMPLATE 
 
-using std::vector;
-
-class PickupTemplate
-{
-	public:
-		PickupTemplate(int t);
-		vector<SubpickupTemplate*> subtemps;
-		int type;
-		void setParameter(int param, int newValue);
-		int getParameter(int param);
-		char* getParameterName(int param);	
-		PickupTemplate* copy();
-
-	private:
-		vector<int> parameterValues; 
-		vector<char*> parameterNames;
-		void computeSubtemps();
-};
-
 #endif
 

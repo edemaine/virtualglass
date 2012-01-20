@@ -112,7 +112,7 @@ SOURCES += glew/glew.c \
 SOURCES += main.cpp \ 
 	pullplan.cpp subpulltemplate.cpp \
 	piece.cpp piecetemplate.cpp \
-	pickupplan.cpp pickuptemplate.cpp subpickuptemplate.cpp pickupplaneditorviewwidget.cpp \
+	pickupplan.cpp subpickuptemplate.cpp pickupplaneditorviewwidget.cpp \
 	purecolorlibrarywidget.cpp \
 	model.cpp controller.cpp geometry.cpp mesh.cpp \
 	mainwindow.cpp niceviewwidget.cpp pullplanlibrarywidget.cpp piecelibrarywidget.cpp \

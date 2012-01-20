@@ -8,23 +8,33 @@
 #include "pickuptemplate.h"
 #include "pullplan.h"
 
+using std::vector;
+
 class PickupPlan
 {
 	public:
 		PickupPlan(int pickupTemplate);
 		PickupPlan();
 
-		void setTemplate(PickupTemplate* pt);
-		PickupTemplate* getTemplate();
-		void updateSubplans();
+		void setTemplateType(int templateType);
+		int getTemplateType();
+
+                void setParameter(int param, int newValue);
+                int getParameter(int param);
+                char* getParameterName(int param);
 
 		PickupPlan* copy();
 
 		vector<PullPlan*> subplans;
+                vector<SubpickupTemplate*> subtemps;
 
 	private:
-		// Variables
-		PickupTemplate* pickupTemplate;
+		void updateSubplans();
+                void updateSubtemps();
+		int templateType;	
+                vector<int> parameterValues;
+                vector<char*> parameterNames;
+		PullPlan* defaultSubplan;
 };
 
 #endif

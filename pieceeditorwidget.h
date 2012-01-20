@@ -26,8 +26,8 @@ class PieceEditorWidget : public QWidget
 		void setPiece(Piece* p);
 		void setPieceTemplate(PieceTemplate* t);
 		void setPickupSubplans(PullPlan* s);
-		void setPickupTemplate(PickupTemplate* t);
-		void setPickupTemplateParameter(int param, int value);
+		void setPickupTemplateType(int templateType);
+		void setPickupParameter(int param, int value);
 		void mousePressEvent(QMouseEvent*);
 
 	signals:
