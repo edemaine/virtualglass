@@ -165,9 +165,10 @@ void PieceEditorWidget :: setupLayout()
 	fillLayout->addWidget(new QLabel("Fill rule:"));
 	fillComboBox = new QComboBox(this);
 	fillComboBox->addItem("Single");
-	fillComboBox->addItem("Group");
 	fillComboBox->addItem("Every other");
 	fillComboBox->addItem("Every third");
+	fillComboBox->addItem("Group");
+	fillComboBox->addItem("All");
 	fillLayout->addWidget(fillComboBox);
 	leftLayout->addLayout(fillLayout);
 

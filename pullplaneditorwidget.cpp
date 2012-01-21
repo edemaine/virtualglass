@@ -107,9 +107,10 @@ void PullPlanEditorWidget :: setupLayout()
 	fillComboBox = new QComboBox(this);
 	// these need to be in the same order as the fill rules in constants.h
 	fillComboBox->addItem("Single");
-	fillComboBox->addItem("Group");
 	fillComboBox->addItem("Every other");
 	fillComboBox->addItem("Every third");
+	fillComboBox->addItem("Group");
+	fillComboBox->addItem("All");
 	pullTemplateShapeLayout->addWidget(fillComboBox);
         QLabel* casingLabel = new QLabel("Casing:");
         QCheckBox* circleCheckBox = new QCheckBox("Circle");

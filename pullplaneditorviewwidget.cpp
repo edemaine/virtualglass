@@ -78,6 +78,12 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 				plan->subplans[i] = droppedPlan;
 				break;
 			}
+			case ALL_FILL_RULE:
+			{
+				for (unsigned int j = 0; j < plan->subplans.size(); ++j)
+					plan->subplans[j] = droppedPlan;
+				break;
+			}
 			case GROUP_FILL_RULE:
 			{
 				int group = plan->subtemps[i].group;

@@ -20,7 +20,7 @@ unix:!macx {
 }
 macx {
   QMAKE_CXXFLAGS += -DUNORDERED_MAP_WORKAROUND
-  ICON = virtualglass.incs
+  ICON = virtualglass.icns
 }
 
 *-msvc* {

@@ -107,12 +107,17 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	else
 		return;
 
-	// If the shift button is down, fill in the entire group
 	switch (fillRule)
 	{
 		case SINGLE_FILL_RULE:
 		{
 			pickup->subplans[hitIndex] = droppedPlan;
+			break;
+		}
+		case ALL_FILL_RULE:
+		{
+			for (unsigned int j = 0; j < pickup->subplans.size(); ++j)
+				pickup->subplans[j] = droppedPlan;
 			break;
 		}
 		case GROUP_FILL_RULE:
