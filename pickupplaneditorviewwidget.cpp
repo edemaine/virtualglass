@@ -6,6 +6,7 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWi
 	setAcceptDrops(true);
 	setFixedSize(500, 500);
 	this->pickup = pickup;
+	this->fillRule = SINGLE_FILL_RULE;
 	this->niceViewWidget = new NiceViewWidget(PICKUPPLAN_MODE, this);
 	mesher.generateMesh(pickup, &geometry);
 	this->niceViewWidget->setGeometry(&geometry);
@@ -15,6 +16,11 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWi
 	this->setLayout(layout);
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addWidget(niceViewWidget);
+}
+
+void PickupPlanEditorViewWidget :: setFillRule(int r)
+{
+	this->fillRule = r;
 }
 
 QPixmap PickupPlanEditorViewWidget :: getPixmap()
@@ -102,38 +108,54 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		return;
 
 	// If the shift button is down, fill in the entire group
-	if (event->keyboardModifiers() & 0x02000000)
+	switch (fillRule)
 	{
-		int group = pickup->subtemps[hitIndex]->group;
-		for (unsigned int j = 0; j < pickup->subtemps.size(); ++j)
+		case SINGLE_FILL_RULE:
 		{
-			if (pickup->subtemps[j]->group == group)
-				pickup->subplans[j] = droppedPlan;
+			pickup->subplans[hitIndex] = droppedPlan;
+			break;
 		}
-	}
-	// If the alt button is down, fill alternating elements in the group
-	else if (event->keyboardModifiers() & 0x08000000)
-	{
-		int group = pickup->subtemps[hitIndex]->group;
-		bool parity = true;
-		unsigned int subtempCount = pickup->subtemps.size();
-		unsigned int j = hitIndex;
-		unsigned int unsgnHitIndex = hitIndex;
-		do
+		case GROUP_FILL_RULE:
 		{
-			if (pickup->subtemps[j]->group == group)
+			int group = pickup->subtemps[hitIndex]->group;
+			for (unsigned int j = hitIndex; j < pickup->subtemps.size(); ++j)
 			{
-				if (parity)
+				if (pickup->subtemps[j]->group == group)
 					pickup->subplans[j] = droppedPlan;
-				parity = !parity;
 			}
-			++j;
-			j = j % subtempCount;
+			break;
 		}
-		while ((j != ((unsgnHitIndex-1 + subtempCount) % subtempCount)) && (j != unsgnHitIndex));
-	}
-	else // Otherwise just fill in this one
-		pickup->subplans[hitIndex] = droppedPlan;
+		case EVERY_OTHER_FILL_RULE:
+		{
+			bool parity = true;
+			int group = pickup->subtemps[hitIndex]->group;
+			for (unsigned int j = hitIndex; j < pickup->subtemps.size(); ++j)
+			{
+				if (pickup->subtemps[j]->group == group)
+				{
+					if (parity)
+						pickup->subplans[j] = droppedPlan;
+					parity = !parity;
+				}
+			}
+			break;
+		}
+		case EVERY_THIRD_FILL_RULE:
+		{
+			int triarity = 0;
+			int group = pickup->subtemps[hitIndex]->group;
+			for (unsigned int j = hitIndex; j < pickup->subtemps.size(); ++j)
+			{
+				if (pickup->subtemps[j]->group == group)
+				{
+					if (triarity == 0)
+						pickup->subplans[j] = droppedPlan;
+					triarity = (triarity + 1) % 3;
+				}
+			}
+			break;
+		}
+	}	
 
 	emit someDataChanged();
 	return;	

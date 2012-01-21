@@ -18,6 +18,7 @@ class PickupPlanEditorViewWidget : public QWidget
 		PickupPlanEditorViewWidget(PickupPlan* pickup, QWidget* parent=0);
 		void setPickup(PickupPlan* p);
 		QPixmap getPixmap();
+		void setFillRule(int r);
 	
 	signals:
 		void someDataChanged();
@@ -32,6 +33,7 @@ class PickupPlanEditorViewWidget : public QWidget
 		Geometry geometry;
 		NiceViewWidget* niceViewWidget;
 		PickupPlan* pickup;
+		int fillRule;
 };
 
 

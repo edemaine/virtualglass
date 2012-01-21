@@ -37,6 +37,7 @@ class PullPlanEditorWidget : public QWidget
 		void updateEverything();
 
 	private slots:
+		void fillComboBoxChanged(int);
 		void addCasingButtonPressed();
 		void viewWidgetDataChanged();
 		void shapeButtonGroupChanged(int);
@@ -52,6 +53,7 @@ class PullPlanEditorWidget : public QWidget
 		PullPlan* plan;
 		PullPlanEditorViewWidget* viewWidget;	
 		NiceViewWidget* niceViewWidget;
+		QComboBox* fillComboBox;
 		QSpinBox* casingThicknessSpin;
 		QSlider* casingThicknessSlider;
 		QSpinBox* twistSpin;

@@ -161,6 +161,16 @@ void PieceEditorWidget :: setupLayout()
         pickupTemplateLibraryScrollArea->setFixedHeight(130);
         leftLayout->addWidget(pickupTemplateLibraryScrollArea, 0);
 
+	QHBoxLayout* fillLayout = new QHBoxLayout(this);
+	fillLayout->addWidget(new QLabel("Fill rule:"));
+	fillComboBox = new QComboBox(this);
+	fillComboBox->addItem("Single");
+	fillComboBox->addItem("Group");
+	fillComboBox->addItem("Every other");
+	fillComboBox->addItem("Every third");
+	fillLayout->addWidget(fillComboBox);
+	leftLayout->addLayout(fillLayout);
+
         pickupTemplateParameter1Label = new QLabel(piece->pickup->getParameterName(0));
         pickupParameter1SpinBox = new QSpinBox(this);
         pickupParameter1SpinBox->setRange(6, 40);
@@ -269,8 +279,15 @@ void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
 	}
 }
 
+void PieceEditorWidget :: fillComboBoxChanged(int)
+{
+	pickupViewWidget->setFillRule(fillComboBox->currentIndex()+1);
+}
+
 void PieceEditorWidget :: setupConnections()
 {
+	connect(fillComboBox, SIGNAL(currentIndexChanged(int)),
+		this, SLOT(fillComboBoxChanged(int)));
         connect(pickupParameter1SpinBox, SIGNAL(valueChanged(int)),
                 this, SLOT(pickupParameter1SpinBoxChanged(int)));
         connect(pickupParameter1Slider, SIGNAL(valueChanged(int)),

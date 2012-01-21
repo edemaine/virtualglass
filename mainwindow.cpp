@@ -9,7 +9,6 @@ MainWindow :: MainWindow()
 
 	centralLayout = new QHBoxLayout(centralWidget);
 	setupLibrary();
-	setupStatusBar();
 	setupEditors();
 	setupConnections();
 
@@ -215,8 +214,6 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	if ((event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
 		return;
 
-	statusBar->showMessage("Hold Shift to fill all subcanes at once, Alt to fill every other subcane.", 10000);
-
 	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
 	int type;
@@ -328,12 +325,6 @@ void MainWindow :: setupLibrary()
 		libraryWidget);
 	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	libraryAreaLayout->addWidget(descriptionLabel, 0);
-}
-
-void MainWindow :: setupStatusBar()
-{
-	statusBar = new QStatusBar();
-	this->setStatusBar(statusBar);
 }
 
 void MainWindow :: setupEditors()

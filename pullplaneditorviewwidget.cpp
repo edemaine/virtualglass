@@ -7,6 +7,12 @@ PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* pa
 	setAcceptDrops(true);
 	setFixedSize(500, 500);
 	this->plan = plan;
+	fill_rule = SINGLE_FILL_RULE;
+}
+
+void PullPlanEditorViewWidget :: setFillRule(int r)
+{
+	fill_rule = r;
 }
 
 void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
@@ -65,42 +71,58 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		event->accept();
 
 		// If the shift button is down, fill in the entire group
-		if (event->keyboardModifiers() & 0x02000000)
+		switch (fill_rule)
 		{
-			int group = plan->subtemps[i].group;
-			for (unsigned int j = 0; j < plan->subtemps.size(); ++j)
+			case SINGLE_FILL_RULE:
 			{
-				if (plan->subtemps[j].group == group)
-					plan->subplans[j] = droppedPlan;
+				plan->subplans[i] = droppedPlan;
+				break;
 			}
-		}
-		// If the alt button is down, fill alternating elements in the group
-		else if (event->keyboardModifiers() & 0x08000000)
-		{
-			int group = plan->subtemps[i].group;
-			bool parity = true;
-			unsigned int subtempCount = plan->subtemps.size();
-			unsigned int j = i;
-			do
+			case GROUP_FILL_RULE:
 			{
-				if (plan->subtemps[j].group == group)
+				int group = plan->subtemps[i].group;
+				for (unsigned int j = i; j < plan->subtemps.size(); ++j)
 				{
-					if (parity)
+					if (plan->subtemps[j].group == group)
 						plan->subplans[j] = droppedPlan;
-					parity = !parity;
 				}
-				++j;
-				j = j % subtempCount;
+				break;
 			}
-			while ((j != ((i-1 + subtempCount) % subtempCount)) && (j != i));
+			case EVERY_OTHER_FILL_RULE:
+			{
+				int group = plan->subtemps[i].group;
+				bool parity = true;
+                                for (unsigned int j = i; j < plan->subtemps.size(); ++j)
+                                {
+                                        if (plan->subtemps[j].group == group)
+					{
+						if (parity)
+							plan->subplans[j] = droppedPlan;
+						parity = !parity;
+					}
+                                }
+				break;
+			}
+                        case EVERY_THIRD_FILL_RULE:
+                        {
+                                int group = plan->subtemps[i].group;
+                                int triarity = 0;
+                                for (unsigned int j = i; j < plan->subtemps.size(); ++j)
+                                {
+                                        if (plan->subtemps[j].group == group)
+                                        {       
+                                                if (triarity == 0)
+                                                        plan->subplans[j] = droppedPlan;
+                                                triarity = (triarity + 1) % 3;
+                                        }
+                                }
+				break;
+                        }
 		}
-		else // Otherwise just fill in this one
-			plan->subplans[i] = droppedPlan;
 
 		emit someDataChanged();
 		return;
 	}
-
 
 	// don't allow complex pulls to be casing
 	if (type == PULL_PLAN_MIME)

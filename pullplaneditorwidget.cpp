@@ -85,6 +85,7 @@ void PullPlanEditorWidget :: setupLayout()
 
         editorLayout->addWidget(viewWidget, 0);
 
+
         // Setup pull template scrolling library
         QWidget* templateLibraryWidget = new QWidget(this);
         templateLibraryLayout = new QHBoxLayout(templateLibraryWidget);
@@ -100,6 +101,16 @@ void PullPlanEditorWidget :: setupLayout()
         pullTemplateLibraryScrollArea->setFixedHeight(130);
         editorLayout->addWidget(pullTemplateLibraryScrollArea, 0);
 
+        QHBoxLayout* pullTemplateShapeLayout = new QHBoxLayout(this);
+
+	pullTemplateShapeLayout->addWidget(new QLabel("Fill rule:", this));
+	fillComboBox = new QComboBox(this);
+	// these need to be in the same order as the fill rules in constants.h
+	fillComboBox->addItem("Single");
+	fillComboBox->addItem("Group");
+	fillComboBox->addItem("Every other");
+	fillComboBox->addItem("Every third");
+	pullTemplateShapeLayout->addWidget(fillComboBox);
         QLabel* casingLabel = new QLabel("Casing:");
         QCheckBox* circleCheckBox = new QCheckBox("Circle");
         QCheckBox* squareCheckBox = new QCheckBox("Square");
@@ -107,7 +118,6 @@ void PullPlanEditorWidget :: setupLayout()
         shapeButtonGroup = new QButtonGroup();
         shapeButtonGroup->addButton(circleCheckBox, 1);
         shapeButtonGroup->addButton(squareCheckBox, 2);
-        QHBoxLayout* pullTemplateShapeLayout = new QHBoxLayout(this);
         pullTemplateShapeLayout->addWidget(casingLabel);
         pullTemplateShapeLayout->addWidget(circleCheckBox);
         pullTemplateShapeLayout->addWidget(squareCheckBox);
@@ -227,8 +237,14 @@ void PullPlanEditorWidget :: addCasingButtonPressed()
 	emit newPullPlan(superplan);
 }
 
+void PullPlanEditorWidget :: fillComboBoxChanged(int)
+{
+	viewWidget->setFillRule(fillComboBox->currentIndex()+1);
+}
+
 void PullPlanEditorWidget :: setupConnections()
 {
+	connect(fillComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(fillComboBoxChanged(int)));
 	connect(addCasingButton, SIGNAL(pressed()), this, SLOT(addCasingButtonPressed()));
         connect(shapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(shapeButtonGroupChanged(int)));
         connect(casingThicknessSlider, SIGNAL(valueChanged(int)),
