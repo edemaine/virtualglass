@@ -27,6 +27,7 @@ class PickupPlan
 
 		vector<PullPlan*> subplans;
                 vector<SubpickupTemplate*> subtemps;
+		PullPlan* underlayColorPlan;
 
 	private:
 		void updateSubplans();
