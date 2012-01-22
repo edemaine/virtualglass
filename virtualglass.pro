@@ -55,7 +55,7 @@ HEADERS += primitives.h constants.h Vector.hpp \
 	pulltemplatelibrarywidget.h pickuptemplatelibrarywidget.h piecetemplatelibrarywidget.h \
 	pullplaneditorviewwidget.h pullplaneditorwidget.h colorbarlibrarywidget.h \
 	pieceeditorwidget.h coloreditorwidget.h \
-	controller.h model.h geometry.h mesh.h \ 
+	controller.h geometry.h mesh.h \ 
 	qgraphicshighlighteffect.h \
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
@@ -114,7 +114,7 @@ SOURCES += main.cpp \
 	piece.cpp piecetemplate.cpp \
 	pickupplan.cpp subpickuptemplate.cpp pickupplaneditorviewwidget.cpp \
 	purecolorlibrarywidget.cpp \
-	model.cpp controller.cpp geometry.cpp mesh.cpp \
+	controller.cpp geometry.cpp mesh.cpp \
 	mainwindow.cpp niceviewwidget.cpp pullplanlibrarywidget.cpp piecelibrarywidget.cpp \
 	pulltemplatelibrarywidget.cpp pickuptemplatelibrarywidget.cpp piecetemplatelibrarywidget.cpp \
 	pullplaneditorviewwidget.cpp pullplaneditorwidget.cpp colorbarlibrarywidget.cpp \ 

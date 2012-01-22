@@ -64,6 +64,13 @@ void Mesher :: applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentP
 	}
 }
 
+void Mesher :: applyResizeTransform(Vertex* v, float scale)
+{
+	// Adjust diameter
+	v->position.x *= scale; 
+	v->position.y *= scale; 
+}
+
 void Mesher :: applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int subplan)
 {
 	SubpullTemplate* subTemp = &(parentNode->subtemps[subplan]);
@@ -274,8 +281,8 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 	if (plan->getColor()->a < 0.0001 && !ensureVisible)
 		return;
 
-	unsigned int angularResolution = MIN(MAX(TOTAL_ANGULAR_RESOLUTION / totalCaneLength, 10), 15);
-	unsigned int axialResolution = MIN(MAX(TOTAL_AXIAL_RESOLUTION / totalCaneLength * length, 30), 65);
+	unsigned int angularResolution = MIN(MAX(TOTAL_ANGULAR_RESOLUTION / totalCaneLength, 10), 25);
+	unsigned int axialResolution = MIN(MAX(TOTAL_AXIAL_RESOLUTION / totalCaneLength * length, 30), 100);
 	
 	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
@@ -558,7 +565,26 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry* geometry)
 	geometry->compute_normals_from_triangles();
 }
 
-void Mesher :: generateMesh(PullPlan* plan, Geometry* geometry)
+
+
+void Mesher :: generatePullMesh(PullPlan* plan, Geometry* geometry)
+{
+	totalCaneLength = computeTotalCaneLength(plan);
+        vector<PullPlan*> ancestors;
+        vector<int> ancestorIndices;
+	if (plan->getTemplateType() == AMORPHOUS_BASE_PULL_TEMPLATE)
+		generateMesh(plan, CIRCLE_SHAPE, geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
+	else
+		generateMesh(plan, plan->getShape(), geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
+	// Make skinner to more closely mimic the canes found in pickups
+        for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
+        {
+                applyResizeTransform(&(geometry->vertices[v]), 0.5);
+        }
+	geometry->compute_normals_from_triangles();
+}
+
+void Mesher :: generateColorMesh(PullPlan* plan, Geometry* geometry)
 {
 	totalCaneLength = computeTotalCaneLength(plan);
         vector<PullPlan*> ancestors;

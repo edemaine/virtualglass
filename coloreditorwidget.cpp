@@ -8,7 +8,7 @@ ColorEditorWidget :: ColorEditorWidget(QWidget* parent) : QWidget(parent)
 	color->a = 0.0;
         this->colorBar = new PullPlan(AMORPHOUS_BASE_PULL_TEMPLATE, color);
 	this->niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);
-	mesher.generateMesh(colorBar, &geometry);
+	mesher.generateColorMesh(colorBar, &geometry);
 	niceViewWidget->setGeometry(&geometry);
 
 	setupLayout();
@@ -304,7 +304,7 @@ void ColorEditorWidget :: setColorBar(PullPlan* b)
 void ColorEditorWidget :: updateEverything()
 {
         geometry.clear();
-        mesher.generateMesh(colorBar, &geometry);
+        mesher.generateColorMesh(colorBar, &geometry);
         niceViewWidget->repaint();
 
 	this->alphaSlider->setSliderPosition(255 - (int) (colorBar->getColor()->a * 255));

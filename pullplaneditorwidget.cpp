@@ -47,7 +47,7 @@ void PullPlanEditorWidget :: updateEverything()
 	}
 
         geometry.clear();
-        mesher.generateMesh(plan, &geometry);
+        mesher.generatePullMesh(plan, &geometry);
         niceViewWidget->repaint();
 	//geometry.save_raw_file("./cane.raw");
 

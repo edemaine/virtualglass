@@ -19,7 +19,8 @@ class Mesher
 
 	public:
 		Mesher();
-		void generateMesh(PullPlan* plan, Geometry* geometry);
+		void generatePullMesh(PullPlan* plan, Geometry* geometry);
+		void generateColorMesh(PullPlan* plan, Geometry* geometry);
 		void generateMesh(PickupPlan* plan, Geometry* geometry);
 		void generateMesh(Piece* piece, Geometry* geometry);
 		void updateTotalCaneLength(Piece* piece);
@@ -34,11 +35,13 @@ class Mesher
 			vector<int>* ancestorIndices);
 		void generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometry, vector<PullPlan*>* ancestors, 
 			vector<int>* ancestorIndices, float offset, float length, bool ensureVisible=false, int groupIndex = -1);
+
 		float asymptoteVal(float s, float t);
 		float splineVal(float r1, float r2, float r3, float t);
 		float splineVal(float r1, float r2, float r3, float r4, float t);
 		void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
 			PullPlan* plan, int mandatedShape, float offset, float length, bool ensureVisible, uint32_t group_tag);
+		void applyResizeTransform(Vertex* v, float scale);
 		void applyMoveAndResizeTransform(Vertex* v, PullPlan* parentPlan, int subplan);
 		void applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentPlan, int subplan);
 		void applyTwistTransform(Vertex* v, PullPlan* p);
