@@ -37,6 +37,7 @@ class PieceEditorWidget : public QWidget
 		void updateEverything();
 
 	private slots:
+		void underlayCheckBoxChanged(int);
 		void fillComboBoxChanged(int);
                 void pieceTemplateParameterSlider1Changed(int);
                 void pieceTemplateParameterSlider2Changed(int);
@@ -51,6 +52,7 @@ class PieceEditorWidget : public QWidget
 		PickupPlanEditorViewWidget* pickupViewWidget;	
 		NiceViewWidget* niceViewWidget;
 
+		QCheckBox* underlayCheckBox;
 		QComboBox* fillComboBox;
                 QLabel* pickupTemplateParameter1Label;
                 QSpinBox* pickupParameter1SpinBox;

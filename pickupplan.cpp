@@ -11,6 +11,7 @@ PickupPlan :: PickupPlan(int templateType)
 	defaultSubplan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, defaultColor);
 	overlayColorPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, defaultColor);
 	underlayColorPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, defaultColor);
+	useUnderlay = false;
 
 	setTemplateType(templateType);
 }

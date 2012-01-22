@@ -170,7 +170,11 @@ void PieceEditorWidget :: setupLayout()
 	fillComboBox->addItem("Group");
 	fillComboBox->addItem("All");
 	fillLayout->addWidget(fillComboBox);
+	fillLayout->addStretch();
+	underlayCheckBox = new QCheckBox("Use underlay", this);
+	fillLayout->addWidget(underlayCheckBox);
 	leftLayout->addLayout(fillLayout);
+
 
         pickupTemplateParameter1Label = new QLabel(piece->pickup->getParameterName(0));
         pickupParameter1SpinBox = new QSpinBox(this);
@@ -285,8 +289,16 @@ void PieceEditorWidget :: fillComboBoxChanged(int)
 	pickupViewWidget->setFillRule(fillComboBox->currentIndex()+1);
 }
 
+void PieceEditorWidget :: underlayCheckBoxChanged(int)
+{
+	piece->pickup->useUnderlay = underlayCheckBox->isChecked();
+	emit someDataChanged();
+}
+
 void PieceEditorWidget :: setupConnections()
 {
+	connect(underlayCheckBox, SIGNAL(stateChanged(int)),
+		this, SLOT(underlayCheckBoxChanged(int)));
 	connect(fillComboBox, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(fillComboBoxChanged(int)));
         connect(pickupParameter1SpinBox, SIGNAL(valueChanged(int)),
