@@ -5,11 +5,11 @@
 PullPlan :: PullPlan(int templateType, Color* color)
 {
 	defaultCircleSubplan = defaultSquareSubplan = NULL;
-	setTemplateType(templateType);
 	this->color = color;
 	this->twist = 0.0;
-        this->templateType = templateType;
         this->casingThickness = 0.1;
+        this->templateType = -1;
+	setTemplateType(templateType);
 }
 
 PullPlan* PullPlan :: copy()

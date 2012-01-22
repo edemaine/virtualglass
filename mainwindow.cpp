@@ -426,13 +426,6 @@ void MainWindow :: newColorBar()
 
 void MainWindow :: newPullPlan()
 {
-	/*
-	 This (old) code duplicates the current cane:
-	 PullPlan* oldEditorPlan = pullPlanEditorWidget->getPlan();
-	 // Create the new plan
-	 PullPlan* newEditorPlan = oldEditorPlan->copy();
-	*/
-
 	Color* color = new Color;
 	*color = make_vector(1.0f, 1.0f, 1.0f, 0.0f); //clear
 	PullPlan *newEditorPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
