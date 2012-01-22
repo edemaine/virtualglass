@@ -284,27 +284,15 @@ void Mesher :: meshPickupCasingSlab(Geometry* geometry, PullPlan* colorPlan, flo
 	Vector2f p;
 	vector< Vector2f > points;
 		
-	for (unsigned int i = 0; i < 10; ++i)
-	{
-		p.x = 4.999;
-		p.y = -thickness - 0.01 + (2 * thickness + 0.02) * i / 10.0;
-		points.push_back(p);
-	}
 	for (unsigned int i = 0; i < slabResolution; ++i)
 	{
-		p.x = 4.999 - 9.888* i / slabResolution;
+		p.x = 4.999 - 9.998* i / (slabResolution-1);
 		p.y = thickness + 0.01;
 		points.push_back(p);
 	}
-	for (unsigned int i = 0; i < 10; ++i)
-	{
-		p.x = -4.999;
-		p.y = thickness + 0.01 - (2 * thickness + 0.02) * i / 10.0;
-		points.push_back(p);
-	}
 	for (unsigned int i = 0; i < slabResolution; ++i)
 	{
-		p.x = -4.999 + 9.888 * i / slabResolution;
+		p.x = -4.999 + 9.998 * i / (slabResolution-1);
 		p.y = -thickness - 0.01;
 		points.push_back(p);
 	}
@@ -319,143 +307,103 @@ void Mesher :: meshPickupCasingSlab(Geometry* geometry, PullPlan* colorPlan, flo
 			tris[i].c[2] = i+2;
 		}
 	}
-	vector< vector< unsigned int > > loops;
-	{ //make edge loops, given tris:
-		EdgeMap next_edge;
-		//First, make it easy to walk around edges:
-		for (vector< Vector3ui >::const_iterator tri = tris.begin(); tri != tris.end(); ++tri) {
-			for (unsigned int i = 0; i < 3; ++i) {
-				unsigned int a = tri->c[i];
-				unsigned int b = tri->c[(i+1)%3];
-				unsigned int c = tri->c[(i+2)%3];
-				//do edges incident to vertex b:
-				//next_edge[(a,b)] = (b,c)
-				assert(!next_edge.count(make_vector(a,b)));
-				next_edge.insert(make_pair(make_vector(a,b),make_vector(b,c)));
-			}
-		}
-		EdgeSet outside_edges;
-		for (EdgeMap::const_iterator n = next_edge.begin(); n != next_edge.end(); ++n) {
-			Vector2ui e = n->first;
-			//any edge without a reverse is an outside edge:
-			if (!next_edge.count(make_vector(e[1],e[0]))) {
-				outside_edges.insert(e);
-			}
-		}
-		while (!outside_edges.empty()) {
-			assert(outside_edges.size() >= 3);
 
-			Vector2ui seed = *outside_edges.begin();
-			outside_edges.erase(outside_edges.begin());
-			vector< unsigned int > loop;
-			Vector2ui edge = seed;
-			while (1) {
-				//Add edge to loop:
-				loop.push_back(edge[0]);
-				//Walk to next edge in triangle:
-				EdgeMap::iterator f = next_edge.find(edge);
-				assert(f != next_edge.end());
-				edge = f->second;
-				//Follow adjacent triangles:
-				while ((f = next_edge.find(make_vector(edge[1],edge[0]))) != next_edge.end()) {
-					edge = f->second;
-				}
-				//Should darn well lead to an outside edge:
-				EdgeSet::iterator o = outside_edges.find(edge);
-				if (o == outside_edges.end()) {
-					//we looped.
-					assert(edge == seed);
-					break;
-				} else {
-					outside_edges.erase(o);
-				}
-			}
-			assert(loop.size() >= 3);
-
-			loops.push_back(loop);
-		} //while there are still edge loops to walk.
-	}
-	for (vector< vector< unsigned int > >::const_iterator loop = loops.begin(); loop != loops.end(); ++loop)
+	unsigned int base = geometry->vertices.size();
+	for (unsigned int i = 0; i < slabResolution; ++i)
 	{
-		unsigned int base = geometry->vertices.size();
-		for (unsigned int i = 0; i < slabResolution; ++i)
-		{
-			for (unsigned int j = 0; j < loop->size(); ++j)
-			{
-				Point p;
-				p.xy = points[(*loop)[j]];
-				if (i == 0)
-					p.z = -4.999;
-				else
-					p.z = -5.0 + 9.999 * i / (slabResolution-1);
-				Point n;
-				//This is a terrible normal estimate, but I guess it gets re-estimated anyway.
-				n.x = p.x;
-				n.y = p.y;
-				n.z = 0.0f;
-				geometry->vertices.push_back(Vertex(p,n));
-			}
-		}
-		//Generate triangles linking them:
-		for (unsigned int i = 0; i + 1 < slabResolution; ++i)
-		{
-			for (unsigned int j = 0; j < loop->size(); ++j)
-			{
-				uint32_t p1 = base + i * loop->size() + j;
-				uint32_t p2 = base + (i+1) * loop->size() + j;
-				uint32_t p3 = base + i * loop->size() + (j+1) % loop->size();
-				uint32_t p4 = base + (i+1) * loop->size() + (j+1) % loop->size();
-				// Four points that define a (non-flat) quad are used
-				// to create two triangles.
-				geometry->triangles.push_back(Triangle(p2, p1, p4));
-				geometry->triangles.push_back(Triangle(p1, p3, p4));
-			}
-		}
-	} //for (loops)
-	assert(geometry->valid());
-
-#ifdef UNDEF
-	/*
-	Draw the polygon bottom, then top.
-	The mesh uses a set of n-2 triangles with a common vertex
-	to draw a regular n-gon.
-	*/
-	for (int side = 0; side <= 1; ++side) 
-	{
-		float z;
-		if (side)
-			z = 5.0;
-		else
-			z = -5.0;
-		float nz = (side ? 1.0:-1.0);
-		uint32_t base = geometry->vertices.size();
 		for (unsigned int j = 0; j < points.size(); ++j)
 		{
 			Point p;
 			p.xy = points[j];
-			p.z = z;
-
+			if (i == 0)
+				p.z = -4.999;
+			else
+				p.z = -4.999 + 9.998 * i / (slabResolution-1);
 			Point n;
-			n.x = 0.0; n.y = 0.0; n.z = nz;
-			geometry->vertices.push_back(Vertex(p, n));
-		}
-		if (side)
-		{
-			for (unsigned int j = 0; j < tris.size(); ++j)
-			{
-				geometry->triangles.push_back(Triangle(base + tris[j].c[0], base + tris[j].c[1], base + tris[j].c[2]));
-			}
-		}
-		else
-		{
-			for (unsigned int j = 0; j < tris.size(); ++j)
-			{
-				geometry->triangles.push_back(Triangle(base + tris[j].c[0], base + tris[j].c[2], base + tris[j].c[1]));
-			}
+			//This is a terrible normal estimate, but I guess it gets re-estimated anyway.
+			n.x = p.x;
+			n.y = p.y;
+			n.z = 0.0f;
+			geometry->vertices.push_back(Vertex(p,n));
 		}
 	}
+	//Generate triangles linking them:
+	for (unsigned int i = 0; i + 1 < slabResolution; ++i)
+	{
+		for (unsigned int j = 0; j < slabResolution-1; ++j)
+		{
+			uint32_t p1 = base + i * 2 * slabResolution + j;
+			uint32_t p2 = base + (i+1) * 2 * slabResolution + j;
+			uint32_t p3 = base + i * 2 * slabResolution + j+1;
+			uint32_t p4 = base + (i+1) * 2 * slabResolution + j+1;
+			// Four points that define a (non-flat) quad are used
+			// to create two triangles.
+			geometry->triangles.push_back(Triangle(p2, p1, p4));
+			geometry->triangles.push_back(Triangle(p1, p3, p4));
+		}
+		for (unsigned int j = slabResolution; j < 2 * slabResolution - 1; ++j)
+		{
+			uint32_t p1 = base + i * 2 * slabResolution + j;
+			uint32_t p2 = base + (i+1) * 2 * slabResolution + j;
+			uint32_t p3 = base + i * 2 * slabResolution + j+1;
+			uint32_t p4 = base + (i+1) * 2 * slabResolution + j+1;
+			// Four points that define a (non-flat) quad are used
+			// to create two triangles.
+			geometry->triangles.push_back(Triangle(p2, p1, p4));
+			geometry->triangles.push_back(Triangle(p1, p3, p4));
+		}
+	}
+
 	assert(geometry->valid());
-#endif
+
+	base = geometry->vertices.size();
+	for (unsigned int j = 0; j < points.size(); ++j)
+	{
+		Point p;
+		p.xy = points[j];
+		p.z = -4.99;
+
+		Point n;
+		n.x = 0.0; n.y = 0.0; n.z = -1.0;
+		geometry->vertices.push_back(Vertex(p, n));
+	}
+	for (unsigned int j = 0; j < slabResolution; ++j)
+	{
+		uint32_t p1 = base + j;
+		uint32_t p2 = base + j+1;
+		uint32_t p3 = base + 2 * slabResolution-1 - j;
+		uint32_t p4 = base + 2 * slabResolution-1 - (j+1);
+		// Four points that define a (non-flat) quad are used
+		// to create two triangles.
+		geometry->triangles.push_back(Triangle(p2, p1, p4));
+		geometry->triangles.push_back(Triangle(p1, p3, p4));
+	}
+	
+	base = geometry->vertices.size();
+	for (unsigned int j = 0; j < points.size(); ++j)
+	{
+		Point p;
+		p.xy = points[j];
+		p.z = 4.99;
+
+		Point n;
+		n.x = 0.0; n.y = 0.0; n.z = 1.0;
+		geometry->vertices.push_back(Vertex(p, n));
+	}
+	for (unsigned int j = 0; j < slabResolution-1; ++j)
+	{
+		uint32_t p1 = base + j;
+		uint32_t p2 = base + j+1;
+		uint32_t p3 = base + 2 * slabResolution-1 - j;
+		uint32_t p4 = base + 2 * slabResolution-1 - (j+1);
+		// Four points that define a (non-flat) quad are used
+		// to create two triangles.
+		geometry->triangles.push_back(Triangle(p1, p2, p4));
+		geometry->triangles.push_back(Triangle(p1, p4, p3));
+	}
+	
+	assert(geometry->valid());
+
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
 		first_vert, geometry->vertices.size() - first_vert, colorPlan, true, -1));
 }
@@ -702,6 +650,7 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>*
 				break;
 		}
 	}	
+
 }
 
 void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
