@@ -43,7 +43,13 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	if (type == COLOR_BAR_MIME) // if you drop a color, you're specifying the underlay color
 	{
                 event->accept();
-		pickup->underlayColorPlan->setColor(droppedPlan->getColor());
+                if (event->pos().x() < 10 || event->pos().x() > width()-10
+			|| event->pos().y() < 10 || event->pos().y() > height()-10)
+		{
+			pickup->underlayColorPlan->setColor(droppedPlan->getColor());
+		}
+		else
+			pickup->overlayColorPlan->setColor(droppedPlan->getColor());
 		emit someDataChanged();
                 return;  
 	}

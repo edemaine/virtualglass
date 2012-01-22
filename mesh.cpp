@@ -272,7 +272,7 @@ Vertex Mesher :: applyTransforms(Vertex v, vector<PullPlan*>* ancestors, vector<
 typedef map< Vector2ui, Vector2ui > EdgeMap;
 typedef set< Vector2ui > EdgeSet;
 
-void Mesher :: meshPickupCasingSlab(Geometry* geometry, PullPlan* colorPlan, float thickness)
+void Mesher :: meshPickupCasingSlab(Geometry* geometry, PullPlan* colorPlan, float y, float thickness)
 {
 	unsigned int slabResolution = 100;
 
@@ -287,13 +287,13 @@ void Mesher :: meshPickupCasingSlab(Geometry* geometry, PullPlan* colorPlan, flo
 	for (unsigned int i = 0; i < slabResolution; ++i)
 	{
 		p.x = 4.999 - 9.998* i / (slabResolution-1);
-		p.y = thickness + 0.01;
+		p.y = y + thickness + 0.01;
 		points.push_back(p);
 	}
 	for (unsigned int i = 0; i < slabResolution; ++i)
 	{
 		p.x = -4.999 + 9.998 * i / (slabResolution-1);
-		p.y = -thickness - 0.01;
+		p.y = y + -thickness - 0.01;
 		points.push_back(p);
 	}
 
@@ -681,7 +681,8 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPla
 			}
 		}
 	}
-	meshPickupCasingSlab(geometry, plan->underlayColorPlan, plan->subtemps[0]->width*2.5);
+	meshPickupCasingSlab(geometry, plan->overlayColorPlan, 0.0, plan->subtemps[0]->width*2.5 + 0.02);
+	meshPickupCasingSlab(geometry, plan->underlayColorPlan, 0.08 + plan->subtemps[0]->width*2.5, 0.05);
 }
 
 
