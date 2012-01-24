@@ -625,35 +625,36 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>*
 
 	geometry->clear();
 	
-	generateMesh(piece->pickup, geometry, ancestors, ancestorIndices);		
-	
-	Vertex* v;
-        for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
-        {
-		v = &(geometry->vertices[i]);
-		switch (piece->getTemplate()->type)
-		{
-			case VASE_PIECE_TEMPLATE:
-				applyVaseTransform(v, &(piece->getTemplate()->parameterValues));
-				break;
-			case TUMBLER_PIECE_TEMPLATE:
-				applyTumblerTransform(v, &(piece->getTemplate()->parameterValues));
-				break;
-			case BOWL_PIECE_TEMPLATE:
-				applyBowlTransform(v, &(piece->getTemplate()->parameterValues));
-				break;
-			case POT_PIECE_TEMPLATE:
-				applyPotTransform(v, &(piece->getTemplate()->parameterValues));
-				break;
-			case WAVY_PLATE_PIECE_TEMPLATE:
-				applyWavyPlateTransform(v, &(piece->getTemplate()->parameterValues));
-				break;
-		}
+	generateMesh(piece->pickup, geometry, false, ancestors, ancestorIndices);		
+
+	switch (piece->getTemplate()->type)
+	{
+		case VASE_PIECE_TEMPLATE:
+			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
+				applyVaseTransform(&(geometry->vertices[i]), &(piece->getTemplate()->parameterValues));
+			break;
+		case TUMBLER_PIECE_TEMPLATE:
+			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
+				applyTumblerTransform(&(geometry->vertices[i]), &(piece->getTemplate()->parameterValues));
+			break;
+		case BOWL_PIECE_TEMPLATE:
+			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
+				applyBowlTransform(&(geometry->vertices[i]), &(piece->getTemplate()->parameterValues));
+			break;
+		case POT_PIECE_TEMPLATE:
+			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
+				applyPotTransform(&(geometry->vertices[i]), &(piece->getTemplate()->parameterValues));
+			break;
+		case WAVY_PLATE_PIECE_TEMPLATE:
+			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
+				applyWavyPlateTransform(&(geometry->vertices[i]), &(piece->getTemplate()->parameterValues));
+			break;
+
 	}	
 
 }
 
-void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
+void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, bool ignoreCasing, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
 {
 	if (plan == NULL)
 		return;
@@ -664,7 +665,7 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, vector<PullPla
 		ancestors->clear();
 		ancestorIndices->clear();
 		generateMesh(plan->subplans[i], plan->subplans[i]->getShape(), geometry, 
-			ancestors, ancestorIndices, 0.0, plan->subtemps[i]->length, true, i); 
+			ancestors, ancestorIndices, 0.0, plan->subtemps[i]->length, ignoreCasing, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
 		{
@@ -701,11 +702,9 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry* geometry)
 	totalCaneLength = computeTotalCaneLength(plan);
         vector<PullPlan*> ancestors;
         vector<int> ancestorIndices;
-	generateMesh(plan, geometry, &ancestors, &ancestorIndices);
+	generateMesh(plan, geometry, true, &ancestors, &ancestorIndices);
 	geometry->compute_normals_from_triangles();
 }
-
-
 
 void Mesher :: generatePullMesh(PullPlan* plan, Geometry* geometry)
 {
