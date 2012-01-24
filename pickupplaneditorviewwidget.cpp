@@ -18,6 +18,11 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWi
 	layout->addWidget(niceViewWidget);
 }
 
+int PickupPlanEditorViewWidget :: getFillRule()
+{
+	return this->fillRule;
+}
+
 void PickupPlanEditorViewWidget :: setFillRule(int r)
 {
 	this->fillRule = r;

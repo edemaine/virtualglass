@@ -682,9 +682,9 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, bool ignoreCas
 			}
 		}
 	}
-	meshPickupCasingSlab(geometry, plan->overlayColorPlan, 0.0, plan->subtemps[0]->width*2.5 + 0.02);
+	meshPickupCasingSlab(geometry, plan->overlayColorPlan, 0.0, plan->subtemps[0]->width*2.5 + 0.01);
 	if (plan->useUnderlay)
-		meshPickupCasingSlab(geometry, plan->underlayColorPlan, 0.08 + plan->subtemps[0]->width*2.5, 0.05);
+		meshPickupCasingSlab(geometry, plan->underlayColorPlan, plan->subtemps[0]->width*2.5 + 0.01 + 0.06, 0.05);
 }
 
 

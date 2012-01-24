@@ -10,6 +10,11 @@ PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* pa
 	fill_rule = SINGLE_FILL_RULE;
 }
 
+int PullPlanEditorViewWidget :: getFillRule()
+{
+	return fill_rule;
+}
+
 void PullPlanEditorViewWidget :: setFillRule(int r)
 {
 	fill_rule = r;

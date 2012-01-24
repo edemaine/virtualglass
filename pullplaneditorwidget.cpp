@@ -18,6 +18,9 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 
 void PullPlanEditorWidget :: updateEverything()
 {
+        static_cast<QCheckBox*>(fillRuleButtonGroup->button(
+                viewWidget->getFillRule()))->setCheckState(Qt::Checked);
+
         static_cast<QCheckBox*>(shapeButtonGroup->button(
                 plan->getShape()))->setCheckState(Qt::Checked);
 
@@ -85,7 +88,26 @@ void PullPlanEditorWidget :: setupLayout()
 
         editorLayout->addWidget(viewWidget, 0);
 
-
+	QHBoxLayout* fillRuleLayout = new QHBoxLayout(this);
+        fillRuleLayout->addWidget(new QLabel("Fill rule:", this), 1);
+        QCheckBox* singleCheckBox = new QCheckBox("Single");
+        QCheckBox* eoCheckBox = new QCheckBox("Every other");
+        QCheckBox* etCheckBox = new QCheckBox("Every third");
+        QCheckBox* gCheckBox = new QCheckBox("Group");
+        QCheckBox* aCheckBox = new QCheckBox("All");
+        fillRuleButtonGroup = new QButtonGroup();
+        fillRuleButtonGroup->addButton(singleCheckBox, 1);
+        fillRuleButtonGroup->addButton(eoCheckBox, 2);
+        fillRuleButtonGroup->addButton(etCheckBox, 3);
+        fillRuleButtonGroup->addButton(gCheckBox, 4);
+        fillRuleButtonGroup->addButton(aCheckBox, 5);
+	fillRuleLayout->addWidget(singleCheckBox, 1);
+	fillRuleLayout->addWidget(eoCheckBox, 1);
+	fillRuleLayout->addWidget(etCheckBox, 1);
+	fillRuleLayout->addWidget(gCheckBox, 1);
+	fillRuleLayout->addWidget(aCheckBox, 1);
+	editorLayout->addLayout(fillRuleLayout, 1);
+	
         // Setup pull template scrolling library
         QWidget* templateLibraryWidget = new QWidget(this);
         templateLibraryLayout = new QHBoxLayout(templateLibraryWidget);
@@ -102,16 +124,6 @@ void PullPlanEditorWidget :: setupLayout()
         editorLayout->addWidget(pullTemplateLibraryScrollArea, 0);
 
         QHBoxLayout* pullTemplateShapeLayout = new QHBoxLayout(this);
-
-	pullTemplateShapeLayout->addWidget(new QLabel("Fill rule:", this));
-	fillComboBox = new QComboBox(this);
-	// these need to be in the same order as the fill rules in constants.h
-	fillComboBox->addItem("Single");
-	fillComboBox->addItem("Every other");
-	fillComboBox->addItem("Every third");
-	fillComboBox->addItem("Group");
-	fillComboBox->addItem("All");
-	pullTemplateShapeLayout->addWidget(fillComboBox);
         QLabel* casingLabel = new QLabel("Casing:");
         QCheckBox* circleCheckBox = new QCheckBox("Circle");
         QCheckBox* squareCheckBox = new QCheckBox("Square");
@@ -238,14 +250,14 @@ void PullPlanEditorWidget :: addCasingButtonPressed()
 	emit newPullPlan(superplan);
 }
 
-void PullPlanEditorWidget :: fillComboBoxChanged(int)
+void PullPlanEditorWidget :: fillRuleButtonGroupChanged(int)
 {
-	viewWidget->setFillRule(fillComboBox->currentIndex()+1);
+	viewWidget->setFillRule(fillRuleButtonGroup->checkedId());
 }
 
 void PullPlanEditorWidget :: setupConnections()
 {
-	connect(fillComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(fillComboBoxChanged(int)));
+	connect(fillRuleButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(fillRuleButtonGroupChanged(int)));
 	connect(addCasingButton, SIGNAL(pressed()), this, SLOT(addCasingButtonPressed()));
         connect(shapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(shapeButtonGroupChanged(int)));
         connect(casingThicknessSlider, SIGNAL(valueChanged(int)),

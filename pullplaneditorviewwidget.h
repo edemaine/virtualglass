@@ -14,6 +14,7 @@ class PullPlanEditorViewWidget : public QWidget
 		PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent=0);
 		void setPullPlan(PullPlan* plan);
 		void setFillRule(int r);
+		int getFillRule();
 	
 	signals:
 		void someDataChanged();

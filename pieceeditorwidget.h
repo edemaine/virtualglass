@@ -38,7 +38,7 @@ class PieceEditorWidget : public QWidget
 
 	private slots:
 		void underlayCheckBoxChanged(int);
-		void fillComboBoxChanged(int);
+		void fillRuleButtonGroupChanged(int);
                 void pieceTemplateParameterSlider1Changed(int);
                 void pieceTemplateParameterSlider2Changed(int);
                 void pieceTemplateParameterSlider3Changed(int);
@@ -53,7 +53,7 @@ class PieceEditorWidget : public QWidget
 		NiceViewWidget* niceViewWidget;
 
 		QCheckBox* underlayCheckBox;
-		QComboBox* fillComboBox;
+		QButtonGroup* fillRuleButtonGroup;
                 QLabel* pickupTemplateParameter1Label;
                 QSpinBox* pickupParameter1SpinBox;
                 QSlider* pickupParameter1Slider;

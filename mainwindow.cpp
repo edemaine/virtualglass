@@ -19,7 +19,7 @@ MainWindow :: MainWindow()
         show();
 
         seedEverything();
-        //editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
+        editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
         emit someDataChanged();
         whatToDoLabel->setText("Click a library item at left to edit/view.");
 }

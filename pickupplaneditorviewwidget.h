@@ -19,6 +19,7 @@ class PickupPlanEditorViewWidget : public QWidget
 		void setPickup(PickupPlan* p);
 		QPixmap getPixmap();
 		void setFillRule(int r);
+		int getFillRule();
 	
 	signals:
 		void someDataChanged();
