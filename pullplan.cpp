@@ -8,7 +8,7 @@ PullPlan :: PullPlan(int templateType, Color* color)
 	this->color = color;
 	this->twist = 0.0;
         this->casingThickness = 0.1;
-        this->templateType = -1;
+        this->templateType = -1; // to guarantee setTemplateType goes through
 	setTemplateType(templateType);
 }
 
