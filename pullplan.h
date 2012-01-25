@@ -6,6 +6,7 @@
 class PullPlanLibraryWidget;
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <vector>
 #include "pulltemplate.h"
 
