@@ -3,11 +3,14 @@
 #define SUBPICKUPTEMPLATE_H
 
 #include "primitives.h"
+#include "pullplan.h"
 
 class SubpickupTemplate
 {
 	public:
-		SubpickupTemplate(Point location, int orientation, float length, float width, int shape, int group);
+		SubpickupTemplate(PullPlan* plan, Point location, int orientation, 
+			float length, float width, int shape, int group);
+		PullPlan* plan;
 		Point location;
 		int orientation;
 		float length;

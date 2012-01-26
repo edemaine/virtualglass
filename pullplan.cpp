@@ -22,13 +22,13 @@ PullPlan* PullPlan :: copy()
 
 	for (unsigned int i = 0; i < this->parameterNames.size(); ++i)
 	{
-		c->parameterNames.push_back(this->parameterNames[i]);
-		c->parameterValues.push_back(this->parameterValues[i]);
+		c->parameterValues[i] = this->parameterValues[i];
 	}	
+	c->updateSubs(); 
 
-	for (unsigned int i = 0; i < this->subplans.size(); ++i)
+	for (unsigned int i = 0; i < this->subs.size(); ++i)
 	{
-		c->subplans.push_back(this->subplans[i]);
+		c->subs[i].plan = this->subs[i].plan;
 	}
 
 	return c;
@@ -42,9 +42,9 @@ bool PullPlan :: hasDependencyOn(PullPlan* plan)
 		return false;
 
         bool childrenAreDependent = false;
-        for (unsigned int i = 0; i < subplans.size(); ++i)
+        for (unsigned int i = 0; i < subs.size(); ++i)
         {
-                if (subplans[i]->hasDependencyOn(plan))
+                if (subs[i].plan->hasDependencyOn(plan))
                 {
                         childrenAreDependent = true;
                         break;
@@ -62,9 +62,9 @@ bool PullPlan :: hasDependencyOn(Color* color)
 		return false;
 
 	bool childrenAreDependent = false;
-	for (unsigned int i = 0; i < subplans.size(); ++i)
+	for (unsigned int i = 0; i < subs.size(); ++i)
 	{
-		if (subplans[i]->hasDependencyOn(color))
+		if (subs[i].plan->hasDependencyOn(color))
 		{
 			childrenAreDependent = true;
 			break;
@@ -87,7 +87,20 @@ void PullPlan :: setTemplateType(int templateType)
 		return;
 
 	this->templateType = templateType;
-	
+
+        // If the pull template has subplans and you
+        // haven't initialized your default subplans yet, do it
+        if (!isBase() && defaultCircleSubplan == NULL)
+        {
+                // initialize default subplans
+                Color* defaultColor;
+                defaultColor = new Color();
+                defaultColor->r = defaultColor->g = defaultColor->b = 1.0;
+                defaultColor->a = 0.0;
+                defaultCircleSubplan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, defaultColor);
+                defaultSquareSubplan = new PullPlan(SQUARE_BASE_PULL_TEMPLATE, defaultColor);
+        }
+
 	parameterNames.clear();
 	parameterValues.clear();
         char* tmp;
@@ -160,43 +173,14 @@ void PullPlan :: setTemplateType(int templateType)
                         break;
         }
 
-	updateSubtemps();
-
-	// If the pull template has subplans and you
-	// haven't initialized your default subplans yet, do it
-	if (subtemps.size() > 0
-		&& defaultCircleSubplan == NULL)
-	{
-		// initialize default subplans
-		Color* defaultColor;
-		defaultColor = new Color();
-		defaultColor->r = defaultColor->g = defaultColor->b = 1.0;
-		defaultColor->a = 0.0;
-		defaultCircleSubplan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, defaultColor);
-		defaultSquareSubplan = new PullPlan(SQUARE_BASE_PULL_TEMPLATE, defaultColor);
-	}
-
-	// create the new subplans based on template
-	this->subplans.clear();
-	for (unsigned int i = 0; i < subtemps.size(); ++i)
-	{
-		switch (subtemps[i].shape)
-		{
-			case CIRCLE_SHAPE:
-				subplans.push_back(defaultCircleSubplan);
-				break;
-			case SQUARE_SHAPE:
-				subplans.push_back(defaultSquareSubplan);
-				break;
-		}
-	}
+	subs.clear(); // don't carry over any of the current stuff
+	updateSubs();
 }
 
 void PullPlan :: setShape(int shape)
 {
 	this->shape = shape;
-	updateSubtemps();
-	updateSubplans();
+	updateSubs();
 }
 
 int PullPlan :: getShape()
@@ -232,8 +216,7 @@ int PullPlan :: getTemplateType()
 void PullPlan :: setParameter(int p, int v)
 {
         parameterValues[p] = v;
-        updateSubtemps();
-	updateSubplans();
+        updateSubs();
 }
 
 int PullPlan :: getParameter(int p)
@@ -254,8 +237,7 @@ unsigned int PullPlan :: getParameterCount()
 void PullPlan :: setCasingThickness(float t)
 {
 	this->casingThickness = t;
-	updateSubtemps();
-	updateSubplans();
+	updateSubs();
 }
 
 float PullPlan :: getCasingThickness()
@@ -263,47 +245,47 @@ float PullPlan :: getCasingThickness()
 	return this->casingThickness;	
 }
 
-void PullPlan :: updateSubplans()
+
+void PullPlan :: pushNewSubpull(vector<SubpullTemplate>* newSubs, 
+	int shape, Point p, float diameter, int group)
 {
-        // This fixes the subplans to correspond to a change in the pickup template
-        // Eventually, template changes should go through a function in the 
-        // pickup plan to ensure the changes are made no matter what. So it goes.
-        if (this->subplans.size() > this->subtemps.size())
-        {
-                while (this->subplans.size() > this->subtemps.size())
-                {
-                        this->subplans.pop_back();
-                }
-                return;
-        }
-        else if (this->subplans.size() < this->subtemps.size())
-        {
-                while (this->subplans.size() < this->subtemps.size())
-                {
-                        this->subplans.push_back(this->subplans.back());
-                }
-                return;
-        }
+	if (newSubs->size() < subs.size())
+	{
+		newSubs->push_back(SubpullTemplate(subs[newSubs->size()].plan, CIRCLE_SHAPE, p, diameter, group));
+	}
+	else // you've run out of existing subplans copy from
+	{
+		switch (shape)
+		{
+			case CIRCLE_SHAPE:
+				newSubs->push_back(SubpullTemplate(defaultCircleSubplan, CIRCLE_SHAPE, p, diameter, group));
+				break;
+			case SQUARE_SHAPE:
+				newSubs->push_back(SubpullTemplate(defaultSquareSubplan, SQUARE_SHAPE, p, diameter, group));
+				break;
+		}
+	}
 }
 
-void PullPlan :: updateSubtemps()
+void PullPlan :: updateSubs()
 {
         Point p;
         float radius = 1.0 - casingThickness;
 
-        subtemps.clear();
+	vector<SubpullTemplate> newSubs;
+
         p.x = p.y = p.z = 0.0;
         switch (this->templateType)
         {
                 case CASED_CIRCLE_PULL_TEMPLATE:
-                        subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, radius * 2.0, 0));
+                        pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, radius * 2.0, 0);
                         break;
                 case CASED_SQUARE_PULL_TEMPLATE:
                         if (this->shape == CIRCLE_SHAPE)
                         {
                                 radius *= 1.0 / pow(2, 0.5);
                         }
-                        subtemps.push_back(SubpullTemplate(SQUARE_SHAPE, p, radius * 2.0, 0));
+                        pushNewSubpull(&newSubs, SQUARE_SHAPE, p, radius * 2.0, 0);
                         break;
                 case HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE:
                 {
@@ -312,7 +294,7 @@ void PullPlan :: updateSubtemps()
                         {
                                 float littleRadius = (2 * radius / count) / 2;
                                 p.x = -radius + littleRadius + i * 2 * littleRadius;
-                                subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2.0, 0));
+                                pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
                         }
                         break;
                 }
@@ -326,7 +308,7 @@ void PullPlan :: updateSubtemps()
                         {
                                 float littleRadius = (2 * radius / count) / 2;
                                 p.x = -radius + littleRadius + i * 2 * littleRadius;
-                                subtemps.push_back(SubpullTemplate(SQUARE_SHAPE, p, littleRadius * 2.0, 0));
+                                pushNewSubpull(&newSubs, SQUARE_SHAPE, p, littleRadius * 2.0, 0);
                         }
                         break;
                 }
@@ -337,12 +319,12 @@ void PullPlan :: updateSubtemps()
                         float k = sin(theta/2) / (1 + sin(theta/2));
 
                         p.x = p.y = 0.0;
-                        subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, (1 - 2 * k) * 2 * radius, 0));
+                        pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, (1 - 2 * k) * 2 * radius, 0);
                         for (int i = 0; i < count; ++i)
                         {
                                 p.x = (1.0 - k) * radius * cos(TWO_PI / count * i);
                                 p.y = (1.0 - k) * radius * sin(TWO_PI / count * i);
-                                subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 2 * k * radius, 0));
+                                pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * k * radius, 0);
                         }
                         break;
                 }
@@ -352,21 +334,21 @@ void PullPlan :: updateSubtemps()
 			float littleRadius = (radius / (count + 0.5)) / 2.0;
 
 			p.x = p.y = 0.0;
-			subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2.0, 0));
+			pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
                         for (int i = 0; i < count; ++i)
                         {
                                 p.x = (i+1) * 2 * littleRadius;
                                 p.y = 0.0;
-                                subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2.0, 0));
+                                pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
                                 p.x = 0.0;
                                 p.y = (i+1) * 2 * littleRadius;
-                                subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2.0, 0));
+                                pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
                                 p.x = -((i+1) * 2 * littleRadius);
                                 p.y = 0.0;
-                                subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2.0, 0));
+                                pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
                                 p.x = 0.0;
                                 p.y = -((i+1) * 2 * littleRadius);
-                                subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2.0, 0));
+                                pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
                         }
                         break;
                 }
@@ -393,9 +375,9 @@ void PullPlan :: updateSubtemps()
 						p.x = -radius + littleRadius + 2 * littleRadius * i;
 						p.y = -radius + littleRadius + 2 * littleRadius * j;
 						if (this->templateType == SQUARE_OF_CIRCLES_PULL_TEMPLATE)
-							subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 2 * littleRadius, 0));
+							pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 0);
 						else
-							subtemps.push_back(SubpullTemplate(SQUARE_SHAPE, p, 2 * littleRadius, 0));
+							pushNewSubpull(&newSubs, SQUARE_SHAPE, p, 2 * littleRadius, 0);
 					}
 				}
 			}
@@ -407,14 +389,14 @@ void PullPlan :: updateSubtemps()
                         float littleRadius = radius / (2 * count - 1);
 
                         p.x = p.y = 0.0;
-                        subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 2 * littleRadius, 0));
+                        pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 0);
 			for (int i = 1; i < count; ++i)
 			{
 				for (int theta = 0; theta < 3; ++theta)
 				{
                                         p.x = (littleRadius * 2 * i) * cos(TWO_PI / 3 * theta);
                                         p.y = (littleRadius * 2 * i) * sin(TWO_PI / 3 * theta);
-                                        subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, littleRadius * 2, 0));
+                                        pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2, 0);
                                 }
                         }
                         break;
@@ -428,36 +410,38 @@ void PullPlan :: updateSubtemps()
                         float littleRadius = radius / (count + 2);
 
                         p.x = p.y = 0.0;
-                        subtemps.push_back(SubpullTemplate(SQUARE_SHAPE, p, 2 * littleRadius * count, 0));
+                        pushNewSubpull(&newSubs, SQUARE_SHAPE, p, 2 * littleRadius * count, 0);
                         for (int i = 0; i < count + 2; ++i)
                         {
 				p.x = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * i;
 				p.y = -2 * littleRadius * (count + 1) / 2.0;
-				subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 2 * littleRadius, 1));
+				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
                         }
                         for (int j = 1; j < count + 2; ++j)
                         {
 				p.x = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * (count + 1);
 				p.y = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * j;
-				subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 2 * littleRadius, 1));
+				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
                         }
                         for (int i = count; i >= 0; --i)
                         {
 				p.x = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * i;
 				p.y = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * (count + 1);
-				subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 2 * littleRadius, 1));
+				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
                         }
                         for (int j = count; j >= 0; --j)
                         {
 				p.x = -2 * littleRadius * (count+1) / 2.0;
 				p.y = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * j;
-				subtemps.push_back(SubpullTemplate(CIRCLE_SHAPE, p, 2 * littleRadius, 1));
+				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
                         }
 			
 
                         break;
                 }
         }
+
+	subs = newSubs;
 }
 
 

@@ -3,11 +3,15 @@
 #define SUBPULLTEMPLATE_H
 
 #include "primitives.h"
+#include "pullplan.h"
+
+class PullPlan;
 
 class SubpullTemplate
 {
 	public:
-		SubpullTemplate(int shape, Point location, float diameter, int group);
+		SubpullTemplate(PullPlan* plan, int shape, Point location, float diameter, int group);
+		PullPlan* plan;
 		int shape;
 		Point location;
 		float diameter;

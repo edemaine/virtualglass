@@ -13,6 +13,7 @@ class PullPlanLibraryWidget;
 using std::vector;
 
 class PullPlan;
+class SubpullTemplate;
 
 class PullPlan
 {
@@ -42,8 +43,7 @@ class PullPlan
 
 		PullPlan* copy();
 
-		vector<PullPlan*> subplans;
-                vector<SubpullTemplate> subtemps;
+                vector<SubpullTemplate> subs;
 
 		bool hasDependencyOn(Color* color);
 		bool hasDependencyOn(PullPlan* pullPlan);
@@ -63,8 +63,9 @@ class PullPlan
 
                 // Methods
                 void initializeTemplate();
-                void updateSubtemps();
-                void updateSubplans();
+                void updateSubs();
+                void pushNewSubpull(vector<SubpullTemplate>* newSubs,
+			int shape, Point location, float diameter, int group);
 };
 
 #endif

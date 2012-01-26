@@ -36,9 +36,9 @@ float Mesher :: computeTotalCaneLength(Piece* piece)
 float Mesher :: computeTotalCaneLength(PickupPlan* plan)
 {
 	float total = 0.0;
-	for (unsigned int i = 0; i < plan->subplans.size(); ++i)
+	for (unsigned int i = 0; i < plan->subs.size(); ++i)
 	{
-		total += computeTotalCaneLength(plan->subplans[i]) * plan->subtemps[i]->length / 2.0;
+		total += computeTotalCaneLength(plan->subs[i].plan) * plan->subs[i].length / 2.0;
 	}
 	return total;
 }
@@ -49,9 +49,9 @@ float Mesher :: computeTotalCaneLength(PullPlan* plan)
 		return 1.0;
 	
 	float total = 0.0;
-	for (unsigned int i = 0; i < plan->subplans.size(); ++i)
+	for (unsigned int i = 0; i < plan->subs.size(); ++i)
 	{
-		total += computeTotalCaneLength(plan->subplans[i]);
+		total += computeTotalCaneLength(plan->subs[i].plan);
 	}
 	return total;	
 }
@@ -73,7 +73,7 @@ void Mesher :: applyResizeTransform(Vertex* v, float scale)
 
 void Mesher :: applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int subplan)
 {
-	SubpullTemplate* subTemp = &(parentNode->subtemps[subplan]);
+	SubpullTemplate* subTemp = &(parentNode->subs[subplan]);
 	Point locationInParent = subTemp->location;
 	float diameter = subTemp->diameter;
 
@@ -660,12 +660,12 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, bool ignoreCas
 		return;
 
 	geometry->clear();
-	for (unsigned int i = 0; i < plan->subplans.size(); ++i)
+	for (unsigned int i = 0; i < plan->subs.size(); ++i)
 	{
 		ancestors->clear();
 		ancestorIndices->clear();
-		generateMesh(plan->subplans[i], plan->subplans[i]->getShape(), geometry, 
-			ancestors, ancestorIndices, 0.0, plan->subtemps[i]->length, ignoreCasing, i); 
+		generateMesh(plan->subs[i].plan, plan->subs[i].plan->getShape(), geometry, 
+			ancestors, ancestorIndices, 0.0, plan->subs[i].length, ignoreCasing, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
 		{
@@ -677,14 +677,14 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, bool ignoreCas
 				for (uint32_t v = subpullGroup->vertex_begin; 
 					v < subpullGroup->vertex_begin + subpullGroup->vertex_size; ++v)
 				{
-					applyPickupTransform(&(geometry->vertices[v]), plan->subtemps[i]);
+					applyPickupTransform(&(geometry->vertices[v]), &(plan->subs[i]));
 				}
 			}
 		}
 	}
-	meshPickupCasingSlab(geometry, plan->overlayColorPlan, 0.0, plan->subtemps[0]->width*2.5 + 0.01);
+	meshPickupCasingSlab(geometry, plan->overlayColorPlan, 0.0, plan->subs[0].width*2.5 + 0.01);
 	if (plan->useUnderlay)
-		meshPickupCasingSlab(geometry, plan->underlayColorPlan, plan->subtemps[0]->width*2.5 + 0.01 + 0.06, 0.05);
+		meshPickupCasingSlab(geometry, plan->underlayColorPlan, plan->subs[0].width*2.5 + 0.01 + 0.06, 0.05);
 }
 
 
@@ -766,7 +766,7 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 	}
 	else 
 	{
-		for (unsigned int i = 0; i < plan->subplans.size(); ++i)
+		for (unsigned int i = 0; i < plan->subs.size(); ++i)
 		{
 			if (groupIndex == -1)
 				passGroupIndex = i;
@@ -774,7 +774,7 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 				passGroupIndex = groupIndex;
 
 			ancestorIndices->push_back(i);
-			generateMesh(plan->subplans[i], plan->subtemps[i].shape, geometry, ancestors, 
+			generateMesh(plan->subs[i].plan, plan->subs[i].shape, geometry, ancestors, 
 				ancestorIndices, offset - 0.001, length + 0.001, false, passGroupIndex);
 			ancestorIndices->pop_back();
 		}

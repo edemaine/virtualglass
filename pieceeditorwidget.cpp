@@ -360,17 +360,6 @@ void PieceEditorWidget :: setPickupParameter(int param, int value)
 	emit someDataChanged();
 }
 
-void PieceEditorWidget :: setPickupSubplans(PullPlan* s)
-{
-	piece->pickup->subplans.clear();
-        for (unsigned int i = 0; i < piece->pickup->subtemps.size(); ++i)
-        {
-                piece->pickup->subplans.push_back(s);
-        }
-	emit someDataChanged();
-}
-
-
 void PieceEditorWidget :: setPieceTemplate(PieceTemplate* t)
 {
 	piece->setTemplate(t);

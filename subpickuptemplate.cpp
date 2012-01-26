@@ -2,8 +2,9 @@
 
 #include "subpickuptemplate.h"
 
-SubpickupTemplate :: SubpickupTemplate(Point location, int orientation, float length, float width, int shape, int group)
+SubpickupTemplate :: SubpickupTemplate(PullPlan* plan, Point location, int orientation, float length, float width, int shape, int group)
 {
+	this->plan = plan;
 	this->location = location;
 	this->orientation = orientation;
 	this->length = length;

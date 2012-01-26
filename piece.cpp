@@ -12,9 +12,9 @@ bool Piece :: hasDependencyOn(PullPlan* plan)
 {
         bool pickupPlansDependOn = false;
 
-        for (unsigned int i = 0; i < this->pickup->subplans.size(); ++i)
+        for (unsigned int i = 0; i < this->pickup->subs.size(); ++i)
         {
-                if (this->pickup->subplans[i]->hasDependencyOn(plan))
+                if (this->pickup->subs[i].plan->hasDependencyOn(plan))
                 {
                         pickupPlansDependOn = true;
                         break;
@@ -29,9 +29,9 @@ bool Piece :: hasDependencyOn(Color* color)
 {
 	bool pickupPlansDependOn = false;
 
-	for (unsigned int i = 0; i < this->pickup->subplans.size(); ++i)
+	for (unsigned int i = 0; i < this->pickup->subs.size(); ++i)
 	{
-		if (this->pickup->subplans[i]->hasDependencyOn(color))
+		if (this->pickup->subs[i].plan->hasDependencyOn(color))
 		{
 			pickupPlansDependOn = true;		
 			break;

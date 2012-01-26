@@ -69,9 +69,9 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 
 	int hitIndex = -1;
 	float hitDepth = -100.0;
-	for (unsigned int i = 0; i < pickup->subtemps.size(); ++i)
+	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
 	{
-		SubpickupTemplate* sp = pickup->subtemps[i];
+		SubpickupTemplate* sp = &(pickup->subs[i]);
 		Point ll, ur;
 
 		switch (sp->orientation)
@@ -116,12 +116,12 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			if (hitIndex == -1)
 			{
 				hitIndex = i;
-				hitDepth = pickup->subtemps[i]->location.z;
+				hitDepth = pickup->subs[i].location.z;
 			}
-			else if (hitDepth > pickup->subtemps[i]->location.z)
+			else if (hitDepth > pickup->subs[i].location.z)
 			{
 				hitIndex = i;
-				hitDepth = pickup->subtemps[i]->location.z;
+				hitDepth = pickup->subs[i].location.z;
 			}
 		}
 	}
@@ -135,35 +135,35 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	{
 		case SINGLE_FILL_RULE:
 		{
-			pickup->subplans[hitIndex] = droppedPlan;
+			pickup->subs[hitIndex].plan = droppedPlan;
 			break;
 		}
 		case ALL_FILL_RULE:
 		{
-			for (unsigned int j = 0; j < pickup->subplans.size(); ++j)
-				pickup->subplans[j] = droppedPlan;
+			for (unsigned int j = 0; j < pickup->subs.size(); ++j)
+				pickup->subs[j].plan = droppedPlan;
 			break;
 		}
 		case GROUP_FILL_RULE:
 		{
-			int group = pickup->subtemps[hitIndex]->group;
-			for (unsigned int j = hitIndex; j < pickup->subtemps.size(); ++j)
+			int group = pickup->subs[hitIndex].group;
+			for (unsigned int j = hitIndex; j < pickup->subs.size(); ++j)
 			{
-				if (pickup->subtemps[j]->group == group)
-					pickup->subplans[j] = droppedPlan;
+				if (pickup->subs[j].group == group)
+					pickup->subs[j].plan = droppedPlan;
 			}
 			break;
 		}
 		case EVERY_OTHER_FILL_RULE:
 		{
 			bool parity = true;
-			int group = pickup->subtemps[hitIndex]->group;
-			for (unsigned int j = hitIndex; j < pickup->subtemps.size(); ++j)
+			int group = pickup->subs[hitIndex].group;
+			for (unsigned int j = hitIndex; j < pickup->subs.size(); ++j)
 			{
-				if (pickup->subtemps[j]->group == group)
+				if (pickup->subs[j].group == group)
 				{
 					if (parity)
-						pickup->subplans[j] = droppedPlan;
+						pickup->subs[j].plan = droppedPlan;
 					parity = !parity;
 				}
 			}
@@ -172,13 +172,13 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		case EVERY_THIRD_FILL_RULE:
 		{
 			int triarity = 0;
-			int group = pickup->subtemps[hitIndex]->group;
-			for (unsigned int j = hitIndex; j < pickup->subtemps.size(); ++j)
+			int group = pickup->subs[hitIndex].group;
+			for (unsigned int j = hitIndex; j < pickup->subs.size(); ++j)
 			{
-				if (pickup->subtemps[j]->group == group)
+				if (pickup->subs[j].group == group)
 				{
 					if (triarity == 0)
-						pickup->subplans[j] = droppedPlan;
+						pickup->subs[j].plan = droppedPlan;
 					triarity = (triarity + 1) % 3;
 				}
 			}
@@ -210,11 +210,11 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 	pen.setWidth(3);
 	painter.setPen(pen);
 	
-	for (unsigned int i = 0; i < pickup->subtemps.size(); ++i)
+	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
 	{
-		if (pickup->subplans[i]->isBase())
+		if (pickup->subs[i].plan->isBase())
 		{
-			Color* c = pickup->subplans[i]->getColor();
+			Color* c = pickup->subs[i].plan->getColor();
 			painter.setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
 			pen.setStyle(Qt::NoPen);
 		}
@@ -226,7 +226,7 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 		}
 		painter.setPen(pen);
 
-		SubpickupTemplate* sp = pickup->subtemps[i];
+		SubpickupTemplate* sp = &(pickup->subs[i]);
                 Point ll;
 		float rWidth, rHeight;
                 switch (sp->orientation)

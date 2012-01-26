@@ -22,7 +22,6 @@ class PullPlanEditorWidget : public QWidget
 		void setPlan(PullPlan* p);
 		void updateLibraryWidgetPixmaps(PullPlanLibraryWidget* w);
 		void seedTemplates();
-		void setPlanSubplans(PullPlan* plan);
 		void setPlanColor(Color* c);
 		void setPlanTwist(int t);
 		void setPlanTemplate(int templateType);

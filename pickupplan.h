@@ -25,15 +25,15 @@ class PickupPlan
 
 		PickupPlan* copy();
 
-		vector<PullPlan*> subplans;
-                vector<SubpickupTemplate*> subtemps;
+		vector<SubpickupTemplate> subs;
 		PullPlan* overlayColorPlan;
 		PullPlan* underlayColorPlan;
 		bool useUnderlay;
 
 	private:
-		void updateSubplans();
-                void updateSubtemps();
+		void updateSubs();
+		void pushNewSubplan(vector<SubpickupTemplate>* newSubs, Point location,
+			int orientation, float length, float width, int shape, int group); 
 		int templateType;	
                 vector<int> parameterValues;
                 vector<char*> parameterNames;

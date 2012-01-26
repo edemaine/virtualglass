@@ -40,9 +40,9 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 
 	int drawSize = width() - 20;
 	// check to see if the drop was in a subpull
-	for (unsigned int i = 0; i < plan->subtemps.size(); ++i)
+	for (unsigned int i = 0; i < plan->subs.size(); ++i)
 	{
-		SubpullTemplate* subpull = &(plan->subtemps[i]);
+		SubpullTemplate* subpull = &(plan->subs[i]);
 
 		// Determine if drop hit the subplan
 		bool hit = false;
@@ -80,35 +80,35 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		{
 			case SINGLE_FILL_RULE:
 			{
-				plan->subplans[i] = droppedPlan;
+				plan->subs[i].plan = droppedPlan;
 				break;
 			}
 			case ALL_FILL_RULE:
 			{
-				for (unsigned int j = 0; j < plan->subplans.size(); ++j)
-					plan->subplans[j] = droppedPlan;
+				for (unsigned int j = 0; j < plan->subs.size(); ++j)
+					plan->subs[j].plan = droppedPlan;
 				break;
 			}
 			case GROUP_FILL_RULE:
 			{
-				int group = plan->subtemps[i].group;
-				for (unsigned int j = i; j < plan->subtemps.size(); ++j)
+				int group = plan->subs[i].group;
+				for (unsigned int j = i; j < plan->subs.size(); ++j)
 				{
-					if (plan->subtemps[j].group == group)
-						plan->subplans[j] = droppedPlan;
+					if (plan->subs[j].group == group)
+						plan->subs[j].plan = droppedPlan;
 				}
 				break;
 			}
 			case EVERY_OTHER_FILL_RULE:
 			{
-				int group = plan->subtemps[i].group;
+				int group = plan->subs[i].group;
 				bool parity = true;
-                                for (unsigned int j = i; j < plan->subtemps.size(); ++j)
+                                for (unsigned int j = i; j < plan->subs.size(); ++j)
                                 {
-                                        if (plan->subtemps[j].group == group)
+                                        if (plan->subs[j].group == group)
 					{
 						if (parity)
-							plan->subplans[j] = droppedPlan;
+							plan->subs[j].plan = droppedPlan;
 						parity = !parity;
 					}
                                 }
@@ -116,14 +116,14 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			}
                         case EVERY_THIRD_FILL_RULE:
                         {
-                                int group = plan->subtemps[i].group;
+                                int group = plan->subs[i].group;
                                 int triarity = 0;
-                                for (unsigned int j = i; j < plan->subtemps.size(); ++j)
+                                for (unsigned int j = i; j < plan->subs.size(); ++j)
                                 {
-                                        if (plan->subtemps[j].group == group)
+                                        if (plan->subs[j].group == group)
                                         {       
                                                 if (triarity == 0)
-                                                        plan->subplans[j] = droppedPlan;
+                                                        plan->subs[j].plan = droppedPlan;
                                                 triarity = (triarity + 1) % 3;
                                         }
                                 }
@@ -244,16 +244,16 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		return;
 
 	// Recurse
-	for (unsigned int i = plan->subtemps.size()-1; i < plan->subtemps.size(); --i)
+	for (unsigned int i = plan->subs.size()-1; i < plan->subs.size(); --i)
 	{
-		SubpullTemplate* subpull = &(plan->subtemps[i]);
+		SubpullTemplate* sub = &(plan->subs[i]);
 
-		float rX = x + (subpull->location.x - subpull->diameter/2.0) * drawWidth/2 + drawWidth/2;
-		float rY = y + (subpull->location.y - subpull->diameter/2.0) * drawWidth/2 + drawHeight/2;
-		float rWidth = subpull->diameter * drawWidth/2;
-		float rHeight = subpull->diameter * drawHeight/2;
+		float rX = x + (sub->location.x - sub->diameter/2.0) * drawWidth/2 + drawWidth/2;
+		float rY = y + (sub->location.y - sub->diameter/2.0) * drawWidth/2 + drawHeight/2;
+		float rWidth = sub->diameter * drawWidth/2;
+		float rHeight = sub->diameter * drawHeight/2;
 
-		drawSubplan(rX, rY, rWidth, rHeight, plan->subplans[i], plan->subtemps[i].shape, 
+		drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, plan->subs[i].shape, 
 			borderLevels-1, painter);
 	}
 }
