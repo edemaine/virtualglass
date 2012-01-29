@@ -54,6 +54,7 @@ void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 void PullPlanEditorViewWidget :: mouseReleaseEvent(QMouseEvent* /*event*/)
 {
 	isDraggingCasing = false;
+	emit someDataChanged();
 }
 
 void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
@@ -81,9 +82,6 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	int type;
 	sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &droppedPlan, &type);
 
-	subplansHighlighted.clear();
-	casingHighlighted = false;
-
 	populateHighlightedSubplans(event->pos().x(), event->pos().y(), droppedPlan, type);
 	if (subplansHighlighted.size() > 0)
 	{
@@ -91,19 +89,22 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		for (unsigned int i = 0; i < subplansHighlighted.size(); ++i)
 		{
 			plan->subs[subplansHighlighted[i]].plan = droppedPlan;
-			emit someDataChanged();
-			return;
+		}
+	}
+	else
+	{
+		populateIsCasingHighlighted(event->pos().x(), event->pos().y(), type);
+		if (casingHighlighted)
+		{
+			event->accept();
+			plan->setColor(droppedPlan->getColor());
 		}
 	}
 
-	populateIsCasingHighlighted(event->pos().x(), event->pos().y(), type);
-	if (casingHighlighted)
-	{
-		event->accept();
-		plan->setColor(droppedPlan->getColor());
-		emit someDataChanged();
-		return;
-	}
+	subplansHighlighted.clear();
+	casingHighlighted = false;
+	emit someDataChanged();
+
 }
 
 
