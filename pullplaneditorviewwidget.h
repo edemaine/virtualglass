@@ -22,11 +22,12 @@ class PullPlanEditorViewWidget : public QWidget
 	protected:
 		void dragEnterEvent(QDragEnterEvent* dee);
 		void dropEvent(QDropEvent* de);
+		void dragMoveEvent(QDragMoveEvent* dme);
 		void paintEvent(QPaintEvent *event);
 
 	private:
 		void drawSubplan(float x, float y, float width, float height, PullPlan* plan, 
-			int mandatedShape, int borderLevels, QPainter* painter);
+			int mandatedShape, int borderLevels, QPainter* painter, int index);
 		PullPlan* plan;
 		int fill_rule;
 };

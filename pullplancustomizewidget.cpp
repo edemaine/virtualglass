@@ -86,6 +86,7 @@ void PullPlanCustomizeWidget :: setPullPlan(PullPlan* plan)
 void PullPlanCustomizeWidget :: openWindow(PullPlan* plan)
 {
 	viewWidget->setPullPlan(plan);
+	viewWidget->setMouseTracking(true);
 	this->show();
 }
 

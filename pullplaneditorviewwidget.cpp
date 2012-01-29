@@ -27,6 +27,11 @@ void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 
 void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
+	// deactivate any highlighting
+	for (unsigned int i = 0; i<plan->subs.size(); ++i)
+	{
+		plan->deactivate((int)i);
+	}
 	event->setDropAction(Qt::CopyAction);
 
 	PullPlan* droppedPlan;
@@ -167,6 +172,160 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	}
 }
 
+void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
+{
+	// deactivate any highlighting
+	for (unsigned int i = 0; i<plan->subs.size(); ++i)
+	{
+		plan->deactivate((int)i);
+	}
+	PullPlan* droppedPlan;
+	int type;
+	sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &droppedPlan, &type);
+	if (!(type == COLOR_BAR_MIME || type == PULL_PLAN_MIME))
+		return;
+
+	if (droppedPlan->hasDependencyOn(plan)) // don't allow circular DAGs
+		return;
+
+	int drawSize = width() - 20;
+	// check to see if the drop was in a subpull
+	for (unsigned int i = 0; i < plan->subs.size(); ++i)
+	{
+		SubpullTemplate* subpull = &(plan->subs[i]);
+
+		// Determine if drop hit the subplan
+		bool hit = false;
+		float dx = fabs(event->pos().x() - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
+		float dy = fabs(event->pos().y() - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
+		switch (subpull->shape)
+		{
+			case CIRCLE_SHAPE:
+				if (pow(double(dx*dx + dy*dy), 0.5) < (subpull->diameter/2.0)*drawSize/2)
+					hit = true;
+				break;
+			case SQUARE_SHAPE:
+				if (MAX(dx, dy) < (subpull->diameter/2.0)*drawSize/2)
+					hit = true;
+				break;
+		}
+
+		if (!hit)
+		{
+			plan->deactivate((int)i);
+			continue;
+		}
+
+		// If the dropped plan is a complex plan and its casing shape doesn't match the shape of the
+		// subplan, reject
+		if (type == PULL_PLAN_MIME)
+		{
+			if (subpull->shape != droppedPlan->getShape())
+			{
+				plan->deactivate((int)i);
+				continue;
+			}
+		}
+
+		event->accept();
+
+		// If the shift button is down, fill in the entire group
+		switch (fill_rule)
+		{
+			case SINGLE_FILL_RULE:
+			{
+				plan->activate((int)i);
+				break;
+			}
+			case ALL_FILL_RULE:
+			{
+				for (unsigned int j = 0; j < plan->subs.size(); ++j)
+					plan->activate((int)j);
+				break;
+			}
+			case GROUP_FILL_RULE:
+			{
+				int group = plan->subs[i].group;
+				for (unsigned int j = i; j < plan->subs.size(); ++j)
+				{
+					if (plan->subs[j].group == group)
+						plan->activate((int)j);
+				}
+				break;
+			}
+			case EVERY_OTHER_FILL_RULE:
+			{
+				int group = plan->subs[i].group;
+				bool parity = true;
+				for (unsigned int j = i; j < plan->subs.size(); ++j)
+				{
+					if (plan->subs[j].group == group)
+					{
+						if (parity)
+							plan->activate((int)j);
+						parity = !parity;
+					}
+				}
+				break;
+			}
+						case EVERY_THIRD_FILL_RULE:
+						{
+								int group = plan->subs[i].group;
+								int triarity = 0;
+								for (unsigned int j = i; j < plan->subs.size(); ++j)
+								{
+										if (plan->subs[j].group == group)
+										{
+												if (triarity == 0)
+														plan->activate((int)j);
+												triarity = (triarity + 1) % 3;
+										}
+								}
+						break;
+			}
+		}
+
+		this->update();
+		return;
+	}
+
+	// don't allow complex pulls to be casing
+	if (type == PULL_PLAN_MIME)
+	{
+//		plan->setActivated(false);
+		this->update();
+		return;
+	}
+
+	// Deal w/casing
+	float distanceFromCenter;
+	switch (plan->getShape())
+	{
+		case CIRCLE_SHAPE:
+			distanceFromCenter = sqrt(pow(double(event->pos().x() - drawSize/2 + 10), 2.0)
+				+ pow(double(event->pos().y() - drawSize/2 + 10), 2.0));
+			if (distanceFromCenter <= drawSize/2)
+			{
+				event->accept();
+//				plan->setActivated(true);
+				this->update();
+				return;
+			}
+			break;
+		case SQUARE_SHAPE:
+			if (10 <= event->pos().x() && event->pos().x() <= drawSize
+				&& 10 <= event->pos().y() && event->pos().y() <= drawSize)
+			{
+				event->accept();
+//				plan->setActivated(true);
+				this->update();
+				return;
+			}
+			break;
+	}
+	this->update();
+}
+
 void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan)
 {
 	this->plan = plan;
@@ -174,7 +333,7 @@ void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan)
 
 
 void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, float drawHeight, 
-	PullPlan* plan, int mandatedShape, int borderLevels, QPainter* painter)
+	PullPlan* plan, int mandatedShape, int borderLevels, QPainter* painter, int index=-1)
 {
 	// Fill the subplan area with some `cleared out' color
 	painter->setBrush(QColor(200, 200, 200));
@@ -218,7 +377,10 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	{
 		QPen pen;
 		pen.setWidth(borderLevels*2+1);
-		pen.setColor(Qt::black);
+		if (this->plan->isActivated(index))
+			pen.setColor(Qt::white);
+		else
+			pen.setColor(Qt::black);
 		painter->setPen(pen);
 	}
 	else
@@ -254,7 +416,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		float rHeight = sub->diameter * drawHeight/2;
 
 		drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, plan->subs[i].shape, 
-			borderLevels-1, painter);
+			borderLevels-1, painter, i);
 	}
 }
 

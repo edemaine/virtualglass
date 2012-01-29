@@ -45,6 +45,8 @@ macx {
 
 # Input
 HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
+    pullplancustomizeviewwidget.h \
+    pullplancustomizewidget.h
 
 HEADERS += primitives.h constants.h Vector.hpp \ 
 	pullplan.h pulltemplate.h subpulltemplate.h pickupplan.h \
@@ -108,6 +110,8 @@ HEADERS += yaml-cpp/src/token.h \
 	yaml-cpp/src/collectionstack.h \
 
 SOURCES += glew/glew.c \
+    pullplancustomizeviewwidget.cpp \
+    pullplancustomizewidget.cpp
 
 SOURCES += main.cpp \ 
 	pullplan.cpp subpulltemplate.cpp \

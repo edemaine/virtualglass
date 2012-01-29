@@ -48,6 +48,10 @@ class PullPlan
 		bool hasDependencyOn(Color* color);
 		bool hasDependencyOn(PullPlan* pullPlan);
 
+		void activate(int i);
+		void deactivate(int i);
+		bool isActivated(int i);
+
 	private:
 		// Variables
 		PullPlan* defaultCircleSubplan;
@@ -60,6 +64,8 @@ class PullPlan
 		Color* color;
                 vector<int> parameterValues;
                 vector<char*> parameterNames;
+
+		vector<bool>* activated;
 
                 // Methods
                 void initializeTemplate();

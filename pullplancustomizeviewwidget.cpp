@@ -6,7 +6,6 @@ PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget
 	setAcceptDrops(true);
 	setFixedSize(500, 500);
 	setPullPlan(plan);
-	this->setMouseTracking(true);
 	Color* color = new Color;
 	color->r = color->g = color->b = 1.0;
 	color->a = 1.0;
@@ -46,7 +45,7 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 					anyHit = true;
 					if (hoveringIndex != (int)i)
 					{
-						if (hoveringIndex != 1)
+						if (hoveringIndex != -1)
 						{
 							plan->subs[hoveringIndex].plan = hoveringPlan;
 						}
@@ -63,7 +62,7 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 					anyHit = true;
 					if (hoveringIndex != (int)i)
 					{
-						if (hoveringIndex != 1)
+						if (hoveringIndex != -1)
 						{
 							plan->subs[hoveringIndex].plan = hoveringPlan;
 						}
@@ -81,17 +80,19 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 		}
 
 		event->accept();
+		this->update();
 		return;
 	}
 	plan->subs[hoveringIndex].plan = hoveringPlan;
 	hoveringIndex = -1;
+	this->update();
 	return;
 }
 
 void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
 {
 	this->plan = plan->copy();
-	if (this->plan->getShape() == SQUARE_SHAPE)
+	if (plan->getShape() == SQUARE_SHAPE)
 	{
 		this->plan->setTemplateType(CUSTOM_SQUARE_PULL_TEMPLATE);
 	}
@@ -99,6 +100,7 @@ void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
 	{
 		this->plan->setTemplateType(CUSTOM_CIRCLE_PULL_TEMPLATE);
 	}
+	this->plan->subs = plan->subs;
 	hoveringIndex = -1;
 }
 
