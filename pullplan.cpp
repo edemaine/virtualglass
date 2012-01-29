@@ -10,7 +10,6 @@ PullPlan :: PullPlan(int templateType, Color* color)
         this->casingThickness = 0.1;
         this->templateType = -1; // to guarantee setTemplateType goes through
 	setTemplateType(templateType);
-	activated = new vector<bool>(this->subs.size(),false);
 }
 
 PullPlan* PullPlan :: copy()
@@ -20,10 +19,6 @@ PullPlan* PullPlan :: copy()
 	c->casingThickness = this->casingThickness;
 	c->twist = this->twist;
 	c->color = this->color;
-	for (unsigned int i = 0; i < this->activated->size(); ++i)
-	{
-		c->activated[i] = this->activated[i];
-	}
 
 	for (unsigned int i = 0; i < this->parameterNames.size(); ++i)
 	{
@@ -256,26 +251,6 @@ float PullPlan :: getCasingThickness()
 	return this->casingThickness;	
 }
 
-void PullPlan :: activate(int i)
-{
-	if (i >= 0 && i < (int)activated->size())
-		this->activated->at(i) = true;
-}
-
-void PullPlan :: deactivate(int i)
-{
-	if (i >= 0 && i < (int)activated->size())
-		this->activated->at(i) = false;
-}
-
-bool PullPlan :: isActivated(int i)
-{
-	if (i >= 0 && i < (int)activated->size())
-		return this->activated->at(i);
-	return false;
-}
-
-
 void PullPlan :: pushNewSubpull(vector<SubpullTemplate>* newSubs, 
 	int shape, Point p, float diameter, int group)
 {
@@ -295,8 +270,6 @@ void PullPlan :: pushNewSubpull(vector<SubpullTemplate>* newSubs,
 				break;
 		}
 	}
-//	Possible memory leak?
-	activated = new vector<bool>(this->subs.size(),false);
 }
 
 void PullPlan :: updateSubs()
@@ -474,8 +447,6 @@ void PullPlan :: updateSubs()
         }
 
 	subs = newSubs;
-//	Possible memory leak?
-	activated = new vector<bool>(this->subs.size(),false);
 }
 
 

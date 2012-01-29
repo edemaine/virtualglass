@@ -3,8 +3,11 @@
 #define PULLPLANEDITORVIEWWIDGET_H
 
 #include <QtGui>
+#include <vector>
 #include "constants.h"
 #include "pullplan.h"
+
+using std::vector;
 
 class PullPlanEditorViewWidget : public QWidget
 {
@@ -30,10 +33,14 @@ class PullPlanEditorViewWidget : public QWidget
 
 	private:
 		void drawSubplan(float x, float y, float width, float height, PullPlan* plan, 
-			int mandatedShape, int borderLevels, QPainter* painter, int index);
+			bool highlightThis, int mandatedShape, int borderLevels, QPainter* painter);
 		PullPlan* plan;
 		int fill_rule;
 		bool isDraggingCasing;
+		void populateHighlightedSubplans(int x, int y, PullPlan* plan, int type);
+		void populateIsCasingHighlighted(int x, int y, int type);
+		bool casingHighlighted;
+		vector<unsigned int> subplansHighlighted; 
 };
 
 

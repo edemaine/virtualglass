@@ -9,6 +9,7 @@ PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* pa
 	this->plan = plan;
 	fill_rule = SINGLE_FILL_RULE;
 	isDraggingCasing = false;
+	casingHighlighted = false;
 }
 
 int PullPlanEditorViewWidget :: getFillRule()
@@ -55,163 +56,61 @@ void PullPlanEditorViewWidget :: mouseReleaseEvent(QMouseEvent* /*event*/)
 	isDraggingCasing = false;
 }
 
+void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
+{
+	PullPlan* draggedPlan;
+	int type;
+	sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &draggedPlan, &type);
+
+	subplansHighlighted.clear();
+	casingHighlighted = false;
+
+	populateHighlightedSubplans(event->pos().x(), event->pos().y(), draggedPlan, type);
+	if (subplansHighlighted.size() == 0)
+	{
+		populateIsCasingHighlighted(event->pos().x(), event->pos().y(), type);
+	}
+	emit someDataChanged();
+}
+
+
+
 void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
-	// deactivate any highlighting
-	for (unsigned int i = 0; i<plan->subs.size(); ++i)
-	{
-		plan->deactivate((int)i);
-	}
-	event->setDropAction(Qt::CopyAction);
-
 	PullPlan* droppedPlan;
 	int type;
 	sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &droppedPlan, &type);
-	if (!(type == COLOR_BAR_MIME || type == PULL_PLAN_MIME))
-		return;
 
-	if (droppedPlan->hasDependencyOn(plan)) // don't allow circular DAGs
-		return;
+	subplansHighlighted.clear();
+	casingHighlighted = false;
 
-	int drawSize = width() - 20;
-	// check to see if the drop was in a subpull
-	for (unsigned int i = 0; i < plan->subs.size(); ++i)
+	populateHighlightedSubplans(event->pos().x(), event->pos().y(), droppedPlan, type);
+	if (subplansHighlighted.size() > 0)
 	{
-		SubpullTemplate* subpull = &(plan->subs[i]);
-
-		// Determine if drop hit the subplan
-		bool hit = false;
-		float dx = fabs(event->pos().x() - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
-		float dy = fabs(event->pos().y() - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
-		switch (subpull->shape)
-		{
-			case CIRCLE_SHAPE:
-				if (pow(double(dx*dx + dy*dy), 0.5) < (subpull->diameter/2.0)*drawSize/2)
-					hit = true;
-				break;
-			case SQUARE_SHAPE:
-				if (MAX(dx, dy) < (subpull->diameter/2.0)*drawSize/2)
-					hit = true;
-				break;	
-		}
-		
-		if (!hit)
-			continue;
-
-		// If the dropped plan is a complex plan and its casing shape doesn't match the shape of the
-		// subplan, reject
-		if (type == PULL_PLAN_MIME)
-		{
-			if (subpull->shape != droppedPlan->getShape())
-			{
-				continue;
-			}
-		}
-
 		event->accept();
-
-		// If the shift button is down, fill in the entire group
-		switch (fill_rule)
+		for (unsigned int i = 0; i < subplansHighlighted.size(); ++i)
 		{
-			case SINGLE_FILL_RULE:
-			{
-				plan->subs[i].plan = droppedPlan;
-				break;
-			}
-			case ALL_FILL_RULE:
-			{
-				for (unsigned int j = 0; j < plan->subs.size(); ++j)
-					plan->subs[j].plan = droppedPlan;
-				break;
-			}
-			case GROUP_FILL_RULE:
-			{
-				int group = plan->subs[i].group;
-				for (unsigned int j = i; j < plan->subs.size(); ++j)
-				{
-					if (plan->subs[j].group == group)
-						plan->subs[j].plan = droppedPlan;
-				}
-				break;
-			}
-			case EVERY_OTHER_FILL_RULE:
-			{
-				int group = plan->subs[i].group;
-				bool parity = true;
-                                for (unsigned int j = i; j < plan->subs.size(); ++j)
-                                {
-                                        if (plan->subs[j].group == group)
-					{
-						if (parity)
-							plan->subs[j].plan = droppedPlan;
-						parity = !parity;
-					}
-                                }
-				break;
-			}
-                        case EVERY_THIRD_FILL_RULE:
-                        {
-                                int group = plan->subs[i].group;
-                                int triarity = 0;
-                                for (unsigned int j = i; j < plan->subs.size(); ++j)
-                                {
-                                        if (plan->subs[j].group == group)
-                                        {       
-                                                if (triarity == 0)
-                                                        plan->subs[j].plan = droppedPlan;
-                                                triarity = (triarity + 1) % 3;
-                                        }
-                                }
-				break;
-                        }
+			plan->subs[subplansHighlighted[i]].plan = droppedPlan;
+			emit someDataChanged();
+			return;
 		}
+	}
 
+	populateIsCasingHighlighted(event->pos().x(), event->pos().y(), type);
+	if (casingHighlighted)
+	{
+		event->accept();
+		plan->setColor(droppedPlan->getColor());
 		emit someDataChanged();
 		return;
 	}
-
-	// don't allow complex pulls to be casing
-	if (type == PULL_PLAN_MIME)
-		return;
-
-	// Deal w/casing
-	float distanceFromCenter;
-	switch (plan->getShape())
-	{
-		case CIRCLE_SHAPE:
-			distanceFromCenter = sqrt(pow(double(event->pos().x() - drawSize/2 + 10), 2.0) 
-				+ pow(double(event->pos().y() - drawSize/2 + 10), 2.0));
-			if (distanceFromCenter <= drawSize/2)
-			{
-				event->accept();
-				plan->setColor(droppedPlan->getColor());
-				emit someDataChanged();
-				return;
-			}
-			break;
-		case SQUARE_SHAPE:
-			if (10 <= event->pos().x() && event->pos().x() <= drawSize 
-				&& 10 <= event->pos().y() && event->pos().y() <= drawSize)
-			{
-				event->accept();
-				plan->setColor(droppedPlan->getColor());
-				emit someDataChanged();
-				return;
-			}
-			break;
-	}
 }
 
-void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
+
+void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, PullPlan* droppedPlan, int type)
 {
-	// deactivate any highlighting
-	for (unsigned int i = 0; i<plan->subs.size(); ++i)
-	{
-		plan->deactivate((int)i);
-	}
-	PullPlan* droppedPlan;
-	int type;
-	sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &droppedPlan, &type);
+	subplansHighlighted.clear();
+
 	if (!(type == COLOR_BAR_MIME || type == PULL_PLAN_MIME))
 		return;
 
@@ -226,8 +125,8 @@ void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 
 		// Determine if drop hit the subplan
 		bool hit = false;
-		float dx = fabs(event->pos().x() - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
-		float dy = fabs(event->pos().y() - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
+		float dx = fabs(x - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
+		float dy = fabs(y - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
 		switch (subpull->shape)
 		{
 			case CIRCLE_SHAPE:
@@ -241,10 +140,7 @@ void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 		}
 
 		if (!hit)
-		{
-			plan->deactivate((int)i);
 			continue;
-		}
 
 		// If the dropped plan is a complex plan and its casing shape doesn't match the shape of the
 		// subplan, reject
@@ -252,25 +148,22 @@ void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 		{
 			if (subpull->shape != droppedPlan->getShape())
 			{
-				plan->deactivate((int)i);
 				continue;
 			}
 		}
-
-		event->accept();
 
 		// If the shift button is down, fill in the entire group
 		switch (fill_rule)
 		{
 			case SINGLE_FILL_RULE:
 			{
-				plan->activate((int)i);
+				subplansHighlighted.push_back(i);	
 				break;
 			}
 			case ALL_FILL_RULE:
 			{
 				for (unsigned int j = 0; j < plan->subs.size(); ++j)
-					plan->activate((int)j);
+					subplansHighlighted.push_back(j);
 				break;
 			}
 			case GROUP_FILL_RULE:
@@ -279,7 +172,7 @@ void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 				for (unsigned int j = i; j < plan->subs.size(); ++j)
 				{
 					if (plan->subs[j].group == group)
-						plan->activate((int)j);
+						subplansHighlighted.push_back(j);
 				}
 				break;
 			}
@@ -292,68 +185,62 @@ void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 					if (plan->subs[j].group == group)
 					{
 						if (parity)
-							plan->activate((int)j);
+							subplansHighlighted.push_back(j);
 						parity = !parity;
 					}
 				}
 				break;
 			}
-						case EVERY_THIRD_FILL_RULE:
-						{
-								int group = plan->subs[i].group;
-								int triarity = 0;
-								for (unsigned int j = i; j < plan->subs.size(); ++j)
-								{
-										if (plan->subs[j].group == group)
-										{
-												if (triarity == 0)
-														plan->activate((int)j);
-												triarity = (triarity + 1) % 3;
-										}
-								}
-						break;
+			case EVERY_THIRD_FILL_RULE:
+			{
+				int group = plan->subs[i].group;
+				int triarity = 0;
+				for (unsigned int j = i; j < plan->subs.size(); ++j)
+				{
+					if (plan->subs[j].group == group)
+					{
+						if (triarity == 0)
+							subplansHighlighted.push_back(j);
+						triarity = (triarity + 1) % 3;
+					}
+				}
+				break;
 			}
 		}
-
-		this->update();
-		return;
 	}
+}
 
-	// don't allow complex pulls to be casing
-	if (type == PULL_PLAN_MIME)
-	{
-//		plan->setActivated(false);
-		this->update();
-		return;
-	}
+
+void PullPlanEditorViewWidget :: populateIsCasingHighlighted(int x, int y, int type)
+{
+	casingHighlighted = false;
+
+	if (type != COLOR_BAR_MIME)
+		return; 
 
 	// Deal w/casing
+	int drawSize = width() - 20;
 	float distanceFromCenter;
 	switch (plan->getShape())
 	{
 		case CIRCLE_SHAPE:
-			distanceFromCenter = sqrt(pow(double(event->pos().x() - drawSize/2 + 10), 2.0)
-				+ pow(double(event->pos().y() - drawSize/2 + 10), 2.0));
+			distanceFromCenter = sqrt(pow(double(x - drawSize/2 + 10), 2.0)
+				+ pow(double(y - drawSize/2 + 10), 2.0));
 			if (distanceFromCenter <= drawSize/2)
 			{
-				event->accept();
-//				plan->setActivated(true);
-				this->update();
+				casingHighlighted = true;
 				return;
 			}
 			break;
 		case SQUARE_SHAPE:
-			if (10 <= event->pos().x() && event->pos().x() <= drawSize
-				&& 10 <= event->pos().y() && event->pos().y() <= drawSize)
+			if (10 <= x && x <= drawSize
+				&& 10 <= y && y <= drawSize)
 			{
-				event->accept();
-//				plan->setActivated(true);
-				this->update();
+				casingHighlighted = true;
 				return;
 			}
 			break;
 	}
-	this->update();
 }
 
 void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan)
@@ -363,7 +250,8 @@ void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan)
 
 
 void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, float drawHeight, 
-	PullPlan* plan, int mandatedShape, int borderLevels, QPainter* painter, int index=-1)
+	PullPlan* plan, bool highlightThis, int mandatedShape, 
+	int borderLevels, QPainter* painter)
 {
 	// Fill the subplan area with some `cleared out' color
 	painter->setBrush(QColor(200, 200, 200));
@@ -377,7 +265,6 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 			painter->drawRect(x, y, drawWidth, drawHeight);
 			break;
 	}
-
 
 	// If it's a base color, fill region with color
 	if (plan->isBase())
@@ -403,11 +290,21 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	{
                 painter->setPen(Qt::NoPen);
 	}
-	else if (borderLevels > 0)
+	else if (borderLevels == 2)
 	{
 		QPen pen;
-		pen.setWidth(borderLevels*2+1);
-		if (this->plan->isActivated(index))
+		pen.setWidth(5);
+		if (highlightThis)
+			pen.setColor(Qt::white);
+		else
+			pen.setColor(Qt::black);
+		painter->setPen(pen);
+	}
+	else if (borderLevels == 1)
+	{
+		QPen pen;
+		pen.setWidth(3);
+		if (highlightThis)
 			pen.setColor(Qt::white);
 		else
 			pen.setColor(Qt::black);
@@ -421,7 +318,8 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		pen.setStyle(Qt::DotLine);
 		painter->setPen(pen);
 	}
-	painter->setBrush(QColor(255*plan->getColor()->r, 255*plan->getColor()->g, 255*plan->getColor()->b, 255*plan->getColor()->a));
+	painter->setBrush(QColor(255*plan->getColor()->r, 255*plan->getColor()->g, 
+		255*plan->getColor()->b, 255*plan->getColor()->a));
 	switch (mandatedShape)
 	{
 		case CIRCLE_SHAPE:
@@ -435,7 +333,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	if (plan->isBase())
 		return;
 
-	// Recurse
+	// Recurse. Draw unhighlighted subplans first
 	for (unsigned int i = plan->subs.size()-1; i < plan->subs.size(); --i)
 	{
 		SubpullTemplate* sub = &(plan->subs[i]);
@@ -445,8 +343,24 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		float rWidth = sub->diameter * drawWidth/2;
 		float rHeight = sub->diameter * drawHeight/2;
 
-		drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, plan->subs[i].shape, 
-			borderLevels-1, painter, i);
+		if (borderLevels == 2)
+		{
+			bool highlighted = false;
+			for (unsigned int j = 0; j < subplansHighlighted.size(); ++j)
+			{
+				if (subplansHighlighted[j] == i)
+					highlighted = true;
+			}
+			drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
+				highlighted, plan->subs[i].shape, 
+				borderLevels-1, painter);
+		}
+		else
+		{
+			drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
+				false, plan->subs[i].shape, 
+				borderLevels-1, painter);
+		}
 	}
 }
 
@@ -456,7 +370,7 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 	painter.begin(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 	painter.fillRect(event->rect(), QColor(200, 200, 200));
-	drawSubplan(10, 10, width() - 20, height() - 20, plan, plan->getShape(), 2, &painter);
+	drawSubplan(10, 10, width() - 20, height() - 20, plan, casingHighlighted, plan->getShape(), 2, &painter);
 	painter.end();
 }
 
