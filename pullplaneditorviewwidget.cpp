@@ -74,8 +74,6 @@ void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 	emit someDataChanged();
 }
 
-
-
 void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
 	PullPlan* droppedPlan;
@@ -391,12 +389,6 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 					true, plan->subs[i].shape, 
 					borderLevels-1, painter);
 			}
-		}
-		else
-		{
-			drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
-				false, plan->subs[i].shape, 
-				borderLevels-1, painter);
 		}
 	}
 }
