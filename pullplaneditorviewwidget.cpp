@@ -351,9 +351,45 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 				if (subplansHighlighted[j] == i)
 					highlighted = true;
 			}
+			if (!highlighted)
+			{
+				drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
+					false, plan->subs[i].shape, 
+					borderLevels-1, painter);
+			}
+		}
+		else
+		{
 			drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
-				highlighted, plan->subs[i].shape, 
+				false, plan->subs[i].shape, 
 				borderLevels-1, painter);
+		}
+	}
+
+	// Recurse. Now draw highlighted subplans 
+	for (unsigned int i = plan->subs.size()-1; i < plan->subs.size(); --i)
+	{
+		SubpullTemplate* sub = &(plan->subs[i]);
+
+		float rX = x + (sub->location.x - sub->diameter/2.0) * drawWidth/2 + drawWidth/2;
+		float rY = y + (sub->location.y - sub->diameter/2.0) * drawWidth/2 + drawHeight/2;
+		float rWidth = sub->diameter * drawWidth/2;
+		float rHeight = sub->diameter * drawHeight/2;
+
+		if (borderLevels == 2)
+		{
+			bool highlighted = false;
+			for (unsigned int j = 0; j < subplansHighlighted.size(); ++j)
+			{
+				if (subplansHighlighted[j] == i)
+					highlighted = true;
+			}
+			if (highlighted)
+			{
+				drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
+					true, plan->subs[i].shape, 
+					borderLevels-1, painter);
+			}
 		}
 		else
 		{
