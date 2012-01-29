@@ -40,7 +40,7 @@ void PullPlanCustomizeWidget :: setupLayout()
 	editorLayout->addLayout(windowControlsLayout, 0);
 }
 
-void PullPlanCustomizeWidget :: mousePressEvent(QMouseEvent* event)
+void PullPlanCustomizeWidget :: mousePressEvent(QMouseEvent* /*event*/)
 {
 /*	PullTemplateLibraryWidget* ptlw = dynamic_cast<PullTemplateLibraryWidget*>(childAt(event->pos()));
 

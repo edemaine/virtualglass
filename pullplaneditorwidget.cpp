@@ -26,10 +26,6 @@ void PullPlanEditorWidget :: updateEverything()
         static_cast<QCheckBox*>(shapeButtonGroup->button(
                 plan->getShape()))->setCheckState(Qt::Checked);
 
-        int thickness = (int) (plan->getCasingThickness() * 100);
-        casingThicknessSlider->setSliderPosition(thickness);
-        casingThicknessSpin->setValue(thickness);
-
         int twist = plan->getTwist();
         twistSlider->setSliderPosition(twist);
         twistSpin->setValue(twist);
@@ -139,29 +135,6 @@ void PullPlanEditorWidget :: setupLayout()
         pullTemplateShapeLayout->addWidget(addCasingButton);
         editorLayout->addLayout(pullTemplateShapeLayout, 0);
 
-        // Casing thickness slider stuff
-        QHBoxLayout* casingThicknessLayout = new QHBoxLayout(this);
-        editorLayout->addLayout(casingThicknessLayout);
-
-        QLabel* casingLabel1 = new QLabel("Casing Thickness:", this);
-        casingThicknessLayout->addWidget(casingLabel1, 0);
-
-        casingThicknessSpin = new QSpinBox(this);
-        casingThicknessSpin->setRange(1, 99);
-        casingThicknessSpin->setSingleStep(1);
-        casingThicknessLayout->addWidget(casingThicknessSpin, 1);
-
-        QLabel* casingLabel2 = new QLabel("0%", this);
-        casingThicknessLayout->addWidget(casingLabel2, 0);
-
-        casingThicknessSlider = new QSlider(Qt::Horizontal, this);
-        casingThicknessSlider->setRange(1, 99);
-        casingThicknessSlider->setSliderPosition(0);
-        casingThicknessLayout->addWidget(casingThicknessSlider, 10);
-
-        QLabel* casingLabel3 = new QLabel("100%", this);
-        casingThicknessLayout->addWidget(casingLabel3, 0);
-
         // Twist slider stuff
         QHBoxLayout* twistLayout = new QHBoxLayout(this);
         editorLayout->addLayout(twistLayout, 0);
@@ -266,10 +239,6 @@ void PullPlanEditorWidget :: setupConnections()
 	connect(fillRuleButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(fillRuleButtonGroupChanged(int)));
 	connect(addCasingButton, SIGNAL(pressed()), this, SLOT(addCasingButtonPressed()));
         connect(shapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(shapeButtonGroupChanged(int)));
-        connect(casingThicknessSlider, SIGNAL(valueChanged(int)),
-                this, SLOT(casingThicknessSliderChanged(int)));
-        connect(casingThicknessSpin, SIGNAL(valueChanged(int)),
-                this, SLOT(casingThicknessSpinChanged(int)));
         connect(twistSlider, SIGNAL(valueChanged(int)), this, SLOT(twistSliderChanged(int)));
         connect(twistSpin, SIGNAL(valueChanged(int)), this, SLOT(twistSpinChanged(int)));
 
@@ -299,26 +268,6 @@ void PullPlanEditorWidget :: paramSpinChanged(int)
 			emit someDataChanged();
 		}
 	}
-}
-
-void PullPlanEditorWidget :: casingThicknessSliderChanged(int)
-{
-        float thickness = casingThicknessSlider->sliderPosition() / 100.0;
-
-	if (thickness == plan->getCasingThickness())
-		return;
-        plan->setCasingThickness(thickness);
-        emit someDataChanged();
-}
-
-void PullPlanEditorWidget :: casingThicknessSpinChanged(int)
-{
-        float thickness = casingThicknessSpin->value() / 100.0;
-
-	if (thickness == plan->getCasingThickness())
-		return;
-        plan->setCasingThickness(thickness);
-        emit someDataChanged();
 }
 
 void PullPlanEditorWidget :: twistSliderChanged(int)

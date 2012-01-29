@@ -281,7 +281,7 @@ void PullPlan :: pushNewSubpull(vector<SubpullTemplate>* newSubs,
 {
 	if (newSubs->size() < subs.size())
 	{
-		newSubs->push_back(SubpullTemplate(subs[newSubs->size()].plan, CIRCLE_SHAPE, p, diameter, group));
+		newSubs->push_back(SubpullTemplate(subs[newSubs->size()].plan, shape, p, diameter, group));
 	}
 	else // you've run out of existing subplans copy from
 	{

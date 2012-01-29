@@ -8,6 +8,7 @@ PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* pa
 	setFixedSize(500, 500);
 	this->plan = plan;
 	fill_rule = SINGLE_FILL_RULE;
+	isDraggingCasing = false;
 }
 
 int PullPlanEditorViewWidget :: getFillRule()
@@ -23,6 +24,35 @@ void PullPlanEditorViewWidget :: setFillRule(int r)
 void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 {
 	event->acceptProposedAction();
+}
+
+void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
+{
+	float x = (event->pos().x() - width()/2);
+	float y = (event->pos().y() - height()/2);
+	float radius = sqrt(x * x + y * y) / (width()/2 - 10); 
+
+	if (fabs(radius - (1.0 - plan->getCasingThickness())) < 20)
+	{
+		isDraggingCasing = true; 
+	}
+}
+
+void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
+{
+	float x = (event->pos().x() - width()/2);
+	float y = (event->pos().y() - height()/2);
+	if (isDraggingCasing)
+	{
+		float radius = sqrt(x * x + y * y) / (width()/2 - 10); 
+		plan->setCasingThickness(MAX(1.0 - radius, 0));
+		emit someDataChanged();
+	}
+}
+
+void PullPlanEditorViewWidget :: mouseReleaseEvent(QMouseEvent* /*event*/)
+{
+	isDraggingCasing = false;
 }
 
 void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
