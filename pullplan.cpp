@@ -171,6 +171,12 @@ void PullPlan :: setTemplateType(int templateType)
                         parameterNames.push_back(tmp);
                         parameterValues.push_back(2);
                         break;
+				case CUSTOM_CIRCLE_PULL_TEMPLATE:
+						shape = CIRCLE_SHAPE;
+						break;
+				case CUSTOM_SQUARE_PULL_TEMPLATE:
+						shape = SQUARE_SHAPE;
+						break;
         }
 
 	subs.clear(); // don't carry over any of the current stuff

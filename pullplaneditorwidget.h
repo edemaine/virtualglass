@@ -11,6 +11,7 @@
 #include "niceviewwidget.h"
 #include "geometry.h"
 #include "mesh.h"
+#include "pullplancustomizewidget.h"
 
 class PullPlanEditorWidget : public QWidget
 {
@@ -45,12 +46,14 @@ class PullPlanEditorWidget : public QWidget
 		void casingThicknessSpinChanged(int);
 		void casingThicknessSliderChanged(int);
 		void paramSpinChanged(int);
+		void openCustomizeWidget();
 
 	private:
 		Geometry geometry;
 		Mesher mesher;
 		PullPlan* plan;
 		PullPlanEditorViewWidget* viewWidget;	
+		PullPlanCustomizeWidget* pullPlanCustomizeWidget;
 		NiceViewWidget* niceViewWidget;
 		QSpinBox* casingThicknessSpin;
 		QSlider* casingThicknessSlider;
@@ -62,6 +65,7 @@ class PullPlanEditorWidget : public QWidget
                 QButtonGroup* shapeButtonGroup;
         	QHBoxLayout* templateLibraryLayout;
 		QPushButton* addCasingButton;
+		QPushButton* customizePlanButton;
 
 		void setupLayout();
 		void setupConnections();

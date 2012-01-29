@@ -11,6 +11,8 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 	this->viewWidget = new PullPlanEditorViewWidget(plan, this);	
 	this->niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);
 	niceViewWidget->setGeometry(&geometry);
+	this->pullPlanCustomizeWidget = new PullPlanCustomizeWidget(this->getPlan());
+	this->pullPlanCustomizeWidget->hide();
 
 	setupLayout();
 	setupConnections();
@@ -202,6 +204,11 @@ void PullPlanEditorWidget :: setupLayout()
 	}
 	editorLayout->addLayout(paramLayout, 0);	
 
+	QHBoxLayout* customizePullTemplateLayout = new QHBoxLayout(this);
+	customizePlanButton = new QPushButton("Manually Customize");
+	customizePullTemplateLayout->addWidget(customizePlanButton);
+	editorLayout->addLayout(customizePullTemplateLayout, 0);
+
         // Little description for the editor
 	editorLayout->addStretch(1);
         QLabel* descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", this);
@@ -270,6 +277,7 @@ void PullPlanEditorWidget :: setupConnections()
 	{
 		connect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
 	}
+	connect(customizePlanButton, SIGNAL(pressed()),this,SLOT(openCustomizeWidget()));
 
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(viewWidgetDataChanged()));
@@ -395,6 +403,11 @@ void PullPlanEditorWidget :: updateLibraryWidgetPixmaps(PullPlanLibraryWidget* w
 	w->updatePixmaps(
 		QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100),
 		QPixmap::grabWidget(viewWidget).scaled(100, 100));
+}
+
+void PullPlanEditorWidget :: openCustomizeWidget()
+{
+	pullPlanCustomizeWidget->openWindow(this->getPlan());
 }
 
 void PullPlanEditorWidget :: setPlan(PullPlan* p)
