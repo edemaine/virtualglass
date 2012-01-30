@@ -26,8 +26,8 @@ class PullPlanEditorViewWidget : public QWidget
 		void someDataChanged();
 
 	protected:
-		void dragEnterEvent(QDragEnterEvent* dee);
 		void dropEvent(QDropEvent* de);
+		void dragEnterEvent(QDragEnterEvent* dee);
 		void dragMoveEvent(QDragMoveEvent* dme);
 		void paintEvent(QPaintEvent *event);
 

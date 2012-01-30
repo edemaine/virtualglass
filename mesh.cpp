@@ -664,7 +664,7 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, bool ignoreCas
 	{
 		ancestors->clear();
 		ancestorIndices->clear();
-		generateMesh(plan->subs[i].plan, plan->subs[i].plan->getShape(), geometry, 
+		generateMesh(plan->subs[i].plan, plan->subs[i].plan->getCasingShape(), geometry, 
 			ancestors, ancestorIndices, 0.0, plan->subs[i].length, ignoreCasing, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
@@ -714,7 +714,7 @@ void Mesher :: generatePullMesh(PullPlan* plan, Geometry* geometry)
 	if (plan->getTemplateType() == AMORPHOUS_BASE_PULL_TEMPLATE)
 		generateMesh(plan, CIRCLE_SHAPE, geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 	else
-		generateMesh(plan, plan->getShape(), geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
+		generateMesh(plan, plan->getCasingShape(), geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 	// Make skinner to more closely mimic the canes found in pickups
         for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
         {
@@ -731,7 +731,7 @@ void Mesher :: generateColorMesh(PullPlan* plan, Geometry* geometry)
 	if (plan->getTemplateType() == AMORPHOUS_BASE_PULL_TEMPLATE)
 		generateMesh(plan, CIRCLE_SHAPE, geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 	else
-		generateMesh(plan, plan->getShape(), geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
+		generateMesh(plan, plan->getCasingShape(), geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 	geometry->compute_normals_from_triangles();
 }
 

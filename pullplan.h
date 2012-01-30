@@ -9,6 +9,7 @@ class PullPlanLibraryWidget;
 #include <stdio.h>
 #include <vector>
 #include "pulltemplate.h"
+#include "casing.h"
 
 using std::vector;
 
@@ -29,11 +30,10 @@ class PullPlan
                 char* getParameterName(int param);
                 unsigned int getParameterCount();
 
-                void setShape(int s);
-                int getShape();
-
                 void setCasingThickness(float t);
+                void setCasingShape(int s);
                 float getCasingThickness();
+                int getCasingShape();
 
 		void setTwist(float t);
 		float getTwist();
@@ -54,8 +54,7 @@ class PullPlan
 		PullPlan* defaultSquareSubplan;
 
 		int templateType;
-                int shape;
-                float casingThickness;
+		Casing casing;
 		float twist;
 		Color* color;
                 vector<int> parameterValues;

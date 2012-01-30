@@ -52,7 +52,7 @@ HEADERS += primitives.h constants.h Vector.hpp \
 	pullplan.h pulltemplate.h subpulltemplate.h pickupplan.h \
 	piece.h piecetemplate.h \
 	pickuptemplate.h subpickuptemplate.h pickupplaneditorviewwidget.h \ 
-	purecolorlibrarywidget.h \
+	purecolorlibrarywidget.h casing.h \
 	mainwindow.h niceviewwidget.h pullplanlibrarywidget.h piecelibrarywidget.h \
 	pulltemplatelibrarywidget.h pickuptemplatelibrarywidget.h piecetemplatelibrarywidget.h \
 	pullplaneditorviewwidget.h pullplaneditorwidget.h colorbarlibrarywidget.h \
@@ -110,21 +110,20 @@ HEADERS += yaml-cpp/src/token.h \
 	yaml-cpp/src/collectionstack.h \
 
 SOURCES += glew/glew.c \
-    pullplancustomizeviewwidget.cpp \
-    pullplancustomizewidget.cpp
 
 SOURCES += main.cpp \ 
+	pullplancustomizeviewwidget.cpp \
+	pullplancustomizewidget.cpp \
 	pullplan.cpp subpulltemplate.cpp \
 	piece.cpp piecetemplate.cpp \
 	pickupplan.cpp subpickuptemplate.cpp pickupplaneditorviewwidget.cpp \
-	purecolorlibrarywidget.cpp \
+	purecolorlibrarywidget.cpp casing.cpp \
 	controller.cpp geometry.cpp mesh.cpp \
 	mainwindow.cpp niceviewwidget.cpp pullplanlibrarywidget.cpp piecelibrarywidget.cpp \
 	pulltemplatelibrarywidget.cpp pickuptemplatelibrarywidget.cpp piecetemplatelibrarywidget.cpp \
 	pullplaneditorviewwidget.cpp pullplaneditorwidget.cpp colorbarlibrarywidget.cpp \ 
 	qgraphicshighlighteffect.cpp \
 	pieceeditorwidget.cpp coloreditorwidget.cpp \
-
 
 SOURCES += yaml-cpp/src/tag.cpp \
 	yaml-cpp/src/stream.cpp \

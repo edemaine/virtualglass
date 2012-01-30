@@ -24,7 +24,7 @@ void PullPlanEditorWidget :: updateEverything()
                 viewWidget->getFillRule()))->setCheckState(Qt::Checked);
 
         static_cast<QCheckBox*>(shapeButtonGroup->button(
-                plan->getShape()))->setCheckState(Qt::Checked);
+                plan->getCasingShape()))->setCheckState(Qt::Checked);
 
         int twist = plan->getTwist();
         twistSlider->setSliderPosition(twist);
@@ -213,7 +213,7 @@ void PullPlanEditorWidget :: addCasingButtonPressed()
 {
 	PullPlan* superplan;
 
-	switch (plan->getShape())
+	switch (plan->getCasingShape())
 	{
 		case CIRCLE_SHAPE:
 			superplan =  new PullPlan(CASED_CIRCLE_PULL_TEMPLATE, plan->getColor());
@@ -296,15 +296,15 @@ void PullPlanEditorWidget :: shapeButtonGroupChanged(int)
         switch (shapeButtonGroup->checkedId())
         {
                 case 1:
-                        if (plan->getShape() == CIRCLE_SHAPE)
+                        if (plan->getCasingShape() == CIRCLE_SHAPE)
                                 return;
-                        plan->setShape(CIRCLE_SHAPE);
+                        plan->setCasingShape(CIRCLE_SHAPE);
                        	emit someDataChanged(); 
                         break;
                 case 2:
-                        if (plan->getShape() == SQUARE_SHAPE)
+                        if (plan->getCasingShape() == SQUARE_SHAPE)
                                 return;
-                        plan->setShape(SQUARE_SHAPE);
+                        plan->setCasingShape(SQUARE_SHAPE);
 			plan->setTwist(0.0); // reset twist to zero because square casing can't be twisted
                         emit someDataChanged();
                         break;

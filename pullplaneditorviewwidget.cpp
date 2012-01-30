@@ -22,11 +22,6 @@ void PullPlanEditorViewWidget :: setFillRule(int r)
 	fill_rule = r;
 }
 
-void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
-{
-	event->acceptProposedAction();
-}
-
 void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 {
 	float x = (event->pos().x() - width()/2);
@@ -55,6 +50,11 @@ void PullPlanEditorViewWidget :: mouseReleaseEvent(QMouseEvent* /*event*/)
 {
 	isDraggingCasing = false;
 	emit someDataChanged();
+}
+
+void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
+{
+	event->acceptProposedAction();
 }
 
 void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
@@ -145,7 +145,7 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, PullP
 		// subplan, reject
 		if (type == PULL_PLAN_MIME)
 		{
-			if (subpull->shape != droppedPlan->getShape())
+			if (subpull->shape != droppedPlan->getCasingShape())
 			{
 				continue;
 			}
@@ -220,7 +220,7 @@ void PullPlanEditorViewWidget :: populateIsCasingHighlighted(int x, int y, int t
 	// Deal w/casing
 	int drawSize = width() - 20;
 	float distanceFromCenter;
-	switch (plan->getShape())
+	switch (plan->getCasingShape())
 	{
 		case CIRCLE_SHAPE:
 			distanceFromCenter = sqrt(pow(double(x - drawSize/2 + 10), 2.0)
@@ -399,7 +399,7 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 	painter.begin(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 	painter.fillRect(event->rect(), QColor(200, 200, 200));
-	drawSubplan(10, 10, width() - 20, height() - 20, plan, casingHighlighted, plan->getShape(), 2, &painter);
+	drawSubplan(10, 10, width() - 20, height() - 20, plan, casingHighlighted, plan->getCasingShape(), 2, &painter);
 	painter.end();
 }
 

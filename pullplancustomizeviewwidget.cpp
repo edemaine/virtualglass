@@ -92,7 +92,7 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
 {
 	this->plan = plan->copy();
-	if (plan->getShape() == SQUARE_SHAPE)
+	if (plan->getCasingShape() == SQUARE_SHAPE)
 	{
 		this->plan->setTemplateType(CUSTOM_SQUARE_PULL_TEMPLATE);
 	}
@@ -196,7 +196,7 @@ void PullPlanCustomizeViewWidget :: paintEvent(QPaintEvent *event)
 	painter.begin(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 	painter.fillRect(event->rect(), QColor(200, 200, 200));
-	drawSubplan(10, 10, width() - 20, height() - 20, plan, plan->getShape(), 2, &painter);
+	drawSubplan(10, 10, width() - 20, height() - 20, plan, plan->getCasingShape(), 2, &painter);
 	painter.end();
 }
 

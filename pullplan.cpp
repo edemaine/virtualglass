@@ -7,7 +7,8 @@ PullPlan :: PullPlan(int templateType, Color* color)
 	defaultCircleSubplan = defaultSquareSubplan = NULL;
 	this->color = color;
 	this->twist = 0.0;
-        this->casingThickness = 0.1;
+        this->casing.thickness = 0.1;
+        this->casing.shape = CIRCLE_SHAPE;
         this->templateType = -1; // to guarantee setTemplateType goes through
 	setTemplateType(templateType);
 }
@@ -15,8 +16,7 @@ PullPlan :: PullPlan(int templateType, Color* color)
 PullPlan* PullPlan :: copy()
 {
 	PullPlan* c = new PullPlan(this->templateType, this->color);
-	c->shape = this->shape;
-	c->casingThickness = this->casingThickness;
+	c->casing = this->casing;
 	c->twist = this->twist;
 	c->color = this->color;
 
@@ -104,46 +104,39 @@ void PullPlan :: setTemplateType(int templateType)
 	parameterNames.clear();
 	parameterValues.clear();
         char* tmp;
+	casing.shape = CIRCLE_SHAPE;
         switch (templateType)
         {
                 case CIRCLE_BASE_PULL_TEMPLATE:
-                        this->shape = CIRCLE_SHAPE;
                         break;
                 case SQUARE_BASE_PULL_TEMPLATE:
-                        shape = CIRCLE_SHAPE;
                         break;
                 case AMORPHOUS_BASE_PULL_TEMPLATE:
-                        shape = AMORPHOUS_SHAPE;
+                        casing.shape = AMORPHOUS_SHAPE;
                         break;
                 case CASED_CIRCLE_PULL_TEMPLATE:
-                        shape = CIRCLE_SHAPE;
                         break;
                 case CASED_SQUARE_PULL_TEMPLATE:
-                        shape = CIRCLE_SHAPE;
                         break;
                 case HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE:
-                        shape = CIRCLE_SHAPE;
                         tmp = new char[100];
                         sprintf(tmp, "Row count:");
                         parameterNames.push_back(tmp);
                         parameterValues.push_back(3);
                         break;
                 case HORIZONTAL_LINE_SQUARE_PULL_TEMPLATE:
-                        shape = CIRCLE_SHAPE;
                         tmp = new char[100];
                         sprintf(tmp, "Row count:");
                         parameterNames.push_back(tmp);
                         parameterValues.push_back(3);
                         break;
                 case SURROUNDING_CIRCLE_PULL_TEMPLATE:
-                        shape = CIRCLE_SHAPE;
                         tmp = new char[100];
                         sprintf(tmp, "Count:");
                         parameterNames.push_back(tmp);
                         parameterValues.push_back(8);
                         break;
                 case CROSS_PULL_TEMPLATE:
-                        shape = CIRCLE_SHAPE;
                         tmp = new char[100];
                         sprintf(tmp, "Radial count:");
                         parameterNames.push_back(tmp);
@@ -151,47 +144,32 @@ void PullPlan :: setTemplateType(int templateType)
                         break;
                 case SQUARE_OF_SQUARES_PULL_TEMPLATE:
                 case SQUARE_OF_CIRCLES_PULL_TEMPLATE:
-                        shape = CIRCLE_SHAPE;
                         tmp = new char[100];
                         sprintf(tmp, "Row count:");
                         parameterNames.push_back(tmp);
                         parameterValues.push_back(4);
                         break;
                 case TRIPOD_PULL_TEMPLATE:
-                        shape = CIRCLE_SHAPE;
                         tmp = new char[100];
                         sprintf(tmp, "Radial count:");
                         parameterNames.push_back(tmp);
                         parameterValues.push_back(3);
                         break;
                 case SURROUNDING_SQUARE_PULL_TEMPLATE:
-                        shape = CIRCLE_SHAPE;
                         tmp = new char[100];
                         sprintf(tmp, "Column count:");
                         parameterNames.push_back(tmp);
                         parameterValues.push_back(2);
                         break;
-				case CUSTOM_CIRCLE_PULL_TEMPLATE:
-						shape = CIRCLE_SHAPE;
-						break;
-				case CUSTOM_SQUARE_PULL_TEMPLATE:
-						shape = SQUARE_SHAPE;
-						break;
+		case CUSTOM_CIRCLE_PULL_TEMPLATE:
+			break;
+		case CUSTOM_SQUARE_PULL_TEMPLATE:
+			this->casing.shape = SQUARE_SHAPE;
+			break;
         }
 
 	subs.clear(); // don't carry over any of the current stuff
 	updateSubs();
-}
-
-void PullPlan :: setShape(int shape)
-{
-	this->shape = shape;
-	updateSubs();
-}
-
-int PullPlan :: getShape()
-{
-	return this->shape;
 }
 
 void PullPlan :: setColor(Color* c)
@@ -242,13 +220,24 @@ unsigned int PullPlan :: getParameterCount()
 
 void PullPlan :: setCasingThickness(float t)
 {
-	this->casingThickness = t;
+	this->casing.thickness = t;
+	updateSubs();
+}
+
+void PullPlan :: setCasingShape(int s)
+{
+	this->casing.shape = s;
 	updateSubs();
 }
 
 float PullPlan :: getCasingThickness()
 {
-	return this->casingThickness;	
+	return this->casing.thickness;	
+}
+
+int PullPlan :: getCasingShape()
+{
+	return this->casing.shape;	
 }
 
 void PullPlan :: pushNewSubpull(vector<SubpullTemplate>* newSubs, 
@@ -275,7 +264,7 @@ void PullPlan :: pushNewSubpull(vector<SubpullTemplate>* newSubs,
 void PullPlan :: updateSubs()
 {
         Point p;
-        float radius = 1.0 - casingThickness;
+        float radius = 1.0 - casing.thickness;
 
 	vector<SubpullTemplate> newSubs;
 
@@ -286,7 +275,7 @@ void PullPlan :: updateSubs()
                         pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, radius * 2.0, 0);
                         break;
                 case CASED_SQUARE_PULL_TEMPLATE:
-                        if (this->shape == CIRCLE_SHAPE)
+                        if (this->casing.shape == CIRCLE_SHAPE)
                         {
                                 radius *= 1.0 / pow(2, 0.5);
                         }
@@ -305,7 +294,7 @@ void PullPlan :: updateSubs()
                 }
                 case HORIZONTAL_LINE_SQUARE_PULL_TEMPLATE:
                 {
-                        if (this->shape == CIRCLE_SHAPE)
+                        if (this->casing.shape == CIRCLE_SHAPE)
                                 radius *= 0.9;
 
                         int count = parameterValues[0];
@@ -360,7 +349,7 @@ void PullPlan :: updateSubs()
                 case SQUARE_OF_CIRCLES_PULL_TEMPLATE:
                 case SQUARE_OF_SQUARES_PULL_TEMPLATE:
                 {
-                        if (this->shape == CIRCLE_SHAPE)
+                        if (this->casing.shape == CIRCLE_SHAPE)
                                 radius *= 1 / SQRT_TWO;
 
                         int count = parameterValues[0];
@@ -408,7 +397,7 @@ void PullPlan :: updateSubs()
                 }
                 case SURROUNDING_SQUARE_PULL_TEMPLATE:
                 {
-                        if (this->shape == CIRCLE_SHAPE)
+                        if (this->casing.shape == CIRCLE_SHAPE)
                                 radius *= 1 / SQRT_TWO;
 
                         int count = parameterValues[0];
