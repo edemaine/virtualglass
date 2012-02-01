@@ -211,7 +211,7 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 void PullPlanEditorWidget :: addCasingButtonPressed()
 {
-	PullPlan* superplan;
+	PullPlan* superplan = NULL;
 
 	switch (plan->getCasingShape())
 	{
@@ -224,7 +224,8 @@ void PullPlanEditorWidget :: addCasingButtonPressed()
 		default:
 			exit(0);
 	}
-	
+	assert(superplan);
+	assert(superplan->subs.size() >= 1);
 	superplan->subs[0].plan = plan;
 	emit newPullPlan(superplan);
 }
