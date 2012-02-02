@@ -266,7 +266,8 @@ void NiceViewWidget :: paintWithDepthPeeling()
 		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, peelColorTex);
 		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, peelBufferSize.x, peelBufferSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, peelBufferSize.x, peelBufferSize.y, 
+			0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 
 		if (peelDepthTex == 0) {
@@ -275,7 +276,8 @@ void NiceViewWidget :: paintWithDepthPeeling()
 		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, peelDepthTex);
 		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_DEPTH_COMPONENT, peelBufferSize.x, peelBufferSize.y, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_DEPTH_COMPONENT, peelBufferSize.x, peelBufferSize.y, 
+			0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
 		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 
 		if (peelPrevDepthTex == 0) {
@@ -284,7 +286,8 @@ void NiceViewWidget :: paintWithDepthPeeling()
 		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, peelPrevDepthTex);
 		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_DEPTH_COMPONENT, peelBufferSize.x, peelBufferSize.y, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_DEPTH_COMPONENT, peelBufferSize.x, peelBufferSize.y, 
+			0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
 		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 
 		gl_errors("(depth peeling setup)");

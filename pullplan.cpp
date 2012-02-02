@@ -252,6 +252,18 @@ void PullPlan :: pushNewSubpull(vector<SubpullTemplate>* newSubs,
 	}
 }
 
+/*
+updateSubs()
+
+Description:
+This function is invoked after the template, a template parameter,
+or casing data is changed in the pull plan. The purpose is to
+recompute the locations and sizes of subcanes, as well as add or remove
+subplans if the number of subplans changed. For instance, changing
+a template parameter specifying the number of subcanes in a row changes
+the size and location of subplans, as well as increasing or decreasing
+the number of subplans.
+*/
 void PullPlan :: updateSubs()
 {
         Point p;

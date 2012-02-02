@@ -10,12 +10,14 @@
 // Commented out to turn off validity checks of geometry
 // #define GEOMETRY_DEBUG
 
+class Cane;
+
 // Mesh stuff
 class Vertex
 {
 public:
-	Vertex(Point const &_position = make_vector(0.0f, 0.0f, 0.0f), Point const &_normal = make_vector(0.0f, 0.0f, 0.0f)) : position(_position), normal(_normal) {
-	}
+	Vertex(Point const &_position = make_vector(0.0f, 0.0f, 0.0f), 
+		Point const &_normal = make_vector(0.0f, 0.0f, 0.0f)) : position(_position), normal(_normal) {}
 	Point position;
 	Point normal;
 };
@@ -23,14 +25,12 @@ public:
 class Triangle
 {
 public:
-	Triangle(uint32_t _v1 = -1U, uint32_t _v2 = -1U, uint32_t _v3 = -1U) : v1(_v1), v2(_v2), v3(_v3) {
-	}
+	Triangle(uint32_t _v1 = -1U, uint32_t _v2 = -1U, uint32_t _v3 = -1U) : v1(_v1), v2(_v2), v3(_v3) {}
 	uint32_t v1;
 	uint32_t v2;
 	uint32_t v3;
 };
 
-class Cane;
 
 //groups are a (hack-y) way of tracking triangles that belong to specific canes
 class Group
