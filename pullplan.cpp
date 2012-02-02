@@ -5,20 +5,19 @@
 PullPlan :: PullPlan(int templateType, Color* color) {
 
 	defaultCircleSubplan = defaultSquareSubplan = NULL;
-	this->color = color;
 	this->twist = 0.0;
 	this->casing.thickness = 0.1;
 	this->casing.shape = CIRCLE_SHAPE;
+	this->casing.color = color;
 	this->templateType = -1; // to guarantee setTemplateType goes through
 	setTemplateType(templateType);
 }
 
 PullPlan* PullPlan :: copy() {
 
-	PullPlan* c = new PullPlan(this->templateType, this->color);
+	PullPlan* c = new PullPlan(this->templateType, this->casing.color);
 	c->casing = this->casing;
 	c->twist = this->twist;
-	c->color = this->color;
 
 	for (unsigned int i = 0; i < this->parameterNames.size(); ++i) {
 		c->parameterValues[i] = this->parameterValues[i];
@@ -52,7 +51,7 @@ bool PullPlan :: hasDependencyOn(PullPlan* plan) {
 
 bool PullPlan :: hasDependencyOn(Color* color) {
 
-	if (this->color == color)
+	if (this->casing.color == color)
 		return true;
 	if (this->isBase())
 		return false;
@@ -164,14 +163,14 @@ void PullPlan :: setTemplateType(int templateType) {
 	updateSubs();
 }
 
-void PullPlan :: setColor(Color* c) {
+void PullPlan :: setCasingColor(Color* c) {
 
-	this->color = c;
+	this->casing.color = c;
 }
 
-Color* PullPlan :: getColor() {
+Color* PullPlan :: getCasingColor() {
 
-	return this->color;
+	return this->casing.color;
 }
 
 void PullPlan :: setTwist(float t) {

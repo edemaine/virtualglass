@@ -34,12 +34,11 @@ class PullPlan
                 void setCasingShape(int s);
                 float getCasingThickness();
                 int getCasingShape();
+                void setCasingColor(Color* c);
+                Color* getCasingColor();
 
 		void setTwist(float t);
 		float getTwist();
-
-		void setColor(Color* c);
-		Color* getColor();
 
 		PullPlan* copy();
 
@@ -56,7 +55,6 @@ class PullPlan
 		int templateType;
 		Casing casing;
 		float twist;
-		Color* color;
                 vector<int> parameterValues;
                 vector<char*> parameterNames;
 

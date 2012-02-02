@@ -407,7 +407,7 @@ void MainWindow :: newColorBar()
 	Color* newColor = new Color;
 	*newColor = make_vector(1.0f, 1.0f, 1.0f, 0.0f);
 	//*(newColor) = *(oldEditorBar->color);
-	newEditorBar->setColor(newColor);
+	newEditorBar->setCasingColor(newColor);
 
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();
@@ -543,7 +543,7 @@ void MainWindow :: updateLibrary()
 			{
 				pplw = dynamic_cast<PullPlanLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
-				if (pplw->getPullPlan()->hasDependencyOn(colorEditorBarLibraryWidget->getPullPlan()->getColor()))
+				if (pplw->getPullPlan()->hasDependencyOn(colorEditorBarLibraryWidget->getPullPlan()->getCasingColor()))
 					highlightLibraryWidget(pplw, USES_DEPENDANCY);
 			}
 
@@ -552,7 +552,7 @@ void MainWindow :: updateLibrary()
 			{
 				plw = dynamic_cast<PieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
-				if (plw->getPiece()->hasDependencyOn(colorEditorBarLibraryWidget->getPullPlan()->getColor()))
+				if (plw->getPiece()->hasDependencyOn(colorEditorBarLibraryWidget->getPullPlan()->getCasingColor()))
 					highlightLibraryWidget(plw, USES_DEPENDANCY);
 			}
 
@@ -568,7 +568,7 @@ void MainWindow :: updateLibrary()
 			{
 				cblw = dynamic_cast<ColorBarLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
-				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(cblw->getPullPlan()->getColor()))
+				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(cblw->getPullPlan()->getCasingColor()))
 					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
 			}
 
@@ -604,7 +604,7 @@ void MainWindow :: updateLibrary()
 			{
 				cblw = dynamic_cast<ColorBarLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
-				if (pieceEditorWidget->getPiece()->hasDependencyOn(cblw->getPullPlan()->getColor()))
+				if (pieceEditorWidget->getPiece()->hasDependencyOn(cblw->getPullPlan()->getCasingColor()))
 					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
 			}
 

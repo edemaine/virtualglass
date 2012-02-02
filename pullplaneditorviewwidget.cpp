@@ -95,7 +95,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		if (casingHighlighted)
 		{
 			event->accept();
-			plan->setColor(droppedPlan->getColor());
+			plan->setCasingColor(droppedPlan->getCasingColor());
 		}
 	}
 
@@ -268,7 +268,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	// If it's a base color, fill region with color
 	if (plan->isBase())
 	{
-		Color* c = plan->getColor();
+		Color* c = plan->getCasingColor();
 		painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
 		painter->setPen(Qt::NoPen);
 
@@ -317,8 +317,8 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		pen.setStyle(Qt::DotLine);
 		painter->setPen(pen);
 	}
-	painter->setBrush(QColor(255*plan->getColor()->r, 255*plan->getColor()->g, 
-		255*plan->getColor()->b, 255*plan->getColor()->a));
+	painter->setBrush(QColor(255*plan->getCasingColor()->r, 255*plan->getCasingColor()->g, 
+		255*plan->getCasingColor()->b, 255*plan->getCasingColor()->a));
 	switch (mandatedShape)
 	{
 		case CIRCLE_SHAPE:

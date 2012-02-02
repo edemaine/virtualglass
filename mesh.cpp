@@ -414,7 +414,7 @@ The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 
 void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
 	PullPlan* plan, int mandatedShape, float offset, float length, bool ensureVisible, uint32_t group_tag)
 {
-	if (plan->getColor()->a < 0.0001 && !ensureVisible)
+	if (plan->getCasingColor()->a < 0.0001 && !ensureVisible)
 		return;
 
 	unsigned int angularResolution = MIN(MAX(TOTAL_ANGULAR_RESOLUTION / totalCaneLength, 10), 25);
@@ -616,7 +616,7 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorIndices);
 	}
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, plan->getColor(), ensureVisible, group_tag));
+		first_vert, geometry->vertices.size() - first_vert, plan->getCasingColor(), ensureVisible, group_tag));
 }
 
 void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)

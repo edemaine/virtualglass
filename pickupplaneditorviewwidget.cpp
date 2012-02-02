@@ -54,12 +54,12 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			if (!pickup->useUnderlay)
 				return;
 	                event->accept();
-			pickup->underlayColor = droppedPlan->getColor();
+			pickup->underlayColor = droppedPlan->getCasingColor();
 		}
 		else
 		{
 	                event->accept();
-			pickup->overlayColor = droppedPlan->getColor();
+			pickup->overlayColor = droppedPlan->getCasingColor();
 		}
 		emit someDataChanged();
                 return;  
@@ -214,7 +214,7 @@ void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
 	{
 		if (pickup->subs[i].plan->isBase())
 		{
-			Color* c = pickup->subs[i].plan->getColor();
+			Color* c = pickup->subs[i].plan->getCasingColor();
 			painter.setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
 			pen.setStyle(Qt::NoPen);
 		}

@@ -216,10 +216,10 @@ void PullPlanEditorWidget :: addCasingButtonPressed()
 	switch (plan->getCasingShape())
 	{
 		case CIRCLE_SHAPE:
-			superplan =  new PullPlan(CASED_CIRCLE_PULL_TEMPLATE, plan->getColor());
+			superplan =  new PullPlan(CASED_CIRCLE_PULL_TEMPLATE, plan->getCasingColor());
 			break;
 		case SQUARE_SHAPE:
-			superplan =  new PullPlan(CASED_SQUARE_PULL_TEMPLATE, plan->getColor());
+			superplan =  new PullPlan(CASED_SQUARE_PULL_TEMPLATE, plan->getCasingColor());
 			break;
 		default:
 			exit(0);
@@ -326,7 +326,7 @@ void PullPlanEditorWidget :: setPlanTemplate(int templateType)
 
 void PullPlanEditorWidget :: setPlanColor(Color* c)
 {
-	plan->setColor(c);
+	plan->setCasingColor(c);
 	emit someDataChanged();	
 }
 
