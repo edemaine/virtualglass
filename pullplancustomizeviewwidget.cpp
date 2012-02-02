@@ -1,4 +1,5 @@
 #include "pullplancustomizeviewwidget.h"
+#include <QtDebug>
 
 PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
 {
@@ -11,6 +12,8 @@ PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget
 	color->a = 1.0;
 	tempCirclePlan = new PullPlan(CUSTOM_CIRCLE_PULL_TEMPLATE,color);
 	tempSquarePlan = new PullPlan(CUSTOM_SQUARE_PULL_TEMPLATE,color);
+	mouseStartingLoc = new QPoint(INT_MAX,INT_MAX);
+	subpullStartingLoc = new Vector3f();
 }
 
 void PullPlanCustomizeViewWidget :: dragEnterEvent(QDragEnterEvent* event)
@@ -20,11 +23,44 @@ void PullPlanCustomizeViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 
 void PullPlanCustomizeViewWidget :: dropEvent(QDropEvent* event)
 {
-	event->setDropAction(Qt::CopyAction);
+	mouseStartingLoc->setX(INT_MAX);
+	mouseStartingLoc->setY(INT_MAX);
+	subpullStartingLoc->x=0;
+	subpullStartingLoc->y=0;
+	subpullStartingLoc->z=0;
+//	event->setDropAction(Qt::CopyAction);
 }
 
 void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 {
+	if (event->buttons() != Qt::NoButton)
+	{
+		if (hoveringIndex == -1)
+			return;
+		if (mouseStartingLoc->x() == INT_MAX && mouseStartingLoc->y() == INT_MAX)
+		{
+			mouseStartingLoc->setX(event->pos().x());
+			mouseStartingLoc->setY(event->pos().y());
+			subpullStartingLoc->x = plan->subs[hoveringIndex].location.x;
+			subpullStartingLoc->y = plan->subs[hoveringIndex].location.y;
+		}
+		if (isValidMovePosition(event))
+		{
+			plan->subs[hoveringIndex].location.x = subpullStartingLoc->x + event->pos().x()/(width()/2.0 - 10) - mouseStartingLoc->x()/(width()/2.0 - 10);
+			plan->subs[hoveringIndex].location.y = subpullStartingLoc->y + event->pos().y()/(width()/2.0 - 10) - mouseStartingLoc->y()/(width()/2.0 - 10);
+		}
+//		qDebug() << "location" << plan->subs[hoveringIndex].location.x << plan->subs[hoveringIndex].location.y;
+//		qDebug() << "event" << event->pos().x() << event->pos().y();
+//		qDebug() << "displacement" << event->pos().x()/(width()/2.0 - 10) - mouseStartingLoc->x()/(width()/2.0 - 10)
+//				 << event->pos().y()/(width()/2.0 - 10) - mouseStartingLoc->y()/(width()/2.0 - 10);
+		this->update();
+		return;
+	}
+	mouseStartingLoc->setX(INT_MAX);
+	mouseStartingLoc->setY(INT_MAX);
+	subpullStartingLoc->x=0;
+	subpullStartingLoc->y=0;
+	subpullStartingLoc->z=0;
 	int drawSize = width() - 20;
 	// check to see if the drop was in a subpull
 	bool anyHit = false;
@@ -89,6 +125,21 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 	return;
 }
 
+void PullPlanCustomizeViewWidget :: dragMoveEvent(QDragMoveEvent* event)
+{
+	if (hoveringIndex == -1)
+		return;
+	if (mouseStartingLoc->isNull())
+	{
+		mouseStartingLoc->setX(event->pos().x());
+		mouseStartingLoc->setY(event->pos().y());
+		subpullStartingLoc = &(plan->subs[hoveringIndex].location);
+	}
+	plan->subs[hoveringIndex].location.x = subpullStartingLoc->x + event->pos().x() - mouseStartingLoc->x();
+	plan->subs[hoveringIndex].location.y = subpullStartingLoc->y + event->pos().y() - mouseStartingLoc->y();
+	this->update();
+}
+
 void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
 {
 	this->plan = plan->copy();
@@ -102,8 +153,17 @@ void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
 	}
 	this->plan->subs = plan->subs;
 	hoveringIndex = -1;
+	mouseStartingLoc = new QPoint(-1,-1);
+	subpullStartingLoc = new Vector3f();
 }
 
+bool PullPlanCustomizeViewWidget :: isValidMovePosition(QMouseEvent* event)
+{
+	/* This should check if the subcane can be moved to the given position
+	  (i.e. not intersecting with another subcane or leaving the casing).
+	  For now it doesn't prevent anything. */
+	return true;
+}
 
 void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidth, float drawHeight,
 	PullPlan* plan, int mandatedShape, int borderLevels, QPainter* painter)
