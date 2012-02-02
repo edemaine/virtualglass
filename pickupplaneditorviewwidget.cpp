@@ -54,12 +54,12 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			if (!pickup->useUnderlay)
 				return;
 	                event->accept();
-			pickup->underlayColorPlan->setColor(droppedPlan->getColor());
+			pickup->underlayColor = droppedPlan->getColor();
 		}
 		else
 		{
 	                event->accept();
-			pickup->overlayColorPlan->setColor(droppedPlan->getColor());
+			pickup->overlayColor = droppedPlan->getColor();
 		}
 		emit someDataChanged();
                 return;  

@@ -26,8 +26,8 @@ class PickupPlan
 		PickupPlan* copy();
 
 		vector<SubpickupTemplate> subs;
-		PullPlan* overlayColorPlan;
-		PullPlan* underlayColorPlan;
+		Color* overlayColor;
+		Color* underlayColor;
 		bool useUnderlay;
 
 	private:

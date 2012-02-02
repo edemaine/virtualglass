@@ -272,7 +272,7 @@ Vertex Mesher :: applyTransforms(Vertex v, vector<PullPlan*>* ancestors, vector<
 typedef map< Vector2ui, Vector2ui > EdgeMap;
 typedef set< Vector2ui > EdgeSet;
 
-void Mesher :: meshPickupCasingSlab(Geometry* geometry, PullPlan* colorPlan, float y, float thickness)
+void Mesher :: meshPickupCasingSlab(Geometry* geometry, Color* color, float y, float thickness)
 {
 	unsigned int slabResolution = 100;
 
@@ -405,7 +405,7 @@ void Mesher :: meshPickupCasingSlab(Geometry* geometry, PullPlan* colorPlan, flo
 	assert(geometry->valid());
 
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, colorPlan, true, -1));
+		first_vert, geometry->vertices.size() - first_vert, color, true, -1));
 }
 
 /*
@@ -615,7 +615,8 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 	{
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorIndices);
 	}
-	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, first_vert, geometry->vertices.size() - first_vert, plan, ensureVisible, group_tag));
+	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
+		first_vert, geometry->vertices.size() - first_vert, plan->getColor(), ensureVisible, group_tag));
 }
 
 void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
@@ -654,18 +655,18 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>*
 
 }
 
-void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, bool ignoreCasing, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
+void Mesher :: generateMesh(PickupPlan* pickup, Geometry *geometry, bool ignoreCasing, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
 {
-	if (plan == NULL)
+	if (pickup == NULL)
 		return;
 
 	geometry->clear();
-	for (unsigned int i = 0; i < plan->subs.size(); ++i)
+	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
 	{
 		ancestors->clear();
 		ancestorIndices->clear();
-		generateMesh(plan->subs[i].plan, plan->subs[i].plan->getCasingShape(), geometry, 
-			ancestors, ancestorIndices, 0.0, plan->subs[i].length, ignoreCasing, i); 
+		generateMesh(pickup->subs[i].plan, pickup->subs[i].plan->getCasingShape(), geometry, 
+			ancestors, ancestorIndices, 0.0, pickup->subs[i].length, ignoreCasing, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
 		{
@@ -677,14 +678,14 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry *geometry, bool ignoreCas
 				for (uint32_t v = subpullGroup->vertex_begin; 
 					v < subpullGroup->vertex_begin + subpullGroup->vertex_size; ++v)
 				{
-					applyPickupTransform(&(geometry->vertices[v]), &(plan->subs[i]));
+					applyPickupTransform(&(geometry->vertices[v]), &(pickup->subs[i]));
 				}
 			}
 		}
 	}
-	meshPickupCasingSlab(geometry, plan->overlayColorPlan, 0.0, plan->subs[0].width*2.5 + 0.01);
-	if (plan->useUnderlay)
-		meshPickupCasingSlab(geometry, plan->underlayColorPlan, plan->subs[0].width*2.5 + 0.01 + 0.06, 0.05);
+	meshPickupCasingSlab(geometry, pickup->overlayColor, 0.0, pickup->subs[0].width*2.5 + 0.01);
+	if (pickup->useUnderlay)
+		meshPickupCasingSlab(geometry, pickup->underlayColor, pickup->subs[0].width*2.5 + 0.01 + 0.06, 0.05);
 }
 
 

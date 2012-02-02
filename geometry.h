@@ -37,15 +37,15 @@ class Group
 {
 public:
 	Group(uint32_t _triangle_begin, uint32_t _triangle_size, uint32_t _vertex_begin, uint32_t _vertex_size, 
-		PullPlan *_pullplan, bool _ensureVisible, uint32_t _tag)
+		Color *_color, bool _ensureVisible, uint32_t _tag)
 		: triangle_begin(_triangle_begin), triangle_size(_triangle_size), vertex_begin(_vertex_begin), 
-		vertex_size(_vertex_size), pullplan(_pullplan), ensureVisible(_ensureVisible), tag(_tag) {
+		vertex_size(_vertex_size), color(_color), ensureVisible(_ensureVisible), tag(_tag) {
 	}
 	uint32_t triangle_begin;
 	uint32_t triangle_size;
 	uint32_t vertex_begin;
 	uint32_t vertex_size;
-	PullPlan* pullplan;
+	Color* color;
 	bool ensureVisible;
 	uint32_t tag;
 };
@@ -74,7 +74,7 @@ public:
 		for (std::vector< Group >::const_iterator g = groups.begin(); g != groups.end(); ++g) {
 			if (g->triangle_begin >= triangles.size()) return false;
 			if (g->triangle_begin + g->triangle_size > triangles.size()) return false;
-			if (g->pullplan == NULL) return false;
+			if (g->color == NULL) return false;
 			if (g->vertex_begin >= vertices.size()) return false;
 			if (g->vertex_begin + g->vertex_size > vertices.size()) return false;
 		}
