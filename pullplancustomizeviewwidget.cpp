@@ -21,7 +21,7 @@ void PullPlanCustomizeViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 	event->acceptProposedAction();
 }
 
-void PullPlanCustomizeViewWidget :: dropEvent(QDropEvent* event)
+void PullPlanCustomizeViewWidget :: dropEvent(QDropEvent*)
 {
 	mouseStartingLoc->setX(INT_MAX);
 	mouseStartingLoc->setY(INT_MAX);
@@ -157,7 +157,7 @@ void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
 	subpullStartingLoc = new Vector3f();
 }
 
-bool PullPlanCustomizeViewWidget :: isValidMovePosition(QMouseEvent* event)
+bool PullPlanCustomizeViewWidget :: isValidMovePosition(QMouseEvent*)
 {
 	/* This should check if the subcane can be moved to the given position
 	  (i.e. not intersecting with another subcane or leaving the casing).

@@ -8,6 +8,7 @@ class Casing
 {
 	public:
 		Casing();
+		Casing(float thickness, int shape);
 		float thickness;	
 		int shape;
 		
