@@ -9,7 +9,7 @@ PickupPlan :: PickupPlan(int templateType) {
 	defaultColor->r = defaultColor->g = defaultColor->b = 1.0;
 	defaultColor->a = 0.0;
 
-	defaultSubplan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, defaultColor);
+	defaultSubplan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE);
 	overlayColor = defaultColor;
 	underlayColor = defaultColor;
 	useUnderlay = false;

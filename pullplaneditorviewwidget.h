@@ -32,6 +32,8 @@ class PullPlanEditorViewWidget : public QWidget
 		void paintEvent(QPaintEvent *event);
 
 	private:
+		void setBoundaryPainter(QPainter* painter, int drawWidth, int drawHeight, 
+			int borderLevels, bool highlightThis);
 		void drawSubplan(float x, float y, float width, float height, PullPlan* plan, 
 			bool highlightThis, int mandatedShape, int borderLevels, QPainter* painter);
 		PullPlan* plan;

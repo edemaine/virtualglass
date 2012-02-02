@@ -19,7 +19,7 @@ class SubpullTemplate;
 class PullPlan
 {
 	public:
-		PullPlan(int pullTemplate, Color* color);
+		PullPlan(int pullTemplate);
 
 		void setTemplateType(int pullTemplateType);
 		int getTemplateType();
@@ -30,12 +30,18 @@ class PullPlan
                 char* getParameterName(int param);
                 unsigned int getParameterCount();
 
-                void setCasingThickness(float t);
-                void setCasingShape(int s);
-                float getCasingThickness();
-                int getCasingShape();
-                void setCasingColor(Color* c);
-                Color* getCasingColor();
+                void setCasingThickness(float t, unsigned int index);
+                void setCasingShape(int s, unsigned int index);
+		void setOutermostCasingShape(int shape);
+                void setCasingColor(Color* c, unsigned int index);
+		void addCasing(float thickness, int shape, Color* color);
+		void removeCasing();
+                float getCasingThickness(unsigned int index);
+                int getCasingShape(unsigned int index);
+		int getOutermostCasingShape();
+                Color* getOutermostCasingColor();
+                Color* getCasingColor(unsigned int index);
+		unsigned int getCasingCount(); 
 
 		void setTwist(float t);
 		float getTwist();
@@ -51,9 +57,10 @@ class PullPlan
 		// Variables
 		PullPlan* defaultCircleSubplan;
 		PullPlan* defaultSquareSubplan;
+		Color* defaultColor;
 
 		int templateType;
-		Casing casing;
+		vector<Casing> casings;
 		float twist;
                 vector<int> parameterValues;
                 vector<char*> parameterNames;

@@ -407,7 +407,7 @@ void MainWindow :: newColorBar()
 	Color* newColor = new Color;
 	*newColor = make_vector(1.0f, 1.0f, 1.0f, 0.0f);
 	//*(newColor) = *(oldEditorBar->color);
-	newEditorBar->setCasingColor(newColor);
+	newEditorBar->setCasingColor(newColor, 0);
 
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();
@@ -426,9 +426,7 @@ void MainWindow :: newColorBar()
 
 void MainWindow :: newPullPlan()
 {
-	Color* color = new Color;
-	*color = make_vector(1.0f, 1.0f, 1.0f, 0.0f); //clear
-	PullPlan *newEditorPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
+	PullPlan *newEditorPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE);
 	newEditorPlan->setTemplateType(CASED_CIRCLE_PULL_TEMPLATE);
 	emit newPullPlan(newEditorPlan);
 }
@@ -543,7 +541,8 @@ void MainWindow :: updateLibrary()
 			{
 				pplw = dynamic_cast<PullPlanLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
-				if (pplw->getPullPlan()->hasDependencyOn(colorEditorBarLibraryWidget->getPullPlan()->getCasingColor()))
+				if (pplw->getPullPlan()->hasDependencyOn(
+					colorEditorBarLibraryWidget->getPullPlan()->getOutermostCasingColor()))
 					highlightLibraryWidget(pplw, USES_DEPENDANCY);
 			}
 
@@ -552,7 +551,8 @@ void MainWindow :: updateLibrary()
 			{
 				plw = dynamic_cast<PieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
-				if (plw->getPiece()->hasDependencyOn(colorEditorBarLibraryWidget->getPullPlan()->getCasingColor()))
+				if (plw->getPiece()->hasDependencyOn(
+					colorEditorBarLibraryWidget->getPullPlan()->getOutermostCasingColor()))
 					highlightLibraryWidget(plw, USES_DEPENDANCY);
 			}
 
@@ -568,7 +568,8 @@ void MainWindow :: updateLibrary()
 			{
 				cblw = dynamic_cast<ColorBarLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
-				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(cblw->getPullPlan()->getCasingColor()))
+				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(
+					cblw->getPullPlan()->getOutermostCasingColor()))
 					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
 			}
 
@@ -604,7 +605,8 @@ void MainWindow :: updateLibrary()
 			{
 				cblw = dynamic_cast<ColorBarLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
-				if (pieceEditorWidget->getPiece()->hasDependencyOn(cblw->getPullPlan()->getCasingColor()))
+				if (pieceEditorWidget->getPiece()->hasDependencyOn(
+					cblw->getPullPlan()->getOutermostCasingColor()))
 					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
 			}
 

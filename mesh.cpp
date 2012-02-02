@@ -412,9 +412,9 @@ void Mesher :: meshPickupCasingSlab(Geometry* geometry, Color* color, float y, f
 The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
 */
 void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
-	PullPlan* plan, int mandatedShape, float offset, float length, bool ensureVisible, uint32_t group_tag)
+	Color* color, int mandatedShape, float offset, float length, bool ensureVisible, uint32_t group_tag)
 {
-	if (plan->getCasingColor()->a < 0.0001 && !ensureVisible)
+	if (color->a < 0.0001 && !ensureVisible)
 		return;
 
 	unsigned int angularResolution = MIN(MAX(TOTAL_ANGULAR_RESOLUTION / totalCaneLength, 10), 25);
@@ -616,7 +616,7 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorIndices);
 	}
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, plan->getCasingColor(), ensureVisible, group_tag));
+		first_vert, geometry->vertices.size() - first_vert, color, ensureVisible, group_tag));
 }
 
 void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
@@ -665,7 +665,7 @@ void Mesher :: generateMesh(PickupPlan* pickup, Geometry *geometry, bool ignoreC
 	{
 		ancestors->clear();
 		ancestorIndices->clear();
-		generateMesh(pickup->subs[i].plan, pickup->subs[i].plan->getCasingShape(), geometry, 
+		generateMesh(pickup->subs[i].plan, pickup->subs[i].plan->getOutermostCasingShape(), geometry, 
 			ancestors, ancestorIndices, 0.0, pickup->subs[i].length, ignoreCasing, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
@@ -715,7 +715,8 @@ void Mesher :: generatePullMesh(PullPlan* plan, Geometry* geometry)
 	if (plan->getTemplateType() == AMORPHOUS_BASE_PULL_TEMPLATE)
 		generateMesh(plan, CIRCLE_SHAPE, geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 	else
-		generateMesh(plan, plan->getCasingShape(), geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
+		generateMesh(plan, plan->getOutermostCasingShape(), geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
+
 	// Make skinner to more closely mimic the canes found in pickups
         for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
         {
@@ -732,7 +733,7 @@ void Mesher :: generateColorMesh(PullPlan* plan, Geometry* geometry)
 	if (plan->getTemplateType() == AMORPHOUS_BASE_PULL_TEMPLATE)
 		generateMesh(plan, CIRCLE_SHAPE, geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 	else
-		generateMesh(plan, plan->getCasingShape(), geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
+		generateMesh(plan, plan->getOutermostCasingShape(), geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 	geometry->compute_normals_from_triangles();
 }
 
@@ -752,7 +753,15 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 		return;
 
 	ancestors->push_back(plan); 
-	meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan, mandatedShape, offset, length, ensureVisible, groupIndex);
+	// for the outermost casing, use the shape suggestion from your parent, as you might 
+	// have an AMORPHOUS_SHAPE and need it specified for you. Even if you don't the shape
+	// suggestion matches your shape, so it's still ok to use.
+	meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getOutermostCasingColor(), 
+		mandatedShape, offset, length, ensureVisible, groupIndex);
+	for (unsigned int i = 0; i < plan->getCasingCount() - 1; ++i) {
+		meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getCasingColor(i), 
+			plan->getCasingShape(i), offset, length, ensureVisible, groupIndex);
+	}
 	ancestors->pop_back();
 
 	// Make recursive calls depending on the type of the current node

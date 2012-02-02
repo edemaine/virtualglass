@@ -28,7 +28,7 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	float y = (event->pos().y() - height()/2);
 	float radius = sqrt(x * x + y * y) / (width()/2 - 10); 
 
-	if (fabs(radius - (1.0 - plan->getCasingThickness())) < 20)
+	if (fabs(radius - (1.0 - plan->getCasingThickness(plan->getCasingCount()-1))) < 20)
 	{
 		isDraggingCasing = true; 
 	}
@@ -41,7 +41,7 @@ void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 	if (isDraggingCasing)
 	{
 		float radius = sqrt(x * x + y * y) / (width()/2 - 10); 
-		plan->setCasingThickness(MAX(1.0 - radius, 0));
+		plan->setCasingThickness(MAX(1.0 - radius, 0), plan->getCasingCount()-1);
 		emit someDataChanged();
 	}
 }
@@ -95,7 +95,10 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		if (casingHighlighted)
 		{
 			event->accept();
-			plan->setCasingColor(droppedPlan->getCasingColor());
+			// at this point we have already checked that the dropped plan is a color bar
+			// (that was done in populateIsCasingHighlighted()). So now we can just
+			// take the color w/o thinking.
+			plan->setCasingColor(droppedPlan->getOutermostCasingColor(), plan->getCasingCount()-1);
 		}
 	}
 
@@ -145,7 +148,7 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, PullP
 		// subplan, reject
 		if (type == PULL_PLAN_MIME)
 		{
-			if (subpull->shape != droppedPlan->getCasingShape())
+			if (subpull->shape != droppedPlan->getOutermostCasingShape())
 			{
 				continue;
 			}
@@ -220,7 +223,7 @@ void PullPlanEditorViewWidget :: populateIsCasingHighlighted(int x, int y, int t
 	// Deal w/casing
 	int drawSize = width() - 20;
 	float distanceFromCenter;
-	switch (plan->getCasingShape())
+	switch (plan->getOutermostCasingShape())
 	{
 		case CIRCLE_SHAPE:
 			distanceFromCenter = sqrt(pow(double(x - drawSize/2 + 10), 2.0)
@@ -248,42 +251,9 @@ void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan)
 }
 
 
-void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, float drawHeight, 
-	PullPlan* plan, bool highlightThis, int mandatedShape, 
-	int borderLevels, QPainter* painter)
-{
-	// Fill the subplan area with some `cleared out' color
-	painter->setBrush(QColor(200, 200, 200));
-	painter->setPen(Qt::NoPen);
-	switch (mandatedShape)
-	{
-		case CIRCLE_SHAPE:
-			painter->drawEllipse(x, y, drawWidth, drawHeight);
-			break;
-		case SQUARE_SHAPE:
-			painter->drawRect(x, y, drawWidth, drawHeight);
-			break;
-	}
+void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, int drawWidth, 
+	int drawHeight, int borderLevels, bool highlightThis) {
 
-	// If it's a base color, fill region with color
-	if (plan->isBase())
-	{
-		Color* c = plan->getCasingColor();
-		painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
-		painter->setPen(Qt::NoPen);
-
-		switch (mandatedShape)
-		{
-			case CIRCLE_SHAPE:
-				painter->drawEllipse(x, y, drawWidth, drawHeight);
-				break;
-			case SQUARE_SHAPE:
-				painter->drawRect(x, y, drawWidth, drawHeight);
-				break;
-		}
-	}
-
-	// Draw casing shape
 	painter->setBrush(Qt::NoBrush);
 	if (MIN(drawWidth, drawHeight) < 10)
 	{
@@ -317,8 +287,16 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		pen.setStyle(Qt::DotLine);
 		painter->setPen(pen);
 	}
-	painter->setBrush(QColor(255*plan->getCasingColor()->r, 255*plan->getCasingColor()->g, 
-		255*plan->getCasingColor()->b, 255*plan->getCasingColor()->a));
+
+}
+
+
+void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, float drawHeight, 
+	PullPlan* plan, bool highlightThis, int mandatedShape, int borderLevels, QPainter* painter) {
+
+	// Fill the subplan area with some `cleared out' color
+	painter->setBrush(QColor(200, 200, 200));
+	painter->setPen(Qt::NoPen);
 	switch (mandatedShape)
 	{
 		case CIRCLE_SHAPE:
@@ -329,7 +307,60 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 			break;
 	}
 
+	// If it's a base color, fill region with color
 	if (plan->isBase())
+	{
+		Color* c = plan->getOutermostCasingColor();
+		painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
+		painter->setPen(Qt::NoPen);
+
+		switch (mandatedShape)
+		{
+			case CIRCLE_SHAPE:
+				painter->drawEllipse(x, y, drawWidth, drawHeight);
+				break;
+			case SQUARE_SHAPE:
+				painter->drawRect(x, y, drawWidth, drawHeight);
+				break;
+		}
+	}
+
+	// Draw casings
+	setBoundaryPainter(painter, drawWidth, drawHeight, borderLevels, highlightThis);
+	painter->setBrush(QColor(255*plan->getOutermostCasingColor()->r, 255*plan->getOutermostCasingColor()->g, 
+		255*plan->getOutermostCasingColor()->b, 255*plan->getOutermostCasingColor()->a));
+	switch (mandatedShape)
+	{
+		case CIRCLE_SHAPE:
+			painter->drawEllipse(x, y, drawWidth, drawHeight);
+			break;
+		case SQUARE_SHAPE:
+			painter->drawRect(x, y, drawWidth, drawHeight);
+			break;
+	}
+
+	for (unsigned int i = plan->getCasingCount() - 2; i < plan->getCasingCount() - 1; --i) {
+
+		int casingWidth = drawWidth * (1.0 - plan->getCasingThickness(i));
+		int casingHeight = drawWidth * (1.0 - plan->getCasingThickness(i));
+		int casingX = x + drawWidth / 2 - casingWidth / 2;
+		int casingY = y + drawHeight / 2 - casingHeight / 2;
+		
+		setBoundaryPainter(painter, casingHeight, casingWidth, borderLevels, highlightThis);
+		painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g, 
+			255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
+		switch (plan->getCasingShape(i))
+		{
+			case CIRCLE_SHAPE:
+				painter->drawEllipse(casingX, casingY, casingWidth, casingHeight);
+				break;
+			case SQUARE_SHAPE:
+				painter->drawRect(casingX, casingY, casingWidth, casingHeight);
+				break;
+		}
+	}
+
+	if (plan->isBase()) // no subplans, so time to go home
 		return;
 
 	// Recurse. Draw unhighlighted subplans first
@@ -337,10 +368,12 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	{
 		SubpullTemplate* sub = &(plan->subs[i]);
 
-		float rX = x + (sub->location.x - sub->diameter/2.0) * drawWidth/2 + drawWidth/2;
-		float rY = y + (sub->location.y - sub->diameter/2.0) * drawWidth/2 + drawHeight/2;
-		float rWidth = sub->diameter * drawWidth/2;
-		float rHeight = sub->diameter * drawHeight/2;
+		float casingScale = (1.0 - plan->getCasingThickness(0));
+
+		float rX = x + (sub->location.x - sub->diameter/2.0) * casingScale * drawWidth/2 + drawWidth/2;
+		float rY = y + (sub->location.y - sub->diameter/2.0) * casingScale * drawWidth/2 + drawHeight/2;
+		float rWidth = sub->diameter * casingScale * drawWidth/2;
+		float rHeight = sub->diameter * casingScale * drawHeight/2;
 
 		if (borderLevels == 2)
 		{
@@ -370,10 +403,17 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	{
 		SubpullTemplate* sub = &(plan->subs[i]);
 
+		// compute location assuming there is a single casing
 		float rX = x + (sub->location.x - sub->diameter/2.0) * drawWidth/2 + drawWidth/2;
 		float rY = y + (sub->location.y - sub->diameter/2.0) * drawWidth/2 + drawHeight/2;
 		float rWidth = sub->diameter * drawWidth/2;
 		float rHeight = sub->diameter * drawHeight/2;
+
+		// now scale for innermost
+		rWidth *= (1.0 - plan->getCasingThickness(0));
+		rHeight *= (1.0 - plan->getCasingThickness(0));
+		rX = (rX - drawWidth/2) * (1.0 - plan->getCasingThickness(0)) + drawWidth/2;
+		rY = (rY - drawHeight/2) * (1.0 - plan->getCasingThickness(0)) + drawHeight/2;
 
 		if (borderLevels == 2)
 		{
@@ -399,7 +439,8 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 	painter.begin(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 	painter.fillRect(event->rect(), QColor(200, 200, 200));
-	drawSubplan(10, 10, width() - 20, height() - 20, plan, casingHighlighted, plan->getCasingShape(), 2, &painter);
+	drawSubplan(10, 10, width() - 20, height() - 20, plan, casingHighlighted, 
+		plan->getOutermostCasingShape(), 2, &painter);
 	painter.end();
 }
 

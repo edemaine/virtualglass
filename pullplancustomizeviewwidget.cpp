@@ -10,8 +10,10 @@ PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget
 	Color* color = new Color;
 	color->r = color->g = color->b = 1.0;
 	color->a = 1.0;
-	tempCirclePlan = new PullPlan(CUSTOM_CIRCLE_PULL_TEMPLATE,color);
-	tempSquarePlan = new PullPlan(CUSTOM_SQUARE_PULL_TEMPLATE,color);
+	tempCirclePlan = new PullPlan(CUSTOM_CIRCLE_PULL_TEMPLATE);
+	tempCirclePlan->setCasingColor(color, 0);
+	tempSquarePlan = new PullPlan(CUSTOM_SQUARE_PULL_TEMPLATE);
+	tempSquarePlan->setCasingColor(color, 0);
 	mouseStartingLoc = new QPoint(INT_MAX,INT_MAX);
 	subpullStartingLoc = new Vector3f();
 }
@@ -143,7 +145,7 @@ void PullPlanCustomizeViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
 {
 	this->plan = plan->copy();
-	if (plan->getCasingShape() == SQUARE_SHAPE)
+	if (plan->getCasingShape(0) == SQUARE_SHAPE)
 	{
 		this->plan->setTemplateType(CUSTOM_SQUARE_PULL_TEMPLATE);
 	}
@@ -185,7 +187,7 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 	// If it's a base color, fill region with color
 	if (plan->isBase())
 	{
-		Color* c = plan->getCasingColor();
+		Color* c = plan->getCasingColor(0);
 		painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
 		painter->setPen(Qt::NoPen);
 
@@ -221,8 +223,8 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 		pen.setStyle(Qt::DotLine);
 		painter->setPen(pen);
 	}
-	painter->setBrush(QColor(255*plan->getCasingColor()->r, 255*plan->getCasingColor()->g, 
-		255*plan->getCasingColor()->b, 255*plan->getCasingColor()->a));
+	painter->setBrush(QColor(255*plan->getCasingColor(0)->r, 255*plan->getCasingColor(0)->g, 
+		255*plan->getCasingColor(0)->b, 255*plan->getCasingColor(0)->a));
 	switch (mandatedShape)
 	{
 		case CIRCLE_SHAPE:
@@ -257,7 +259,7 @@ void PullPlanCustomizeViewWidget :: paintEvent(QPaintEvent *event)
 	painter.begin(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 	painter.fillRect(event->rect(), QColor(200, 200, 200));
-	drawSubplan(10, 10, width() - 20, height() - 20, plan, plan->getCasingShape(), 2, &painter);
+	drawSubplan(10, 10, width() - 20, height() - 20, plan, plan->getCasingShape(0), 2, &painter);
 	painter.end();
 }
 

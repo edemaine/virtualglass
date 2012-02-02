@@ -3,9 +3,7 @@
 
 PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 {
-	Color* color = new Color;
-	*color = make_vector(1.0f, 1.0f, 1.0f, 0.0f); //clear
-	this->plan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE, color);
+	this->plan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE);
 	this->plan->setTemplateType(CASED_CIRCLE_PULL_TEMPLATE);
 
 	this->viewWidget = new PullPlanEditorViewWidget(plan, this);	
@@ -24,7 +22,7 @@ void PullPlanEditorWidget :: updateEverything()
                 viewWidget->getFillRule()))->setCheckState(Qt::Checked);
 
         static_cast<QCheckBox*>(shapeButtonGroup->button(
-                plan->getCasingShape()))->setCheckState(Qt::Checked);
+                plan->getOutermostCasingShape()))->setCheckState(Qt::Checked);
 
         int twist = plan->getTwist();
         twistSlider->setSliderPosition(twist);
@@ -211,23 +209,8 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 void PullPlanEditorWidget :: addCasingButtonPressed()
 {
-	PullPlan* superplan = NULL;
-
-	switch (plan->getCasingShape())
-	{
-		case CIRCLE_SHAPE:
-			superplan =  new PullPlan(CASED_CIRCLE_PULL_TEMPLATE, plan->getCasingColor());
-			break;
-		case SQUARE_SHAPE:
-			superplan =  new PullPlan(CASED_SQUARE_PULL_TEMPLATE, plan->getCasingColor());
-			break;
-		default:
-			exit(0);
-	}
-	assert(superplan);
-	assert(superplan->subs.size() >= 1);
-	superplan->subs[0].plan = plan;
-	emit newPullPlan(superplan);
+	plan->addCasing(0.1, shapeButtonGroup->checkedId(), plan->getOutermostCasingColor());
+	emit someDataChanged();
 }
 
 void PullPlanEditorWidget :: fillRuleButtonGroupChanged(int)
@@ -297,43 +280,19 @@ void PullPlanEditorWidget :: shapeButtonGroupChanged(int)
         switch (shapeButtonGroup->checkedId())
         {
                 case 1:
-                        if (plan->getCasingShape() == CIRCLE_SHAPE)
+                        if (plan->getOutermostCasingShape() == CIRCLE_SHAPE)
                                 return;
-                        plan->setCasingShape(CIRCLE_SHAPE);
+                        plan->setOutermostCasingShape(CIRCLE_SHAPE);
                        	emit someDataChanged(); 
                         break;
                 case 2:
-                        if (plan->getCasingShape() == SQUARE_SHAPE)
+                        if (plan->getOutermostCasingShape() == SQUARE_SHAPE)
                                 return;
-                        plan->setCasingShape(SQUARE_SHAPE);
+                        plan->setOutermostCasingShape(SQUARE_SHAPE);
 			plan->setTwist(0.0); // reset twist to zero because square casing can't be twisted
                         emit someDataChanged();
                         break;
         }
-}
-
-void PullPlanEditorWidget :: setPlanTwist(int twist)
-{
-	plan->setTwist(twist);
-	emit someDataChanged();	
-}
-
-void PullPlanEditorWidget :: setPlanTemplate(int templateType)
-{
-	plan->setTemplateType(templateType);
-	emit someDataChanged();	
-}
-
-void PullPlanEditorWidget :: setPlanColor(Color* c)
-{
-	plan->setCasingColor(c);
-	emit someDataChanged();	
-}
-
-void PullPlanEditorWidget :: setPlanTemplateCasingThickness(float t)
-{
-	plan->setCasingThickness(t);
-	emit someDataChanged();	
 }
 
 void PullPlanEditorWidget :: seedTemplates()
