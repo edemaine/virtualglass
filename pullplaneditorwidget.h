@@ -35,6 +35,7 @@ class PullPlanEditorWidget : public QWidget
 	private slots:
 		void fillRuleButtonGroupChanged(int);
 		void addCasingButtonPressed();
+		void removeCasingButtonPressed();
 		void viewWidgetDataChanged();
 		void shapeButtonGroupChanged(int);
 		void twistSpinChanged(int);
@@ -57,6 +58,7 @@ class PullPlanEditorWidget : public QWidget
                 QButtonGroup* shapeButtonGroup;
         	QHBoxLayout* templateLibraryLayout;
 		QPushButton* addCasingButton;
+		QPushButton* removeCasingButton;
 		QPushButton* customizePlanButton;
 
 		void setupLayout();

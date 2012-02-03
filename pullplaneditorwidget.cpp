@@ -124,6 +124,7 @@ void PullPlanEditorWidget :: setupLayout()
         QCheckBox* circleCheckBox = new QCheckBox("Circle");
         QCheckBox* squareCheckBox = new QCheckBox("Square");
 	addCasingButton = new QPushButton("Add Casing");
+	removeCasingButton = new QPushButton("Remove Casing");
         shapeButtonGroup = new QButtonGroup();
         shapeButtonGroup->addButton(circleCheckBox, 1);
         shapeButtonGroup->addButton(squareCheckBox, 2);
@@ -131,6 +132,7 @@ void PullPlanEditorWidget :: setupLayout()
         pullTemplateShapeLayout->addWidget(circleCheckBox);
         pullTemplateShapeLayout->addWidget(squareCheckBox);
         pullTemplateShapeLayout->addWidget(addCasingButton);
+        pullTemplateShapeLayout->addWidget(removeCasingButton);
         editorLayout->addLayout(pullTemplateShapeLayout, 0);
 
         // Twist slider stuff
@@ -207,6 +209,12 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
         }
 }
 
+void PullPlanEditorWidget :: removeCasingButtonPressed()
+{
+	plan->removeCasing();
+	emit someDataChanged();
+}
+
 void PullPlanEditorWidget :: addCasingButtonPressed()
 {
 	plan->addCasing(shapeButtonGroup->checkedId(), plan->getOutermostCasingColor());
@@ -222,6 +230,7 @@ void PullPlanEditorWidget :: setupConnections()
 {
 	connect(fillRuleButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(fillRuleButtonGroupChanged(int)));
 	connect(addCasingButton, SIGNAL(pressed()), this, SLOT(addCasingButtonPressed()));
+	connect(removeCasingButton, SIGNAL(pressed()), this, SLOT(removeCasingButtonPressed()));
         connect(shapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(shapeButtonGroupChanged(int)));
         connect(twistSlider, SIGNAL(valueChanged(int)), this, SLOT(twistSliderChanged(int)));
         connect(twistSpin, SIGNAL(valueChanged(int)), this, SLOT(twistSpinChanged(int)));

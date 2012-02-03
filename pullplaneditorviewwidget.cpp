@@ -331,8 +331,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	setBoundaryPainter(painter, drawWidth, drawHeight, borderLevels);
 	painter->setBrush(QColor(255*plan->getOutermostCasingColor()->r, 255*plan->getOutermostCasingColor()->g, 
 		255*plan->getOutermostCasingColor()->b, 255*plan->getOutermostCasingColor()->a));
-	switch (mandatedShape)
-	{
+	switch (mandatedShape) {
 		case CIRCLE_SHAPE:
 			painter->drawEllipse(x, y, drawWidth, drawHeight);
 			break;
