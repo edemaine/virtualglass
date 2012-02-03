@@ -24,17 +24,26 @@ void PullPlanEditorViewWidget :: setFillRule(int r)
 
 void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 {
-	float x = (event->pos().x() - width()/2);
-	float y = (event->pos().y() - height()/2);
-	float radius = sqrt(x * x + y * y) / (width()/2 - 10); 
+	float x = (event->pos().x() - width()/2) / float(width()/2-10);
+	float y = (event->pos().y() - height()/2) / float(width()/2-10);
+	float radius = sqrt(x * x + y * y); 
 
-	for (unsigned int i = 0; i < plan->getCasingCount() - 1; ++i)
-	{
-		if (fabs(radius - plan->getCasingThickness(i)) < 0.05)
-		{
-			isDraggingCasing = true; 
-			draggedCasingIndex = i;
-			return;
+	for (unsigned int i = 0; i < plan->getCasingCount() - 1; ++i) {
+		switch (plan->getCasingShape(i)) {
+			case CIRCLE_SHAPE:
+				if (fabs(radius - plan->getCasingThickness(i)) < 0.05) {
+					isDraggingCasing = true; 
+					draggedCasingIndex = i;
+					return;
+				}
+				break;
+			case SQUARE_SHAPE:
+				if (fabs(radius - plan->getCasingThickness(i)) < 0.05) {
+					isDraggingCasing = true; 
+					draggedCasingIndex = i;
+					return;
+				}
+				break;
 		}
 	}
 }
@@ -46,14 +55,33 @@ void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 		float x = (event->pos().x() - width()/2);
 		float y = (event->pos().y() - height()/2);
 		float radius = sqrt(x * x + y * y) / (width()/2 - 10); 
-	
-		if (draggedCasingIndex == 0)
-			plan->setCasingThickness(MIN(
-				MAX(radius, 0.01), plan->getCasingThickness(draggedCasingIndex + 1) - 0.05), 
-				draggedCasingIndex);
-		else
-			plan->setCasingThickness(MIN(MAX(radius, plan->getCasingThickness(draggedCasingIndex-1) + 0.05), 
-				plan->getCasingThickness(draggedCasingIndex+1) - 0.05), draggedCasingIndex);
+
+		float min;
+		float max;
+
+		if (draggedCasingIndex == 0) {
+			min = 0.01;
+			if (plan->getCasingShape(0) == SQUARE_SHAPE 
+				&& plan->getCasingShape(1) == CIRCLE_SHAPE) 
+				max = plan->getCasingThickness(1) / sqrt(2) - 0.05;
+			else 
+				max = plan->getCasingThickness(1) - 0.05;
+		}
+		else {
+			if (plan->getCasingShape(draggedCasingIndex) == CIRCLE_SHAPE
+				&& plan->getCasingShape(draggedCasingIndex-1) == SQUARE_SHAPE) 
+				min = plan->getCasingThickness(draggedCasingIndex-1) * sqrt(2) + 0.05;
+			else
+				min = plan->getCasingThickness(draggedCasingIndex-1) + 0.05;
+
+			if (plan->getCasingShape(draggedCasingIndex) == SQUARE_SHAPE
+				&& plan->getCasingShape(draggedCasingIndex+1) == CIRCLE_SHAPE) 
+				max = plan->getCasingThickness(draggedCasingIndex+1) / sqrt(2) - 0.05;
+			else
+				max = plan->getCasingThickness(draggedCasingIndex+1) - 0.05;
+		}
+
+		plan->setCasingThickness(MIN(MAX(radius, min), max), draggedCasingIndex);
 		emit someDataChanged();
 	}
 }

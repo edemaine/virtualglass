@@ -106,6 +106,8 @@ void PullPlan :: setTemplateType(int templateType) {
                 case CIRCLE_BASE_PULL_TEMPLATE:
                         break;
                 case SQUARE_BASE_PULL_TEMPLATE:
+                        casings[0].shape = SQUARE_SHAPE;
+                        casings[0].thickness = 1 / SQRT_TWO;
                         break;
                 case AMORPHOUS_BASE_PULL_TEMPLATE:
                         casings[0].shape = AMORPHOUS_SHAPE;
@@ -113,6 +115,8 @@ void PullPlan :: setTemplateType(int templateType) {
                 case CASED_CIRCLE_PULL_TEMPLATE:
                         break;
                 case CASED_SQUARE_PULL_TEMPLATE:
+                        casings[0].shape = SQUARE_SHAPE;
+                        casings[0].thickness = 1 / SQRT_TWO;
                         break;
                 case HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE:
                         tmp = new char[100];
@@ -140,6 +144,8 @@ void PullPlan :: setTemplateType(int templateType) {
                         break;
                 case SQUARE_OF_SQUARES_PULL_TEMPLATE:
                 case SQUARE_OF_CIRCLES_PULL_TEMPLATE:
+                        casings[0].shape = SQUARE_SHAPE;
+                        casings[0].thickness = 1 / SQRT_TWO;
                         tmp = new char[100];
                         sprintf(tmp, "Row count:");
                         parameterNames.push_back(tmp);
@@ -152,6 +158,8 @@ void PullPlan :: setTemplateType(int templateType) {
                         parameterValues.push_back(3);
                         break;
                 case SURROUNDING_SQUARE_PULL_TEMPLATE:
+                        casings[0].shape = SQUARE_SHAPE;
+                        casings[0].thickness = 1 / SQRT_TWO;
                         tmp = new char[100];
                         sprintf(tmp, "Column count:");
                         parameterNames.push_back(tmp);
@@ -161,6 +169,7 @@ void PullPlan :: setTemplateType(int templateType) {
 			break;
 		case CUSTOM_SQUARE_PULL_TEMPLATE:
 			this->casings[0].shape = SQUARE_SHAPE;
+                        casings[0].thickness = 1 / SQRT_TWO;
 			break;
         }
 
@@ -231,7 +240,7 @@ unsigned int PullPlan :: getParameterCount() {
 void PullPlan :: removeCasing() {
 
 	int count = casings.size();
-	if (count < 2)
+	if (count < 3)
 		return;
 
 	float diff = casings[count-1].thickness - casings[count-2].thickness;
@@ -242,32 +251,51 @@ void PullPlan :: removeCasing() {
 }
 
 void PullPlan :: addCasing(int shape) {
-	
-	for (unsigned int i = 0; i < casings.size(); ++i) {
-		casings[i].thickness -= 0.1;
+
+	if (shape == CIRCLE_SHAPE && getOutermostCasingShape() == SQUARE_SHAPE) {		
+		for (unsigned int i = 0; i < casings.size(); ++i) {
+			casings[i].thickness *= 1 / SQRT_TWO;
+		}
+	}
+	else {
+		for (unsigned int i = 0; i < casings.size(); ++i) {
+			casings[i].thickness -= 0.1;
+		}
 	}
 	casings.push_back(Casing(1.0, shape, defaultColor));
 }
 
 void PullPlan :: setCasingThickness(float t, unsigned int index) {
-
+	
+	// this currently doesn't enforce any overlapping issues with
+	// differently-shaped casings. It assumes they are being set 
+	// to valid relative sizes.
 	if (index >= this->casings.size())
 		return;
 	this->casings[index].thickness = t;
 	updateSubs();
 }
 
-void PullPlan :: setCasingShape(int s, unsigned int index) {
+void PullPlan :: setOutermostCasingShape(int newShape) {
 
-	if (index >= this->casings.size())
+	if (newShape == getOutermostCasingShape()) 
+		return; 
+
+	// simple case of only 1 casing
+	if (casings.size() == 1) {
+		casings[0].shape = newShape;
 		return;
-	this->casings[index].shape = s;
-	updateSubs();
-}
+	}
 
-void PullPlan :: setOutermostCasingShape(int s) {
-
-	this->casings[casings.size()-1].shape = s;
+	// if we're moving from square to circle and the interior casing is square and
+	// would collide with the new casing shape, scale everything down to make room
+        if (newShape == CIRCLE_SHAPE && casings[casings.size()-2].shape == SQUARE_SHAPE
+		&& casings[casings.size()-2].thickness > 1 / SQRT_TWO) { 
+		for (unsigned int i = 0; i < casings.size() - 1; ++i) 
+			casings[i].thickness *= 1 / SQRT_TWO;
+        }
+	
+	casings[casings.size()-1].shape = newShape;
 	updateSubs();
 }
 

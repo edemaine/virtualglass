@@ -298,7 +298,6 @@ void PullPlanEditorWidget :: shapeButtonGroupChanged(int)
                         if (plan->getOutermostCasingShape() == SQUARE_SHAPE)
                                 return;
                         plan->setOutermostCasingShape(SQUARE_SHAPE);
-			plan->setTwist(0.0); // reset twist to zero because square casing can't be twisted
                         emit someDataChanged();
                         break;
         }

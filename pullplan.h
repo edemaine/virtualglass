@@ -31,7 +31,6 @@ class PullPlan
                 unsigned int getParameterCount();
 
                 void setCasingThickness(float t, unsigned int index);
-                void setCasingShape(int s, unsigned int index);
 		void setOutermostCasingShape(int shape);
                 void setCasingColor(Color* c, unsigned int index);
 		void addCasing(int shape);
