@@ -34,7 +34,7 @@ class PullPlan
                 void setCasingShape(int s, unsigned int index);
 		void setOutermostCasingShape(int shape);
                 void setCasingColor(Color* c, unsigned int index);
-		void addCasing(int shape, Color* color);
+		void addCasing(int shape);
 		void removeCasing();
                 float getCasingThickness(unsigned int index);
                 int getCasingShape(unsigned int index);

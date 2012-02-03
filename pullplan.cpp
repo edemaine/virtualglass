@@ -54,7 +54,7 @@ bool PullPlan :: hasDependencyOn(PullPlan* plan) {
 bool PullPlan :: hasDependencyOn(Color* color) {
 
 	for (unsigned int i = 0; i < casings.size(); ++i) {
-		if (this->casings[0].color == color)
+		if (this->casings[i].color == color)
 			return true;
 	} 
 	if (this->isBase())
@@ -241,12 +241,12 @@ void PullPlan :: removeCasing() {
 	}
 }
 
-void PullPlan :: addCasing(int shape, Color* color) {
+void PullPlan :: addCasing(int shape) {
 	
 	for (unsigned int i = 0; i < casings.size(); ++i) {
 		casings[i].thickness -= 0.1;
 	}
-	casings.push_back(Casing(1.0, shape, color));
+	casings.push_back(Casing(1.0, shape, defaultColor));
 }
 
 void PullPlan :: setCasingThickness(float t, unsigned int index) {

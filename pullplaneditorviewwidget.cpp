@@ -69,6 +69,13 @@ void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 	event->acceptProposedAction();
 }
 
+void PullPlanEditorViewWidget :: dragLeaveEvent(QDragLeaveEvent* /*event*/)
+{
+	subplansHighlighted.clear();
+	casingHighlighted = false;
+	emit someDataChanged();
+}
+
 void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 {
 	PullPlan* draggedPlan;
@@ -329,8 +336,11 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 
 	// Draw casings
 	setBoundaryPainter(painter, drawWidth, drawHeight, borderLevels);
-	painter->setBrush(QColor(255*plan->getOutermostCasingColor()->r, 255*plan->getOutermostCasingColor()->g, 
-		255*plan->getOutermostCasingColor()->b, 255*plan->getOutermostCasingColor()->a));
+	if (borderLevels == 1 && highlightThis)
+		painter->setBrush(QColor(255, 255, 255, 255));
+	else
+		painter->setBrush(QColor(255*plan->getOutermostCasingColor()->r, 255*plan->getOutermostCasingColor()->g, 
+			255*plan->getOutermostCasingColor()->b, 255*plan->getOutermostCasingColor()->a));
 	switch (mandatedShape) {
 		case CIRCLE_SHAPE:
 			painter->drawEllipse(x, y, drawWidth, drawHeight);
@@ -339,6 +349,9 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 			painter->drawRect(x, y, drawWidth, drawHeight);
 			break;
 	}
+
+	if (borderLevels == 1 && highlightThis)
+		return;
 
 	for (unsigned int i = plan->getCasingCount() - 1; i > 0; --i) {
 
@@ -350,11 +363,11 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		setBoundaryPainter(painter, casingHeight, casingWidth, borderLevels);
 
 		// set fill to be white if highlighted or background grey if not
-		bool highlighting = false;
+		bool highlighted = false;
 		if ((borderLevels == 2 && casingHighlighted && i == casingHighlightIndex) 
 			|| (borderLevels == 1 && highlightThis))  
 		{
-			highlighting = true;
+			highlighted = true;
 			painter->setBrush(QColor(255, 255, 255));
 		}
 		else
@@ -363,7 +376,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		{
 			case CIRCLE_SHAPE:
 				painter->drawEllipse(casingX, casingY, casingWidth, casingHeight);
-				if (highlighting)
+				if (highlighted)
 					break;
 				painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g, 
 					255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
@@ -371,7 +384,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 				break;
 			case SQUARE_SHAPE:
 				painter->drawRect(casingX, casingY, casingWidth, casingHeight);
-				if (highlighting)
+				if (highlighted)
 					break;
 				painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g, 
 					255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
@@ -380,10 +393,6 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		}
 	}
 
-	if (plan->isBase()) // no subplans, so time to go home
-		return;
-
-	// Recurse. Draw unhighlighted subplans first
 	for (unsigned int i = plan->subs.size()-1; i < plan->subs.size(); --i)
 	{
 		SubpullTemplate* sub = &(plan->subs[i]);
@@ -394,54 +403,26 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		float rWidth = sub->diameter * casingScale * drawWidth/2;
 		float rHeight = sub->diameter * casingScale * drawHeight/2;
 
-		if (borderLevels == 2)
-		{
+		if (borderLevels == 2) {
 			bool highlighted = false;
-			for (unsigned int j = 0; j < subplansHighlighted.size(); ++j)
-			{
+			for (unsigned int j = 0; j < subplansHighlighted.size(); ++j) {
 				if (subplansHighlighted[j] == i)
 					highlighted = true;
 			}
-			if (!highlighted)
-			{
+			if (highlighted) {
 				drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
-					false, plan->subs[i].shape, 
-					borderLevels-1, painter);
+					true, plan->subs[i].shape, 1, painter);
+			}
+			else {
+				drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
+					false, plan->subs[i].shape, 1, painter);
+
 			}
 		}
-		else
-		{
+		else {
 			drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
 				false, plan->subs[i].shape, 
 				borderLevels-1, painter);
-		}
-	}
-
-	// Recurse. Now draw highlighted subplans 
-	for (unsigned int i = plan->subs.size()-1; i < plan->subs.size(); --i)
-	{
-		SubpullTemplate* sub = &(plan->subs[i]);
-
-		float casingScale = plan->getCasingThickness(0);
-		float rX = x + (sub->location.x - sub->diameter/2.0) * casingScale * drawWidth/2 + drawWidth/2;
-		float rY = y + (sub->location.y - sub->diameter/2.0) * casingScale * drawWidth/2 + drawHeight/2;
-		float rWidth = sub->diameter * casingScale * drawWidth/2;
-		float rHeight = sub->diameter * casingScale * drawHeight/2;
-
-		if (borderLevels == 2)
-		{
-			bool highlighted = false;
-			for (unsigned int j = 0; j < subplansHighlighted.size(); ++j)
-			{
-				if (subplansHighlighted[j] == i)
-					highlighted = true;
-			}
-			if (highlighted)
-			{
-				drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
-					true, plan->subs[i].shape, 
-					borderLevels-1, painter);
-			}
 		}
 	}
 }

@@ -217,7 +217,7 @@ void PullPlanEditorWidget :: removeCasingButtonPressed()
 
 void PullPlanEditorWidget :: addCasingButtonPressed()
 {
-	plan->addCasing(shapeButtonGroup->checkedId(), plan->getOutermostCasingColor());
+	plan->addCasing(shapeButtonGroup->checkedId());
 	emit someDataChanged();
 }
 
