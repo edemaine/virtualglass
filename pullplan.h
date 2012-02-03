@@ -41,6 +41,7 @@ class PullPlan
                 Color* getOutermostCasingColor();
                 Color* getCasingColor(unsigned int index);
 		unsigned int getCasingCount(); 
+		bool hasSquareCasing();
 
 		void setTwist(float t);
 		float getTwist();

@@ -71,15 +71,6 @@ void Mesher :: applyResizeTransform(Vertex* v, float scale)
 	v->position.y *= scale; 
 }
 
-void Mesher :: applyCasingResizeTransform(Vertex* v, PullPlan* parentNode) {
-
-	float scale = parentNode->getCasingThickness(0); // innermost casing radius
-
-	// Shrink diameter of whole subcane area
-	v->position.x *= scale;
-	v->position.y *= scale;
-}
-
 void Mesher :: applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int subplan)
 {
 	SubpullTemplate* subTemp = &(parentNode->subs[subplan]);
@@ -273,7 +264,6 @@ Vertex Mesher :: applyTransforms(Vertex v, vector<PullPlan*>* ancestors, vector<
 	for (int i = ancestors->size() - 2; i >= 0; --i)
 	{
 		applyMoveAndResizeTransform(&v, (*ancestors)[i], (*ancestorIndices)[i]);
-		applyCasingResizeTransform(&v, (*ancestors)[i]);
 		applyTwistTransform(&v,(*ancestors)[i]);
 	}
 	return v;

@@ -424,11 +424,10 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	{
 		SubpullTemplate* sub = &(plan->subs[i]);
 
-		float casingScale = plan->getCasingThickness(0);
-		float rX = x + (sub->location.x - sub->diameter/2.0) * casingScale * drawWidth/2 + drawWidth/2;
-		float rY = y + (sub->location.y - sub->diameter/2.0) * casingScale * drawWidth/2 + drawHeight/2;
-		float rWidth = sub->diameter * casingScale * drawWidth/2;
-		float rHeight = sub->diameter * casingScale * drawHeight/2;
+		float rX = x + (sub->location.x - sub->diameter/2.0) * drawWidth/2 + drawWidth/2;
+		float rY = y + (sub->location.y - sub->diameter/2.0) * drawWidth/2 + drawHeight/2;
+		float rWidth = sub->diameter * drawWidth/2;
+		float rHeight = sub->diameter * drawHeight/2;
 
 		if (borderLevels == 2) {
 			bool highlighted = false;

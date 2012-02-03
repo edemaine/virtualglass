@@ -248,6 +248,20 @@ void PullPlan :: removeCasing() {
 	for (unsigned int i = 0; i < casings.size(); ++i) {
 		casings[i].thickness += diff;
 	}
+
+	updateSubs();
+}
+
+
+
+bool PullPlan :: hasSquareCasing() {
+	
+	for (unsigned int i = 1; i < casings.size(); ++i) {
+		if (casings[i].shape == SQUARE_SHAPE) {
+			return true;
+		}
+	}
+	return false;	
 }
 
 void PullPlan :: addCasing(int shape) {
@@ -263,6 +277,10 @@ void PullPlan :: addCasing(int shape) {
 		}
 	}
 	casings.push_back(Casing(1.0, shape, defaultColor));
+	if (hasSquareCasing())
+		this->twist = 0.0;
+
+	updateSubs();
 }
 
 void PullPlan :: setCasingThickness(float t, unsigned int index) {
@@ -296,6 +314,9 @@ void PullPlan :: setOutermostCasingShape(int newShape) {
         }
 	
 	casings[casings.size()-1].shape = newShape;
+	if (hasSquareCasing())
+		this->twist = 0.0;
+
 	updateSubs();
 }
 
@@ -353,7 +374,7 @@ the number of subplans.
 void PullPlan :: updateSubs()
 {
         Point p;
-        float radius = 1.0;
+        float radius = casings[0].thickness;
 
 	vector<SubpullTemplate> newSubs;
 
