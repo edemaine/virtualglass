@@ -47,9 +47,6 @@ void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 		float y = (event->pos().y() - height()/2);
 		float radius = sqrt(x * x + y * y) / (width()/2 - 10); 
 	
-		plan->setCasingThickness(MIN(MAX(radius, 0.05), 0.95), draggedCasingIndex);
-		emit someDataChanged();
-	/*
 		if (draggedCasingIndex == 0)
 			plan->setCasingThickness(MIN(
 				MAX(radius, 0.01), plan->getCasingThickness(draggedCasingIndex + 1) - 0.05), 
@@ -58,7 +55,6 @@ void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 			plan->setCasingThickness(MIN(MAX(radius, plan->getCasingThickness(draggedCasingIndex-1) + 0.05), 
 				plan->getCasingThickness(draggedCasingIndex+1) - 0.05), draggedCasingIndex);
 		emit someDataChanged();
-	*/
 	}
 }
 
@@ -114,7 +110,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			// at this point we have already checked that the dropped plan is a color bar
 			// (that was done in populateIsCasingHighlighted()). So now we can just
 			// take the color w/o thinking.
-			plan->setCasingColor(droppedPlan->getOutermostCasingColor(), plan->getCasingCount()-1);
+			plan->setCasingColor(droppedPlan->getOutermostCasingColor(), casingHighlightIndex);
 		}
 	}
 
@@ -143,16 +139,16 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, PullP
 
 		// Determine if drop hit the subplan
 		bool hit = false;
-		float dx = fabs(x - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
-		float dy = fabs(y - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
+		float dx = fabs(x - (drawSize/2 * subpull->location.x * plan->getCasingThickness(0) + drawSize/2 + 10));
+		float dy = fabs(y - (drawSize/2 * subpull->location.y * plan->getCasingThickness(0) + drawSize/2 + 10));
 		switch (subpull->shape)
 		{
 			case CIRCLE_SHAPE:
-				if (pow(double(dx*dx + dy*dy), 0.5) < (subpull->diameter/2.0)*drawSize/2)
+				if (pow(double(dx*dx + dy*dy), 0.5) < (subpull->diameter/2.0)* drawSize/2 * plan->getCasingThickness(0))
 					hit = true;
 				break;
 			case SQUARE_SHAPE:
-				if (MAX(dx, dy) < (subpull->diameter/2.0)*drawSize/2)
+				if (MAX(dx, dy) < (subpull->diameter/2.0) * drawSize/2 * plan->getCasingThickness(0))
 					hit = true;
 				break;
 		}
@@ -237,38 +233,41 @@ void PullPlanEditorViewWidget :: populateIsCasingHighlighted(int x, int y, int t
 		return; 
 
 	// Deal w/casing
-	int drawSize = width() - 20;
+	float drawSize = (width() - 20);
 	float distanceFromCenter;
-	switch (plan->getOutermostCasingShape())
-	{
-		case CIRCLE_SHAPE:
-			distanceFromCenter = sqrt(pow(double(x - drawSize/2 + 10), 2.0)
-				+ pow(double(y - drawSize/2 + 10), 2.0));
-			if (distanceFromCenter <= drawSize/2)
-			{
-				casingHighlighted = true;
-				return;
-			}
-			break;
-		case SQUARE_SHAPE:
-			if (10 <= x && x <= drawSize
-				&& 10 <= y && y <= drawSize)
-			{
-				casingHighlighted = true;
-				return;
-			}
-			break;
+	for (unsigned int i = 0; i < plan->getCasingCount(); ++i) {
+
+		switch (plan->getCasingShape(i)) {
+			case CIRCLE_SHAPE:
+				distanceFromCenter = sqrt(pow(x - drawSize/2 + 10, 2.0)
+					+ pow(y - drawSize/2 + 10, 2.0));
+				if (distanceFromCenter <= drawSize/2 * plan->getCasingThickness(i))
+				{
+					casingHighlighted = true;
+					casingHighlightIndex = i;
+					return;
+				}
+				break;
+			case SQUARE_SHAPE:
+				if (MAX(fabs(x - width()/2), fabs(y - height()/2)) < drawSize/2 * plan->getCasingThickness(i))
+				{
+					casingHighlighted = true;
+					casingHighlightIndex = i;
+					return;
+				}
+				break;
+		}
 	}
 }
 
-void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan)
-{
+void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan) {
+
 	this->plan = plan;
 }
 
 
 void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, int drawWidth, 
-	int drawHeight, int borderLevels, bool highlightThis) {
+	int drawHeight, int borderLevels) {
 
 	painter->setBrush(Qt::NoBrush);
 	if (MIN(drawWidth, drawHeight) < 10)
@@ -278,11 +277,8 @@ void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, int drawW
 	else if (borderLevels > 0)
 	{
 		QPen pen;
-		pen.setWidth(5);
-		if (highlightThis)
-			pen.setColor(Qt::white);
-		else
-			pen.setColor(Qt::black);
+		pen.setWidth(3);
+		pen.setColor(Qt::black);
 		painter->setPen(pen);
 	}
 	else
@@ -332,7 +328,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	}
 
 	// Draw casings
-	setBoundaryPainter(painter, drawWidth, drawHeight, borderLevels, highlightThis);
+	setBoundaryPainter(painter, drawWidth, drawHeight, borderLevels);
 	painter->setBrush(QColor(255*plan->getOutermostCasingColor()->r, 255*plan->getOutermostCasingColor()->g, 
 		255*plan->getOutermostCasingColor()->b, 255*plan->getOutermostCasingColor()->a));
 	switch (mandatedShape)
@@ -351,16 +347,28 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		int casingHeight = drawHeight * plan->getCasingThickness(i);
 		int casingX = x + drawWidth / 2 - casingWidth / 2;
 		int casingY = y + drawHeight / 2 - casingHeight / 2;
-		
-		setBoundaryPainter(painter, casingHeight, casingWidth, borderLevels, highlightThis);
-		painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g, 
-			255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
+	
+		setBoundaryPainter(painter, casingHeight, casingWidth, borderLevels);
+
+		// set fill to be white if highlighted or background grey if not
+		if ((borderLevels == 2 && casingHighlighted && i == casingHighlightIndex) 
+			|| (borderLevels == 1 && highlightThis))  
+			painter->setBrush(QColor(255, 255, 255));
+		else
+			painter->setBrush(QColor(200, 200, 200));
 		switch (plan->getCasingShape(i))
 		{
 			case CIRCLE_SHAPE:
+
+				painter->drawEllipse(casingX, casingY, casingWidth, casingHeight);
+				painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g, 
+					255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
 				painter->drawEllipse(casingX, casingY, casingWidth, casingHeight);
 				break;
 			case SQUARE_SHAPE:
+				painter->drawRect(casingX, casingY, casingWidth, casingHeight);
+				painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g, 
+					255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
 				painter->drawRect(casingX, casingY, casingWidth, casingHeight);
 				break;
 		}

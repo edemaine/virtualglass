@@ -33,7 +33,7 @@ class PullPlanEditorViewWidget : public QWidget
 
 	private:
 		void setBoundaryPainter(QPainter* painter, int drawWidth, int drawHeight, 
-			int borderLevels, bool highlightThis);
+			int borderLevels);
 		void drawSubplan(float x, float y, float width, float height, PullPlan* plan, 
 			bool highlightThis, int mandatedShape, int borderLevels, QPainter* painter);
 		PullPlan* plan;
@@ -43,6 +43,7 @@ class PullPlanEditorViewWidget : public QWidget
 		void populateHighlightedSubplans(int x, int y, PullPlan* plan, int type);
 		void populateIsCasingHighlighted(int x, int y, int type);
 		bool casingHighlighted;
+		unsigned int casingHighlightIndex;
 		vector<unsigned int> subplansHighlighted; 
 };
 
