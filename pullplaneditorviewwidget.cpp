@@ -88,7 +88,7 @@ void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 	populateHighlightedSubplans(event->pos().x(), event->pos().y(), draggedPlan, type);
 	if (subplansHighlighted.size() == 0)
 	{
-		populateIsCasingHighlighted(event->pos().x(), event->pos().y(), type);
+		populateHighlightedCasings(event->pos().x(), event->pos().y(), type);
 	}
 	emit someDataChanged();
 }
@@ -110,12 +110,12 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	}
 	else
 	{
-		populateIsCasingHighlighted(event->pos().x(), event->pos().y(), type);
+		populateHighlightedCasings(event->pos().x(), event->pos().y(), type);
 		if (casingHighlighted)
 		{
 			event->accept();
 			// at this point we have already checked that the dropped plan is a color bar
-			// (that was done in populateIsCasingHighlighted()). So now we can just
+			// (that was done in populateHighlightedCasings()). So now we can just
 			// take the color w/o thinking.
 			plan->setCasingColor(droppedPlan->getOutermostCasingColor(), casingHighlightIndex);
 		}
@@ -232,7 +232,7 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, PullP
 }
 
 
-void PullPlanEditorViewWidget :: populateIsCasingHighlighted(int x, int y, int type)
+void PullPlanEditorViewWidget :: populateHighlightedCasings(int x, int y, int type)
 {
 	casingHighlighted = false;
 
@@ -243,11 +243,10 @@ void PullPlanEditorViewWidget :: populateIsCasingHighlighted(int x, int y, int t
 	float drawSize = (width() - 20);
 	float distanceFromCenter;
 	for (unsigned int i = 1; i < plan->getCasingCount(); ++i) {
-
 		switch (plan->getCasingShape(i)) {
 			case CIRCLE_SHAPE:
-				distanceFromCenter = sqrt(pow(x - drawSize/2 + 10, 2.0)
-					+ pow(y - drawSize/2 + 10, 2.0));
+				distanceFromCenter = sqrt(pow(x - (drawSize/2 + 10), 2.0)
+					+ pow(y - (drawSize/2 + 10), 2.0));
 				if (distanceFromCenter <= drawSize/2 * plan->getCasingThickness(i))
 				{
 					casingHighlighted = true;
