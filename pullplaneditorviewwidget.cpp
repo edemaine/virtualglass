@@ -351,22 +351,29 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		setBoundaryPainter(painter, casingHeight, casingWidth, borderLevels);
 
 		// set fill to be white if highlighted or background grey if not
+		bool highlighting = false;
 		if ((borderLevels == 2 && casingHighlighted && i == casingHighlightIndex) 
 			|| (borderLevels == 1 && highlightThis))  
+		{
+			highlighting = true;
 			painter->setBrush(QColor(255, 255, 255));
+		}
 		else
 			painter->setBrush(QColor(200, 200, 200));
 		switch (plan->getCasingShape(i))
 		{
 			case CIRCLE_SHAPE:
-
 				painter->drawEllipse(casingX, casingY, casingWidth, casingHeight);
+				if (highlighting)
+					break;
 				painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g, 
 					255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
 				painter->drawEllipse(casingX, casingY, casingWidth, casingHeight);
 				break;
 			case SQUARE_SHAPE:
 				painter->drawRect(casingX, casingY, casingWidth, casingHeight);
+				if (highlighting)
+					break;
 				painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g, 
 					255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
 				painter->drawRect(casingX, casingY, casingWidth, casingHeight);
