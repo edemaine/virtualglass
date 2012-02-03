@@ -71,6 +71,15 @@ void Mesher :: applyResizeTransform(Vertex* v, float scale)
 	v->position.y *= scale; 
 }
 
+void Mesher :: applyCasingResizeTransform(Vertex* v, PullPlan* parentNode) {
+
+	float scale = parentNode->getCasingThickness(0); // innermost casing radius
+
+	// Shrink diameter of whole subcane area
+	v->position.x *= scale;
+	v->position.y *= scale;
+}
+
 void Mesher :: applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int subplan)
 {
 	SubpullTemplate* subTemp = &(parentNode->subs[subplan]);
@@ -264,6 +273,7 @@ Vertex Mesher :: applyTransforms(Vertex v, vector<PullPlan*>* ancestors, vector<
 	for (int i = ancestors->size() - 2; i >= 0; --i)
 	{
 		applyMoveAndResizeTransform(&v, (*ancestors)[i], (*ancestorIndices)[i]);
+		applyCasingResizeTransform(&v, (*ancestors)[i]);
 		applyTwistTransform(&v,(*ancestors)[i]);
 	}
 	return v;
@@ -412,7 +422,7 @@ void Mesher :: meshPickupCasingSlab(Geometry* geometry, Color* color, float y, f
 The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
 */
 void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
-	Color* color, int mandatedShape, float offset, float length, bool ensureVisible, uint32_t group_tag)
+	Color* color, int mandatedShape, float offset, float length, float radius, bool ensureVisible, uint32_t group_tag)
 {
 	if (color->a < 0.0001 && !ensureVisible)
 		return;
@@ -463,6 +473,12 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 				points.push_back(p);
 			}
 			break;
+	}
+
+	// scale for radius 
+	for (unsigned int i = 0; i < points.size(); ++i) {
+		points[i].x *= radius;
+		points[i].y *= radius;
 	}
 
 	//Generate verts:
@@ -717,7 +733,7 @@ void Mesher :: generatePullMesh(PullPlan* plan, Geometry* geometry)
 	else
 		generateMesh(plan, plan->getOutermostCasingShape(), geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 
-	// Make skinner to more closely mimic the canes found in pickups
+	// Make skinnier to more closely mimic the canes found in pickups
         for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
         {
                 applyResizeTransform(&(geometry->vertices[v]), 0.5);
@@ -757,10 +773,10 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 	// have an AMORPHOUS_SHAPE and need it specified for you. Even if you don't the shape
 	// suggestion matches your shape, so it's still ok to use.
 	meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getOutermostCasingColor(), 
-		mandatedShape, offset, length, ensureVisible, groupIndex);
+		mandatedShape, offset, length, 1.0, ensureVisible, groupIndex);
 	for (unsigned int i = 0; i < plan->getCasingCount() - 1; ++i) {
 		meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getCasingColor(i), 
-			plan->getCasingShape(i), offset, length, ensureVisible, groupIndex);
+			plan->getCasingShape(i), offset, length, plan->getCasingThickness(i), ensureVisible, groupIndex);
 	}
 	ancestors->pop_back();
 

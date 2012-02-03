@@ -40,10 +40,12 @@ class Mesher
 		float splineVal(float r1, float r2, float r3, float t);
 		float splineVal(float r1, float r2, float r3, float r4, float t);
 		void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
-			Color* color, int mandatedShape, float offset, float length, bool ensureVisible, uint32_t group_tag);
+			Color* color, int mandatedShape, float offset, float length, float radius, 
+			bool ensureVisible, uint32_t group_tag);
 		void meshPickupCasingSlab(Geometry* geometry, Color* color, float y, float thickness);
 		void applyResizeTransform(Vertex* v, float scale);
 		void applyMoveAndResizeTransform(Vertex* v, PullPlan* parentPlan, int subplan);
+		void applyCasingResizeTransform(Vertex* v, PullPlan* parentPlan);
 		void applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentPlan, int subplan);
 		void applyTwistTransform(Vertex* v, PullPlan* p);
 		void applyTwistTransform(Geometry* geometry, PullPlan* p);
