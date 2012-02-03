@@ -209,7 +209,7 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 void PullPlanEditorWidget :: addCasingButtonPressed()
 {
-	plan->addCasing(0.1, shapeButtonGroup->checkedId(), plan->getOutermostCasingColor());
+	plan->addCasing(shapeButtonGroup->checkedId(), plan->getOutermostCasingColor());
 	emit someDataChanged();
 }
 

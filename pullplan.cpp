@@ -97,7 +97,7 @@ void PullPlan :: setTemplateType(int templateType) {
 	parameterValues.clear();
 	char* tmp;
 	casings.clear();
-	casings.push_back(Casing(0.1, CIRCLE_SHAPE, defaultColor));
+	casings.push_back(Casing(1.0, CIRCLE_SHAPE, defaultColor));
         switch (templateType) {
                 case CIRCLE_BASE_PULL_TEMPLATE:
                         break;
@@ -226,15 +226,23 @@ unsigned int PullPlan :: getParameterCount() {
 
 void PullPlan :: removeCasing() {
 
+	int count = casings.size();
+	if (count < 2)
+		return;
+
+	float diff = casings[count-1].thickness - casings[count-2].thickness;
 	casings.pop_back();
+	for (unsigned int i = 0; i < casings.size(); ++i) {
+		casings[i].thickness += diff;
+	}
 }
 
-void PullPlan :: addCasing(float thickness, int shape, Color* color) {
+void PullPlan :: addCasing(int shape, Color* color) {
 	
-	for (unsigned int i = casings.size()-1; i < casings.size(); --i) {
-		casings[i].thickness += 0.1; // (1.0 + thickness);
+	for (unsigned int i = 0; i < casings.size(); ++i) {
+		casings[i].thickness -= 0.1;
 	}
-	casings.push_back(Casing(thickness, shape, color));
+	casings.push_back(Casing(1.0, shape, color));
 }
 
 void PullPlan :: setCasingThickness(float t, unsigned int index) {
@@ -313,17 +321,14 @@ the number of subplans.
 void PullPlan :: updateSubs()
 {
         Point p;
-	float totalCasingThickness = 0.0;
-	for (unsigned int i = 0; i < casings.size(); ++i) 
-		totalCasingThickness += casings[i].thickness;
-        float radius = 1.0 - totalCasingThickness;
+        float radius = 1.0;
 
 	vector<SubpullTemplate> newSubs;
 
         p.x = p.y = p.z = 0.0;
         switch (this->templateType) {
                 case CASED_CIRCLE_PULL_TEMPLATE:
-                        pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, radius * 2.0, 0);
+                        pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, radius * 1.9, 0);
                         break;
                 case CASED_SQUARE_PULL_TEMPLATE:
                         if (this->casings[0].shape == CIRCLE_SHAPE) {

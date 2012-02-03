@@ -39,6 +39,7 @@ class PullPlanEditorViewWidget : public QWidget
 		PullPlan* plan;
 		int fill_rule;
 		bool isDraggingCasing;
+		unsigned int draggedCasingIndex;
 		void populateHighlightedSubplans(int x, int y, PullPlan* plan, int type);
 		void populateIsCasingHighlighted(int x, int y, int type);
 		bool casingHighlighted;

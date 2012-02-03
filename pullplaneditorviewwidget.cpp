@@ -28,21 +28,37 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	float y = (event->pos().y() - height()/2);
 	float radius = sqrt(x * x + y * y) / (width()/2 - 10); 
 
-	if (fabs(radius - (1.0 - plan->getCasingThickness(plan->getCasingCount()-1))) < 20)
+	for (unsigned int i = 0; i < plan->getCasingCount() - 1; ++i)
 	{
-		isDraggingCasing = true; 
+		if (fabs(radius - plan->getCasingThickness(i)) < 0.05)
+		{
+			isDraggingCasing = true; 
+			draggedCasingIndex = i;
+			return;
+		}
 	}
 }
 
 void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 {
-	float x = (event->pos().x() - width()/2);
-	float y = (event->pos().y() - height()/2);
 	if (isDraggingCasing)
 	{
+		float x = (event->pos().x() - width()/2);
+		float y = (event->pos().y() - height()/2);
 		float radius = sqrt(x * x + y * y) / (width()/2 - 10); 
-		plan->setCasingThickness(MAX(1.0 - radius, 0), plan->getCasingCount()-1);
+	
+		plan->setCasingThickness(MIN(MAX(radius, 0.05), 0.95), draggedCasingIndex);
 		emit someDataChanged();
+	/*
+		if (draggedCasingIndex == 0)
+			plan->setCasingThickness(MIN(
+				MAX(radius, 0.01), plan->getCasingThickness(draggedCasingIndex + 1) - 0.05), 
+				draggedCasingIndex);
+		else
+			plan->setCasingThickness(MIN(MAX(radius, plan->getCasingThickness(draggedCasingIndex-1) + 0.05), 
+				plan->getCasingThickness(draggedCasingIndex+1) - 0.05), draggedCasingIndex);
+		emit someDataChanged();
+	*/
 	}
 }
 
@@ -259,20 +275,10 @@ void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, int drawW
 	{
                 painter->setPen(Qt::NoPen);
 	}
-	else if (borderLevels == 2)
+	else if (borderLevels > 0)
 	{
 		QPen pen;
 		pen.setWidth(5);
-		if (highlightThis)
-			pen.setColor(Qt::white);
-		else
-			pen.setColor(Qt::black);
-		painter->setPen(pen);
-	}
-	else if (borderLevels == 1)
-	{
-		QPen pen;
-		pen.setWidth(3);
 		if (highlightThis)
 			pen.setColor(Qt::white);
 		else
@@ -339,10 +345,10 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 			break;
 	}
 
-	for (unsigned int i = plan->getCasingCount() - 2; i < plan->getCasingCount() - 1; --i) {
+	for (unsigned int i = plan->getCasingCount() - 1; i < plan->getCasingCount(); --i) {
 
-		int casingWidth = drawWidth * (1.0 - plan->getCasingThickness(i));
-		int casingHeight = drawWidth * (1.0 - plan->getCasingThickness(i));
+		int casingWidth = drawWidth * plan->getCasingThickness(i);
+		int casingHeight = drawHeight * plan->getCasingThickness(i);
 		int casingX = x + drawWidth / 2 - casingWidth / 2;
 		int casingY = y + drawHeight / 2 - casingHeight / 2;
 		
@@ -368,8 +374,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	{
 		SubpullTemplate* sub = &(plan->subs[i]);
 
-		float casingScale = (1.0 - plan->getCasingThickness(0));
-
+		float casingScale = plan->getCasingThickness(0);
 		float rX = x + (sub->location.x - sub->diameter/2.0) * casingScale * drawWidth/2 + drawWidth/2;
 		float rY = y + (sub->location.y - sub->diameter/2.0) * casingScale * drawWidth/2 + drawHeight/2;
 		float rWidth = sub->diameter * casingScale * drawWidth/2;
@@ -403,17 +408,11 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	{
 		SubpullTemplate* sub = &(plan->subs[i]);
 
-		// compute location assuming there is a single casing
-		float rX = x + (sub->location.x - sub->diameter/2.0) * drawWidth/2 + drawWidth/2;
-		float rY = y + (sub->location.y - sub->diameter/2.0) * drawWidth/2 + drawHeight/2;
-		float rWidth = sub->diameter * drawWidth/2;
-		float rHeight = sub->diameter * drawHeight/2;
-
-		// now scale for innermost
-		rWidth *= (1.0 - plan->getCasingThickness(0));
-		rHeight *= (1.0 - plan->getCasingThickness(0));
-		rX = (rX - drawWidth/2) * (1.0 - plan->getCasingThickness(0)) + drawWidth/2;
-		rY = (rY - drawHeight/2) * (1.0 - plan->getCasingThickness(0)) + drawHeight/2;
+		float casingScale = plan->getCasingThickness(0);
+		float rX = x + (sub->location.x - sub->diameter/2.0) * casingScale * drawWidth/2 + drawWidth/2;
+		float rY = y + (sub->location.y - sub->diameter/2.0) * casingScale * drawWidth/2 + drawHeight/2;
+		float rWidth = sub->diameter * casingScale * drawWidth/2;
+		float rHeight = sub->diameter * casingScale * drawHeight/2;
 
 		if (borderLevels == 2)
 		{
