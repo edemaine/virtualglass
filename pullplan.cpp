@@ -98,6 +98,10 @@ void PullPlan :: setTemplateType(int templateType) {
 	char* tmp;
 	casings.clear();
 	casings.push_back(Casing(1.0, CIRCLE_SHAPE, defaultColor));
+	if (!isBase()) {
+		casings.push_back(Casing(1.0, CIRCLE_SHAPE, defaultColor));
+		casings[0].thickness = 0.9;
+	}
         switch (templateType) {
                 case CIRCLE_BASE_PULL_TEMPLATE:
                         break;

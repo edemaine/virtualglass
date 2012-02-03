@@ -235,7 +235,7 @@ void PullPlanEditorViewWidget :: populateIsCasingHighlighted(int x, int y, int t
 	// Deal w/casing
 	float drawSize = (width() - 20);
 	float distanceFromCenter;
-	for (unsigned int i = 0; i < plan->getCasingCount(); ++i) {
+	for (unsigned int i = 1; i < plan->getCasingCount(); ++i) {
 
 		switch (plan->getCasingShape(i)) {
 			case CIRCLE_SHAPE:
@@ -340,7 +340,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 			break;
 	}
 
-	for (unsigned int i = plan->getCasingCount() - 1; i < plan->getCasingCount(); --i) {
+	for (unsigned int i = plan->getCasingCount() - 1; i > 0; --i) {
 
 		int casingWidth = drawWidth * plan->getCasingThickness(i);
 		int casingHeight = drawHeight * plan->getCasingThickness(i);
