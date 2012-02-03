@@ -59,6 +59,9 @@ HEADERS += primitives.h constants.h Vector.hpp \
 	pieceeditorwidget.h coloreditorwidget.h \
 	controller.h geometry.h mesh.h \ 
 	qgraphicshighlighteffect.h \
+	asyncrenderwidget.h \
+	asyncrenderinternal.h \
+
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
 	yaml-cpp/include/yaml-cpp/traits.h \
@@ -124,6 +127,9 @@ SOURCES += main.cpp \
 	pullplaneditorviewwidget.cpp pullplaneditorwidget.cpp colorbarlibrarywidget.cpp \ 
 	qgraphicshighlighteffect.cpp \
 	pieceeditorwidget.cpp coloreditorwidget.cpp \
+	asyncrenderwidget.cpp \
+	asyncrenderinternal.cpp \
+
 
 SOURCES += yaml-cpp/src/tag.cpp \
 	yaml-cpp/src/stream.cpp \
