@@ -52,6 +52,10 @@ void QGraphicsHighlightEffect::setHighlightType(int dependancy)
 
 void QGraphicsHighlightEffect::draw( QPainter *painter )
 {
+
+	drawSource(painter);
+	return;
+/* This stuff seemed to cause drawing updates to be ignored: (weird!)
 	QPoint offset;
 	QPixmap pixmap;
 
@@ -79,4 +83,5 @@ void QGraphicsHighlightEffect::draw( QPainter *painter )
 	painter->drawPixmap( offset, pixmap );
 	painter->restore();
 	//painter->drawPixmap( offset, pixmap );
+*/
 }
