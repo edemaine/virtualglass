@@ -9,11 +9,11 @@ ColorBarLibraryWidget :: ColorBarLibraryWidget(PullPlan* plan, QString colorName
 	setScaledContents(true);
 	setMouseTracking(true);
 
-        QPixmap pixmap(100, 100);
-        pixmap.fill(Qt::white);
+	QPixmap pixmap(100, 100);
+	pixmap.fill(Qt::white);
 	setPixmap(pixmap);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
-        this->editorPixmap = pixmap;
+	this->editorPixmap = pixmap;
 
 	this->colorName = colorName;
 	this->pullPlan = plan;
@@ -24,7 +24,7 @@ ColorBarLibraryWidget :: ColorBarLibraryWidget(PullPlan* plan, QString colorName
 
 const QPixmap* ColorBarLibraryWidget :: getEditorPixmap()
 {
-        return &(this->editorPixmap);
+	return &(this->editorPixmap);
 }
 
 void ColorBarLibraryWidget :: updatePixmaps(QPixmap niceViewPixmap, QPixmap editorPixmap)

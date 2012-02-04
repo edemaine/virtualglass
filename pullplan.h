@@ -20,36 +20,37 @@ class PullPlan
 {
 	public:
 		PullPlan(int pullTemplate);
+		~PullPlan();
 
 		void setTemplateType(int pullTemplateType);
 		int getTemplateType();
-                bool isBase();
+		bool isBase();
 
-                void setParameter(int param, int newValue);
-                int getParameter(int param);
-                char* getParameterName(int param);
-                unsigned int getParameterCount();
+		void setParameter(int param, int newValue);
+		int getParameter(int param);
+		char* getParameterName(int param);
+		unsigned int getParameterCount();
 
-                void setCasingThickness(float t, unsigned int index);
+		void setCasingThickness(float t, unsigned int index);
 		void setOutermostCasingShape(int shape);
-                void setCasingColor(Color* c, unsigned int index);
+		void setCasingColor(Color* c, unsigned int index);
 		void addCasing(int shape);
 		void removeCasing();
-                float getCasingThickness(unsigned int index);
-                int getCasingShape(unsigned int index);
+		float getCasingThickness(unsigned int index);
+		int getCasingShape(unsigned int index);
 		int getOutermostCasingShape();
-                void setOutermostCasingColor(Color* color);
-                Color* getOutermostCasingColor();
-                Color* getCasingColor(unsigned int index);
+		void setOutermostCasingColor(Color* color);
+		Color* getOutermostCasingColor();
+		Color* getCasingColor(unsigned int index);
 		unsigned int getCasingCount(); 
 		bool hasSquareCasing();
 
 		void setTwist(float t);
 		float getTwist();
 
-		PullPlan* copy();
+		PullPlan* copy() const;
 
-                vector<SubpullTemplate*> subs;
+		vector<SubpullTemplate*> subs;
 
 		bool hasDependencyOn(Color* color);
 		bool hasDependencyOn(PullPlan* pullPlan);
@@ -63,13 +64,13 @@ class PullPlan
 		int templateType;
 		vector<Casing> casings;
 		float twist;
-                vector<int> parameterValues;
-                vector<char*> parameterNames;
+		vector<int> parameterValues;
+		vector<char*> parameterNames;
 
-                // Methods
-                void initializeTemplate();
-                void updateSubs();
-                void pushNewSubpull(vector<SubpullTemplate*>* newSubs,
+		// Methods
+		void initializeTemplate();
+		void updateSubs();
+		void pushNewSubpull(vector<SubpullTemplate*>* newSubs,
 			int shape, Point location, float diameter, int group);
 };
 

@@ -59,10 +59,10 @@ void ColorEditorWidget :: sourceComboBoxChanged(int)
 
 void ColorEditorWidget :: setupLayout()
 {
-        QHBoxLayout* pageLayout = new QHBoxLayout(this);
-        this->setLayout(pageLayout);
-        QVBoxLayout* editorLayout = new QVBoxLayout(this);
-        pageLayout->addLayout(editorLayout);
+	QHBoxLayout* pageLayout = new QHBoxLayout(this);
+	this->setLayout(pageLayout);
+	QVBoxLayout* editorLayout = new QVBoxLayout(this);
+	pageLayout->addLayout(editorLayout);
 
 	QHBoxLayout* sourceLayout = new QHBoxLayout(this);
 	editorLayout->addLayout(sourceLayout);
@@ -76,108 +76,108 @@ void ColorEditorWidget :: setupLayout()
 	sourceComboBox->addItem("Kugler - Transparents");
 	sourceComboBox->addItem("Kugler - Opaques");
 
-        colorLibrary1ScrollArea = new QScrollArea(this);
-        editorLayout->addWidget(colorLibrary1ScrollArea);
-        colorLibrary1ScrollArea->setBackgroundRole(QPalette::Dark);
-        colorLibrary1ScrollArea->setWidgetResizable(true);
-        colorLibrary1ScrollArea->setMinimumWidth(320);
-        colorLibrary1ScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        colorLibrary1ScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-        QWidget* colorLibrary1Widget = new QWidget(colorLibrary1ScrollArea);
-        colorLibrary1ScrollArea->setWidget(colorLibrary1Widget);
-        colorLibrary1Layout = new QVBoxLayout(colorLibrary1Widget);
-        colorLibrary1Layout->setSpacing(10);
-        colorLibrary1Widget->setLayout(colorLibrary1Layout);
+	colorLibrary1ScrollArea = new QScrollArea(this);
+	editorLayout->addWidget(colorLibrary1ScrollArea);
+	colorLibrary1ScrollArea->setBackgroundRole(QPalette::Dark);
+	colorLibrary1ScrollArea->setWidgetResizable(true);
+	colorLibrary1ScrollArea->setMinimumWidth(320);
+	colorLibrary1ScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	colorLibrary1ScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	QWidget* colorLibrary1Widget = new QWidget(colorLibrary1ScrollArea);
+	colorLibrary1ScrollArea->setWidget(colorLibrary1Widget);
+	colorLibrary1Layout = new QVBoxLayout(colorLibrary1Widget);
+	colorLibrary1Layout->setSpacing(10);
+	colorLibrary1Widget->setLayout(colorLibrary1Layout);
 	colorLibrary1ScrollArea->hide();
 
-        colorLibrary2ScrollArea = new QScrollArea(this);
-        editorLayout->addWidget(colorLibrary2ScrollArea);
-        colorLibrary2ScrollArea->setBackgroundRole(QPalette::Dark);
-        colorLibrary2ScrollArea->setWidgetResizable(true);
-        colorLibrary2ScrollArea->setMinimumWidth(320);
-        colorLibrary2ScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        colorLibrary2ScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-        QWidget* colorLibrary2Widget = new QWidget(colorLibrary2ScrollArea);
-        colorLibrary2ScrollArea->setWidget(colorLibrary2Widget);
-        colorLibrary2Layout = new QVBoxLayout(colorLibrary2Widget);
-        colorLibrary2Layout->setSpacing(10);
-        colorLibrary2Widget->setLayout(colorLibrary2Layout);
+	colorLibrary2ScrollArea = new QScrollArea(this);
+	editorLayout->addWidget(colorLibrary2ScrollArea);
+	colorLibrary2ScrollArea->setBackgroundRole(QPalette::Dark);
+	colorLibrary2ScrollArea->setWidgetResizable(true);
+	colorLibrary2ScrollArea->setMinimumWidth(320);
+	colorLibrary2ScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	colorLibrary2ScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	QWidget* colorLibrary2Widget = new QWidget(colorLibrary2ScrollArea);
+	colorLibrary2ScrollArea->setWidget(colorLibrary2Widget);
+	colorLibrary2Layout = new QVBoxLayout(colorLibrary2Widget);
+	colorLibrary2Layout->setSpacing(10);
+	colorLibrary2Widget->setLayout(colorLibrary2Layout);
 	colorLibrary2ScrollArea->hide();
 
-        colorLibrary3ScrollArea = new QScrollArea(this);
-        editorLayout->addWidget(colorLibrary3ScrollArea);
-        colorLibrary3ScrollArea->setBackgroundRole(QPalette::Dark);
-        colorLibrary3ScrollArea->setWidgetResizable(true);
-        colorLibrary3ScrollArea->setMinimumWidth(320);
-        colorLibrary3ScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        colorLibrary3ScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-        QWidget* colorLibrary3Widget = new QWidget(colorLibrary3ScrollArea);
-        colorLibrary3ScrollArea->setWidget(colorLibrary3Widget);
-        colorLibrary3Layout = new QVBoxLayout(colorLibrary3Widget);
-        colorLibrary3Layout->setSpacing(10);
-        colorLibrary3Widget->setLayout(colorLibrary3Layout);
+	colorLibrary3ScrollArea = new QScrollArea(this);
+	editorLayout->addWidget(colorLibrary3ScrollArea);
+	colorLibrary3ScrollArea->setBackgroundRole(QPalette::Dark);
+	colorLibrary3ScrollArea->setWidgetResizable(true);
+	colorLibrary3ScrollArea->setMinimumWidth(320);
+	colorLibrary3ScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	colorLibrary3ScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	QWidget* colorLibrary3Widget = new QWidget(colorLibrary3ScrollArea);
+	colorLibrary3ScrollArea->setWidget(colorLibrary3Widget);
+	colorLibrary3Layout = new QVBoxLayout(colorLibrary3Widget);
+	colorLibrary3Layout->setSpacing(10);
+	colorLibrary3Widget->setLayout(colorLibrary3Layout);
 	colorLibrary3ScrollArea->hide();
 
-        colorLibrary4ScrollArea = new QScrollArea(this);
-        editorLayout->addWidget(colorLibrary4ScrollArea);
-        colorLibrary4ScrollArea->setBackgroundRole(QPalette::Dark);
-        colorLibrary4ScrollArea->setWidgetResizable(true);
-        colorLibrary4ScrollArea->setMinimumWidth(320);
-        colorLibrary4ScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        colorLibrary4ScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-        QWidget* colorLibrary4Widget = new QWidget(colorLibrary4ScrollArea);
-        colorLibrary4ScrollArea->setWidget(colorLibrary4Widget);
-        colorLibrary4Layout = new QVBoxLayout(colorLibrary4Widget);
-        colorLibrary4Layout->setSpacing(10);
-        colorLibrary4Widget->setLayout(colorLibrary4Layout);
+	colorLibrary4ScrollArea = new QScrollArea(this);
+	editorLayout->addWidget(colorLibrary4ScrollArea);
+	colorLibrary4ScrollArea->setBackgroundRole(QPalette::Dark);
+	colorLibrary4ScrollArea->setWidgetResizable(true);
+	colorLibrary4ScrollArea->setMinimumWidth(320);
+	colorLibrary4ScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	colorLibrary4ScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	QWidget* colorLibrary4Widget = new QWidget(colorLibrary4ScrollArea);
+	colorLibrary4ScrollArea->setWidget(colorLibrary4Widget);
+	colorLibrary4Layout = new QVBoxLayout(colorLibrary4Widget);
+	colorLibrary4Layout->setSpacing(10);
+	colorLibrary4Widget->setLayout(colorLibrary4Layout);
 	colorLibrary4ScrollArea->hide();
 
-        colorLibrary5ScrollArea = new QScrollArea(this);
-        editorLayout->addWidget(colorLibrary5ScrollArea);
-        colorLibrary5ScrollArea->setBackgroundRole(QPalette::Dark);
-        colorLibrary5ScrollArea->setWidgetResizable(true);
-        colorLibrary5ScrollArea->setMinimumWidth(320);
-        colorLibrary5ScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        colorLibrary5ScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-        QWidget* colorLibrary5Widget = new QWidget(colorLibrary5ScrollArea);
-        colorLibrary5ScrollArea->setWidget(colorLibrary5Widget);
-        colorLibrary5Layout = new QVBoxLayout(colorLibrary5Widget);
-        colorLibrary5Layout->setSpacing(10);
-        colorLibrary5Widget->setLayout(colorLibrary5Layout);
+	colorLibrary5ScrollArea = new QScrollArea(this);
+	editorLayout->addWidget(colorLibrary5ScrollArea);
+	colorLibrary5ScrollArea->setBackgroundRole(QPalette::Dark);
+	colorLibrary5ScrollArea->setWidgetResizable(true);
+	colorLibrary5ScrollArea->setMinimumWidth(320);
+	colorLibrary5ScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	colorLibrary5ScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	QWidget* colorLibrary5Widget = new QWidget(colorLibrary5ScrollArea);
+	colorLibrary5ScrollArea->setWidget(colorLibrary5Widget);
+	colorLibrary5Layout = new QVBoxLayout(colorLibrary5Widget);
+	colorLibrary5Layout->setSpacing(10);
+	colorLibrary5Widget->setLayout(colorLibrary5Layout);
 	colorLibrary5ScrollArea->hide();
 
-        colorLibrary6ScrollArea = new QScrollArea(this);
-        editorLayout->addWidget(colorLibrary6ScrollArea);
-        colorLibrary6ScrollArea->setBackgroundRole(QPalette::Dark);
-        colorLibrary6ScrollArea->setWidgetResizable(true);
-        colorLibrary6ScrollArea->setMinimumWidth(320);
-        colorLibrary6ScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        colorLibrary6ScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-        QWidget* colorLibrary6Widget = new QWidget(colorLibrary6ScrollArea);
-        colorLibrary6ScrollArea->setWidget(colorLibrary6Widget);
-        colorLibrary6Layout = new QVBoxLayout(colorLibrary6Widget);
-        colorLibrary6Layout->setSpacing(10);
-        colorLibrary6Widget->setLayout(colorLibrary6Layout);
+	colorLibrary6ScrollArea = new QScrollArea(this);
+	editorLayout->addWidget(colorLibrary6ScrollArea);
+	colorLibrary6ScrollArea->setBackgroundRole(QPalette::Dark);
+	colorLibrary6ScrollArea->setWidgetResizable(true);
+	colorLibrary6ScrollArea->setMinimumWidth(320);
+	colorLibrary6ScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	colorLibrary6ScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	QWidget* colorLibrary6Widget = new QWidget(colorLibrary6ScrollArea);
+	colorLibrary6ScrollArea->setWidget(colorLibrary6Widget);
+	colorLibrary6Layout = new QVBoxLayout(colorLibrary6Widget);
+	colorLibrary6Layout->setSpacing(10);
+	colorLibrary6Widget->setLayout(colorLibrary6Layout);
 	colorLibrary6ScrollArea->hide();
 
-        QHBoxLayout* alphaLayout = new QHBoxLayout(this);
-        editorLayout->addLayout(alphaLayout);
+	QHBoxLayout* alphaLayout = new QHBoxLayout(this);
+	editorLayout->addLayout(alphaLayout);
 	QLabel* alphaLabel1 = new QLabel("Transparency:", this);
-        alphaLayout->addWidget(alphaLabel1, 0);
-        QLabel* alphaLabel2 = new QLabel("0%", this);
-        alphaLayout->addWidget(alphaLabel2, 0);
-        alphaSlider = new QSlider(Qt::Horizontal, this);
-        alphaSlider->setRange(0, 255);
-        alphaLayout->addWidget(alphaSlider);
-        QLabel* alphaLabel3 = new QLabel("100%", this);
-        alphaLayout->addWidget(alphaLabel3, 0);
-        connect(alphaSlider, SIGNAL(valueChanged(int)), this, SLOT(alphaSliderPositionChanged(int)));
-        pageLayout->addWidget(niceViewWidget, 10);
+	alphaLayout->addWidget(alphaLabel1, 0);
+	QLabel* alphaLabel2 = new QLabel("0%", this);
+	alphaLayout->addWidget(alphaLabel2, 0);
+	alphaSlider = new QSlider(Qt::Horizontal, this);
+	alphaSlider->setRange(0, 255);
+	alphaLayout->addWidget(alphaSlider);
+	QLabel* alphaLabel3 = new QLabel("100%", this);
+	alphaLayout->addWidget(alphaLabel3, 0);
+	connect(alphaSlider, SIGNAL(valueChanged(int)), this, SLOT(alphaSliderPositionChanged(int)));
+	pageLayout->addWidget(niceViewWidget, 10);
 
-        // Little description for the editor
-        QLabel* descriptionLabel = new QLabel("Color editor", this);
-        descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-        editorLayout->addWidget(descriptionLabel, 0);
+	// Little description for the editor
+	QLabel* descriptionLabel = new QLabel("Color editor", this);
+	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	editorLayout->addWidget(descriptionLabel, 0);
 }
 
 void ColorEditorWidget :: setupConnections()
@@ -194,9 +194,9 @@ void ColorEditorWidget :: updateLibraryWidgetPixmaps()
 	editorPixmap.fill(QColor(255*c.r, 255*c.g, 255*c.b, 255*MAX(0.1, c.a))); 
 
 	QPixmap nicePixmap = QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100);
-        QPainter painter(&nicePixmap);
-        painter.drawText(QPointF(5, 95), libraryWidget->getColorName());
-        painter.end();
+	QPainter painter(&nicePixmap);
+	painter.drawText(QPointF(5, 95), libraryWidget->getColorName());
+	painter.end();
 	
 	libraryWidget->updatePixmaps(nicePixmap, editorPixmap);
 }
@@ -206,33 +206,33 @@ void ColorEditorWidget :: seedColors()
 	Color caneColor;
 	QString caneName;
 
-        QFile file(":/Colors1.txt");
-        file.open(QIODevice::ReadOnly | QIODevice::Text);
-        while (!file.atEnd())
-        {
-                QByteArray line = file.readLine();
-                line = line.trimmed();
-                if (line.isEmpty())
+	QFile file(":/Colors1.txt");
+	file.open(QIODevice::ReadOnly | QIODevice::Text);
+	while (!file.atEnd())
+	{
+		QByteArray line = file.readLine();
+		line = line.trimmed();
+		if (line.isEmpty())
 			continue;
 
-                if (line.at(0) == '[')
-                {
-                        line.remove(0,1);
-                        line.remove(line.lastIndexOf(']'),1);
-                        line = line.trimmed();
+		if (line.at(0) == '[')
+		{
+			line.remove(0,1);
+			line.remove(line.lastIndexOf(']'),1);
+			line = line.trimmed();
 			caneName = line;
-                }
-                else if (line.at(0) == '-')
-                {
-                        line.remove(0,1);
-                        line = line.trimmed();
-                        QList<QByteArray> colorData = line.split(',');
+		}
+		else if (line.at(0) == '-')
+		{
+			line.remove(0,1);
+			line = line.trimmed();
+			QList<QByteArray> colorData = line.split(',');
 			caneColor.r = colorData[0].toInt() / 255.0;
 			caneColor.g = colorData[1].toInt() / 255.0;
 			caneColor.b = colorData[2].toInt() / 255.0;
 			caneColor.a = colorData[3].toInt() / 255.0;
 
-	                PureColorLibraryWidget* pclw = new PureColorLibraryWidget(caneColor, caneName, this);
+			PureColorLibraryWidget* pclw = new PureColorLibraryWidget(caneColor, caneName, this);
 			if (colorData[3].toInt() != 255) // if a transparent
 			{
 				if (caneName[0] ==  'R')
@@ -251,9 +251,9 @@ void ColorEditorWidget :: seedColors()
 				else if (caneName[0] == 'K')
 					colorLibrary6Layout->addWidget(pclw);
 			}
-                }
-        }
-	file.close();      
+		}
+	}
+	file.close();
 }
 
 void ColorEditorWidget :: alphaSliderPositionChanged(int)
@@ -267,7 +267,7 @@ void ColorEditorWidget :: alphaSliderPositionChanged(int)
 
 void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 {
-        PureColorLibraryWidget* pclw = dynamic_cast<PureColorLibraryWidget*>(childAt(event->pos()));
+	PureColorLibraryWidget* pclw = dynamic_cast<PureColorLibraryWidget*>(childAt(event->pos()));
 	if (pclw != NULL)
 	{
 		*(libraryWidget->getPullPlan()->getOutermostCasingColor()) = pclw->getColor();
@@ -279,46 +279,46 @@ void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 void ColorEditorWidget :: unhighlightLibraryWidget(PureColorLibraryWidget* w)
 {
-        w->graphicsEffect()->setEnabled(false);
+	w->graphicsEffect()->setEnabled(false);
 }
 
 void ColorEditorWidget :: highlightLibraryWidget(PureColorLibraryWidget* w)
 {
-        w->graphicsEffect()->setEnabled(false);
-        ((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
-        w->graphicsEffect()->setEnabled(true);
+	w->graphicsEffect()->setEnabled(false);
+	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
+	w->graphicsEffect()->setEnabled(true);
 }
 
 void ColorEditorWidget :: updateEverything()
 {
-        geometry.clear();
-        mesher.generateColorMesh(libraryWidget->getPullPlan(), &geometry);
-        niceViewWidget->repaint();
+	geometry.clear();
+	mesher.generateColorMesh(libraryWidget->getPullPlan(), &geometry);
+	niceViewWidget->repaint();
 	updateLibraryWidgetPixmaps();
 
 	this->alphaSlider->setSliderPosition(255 - (int) (libraryWidget->getPullPlan()->getOutermostCasingColor()->a * 255));
 
-        QLayoutItem* w;
+	QLayoutItem* w;
 	PureColorLibraryWidget* pclw;
 	Color* pColor;
-        for (int j = 0; j < colorLibrary6Layout->count(); ++j)
-        {
-                w = colorLibrary6Layout->itemAt(j);
-                pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-                pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
-                if (pclw->getColor().r == pColor->r &&
-                        pclw->getColor().g == pColor->g &&
-                        pclw->getColor().b == pColor->b)
+	for (int j = 0; j < colorLibrary6Layout->count(); ++j)
+	{
+		w = colorLibrary6Layout->itemAt(j);
+		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
+		pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
+		if (pclw->getColor().r == pColor->r &&
+			pclw->getColor().g == pColor->g &&
+			pclw->getColor().b == pColor->b)
 		{
 			highlightLibraryWidget(pclw);
 			sourceComboBox->setCurrentIndex(5);
 		}
-                else
-                        unhighlightLibraryWidget(pclw);
-        }
+		else
+			unhighlightLibraryWidget(pclw);
+	}
 	for (int j = 0; j < colorLibrary5Layout->count(); ++j)
-        {
-                w = colorLibrary5Layout->itemAt(j);
+	{
+		w = colorLibrary5Layout->itemAt(j);
 		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
 		pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
 		if (pclw->getColor().r == pColor->r &&
@@ -330,55 +330,55 @@ void ColorEditorWidget :: updateEverything()
 		}
 		else
 			unhighlightLibraryWidget(pclw);
-        }
-        for (int j = 0; j < colorLibrary4Layout->count(); ++j)
-        {
-                w = colorLibrary4Layout->itemAt(j);
-                pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-                pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
-                if (pclw->getColor().r == pColor->r &&
-                        pclw->getColor().g == pColor->g &&
-                        pclw->getColor().b == pColor->b)
+	}
+	for (int j = 0; j < colorLibrary4Layout->count(); ++j)
+	{
+		w = colorLibrary4Layout->itemAt(j);
+		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
+		pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
+		if (pclw->getColor().r == pColor->r &&
+			pclw->getColor().g == pColor->g &&
+			pclw->getColor().b == pColor->b)
 		{
 			highlightLibraryWidget(pclw);
 			sourceComboBox->setCurrentIndex(3);
 		}
-                else
-                        unhighlightLibraryWidget(pclw);
-        }
-        for (int j = 0; j < colorLibrary3Layout->count(); ++j)
-        {
-                w = colorLibrary3Layout->itemAt(j);
-                pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-                pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
-                if (pclw->getColor().r == pColor->r &&
-                        pclw->getColor().g == pColor->g &&
-                        pclw->getColor().b == pColor->b)
+		else
+			unhighlightLibraryWidget(pclw);
+	}
+	for (int j = 0; j < colorLibrary3Layout->count(); ++j)
+	{
+		w = colorLibrary3Layout->itemAt(j);
+		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
+		pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
+		if (pclw->getColor().r == pColor->r &&
+			pclw->getColor().g == pColor->g &&
+			pclw->getColor().b == pColor->b)
 		{
 			highlightLibraryWidget(pclw);
 			sourceComboBox->setCurrentIndex(2);
 		}
-                else
-                        unhighlightLibraryWidget(pclw);
-        }
-        for (int j = 0; j < colorLibrary2Layout->count(); ++j)
-        {
-                w = colorLibrary2Layout->itemAt(j);
-                pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-                pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
-                if (pclw->getColor().r == pColor->r &&
-                        pclw->getColor().g == pColor->g &&
-                        pclw->getColor().b == pColor->b)
+		else
+			unhighlightLibraryWidget(pclw);
+	}
+	for (int j = 0; j < colorLibrary2Layout->count(); ++j)
+	{
+		w = colorLibrary2Layout->itemAt(j);
+		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
+		pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
+		if (pclw->getColor().r == pColor->r &&
+			pclw->getColor().g == pColor->g &&
+			pclw->getColor().b == pColor->b)
 		{
 			highlightLibraryWidget(pclw);
 			sourceComboBox->setCurrentIndex(1);
 		}
-                else
-                        unhighlightLibraryWidget(pclw);
-        }
+		else
+			unhighlightLibraryWidget(pclw);
+	}
 	for (int j = 0; j < colorLibrary1Layout->count(); ++j)
-        {
-                w = colorLibrary1Layout->itemAt(j);
+	{
+		w = colorLibrary1Layout->itemAt(j);
 		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
 		pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
 		if (pclw->getColor().r == pColor->r &&

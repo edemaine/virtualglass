@@ -18,20 +18,20 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 
 void PullPlanEditorWidget :: updateEverything()
 {
-        static_cast<QCheckBox*>(fillRuleButtonGroup->button(
-                viewWidget->getFillRule()))->setCheckState(Qt::Checked);
+	static_cast<QCheckBox*>(fillRuleButtonGroup->button(
+		viewWidget->getFillRule()))->setCheckState(Qt::Checked);
 
-        static_cast<QCheckBox*>(shapeButtonGroup->button(
-                plan->getOutermostCasingShape()))->setCheckState(Qt::Checked);
+	static_cast<QCheckBox*>(shapeButtonGroup->button(
+		plan->getOutermostCasingShape()))->setCheckState(Qt::Checked);
 
-        int twist = plan->getTwist();
-        twistSlider->setSliderPosition(twist);
-        twistSpin->setValue(twist);
+	int twist = plan->getTwist();
+	twistSlider->setSliderPosition(twist);
+	twistSpin->setValue(twist);
 	twistSlider->setEnabled(!plan->hasSquareCasing());
 	twistSpin->setEnabled(!plan->hasSquareCasing());
 
 	viewWidget->setPullPlan(plan);
-        viewWidget->repaint();
+	viewWidget->repaint();
 
 	unsigned int i = 0;
 	for (; i < plan->getParameterCount(); ++i)
@@ -47,9 +47,9 @@ void PullPlanEditorWidget :: updateEverything()
 		paramSpins[i]->hide();
 	}
 
-        geometry.clear();
-        mesher.generatePullMesh(plan, &geometry);
-        niceViewWidget->repaint();
+	geometry.clear();
+	mesher.generatePullMesh(plan, &geometry);
+	niceViewWidget->repaint();
 	//geometry.save_raw_file("./cane.raw");
 
 	// Highlight correct pull template
@@ -66,39 +66,39 @@ void PullPlanEditorWidget :: updateEverything()
 
 void PullPlanEditorWidget :: unhighlightLibraryWidget(PullTemplateLibraryWidget* w)
 {
-        w->graphicsEffect()->setEnabled(false);
+	w->graphicsEffect()->setEnabled(false);
 }
 
 void PullPlanEditorWidget :: highlightLibraryWidget(PullTemplateLibraryWidget* w)
 {
-        w->graphicsEffect()->setEnabled(false);
-        ((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
-        w->graphicsEffect()->setEnabled(true);
+	w->graphicsEffect()->setEnabled(false);
+	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
+	w->graphicsEffect()->setEnabled(true);
 }
 
 void PullPlanEditorWidget :: setupLayout()
 {
-        // Setup the editor layout
-        QHBoxLayout* pageLayout = new QHBoxLayout(this);
-        this->setLayout(pageLayout);
-        QVBoxLayout* editorLayout = new QVBoxLayout(this);
-        pageLayout->addLayout(editorLayout);
+	// Setup the editor layout
+	QHBoxLayout* pageLayout = new QHBoxLayout(this);
+	this->setLayout(pageLayout);
+	QVBoxLayout* editorLayout = new QVBoxLayout(this);
+	pageLayout->addLayout(editorLayout);
 
-        editorLayout->addWidget(viewWidget, 0);
+	editorLayout->addWidget(viewWidget, 0);
 
 	QHBoxLayout* fillRuleLayout = new QHBoxLayout(this);
-        fillRuleLayout->addWidget(new QLabel("Fill rule:", this), 1);
-        QCheckBox* singleCheckBox = new QCheckBox("Single");
-        QCheckBox* eoCheckBox = new QCheckBox("Every other");
-        QCheckBox* etCheckBox = new QCheckBox("Every third");
-        QCheckBox* gCheckBox = new QCheckBox("Group");
-        QCheckBox* aCheckBox = new QCheckBox("All");
-        fillRuleButtonGroup = new QButtonGroup();
-        fillRuleButtonGroup->addButton(singleCheckBox, 1);
-        fillRuleButtonGroup->addButton(eoCheckBox, 2);
-        fillRuleButtonGroup->addButton(etCheckBox, 3);
-        fillRuleButtonGroup->addButton(gCheckBox, 4);
-        fillRuleButtonGroup->addButton(aCheckBox, 5);
+	fillRuleLayout->addWidget(new QLabel("Fill rule:", this), 1);
+	QCheckBox* singleCheckBox = new QCheckBox("Single");
+	QCheckBox* eoCheckBox = new QCheckBox("Every other");
+	QCheckBox* etCheckBox = new QCheckBox("Every third");
+	QCheckBox* gCheckBox = new QCheckBox("Group");
+	QCheckBox* aCheckBox = new QCheckBox("All");
+	fillRuleButtonGroup = new QButtonGroup();
+	fillRuleButtonGroup->addButton(singleCheckBox, 1);
+	fillRuleButtonGroup->addButton(eoCheckBox, 2);
+	fillRuleButtonGroup->addButton(etCheckBox, 3);
+	fillRuleButtonGroup->addButton(gCheckBox, 4);
+	fillRuleButtonGroup->addButton(aCheckBox, 5);
 	fillRuleLayout->addWidget(singleCheckBox, 1);
 	fillRuleLayout->addWidget(eoCheckBox, 1);
 	fillRuleLayout->addWidget(etCheckBox, 1);
@@ -106,59 +106,59 @@ void PullPlanEditorWidget :: setupLayout()
 	fillRuleLayout->addWidget(aCheckBox, 1);
 	editorLayout->addLayout(fillRuleLayout, 1);
 	
-        // Setup pull template scrolling library
-        QWidget* templateLibraryWidget = new QWidget(this);
-        templateLibraryLayout = new QHBoxLayout(templateLibraryWidget);
-        templateLibraryLayout->setSpacing(10);
-        templateLibraryWidget->setLayout(templateLibraryLayout);
+	// Setup pull template scrolling library
+	QWidget* templateLibraryWidget = new QWidget(this);
+	templateLibraryLayout = new QHBoxLayout(templateLibraryWidget);
+	templateLibraryLayout->setSpacing(10);
+	templateLibraryWidget->setLayout(templateLibraryLayout);
 
-        QScrollArea* pullTemplateLibraryScrollArea = new QScrollArea(this);
-        pullTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
-        pullTemplateLibraryScrollArea->setWidget(templateLibraryWidget);
-        pullTemplateLibraryScrollArea->setWidgetResizable(true);
-        pullTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-        pullTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        pullTemplateLibraryScrollArea->setFixedHeight(130);
-        editorLayout->addWidget(pullTemplateLibraryScrollArea, 0);
+	QScrollArea* pullTemplateLibraryScrollArea = new QScrollArea(this);
+	pullTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
+	pullTemplateLibraryScrollArea->setWidget(templateLibraryWidget);
+	pullTemplateLibraryScrollArea->setWidgetResizable(true);
+	pullTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	pullTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	pullTemplateLibraryScrollArea->setFixedHeight(130);
+	editorLayout->addWidget(pullTemplateLibraryScrollArea, 0);
 
-        QHBoxLayout* pullTemplateShapeLayout = new QHBoxLayout(this);
-        QLabel* casingLabel = new QLabel("Casing:");
-        QCheckBox* circleCheckBox = new QCheckBox("Circle");
-        QCheckBox* squareCheckBox = new QCheckBox("Square");
+	QHBoxLayout* pullTemplateShapeLayout = new QHBoxLayout(this);
+	QLabel* casingLabel = new QLabel("Casing:");
+	QCheckBox* circleCheckBox = new QCheckBox("Circle");
+	QCheckBox* squareCheckBox = new QCheckBox("Square");
 	addCasingButton = new QPushButton("Add Casing");
 	removeCasingButton = new QPushButton("Remove Casing");
-        shapeButtonGroup = new QButtonGroup();
-        shapeButtonGroup->addButton(circleCheckBox, 1);
-        shapeButtonGroup->addButton(squareCheckBox, 2);
-        pullTemplateShapeLayout->addWidget(casingLabel);
-        pullTemplateShapeLayout->addWidget(circleCheckBox);
-        pullTemplateShapeLayout->addWidget(squareCheckBox);
-        pullTemplateShapeLayout->addWidget(addCasingButton);
-        pullTemplateShapeLayout->addWidget(removeCasingButton);
-        editorLayout->addLayout(pullTemplateShapeLayout, 0);
+	shapeButtonGroup = new QButtonGroup();
+	shapeButtonGroup->addButton(circleCheckBox, 1);
+	shapeButtonGroup->addButton(squareCheckBox, 2);
+	pullTemplateShapeLayout->addWidget(casingLabel);
+	pullTemplateShapeLayout->addWidget(circleCheckBox);
+	pullTemplateShapeLayout->addWidget(squareCheckBox);
+	pullTemplateShapeLayout->addWidget(addCasingButton);
+	pullTemplateShapeLayout->addWidget(removeCasingButton);
+	editorLayout->addLayout(pullTemplateShapeLayout, 0);
 
-        // Twist slider stuff
-        QHBoxLayout* twistLayout = new QHBoxLayout(this);
-        editorLayout->addLayout(twistLayout, 0);
+	// Twist slider stuff
+	QHBoxLayout* twistLayout = new QHBoxLayout(this);
+	editorLayout->addLayout(twistLayout, 0);
 
-        QLabel* twistLabel1 = new QLabel("Twist:", this);
-        twistLayout->addWidget(twistLabel1);
+	QLabel* twistLabel1 = new QLabel("Twist:", this);
+	twistLayout->addWidget(twistLabel1);
 
-        twistSpin = new QSpinBox(this);
-        twistSpin->setRange(0, 100);
-        twistSpin->setSingleStep(1);
-        twistLayout->addWidget(twistSpin, 1);
+	twistSpin = new QSpinBox(this);
+	twistSpin->setRange(0, 100);
+	twistSpin->setSingleStep(1);
+	twistLayout->addWidget(twistSpin, 1);
 
-        QLabel* twistLabel2 = new QLabel("0", this);
-        twistLayout->addWidget(twistLabel2);
+	QLabel* twistLabel2 = new QLabel("0", this);
+	twistLayout->addWidget(twistLabel2);
 
-        twistSlider = new QSlider(Qt::Horizontal, this);
-        twistSlider->setRange(0, 100);
-        twistSlider->setSliderPosition(0);
-        twistLayout->addWidget(twistSlider, 10);
+	twistSlider = new QSlider(Qt::Horizontal, this);
+	twistSlider->setRange(0, 100);
+	twistSlider->setSliderPosition(0);
+	twistLayout->addWidget(twistSlider, 10);
 
-        QLabel* twistLabel3 = new QLabel("100", this);
-        twistLayout->addWidget(twistLabel3);
+	QLabel* twistLabel3 = new QLabel("100", this);
+	twistLayout->addWidget(twistLabel3);
 
 	// Parameter spin stuff
 	QHBoxLayout* paramLayout = new QHBoxLayout(this);
@@ -184,20 +184,20 @@ void PullPlanEditorWidget :: setupLayout()
 	customizePullTemplateLayout->addWidget(customizePlanButton);
 	editorLayout->addLayout(customizePullTemplateLayout, 0);
 
-        // Little description for the editor
+	// Little description for the editor
 	editorLayout->addStretch(1);
-        QLabel* descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", this);
-        descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-        editorLayout->addWidget(descriptionLabel, 0);
+	QLabel* descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", this);
+	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	editorLayout->addWidget(descriptionLabel, 0);
 
-        QVBoxLayout* niceViewLayout = new QVBoxLayout(this);
-        pageLayout->addLayout(niceViewLayout, 1);
+	QVBoxLayout* niceViewLayout = new QVBoxLayout(this);
+	pageLayout->addLayout(niceViewLayout, 1);
 	niceViewLayout->addWidget(niceViewWidget, 10);
 
-        // Little description for the editor
-        QLabel* niceViewDescriptionLabel = new QLabel("3D view of cane.", this);
-        niceViewDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-        niceViewLayout->addWidget(niceViewDescriptionLabel, 0);
+	// Little description for the editor
+	QLabel* niceViewDescriptionLabel = new QLabel("3D view of cane.", this);
+	niceViewDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	niceViewLayout->addWidget(niceViewDescriptionLabel, 0);
 }
 
 void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
@@ -205,10 +205,10 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
 	PullTemplateLibraryWidget* ptlw = dynamic_cast<PullTemplateLibraryWidget*>(childAt(event->pos()));
 
 	if (ptlw != NULL)
-        {
-                plan->setTemplateType(ptlw->getPullTemplateType());
+	{
+		plan->setTemplateType(ptlw->getPullTemplateType());
 		emit someDataChanged();
-        }
+	}
 }
 
 void PullPlanEditorWidget :: removeCasingButtonPressed()
@@ -233,9 +233,9 @@ void PullPlanEditorWidget :: setupConnections()
 	connect(fillRuleButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(fillRuleButtonGroupChanged(int)));
 	connect(addCasingButton, SIGNAL(pressed()), this, SLOT(addCasingButtonPressed()));
 	connect(removeCasingButton, SIGNAL(pressed()), this, SLOT(removeCasingButtonPressed()));
-        connect(shapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(shapeButtonGroupChanged(int)));
-        connect(twistSlider, SIGNAL(valueChanged(int)), this, SLOT(twistSliderChanged(int)));
-        connect(twistSpin, SIGNAL(valueChanged(int)), this, SLOT(twistSpinChanged(int)));
+	connect(shapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(shapeButtonGroupChanged(int)));
+	connect(twistSlider, SIGNAL(valueChanged(int)), this, SLOT(twistSliderChanged(int)));
+	connect(twistSpin, SIGNAL(valueChanged(int)), this, SLOT(twistSpinChanged(int)));
 
 	for (unsigned int i = 0; i < paramSpins.size(); ++i)
 	{
@@ -267,61 +267,59 @@ void PullPlanEditorWidget :: paramSpinChanged(int)
 
 void PullPlanEditorWidget :: twistSliderChanged(int)
 {
-        float twist = twistSlider->sliderPosition();
+	float twist = twistSlider->sliderPosition();
 
 	if (twist == plan->getTwist())
 		return;
-        plan->setTwist(twist);
-        emit someDataChanged();
+	plan->setTwist(twist);
+	emit someDataChanged();
 }
 
 void PullPlanEditorWidget :: twistSpinChanged(int)
 {
-        float twist = twistSpin->value();
+	float twist = twistSpin->value();
 
 	if (twist == plan->getTwist())
 		return;
-        plan->setTwist(twist);
-        emit someDataChanged();
+	plan->setTwist(twist);
+	emit someDataChanged();
 }
 
 
 void PullPlanEditorWidget :: shapeButtonGroupChanged(int)
 {
-        switch (shapeButtonGroup->checkedId())
-        {
-                case 1:
-                        if (plan->getOutermostCasingShape() == CIRCLE_SHAPE)
-                                return;
-                        plan->setOutermostCasingShape(CIRCLE_SHAPE);
-                       	emit someDataChanged(); 
-                        break;
-                case 2:
-                        if (plan->getOutermostCasingShape() == SQUARE_SHAPE)
-                                return;
-                        plan->setOutermostCasingShape(SQUARE_SHAPE);
-                        emit someDataChanged();
-                        break;
-        }
+	switch (shapeButtonGroup->checkedId())
+	{
+		case 1:
+			if (plan->getOutermostCasingShape() == CIRCLE_SHAPE)
+				return;
+			plan->setOutermostCasingShape(CIRCLE_SHAPE);
+			emit someDataChanged(); 
+			break;
+		case 2:
+			if (plan->getOutermostCasingShape() == SQUARE_SHAPE)
+				return;
+			plan->setOutermostCasingShape(SQUARE_SHAPE);
+			emit someDataChanged();
+			break;
+	}
 }
 
 void PullPlanEditorWidget :: seedTemplates()
 {
-        char filename[100];
-        for (int i = FIRST_PULL_TEMPLATE; i <= LAST_PULL_TEMPLATE; ++i)
-        {
-                sprintf(filename, ":/images/pulltemplate%d.png", i - FIRST_PULL_TEMPLATE + 1);
-                PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
-                        QPixmap::fromImage(QImage(filename)), i);
-                templateLibraryLayout->addWidget(ptlw);
-        }
+	char filename[100];
+	for (int i = FIRST_PULL_TEMPLATE; i <= LAST_PULL_TEMPLATE; ++i)
+	{
+		sprintf(filename, ":/images/pulltemplate%d.png", i - FIRST_PULL_TEMPLATE + 1);
+		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
+			QPixmap::fromImage(QImage(filename)), i);
+		templateLibraryLayout->addWidget(ptlw);
+	}
 }
 
-void PullPlanEditorWidget :: updateLibraryWidgetPixmaps(PullPlanLibraryWidget* w)
+void PullPlanEditorWidget :: updateLibraryWidgetPixmaps(AsyncPullPlanLibraryWidget* w)
 {
-	w->updatePixmaps(
-		QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100),
-		QPixmap::grabWidget(viewWidget).scaled(100, 100));
+	w->updatePixmaps(QPixmap::grabWidget(viewWidget).scaled(100, 100));
 }
 
 void PullPlanEditorWidget :: openCustomizeWidget()

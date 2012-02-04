@@ -15,13 +15,13 @@ MainWindow :: MainWindow()
 	setWindowTitle(tr("VirtualGlass"));
 	//HACK for video recording:
 	//setFixedSize(1600,900);
-        //move(-8, 0);
-        show();
+	//move(-8, 0);
+	show();
 
-        seedEverything();
-        editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
-        emit someDataChanged();
-        whatToDoLabel->setText("Click a library item at left to edit/view.");
+	seedEverything();
+	editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
+	emit someDataChanged();
+	whatToDoLabel->setText("Click a library item at left to edit/view.");
 }
 
 void MainWindow :: seedEverything()
@@ -36,7 +36,7 @@ void MainWindow :: seedEverything()
 	emit someDataChanged();
 	pullPlanEditorWidget->seedTemplates();
 
-        // Load pickup and piece template types
+	// Load pickup and piece template types
 	editorStack->setCurrentIndex(PIECE_MODE);
 	emit someDataChanged();
 	pieceEditorWidget->seedTemplates();
@@ -53,7 +53,7 @@ void MainWindow :: unhighlightAllLibraryWidgets()
 	for (int j = 0; j < pullPlanLibraryLayout->count(); ++j)
 	{
 		w = pullPlanLibraryLayout->itemAt(j);
-		unhighlightLibraryWidget(dynamic_cast<PullPlanLibraryWidget*>(w->widget()));
+		unhighlightLibraryWidget(dynamic_cast<AsyncPullPlanLibraryWidget*>(w->widget()));
 	}
 	for (int j = 0; j < pieceLibraryLayout->count(); ++j)
 	{
@@ -105,54 +105,54 @@ void MainWindow :: deleteCurrentEditingObject()
 			if (pullPlanLibraryLayout->count() == 1)
 				return;
 
-                        int i;
-                        for (i = 0; i < pullPlanLibraryLayout->count(); ++i)
-                        {
-                                w = pullPlanLibraryLayout->itemAt(i);
-                                PullPlan* p = dynamic_cast<PullPlanLibraryWidget*>(w->widget())->getPullPlan();
-                                if (p == pullPlanEditorWidget->getPlan())
-                                {
-                                        // this may be a memory leak, the library widget is never explicitly deleted
-                                        w = pullPlanLibraryLayout->takeAt(i);
-                                        delete w->widget();
-                                        delete w;
-                                        break;
-                                }
-                        }
+			int i;
+			for (i = 0; i < pullPlanLibraryLayout->count(); ++i)
+			{
+				w = pullPlanLibraryLayout->itemAt(i);
+				PullPlan* p = dynamic_cast<AsyncPullPlanLibraryWidget*>(w->widget())->getPullPlan();
+				if (p == pullPlanEditorWidget->getPlan())
+				{
+					// this may be a memory leak, the library widget is never explicitly deleted
+					w = pullPlanLibraryLayout->takeAt(i);
+					delete w->widget();
+					delete w;
+					break;
+				}
+			}
 
-                        pullPlanEditorPlanLibraryWidget = dynamic_cast<PullPlanLibraryWidget*>(
-                                                          	pullPlanLibraryLayout->itemAt(
-                                                                        MIN(pullPlanLibraryLayout->count()-1, i))->widget());
-                        pullPlanEditorWidget->setPlan(pullPlanEditorPlanLibraryWidget->getPullPlan());
-                        emit someDataChanged();
-                        break;
+			pullPlanEditorPlanLibraryWidget = dynamic_cast<AsyncPullPlanLibraryWidget*>(
+							  	pullPlanLibraryLayout->itemAt(
+									MIN(pullPlanLibraryLayout->count()-1, i))->widget());
+			pullPlanEditorWidget->setPlan(pullPlanEditorPlanLibraryWidget->getPullPlan());
+			emit someDataChanged();
+			break;
 		}
 		case PIECE_MODE:
 		{
 			if (pieceLibraryLayout->count() == 1)
 				return;
 
-                        int i;
-                        for (i = 0; i < pieceLibraryLayout->count(); ++i)
-                        {
-                                w = pieceLibraryLayout->itemAt(i);
-                                Piece* p = dynamic_cast<PieceLibraryWidget*>(w->widget())->getPiece();
-                                if (p == pieceEditorWidget->getPiece())
-                                {
-                                        // this may be a memory leak, the library widget is never explicitly deleted
-                                        w = pieceLibraryLayout->takeAt(i);
-                                        delete w->widget();
-                                        delete w;
-                                        break;
-                                }
-                        }
+			int i;
+			for (i = 0; i < pieceLibraryLayout->count(); ++i)
+			{
+				w = pieceLibraryLayout->itemAt(i);
+				Piece* p = dynamic_cast<PieceLibraryWidget*>(w->widget())->getPiece();
+				if (p == pieceEditorWidget->getPiece())
+				{
+					// this may be a memory leak, the library widget is never explicitly deleted
+					w = pieceLibraryLayout->takeAt(i);
+					delete w->widget();
+					delete w;
+					break;
+				}
+			}
 
-                        pieceEditorPieceLibraryWidget = dynamic_cast<PieceLibraryWidget*>(
-                                                                pieceLibraryLayout->itemAt(
-                                                                        MIN(pieceLibraryLayout->count()-1, i))->widget());
-                        pieceEditorWidget->setPiece(pieceEditorPieceLibraryWidget->getPiece());
-                        emit someDataChanged();
-                        break;
+			pieceEditorPieceLibraryWidget = dynamic_cast<PieceLibraryWidget*>(
+								pieceLibraryLayout->itemAt(
+									MIN(pieceLibraryLayout->count()-1, i))->widget());
+			pieceEditorWidget->setPiece(pieceEditorPieceLibraryWidget->getPiece());
+			emit someDataChanged();
+			break;
 		}
 	}
 	
@@ -167,7 +167,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	}
 
 	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
-	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
+	AsyncPullPlanLibraryWidget* plplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(childAt(event->pos()));
 	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
 
 	if (cblw != NULL)
@@ -214,7 +214,7 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 		return;
 
 	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
-	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
+	AsyncPullPlanLibraryWidget* plplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(childAt(event->pos()));
 	int type;
 	if (cblw != NULL)
 	{
@@ -346,10 +346,10 @@ void MainWindow :: setupEditors()
 
 void MainWindow :: setupPieceEditor()
 {
-        // Setup data objects - the current plan and library widget for this plan
-        pieceEditorWidget = new PieceEditorWidget(editorStack);
-        pieceEditorPieceLibraryWidget = new PieceLibraryWidget(pieceEditorWidget->getPiece());
-        pieceLibraryLayout->addWidget(pieceEditorPieceLibraryWidget);
+	// Setup data objects - the current plan and library widget for this plan
+	pieceEditorWidget = new PieceEditorWidget(editorStack);
+	pieceEditorPieceLibraryWidget = new PieceLibraryWidget(pieceEditorWidget->getPiece());
+	pieceLibraryLayout->addWidget(pieceEditorPieceLibraryWidget);
 }
 
 void MainWindow :: setupEmptyPaneEditor()
@@ -374,7 +374,7 @@ void MainWindow :: setupPullPlanEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
 	pullPlanEditorWidget = new PullPlanEditorWidget(editorStack);
-	pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(pullPlanEditorWidget->getPlan());
+	pullPlanEditorPlanLibraryWidget = new AsyncPullPlanLibraryWidget(pullPlanEditorWidget->getPlan());
 	pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);
 }
 
@@ -425,18 +425,18 @@ void MainWindow :: newPullPlan()
 
 void MainWindow :: newPullPlan(PullPlan* newPlan)
 {
-        unhighlightAllLibraryWidgets();
-        pullPlanEditorPlanLibraryWidget = new PullPlanLibraryWidget(newPlan);
-        pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);
+	unhighlightAllLibraryWidgets();
+	pullPlanEditorPlanLibraryWidget = new AsyncPullPlanLibraryWidget(newPlan);
+	pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);
 
-        // Give the new plan to the editor
-        pullPlanEditorWidget->setPlan(newPlan);
+	// Give the new plan to the editor
+	pullPlanEditorWidget->setPlan(newPlan);
 
-        // Load up the right editor
-        editorStack->setCurrentIndex(PULLPLAN_MODE);
+	// Load up the right editor
+	editorStack->setCurrentIndex(PULLPLAN_MODE);
 
-        // Trigger GUI updates
-        emit someDataChanged();
+	// Trigger GUI updates
+	emit someDataChanged();
 }
 
 
@@ -455,7 +455,7 @@ void MainWindow :: unhighlightLibraryWidget(ColorBarLibraryWidget* w)
 	w->graphicsEffect()->setEnabled(false);
 }
 
-void MainWindow :: unhighlightLibraryWidget(PullPlanLibraryWidget* w)
+void MainWindow :: unhighlightLibraryWidget(AsyncPullPlanLibraryWidget* w)
 {
 	w->graphicsEffect()->setEnabled(false);
 }
@@ -486,7 +486,7 @@ void MainWindow :: highlightLibraryWidget(ColorBarLibraryWidget* w, int dependan
 	w->graphicsEffect()->setEnabled(true);
 }
 
-void MainWindow :: highlightLibraryWidget(PullPlanLibraryWidget* w, int dependancy)
+void MainWindow :: highlightLibraryWidget(AsyncPullPlanLibraryWidget* w, int dependancy)
 {
 	w->graphicsEffect()->setEnabled(false);
 	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(dependancy);
@@ -526,10 +526,10 @@ void MainWindow :: updateLibrary()
 	{
 		case COLORBAR_MODE:
 		{
-			PullPlanLibraryWidget* pplw;
+			AsyncPullPlanLibraryWidget* pplw;
 			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 			{
-				pplw = dynamic_cast<PullPlanLibraryWidget*>(
+				pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 				if (pplw->getPullPlan()->hasDependencyOn(
 					colorEditorBarLibraryWidget->getPullPlan()->getOutermostCasingColor()))
@@ -563,10 +563,10 @@ void MainWindow :: updateLibrary()
 					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
 			}
 
-			PullPlanLibraryWidget* pplw;
+			AsyncPullPlanLibraryWidget* pplw;
 			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 			{
-				pplw = dynamic_cast<PullPlanLibraryWidget*>(
+				pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
 						dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(pplw->getPullPlan()))
 						highlightLibraryWidget(pplw, IS_USED_BY_DEPENDANCY);
@@ -600,10 +600,10 @@ void MainWindow :: updateLibrary()
 					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
 			}
 
-			PullPlanLibraryWidget* pplw;
+			AsyncPullPlanLibraryWidget* pplw;
 			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 			{
-				pplw = dynamic_cast<PullPlanLibraryWidget*>(
+				pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 				if (pieceEditorWidget->getPiece()->hasDependencyOn(pplw->getPullPlan()))
 					highlightLibraryWidget(pplw, IS_USED_BY_DEPENDANCY);

@@ -17,6 +17,7 @@ RESOURCES = virtualglass.qrc
 
 unix:!macx {
   QMAKE_CXXFLAGS += -std=gnu++0x
+  LIBS += -lGLU
 }
 macx {
   QMAKE_CXXFLAGS += -DUNORDERED_MAP_WORKAROUND
@@ -53,7 +54,7 @@ HEADERS += primitives.h constants.h Vector.hpp \
 	piece.h piecetemplate.h \
 	pickuptemplate.h subpickuptemplate.h pickupplaneditorviewwidget.h \ 
 	purecolorlibrarywidget.h casing.h \
-	mainwindow.h niceviewwidget.h pullplanlibrarywidget.h piecelibrarywidget.h \
+	mainwindow.h niceviewwidget.h piecelibrarywidget.h \
 	pulltemplatelibrarywidget.h pickuptemplatelibrarywidget.h piecetemplatelibrarywidget.h \
 	pullplaneditorviewwidget.h pullplaneditorwidget.h colorbarlibrarywidget.h \
 	pieceeditorwidget.h coloreditorwidget.h \
@@ -61,6 +62,7 @@ HEADERS += primitives.h constants.h Vector.hpp \
 	qgraphicshighlighteffect.h \
 	asyncrenderwidget.h \
 	asyncrenderinternal.h \
+	asyncpullplanlibrarywidget.h \
 
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
@@ -122,13 +124,14 @@ SOURCES += main.cpp \
 	pickupplan.cpp subpickuptemplate.cpp pickupplaneditorviewwidget.cpp \
 	purecolorlibrarywidget.cpp casing.cpp \
 	controller.cpp geometry.cpp mesh.cpp \
-	mainwindow.cpp niceviewwidget.cpp pullplanlibrarywidget.cpp piecelibrarywidget.cpp \
+	mainwindow.cpp niceviewwidget.cpp piecelibrarywidget.cpp \
 	pulltemplatelibrarywidget.cpp pickuptemplatelibrarywidget.cpp piecetemplatelibrarywidget.cpp \
 	pullplaneditorviewwidget.cpp pullplaneditorwidget.cpp colorbarlibrarywidget.cpp \ 
 	qgraphicshighlighteffect.cpp \
 	pieceeditorwidget.cpp coloreditorwidget.cpp \
 	asyncrenderwidget.cpp \
 	asyncrenderinternal.cpp \
+	asyncpullplanlibrarywidget.cpp \
 
 
 SOURCES += yaml-cpp/src/tag.cpp \

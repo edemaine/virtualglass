@@ -14,7 +14,15 @@ PullPlan :: PullPlan(int templateType) {
 	setTemplateType(templateType);
 }
 
-PullPlan* PullPlan :: copy() {
+PullPlan :: ~PullPlan() {
+	while (!subs.empty()) {
+		delete subs.back();
+		subs.back() = NULL;
+		subs.pop_back();
+	}
+}
+
+PullPlan* PullPlan :: copy() const {
 
 	PullPlan* c = new PullPlan(this->templateType);
 	c->casings.clear();
@@ -26,6 +34,7 @@ PullPlan* PullPlan :: copy() {
 	}
 	c->updateSubs();
 
+	assert(c->subs.size() == this->subs.size());
 	for (unsigned int i = 0; i < this->subs.size(); ++i) {
 		c->subs[i]->plan = this->subs[i]->plan;
 	}
@@ -85,13 +94,13 @@ void PullPlan :: setTemplateType(int templateType) {
 
 	this->templateType = templateType;
 
-        // If the pull template has subplans and you
-        // haven't initialized your default subplans yet, do it
-        if (!isBase() && defaultCircleSubplan == NULL) {
-                // initialize default subplans
-                defaultCircleSubplan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE);
-                defaultSquareSubplan = new PullPlan(SQUARE_BASE_PULL_TEMPLATE);
-        }
+	// If the pull template has subplans and you
+	// haven't initialized your default subplans yet, do it
+	if (!isBase() && defaultCircleSubplan == NULL) {
+		// initialize default subplans
+		defaultCircleSubplan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE);
+		defaultSquareSubplan = new PullPlan(SQUARE_BASE_PULL_TEMPLATE);
+	}
 
 	parameterNames.clear();
 	parameterValues.clear();
@@ -102,76 +111,76 @@ void PullPlan :: setTemplateType(int templateType) {
 		casings.push_back(Casing(1.0, CIRCLE_SHAPE, defaultColor));
 		casings[0].thickness = 0.9;
 	}
-        switch (templateType) {
-                case CIRCLE_BASE_PULL_TEMPLATE:
-                        break;
-                case SQUARE_BASE_PULL_TEMPLATE:
-                        casings[0].shape = SQUARE_SHAPE;
-                        casings[0].thickness = 1 / SQRT_TWO;
-                        break;
-                case AMORPHOUS_BASE_PULL_TEMPLATE:
-                        casings[0].shape = AMORPHOUS_SHAPE;
-                        break;
-                case CASED_CIRCLE_PULL_TEMPLATE:
-                        break;
-                case CASED_SQUARE_PULL_TEMPLATE:
-                        casings[0].shape = SQUARE_SHAPE;
-                        casings[0].thickness = 1 / SQRT_TWO;
-                        break;
-                case HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE:
-                        tmp = new char[100];
-                        sprintf(tmp, "Row count:");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(3);
-                        break;
-                case HORIZONTAL_LINE_SQUARE_PULL_TEMPLATE:
-                        tmp = new char[100];
-                        sprintf(tmp, "Row count:");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(3);
-                        break;
-                case SURROUNDING_CIRCLE_PULL_TEMPLATE:
-                        tmp = new char[100];
-                        sprintf(tmp, "Count:");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(8);
-                        break;
-                case CROSS_PULL_TEMPLATE:
-                        tmp = new char[100];
-                        sprintf(tmp, "Radial count:");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(3);
-                        break;
-                case SQUARE_OF_SQUARES_PULL_TEMPLATE:
-                case SQUARE_OF_CIRCLES_PULL_TEMPLATE:
-                        casings[0].shape = SQUARE_SHAPE;
-                        casings[0].thickness = 1 / SQRT_TWO;
-                        tmp = new char[100];
-                        sprintf(tmp, "Row count:");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(4);
-                        break;
-                case TRIPOD_PULL_TEMPLATE:
-                        tmp = new char[100];
-                        sprintf(tmp, "Radial count:");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(3);
-                        break;
-                case SURROUNDING_SQUARE_PULL_TEMPLATE:
-                        casings[0].shape = SQUARE_SHAPE;
-                        casings[0].thickness = 1 / SQRT_TWO;
-                        tmp = new char[100];
-                        sprintf(tmp, "Column count:");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(2);
-                        break;
+	switch (templateType) {
+		case CIRCLE_BASE_PULL_TEMPLATE:
+			break;
+		case SQUARE_BASE_PULL_TEMPLATE:
+			casings[0].shape = SQUARE_SHAPE;
+			casings[0].thickness = 1 / SQRT_TWO;
+			break;
+		case AMORPHOUS_BASE_PULL_TEMPLATE:
+			casings[0].shape = AMORPHOUS_SHAPE;
+			break;
+		case CASED_CIRCLE_PULL_TEMPLATE:
+			break;
+		case CASED_SQUARE_PULL_TEMPLATE:
+			casings[0].shape = SQUARE_SHAPE;
+			casings[0].thickness = 1 / SQRT_TWO;
+			break;
+		case HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE:
+			tmp = new char[100];
+			sprintf(tmp, "Row count:");
+			parameterNames.push_back(tmp);
+			parameterValues.push_back(3);
+			break;
+		case HORIZONTAL_LINE_SQUARE_PULL_TEMPLATE:
+			tmp = new char[100];
+			sprintf(tmp, "Row count:");
+			parameterNames.push_back(tmp);
+			parameterValues.push_back(3);
+			break;
+		case SURROUNDING_CIRCLE_PULL_TEMPLATE:
+			tmp = new char[100];
+			sprintf(tmp, "Count:");
+			parameterNames.push_back(tmp);
+			parameterValues.push_back(8);
+			break;
+		case CROSS_PULL_TEMPLATE:
+			tmp = new char[100];
+			sprintf(tmp, "Radial count:");
+			parameterNames.push_back(tmp);
+			parameterValues.push_back(3);
+			break;
+		case SQUARE_OF_SQUARES_PULL_TEMPLATE:
+		case SQUARE_OF_CIRCLES_PULL_TEMPLATE:
+			casings[0].shape = SQUARE_SHAPE;
+			casings[0].thickness = 1 / SQRT_TWO;
+			tmp = new char[100];
+			sprintf(tmp, "Row count:");
+			parameterNames.push_back(tmp);
+			parameterValues.push_back(4);
+			break;
+		case TRIPOD_PULL_TEMPLATE:
+			tmp = new char[100];
+			sprintf(tmp, "Radial count:");
+			parameterNames.push_back(tmp);
+			parameterValues.push_back(3);
+			break;
+		case SURROUNDING_SQUARE_PULL_TEMPLATE:
+			casings[0].shape = SQUARE_SHAPE;
+			casings[0].thickness = 1 / SQRT_TWO;
+			tmp = new char[100];
+			sprintf(tmp, "Column count:");
+			parameterNames.push_back(tmp);
+			parameterValues.push_back(2);
+			break;
 		case CUSTOM_CIRCLE_PULL_TEMPLATE:
 			break;
 		case CUSTOM_SQUARE_PULL_TEMPLATE:
 			this->casings[0].shape = SQUARE_SHAPE;
-                        casings[0].thickness = 1 / SQRT_TWO;
+			casings[0].thickness = 1 / SQRT_TWO;
 			break;
-        }
+	}
 
 	subs.clear(); // don't carry over any of the current stuff
 	updateSubs();
@@ -223,18 +232,18 @@ int PullPlan :: getTemplateType() {
 
 void PullPlan :: setParameter(int p, int v) {
 
-        parameterValues[p] = v;
-        updateSubs();
+	parameterValues[p] = v;
+	updateSubs();
 }
 
 int PullPlan :: getParameter(int p) {
 
-        return parameterValues[p];
+	return parameterValues[p];
 }
 
 char* PullPlan :: getParameterName(int p) {
 
-        return parameterNames[p];
+	return parameterNames[p];
 }
 
 unsigned int PullPlan :: getParameterCount() {
@@ -312,11 +321,11 @@ void PullPlan :: setOutermostCasingShape(int newShape) {
 
 	// if we're moving from square to circle and the interior casing is square and
 	// would collide with the new casing shape, scale everything down to make room
-        if (newShape == CIRCLE_SHAPE && casings[casings.size()-2].shape == SQUARE_SHAPE
+	if (newShape == CIRCLE_SHAPE && casings[casings.size()-2].shape == SQUARE_SHAPE
 		&& casings[casings.size()-2].thickness > 1 / SQRT_TWO) { 
 		for (unsigned int i = 0; i < casings.size() - 1; ++i) 
 			casings[i].thickness *= 1 / SQRT_TWO;
-        }
+	}
 	
 	casings[casings.size()-1].shape = newShape;
 	if (hasSquareCasing())
@@ -378,91 +387,91 @@ the number of subplans.
 */
 void PullPlan :: updateSubs()
 {
-        Point p;
-        float radius = casings[0].thickness;
+	Point p;
+	float radius = casings[0].thickness;
 
 	vector<SubpullTemplate*> newSubs;
 
-        p.x = p.y = p.z = 0.0;
-        switch (this->templateType) {
-                case CASED_CIRCLE_PULL_TEMPLATE:
-                        pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, radius * 1.9, 0);
-                        break;
-                case CASED_SQUARE_PULL_TEMPLATE:
-                        if (this->casings[0].shape == CIRCLE_SHAPE) {
-                                radius *= 1.0 / pow(2, 0.5);
-                        }
-                        pushNewSubpull(&newSubs, SQUARE_SHAPE, p, radius * 2.0, 0);
-                        break;
-                case HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE: 
+	p.x = p.y = p.z = 0.0;
+	switch (this->templateType) {
+		case CASED_CIRCLE_PULL_TEMPLATE:
+			pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, radius * 1.9, 0);
+			break;
+		case CASED_SQUARE_PULL_TEMPLATE:
+			if (this->casings[0].shape == CIRCLE_SHAPE) {
+				radius *= 1.0 / pow(2, 0.5);
+			}
+			pushNewSubpull(&newSubs, SQUARE_SHAPE, p, radius * 2.0, 0);
+			break;
+		case HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE: 
 		{
-                        int count = parameterValues[0];
-                        for (int i = 0; i < count; ++i) {
-                                float littleRadius = (2 * radius / count) / 2;
-                                p.x = -radius + littleRadius + i * 2 * littleRadius;
-                                pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
-                        }
-                        break;
-                }
-                case HORIZONTAL_LINE_SQUARE_PULL_TEMPLATE:
-                {
-                        if (this->casings[0].shape == CIRCLE_SHAPE)
-                                radius *= 0.9;
+			int count = parameterValues[0];
+			for (int i = 0; i < count; ++i) {
+				float littleRadius = (2 * radius / count) / 2;
+				p.x = -radius + littleRadius + i * 2 * littleRadius;
+				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+			}
+			break;
+		}
+		case HORIZONTAL_LINE_SQUARE_PULL_TEMPLATE:
+		{
+			if (this->casings[0].shape == CIRCLE_SHAPE)
+				radius *= 0.9;
 
-                        int count = parameterValues[0];
-                        for (int i = 0; i < count; ++i) {
-                                float littleRadius = (2 * radius / count) / 2;
-                                p.x = -radius + littleRadius + i * 2 * littleRadius;
-                                pushNewSubpull(&newSubs, SQUARE_SHAPE, p, littleRadius * 2.0, 0);
-                        }
-                        break;
-                }
-                case SURROUNDING_CIRCLE_PULL_TEMPLATE:
-                {
-                        int count = parameterValues[0];
-                        float theta = TWO_PI / count;
-                        float k = sin(theta/2) / (1 + sin(theta/2));
+			int count = parameterValues[0];
+			for (int i = 0; i < count; ++i) {
+				float littleRadius = (2 * radius / count) / 2;
+				p.x = -radius + littleRadius + i * 2 * littleRadius;
+				pushNewSubpull(&newSubs, SQUARE_SHAPE, p, littleRadius * 2.0, 0);
+			}
+			break;
+		}
+		case SURROUNDING_CIRCLE_PULL_TEMPLATE:
+		{
+			int count = parameterValues[0];
+			float theta = TWO_PI / count;
+			float k = sin(theta/2) / (1 + sin(theta/2));
 
-                        p.x = p.y = 0.0;
-                        pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, (1 - 2 * k) * 2 * radius, 0);
-                        for (int i = 0; i < count; ++i) {
-                                p.x = (1.0 - k) * radius * cos(TWO_PI / count * i);
-                                p.y = (1.0 - k) * radius * sin(TWO_PI / count * i);
-                                pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * k * radius, 0);
-                        }
-                        break;
-                }
-                case CROSS_PULL_TEMPLATE:
-                {
-                        int count = parameterValues[0]-1;
+			p.x = p.y = 0.0;
+			pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, (1 - 2 * k) * 2 * radius, 0);
+			for (int i = 0; i < count; ++i) {
+				p.x = (1.0 - k) * radius * cos(TWO_PI / count * i);
+				p.y = (1.0 - k) * radius * sin(TWO_PI / count * i);
+				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * k * radius, 0);
+			}
+			break;
+		}
+		case CROSS_PULL_TEMPLATE:
+		{
+			int count = parameterValues[0]-1;
 			float littleRadius = (radius / (count + 0.5)) / 2.0;
 
 			p.x = p.y = 0.0;
 			pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
-                        for (int i = 0; i < count; ++i) {
-                                p.x = (i+1) * 2 * littleRadius;
-                                p.y = 0.0;
-                                pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
-                                p.x = 0.0;
-                                p.y = (i+1) * 2 * littleRadius;
-                                pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
-                                p.x = -((i+1) * 2 * littleRadius);
-                                p.y = 0.0;
-                                pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
-                                p.x = 0.0;
-                                p.y = -((i+1) * 2 * littleRadius);
-                                pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
-                        }
-                        break;
-                }
-                case SQUARE_OF_CIRCLES_PULL_TEMPLATE:
-                case SQUARE_OF_SQUARES_PULL_TEMPLATE:
-                {
-                        if (this->casings[0].shape == CIRCLE_SHAPE)
-                                radius *= 1 / SQRT_TWO;
+			for (int i = 0; i < count; ++i) {
+				p.x = (i+1) * 2 * littleRadius;
+				p.y = 0.0;
+				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+				p.x = 0.0;
+				p.y = (i+1) * 2 * littleRadius;
+				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+				p.x = -((i+1) * 2 * littleRadius);
+				p.y = 0.0;
+				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+				p.x = 0.0;
+				p.y = -((i+1) * 2 * littleRadius);
+				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+			}
+			break;
+		}
+		case SQUARE_OF_CIRCLES_PULL_TEMPLATE:
+		case SQUARE_OF_SQUARES_PULL_TEMPLATE:
+		{
+			if (this->casings[0].shape == CIRCLE_SHAPE)
+				radius *= 1 / SQRT_TWO;
 
-                        int count = parameterValues[0];
-                        float littleRadius = radius / count;
+			int count = parameterValues[0];
+			float littleRadius = radius / count;
 
 			// We add the subtemplates in this funny way so that the
 			// ith subcane is always at the same location regardless of
@@ -482,56 +491,56 @@ void PullPlan :: updateSubs()
 				}
 			}
 			break;
-                }
-                case TRIPOD_PULL_TEMPLATE:
-                {
-                        int count = parameterValues[0];
-                        float littleRadius = radius / (2 * count - 1);
+		}
+		case TRIPOD_PULL_TEMPLATE:
+		{
+			int count = parameterValues[0];
+			float littleRadius = radius / (2 * count - 1);
 
-                        p.x = p.y = 0.0;
-                        pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 0);
+			p.x = p.y = 0.0;
+			pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 0);
 			for (int i = 1; i < count; ++i) {
 				for (int theta = 0; theta < 3; ++theta) {
-                                        p.x = (littleRadius * 2 * i) * cos(TWO_PI / 3 * theta);
-                                        p.y = (littleRadius * 2 * i) * sin(TWO_PI / 3 * theta);
-                                        pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2, 0);
-                                }
-                        }
-                        break;
-                }
-                case SURROUNDING_SQUARE_PULL_TEMPLATE:
-                {
-                        if (this->casings[0].shape == CIRCLE_SHAPE)
-                                radius *= 1 / SQRT_TWO;
+					p.x = (littleRadius * 2 * i) * cos(TWO_PI / 3 * theta);
+					p.y = (littleRadius * 2 * i) * sin(TWO_PI / 3 * theta);
+					pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2, 0);
+				}
+			}
+			break;
+		}
+		case SURROUNDING_SQUARE_PULL_TEMPLATE:
+		{
+			if (this->casings[0].shape == CIRCLE_SHAPE)
+				radius *= 1 / SQRT_TWO;
 
-                        int count = parameterValues[0];
-                        float littleRadius = radius / (count + 2);
+			int count = parameterValues[0];
+			float littleRadius = radius / (count + 2);
 
-                        p.x = p.y = 0.0;
-                        pushNewSubpull(&newSubs, SQUARE_SHAPE, p, 2 * littleRadius * count, 0);
-                        for (int i = 0; i < count + 1; ++i) {
+			p.x = p.y = 0.0;
+			pushNewSubpull(&newSubs, SQUARE_SHAPE, p, 2 * littleRadius * count, 0);
+			for (int i = 0; i < count + 1; ++i) {
 				p.x = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * i;
 				p.y = -2 * littleRadius * (count + 1) / 2.0;
 				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
-                        }
-                        for (int j = 0; j < count + 1; ++j) {
+			}
+			for (int j = 0; j < count + 1; ++j) {
 				p.x = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * (count + 1);
 				p.y = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * j;
 				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
-                        }
-                        for (int i = count + 1; i >= 1; --i) {
+			}
+			for (int i = count + 1; i >= 1; --i) {
 				p.x = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * i;
 				p.y = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * (count + 1);
 				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
-                        }
-                        for (int j = count + 1; j >= 1; --j) {
+			}
+			for (int j = count + 1; j >= 1; --j) {
 				p.x = -2 * littleRadius * (count + 1) / 2.0;
 				p.y = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * j;
 				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
-                        }
-                        break;
-                }
-        }
+			}
+			break;
+		}
+	}
 
 	for (unsigned int i = 0; i < subs.size(); ++i) 
 		delete subs[i];

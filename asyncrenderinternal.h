@@ -99,8 +99,11 @@ public:
 	virtual ~RenderThread();
 	virtual void run();
 
+	void setupCamera(Camera const &camera);
+	void simpleRender(Geometry const &geom);
+
 	Controller *controller;
-	QGLContext *context;
+	QGLWidget *widget; //kinda silly way of getting a context to work with.
 
 signals:
 	void jobFinished(Job *job);

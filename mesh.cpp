@@ -166,49 +166,49 @@ float Mesher :: splineVal(float r1, float r2, float r3, float t)
 
 void Mesher :: applyWavyPlateTransform(Vertex* v, vector<int>* parameterValues)
 {
-        // Do a rollup
-        // send x value to theta value 
-        // -5.0 goes to -PI, 5.0 goes to PI
-        // everything gets a base radius of 5.0
-        float theta = PI * v->position.x / 5.0;
+	// Do a rollup
+	// send x value to theta value 
+	// -5.0 goes to -PI, 5.0 goes to PI
+	// everything gets a base radius of 5.0
+	float theta = PI * v->position.x / 5.0;
 
-        float totalR = 4.0 + 100 * 0.1;
-        float totalPhi = 10.0 / totalR;
+	float totalR = 4.0 + 100 * 0.1;
+	float totalPhi = 10.0 / totalR;
 
-        float r = totalR - v->position.y;
-        float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
+	float r = totalR - v->position.y;
+	float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
 
 	int waveCount = (*parameterValues)[0] / 10;
 	float waveSize = (*parameterValues)[1] / 30.0;
 
 	float waveAdjust = cos(waveCount * theta) * waveSize * (phi + PI/2);
 
-        v->position.x = (r + waveAdjust) * cos(theta) * cos(phi);
-        v->position.y = (r + waveAdjust) * sin(theta) * cos(phi);
-        v->position.z = (r + waveAdjust) * sin(phi) + (totalR - totalR * sin(totalPhi - PI / 2))/2.0;
+	v->position.x = (r + waveAdjust) * cos(theta) * cos(phi);
+	v->position.y = (r + waveAdjust) * sin(theta) * cos(phi);
+	v->position.z = (r + waveAdjust) * sin(phi) + (totalR - totalR * sin(totalPhi - PI / 2))/2.0;
 
 }
 
 void Mesher :: applyPotTransform(Vertex* v, vector<int>* parameterValues)
 {
-        // compute theta within a rollup, starting with pickup geometry
-        float theta = PI * v->position.x / 5.0;
+	// compute theta within a rollup, starting with pickup geometry
+	float theta = PI * v->position.x / 5.0;
 
-        // Deform into a spline-based vase
-        float body_radius = (*parameterValues)[0] * 0.03 + 1.0;
-        float lip_radius = (*parameterValues)[1] * 0.03 + 0.1;
-        float radius = 2.0 * splineVal(lip_radius, body_radius, lip_radius, (v->position.z - -5.0)/10.0);
+	// Deform into a spline-based vase
+	float body_radius = (*parameterValues)[0] * 0.03 + 1.0;
+	float lip_radius = (*parameterValues)[1] * 0.03 + 0.1;
+	float radius = 2.0 * splineVal(lip_radius, body_radius, lip_radius, (v->position.z - -5.0)/10.0);
 
-        if (radius < 1.0)
-        {
-                v->position.x = (radius - v->position.y * radius) * cos(theta);
-                v->position.y = (radius - v->position.y * radius) * sin(theta);
-        }
-        else
-        {
-                v->position.x = (radius - v->position.y / radius) * cos(theta);
-                v->position.y = (radius - v->position.y / radius) * sin(theta);
-        }
+	if (radius < 1.0)
+	{
+		v->position.x = (radius - v->position.y * radius) * cos(theta);
+		v->position.y = (radius - v->position.y * radius) * sin(theta);
+	}
+	else
+	{
+		v->position.x = (radius - v->position.y / radius) * cos(theta);
+		v->position.y = (radius - v->position.y / radius) * sin(theta);
+	}
 }
 
 void Mesher :: applyVaseTransform(Vertex* v, vector<int>* parameterValues)
@@ -698,8 +698,8 @@ void Mesher :: generateMesh(PickupPlan* pickup, Geometry *geometry, bool ignoreC
 void Mesher :: generateMesh(Piece* piece, Geometry* geometry)
 {
 	totalCaneLength = computeTotalCaneLength(piece);
-        vector<PullPlan*> ancestors;
-        vector<int> ancestorIndices;
+	vector<PullPlan*> ancestors;
+	vector<int> ancestorIndices;
 	generateMesh(piece, geometry, &ancestors, &ancestorIndices);
 	geometry->compute_normals_from_triangles();
 }
@@ -707,8 +707,8 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry)
 void Mesher :: generateMesh(PickupPlan* plan, Geometry* geometry)
 {
 	totalCaneLength = computeTotalCaneLength(plan);
-        vector<PullPlan*> ancestors;
-        vector<int> ancestorIndices;
+	vector<PullPlan*> ancestors;
+	vector<int> ancestorIndices;
 	generateMesh(plan, geometry, true, &ancestors, &ancestorIndices);
 	geometry->compute_normals_from_triangles();
 }
@@ -716,26 +716,26 @@ void Mesher :: generateMesh(PickupPlan* plan, Geometry* geometry)
 void Mesher :: generatePullMesh(PullPlan* plan, Geometry* geometry)
 {
 	totalCaneLength = computeTotalCaneLength(plan);
-        vector<PullPlan*> ancestors;
-        vector<int> ancestorIndices;
+	vector<PullPlan*> ancestors;
+	vector<int> ancestorIndices;
 	if (plan->getTemplateType() == AMORPHOUS_BASE_PULL_TEMPLATE)
 		generateMesh(plan, CIRCLE_SHAPE, geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 	else
 		generateMesh(plan, plan->getOutermostCasingShape(), geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 
 	// Make skinnier to more closely mimic the canes found in pickups
-        for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
-        {
-                applyResizeTransform(&(geometry->vertices[v]), 0.5);
-        }
+	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
+	{
+		applyResizeTransform(&(geometry->vertices[v]), 0.5);
+	}
 	geometry->compute_normals_from_triangles();
 }
 
 void Mesher :: generateColorMesh(PullPlan* plan, Geometry* geometry)
 {
 	totalCaneLength = computeTotalCaneLength(plan);
-        vector<PullPlan*> ancestors;
-        vector<int> ancestorIndices;
+	vector<PullPlan*> ancestors;
+	vector<int> ancestorIndices;
 	if (plan->getTemplateType() == AMORPHOUS_BASE_PULL_TEMPLATE)
 		generateMesh(plan, CIRCLE_SHAPE, geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 	else

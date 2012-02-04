@@ -3,6 +3,7 @@
 
 Controller::Controller(int argc, char **argv)
 {
+	QCoreApplication::setAttribute(Qt::AA_X11InitThreads);
 	app = new QApplication(argc, argv);
 	app->setStartDragDistance(3);
 	qsrand(QDateTime::currentDateTime().toTime_t());

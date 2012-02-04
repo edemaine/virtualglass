@@ -38,11 +38,11 @@ class PieceEditorWidget : public QWidget
 	private slots:
 		void underlayCheckBoxChanged(int);
 		void fillRuleButtonGroupChanged(int);
-                void pieceTemplateParameterSlider1Changed(int);
-                void pieceTemplateParameterSlider2Changed(int);
-                void pieceTemplateParameterSlider3Changed(int);
-                void pickupParameter1SpinBoxChanged(int);
-                void pickupParameter1SliderChanged(int);
+		void pieceTemplateParameterSlider1Changed(int);
+		void pieceTemplateParameterSlider2Changed(int);
+		void pieceTemplateParameterSlider3Changed(int);
+		void pickupParameter1SpinBoxChanged(int);
+		void pickupParameter1SliderChanged(int);
 
 	private:
 		Geometry geometry;
@@ -53,25 +53,25 @@ class PieceEditorWidget : public QWidget
 
 		QCheckBox* underlayCheckBox;
 		QButtonGroup* fillRuleButtonGroup;
-                QLabel* pickupTemplateParameter1Label;
-                QSpinBox* pickupParameter1SpinBox;
-                QSlider* pickupParameter1Slider;
-                QSlider* pickupTemplateParameter1Slider;
+		QLabel* pickupTemplateParameter1Label;
+		QSpinBox* pickupParameter1SpinBox;
+		QSlider* pickupParameter1Slider;
+		QSlider* pickupTemplateParameter1Slider;
 
-                QLabel* pieceTemplateParameter1Label;
-                QLabel* pieceTemplateParameter2Label;
-                QLabel* pieceTemplateParameter3Label;
-                QSlider* pieceTemplateParameter1Slider;
-                QSlider* pieceTemplateParameter2Slider;
-                QSlider* pieceTemplateParameter3Slider;
+		QLabel* pieceTemplateParameter1Label;
+		QLabel* pieceTemplateParameter2Label;
+		QLabel* pieceTemplateParameter3Label;
+		QSlider* pieceTemplateParameter1Slider;
+		QSlider* pieceTemplateParameter2Slider;
+		QSlider* pieceTemplateParameter3Slider;
 		vector<QLabel*> pieceParamLabels;
 		vector<QSlider*> pieceParamSliders;
 
-                QHBoxLayout* pickupTemplateLibraryLayout;
-                QHBoxLayout* pieceTemplateLibraryLayout;
-                QButtonGroup* shapeButtonGroup;
+		QHBoxLayout* pickupTemplateLibraryLayout;
+		QHBoxLayout* pieceTemplateLibraryLayout;
+		QButtonGroup* shapeButtonGroup;
 		QSlider* casingThicknessSlider;
-        	QHBoxLayout* templateLibraryLayout;
+		QHBoxLayout* templateLibraryLayout;
 		QPushButton* addCasingButton;
 
 		void setupLayout();

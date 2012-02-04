@@ -17,12 +17,12 @@ public:
 class Camera
 {
 public:
-	//Camera parameters, as might be supplied to gluLookAt.
-	// Camera is at 'eye', pointing at 'lookAt', rotated so
-	// up-vector is as close as possible to 'up'
+	//camera is at eye, looking at 'lookAt' with up vector close to 'up'
+	//if isPerspective camera has 45 degree vertical fov
+	//else camera vertically spans length(eye - lookAt) / 2.2 of the scene
 	Vector3f eye;
-	Vector3f up;
 	Vector3f lookAt;
+	Vector3f up;
 	bool isPerspective;
 	Vector2ui size; //size of desired image, in pixels
 };
