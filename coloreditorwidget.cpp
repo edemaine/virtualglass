@@ -191,7 +191,7 @@ void ColorEditorWidget :: updateLibraryWidgetPixmaps()
 	Color c = *(libraryWidget->getPullPlan()->getOutermostCasingColor());
 
 	QPixmap editorPixmap(100, 100);
-	editorPixmap.fill(QColor(255*c.r, 255*c.g, 255*c.b, 255*0.05)); 
+	editorPixmap.fill(QColor(255*c.r, 255*c.g, 255*c.b, 255*MAX(0.1, c.a))); 
 
 	QPixmap nicePixmap = QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100);
         QPainter painter(&nicePixmap);
