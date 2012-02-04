@@ -1,16 +1,29 @@
 
 #include "coloreditorwidget.h"
 
-ColorEditorWidget :: ColorEditorWidget(QWidget* parent) : QWidget(parent)
+ColorEditorWidget :: ColorEditorWidget(ColorBarLibraryWidget* libraryWidget, QWidget* parent) : QWidget(parent)
 {
-        this->colorBar = new PullPlan(AMORPHOUS_BASE_PULL_TEMPLATE);
 	this->niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);
-	mesher.generateColorMesh(colorBar, &geometry);
+	this->libraryWidget = libraryWidget;
+	mesher.generateColorMesh(libraryWidget->getPullPlan(), &geometry);
 	niceViewWidget->setGeometry(&geometry);
 
 	setupLayout();
 	setupConnections();
 }
+
+
+ColorBarLibraryWidget* ColorEditorWidget :: getLibraryWidget() {
+
+	return this->libraryWidget;
+}
+
+void ColorEditorWidget :: setLibraryWidget(ColorBarLibraryWidget* widget) {
+	
+	this->libraryWidget = widget;
+	updateLibraryWidgetPixmaps();
+}
+
 
 void ColorEditorWidget :: sourceComboBoxChanged(int)
 {
@@ -173,41 +186,20 @@ void ColorEditorWidget :: setupConnections()
 	connect(sourceComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(sourceComboBoxChanged(int)));
 }
 
-void ColorEditorWidget :: updateLibraryWidgetPixmaps(ColorBarLibraryWidget* w)
+void ColorEditorWidget :: updateLibraryWidgetPixmaps()
 {
+	Color c = *(libraryWidget->getPullPlan()->getOutermostCasingColor());
+
 	QPixmap editorPixmap(100, 100);
-	editorPixmap.fill(QColor(255*colorBar->getOutermostCasingColor()->r,
-		255*colorBar->getOutermostCasingColor()->g,
-		255*colorBar->getOutermostCasingColor()->b,
-		MAX(255*colorBar->getOutermostCasingColor()->a, 255*0.05)));
+	editorPixmap.fill(QColor(255*c.r, 255*c.g, 255*c.b, 255*0.05)); 
 
 	QPixmap nicePixmap = QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100);
         QPainter painter(&nicePixmap);
-        painter.drawText(QPointF(5, 95), colorBarName);
+        painter.drawText(QPointF(5, 95), libraryWidget->getColorName());
         painter.end();
 	
-	w->updatePixmaps(nicePixmap, editorPixmap);
+	libraryWidget->updatePixmaps(nicePixmap, editorPixmap);
 }
-
-void ColorEditorWidget :: setColor(float r, float g, float b, float a)
-{
-	colorBar->getOutermostCasingColor()->r = r;	
-	colorBar->getOutermostCasingColor()->g = g;	
-	colorBar->getOutermostCasingColor()->b = b;	
-	colorBar->getOutermostCasingColor()->a = a;	
-	emit someDataChanged();	
-}
-
-Color* ColorEditorWidget :: getColor()
-{
-	return colorBar->getOutermostCasingColor();
-}
-
-PullPlan* ColorEditorWidget :: getColorBar()
-{
-	return colorBar;
-}
-
 
 void ColorEditorWidget :: seedColors()
 { 
@@ -266,9 +258,9 @@ void ColorEditorWidget :: seedColors()
 
 void ColorEditorWidget :: alphaSliderPositionChanged(int)
 {
-	if (alphaSlider->sliderPosition() != (int) (colorBar->getOutermostCasingColor()->a * 255))
+	if (alphaSlider->sliderPosition() != (int) (libraryWidget->getPullPlan()->getOutermostCasingColor()->a * 255))
 	{
-		colorBar->getOutermostCasingColor()->a = (255 - alphaSlider->sliderPosition()) / 255.0;
+		libraryWidget->getPullPlan()->getOutermostCasingColor()->a = (255 - alphaSlider->sliderPosition()) / 255.0;
 		emit someDataChanged();
 	} 
 }
@@ -278,9 +270,9 @@ void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
         PureColorLibraryWidget* pclw = dynamic_cast<PureColorLibraryWidget*>(childAt(event->pos()));
 	if (pclw != NULL)
 	{
-		*(colorBar->getOutermostCasingColor()) = pclw->getColor();
-		colorBarName = pclw->getColorName().split(' ')[0];
-		this->alphaSlider->setSliderPosition(255 - (int) (colorBar->getOutermostCasingColor()->a * 255));
+		*(libraryWidget->getPullPlan()->getOutermostCasingColor()) = pclw->getColor();
+		libraryWidget->setColorName(pclw->getColorName().split(' ')[0]);
+		this->alphaSlider->setSliderPosition(255 - int(libraryWidget->getPullPlan()->getOutermostCasingColor()->a * 255));
 		emit someDataChanged();	
 	}
 }
@@ -297,20 +289,14 @@ void ColorEditorWidget :: highlightLibraryWidget(PureColorLibraryWidget* w)
         w->graphicsEffect()->setEnabled(true);
 }
 
-void ColorEditorWidget :: setColorBar(PullPlan* colorBar, QString colorName)
-{
-	this->colorBar = colorBar;
-	this->colorBarName = colorName;
-	emit someDataChanged();
-}
-
 void ColorEditorWidget :: updateEverything()
 {
         geometry.clear();
-        mesher.generateColorMesh(colorBar, &geometry);
+        mesher.generateColorMesh(libraryWidget->getPullPlan(), &geometry);
         niceViewWidget->repaint();
+	updateLibraryWidgetPixmaps();
 
-	this->alphaSlider->setSliderPosition(255 - (int) (colorBar->getOutermostCasingColor()->a * 255));
+	this->alphaSlider->setSliderPosition(255 - (int) (libraryWidget->getPullPlan()->getOutermostCasingColor()->a * 255));
 
         QLayoutItem* w;
 	PureColorLibraryWidget* pclw;
@@ -319,7 +305,7 @@ void ColorEditorWidget :: updateEverything()
         {
                 w = colorLibrary6Layout->itemAt(j);
                 pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-                pColor = colorBar->getOutermostCasingColor();
+                pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
                 if (pclw->getColor().r == pColor->r &&
                         pclw->getColor().g == pColor->g &&
                         pclw->getColor().b == pColor->b)
@@ -334,7 +320,7 @@ void ColorEditorWidget :: updateEverything()
         {
                 w = colorLibrary5Layout->itemAt(j);
 		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-		pColor = colorBar->getOutermostCasingColor();
+		pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
 		if (pclw->getColor().r == pColor->r &&
 			pclw->getColor().g == pColor->g &&
 			pclw->getColor().b == pColor->b) 
@@ -349,7 +335,7 @@ void ColorEditorWidget :: updateEverything()
         {
                 w = colorLibrary4Layout->itemAt(j);
                 pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-                pColor = colorBar->getOutermostCasingColor();
+                pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
                 if (pclw->getColor().r == pColor->r &&
                         pclw->getColor().g == pColor->g &&
                         pclw->getColor().b == pColor->b)
@@ -364,7 +350,7 @@ void ColorEditorWidget :: updateEverything()
         {
                 w = colorLibrary3Layout->itemAt(j);
                 pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-                pColor = colorBar->getOutermostCasingColor();
+                pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
                 if (pclw->getColor().r == pColor->r &&
                         pclw->getColor().g == pColor->g &&
                         pclw->getColor().b == pColor->b)
@@ -379,7 +365,7 @@ void ColorEditorWidget :: updateEverything()
         {
                 w = colorLibrary2Layout->itemAt(j);
                 pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-                pColor = colorBar->getOutermostCasingColor();
+                pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
                 if (pclw->getColor().r == pColor->r &&
                         pclw->getColor().g == pColor->g &&
                         pclw->getColor().b == pColor->b)
@@ -394,7 +380,7 @@ void ColorEditorWidget :: updateEverything()
         {
                 w = colorLibrary1Layout->itemAt(j);
 		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-		pColor = colorBar->getOutermostCasingColor();
+		pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
 		if (pclw->getColor().r == pColor->r &&
 			pclw->getColor().g == pColor->g &&
 			pclw->getColor().b == pColor->b) 

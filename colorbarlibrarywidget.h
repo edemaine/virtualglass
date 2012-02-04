@@ -13,6 +13,7 @@ class ColorBarLibraryWidget : public QLabel
 		ColorBarLibraryWidget(PullPlan* plan, QString colorName, QWidget* parent=0);
 		QString getColorName();
 		PullPlan* getPullPlan();
+		void setColorName(QString name);
 		void updatePixmaps(QPixmap niceViewPixmap, QPixmap editorPixmap);
 		const QPixmap* getEditorPixmap();
 

@@ -16,13 +16,11 @@ class ColorEditorWidget : public QWidget
 	Q_OBJECT
 
 	public:
-		ColorEditorWidget(QWidget* parent=0);
-		Color* getColor();
-		void setColor(float r, float g, float b, float a);
-		PullPlan* getColorBar();
-		void setColorBar(PullPlan* bar, QString name);
-		void updateLibraryWidgetPixmaps(ColorBarLibraryWidget* w);
+		ColorEditorWidget(ColorBarLibraryWidget* widget, QWidget* parent=0);
+		void setLibraryWidget(ColorBarLibraryWidget* widget);
+		ColorBarLibraryWidget* getLibraryWidget();
 		void seedColors();
+		void updateLibraryWidgetPixmaps();
 
 	signals:
 		void someDataChanged();
@@ -40,17 +38,16 @@ class ColorEditorWidget : public QWidget
 	private:
 		Geometry geometry;
 		Mesher mesher;
+		ColorBarLibraryWidget* libraryWidget;	
 		QComboBox* sourceComboBox;
+		NiceViewWidget* niceViewWidget;
+                QSlider* alphaSlider;
 		QScrollArea* colorLibrary1ScrollArea;
 		QScrollArea* colorLibrary2ScrollArea;
 		QScrollArea* colorLibrary3ScrollArea;
 		QScrollArea* colorLibrary4ScrollArea;
 		QScrollArea* colorLibrary5ScrollArea;
 		QScrollArea* colorLibrary6ScrollArea;
-		PullPlan* colorBar;	
-		QString colorBarName;	
-		NiceViewWidget* niceViewWidget;
-                QSlider* alphaSlider;
                 QVBoxLayout* colorLibrary1Layout;
                 QVBoxLayout* colorLibrary2Layout;
                 QVBoxLayout* colorLibrary3Layout;

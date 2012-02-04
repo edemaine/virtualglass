@@ -83,8 +83,7 @@ void MainWindow :: deleteCurrentEditingObject()
 			for (i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
 				w = colorBarLibraryLayout->itemAt(i);
-				PullPlan* p = dynamic_cast<ColorBarLibraryWidget*>(w->widget())->getPullPlan();
-				if (p == colorEditorWidget->getColorBar())
+				if (dynamic_cast<ColorBarLibraryWidget*>(w->widget()) == colorEditorWidget->getLibraryWidget())
 				{
 					// this may be a memory leak, the library widget is never explicitly deleted
 					w = colorBarLibraryLayout->takeAt(i); 
@@ -97,8 +96,7 @@ void MainWindow :: deleteCurrentEditingObject()
 			colorEditorBarLibraryWidget = dynamic_cast<ColorBarLibraryWidget*>(
 								colorBarLibraryLayout->itemAt(
 									MIN(colorBarLibraryLayout->count()-1, i))->widget());
-			colorEditorWidget->setColorBar(colorEditorBarLibraryWidget->getPullPlan(), 
-				colorEditorBarLibraryWidget->getColorName()); 
+			colorEditorWidget->setLibraryWidget(colorEditorBarLibraryWidget);
 			emit someDataChanged();
 			break;
 		}
@@ -176,7 +174,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	{
 		unhighlightAllLibraryWidgets();
 		colorEditorBarLibraryWidget = cblw;
-		colorEditorWidget->setColorBar(cblw->getPullPlan(), cblw->getColorName());
+		colorEditorWidget->setLibraryWidget(cblw);
 		editorStack->setCurrentIndex(COLORBAR_MODE);
 		emit someDataChanged();
 	}
@@ -367,8 +365,8 @@ void MainWindow :: setupEmptyPaneEditor()
 void MainWindow :: setupColorEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
-	colorEditorWidget = new ColorEditorWidget(editorStack);
-	colorEditorBarLibraryWidget = new ColorBarLibraryWidget(colorEditorWidget->getColorBar(), "R-100");
+	colorEditorBarLibraryWidget = new ColorBarLibraryWidget(new PullPlan(CIRCLE_BASE_PULL_TEMPLATE), "R-100", this);
+	colorEditorWidget = new ColorEditorWidget(colorEditorBarLibraryWidget, editorStack);
 	colorBarLibraryLayout->addWidget(colorEditorBarLibraryWidget);
 }
 
@@ -400,23 +398,16 @@ void MainWindow :: newPiece()
 
 void MainWindow :: newColorBar()
 {
-	PullPlan* oldEditorBar = colorEditorWidget->getColorBar();
-
-	PullPlan* newEditorBar = oldEditorBar->copy();
-
-	//new color is always clear:
-	Color* newColor = new Color;
-	*newColor = make_vector(1.0f, 1.0f, 1.0f, 0.0f);
-	//*(newColor) = *(oldEditorBar->color);
-	newEditorBar->setOutermostCasingColor(newColor);
+	PullPlan* newEditorBar = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE);
 
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();
 	colorEditorBarLibraryWidget = new ColorBarLibraryWidget(newEditorBar, "R-100");
 	colorBarLibraryLayout->addWidget(colorEditorBarLibraryWidget);
+	colorEditorWidget->setLibraryWidget(colorEditorBarLibraryWidget);
 
 	// Give the new plan to the editor
-	colorEditorWidget->setColorBar(newEditorBar, "R-100");
+	colorEditorWidget->setLibraryWidget(colorEditorBarLibraryWidget);
 
 	// Load up the right editor
 	editorStack->setCurrentIndex(COLORBAR_MODE);
@@ -535,8 +526,6 @@ void MainWindow :: updateLibrary()
 	{
 		case COLORBAR_MODE:
 		{
-			colorEditorWidget->updateLibraryWidgetPixmaps(colorEditorBarLibraryWidget);
-
 			PullPlanLibraryWidget* pplw;
 			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 			{

@@ -43,4 +43,9 @@ QString ColorBarLibraryWidget :: getColorName()
 	return colorName;
 }
 
+void ColorBarLibraryWidget :: setColorName(QString name)
+{
+	colorName = name;
+}
+
 
