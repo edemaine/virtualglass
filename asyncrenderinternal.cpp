@@ -17,6 +17,17 @@ using namespace AsyncRenderInternal;
 
 //===========================================
 
+void Job::deleteData() {
+	delete result;
+	result = NULL;
+	delete geometry;
+	geometry = NULL;
+	delete data;
+	data = NULL;
+}
+
+//===========================================
+
 Controller &Controller::controller() {
 	static Controller global_controller;
 	return global_controller;
@@ -91,11 +102,30 @@ void Controller::unregisterWidget(AsyncRenderWidget *widget) {
 	idToWidget.erase(f);
 }
 
+void replaceOrAddJob(deque< Job * > &queue, Job *job) {
+	bool found = false;
+	for (deque< Job * >::iterator j = queue.begin(); j != queue.end(); ++j) {
+		if ((*j)->requesterId == job->requesterId) {
+			assert(!found);
+			found = true;
+			//There's already a job in the queue from the same requester, so take its place in line and clean up its data:
+			(*j)->deleteData();
+			delete *j;
+			*j = job;
+		}
+	}
+	if (found) {
+		delete job;
+	} else {
+		queue.push_back(job);
+	}
+}
+
 void Controller::queue(AsyncRenderWidget *widget, Camera const &camera, RenderData *data) {
 	assert(widget->id != 0);
 	Job *job = new Job(widget->id, camera, data);
 	computeQueueLock.lock();
-	computeQueue.push_back(job);
+	replaceOrAddJob(computeQueue, job);
 	computeQueueLock.unlock();
 	computeQueueHasData.wakeOne();
 }
@@ -103,7 +133,7 @@ void Controller::queue(AsyncRenderWidget *widget, Camera const &camera, RenderDa
 void Controller::queue(AsyncRenderWidget *widget, Camera const &camera, Geometry *geometry) {
 	Job *job = new Job(widget->id, camera, NULL, geometry);
 	renderQueueLock.lock();
-	renderQueue.push_back(job);
+	replaceOrAddJob(renderQueue, job);
 	renderQueueLock.unlock();
 	renderQueueHasData.wakeOne();
 }
@@ -112,12 +142,7 @@ void Controller::jobFinished(Job *job) {
 	assert(job);
 	unordered_map< uint32_t, AsyncRenderWidget * >::iterator f = idToWidget.find(job->requesterId);
 	if (f == idToWidget.end()) {
-		delete job->data;
-		job->data = NULL;
-		delete job->geometry;
-		job->geometry = NULL;
-		delete job->result;
-		job->result = NULL;
+		job->deleteData();
 	} else {
 		f->second->renderFinished(job->camera, job->data, job->geometry, job->result);
 		job->data = NULL;
@@ -158,7 +183,7 @@ void ComputeThread::run() {
 
 		//Pass back to render queue:
 		controller->renderQueueLock.lock();
-		controller->renderQueue.push_back(job);
+		replaceOrAddJob(controller->renderQueue, job);
 		controller->renderQueueHasData.wakeOne();
 		controller->renderQueueLock.unlock();
 

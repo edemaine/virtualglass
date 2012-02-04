@@ -21,6 +21,9 @@ class Job
 public:
 	Job(uint32_t _requesterId, Camera const &_camera, RenderData *_data, Geometry *_geometry = NULL) : requesterId(_requesterId), camera(_camera), data(_data), geometry(_geometry), result(NULL) {
 	}
+
+	//deletes data,geometry,result and sets 'em to NULL:
+	void deleteData();
 	uint32_t requesterId;
 	Camera camera;
 	RenderData *data;
