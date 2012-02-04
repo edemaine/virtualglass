@@ -27,6 +27,8 @@ void PullPlanEditorWidget :: updateEverything()
         int twist = plan->getTwist();
         twistSlider->setSliderPosition(twist);
         twistSpin->setValue(twist);
+	twistSlider->setEnabled(!plan->hasSquareCasing());
+	twistSpin->setEnabled(!plan->hasSquareCasing());
 
 	viewWidget->setPullPlan(plan);
         viewWidget->repaint();
