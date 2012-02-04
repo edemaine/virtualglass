@@ -114,9 +114,21 @@ void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 	casingHighlighted = false;
 
 	populateHighlightedSubplans(event->pos().x(), event->pos().y(), draggedPlan, type);
-	if (subplansHighlighted.size() == 0)
+	if (subplansHighlighted.size() == 0) // anything highlighted must be casing from a color bar
 	{
 		populateHighlightedCasings(event->pos().x(), event->pos().y(), type);
+		draggingColor = *(draggedPlan->getOutermostCasingColor());
+	}
+	else
+	{
+		switch (type) {
+			case COLOR_BAR_MIME:
+				draggingColor = *(draggedPlan->getOutermostCasingColor());
+				break;
+			default:	
+				draggingColor.r = draggingColor.g = draggingColor.b = draggingColor.a = 1.0;
+				break;
+		}
 	}
 	emit someDataChanged();
 }
@@ -364,7 +376,8 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	// Draw casings
 	setBoundaryPainter(painter, drawWidth, drawHeight, borderLevels);
 	if (borderLevels == 1 && highlightThis)
-		painter->setBrush(QColor(255, 255, 255, 255));
+		painter->setBrush(QColor(255*draggingColor.r, 255*draggingColor.g, 255*draggingColor.b, 
+			255*draggingColor.a));
 	else
 		painter->setBrush(QColor(255*plan->getOutermostCasingColor()->r, 255*plan->getOutermostCasingColor()->g, 
 			255*plan->getOutermostCasingColor()->b, 255*plan->getOutermostCasingColor()->a));
@@ -395,7 +408,8 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 			|| (borderLevels == 1 && highlightThis))  
 		{
 			highlighted = true;
-			painter->setBrush(QColor(255, 255, 255));
+			painter->setBrush(QColor(255*draggingColor.r, 255*draggingColor.g, 255*draggingColor.b, 
+				255*draggingColor.a));
 		}
 		else
 			painter->setBrush(QColor(200, 200, 200));

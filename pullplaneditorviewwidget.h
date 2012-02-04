@@ -39,6 +39,7 @@ class PullPlanEditorViewWidget : public QWidget
 			bool highlightThis, int mandatedShape, int borderLevels, QPainter* painter);
 		PullPlan* plan;
 		int fill_rule;
+		Color draggingColor;
 		bool isDraggingCasing;
 		unsigned int draggedCasingIndex;
 		void populateHighlightedSubplans(int x, int y, PullPlan* plan, int type);
