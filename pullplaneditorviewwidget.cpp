@@ -133,7 +133,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		event->accept();
 		for (unsigned int i = 0; i < subplansHighlighted.size(); ++i)
 		{
-			plan->subs[subplansHighlighted[i]].plan = droppedPlan;
+			plan->subs[subplansHighlighted[i]]->plan = droppedPlan;
 		}
 	}
 	else
@@ -170,7 +170,7 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, PullP
 	// check to see if the drop was in a subpull
 	for (unsigned int i = 0; i < plan->subs.size(); ++i)
 	{
-		SubpullTemplate* subpull = &(plan->subs[i]);
+		SubpullTemplate* subpull = plan->subs[i];
 
 		// Determine if drop hit the subplan
 		bool hit = false;
@@ -217,21 +217,21 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, PullP
 			}
 			case GROUP_FILL_RULE:
 			{
-				int group = plan->subs[i].group;
+				int group = plan->subs[i]->group;
 				for (unsigned int j = i; j < plan->subs.size(); ++j)
 				{
-					if (plan->subs[j].group == group)
+					if (plan->subs[j]->group == group)
 						subplansHighlighted.push_back(j);
 				}
 				break;
 			}
 			case EVERY_OTHER_FILL_RULE:
 			{
-				int group = plan->subs[i].group;
+				int group = plan->subs[i]->group;
 				bool parity = true;
 				for (unsigned int j = i; j < plan->subs.size(); ++j)
 				{
-					if (plan->subs[j].group == group)
+					if (plan->subs[j]->group == group)
 					{
 						if (parity)
 							subplansHighlighted.push_back(j);
@@ -242,11 +242,11 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, PullP
 			}
 			case EVERY_THIRD_FILL_RULE:
 			{
-				int group = plan->subs[i].group;
+				int group = plan->subs[i]->group;
 				int triarity = 0;
 				for (unsigned int j = i; j < plan->subs.size(); ++j)
 				{
-					if (plan->subs[j].group == group)
+					if (plan->subs[j]->group == group)
 					{
 						if (triarity == 0)
 							subplansHighlighted.push_back(j);
@@ -422,7 +422,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 
 	for (unsigned int i = plan->subs.size()-1; i < plan->subs.size(); --i)
 	{
-		SubpullTemplate* sub = &(plan->subs[i]);
+		SubpullTemplate* sub = plan->subs[i];
 
 		float rX = x + (sub->location.x - sub->diameter/2.0) * drawWidth/2 + drawWidth/2;
 		float rY = y + (sub->location.y - sub->diameter/2.0) * drawWidth/2 + drawHeight/2;
@@ -436,18 +436,18 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 					highlighted = true;
 			}
 			if (highlighted) {
-				drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
-					true, plan->subs[i].shape, 1, painter);
+				drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i]->plan, 
+					true, plan->subs[i]->shape, 1, painter);
 			}
 			else {
-				drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
-					false, plan->subs[i].shape, 1, painter);
+				drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i]->plan, 
+					false, plan->subs[i]->shape, 1, painter);
 
 			}
 		}
 		else {
-			drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
-				false, plan->subs[i].shape, 
+			drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i]->plan, 
+				false, plan->subs[i]->shape, 
 				borderLevels-1, painter);
 		}
 	}

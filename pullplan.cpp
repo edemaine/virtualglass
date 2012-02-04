@@ -27,7 +27,7 @@ PullPlan* PullPlan :: copy() {
 	c->updateSubs();
 
 	for (unsigned int i = 0; i < this->subs.size(); ++i) {
-		c->subs[i].plan = this->subs[i].plan;
+		c->subs[i]->plan = this->subs[i]->plan;
 	}
 
 	return c;
@@ -42,7 +42,7 @@ bool PullPlan :: hasDependencyOn(PullPlan* plan) {
 
 	bool childrenAreDependent = false;
 	for (unsigned int i = 0; i < subs.size(); ++i) {
-		if (subs[i].plan->hasDependencyOn(plan)) {
+		if (subs[i]->plan->hasDependencyOn(plan)) {
 			childrenAreDependent = true;
 			break;
 		}
@@ -62,7 +62,7 @@ bool PullPlan :: hasDependencyOn(Color* color) {
 
 	bool childrenAreDependent = false;
 	for (unsigned int i = 0; i < subs.size(); ++i) {
-		if (subs[i].plan->hasDependencyOn(color)) {
+		if (subs[i]->plan->hasDependencyOn(color)) {
 			childrenAreDependent = true;
 			break;
 		}
@@ -339,20 +339,20 @@ int PullPlan :: getCasingShape(unsigned int index) {
 	return this->casings[index].shape;
 }
 
-void PullPlan :: pushNewSubpull(vector<SubpullTemplate>* newSubs,
+void PullPlan :: pushNewSubpull(vector<SubpullTemplate*>* newSubs,
 	int shape, Point p, float diameter, int group) {
 
 	if (newSubs->size() < subs.size()) {
-		newSubs->push_back(SubpullTemplate(subs[newSubs->size()].plan, shape, p, diameter, group));
+		newSubs->push_back(new SubpullTemplate(subs[newSubs->size()]->plan, shape, p, diameter, group));
 	}
 	else { // you've run out of existing subplans copy from
 		switch (shape) {
 			case CIRCLE_SHAPE:
-				newSubs->push_back(SubpullTemplate(defaultCircleSubplan, 
+				newSubs->push_back(new SubpullTemplate(defaultCircleSubplan, 
 					CIRCLE_SHAPE, p, diameter, group));
 				break;
 			case SQUARE_SHAPE:
-				newSubs->push_back(SubpullTemplate(defaultSquareSubplan, 
+				newSubs->push_back(new SubpullTemplate(defaultSquareSubplan, 
 					SQUARE_SHAPE, p, diameter, group));
 				break;
 		}
@@ -376,7 +376,7 @@ void PullPlan :: updateSubs()
         Point p;
         float radius = casings[0].thickness;
 
-	vector<SubpullTemplate> newSubs;
+	vector<SubpullTemplate*> newSubs;
 
         p.x = p.y = p.z = 0.0;
         switch (this->templateType) {
@@ -528,6 +528,8 @@ void PullPlan :: updateSubs()
                 }
         }
 
+	for (unsigned int i = 0; i < subs.size(); ++i) 
+		delete subs[i];
 	subs = newSubs;
 }
 
