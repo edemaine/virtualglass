@@ -1,7 +1,6 @@
 #ifndef NICEVIEWWIDGET_H
 #define NICEVIEWWIDGET_H
 
-//#include <GL/glew.h>
 #include "glew.h"
 
 #include <stdlib.h>
@@ -17,8 +16,6 @@
 #include "geometry.h"
 
 using namespace std;
-
-
 
 class NiceViewWidget : public QGLWidget
 {
@@ -49,6 +46,7 @@ private:
 	bool peelEnable;
 	//various OpenGL objects used when depth peeling:
 	const QGLContext *peelInitContext; //context in which all this peel stuff got init'd -- there's something weird going on here with (possibly) copy-constructed versions of the Widget, I'm thinking.
+	GLEWContext *glewContext;
 	Vector2ui peelBufferSize;
 	GLuint peelBuffer; //framebuffer
 	GLuint peelColorTex; //color texture, stores current layer

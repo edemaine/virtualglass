@@ -7,6 +7,8 @@ it is involved in modifying the cane.
 
 #include "niceviewwidget.h"
 
+#define glewGetContext() glewContext
+
 namespace {
 void gl_errors(string const &where) {
 	GLuint err;
@@ -19,41 +21,41 @@ void gl_errors(string const &where) {
 
 
 
-NiceViewWidget :: NiceViewWidget(int cameraMode, QWidget *parent) : QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent)
+NiceViewWidget :: NiceViewWidget(int cameraMode, QWidget *parent) : QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent), glewContext(NULL)
 {
 	leftMouseDown = false;
 	setMinimumWidth(400);
 	bgColor = QColor(200, 200, 200);
 	geometry = NULL;
-        this->cameraMode = cameraMode;
+	this->cameraMode = cameraMode;
 
-        switch (cameraMode)
-        {
-                case PULLPLAN_MODE:
-                        theta = -PI/2.0;
-                        phi = PI/2;
-                        rho = 11.0;
-                        lookAtLoc[0] = 0.0;
-                        lookAtLoc[1] = 0.0;
-                        lookAtLoc[2] = 5.0;
-                        break;
-                case PICKUPPLAN_MODE:
-                        theta = -PI/2.0;
-                        phi = PI/2;
-                        rho = 11.5;
-                        lookAtLoc[0] = 0.0;
-                        lookAtLoc[1] = 0.0;
-                        lookAtLoc[2] = 0.0;
-                        break;
-                case PIECE_MODE:
-                        theta = -PI/2.0;
-                        phi = PI/2;
-                        rho = 16.0;
-                        lookAtLoc[0] = 0.0;
-                        lookAtLoc[1] = 0.0;
-                        lookAtLoc[2] = 0.0;
-                        break;
-        }
+	switch (cameraMode)
+	{
+		case PULLPLAN_MODE:
+			theta = -PI/2.0;
+			phi = PI/2;
+			rho = 11.0;
+			lookAtLoc[0] = 0.0;
+			lookAtLoc[1] = 0.0;
+			lookAtLoc[2] = 5.0;
+			break;
+		case PICKUPPLAN_MODE:
+			theta = -PI/2.0;
+			phi = PI/2;
+			rho = 11.5;
+			lookAtLoc[0] = 0.0;
+			lookAtLoc[1] = 0.0;
+			lookAtLoc[2] = 0.0;
+			break;
+		case PIECE_MODE:
+			theta = -PI/2.0;
+			phi = PI/2;
+			rho = 16.0;
+			lookAtLoc[0] = 0.0;
+			lookAtLoc[1] = 0.0;
+			lookAtLoc[2] = 0.0;
+			break;
+	}
 
 	mouseLocX = 0;
 	mouseLocY = 0;
@@ -109,10 +111,17 @@ NiceViewWidget :: ~NiceViewWidget()
 		glDeleteObjectARB(nopeelProgram);
 		nopeelProgram = 0;
 	}
+
+	delete glewContext;
+	glewContext = NULL;
 }
 
 void NiceViewWidget :: checkDepthPeel()
 {
+	if (glewContext) {
+		delete glewContext;
+	}
+	glewContext = new GLEWContext;
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
 		std::cerr << "WARNING: Failure initializing glew: " << glewGetErrorString(err) << std::endl;
