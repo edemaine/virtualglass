@@ -38,6 +38,7 @@ class PullPlan
                 float getCasingThickness(unsigned int index);
                 int getCasingShape(unsigned int index);
 		int getOutermostCasingShape();
+                void setOutermostCasingColor(Color* color);
                 Color* getOutermostCasingColor();
                 Color* getCasingColor(unsigned int index);
 		unsigned int getCasingCount(); 

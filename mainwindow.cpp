@@ -97,7 +97,8 @@ void MainWindow :: deleteCurrentEditingObject()
 			colorEditorBarLibraryWidget = dynamic_cast<ColorBarLibraryWidget*>(
 								colorBarLibraryLayout->itemAt(
 									MIN(colorBarLibraryLayout->count()-1, i))->widget());
-			colorEditorWidget->setColorBar(colorEditorBarLibraryWidget->getPullPlan());
+			colorEditorWidget->setColorBar(colorEditorBarLibraryWidget->getPullPlan(), 
+				colorEditorBarLibraryWidget->getColorName()); 
 			emit someDataChanged();
 			break;
 		}
@@ -175,7 +176,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	{
 		unhighlightAllLibraryWidgets();
 		colorEditorBarLibraryWidget = cblw;
-		colorEditorWidget->setColorBar(cblw->getPullPlan());
+		colorEditorWidget->setColorBar(cblw->getPullPlan(), cblw->getColorName());
 		editorStack->setCurrentIndex(COLORBAR_MODE);
 		emit someDataChanged();
 	}
@@ -367,7 +368,7 @@ void MainWindow :: setupColorEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
 	colorEditorWidget = new ColorEditorWidget(editorStack);
-	colorEditorBarLibraryWidget = new ColorBarLibraryWidget(colorEditorWidget->getColorBar());
+	colorEditorBarLibraryWidget = new ColorBarLibraryWidget(colorEditorWidget->getColorBar(), "R-100");
 	colorBarLibraryLayout->addWidget(colorEditorBarLibraryWidget);
 }
 
@@ -407,15 +408,15 @@ void MainWindow :: newColorBar()
 	Color* newColor = new Color;
 	*newColor = make_vector(1.0f, 1.0f, 1.0f, 0.0f);
 	//*(newColor) = *(oldEditorBar->color);
-	newEditorBar->setCasingColor(newColor, 0);
+	newEditorBar->setOutermostCasingColor(newColor);
 
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();
-	colorEditorBarLibraryWidget = new ColorBarLibraryWidget(newEditorBar);
+	colorEditorBarLibraryWidget = new ColorBarLibraryWidget(newEditorBar, "R-100");
 	colorBarLibraryLayout->addWidget(colorEditorBarLibraryWidget);
 
 	// Give the new plan to the editor
-	colorEditorWidget->setColorBar(newEditorBar);
+	colorEditorWidget->setColorBar(newEditorBar, "R-100");
 
 	// Load up the right editor
 	editorStack->setCurrentIndex(COLORBAR_MODE);

@@ -10,7 +10,8 @@ class ColorBarLibraryWidget : public QLabel
 	Q_OBJECT
 
 	public:
-		ColorBarLibraryWidget(PullPlan* plan, QWidget* parent=0);
+		ColorBarLibraryWidget(PullPlan* plan, QString colorName, QWidget* parent=0);
+		QString getColorName();
 		PullPlan* getPullPlan();
 		void updatePixmaps(QPixmap niceViewPixmap, QPixmap editorPixmap);
 		const QPixmap* getEditorPixmap();
@@ -18,6 +19,7 @@ class ColorBarLibraryWidget : public QLabel
 	private:
 		QButtonGroup* colorBarTemplateShapeButtonGroup;
 		PullPlan* pullPlan;
+		QString colorName;
 		QPixmap editorPixmap;
 };
 

@@ -184,6 +184,11 @@ void PullPlan :: setCasingColor(Color* c, unsigned int index) {
 	this->casings[index].color = c;
 }
 
+void PullPlan :: setOutermostCasingColor(Color* color) {
+
+	this->casings[casings.size()-1].color = color;
+}
+
 Color* PullPlan :: getOutermostCasingColor() {
 
 	return this->casings[casings.size()-1].color;

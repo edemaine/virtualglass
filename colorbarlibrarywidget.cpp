@@ -2,7 +2,7 @@
 #include "colorbarlibrarywidget.h"
 #include "qgraphicshighlighteffect.h"
 
-ColorBarLibraryWidget :: ColorBarLibraryWidget(PullPlan* plan, QWidget* parent): QLabel(parent)
+ColorBarLibraryWidget :: ColorBarLibraryWidget(PullPlan* plan, QString colorName,  QWidget* parent): QLabel(parent)
 {
 	setBackgroundRole(QPalette::Base);
 	setFixedSize(100, 100);
@@ -15,6 +15,7 @@ ColorBarLibraryWidget :: ColorBarLibraryWidget(PullPlan* plan, QWidget* parent):
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
         this->editorPixmap = pixmap;
 
+	this->colorName = colorName;
 	this->pullPlan = plan;
 	setGraphicsEffect(new QGraphicsHighlightEffect());
 	connect(graphicsEffect(), SIGNAL(enabledChanged(bool)), graphicsEffect(), SLOT(setStyleSheet(bool)));
@@ -37,6 +38,9 @@ PullPlan* ColorBarLibraryWidget :: getPullPlan()
 	return pullPlan;
 }
 
-
+QString ColorBarLibraryWidget :: getColorName()
+{
+	return colorName;
+}
 
 

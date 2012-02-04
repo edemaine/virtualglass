@@ -180,9 +180,13 @@ void ColorEditorWidget :: updateLibraryWidgetPixmaps(ColorBarLibraryWidget* w)
 		255*colorBar->getOutermostCasingColor()->g,
 		255*colorBar->getOutermostCasingColor()->b,
 		MAX(255*colorBar->getOutermostCasingColor()->a, 255*0.05)));
-	w->updatePixmaps(
-		QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100),
-		editorPixmap);
+
+	QPixmap nicePixmap = QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100);
+        QPainter painter(&nicePixmap);
+        painter.drawText(QPointF(5, 95), colorBarName);
+        painter.end();
+	
+	w->updatePixmaps(nicePixmap, editorPixmap);
 }
 
 void ColorEditorWidget :: setColor(float r, float g, float b, float a)
@@ -275,6 +279,7 @@ void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 	if (pclw != NULL)
 	{
 		*(colorBar->getOutermostCasingColor()) = pclw->getColor();
+		colorBarName = pclw->getColorName().split(' ')[0];
 		this->alphaSlider->setSliderPosition(255 - (int) (colorBar->getOutermostCasingColor()->a * 255));
 		emit someDataChanged();	
 	}
@@ -292,9 +297,10 @@ void ColorEditorWidget :: highlightLibraryWidget(PureColorLibraryWidget* w)
         w->graphicsEffect()->setEnabled(true);
 }
 
-void ColorEditorWidget :: setColorBar(PullPlan* b)
+void ColorEditorWidget :: setColorBar(PullPlan* colorBar, QString colorName)
 {
-	this->colorBar = b;
+	this->colorBar = colorBar;
+	this->colorBarName = colorName;
 	emit someDataChanged();
 }
 

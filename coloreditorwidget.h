@@ -20,7 +20,7 @@ class ColorEditorWidget : public QWidget
 		Color* getColor();
 		void setColor(float r, float g, float b, float a);
 		PullPlan* getColorBar();
-		void setColorBar(PullPlan* b);
+		void setColorBar(PullPlan* bar, QString name);
 		void updateLibraryWidgetPixmaps(ColorBarLibraryWidget* w);
 		void seedColors();
 
@@ -48,6 +48,7 @@ class ColorEditorWidget : public QWidget
 		QScrollArea* colorLibrary5ScrollArea;
 		QScrollArea* colorLibrary6ScrollArea;
 		PullPlan* colorBar;	
+		QString colorBarName;	
 		NiceViewWidget* niceViewWidget;
                 QSlider* alphaSlider;
                 QVBoxLayout* colorLibrary1Layout;
