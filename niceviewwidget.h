@@ -14,6 +14,7 @@
 #include "primitives.h"
 #include "constants.h"
 #include "geometry.h"
+#include "peelrenderer.h"
 
 using namespace std;
 
@@ -43,17 +44,7 @@ private:
 
 	bool initializeGLCalled;
 
-	bool peelEnable;
-	//various OpenGL objects used when depth peeling:
-	const QGLContext *peelInitContext; //context in which all this peel stuff got init'd -- there's something weird going on here with (possibly) copy-constructed versions of the Widget, I'm thinking.
-	GLEWContext *glewContext;
-	Vector2ui peelBufferSize;
-	GLuint peelBuffer; //framebuffer
-	GLuint peelColorTex; //color texture, stores current layer
-	GLuint peelDepthTex; //depth texture, stores current depth
-	GLuint peelPrevDepthTex; //stores previous depth
-	GLhandleARB peelProgram; //program that rejects fragments based on depth
-	GLhandleARB nopeelProgram; //program that premultiplies by alpha, but doesn't actually reject
+	PeelRenderer *peelRenderer;
 
 public:
 	QImage renderImage();
@@ -63,18 +54,13 @@ private:
 	void drawTriangle(Triangle* t);
 	void updateTriangles();
 
-signals:
-	void updatePeelButton(bool b);
-
 public slots:
 	void zoomIn();
 	void zoomOut();
 	void zoom(float z);
-	void togglePeel();
 
 protected:
 	void initializeGL();
-	void checkDepthPeel();
 	void paintWithDepthPeeling();
 	void paintWithoutDepthPeeling();
 	void paintGL();

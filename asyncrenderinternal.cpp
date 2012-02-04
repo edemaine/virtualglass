@@ -1,7 +1,9 @@
+#include "asyncrenderthread.h"
 #include "asyncrenderwidget.h"
 #include "asyncrenderinternal.h"
+
 #include "geometry.h"
-#include <QtOpenGL>
+#include <qgl.h>
 #include <GL/glu.h>
 
 #include <deque>
@@ -163,12 +165,11 @@ ComputeThread::~ComputeThread() {
 
 void ComputeThread::run() {
 	controller->computeQueueLock.lock();
-	while (1) {
-		while (controller->computeQueue.empty() && !controller->quitThreads) {
+	while (!controller->quitThreads) {
+		if (controller->computeQueue.empty()) {
 			controller->computeQueueHasData.wait(&controller->computeQueueLock);
+			continue;
 		}
-		if (controller->quitThreads) break;
-		if (controller->computeQueue.empty()) continue;
 
 		//pull job off the queue:
 		Job *job = controller->computeQueue.front();
@@ -191,150 +192,4 @@ void ComputeThread::run() {
 	}
 	controller->computeQueueLock.unlock();
 	std::cout << "Quitting a compute thread." << std::endl;
-}
-
-
-//============================================
-
-namespace {
-void gl_errors(std::string const &where) {
-	GLuint err;
-	while ((err = glGetError()) != GL_NO_ERROR) {
-	std::cerr << "(in " << where << ") OpenGL error #" << err
-	          << ": " << gluErrorString(err) << std::endl;
-	}
-}
-}
-
-RenderThread::RenderThread(Controller *_controller) : controller(_controller), widget(NULL) {
-	widget = new QGLWidget();
-	widget->doneCurrent(); //make sure this widget's context isn't current!
-}
-
-RenderThread::~RenderThread() {
-	delete widget;
-	widget = NULL;
-}
-
-void RenderThread::run() {
-	assert(widget->context());
-	assert(widget->context()->isValid());
-	widget->makeCurrent();
-
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_COLOR_MATERIAL);
-	glEnable (GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-	glShadeModel(GL_SMOOTH);
-	glEnable(GL_DEPTH_TEST);
-	//TODO: I should really set the position and color of LIGHT0, but w/e
-	
-	gl_errors("RenderThread setup");
-
-	controller->renderQueueLock.lock();
-	while (1) {
-		while (controller->renderQueue.empty() && !controller->quitThreads) {
-			controller->renderQueueHasData.wait(&controller->renderQueueLock);
-		}
-		if (controller->quitThreads) {
-			widget->doneCurrent();
-			break;
-		}
-		if (controller->renderQueue.empty()) continue;
-
-		//pull job off the queue:
-		Job *job = controller->renderQueue.front();
-		controller->renderQueue.pop_front();
-
-		controller->renderQueueLock.unlock();
-
-		assert(QGLContext::currentContext() == widget->context()); //shouldn't change if it's a per-thread context, which I've been lead to suspect is true.
-
-		//TODO: could cache fb; not clear it's more efficient.
-		QGLFramebufferObject fb(job->camera.size.x, job->camera.size.y, QGLFramebufferObject::Depth);
-		fb.bind();
-		glPushAttrib(GL_VIEWPORT_BIT);
-		glViewport(0,0,job->camera.size.x, job->camera.size.y);
-
-		glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		setupCamera(job->camera);
-		simpleRender(*job->geometry);
-
-		glPopAttrib();
-		fb.release();
-
-		assert(!job->result);
-
-		job->result = new QImage(fb.toImage());
-
-		/*
-		//Placeholder execute code:
-		job->result = new QImage(job->camera.size.x, job->camera.size.y, QImage::Format_ARGB32);
-		job->result->fill(QColor(rand() % 256, rand() % 256, rand() % 256, 255));
-		*/
-
-
-		//pass job back to main thread:
-		emit jobFinished(job);
-
-		controller->renderQueueLock.lock();
-	}
-	controller->renderQueueLock.unlock();
-	std::cout << "Quitting a render thread." << std::endl;
-}
-
-void RenderThread::setupCamera(Camera const &camera) {
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	if (camera.isPerspective) {
-		gluPerspective(45.0, camera.size.x / float(camera.size.y), 0.01, 100.0);
-	} else {
-		float a = camera.size.y / float(camera.size.x);
-		float s = 2.2f / length(camera.eye - camera.lookAt);
-		glScalef(a * s, s, -0.01f);
-	}
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(camera.eye.x, camera.eye.y, camera.eye.z,
-		camera.lookAt.x, camera.lookAt.y, camera.lookAt.z,
-		camera.up.x, camera.up.y, camera.up.z);
-	gl_errors("RenderThread::setupCamera");
-}
-
-void RenderThread::simpleRender(Geometry const &geometry) {
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);
-	//glEnable(GL_LIGHTING);
-	//Check that Vertex and Triangle have proper size:
-	assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3));
-	assert(sizeof(Triangle) == sizeof(GLuint) * 3);
-
-	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry.vertices[0].position));
-	glNormalPointer(GL_FLOAT, sizeof(Vertex), &(geometry.vertices[0].normal));
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-
-	for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g) {
-		assert(g->color);
-		Color* c = g->color;
-		glColor4f(c->r, c->g, c->b, c->a);
-		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
-			GL_UNSIGNED_INT, &(geometry.triangles[g->triangle_begin].v1));
-	}
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-
-	//glDisable(GL_LIGHTING);
-
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-
-	gl_errors("RenderThread::simpleRender");
 }

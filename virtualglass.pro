@@ -60,8 +60,10 @@ HEADERS += primitives.h constants.h Vector.hpp \
 	pieceeditorwidget.h coloreditorwidget.h \
 	controller.h geometry.h mesh.h \ 
 	qgraphicshighlighteffect.h \
+	peelrenderer.h \
 	asyncrenderwidget.h \
 	asyncrenderinternal.h \
+	asyncrenderthread.h \
 	asyncpullplanlibrarywidget.h \
 
 
@@ -129,8 +131,10 @@ SOURCES += main.cpp \
 	pullplaneditorviewwidget.cpp pullplaneditorwidget.cpp colorbarlibrarywidget.cpp \ 
 	qgraphicshighlighteffect.cpp \
 	pieceeditorwidget.cpp coloreditorwidget.cpp \
+	peelrenderer.cpp \
 	asyncrenderwidget.cpp \
 	asyncrenderinternal.cpp \
+	asyncrenderthread.cpp \
 	asyncpullplanlibrarywidget.cpp \
 
 
