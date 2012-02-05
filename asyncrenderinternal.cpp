@@ -4,7 +4,12 @@
 
 #include "geometry.h"
 #include <qgl.h>
+
+#if defined(Q_OS_MAC)
+#include "glew.h"
+#else
 #include <GL/glu.h>
+#endif
 
 #include <deque>
 #include <vector>

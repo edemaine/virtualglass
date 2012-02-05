@@ -51,7 +51,7 @@ float Mesher :: computeTotalCaneLength(PullPlan* plan)
 	float total = 0.0;
 	for (unsigned int i = 0; i < plan->subs.size(); ++i)
 	{
-		total += computeTotalCaneLength(plan->subs[i]->plan);
+		total += computeTotalCaneLength(plan->subs[i].plan);
 	}
 	return total;	
 }
@@ -73,7 +73,7 @@ void Mesher :: applyResizeTransform(Vertex* v, float scale)
 
 void Mesher :: applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int subplan)
 {
-	SubpullTemplate* subTemp = parentNode->subs[subplan];
+	SubpullTemplate* subTemp = &(parentNode->subs[subplan]);
 	Point locationInParent = subTemp->location;
 	float diameter = subTemp->diameter;
 
@@ -790,7 +790,7 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 				passGroupIndex = groupIndex;
 
 			ancestorIndices->push_back(i);
-			generateMesh(plan->subs[i]->plan, plan->subs[i]->shape, geometry, ancestors, 
+			generateMesh(plan->subs[i].plan, plan->subs[i].shape, geometry, ancestors, 
 				ancestorIndices, offset - 0.001, length + 0.001, false, passGroupIndex);
 			ancestorIndices->pop_back();
 		}

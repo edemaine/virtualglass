@@ -43,13 +43,13 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 		{
 			mouseStartingLoc->setX(event->pos().x());
 			mouseStartingLoc->setY(event->pos().y());
-			subpullStartingLoc->x = plan->subs[hoveringIndex]->location.x;
-			subpullStartingLoc->y = plan->subs[hoveringIndex]->location.y;
+			subpullStartingLoc->x = plan->subs[hoveringIndex].location.x;
+			subpullStartingLoc->y = plan->subs[hoveringIndex].location.y;
 		}
 		if (isValidMovePosition(event))
 		{
-			plan->subs[hoveringIndex]->location.x = subpullStartingLoc->x + event->pos().x()/(width()/2.0 - 10) - mouseStartingLoc->x()/(width()/2.0 - 10);
-			plan->subs[hoveringIndex]->location.y = subpullStartingLoc->y + event->pos().y()/(width()/2.0 - 10) - mouseStartingLoc->y()/(width()/2.0 - 10);
+			plan->subs[hoveringIndex].location.x = subpullStartingLoc->x + event->pos().x()/(width()/2.0 - 10) - mouseStartingLoc->x()/(width()/2.0 - 10);
+			plan->subs[hoveringIndex].location.y = subpullStartingLoc->y + event->pos().y()/(width()/2.0 - 10) - mouseStartingLoc->y()/(width()/2.0 - 10);
 		}
 //		qDebug() << "location" << plan->subs[hoveringIndex].location.x << plan->subs[hoveringIndex].location.y;
 //		qDebug() << "event" << event->pos().x() << event->pos().y();
@@ -68,7 +68,7 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 	bool anyHit = false;
 	for (unsigned int i = 0; i < plan->subs.size(); ++i)
 	{
-		SubpullTemplate* subpull = plan->subs[i];
+		SubpullTemplate* subpull = &(plan->subs[i]);
 
 		// Determine if drop hit the subplan
 		bool hit = false;
@@ -85,11 +85,11 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 					{
 						if (hoveringIndex != -1)
 						{
-							plan->subs[hoveringIndex]->plan = hoveringPlan;
+							plan->subs[hoveringIndex].plan = hoveringPlan;
 						}
 						hoveringIndex = i;
 						hoveringPlan = subpull->plan;
-						plan->subs[i]->plan = tempCirclePlan;
+						plan->subs[i].plan = tempCirclePlan;
 					}
 				}
 				break;
@@ -102,11 +102,11 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 					{
 						if (hoveringIndex != -1)
 						{
-							plan->subs[hoveringIndex]->plan = hoveringPlan;
+							plan->subs[hoveringIndex].plan = hoveringPlan;
 						}
 						hoveringIndex = i;
 						hoveringPlan = subpull->plan;
-						plan->subs[i]->plan = tempSquarePlan;
+						plan->subs[i].plan = tempSquarePlan;
 					}
 				}
 				break;
@@ -121,7 +121,7 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 		this->update();
 		return;
 	}
-	plan->subs[hoveringIndex]->plan = hoveringPlan;
+	plan->subs[hoveringIndex].plan = hoveringPlan;
 	hoveringIndex = -1;
 	this->update();
 	return;
@@ -135,10 +135,10 @@ void PullPlanCustomizeViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 	{
 		mouseStartingLoc->setX(event->pos().x());
 		mouseStartingLoc->setY(event->pos().y());
-		subpullStartingLoc = &(plan->subs[hoveringIndex]->location);
+		subpullStartingLoc = &(plan->subs[hoveringIndex].location);
 	}
-	plan->subs[hoveringIndex]->location.x = subpullStartingLoc->x + event->pos().x() - mouseStartingLoc->x();
-	plan->subs[hoveringIndex]->location.y = subpullStartingLoc->y + event->pos().y() - mouseStartingLoc->y();
+	plan->subs[hoveringIndex].location.x = subpullStartingLoc->x + event->pos().x() - mouseStartingLoc->x();
+	plan->subs[hoveringIndex].location.y = subpullStartingLoc->y + event->pos().y() - mouseStartingLoc->y();
 	this->update();
 }
 
@@ -241,14 +241,14 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 	// Recurse
 	for (unsigned int i = plan->subs.size()-1; i < plan->subs.size(); --i)
 	{
-		SubpullTemplate* sub = plan->subs[i];
+		SubpullTemplate* sub = &(plan->subs[i]);
 
 		float rX = x + (sub->location.x - sub->diameter/2.0) * drawWidth/2 + drawWidth/2;
 		float rY = y + (sub->location.y - sub->diameter/2.0) * drawWidth/2 + drawHeight/2;
 		float rWidth = sub->diameter * drawWidth/2;
 		float rHeight = sub->diameter * drawHeight/2;
 
-		drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i]->plan, plan->subs[i]->shape,
+		drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, plan->subs[i].shape,
 			borderLevels-1, painter);
 	}
 }
@@ -267,7 +267,7 @@ void PullPlanCustomizeViewWidget :: revertAndClose()
 {
 	if (hoveringIndex != -1)
 	{
-		plan->subs[hoveringIndex]->plan = hoveringPlan;
+		plan->subs[hoveringIndex].plan = hoveringPlan;
 		hoveringIndex = -1;
 	}
 	//revertAllChanges();

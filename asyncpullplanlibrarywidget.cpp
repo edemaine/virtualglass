@@ -25,13 +25,13 @@ class PullPlanRenderData : public RenderData
 			while (!to_update.empty()) {
 				PullPlan *t = to_update.back();
 				to_update.pop_back();
-				for (vector< SubpullTemplate * >::iterator s = t->subs.begin(); s != t->subs.end(); ++s) {
-					unordered_map< const PullPlan *, PullPlan * >::iterator f = copies.find((*s)->plan);
+				for (vector< SubpullTemplate >::iterator s = t->subs.begin(); s != t->subs.end(); ++s) {
+					unordered_map< const PullPlan *, PullPlan * >::iterator f = copies.find(s->plan);
 					if (f == copies.end()) {
-						f = copies.insert(make_pair((*s)->plan, (*s)->plan->copy())).first;
+						f = copies.insert(make_pair(s->plan, s->plan->copy())).first;
 						to_update.push_back(f->second);
 					}
-					(*s)->plan = f->second;
+					s->plan = f->second;
 				}
 			}
 		}
@@ -43,11 +43,11 @@ class PullPlanRenderData : public RenderData
 			while (!to_delete.empty()) {
 				PullPlan *t = to_delete.back();
 				to_delete.pop_back();
-				for (vector< SubpullTemplate * >::iterator s = t->subs.begin(); s != t->subs.end(); ++s) {
-					if (marked.insert((*s)->plan).second) {
-						to_delete.push_back((*s)->plan);
+				for (vector< SubpullTemplate >::iterator s = t->subs.begin(); s != t->subs.end(); ++s) {
+					if (marked.insert(s->plan).second) {
+						to_delete.push_back(s->plan);
 					}
-					(*s)->plan = NULL;
+					s->plan = NULL;
 				}
 				delete t;
 			}

@@ -20,7 +20,6 @@ class PullPlan
 {
 	public:
 		PullPlan(int pullTemplate);
-		~PullPlan();
 
 		void setTemplateType(int pullTemplateType);
 		int getTemplateType();
@@ -50,7 +49,7 @@ class PullPlan
 
 		PullPlan* copy() const;
 
-		vector<SubpullTemplate*> subs;
+		vector<SubpullTemplate> subs;
 
 		bool hasDependencyOn(Color* color);
 		bool hasDependencyOn(PullPlan* pullPlan);
@@ -70,7 +69,7 @@ class PullPlan
 		// Methods
 		void initializeTemplate();
 		void updateSubs();
-		void pushNewSubpull(vector<SubpullTemplate*>* newSubs,
+		void pushNewSubpull(vector<SubpullTemplate>* newSubs,
 			int shape, Point location, float diameter, int group);
 };
 
