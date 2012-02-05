@@ -5,6 +5,7 @@
 #include <QtGui>
 #include "piece.h"
 #include "pullplan.h"
+#include "overlaycolorwidget.h"
 #include "pickupplaneditorviewwidget.h"
 #include "piecelibrarywidget.h"
 #include "pickuptemplatelibrarywidget.h"
@@ -36,7 +37,6 @@ class PieceEditorWidget : public QWidget
 		void updateEverything();
 
 	private slots:
-		void underlayCheckBoxChanged(int);
 		void fillRuleButtonGroupChanged(int);
 		void pieceTemplateParameterSlider1Changed(int);
 		void pieceTemplateParameterSlider2Changed(int);
@@ -51,7 +51,10 @@ class PieceEditorWidget : public QWidget
 		PickupPlanEditorViewWidget* pickupViewWidget;	
 		NiceViewWidget* niceViewWidget;
 
-		QCheckBox* underlayCheckBox;
+		OverlayColorWidget* overlayWidget;
+		OverlayColorWidget* underlayWidget;
+                QLabel overlayColorLabel;
+                QLabel underlayColorLabel;
 		QButtonGroup* fillRuleButtonGroup;
 		QLabel* pickupTemplateParameter1Label;
 		QSpinBox* pickupParameter1SpinBox;

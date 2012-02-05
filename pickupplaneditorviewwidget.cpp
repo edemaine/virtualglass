@@ -45,26 +45,7 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
         PullPlan* droppedPlan;
         int type;
         sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &droppedPlan, &type);
-	if (type == COLOR_BAR_MIME) // if you drop a color, you're specifying the underlay color
-	{
-
-                if (event->pos().x() < 10 || event->pos().x() > width()-10
-			|| event->pos().y() < 10 || event->pos().y() > height()-10)
-		{
-			if (!pickup->useUnderlay)
-				return;
-	                event->accept();
-			pickup->underlayColor = droppedPlan->getCasingColor(0);
-		}
-		else
-		{
-	                event->accept();
-			pickup->overlayColor = droppedPlan->getCasingColor(0);
-		}
-		emit someDataChanged();
-                return;  
-	}
-        else if (type != PULL_PLAN_MIME) // if the thing passed isn't a pull plan 
+        if (type != PULL_PLAN_MIME) // if the thing passed isn't a pull plan 
                 return;  
 
 	int hitIndex = -1;

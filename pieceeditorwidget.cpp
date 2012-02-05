@@ -23,6 +23,8 @@ void PieceEditorWidget :: updateEverything()
 	pickupParameter1SpinBox->setValue(value);
 	pickupParameter1Slider->setValue(value);
 	pickupViewWidget->setPickup(piece->pickup);
+	overlayWidget->repaint();	
+	underlayWidget->repaint();	
 
 	for (int i = 0; i < pickupTemplateLibraryLayout->count(); ++i)
 	{
@@ -184,10 +186,15 @@ void PieceEditorWidget :: setupLayout()
 	pickupTemplateLibraryScrollArea->setFixedHeight(130);
 	leftLayout->addWidget(pickupTemplateLibraryScrollArea, 0);
 
-	QHBoxLayout* underlayLayout = new QHBoxLayout(this);	
-	underlayCheckBox = new QCheckBox("Use underlay (drag next to pickup)", this);
-	underlayLayout->addWidget(underlayCheckBox);
-	leftLayout->addLayout(underlayLayout);
+	QHBoxLayout* overlayLayout = new QHBoxLayout(this);	
+	overlayLayout->addWidget(new QLabel("Casing color:"));
+	overlayWidget = new OverlayColorWidget(&(piece->pickup->overlayColor), this);
+	overlayLayout->addWidget(overlayWidget);
+	overlayLayout->addStretch(1);
+	overlayLayout->addWidget(new QLabel("Underlay color:"));
+	underlayWidget = new OverlayColorWidget(&(piece->pickup->underlayColor), this);
+	overlayLayout->addWidget(underlayWidget);
+	leftLayout->addLayout(overlayLayout);
 
 	pickupTemplateParameter1Label = new QLabel(piece->pickup->getParameterName(0));
 	pickupParameter1SpinBox = new QSpinBox(this);
@@ -302,16 +309,12 @@ void PieceEditorWidget :: fillRuleButtonGroupChanged(int)
 	pickupViewWidget->setFillRule(fillRuleButtonGroup->checkedId());
 }
 
-void PieceEditorWidget :: underlayCheckBoxChanged(int)
-{
-	piece->pickup->useUnderlay = underlayCheckBox->isChecked();
-	emit someDataChanged();
-}
-
 void PieceEditorWidget :: setupConnections()
 {
-	connect(underlayCheckBox, SIGNAL(stateChanged(int)),
-		this, SLOT(underlayCheckBoxChanged(int)));
+	connect(overlayWidget, SIGNAL(colorChanged()),
+		this, SLOT(updateEverything()));
+	connect(underlayWidget, SIGNAL(colorChanged()),
+		this, SLOT(updateEverything()));
 	connect(fillRuleButtonGroup, SIGNAL(buttonClicked(int)),
 		this, SLOT(fillRuleButtonGroupChanged(int)));
 	connect(pickupParameter1SpinBox, SIGNAL(valueChanged(int)),

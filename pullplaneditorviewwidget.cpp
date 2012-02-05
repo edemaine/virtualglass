@@ -330,9 +330,8 @@ void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, int drawW
 	else
 	{
 		QPen pen;
-		pen.setWidth(2);
+		pen.setWidth(1);
 		pen.setColor(Qt::black);
-		pen.setStyle(Qt::DotLine);
 		painter->setPen(pen);
 	}
 

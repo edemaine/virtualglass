@@ -690,7 +690,7 @@ void Mesher :: generateMesh(PickupPlan* pickup, Geometry *geometry, bool ignoreC
 		}
 	}
 	meshPickupCasingSlab(geometry, pickup->overlayColor, 0.0, pickup->subs[0].width*2.5 + 0.01);
-	if (pickup->useUnderlay)
+	if (pickup->underlayColor->a > 0.001) // pickup->useUnderlay)
 		meshPickupCasingSlab(geometry, pickup->underlayColor, pickup->subs[0].width*2.5 + 0.01 + 0.06, 0.05);
 }
 

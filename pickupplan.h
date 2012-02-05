@@ -28,7 +28,6 @@ class PickupPlan
 		vector<SubpickupTemplate> subs;
 		Color* overlayColor;
 		Color* underlayColor;
-		bool useUnderlay;
 
 	private:
 		void updateSubs();

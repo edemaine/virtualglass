@@ -61,7 +61,7 @@ public:
 	void registerWidget(AsyncRenderWidget *widget);
 	void unregisterWidget(AsyncRenderWidget *widget);
 private:
-	std::unordered_map< uint32_t, AsyncRenderWidget * > idToWidget;
+	unordered_map< uint32_t, AsyncRenderWidget * > idToWidget;
 	uint32_t freshId;
 
 //These functions are called to actually kick off async rendering:
