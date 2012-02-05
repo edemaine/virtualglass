@@ -53,7 +53,6 @@ Controller::Controller() : quitThreads(false), freshId(1) {
 		thread->start();
 		threads.push_back(thread);
 	}
-
 }
 
 Controller::~Controller() {
@@ -119,9 +118,7 @@ void replaceOrAddJob(deque< Job * > &queue, Job *job) {
 			*j = job;
 		}
 	}
-	if (found) {
-		delete job;
-	} else {
+	if (!found) {
 		queue.push_back(job);
 	}
 }

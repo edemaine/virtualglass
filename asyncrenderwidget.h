@@ -10,6 +10,7 @@ class Geometry;
 class RenderData
 {
 public:
+	virtual ~RenderData() { }
 	//may be called in a separate thread:
 	virtual Geometry *getGeometry() = 0;
 };

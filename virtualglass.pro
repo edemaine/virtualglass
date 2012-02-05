@@ -20,6 +20,8 @@ unix:!macx {
   LIBS += -lGLU
 }
 macx {
+  QMAKE_CC = clang
+  QMAKE_CXX = clang
   QMAKE_CXXFLAGS += -DUNORDERED_MAP_WORKAROUND
   ICON = virtualglass.icns
 }

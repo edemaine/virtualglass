@@ -613,7 +613,7 @@ inline Vector< NUM, SIZE1 + SIZE2 > make_vector( Vector< NUM, SIZE1 > const &a, 
 }
 
 template< typename NUM, int SIZE1 >
-inline Vector< NUM, SIZE1 > make_vector( Vector< NUM, SIZE1 > const &a, Vector< NUM, 0 > const &b ) {
+inline Vector< NUM, SIZE1 > make_vector( Vector< NUM, SIZE1 > const &a, Vector< NUM, 0 > const & ) {
 	return a;
 }
 

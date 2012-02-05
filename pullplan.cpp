@@ -17,13 +17,12 @@ PullPlan :: PullPlan(int templateType) {
 PullPlan* PullPlan :: copy() const {
 
 	PullPlan* c = new PullPlan(this->templateType);
-	c->casings.clear();
+
 	c->casings = this->casings;
 	c->twist = this->twist;
 
-	for (unsigned int i = 0; i < this->parameterNames.size(); ++i) {
-		c->parameterValues[i] = this->parameterValues[i];
-	}
+	assert(c->parameterValues.size() == this->parameterValues.size());
+	c->parameterValues = this->parameterValues;
 	c->updateSubs();
 
 	assert(c->subs.size() == this->subs.size());
@@ -223,7 +222,6 @@ int PullPlan :: getTemplateType() {
 }
 
 void PullPlan :: setParameter(int p, int v) {
-
 	parameterValues[p] = v;
 	updateSubs();
 }
@@ -348,6 +346,8 @@ int PullPlan :: getCasingShape(unsigned int index) {
 void PullPlan :: pushNewSubpull(vector<SubpullTemplate>* newSubs,
 	int shape, Point p, float diameter, int group) {
 
+	assert(shape == CIRCLE_SHAPE || shape == SQUARE_SHAPE);
+
 	if (newSubs->size() < subs.size()) {
 		newSubs->push_back(SubpullTemplate(subs[newSubs->size()].plan, shape, p, diameter, group));
 	}
@@ -360,6 +360,10 @@ void PullPlan :: pushNewSubpull(vector<SubpullTemplate>* newSubs,
 			case SQUARE_SHAPE:
 				newSubs->push_back(SubpullTemplate(defaultSquareSubplan, 
 					SQUARE_SHAPE, p, diameter, group));
+				break;
+			default:
+				//this should always push something, right?
+				assert(shape == CIRCLE_SHAPE || shape == SQUARE_SHAPE);
 				break;
 		}
 	}
@@ -379,12 +383,12 @@ the number of subplans.
 */
 void PullPlan :: updateSubs()
 {
-	Point p;
+	Point p = make_vector(0.0f, 0.0f, 0.0f);
+	assert(!casings.empty());
 	float radius = casings[0].thickness;
 
 	vector<SubpullTemplate> newSubs;
 
-	p.x = p.y = p.z = 0.0;
 	switch (this->templateType) {
 		case CASED_CIRCLE_PULL_TEMPLATE:
 			pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, radius * 1.9, 0);
@@ -397,6 +401,7 @@ void PullPlan :: updateSubs()
 			break;
 		case HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE: 
 		{
+			assert(parameterValues.size() == 1);
 			int count = parameterValues[0];
 			for (int i = 0; i < count; ++i) {
 				float littleRadius = (2 * radius / count) / 2;
@@ -407,9 +412,9 @@ void PullPlan :: updateSubs()
 		}
 		case HORIZONTAL_LINE_SQUARE_PULL_TEMPLATE:
 		{
+			assert(parameterValues.size() == 1);
 			if (this->casings[0].shape == CIRCLE_SHAPE)
 				radius *= 0.9;
-
 			int count = parameterValues[0];
 			for (int i = 0; i < count; ++i) {
 				float littleRadius = (2 * radius / count) / 2;
@@ -420,6 +425,7 @@ void PullPlan :: updateSubs()
 		}
 		case SURROUNDING_CIRCLE_PULL_TEMPLATE:
 		{
+			assert(parameterValues.size() == 1);
 			int count = parameterValues[0];
 			float theta = TWO_PI / count;
 			float k = sin(theta/2) / (1 + sin(theta/2));
@@ -435,6 +441,7 @@ void PullPlan :: updateSubs()
 		}
 		case CROSS_PULL_TEMPLATE:
 		{
+			assert(parameterValues.size() == 1);
 			int count = parameterValues[0]-1;
 			float littleRadius = (radius / (count + 0.5)) / 2.0;
 
@@ -459,6 +466,7 @@ void PullPlan :: updateSubs()
 		case SQUARE_OF_CIRCLES_PULL_TEMPLATE:
 		case SQUARE_OF_SQUARES_PULL_TEMPLATE:
 		{
+			assert(parameterValues.size() == 1);
 			if (this->casings[0].shape == CIRCLE_SHAPE)
 				radius *= 1 / SQRT_TWO;
 
@@ -486,6 +494,7 @@ void PullPlan :: updateSubs()
 		}
 		case TRIPOD_PULL_TEMPLATE:
 		{
+			assert(parameterValues.size() == 1);
 			int count = parameterValues[0];
 			float littleRadius = radius / (2 * count - 1);
 
@@ -502,6 +511,7 @@ void PullPlan :: updateSubs()
 		}
 		case SURROUNDING_SQUARE_PULL_TEMPLATE:
 		{
+			assert(parameterValues.size() == 1);
 			if (this->casings[0].shape == CIRCLE_SHAPE)
 				radius *= 1 / SQRT_TWO;
 
@@ -533,6 +543,8 @@ void PullPlan :: updateSubs()
 			break;
 		}
 	}
+
+	std::cout << this << ": subs from " << subs.size() << " to " << newSubs.size() << std::endl;
 
 	subs = newSubs;
 }
