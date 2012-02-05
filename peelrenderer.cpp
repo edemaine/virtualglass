@@ -65,6 +65,7 @@ void gl_errors(std::string const &where) {
 namespace {
 	//convenience function: grab the error log of a shader:
 	std::string shader_log(GLhandleARB shader, GLEWContext *glewContext) {
+		assert(glewContext);
 		GLint len = 0;
 		glGetObjectParameterivARB(shader, GL_OBJECT_INFO_LOG_LENGTH_ARB, &len);
 		vector< GLchar > log;
@@ -80,6 +81,7 @@ namespace {
 	}
 
 	GLhandleARB load_program(const char *frag, GLEWContext *glewContext) {
+		assert(glewContext);
 		GLhandleARB shader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
 		GLint len = strlen(frag);
 		glShaderSourceARB(shader, 1, &frag, &len);
