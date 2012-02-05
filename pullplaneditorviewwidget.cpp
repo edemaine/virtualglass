@@ -63,20 +63,20 @@ void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 			min = 0.01;
 			if (plan->getCasingShape(0) == SQUARE_SHAPE 
 				&& plan->getCasingShape(1) == CIRCLE_SHAPE) 
-				max = plan->getCasingThickness(1) / sqrt(2) - 0.05;
+				max = plan->getCasingThickness(1) / sqrt(2.0) - 0.05;
 			else 
 				max = plan->getCasingThickness(1) - 0.05;
 		}
 		else {
 			if (plan->getCasingShape(draggedCasingIndex) == CIRCLE_SHAPE
 				&& plan->getCasingShape(draggedCasingIndex-1) == SQUARE_SHAPE) 
-				min = plan->getCasingThickness(draggedCasingIndex-1) * sqrt(2) + 0.05;
+				min = plan->getCasingThickness(draggedCasingIndex-1) * sqrt(2.0) + 0.05;
 			else
 				min = plan->getCasingThickness(draggedCasingIndex-1) + 0.05;
 
 			if (plan->getCasingShape(draggedCasingIndex) == SQUARE_SHAPE
 				&& plan->getCasingShape(draggedCasingIndex+1) == CIRCLE_SHAPE) 
-				max = plan->getCasingThickness(draggedCasingIndex+1) / sqrt(2) - 0.05;
+				max = plan->getCasingThickness(draggedCasingIndex+1) / sqrt(2.0) - 0.05;
 			else
 				max = plan->getCasingThickness(draggedCasingIndex+1) - 0.05;
 		}
@@ -285,8 +285,8 @@ void PullPlanEditorViewWidget :: populateHighlightedCasings(int x, int y, int ty
 	for (unsigned int i = 1; i < plan->getCasingCount(); ++i) {
 		switch (plan->getCasingShape(i)) {
 			case CIRCLE_SHAPE:
-				distanceFromCenter = sqrt(pow(x - (drawSize/2 + 10), 2.0)
-					+ pow(y - (drawSize/2 + 10), 2.0));
+				distanceFromCenter = sqrt(pow(x - (drawSize/2.0 + 10.0), 2.0)
+					+ pow(y - (drawSize/2.0 + 10.0), 2.0));
 				if (distanceFromCenter <= drawSize/2 * plan->getCasingThickness(i))
 				{
 					casingHighlighted = true;
@@ -295,7 +295,7 @@ void PullPlanEditorViewWidget :: populateHighlightedCasings(int x, int y, int ty
 				}
 				break;
 			case SQUARE_SHAPE:
-				if (MAX(fabs(x - width()/2), fabs(y - height()/2)) < drawSize/2 * plan->getCasingThickness(i))
+				if (MAX(fabs(x - width()/2.0), fabs(y - height()/2.0)) < drawSize/2 * plan->getCasingThickness(i))
 				{
 					casingHighlighted = true;
 					casingHighlightIndex = i;

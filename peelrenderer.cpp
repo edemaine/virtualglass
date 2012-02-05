@@ -64,7 +64,7 @@ void gl_errors(std::string const &where) {
 
 namespace {
 	//convenience function: grab the error log of a shader:
-	std::string shader_log(GLhandleARB shader) {
+	std::string shader_log(GLhandleARB shader, GLEWContext *glewContext) {
 		GLint len = 0;
 		glGetObjectParameterivARB(shader, GL_OBJECT_INFO_LOG_LENGTH_ARB, &len);
 		vector< GLchar > log;
@@ -79,7 +79,7 @@ namespace {
 		return out;
 	}
 
-	GLhandleARB load_program(const char *frag) {
+	GLhandleARB load_program(const char *frag, GLEWContext *glewContext) {
 		GLhandleARB shader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
 		GLint len = strlen(frag);
 		glShaderSourceARB(shader, 1, &frag, &len);
@@ -87,7 +87,7 @@ namespace {
 		{ //check shader:
 			GLint val = 0;
 			glGetObjectParameterivARB(shader, GL_OBJECT_COMPILE_STATUS_ARB, &val);
-			std::string log = shader_log(shader);
+			std::string log = shader_log(shader, glewContext);
 			if (val == 0) {
 				std::cerr << "ERROR: failed compiling shader." << std::endl;
 				std::cerr << "Log:\n" << log << std::endl;
@@ -101,7 +101,7 @@ namespace {
 		{ //check program:
 			GLint val = 0;
 			glGetObjectParameterivARB(program, GL_OBJECT_LINK_STATUS_ARB, &val);
-			std::string log = shader_log(program);
+			std::string log = shader_log(program, glewContext);
 			if (val == 0) {
 				std::cerr << "ERROR: failed linking program." << std::endl;
 				std::cerr << "Log:\n" << log << std::endl;
@@ -187,7 +187,7 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const &geometry) {
 		"	//Premultiply alpha to make compositing easier later: \n"
 		"	gl_FragColor = vec4(gl_Color.xyz * gl_Color.w, gl_Color.w); \n"
 		"} \n";
-		peelProgram = load_program(peel_frag);
+		peelProgram = load_program(peel_frag, glewContext);
 		gl_errors("compiling peel program.");
 	}
 
@@ -199,7 +199,7 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const &geometry) {
 		"} \n";
 
 
-		nopeelProgram = load_program(nopeel_frag);
+		nopeelProgram = load_program(nopeel_frag, glewContext);
 		gl_errors("compiling nopeel program.");
 	}
 

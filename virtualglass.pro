@@ -25,7 +25,7 @@ macx {
 }
 
 *-msvc* {
-	MYFLAGS = /DMSVC /Wall /WX /wd4711 /wd4706 /wd4146 /wd4996 /wd4619 /wd4826 /wd4305 /wd4244 /wd4738 /wd4710 /wd4640 /wd4350 /wd4701
+	MYFLAGS = /DMSVC /Wall /WX /wd4711 /wd4706 /wd4146 /wd4996 /wd4619 /wd4826 /wd4305 /wd4244 /wd4738 /wd4710 /wd4640 /wd4350 /wd4701 /wd4628
 	#The 4640 and 4350 warnings disabled above may hide YAML bugs
 	#The 4701 is disabled because of a mis-detection in vector.hpp.
 	#   ...well, I hope it is a mis-detection.

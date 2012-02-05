@@ -7,7 +7,14 @@
 
 #include <deque>
 #include <vector>
+
+#ifdef UNORDERED_MAP_WORKAROUND
 #include <tr1/unordered_map>
+using std::tr1::unordered_map;
+#else
+#include <unordered_map>
+using std::unordered_map;
+#endif
 
 class Geometry;
 
@@ -54,7 +61,7 @@ public:
 	void registerWidget(AsyncRenderWidget *widget);
 	void unregisterWidget(AsyncRenderWidget *widget);
 private:
-	std::tr1::unordered_map< uint32_t, AsyncRenderWidget * > idToWidget;
+	std::unordered_map< uint32_t, AsyncRenderWidget * > idToWidget;
 	uint32_t freshId;
 
 //These functions are called to actually kick off async rendering:
