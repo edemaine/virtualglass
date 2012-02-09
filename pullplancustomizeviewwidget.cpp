@@ -48,7 +48,7 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
             bool isIn = false;
             for (unsigned int i = 0; i < subplansSelected.size(); i++)
             {
-                if (hoveringIndex == subplansSelected.at(i))
+                if (hoveringIndex == int(subplansSelected.at(i)))
                 {
                     isIn = true;
                     break;
