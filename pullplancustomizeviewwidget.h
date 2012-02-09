@@ -33,8 +33,8 @@ private:
 	int hoveringIndex;
 	PullPlan* tempCirclePlan;
 	PullPlan* tempSquarePlan;
-	QPoint* mouseStartingLoc;
-	Point* subpullStartingLoc;
+    QPoint* mouseStartingLoc;
+    vector<unsigned int> subplansSelected;
 
 };
 

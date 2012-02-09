@@ -14,8 +14,8 @@ PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget
 	tempCirclePlan->setCasingColor(color, 0);
 	tempSquarePlan = new PullPlan(CUSTOM_SQUARE_PULL_TEMPLATE);
 	tempSquarePlan->setCasingColor(color, 0);
-	mouseStartingLoc = new QPoint(INT_MAX,INT_MAX);
-	subpullStartingLoc = new Vector3f();
+    mouseStartingLoc = new QPoint(INT_MAX,INT_MAX);
+    subplansSelected.clear();
 }
 
 void PullPlanCustomizeViewWidget :: dragEnterEvent(QDragEnterEvent* event)
@@ -26,31 +26,53 @@ void PullPlanCustomizeViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 void PullPlanCustomizeViewWidget :: dropEvent(QDropEvent*)
 {
 	mouseStartingLoc->setX(INT_MAX);
-	mouseStartingLoc->setY(INT_MAX);
-	subpullStartingLoc->x=0;
-	subpullStartingLoc->y=0;
-	subpullStartingLoc->z=0;
+    mouseStartingLoc->setY(INT_MAX);
 //	event->setDropAction(Qt::CopyAction);
 }
 
 void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 {
-	if (event->buttons() != Qt::NoButton)
+    if (event->buttons() != Qt::NoButton)
 	{
 		if (hoveringIndex == -1)
-			return;
+        {
+            this->update();
+            return;
+        }
 		if (mouseStartingLoc->x() == INT_MAX && mouseStartingLoc->y() == INT_MAX)
 		{
+            if (event->modifiers() != Qt::ControlModifier)
+            {
+                subplansSelected.clear();
+            }
+            bool isIn = false;
+            for (unsigned int i = 0; i < subplansSelected.size(); i++)
+            {
+                if (hoveringIndex == subplansSelected.at(i))
+                {
+                    isIn = true;
+                    break;
+                }
+            }
+            if (!isIn)
+            {
+                subplansSelected.push_back((unsigned int)hoveringIndex);
+            }
 			mouseStartingLoc->setX(event->pos().x());
 			mouseStartingLoc->setY(event->pos().y());
-			subpullStartingLoc->x = plan->subs[hoveringIndex].location.x;
-			subpullStartingLoc->y = plan->subs[hoveringIndex].location.y;
 		}
 		if (isValidMovePosition(event))
 		{
-			plan->subs[hoveringIndex].location.x = subpullStartingLoc->x + event->pos().x()/(width()/2.0 - 10) - mouseStartingLoc->x()/(width()/2.0 - 10);
-			plan->subs[hoveringIndex].location.y = subpullStartingLoc->y + event->pos().y()/(width()/2.0 - 10) - mouseStartingLoc->y()/(width()/2.0 - 10);
-		}
+            for (unsigned int i = 0; i < subplansSelected.size(); i++)
+            {
+                plan->subs[subplansSelected[i]].location.x += (event->pos().x() - mouseStartingLoc->x())/(width()/2.0 - 10);
+                plan->subs[subplansSelected[i]].location.y += (event->pos().y() - mouseStartingLoc->y())/(width()/2.0 - 10);
+            }
+//            plan->subs[hoveringIndex].location.x += (event->pos().x() - mouseStartingLoc->x())/(width()/2.0 - 10);
+//            plan->subs[hoveringIndex].location.y += (event->pos().y() - mouseStartingLoc->y())/(width()/2.0 - 10);
+            mouseStartingLoc->setX(event->pos().x());
+            mouseStartingLoc->setY(event->pos().y());
+        }
 //		qDebug() << "location" << plan->subs[hoveringIndex].location.x << plan->subs[hoveringIndex].location.y;
 //		qDebug() << "event" << event->pos().x() << event->pos().y();
 //		qDebug() << "displacement" << event->pos().x()/(width()/2.0 - 10) - mouseStartingLoc->x()/(width()/2.0 - 10)
@@ -58,11 +80,12 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 		this->update();
 		return;
 	}
+    if (event->modifiers() != Qt::ControlModifier)
+    {
+        subplansSelected.clear();
+    }
 	mouseStartingLoc->setX(INT_MAX);
 	mouseStartingLoc->setY(INT_MAX);
-	subpullStartingLoc->x=0;
-	subpullStartingLoc->y=0;
-	subpullStartingLoc->z=0;
 	int drawSize = width() - 20;
 	// check to see if the drop was in a subpull
 	bool anyHit = false;
@@ -135,11 +158,12 @@ void PullPlanCustomizeViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 	{
 		mouseStartingLoc->setX(event->pos().x());
 		mouseStartingLoc->setY(event->pos().y());
-		subpullStartingLoc = &(plan->subs[hoveringIndex].location);
 	}
-	plan->subs[hoveringIndex].location.x = subpullStartingLoc->x + event->pos().x() - mouseStartingLoc->x();
-	plan->subs[hoveringIndex].location.y = subpullStartingLoc->y + event->pos().y() - mouseStartingLoc->y();
-	this->update();
+    plan->subs[hoveringIndex].location.x += (event->pos().x() - mouseStartingLoc->x())/(width()/2.0 - 10);
+    plan->subs[hoveringIndex].location.y += (event->pos().y() - mouseStartingLoc->y())/(width()/2.0 - 10);
+    mouseStartingLoc->setX(event->pos().x());
+    mouseStartingLoc->setY(event->pos().y());
+    this->update();
 }
 
 void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
@@ -155,8 +179,7 @@ void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
 	}
 	this->plan->subs = plan->subs;
 	hoveringIndex = -1;
-	mouseStartingLoc = new QPoint(-1,-1);
-	subpullStartingLoc = new Vector3f();
+    mouseStartingLoc = new QPoint(-1,-1);
 }
 
 bool PullPlanCustomizeViewWidget :: isValidMovePosition(QMouseEvent*)
