@@ -59,7 +59,7 @@ HEADERS += primitives.h constants.h Vector.hpp \
 	purecolorlibrarywidget.h casing.h \
 	mainwindow.h niceviewwidget.h piecelibrarywidget.h \
 	pulltemplatelibrarywidget.h pickuptemplatelibrarywidget.h piecetemplatelibrarywidget.h \
-	pullplaneditorviewwidget.h pullplaneditorwidget.h colorbarlibrarywidget.h \
+	pullplaneditorviewwidget.h pullplaneditorwidget.h \
 	pieceeditorwidget.h coloreditorwidget.h \
 	controller.h geometry.h mesh.h \ 
 	qgraphicshighlighteffect.h \
@@ -67,7 +67,9 @@ HEADERS += primitives.h constants.h Vector.hpp \
 	asyncrenderwidget.h \
 	asyncrenderinternal.h \
 	asyncrenderthread.h \
+	pullplanrenderdata.h \
 	asyncpullplanlibrarywidget.h \
+	asynccolorbarlibrarywidget.h \
 
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
@@ -132,14 +134,16 @@ SOURCES += main.cpp \
 	controller.cpp geometry.cpp mesh.cpp \
 	mainwindow.cpp niceviewwidget.cpp piecelibrarywidget.cpp \
 	pulltemplatelibrarywidget.cpp pickuptemplatelibrarywidget.cpp piecetemplatelibrarywidget.cpp \
-	pullplaneditorviewwidget.cpp pullplaneditorwidget.cpp colorbarlibrarywidget.cpp \ 
+	pullplaneditorviewwidget.cpp pullplaneditorwidget.cpp \ 
 	qgraphicshighlighteffect.cpp \
 	pieceeditorwidget.cpp coloreditorwidget.cpp \
 	peelrenderer.cpp \
 	asyncrenderwidget.cpp \
 	asyncrenderinternal.cpp \
 	asyncrenderthread.cpp \
+	pullplanrenderdata.cpp \
 	asyncpullplanlibrarywidget.cpp \
+	asynccolorbarlibrarywidget.cpp \
 
 
 SOURCES += yaml-cpp/src/tag.cpp \

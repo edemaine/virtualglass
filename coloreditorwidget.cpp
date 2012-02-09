@@ -1,7 +1,7 @@
 
 #include "coloreditorwidget.h"
 
-ColorEditorWidget :: ColorEditorWidget(ColorBarLibraryWidget* libraryWidget, QWidget* parent) : QWidget(parent)
+ColorEditorWidget :: ColorEditorWidget(AsyncColorBarLibraryWidget* libraryWidget, QWidget* parent) : QWidget(parent)
 {
 	this->niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);
 	this->libraryWidget = libraryWidget;
@@ -13,12 +13,12 @@ ColorEditorWidget :: ColorEditorWidget(ColorBarLibraryWidget* libraryWidget, QWi
 }
 
 
-ColorBarLibraryWidget* ColorEditorWidget :: getLibraryWidget() {
+AsyncColorBarLibraryWidget* ColorEditorWidget :: getLibraryWidget() {
 
 	return this->libraryWidget;
 }
 
-void ColorEditorWidget :: setLibraryWidget(ColorBarLibraryWidget* widget) {
+void ColorEditorWidget :: setLibraryWidget(AsyncColorBarLibraryWidget* widget) {
 	
 	this->libraryWidget = widget;
 	updateLibraryWidgetPixmaps();
@@ -193,12 +193,7 @@ void ColorEditorWidget :: updateLibraryWidgetPixmaps()
 	QPixmap editorPixmap(100, 100);
 	editorPixmap.fill(QColor(255*c.r, 255*c.g, 255*c.b, 255*MAX(0.1, c.a))); 
 
-	QPixmap nicePixmap = QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100);
-	QPainter painter(&nicePixmap);
-	painter.drawText(QPointF(5, 95), libraryWidget->getColorName());
-	painter.end();
-	
-	libraryWidget->updatePixmaps(nicePixmap, editorPixmap);
+	libraryWidget->updatePixmaps(editorPixmap);
 }
 
 void ColorEditorWidget :: seedColors()

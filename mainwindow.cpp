@@ -48,7 +48,7 @@ void MainWindow :: unhighlightAllLibraryWidgets()
 	for (int j = 0; j < colorBarLibraryLayout->count(); ++j)
 	{
 		w = colorBarLibraryLayout->itemAt(j);
-		unhighlightLibraryWidget(dynamic_cast<ColorBarLibraryWidget*>(w->widget()));
+		unhighlightLibraryWidget(dynamic_cast<AsyncColorBarLibraryWidget*>(w->widget()));
 	}
 	for (int j = 0; j < pullPlanLibraryLayout->count(); ++j)
 	{
@@ -83,7 +83,7 @@ void MainWindow :: deleteCurrentEditingObject()
 			for (i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
 				w = colorBarLibraryLayout->itemAt(i);
-				if (dynamic_cast<ColorBarLibraryWidget*>(w->widget()) == colorEditorWidget->getLibraryWidget())
+				if (dynamic_cast<AsyncColorBarLibraryWidget*>(w->widget()) == colorEditorWidget->getLibraryWidget())
 				{
 					// this may be a memory leak, the library widget is never explicitly deleted
 					w = colorBarLibraryLayout->takeAt(i); 
@@ -93,7 +93,7 @@ void MainWindow :: deleteCurrentEditingObject()
 				}
 			}
 
-			colorEditorBarLibraryWidget = dynamic_cast<ColorBarLibraryWidget*>(
+			colorEditorBarLibraryWidget = dynamic_cast<AsyncColorBarLibraryWidget*>(
 								colorBarLibraryLayout->itemAt(
 									MIN(colorBarLibraryLayout->count()-1, i))->widget());
 			colorEditorWidget->setLibraryWidget(colorEditorBarLibraryWidget);
@@ -166,7 +166,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 		return;
 	}
 
-	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
+	AsyncColorBarLibraryWidget* cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(childAt(event->pos()));
 	AsyncPullPlanLibraryWidget* plplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(childAt(event->pos()));
 	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
 
@@ -213,7 +213,7 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	if ((event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
 		return;
 
-	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
+	AsyncColorBarLibraryWidget* cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(childAt(event->pos()));
 	AsyncPullPlanLibraryWidget* plplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(childAt(event->pos()));
 	int type;
 	if (cblw != NULL)
@@ -365,7 +365,7 @@ void MainWindow :: setupEmptyPaneEditor()
 void MainWindow :: setupColorEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
-	colorEditorBarLibraryWidget = new ColorBarLibraryWidget(new PullPlan(CIRCLE_BASE_PULL_TEMPLATE), "R-100", this);
+	colorEditorBarLibraryWidget = new AsyncColorBarLibraryWidget(new PullPlan(CIRCLE_BASE_PULL_TEMPLATE), "R-100", this);
 	colorEditorWidget = new ColorEditorWidget(colorEditorBarLibraryWidget, editorStack);
 	colorBarLibraryLayout->addWidget(colorEditorBarLibraryWidget);
 }
@@ -402,7 +402,7 @@ void MainWindow :: newColorBar()
 
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();
-	colorEditorBarLibraryWidget = new ColorBarLibraryWidget(newEditorBar, "R-100");
+	colorEditorBarLibraryWidget = new AsyncColorBarLibraryWidget(newEditorBar, "R-100");
 	colorBarLibraryLayout->addWidget(colorEditorBarLibraryWidget);
 	colorEditorWidget->setLibraryWidget(colorEditorBarLibraryWidget);
 
@@ -450,7 +450,7 @@ void MainWindow :: unhighlightLibraryWidget(PickupTemplateLibraryWidget* w)
 	w->graphicsEffect()->setEnabled(false);
 }
 
-void MainWindow :: unhighlightLibraryWidget(ColorBarLibraryWidget* w)
+void MainWindow :: unhighlightLibraryWidget(AsyncColorBarLibraryWidget* w)
 {
 	w->graphicsEffect()->setEnabled(false);
 }
@@ -479,7 +479,7 @@ void MainWindow :: highlightLibraryWidget(PickupTemplateLibraryWidget* w)
 	w->graphicsEffect()->setEnabled(true);
 }
 
-void MainWindow :: highlightLibraryWidget(ColorBarLibraryWidget* w, int dependancy)
+void MainWindow :: highlightLibraryWidget(AsyncColorBarLibraryWidget* w, int dependancy)
 {
 	w->graphicsEffect()->setEnabled(false);
 	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(dependancy);
@@ -553,10 +553,10 @@ void MainWindow :: updateLibrary()
 		{
 			pullPlanEditorWidget->updateLibraryWidgetPixmaps(pullPlanEditorPlanLibraryWidget);
 
-			ColorBarLibraryWidget* cblw;
+			AsyncColorBarLibraryWidget* cblw;
 			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
-				cblw = dynamic_cast<ColorBarLibraryWidget*>(
+				cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(
 					cblw->getPullPlan()->getOutermostCasingColor()))
@@ -590,10 +590,10 @@ void MainWindow :: updateLibrary()
 		{
 			pieceEditorWidget->updateLibraryWidgetPixmaps(pieceEditorPieceLibraryWidget);
 
-			ColorBarLibraryWidget* cblw;
+			AsyncColorBarLibraryWidget* cblw;
 			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
-				cblw = dynamic_cast<ColorBarLibraryWidget*>(
+				cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 				if (pieceEditorWidget->getPiece()->hasDependencyOn(
 					cblw->getPullPlan()->getOutermostCasingColor()))

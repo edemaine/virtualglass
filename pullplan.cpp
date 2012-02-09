@@ -544,8 +544,6 @@ void PullPlan :: updateSubs()
 		}
 	}
 
-	std::cout << this << ": subs from " << subs.size() << " to " << newSubs.size() << std::endl;
-
 	subs = newSubs;
 }
 

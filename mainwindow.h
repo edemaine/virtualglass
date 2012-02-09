@@ -10,7 +10,7 @@
 #include "niceviewwidget.h"
 #include "piecelibrarywidget.h"
 #include "asyncpullplanlibrarywidget.h"
-#include "colorbarlibrarywidget.h"
+#include "asynccolorbarlibrarywidget.h"
 #include "pulltemplate.h"
 #include "pullplan.h"
 #include "pickupplan.h"
@@ -51,12 +51,12 @@ class MainWindow : public QMainWindow
 
 		void unhighlightLibraryWidget(PieceTemplateLibraryWidget* w);
 		void unhighlightLibraryWidget(PickupTemplateLibraryWidget* w);
-		void unhighlightLibraryWidget(ColorBarLibraryWidget* w);
+		void unhighlightLibraryWidget(AsyncColorBarLibraryWidget* w);
 		void unhighlightLibraryWidget(AsyncPullPlanLibraryWidget* w);
 		void unhighlightLibraryWidget(PieceLibraryWidget* w);
 		void highlightLibraryWidget(PieceTemplateLibraryWidget* w);
 		void highlightLibraryWidget(PickupTemplateLibraryWidget* w);
-		void highlightLibraryWidget(ColorBarLibraryWidget* w, int dependancy);
+		void highlightLibraryWidget(AsyncColorBarLibraryWidget* w, int dependancy);
 		void highlightLibraryWidget(AsyncPullPlanLibraryWidget* w, int dependancy);
 		void highlightLibraryWidget(PieceLibraryWidget* w, int dependancy);
 		void unhighlightAllLibraryWidgets();
@@ -70,7 +70,7 @@ class MainWindow : public QMainWindow
 		QPoint dragStartPosition;
 		QStackedWidget* editorStack; //editorStack.currentIndex() gives with mode
 		QWidget* emptyEditorPage;
-		ColorBarLibraryWidget* colorEditorBarLibraryWidget;
+		AsyncColorBarLibraryWidget* colorEditorBarLibraryWidget;
 		AsyncPullPlanLibraryWidget* pullPlanEditorPlanLibraryWidget;
 		PieceLibraryWidget* pieceEditorPieceLibraryWidget;
 		QWidget* centralWidget;

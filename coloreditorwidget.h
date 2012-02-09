@@ -8,7 +8,7 @@
 #include "niceviewwidget.h"
 #include "geometry.h"
 #include "mesh.h"
-#include "colorbarlibrarywidget.h"
+#include "asynccolorbarlibrarywidget.h"
 #include "purecolorlibrarywidget.h"
 
 class ColorEditorWidget : public QWidget
@@ -16,9 +16,9 @@ class ColorEditorWidget : public QWidget
 	Q_OBJECT
 
 	public:
-		ColorEditorWidget(ColorBarLibraryWidget* widget, QWidget* parent=0);
-		void setLibraryWidget(ColorBarLibraryWidget* widget);
-		ColorBarLibraryWidget* getLibraryWidget();
+		ColorEditorWidget(AsyncColorBarLibraryWidget* widget, QWidget* parent=0);
+		void setLibraryWidget(AsyncColorBarLibraryWidget* widget);
+		AsyncColorBarLibraryWidget* getLibraryWidget();
 		void seedColors();
 		void updateLibraryWidgetPixmaps();
 
@@ -38,7 +38,7 @@ class ColorEditorWidget : public QWidget
 	private:
 		Geometry geometry;
 		Mesher mesher;
-		ColorBarLibraryWidget* libraryWidget;	
+		AsyncColorBarLibraryWidget* libraryWidget;	
 		QComboBox* sourceComboBox;
 		NiceViewWidget* niceViewWidget;
                 QSlider* alphaSlider;
