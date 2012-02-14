@@ -73,5 +73,8 @@ class PullPlan
 			int shape, Point location, float diameter, int group);
 };
 
+PullPlan *deep_copy(const PullPlan *plan);
+void deep_delete(PullPlan *plan);
+
 #endif
 

@@ -71,7 +71,7 @@ PieceTemplate :: PieceTemplate(int t)
 	}
 }
 
-PieceTemplate* PieceTemplate :: copy()
+PieceTemplate* PieceTemplate :: copy() const
 {
 	PieceTemplate* c = new PieceTemplate(this->type);
 

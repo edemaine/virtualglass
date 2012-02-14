@@ -8,7 +8,7 @@
 
 #include "constants.h"
 #include "niceviewwidget.h"
-#include "piecelibrarywidget.h"
+#include "asyncpiecelibrarywidget.h"
 #include "asyncpullplanlibrarywidget.h"
 #include "asynccolorbarlibrarywidget.h"
 #include "pulltemplate.h"
@@ -53,12 +53,12 @@ class MainWindow : public QMainWindow
 		void unhighlightLibraryWidget(PickupTemplateLibraryWidget* w);
 		void unhighlightLibraryWidget(AsyncColorBarLibraryWidget* w);
 		void unhighlightLibraryWidget(AsyncPullPlanLibraryWidget* w);
-		void unhighlightLibraryWidget(PieceLibraryWidget* w);
+		void unhighlightLibraryWidget(AsyncPieceLibraryWidget* w);
 		void highlightLibraryWidget(PieceTemplateLibraryWidget* w);
 		void highlightLibraryWidget(PickupTemplateLibraryWidget* w);
 		void highlightLibraryWidget(AsyncColorBarLibraryWidget* w, int dependancy);
 		void highlightLibraryWidget(AsyncPullPlanLibraryWidget* w, int dependancy);
-		void highlightLibraryWidget(PieceLibraryWidget* w, int dependancy);
+		void highlightLibraryWidget(AsyncPieceLibraryWidget* w, int dependancy);
 		void unhighlightAllLibraryWidgets();
 
 		// Variables
@@ -72,7 +72,7 @@ class MainWindow : public QMainWindow
 		QWidget* emptyEditorPage;
 		AsyncColorBarLibraryWidget* colorEditorBarLibraryWidget;
 		AsyncPullPlanLibraryWidget* pullPlanEditorPlanLibraryWidget;
-		PieceLibraryWidget* pieceEditorPieceLibraryWidget;
+		AsyncPieceLibraryWidget* pieceEditorPieceLibraryWidget;
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
 		ColorEditorWidget* colorEditorWidget;

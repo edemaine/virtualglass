@@ -18,15 +18,18 @@ class Piece
 		void setTemplate(PieceTemplate* pt);
 		PieceTemplate* getTemplate();
 
-		Piece* copy();
+		Piece* copy() const;
 		PickupPlan* pickup;
 		bool hasDependencyOn(Color* color);
 		bool hasDependencyOn(PullPlan* pullPlan);
 		
-	private:
+	//private:
 		// Variables
 		PieceTemplate* pieceTemplate;
 };
+
+Piece *deep_copy(const Piece *);
+void deep_delete(Piece *);
 
 #endif
 

@@ -352,9 +352,9 @@ void PieceEditorWidget :: seedTemplates()
 	}
 }
 
-void PieceEditorWidget :: updateLibraryWidgetPixmaps(PieceLibraryWidget* w)
+void PieceEditorWidget :: updateLibraryWidgetPixmaps(AsyncPieceLibraryWidget* w)
 {
-	w->updatePixmap(QPixmap::fromImage(niceViewWidget->renderImage()).scaled(100, 100));
+	w->updatePixmap(niceViewWidget->eyePosition());
 }
 
 void PieceEditorWidget :: setPickupParameter(int param, int value)

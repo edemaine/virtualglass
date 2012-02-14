@@ -251,11 +251,7 @@ void NiceViewWidget :: setGLMatrices()
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	float eyeLoc[3];
-
-	eyeLoc[0] = lookAtLoc[0] + rho*sin(phi)*cos(theta);
-	eyeLoc[1] = lookAtLoc[1] + rho*sin(phi)*sin(theta);
-	eyeLoc[2] = lookAtLoc[2] + rho*cos(phi);
+	Vector3f eyeLoc = eyePosition();
 
 	gluLookAt(eyeLoc[0], eyeLoc[1], eyeLoc[2],
 		  lookAtLoc[0], lookAtLoc[1], lookAtLoc[2],
@@ -282,6 +278,15 @@ void NiceViewWidget :: setGeometry(Geometry* g)
 {
 	geometry = g;
 	update();
+}
+
+Vector3f NiceViewWidget :: eyePosition()
+{
+	Vector3f loc;
+	loc.x = lookAtLoc[0] + rho*sin(phi)*cos(theta);
+	loc.y = lookAtLoc[1] + rho*sin(phi)*sin(theta);
+	loc.z = lookAtLoc[2] + rho*cos(phi);
+	return loc;
 }
 
 /*

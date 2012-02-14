@@ -28,6 +28,8 @@ public:
 	bool peelEnabled();
 	void setGeometry(Geometry* g);
 
+	Vector3f eyePosition();
+
 private:
 	bool leftMouseDown;
 	QColor bgColor;

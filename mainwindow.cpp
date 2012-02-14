@@ -58,7 +58,7 @@ void MainWindow :: unhighlightAllLibraryWidgets()
 	for (int j = 0; j < pieceLibraryLayout->count(); ++j)
 	{
 		w = pieceLibraryLayout->itemAt(j);
-		unhighlightLibraryWidget(dynamic_cast<PieceLibraryWidget*>(w->widget()));
+		unhighlightLibraryWidget(dynamic_cast<AsyncPieceLibraryWidget*>(w->widget()));
 	}
 }
 
@@ -136,7 +136,7 @@ void MainWindow :: deleteCurrentEditingObject()
 			for (i = 0; i < pieceLibraryLayout->count(); ++i)
 			{
 				w = pieceLibraryLayout->itemAt(i);
-				Piece* p = dynamic_cast<PieceLibraryWidget*>(w->widget())->getPiece();
+				Piece* p = dynamic_cast<AsyncPieceLibraryWidget*>(w->widget())->getPiece();
 				if (p == pieceEditorWidget->getPiece())
 				{
 					// this may be a memory leak, the library widget is never explicitly deleted
@@ -147,7 +147,7 @@ void MainWindow :: deleteCurrentEditingObject()
 				}
 			}
 
-			pieceEditorPieceLibraryWidget = dynamic_cast<PieceLibraryWidget*>(
+			pieceEditorPieceLibraryWidget = dynamic_cast<AsyncPieceLibraryWidget*>(
 								pieceLibraryLayout->itemAt(
 									MIN(pieceLibraryLayout->count()-1, i))->widget());
 			pieceEditorWidget->setPiece(pieceEditorPieceLibraryWidget->getPiece());
@@ -168,7 +168,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 
 	AsyncColorBarLibraryWidget* cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(childAt(event->pos()));
 	AsyncPullPlanLibraryWidget* plplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(childAt(event->pos()));
-	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
+	AsyncPieceLibraryWidget* plw = dynamic_cast<AsyncPieceLibraryWidget*>(childAt(event->pos()));
 
 	if (cblw != NULL)
 	{
@@ -348,7 +348,7 @@ void MainWindow :: setupPieceEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
 	pieceEditorWidget = new PieceEditorWidget(editorStack);
-	pieceEditorPieceLibraryWidget = new PieceLibraryWidget(pieceEditorWidget->getPiece());
+	pieceEditorPieceLibraryWidget = new AsyncPieceLibraryWidget(pieceEditorWidget->getPiece());
 	pieceLibraryLayout->addWidget(pieceEditorPieceLibraryWidget);
 }
 
@@ -385,7 +385,7 @@ void MainWindow :: newPiece()
 
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();
-	pieceEditorPieceLibraryWidget = new PieceLibraryWidget(newEditorPiece);
+	pieceEditorPieceLibraryWidget = new AsyncPieceLibraryWidget(newEditorPiece);
 	pieceLibraryLayout->addWidget(pieceEditorPieceLibraryWidget);
 
 	pieceEditorWidget->setPiece(newEditorPiece);
@@ -460,7 +460,7 @@ void MainWindow :: unhighlightLibraryWidget(AsyncPullPlanLibraryWidget* w)
 	w->graphicsEffect()->setEnabled(false);
 }
 
-void MainWindow :: unhighlightLibraryWidget(PieceLibraryWidget* w)
+void MainWindow :: unhighlightLibraryWidget(AsyncPieceLibraryWidget* w)
 {
 	w->graphicsEffect()->setEnabled(false);
 }
@@ -493,7 +493,7 @@ void MainWindow :: highlightLibraryWidget(AsyncPullPlanLibraryWidget* w, int dep
 	w->graphicsEffect()->setEnabled(true);
 }
 
-void MainWindow :: highlightLibraryWidget(PieceLibraryWidget* w, int dependancy)
+void MainWindow :: highlightLibraryWidget(AsyncPieceLibraryWidget* w, int dependancy)
 {
 	w->graphicsEffect()->setEnabled(false);
 	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(dependancy);
@@ -536,10 +536,10 @@ void MainWindow :: updateLibrary()
 					highlightLibraryWidget(pplw, USES_DEPENDANCY);
 			}
 
-			PieceLibraryWidget* plw;
+			AsyncPieceLibraryWidget* plw;
 			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
 			{
-				plw = dynamic_cast<PieceLibraryWidget*>(
+				plw = dynamic_cast<AsyncPieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 				if (plw->getPiece()->hasDependencyOn(
 					colorEditorBarLibraryWidget->getPullPlan()->getOutermostCasingColor()))
@@ -574,10 +574,10 @@ void MainWindow :: updateLibrary()
 						highlightLibraryWidget(pplw, USES_DEPENDANCY);
 			}
 
-			PieceLibraryWidget* plw;
+			AsyncPieceLibraryWidget* plw;
 			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
 			{
-				plw = dynamic_cast<PieceLibraryWidget*>(
+				plw = dynamic_cast<AsyncPieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 				if (plw->getPiece()->hasDependencyOn(pullPlanEditorWidget->getPlan()))
 					highlightLibraryWidget(plw, USES_DEPENDANCY);

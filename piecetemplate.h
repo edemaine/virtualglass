@@ -24,7 +24,7 @@ class PieceTemplate
 		int type;
 		vector<char*> parameterNames;
 		vector<int> parameterValues; 	
-		PieceTemplate* copy();
+		PieceTemplate* copy() const;
 };
 
 #endif

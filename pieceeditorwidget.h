@@ -7,7 +7,7 @@
 #include "pullplan.h"
 #include "overlaycolorwidget.h"
 #include "pickupplaneditorviewwidget.h"
-#include "piecelibrarywidget.h"
+#include "asyncpiecelibrarywidget.h"
 #include "pickuptemplatelibrarywidget.h"
 #include "piecetemplatelibrarywidget.h"
 #include "qgraphicshighlighteffect.h"
@@ -22,7 +22,7 @@ class PieceEditorWidget : public QWidget
 	public:
 		PieceEditorWidget(QWidget* parent=0);
 		Piece* getPiece();
-		void updateLibraryWidgetPixmaps(PieceLibraryWidget* w);
+		void updateLibraryWidgetPixmaps(AsyncPieceLibraryWidget* w);
 		void seedTemplates();
 		void setPiece(Piece* p);
 		void setPieceTemplate(PieceTemplate* t);

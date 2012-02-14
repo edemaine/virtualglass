@@ -23,7 +23,7 @@ class PickupPlan
                 int getParameter(int param);
                 char* getParameterName(int param);
 
-		PickupPlan* copy();
+		PickupPlan* copy() const;
 
 		vector<SubpickupTemplate> subs;
 		Color* overlayColor;
@@ -38,6 +38,9 @@ class PickupPlan
                 vector<char*> parameterNames;
 		PullPlan* defaultSubplan;
 };
+
+PickupPlan *deep_copy(const PickupPlan *);
+void deep_delete(PickupPlan *);
 
 #endif
 
