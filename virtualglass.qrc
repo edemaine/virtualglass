@@ -23,5 +23,6 @@
 	<file>images/pulltemplate9.png</file>
 	<file>images/pulltemplate10.png</file>
 	<file>Colors1.txt</file>
+	<file>version.txt</file>
 </qresource>
 </RCC>

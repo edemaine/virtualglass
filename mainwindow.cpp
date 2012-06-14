@@ -12,7 +12,7 @@ MainWindow :: MainWindow()
 	setupEditors();
 	setupConnections();
 
-	setWindowTitle(tr("VirtualGlass"));
+	setWindowTitle(windowTitle());
 	//HACK for video recording:
 	//setFixedSize(1600,900);
 	//move(-8, 0);
@@ -22,6 +22,19 @@ MainWindow :: MainWindow()
 	editorStack->setCurrentIndex(EMPTY_MODE); // end in pull plan mode
 	emit someDataChanged();
 	whatToDoLabel->setText("Click a library item at left to edit/view.");
+}
+
+QString MainWindow :: windowTitle()
+{
+	QString title = tr("VirtualGlass");
+	QFile inFile(":/version.txt");
+    if (inFile.open(QIODevice::ReadOnly)) {
+        QTextStream in(&inFile);
+		QString revision = in.readLine();
+		QString date = in.readLine();
+		title += " - r" + revision + " built on " + date;
+	}
+	return title;
 }
 
 void MainWindow :: seedEverything()

@@ -32,6 +32,7 @@ class MainWindow : public QMainWindow
 		void dragMoveEvent(QDragMoveEvent* event);
 		void seedEverything();
 		void keyPressEvent(QKeyEvent* e);
+		QString windowTitle();
 
 	signals:
 		void someDataChanged();
