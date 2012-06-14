@@ -1,6 +1,7 @@
 #!/bin/sh
+echo Subversion: `svnversion`
+echo Date: `date +%F`
 (
-  #svnversion
-  head -4 .svn/entries | tail -1
+  svnversion
   date +%F
 ) >version.txt
