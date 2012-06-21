@@ -6,25 +6,11 @@ How to create a standalone executable on Mac OS X:
 1b. rm -r ./virtualglass.app
 1c. `make' 
 
-
 2. Modify the library references to be internal:
 
-`/usr/bin/macdeployqt-4.7 ./virtualglass.app/' 
+`/usr/bin/macdeployqt-4.8 ./virtualglass.app/' 
 
-
-3. Check that the library references are right (optional):
-
-`otool -L ./virtualglass.app/Contents/MacOS/virtualglass' 
-
-
-3. Fix the bug in macdeployqt:
-
-`cp -r  /Library/Frameworks/QtGui.framework/Versions/4/Resources/qt_menu.nib/ ./Resources/qt_menu.nib'
-
-
-
-
-Links:
+Links related to old bug in macdeployqt-4.7 (no longer used):
 
 http://wiki.oz9aec.net/index.php/Packaging_Qt_apps_for_Mac_OS_X
 

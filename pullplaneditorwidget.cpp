@@ -7,11 +7,6 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 	this->plan->setTemplateType(CASED_CIRCLE_PULL_TEMPLATE);
 
 	this->viewWidget = new PullPlanEditorViewWidget(plan, this);	
-    //this->niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);
-    //niceViewWidget->setGeometry(&geometry);
-    //emit geometryChanged(geometry);
-/*	this->pullPlanCustomizeWidget = new PullPlanCustomizeWidget(this->getPlan());
-    this->pullPlanCustomizeWidget->hide();*/
 
 	setupLayout();
 	setupConnections();
@@ -22,8 +17,17 @@ void PullPlanEditorWidget :: updateEverything()
 	static_cast<QCheckBox*>(fillRuleButtonGroup->button(
 		viewWidget->getFillRule()))->setCheckState(Qt::Checked);
 
-	static_cast<QCheckBox*>(shapeButtonGroup->button(
-		plan->getOutermostCasingShape()))->setCheckState(Qt::Checked);
+	switch (plan->getOutermostCasingShape())
+	{
+		case CIRCLE_SHAPE:
+			circleCasingPushButton->setDown(true);
+			squareCasingPushButton->setDown(false);
+			break;
+		case SQUARE_SHAPE:
+			circleCasingPushButton->setDown(false);
+			squareCasingPushButton->setDown(true);
+			break;
+	}
 
 	int twist = plan->getTwist();
 	twistSlider->setSliderPosition(twist);
@@ -50,10 +54,8 @@ void PullPlanEditorWidget :: updateEverything()
 
 	geometry.clear();
 	mesher.generatePullMesh(plan, &geometry);
-//	niceViewWidget->repaint();
-    emit geometryChanged(geometry);
-    emit pullPlanChanged(plan);
-	//geometry.save_raw_file("./cane.raw");
+	emit geometryChanged(geometry);
+	emit pullPlanChanged(plan);
 
 	// Highlight correct pull template
 	for (int i = 0; i < templateLibraryLayout->count(); ++i)
@@ -126,18 +128,16 @@ void PullPlanEditorWidget :: setupLayout()
 
 	QHBoxLayout* pullTemplateShapeLayout = new QHBoxLayout(this);
 	QLabel* casingLabel = new QLabel("Casing:");
-	QCheckBox* circleCheckBox = new QCheckBox("Circle");
-	QCheckBox* squareCheckBox = new QCheckBox("Square");
-	addCasingButton = new QPushButton("Add Casing");
-	removeCasingButton = new QPushButton("Remove Casing");
-	shapeButtonGroup = new QButtonGroup();
-	shapeButtonGroup->addButton(circleCheckBox, 1);
-	shapeButtonGroup->addButton(squareCheckBox, 2);
+	circleCasingPushButton = new QPushButton(QString(QChar(9673))); 
+	squareCasingPushButton = new QPushButton(QString(QChar(9635)));
+	addCasingButton = new QPushButton("+");
+	removeCasingButton = new QPushButton("-");
 	pullTemplateShapeLayout->addWidget(casingLabel);
-	pullTemplateShapeLayout->addWidget(circleCheckBox);
-	pullTemplateShapeLayout->addWidget(squareCheckBox);
+	pullTemplateShapeLayout->addWidget(circleCasingPushButton);
+	pullTemplateShapeLayout->addWidget(squareCasingPushButton);
 	pullTemplateShapeLayout->addWidget(addCasingButton);
 	pullTemplateShapeLayout->addWidget(removeCasingButton);
+	pullTemplateShapeLayout->addStretch(1);
 	editorLayout->addLayout(pullTemplateShapeLayout, 0);
 
 	// Twist slider stuff
@@ -182,27 +182,11 @@ void PullPlanEditorWidget :: setupLayout()
 	}
 	editorLayout->addLayout(paramLayout, 0);	
 
-    /*
-	QHBoxLayout* customizePullTemplateLayout = new QHBoxLayout(this);
-	customizePlanButton = new QPushButton("Manually Customize");
-	customizePullTemplateLayout->addWidget(customizePlanButton);
-	editorLayout->addLayout(customizePullTemplateLayout, 0);
-    */
-
 	// Little description for the editor
 	editorLayout->addStretch(1);
 	QLabel* descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", this);
 	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	editorLayout->addWidget(descriptionLabel, 0);
-
-/*	QVBoxLayout* niceViewLayout = new QVBoxLayout(this);
-	pageLayout->addLayout(niceViewLayout, 1);
-	niceViewLayout->addWidget(niceViewWidget, 10);
-
-	// Little description for the editor
-	QLabel* niceViewDescriptionLabel = new QLabel("3D view of cane.", this);
-	niceViewDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    niceViewLayout->addWidget(niceViewDescriptionLabel, 0);*/
 }
 
 void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
@@ -216,6 +200,18 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
 	}
 }
 
+void PullPlanEditorWidget :: circleCasingButtonPressed()
+{
+	plan->setOutermostCasingShape(CIRCLE_SHAPE);
+	emit someDataChanged(); 
+}
+
+void PullPlanEditorWidget :: squareCasingButtonPressed()
+{
+	plan->setOutermostCasingShape(SQUARE_SHAPE);
+	emit someDataChanged();
+}
+
 void PullPlanEditorWidget :: removeCasingButtonPressed()
 {
 	plan->removeCasing();
@@ -224,7 +220,7 @@ void PullPlanEditorWidget :: removeCasingButtonPressed()
 
 void PullPlanEditorWidget :: addCasingButtonPressed()
 {
-	plan->addCasing(shapeButtonGroup->checkedId());
+	plan->addCasing(plan->getOutermostCasingShape());
 	emit someDataChanged();
 }
 
@@ -236,9 +232,10 @@ void PullPlanEditorWidget :: fillRuleButtonGroupChanged(int)
 void PullPlanEditorWidget :: setupConnections()
 {
 	connect(fillRuleButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(fillRuleButtonGroupChanged(int)));
-	connect(addCasingButton, SIGNAL(pressed()), this, SLOT(addCasingButtonPressed()));
-	connect(removeCasingButton, SIGNAL(pressed()), this, SLOT(removeCasingButtonPressed()));
-	connect(shapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(shapeButtonGroupChanged(int)));
+	connect(circleCasingPushButton, SIGNAL(clicked()), this, SLOT(circleCasingButtonPressed()));
+	connect(squareCasingPushButton, SIGNAL(clicked()), this, SLOT(squareCasingButtonPressed()));
+	connect(addCasingButton, SIGNAL(clicked()), this, SLOT(addCasingButtonPressed()));
+	connect(removeCasingButton, SIGNAL(clicked()), this, SLOT(removeCasingButtonPressed()));
 	connect(twistSlider, SIGNAL(valueChanged(int)), this, SLOT(twistSliderChanged(int)));
 	connect(twistSpin, SIGNAL(valueChanged(int)), this, SLOT(twistSpinChanged(int)));
 
@@ -246,7 +243,6 @@ void PullPlanEditorWidget :: setupConnections()
 	{
 		connect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
 	}
-//	connect(customizePlanButton, SIGNAL(pressed()),this,SLOT(openCustomizeWidget()));
 
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(viewWidgetDataChanged()));
@@ -291,24 +287,6 @@ void PullPlanEditorWidget :: twistSpinChanged(int)
 }
 
 
-void PullPlanEditorWidget :: shapeButtonGroupChanged(int)
-{
-	switch (shapeButtonGroup->checkedId())
-	{
-		case 1:
-			if (plan->getOutermostCasingShape() == CIRCLE_SHAPE)
-				return;
-			plan->setOutermostCasingShape(CIRCLE_SHAPE);
-			emit someDataChanged(); 
-			break;
-		case 2:
-			if (plan->getOutermostCasingShape() == SQUARE_SHAPE)
-				return;
-			plan->setOutermostCasingShape(SQUARE_SHAPE);
-			emit someDataChanged();
-			break;
-	}
-}
 
 void PullPlanEditorWidget :: seedTemplates()
 {

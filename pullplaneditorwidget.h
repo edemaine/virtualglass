@@ -20,26 +20,27 @@ class PullPlanEditorWidget : public QWidget
 	public:
 		PullPlanEditorWidget(QWidget* parent=0);
 		PullPlan* getPlan();
-        void setPlan(PullPlan* p);
+		void setPlan(PullPlan* p);
 		void updateLibraryWidgetPixmaps(AsyncPullPlanLibraryWidget* w);
 		void seedTemplates();
-        void mousePressEvent(QMouseEvent*);
+		void mousePressEvent(QMouseEvent*);
 
 	signals:
 		void someDataChanged();
 		void newPullPlan(PullPlan* p);
-        void geometryChanged(Geometry g);
-        void pullPlanChanged(PullPlan* p);
+		void geometryChanged(Geometry g);
+		void pullPlanChanged(PullPlan* p);
 
 	public slots:
 		void updateEverything();
 
 	private slots:
 		void fillRuleButtonGroupChanged(int);
+		void circleCasingButtonPressed();
+		void squareCasingButtonPressed();
 		void addCasingButtonPressed();
 		void removeCasingButtonPressed();
 		void viewWidgetDataChanged();
-		void shapeButtonGroupChanged(int);
 		void twistSpinChanged(int);
 		void twistSliderChanged(int);
 		void paramSpinChanged(int);
@@ -51,17 +52,17 @@ class PullPlanEditorWidget : public QWidget
 		PullPlan* plan;
 		PullPlanEditorViewWidget* viewWidget;	
 		PullPlanCustomizeWidget* pullPlanCustomizeWidget;
-        //NiceViewWidget* niceViewWidget;
 		QSpinBox* twistSpin;
 		QSlider* twistSlider;
 		vector<QLabel*> paramLabels;
 		vector<QSpinBox*> paramSpins;
                 QButtonGroup* fillRuleButtonGroup;
-                QButtonGroup* shapeButtonGroup;
         	QHBoxLayout* templateLibraryLayout;
 		QPushButton* addCasingButton;
 		QPushButton* removeCasingButton;
 		QPushButton* customizePlanButton;
+		QPushButton* circleCasingPushButton;
+		QPushButton* squareCasingPushButton;
 
 		void setupLayout();
 		void setupConnections();
