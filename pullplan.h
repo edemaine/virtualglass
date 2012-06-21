@@ -68,7 +68,7 @@ class PullPlan
 
 		// Methods
 		void initializeTemplate();
-		void updateSubs();
+        void updateSubs(vector<SubpullTemplate> oldSubs);
 		void pushNewSubpull(vector<SubpullTemplate>* newSubs,
 			int shape, Point location, float diameter, int group);
 };

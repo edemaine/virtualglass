@@ -7,10 +7,11 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 	this->plan->setTemplateType(CASED_CIRCLE_PULL_TEMPLATE);
 
 	this->viewWidget = new PullPlanEditorViewWidget(plan, this);	
-	this->niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);
-	niceViewWidget->setGeometry(&geometry);
-	this->pullPlanCustomizeWidget = new PullPlanCustomizeWidget(this->getPlan());
-	this->pullPlanCustomizeWidget->hide();
+    //this->niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);
+    //niceViewWidget->setGeometry(&geometry);
+    //emit geometryChanged(geometry);
+/*	this->pullPlanCustomizeWidget = new PullPlanCustomizeWidget(this->getPlan());
+    this->pullPlanCustomizeWidget->hide();*/
 
 	setupLayout();
 	setupConnections();
@@ -49,7 +50,9 @@ void PullPlanEditorWidget :: updateEverything()
 
 	geometry.clear();
 	mesher.generatePullMesh(plan, &geometry);
-	niceViewWidget->repaint();
+//	niceViewWidget->repaint();
+    emit geometryChanged(geometry);
+    emit pullPlanChanged(plan);
 	//geometry.save_raw_file("./cane.raw");
 
 	// Highlight correct pull template
@@ -179,10 +182,12 @@ void PullPlanEditorWidget :: setupLayout()
 	}
 	editorLayout->addLayout(paramLayout, 0);	
 
+    /*
 	QHBoxLayout* customizePullTemplateLayout = new QHBoxLayout(this);
 	customizePlanButton = new QPushButton("Manually Customize");
 	customizePullTemplateLayout->addWidget(customizePlanButton);
 	editorLayout->addLayout(customizePullTemplateLayout, 0);
+    */
 
 	// Little description for the editor
 	editorLayout->addStretch(1);
@@ -190,14 +195,14 @@ void PullPlanEditorWidget :: setupLayout()
 	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	editorLayout->addWidget(descriptionLabel, 0);
 
-	QVBoxLayout* niceViewLayout = new QVBoxLayout(this);
+/*	QVBoxLayout* niceViewLayout = new QVBoxLayout(this);
 	pageLayout->addLayout(niceViewLayout, 1);
 	niceViewLayout->addWidget(niceViewWidget, 10);
 
 	// Little description for the editor
 	QLabel* niceViewDescriptionLabel = new QLabel("3D view of cane.", this);
 	niceViewDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	niceViewLayout->addWidget(niceViewDescriptionLabel, 0);
+    niceViewLayout->addWidget(niceViewDescriptionLabel, 0);*/
 }
 
 void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
@@ -241,7 +246,7 @@ void PullPlanEditorWidget :: setupConnections()
 	{
 		connect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
 	}
-	connect(customizePlanButton, SIGNAL(pressed()),this,SLOT(openCustomizeWidget()));
+//	connect(customizePlanButton, SIGNAL(pressed()),this,SLOT(openCustomizeWidget()));
 
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(viewWidgetDataChanged()));

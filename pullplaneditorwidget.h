@@ -20,14 +20,16 @@ class PullPlanEditorWidget : public QWidget
 	public:
 		PullPlanEditorWidget(QWidget* parent=0);
 		PullPlan* getPlan();
-		void setPlan(PullPlan* p);
+        void setPlan(PullPlan* p);
 		void updateLibraryWidgetPixmaps(AsyncPullPlanLibraryWidget* w);
 		void seedTemplates();
-		void mousePressEvent(QMouseEvent*);
+        void mousePressEvent(QMouseEvent*);
 
 	signals:
 		void someDataChanged();
 		void newPullPlan(PullPlan* p);
+        void geometryChanged(Geometry g);
+        void pullPlanChanged(PullPlan* p);
 
 	public slots:
 		void updateEverything();
@@ -49,7 +51,7 @@ class PullPlanEditorWidget : public QWidget
 		PullPlan* plan;
 		PullPlanEditorViewWidget* viewWidget;	
 		PullPlanCustomizeWidget* pullPlanCustomizeWidget;
-		NiceViewWidget* niceViewWidget;
+        //NiceViewWidget* niceViewWidget;
 		QSpinBox* twistSpin;
 		QSlider* twistSlider;
 		vector<QLabel*> paramLabels;

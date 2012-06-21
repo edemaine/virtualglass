@@ -49,7 +49,8 @@ macx {
 # Input
 HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
     pullplancustomizeviewwidget.h \
-    pullplancustomizewidget.h
+    pullplancustomizewidget.h \
+    pullplantabwidget.h
 
 HEADERS += primitives.h constants.h Vector.hpp \ 
 	overlaycolorwidget.h \
@@ -124,6 +125,7 @@ HEADERS += yaml-cpp/src/token.h \
 	yaml-cpp/src/collectionstack.h \
 
 SOURCES += glew/glew.c \
+    pullplantabwidget.cpp
 
 SOURCES += main.cpp \ 
 	pullplancustomizeviewwidget.cpp \

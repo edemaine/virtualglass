@@ -40,20 +40,21 @@ void PullPlanCustomizeWidget :: setupLayout()
 	editorLayout->addLayout(windowControlsLayout, 0);
 }
 
-void PullPlanCustomizeWidget :: mousePressEvent(QMouseEvent* /*event*/)
+/*void PullPlanCustomizeWidget :: mousePressEvent(QMouseEvent* event)
 {
-/*	PullTemplateLibraryWidget* ptlw = dynamic_cast<PullTemplateLibraryWidget*>(childAt(event->pos()));
+    PullTemplateLibraryWidget* ptlw = dynamic_cast<PullTemplateLibraryWidget*>(childAt(event->pos()));
 
 	if (ptlw != NULL)
 		{
 				plan->setTemplateType(ptlw->getPullTemplateType());
 		emit someDataChanged();
-		}*/
-}
+        }
+}*/
 
 void PullPlanCustomizeWidget :: setupConnections()
 {
 	connect(cancelButton, SIGNAL(pressed()), this, SLOT(cancelButtonPressed()));
+    connect(viewWidget, SIGNAL(pullPlanChanged(PullPlan*)), this, SLOT(pullPlanChanged(PullPlan*)));
 /*	connect(fillRuleButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(fillRuleButtonGroupChanged(int)));
 	connect(addCasingButton, SIGNAL(pressed()), this, SLOT(addCasingButtonPressed()));
 		connect(shapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(shapeButtonGroupChanged(int)));
@@ -87,11 +88,16 @@ void PullPlanCustomizeWidget :: openWindow(PullPlan* plan)
 {
 	viewWidget->setPullPlan(plan);
 	viewWidget->setMouseTracking(true);
-	this->show();
+//	this->show();
+}
+
+void PullPlanCustomizeWidget :: pullPlanChanged(PullPlan *p)
+{
+    emit newPullPlan(p);
 }
 
 void PullPlanCustomizeWidget :: cancelButtonPressed()
 {
 	viewWidget->revertAndClose();
-	this->hide();
+//	this->hide();
 }

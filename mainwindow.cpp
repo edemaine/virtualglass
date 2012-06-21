@@ -47,7 +47,7 @@ void MainWindow :: seedEverything()
 	// Load pull template types
 	editorStack->setCurrentIndex(PULLPLAN_MODE);
 	emit someDataChanged();
-	pullPlanEditorWidget->seedTemplates();
+    pullPlanTabWidget->seedTemplates();
 
 	// Load pickup and piece template types
 	editorStack->setCurrentIndex(PIECE_MODE);
@@ -123,7 +123,7 @@ void MainWindow :: deleteCurrentEditingObject()
 			{
 				w = pullPlanLibraryLayout->itemAt(i);
 				PullPlan* p = dynamic_cast<AsyncPullPlanLibraryWidget*>(w->widget())->getPullPlan();
-				if (p == pullPlanEditorWidget->getPlan())
+                if (p == pullPlanTabWidget->getPlan())
 				{
 					// this may be a memory leak, the library widget is never explicitly deleted
 					w = pullPlanLibraryLayout->takeAt(i);
@@ -136,7 +136,7 @@ void MainWindow :: deleteCurrentEditingObject()
 			pullPlanEditorPlanLibraryWidget = dynamic_cast<AsyncPullPlanLibraryWidget*>(
 							  	pullPlanLibraryLayout->itemAt(
 									MIN(pullPlanLibraryLayout->count()-1, i))->widget());
-			pullPlanEditorWidget->setPlan(pullPlanEditorPlanLibraryWidget->getPullPlan());
+            pullPlanTabWidget->setPlan(pullPlanEditorPlanLibraryWidget->getPullPlan());
 			emit someDataChanged();
 			break;
 		}
@@ -195,7 +195,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	{
 		unhighlightAllLibraryWidgets();
 		pullPlanEditorPlanLibraryWidget = plplw;
-		pullPlanEditorWidget->setPlan(plplw->getPullPlan());
+        pullPlanTabWidget->setPlan(plplw->getPullPlan());
 		editorStack->setCurrentIndex(PULLPLAN_MODE);
 		emit someDataChanged();
 	}
@@ -271,8 +271,8 @@ void MainWindow :: setupConnections()
 	connect(colorEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 
 	connect(newPullPlanButton, SIGNAL(pressed()), this, SLOT(newPullPlan()));
-	connect(pullPlanEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
-	connect(pullPlanEditorWidget, SIGNAL(newPullPlan(PullPlan*)), this, SLOT(newPullPlan(PullPlan*)));
+    connect(pullPlanTabWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+    connect(pullPlanTabWidget, SIGNAL(newPullPlan(PullPlan*)), this, SLOT(newPullPlan(PullPlan*)));
 
 	connect(newPieceButton, SIGNAL(pressed()), this, SLOT(newPiece()));
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
@@ -351,7 +351,7 @@ void MainWindow :: setupEditors()
 	editorStack->addWidget(colorEditorWidget);
 
 	setupPullPlanEditor();
-	editorStack->addWidget(pullPlanEditorWidget);
+    editorStack->addWidget(pullPlanTabWidget);
 
 	setupPieceEditor();
 	editorStack->addWidget(pieceEditorWidget);
@@ -386,8 +386,8 @@ void MainWindow :: setupColorEditor()
 void MainWindow :: setupPullPlanEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
-	pullPlanEditorWidget = new PullPlanEditorWidget(editorStack);
-	pullPlanEditorPlanLibraryWidget = new AsyncPullPlanLibraryWidget(pullPlanEditorWidget->getPlan());
+    pullPlanTabWidget = new PullPlanTabWidget(editorStack);
+    pullPlanEditorPlanLibraryWidget = new AsyncPullPlanLibraryWidget(pullPlanTabWidget->getPlan());
 	pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);
 }
 
@@ -443,7 +443,7 @@ void MainWindow :: newPullPlan(PullPlan* newPlan)
 	pullPlanLibraryLayout->addWidget(pullPlanEditorPlanLibraryWidget);
 
 	// Give the new plan to the editor
-	pullPlanEditorWidget->setPlan(newPlan);
+    pullPlanTabWidget->setPlan(newPlan);
 
 	// Load up the right editor
 	editorStack->setCurrentIndex(PULLPLAN_MODE);
@@ -521,7 +521,7 @@ void MainWindow :: updateEverything()
 			colorEditorWidget->updateEverything();
 			break;
 		case PULLPLAN_MODE:
-			pullPlanEditorWidget->updateEverything();
+            pullPlanTabWidget->updateEverything();
 			break;
 		case PIECE_MODE:
 			pieceEditorWidget->updateEverything();
@@ -564,14 +564,14 @@ void MainWindow :: updateLibrary()
 		}
 		case PULLPLAN_MODE:
 		{
-			pullPlanEditorWidget->updateLibraryWidgetPixmaps(pullPlanEditorPlanLibraryWidget);
+            pullPlanTabWidget->updateLibraryWidgetPixmaps(pullPlanEditorPlanLibraryWidget);
 
 			AsyncColorBarLibraryWidget* cblw;
 			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
 				cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
-				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(
+                if (pullPlanTabWidget->getPlan()->hasDependencyOn(
 					cblw->getPullPlan()->getOutermostCasingColor()))
 					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
 			}
@@ -581,9 +581,9 @@ void MainWindow :: updateLibrary()
 			{
 				pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
 						dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
-				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(pplw->getPullPlan()))
+                if (pullPlanTabWidget->getPlan()->hasDependencyOn(pplw->getPullPlan()))
 						highlightLibraryWidget(pplw, IS_USED_BY_DEPENDANCY);
-				else if (pplw->getPullPlan()->hasDependencyOn(pullPlanEditorWidget->getPlan()))
+                else if (pplw->getPullPlan()->hasDependencyOn(pullPlanTabWidget->getPlan()))
 						highlightLibraryWidget(pplw, USES_DEPENDANCY);
 			}
 
@@ -592,7 +592,7 @@ void MainWindow :: updateLibrary()
 			{
 				plw = dynamic_cast<AsyncPieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
-				if (plw->getPiece()->hasDependencyOn(pullPlanEditorWidget->getPlan()))
+                if (plw->getPiece()->hasDependencyOn(pullPlanTabWidget->getPlan()))
 					highlightLibraryWidget(plw, USES_DEPENDANCY);
 			}
 

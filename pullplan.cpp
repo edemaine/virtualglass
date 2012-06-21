@@ -39,7 +39,8 @@ PullPlan* PullPlan :: copy() const {
 
 	assert(c->parameterValues.size() == this->parameterValues.size());
 	c->parameterValues = this->parameterValues;
-	c->updateSubs();
+    vector<SubpullTemplate> oldSubs = this->subs;
+    c->updateSubs(oldSubs);
 
 	assert(c->subs.size() == this->subs.size());
 	for (unsigned int i = 0; i < this->subs.size(); ++i) {
@@ -189,8 +190,9 @@ void PullPlan :: setTemplateType(int templateType) {
 			break;
 	}
 
+    vector<SubpullTemplate> oldSubs = subs;
 	subs.clear(); // don't carry over any of the current stuff
-	updateSubs();
+    updateSubs(oldSubs);
 }
 
 void PullPlan :: setCasingColor(Color* c, unsigned int index) {
@@ -239,7 +241,8 @@ int PullPlan :: getTemplateType() {
 
 void PullPlan :: setParameter(int p, int v) {
 	parameterValues[p] = v;
-	updateSubs();
+    vector<SubpullTemplate> oldSubs = this->subs;
+    updateSubs(oldSubs);
 }
 
 int PullPlan :: getParameter(int p) {
@@ -269,7 +272,8 @@ void PullPlan :: removeCasing() {
 		casings[i].thickness += diff;
 	}
 
-	updateSubs();
+    vector<SubpullTemplate> oldSubs = this->subs;
+    updateSubs(oldSubs);
 }
 
 
@@ -300,7 +304,8 @@ void PullPlan :: addCasing(int shape) {
 	if (hasSquareCasing())
 		this->twist = 0.0;
 
-	updateSubs();
+    vector<SubpullTemplate> oldSubs = this->subs;
+    updateSubs(oldSubs);
 }
 
 void PullPlan :: setCasingThickness(float t, unsigned int index) {
@@ -310,8 +315,9 @@ void PullPlan :: setCasingThickness(float t, unsigned int index) {
 	// to valid relative sizes.
 	if (index >= this->casings.size())
 		return;
-	this->casings[index].thickness = t;
-	updateSubs();
+    this->casings[index].thickness = t;
+    vector<SubpullTemplate> oldSubs = this->subs;
+    updateSubs(oldSubs);
 }
 
 void PullPlan :: setOutermostCasingShape(int newShape) {
@@ -337,7 +343,8 @@ void PullPlan :: setOutermostCasingShape(int newShape) {
 	if (hasSquareCasing())
 		this->twist = 0.0;
 
-	updateSubs();
+    vector<SubpullTemplate> oldSubs = this->subs;
+    updateSubs(oldSubs);
 }
 
 float PullPlan :: getCasingThickness(unsigned int index) {
@@ -397,7 +404,7 @@ a template parameter specifying the number of subcanes in a row changes
 the size and location of subplans, as well as increasing or decreasing
 the number of subplans.
 */
-void PullPlan :: updateSubs()
+void PullPlan :: updateSubs(vector<SubpullTemplate> oldSubs)
 {
 	Point p = make_vector(0.0f, 0.0f, 0.0f);
 	assert(!casings.empty());
@@ -558,6 +565,14 @@ void PullPlan :: updateSubs()
 			}
 			break;
 		}
+        case CUSTOM_CIRCLE_PULL_TEMPLATE:
+        case CUSTOM_SQUARE_PULL_TEMPLATE:
+        {
+            for (unsigned int i = 0; i < oldSubs.size(); i++)
+            {
+                pushNewSubpull(&newSubs, oldSubs[i].shape, oldSubs[i].location, oldSubs[i].diameter, oldSubs[i].group);
+            }
+        }
 	}
 
 	subs = newSubs;

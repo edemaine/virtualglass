@@ -14,7 +14,7 @@ class PullPlanCustomizeWidget : public QWidget
 		PullPlanCustomizeWidget(PullPlan* plan, QWidget* parent=0);
 //		PullPlan* getPlan();
 		void setPullPlan(PullPlan* p);
-		void mousePressEvent(QMouseEvent*);
+//		void mousePressEvent(QMouseEvent*);
 		void openWindow(PullPlan* plan);
 
 	signals:
@@ -23,7 +23,8 @@ class PullPlanCustomizeWidget : public QWidget
 
 	public slots:
 //		void updateEverything();
-		void cancelButtonPressed();
+        void cancelButtonPressed();
+        void pullPlanChanged(PullPlan* p);
 
 	private slots:
 //		void viewWidgetDataChanged();

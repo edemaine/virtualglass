@@ -16,6 +16,7 @@
 #include "pickupplan.h"
 #include "piece.h"
 #include "pullplaneditorwidget.h"
+#include "pullplantabwidget.h"
 #include "coloreditorwidget.h"
 #include "pieceeditorwidget.h"
 #include "qgraphicshighlighteffect.h"
@@ -77,8 +78,9 @@ class MainWindow : public QMainWindow
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
 		ColorEditorWidget* colorEditorWidget;
-		PullPlanEditorWidget* pullPlanEditorWidget;
-		PieceEditorWidget* pieceEditorWidget;
+//		PullPlanEditorWidget* pullPlanEditorWidget;
+        PullPlanTabWidget* pullPlanTabWidget;
+        PieceEditorWidget* pieceEditorWidget;
 		QPushButton* newColorBarButton;
 		QPushButton* newPullPlanButton;
 		QPushButton* newPieceButton;

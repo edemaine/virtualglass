@@ -16,6 +16,7 @@ public:
 
 signals:
 	void someDataChanged();
+    void pullPlanChanged(PullPlan* p);
 
 protected:
 	void dragEnterEvent(QDragEnterEvent* dee);
@@ -23,18 +24,28 @@ protected:
 	void dragMoveEvent(QDragMoveEvent* dme);
 	void paintEvent(QPaintEvent *event);
 	void mouseMoveEvent(QMouseEvent* event);
+    void mousePressEvent(QMouseEvent* event);
+    void mouseReleaseEvent(QMouseEvent* event);
 
 private:
 	void drawSubplan(float x, float y, float width, float height, PullPlan* plan,
 		int mandatedShape, int borderLevels, QPainter* painter);
 	bool isValidMovePosition(QMouseEvent* event);
+    void boundActiveBox();
 	PullPlan* plan;
-	PullPlan* hoveringPlan;
-	int hoveringIndex;
+    PullPlan* hoveringPlan;
+    int hoveringIndex;
+    int activeBoxIndex;
 	PullPlan* tempCirclePlan;
 	PullPlan* tempSquarePlan;
     QPoint* mouseStartingLoc;
     vector<unsigned int> subplansSelected;
+    int activeBox_xmin;
+    int activeBox_ymin;
+    int activeBox_xmax;
+    int activeBox_ymax;
+
+    static const int BOUNDING_BOX_SPACE = 5;
 
 };
 
