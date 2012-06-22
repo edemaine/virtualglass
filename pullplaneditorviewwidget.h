@@ -21,6 +21,7 @@ class PullPlanEditorViewWidget : public QWidget
 		void mousePressEvent(QMouseEvent* event);
 		void mouseMoveEvent(QMouseEvent* event);
 		void mouseReleaseEvent(QMouseEvent* event);
+		void resizeEvent(QResizeEvent* event);
 	
 	signals:
 		void someDataChanged();
@@ -33,6 +34,10 @@ class PullPlanEditorViewWidget : public QWidget
 		void paintEvent(QPaintEvent *event);
 
 	private:
+		float adjustedX(float rawX);
+		float adjustedY(float rawX);
+		float rawX(float adjustedX);
+		float rawY(float adjustedY);
 		void setBoundaryPainter(QPainter* painter, int drawWidth, int drawHeight, 
 			int borderLevels);
 		void drawSubplan(float x, float y, float width, float height, PullPlan* plan, 
@@ -47,6 +52,7 @@ class PullPlanEditorViewWidget : public QWidget
 		bool casingHighlighted;
 		unsigned int casingHighlightIndex;
 		vector<unsigned int> subplansHighlighted; 
+		float ulX, ulY, squareSize;
 };
 
 

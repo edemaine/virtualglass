@@ -12,6 +12,27 @@ PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* pa
 	casingHighlighted = false;
 }
 
+void PullPlanEditorViewWidget :: resizeEvent(QResizeEvent* event)
+{
+	int width, height;
+
+	width = event->size().width();
+	height = event->size().height();
+
+	if (width > height) // wider than tall 
+	{
+		ulX = (width - height)/2.0;
+		ulY = 0;
+		squareSize = height; 
+	}
+	else  
+	{
+		ulX = 0;
+		ulY = (height - width)/2.0;
+		squareSize = width; 
+	}
+}
+
 int PullPlanEditorViewWidget :: getFillRule()
 {
 	return fill_rule;
@@ -22,10 +43,30 @@ void PullPlanEditorViewWidget :: setFillRule(int r)
 	fill_rule = r;
 }
 
+float PullPlanEditorViewWidget :: adjustedX(float rawX)
+{
+	return rawX - ulX;
+}
+
+float PullPlanEditorViewWidget :: adjustedY(float rawY)
+{
+	return rawY - ulY;
+}
+
+float PullPlanEditorViewWidget :: rawX(float adjustedX)
+{
+	return adjustedX + ulX;
+}
+
+float PullPlanEditorViewWidget :: rawY(float adjustedY)
+{
+	return adjustedY + ulY;
+}
+
 void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 {
-	float x = (event->pos().x() - width()/2) / float(width()/2-10);
-	float y = (event->pos().y() - height()/2) / float(width()/2-10);
+	float x = (adjustedX(event->pos().x()) - squareSize/2) / float(squareSize/2-10);
+	float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
 	float radius = sqrt(x * x + y * y); 
 
 	for (unsigned int i = 0; i < plan->getCasingCount() - 1; ++i) {
@@ -52,9 +93,9 @@ void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 {
 	if (isDraggingCasing)
 	{
-		float x = (event->pos().x() - width()/2);
-		float y = (event->pos().y() - height()/2);
-		float radius = sqrt(x * x + y * y) / (width()/2 - 10); 
+		float x = (adjustedX(event->pos().x()) - squareSize/2);
+		float y = (adjustedY(event->pos().y()) - squareSize/2);
+		float radius = sqrt(x * x + y * y) / (squareSize/2 - 10); 
 
 		float min;
 		float max;
@@ -113,10 +154,10 @@ void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 	subplansHighlighted.clear();
 	casingHighlighted = false;
 
-	populateHighlightedSubplans(event->pos().x(), event->pos().y(), draggedPlan, type);
+	populateHighlightedSubplans(adjustedX(event->pos().x()), adjustedY(event->pos().y()), draggedPlan, type);
 	if (subplansHighlighted.size() == 0) // anything highlighted must be casing from a color bar
 	{
-		populateHighlightedCasings(event->pos().x(), event->pos().y(), type);
+		populateHighlightedCasings(adjustedX(event->pos().x()), adjustedY(event->pos().y()), type);
 		draggingColor = *(draggedPlan->getOutermostCasingColor());
 	}
 	else
@@ -139,7 +180,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	int type;
 	sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &droppedPlan, &type);
 
-	populateHighlightedSubplans(event->pos().x(), event->pos().y(), droppedPlan, type);
+	populateHighlightedSubplans(adjustedX(event->pos().x()), adjustedX(event->pos().y()), droppedPlan, type);
 	if (subplansHighlighted.size() > 0)
 	{
 		event->accept();
@@ -150,7 +191,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	}
 	else
 	{
-		populateHighlightedCasings(event->pos().x(), event->pos().y(), type);
+		populateHighlightedCasings(adjustedX(event->pos().x()), adjustedX(event->pos().y()), type);
 		if (casingHighlighted)
 		{
 			event->accept();
@@ -178,7 +219,7 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, PullP
 	if (droppedPlan->hasDependencyOn(plan)) // don't allow circular DAGs
 		return;
 
-	int drawSize = width() - 20;
+	int drawSize = squareSize - 20;
 	// check to see if the drop was in a subpull
 	for (unsigned int i = 0; i < plan->subs.size(); ++i)
 	{
@@ -280,7 +321,7 @@ void PullPlanEditorViewWidget :: populateHighlightedCasings(int x, int y, int ty
 		return; 
 
 	// Deal w/casing
-	float drawSize = (width() - 20);
+	float drawSize = (squareSize - 20);
 	float distanceFromCenter;
 	for (unsigned int i = 1; i < plan->getCasingCount(); ++i) {
 		switch (plan->getCasingShape(i)) {
@@ -295,7 +336,7 @@ void PullPlanEditorViewWidget :: populateHighlightedCasings(int x, int y, int ty
 				}
 				break;
 			case SQUARE_SHAPE:
-				if (MAX(fabs(x - width()/2.0), fabs(y - height()/2.0)) < drawSize/2 * plan->getCasingThickness(i))
+				if (MAX(fabs(x - squareSize/2.0), fabs(y - squareSize/2.0)) < drawSize/2 * plan->getCasingThickness(i))
 				{
 					casingHighlighted = true;
 					casingHighlightIndex = i;
@@ -347,10 +388,10 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	switch (mandatedShape)
 	{
 		case CIRCLE_SHAPE:
-			painter->drawEllipse(x, y, drawWidth, drawHeight);
+			painter->drawEllipse(rawX(x), rawY(y), drawWidth, drawHeight);
 			break;
 		case SQUARE_SHAPE:
-			painter->drawRect(x, y, drawWidth, drawHeight);
+			painter->drawRect(rawX(x), rawY(y), drawWidth, drawHeight);
 			break;
 	}
 
@@ -364,10 +405,10 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		switch (mandatedShape)
 		{
 			case CIRCLE_SHAPE:
-				painter->drawEllipse(x, y, drawWidth, drawHeight);
+				painter->drawEllipse(rawX(x), rawY(y), drawWidth, drawHeight);
 				break;
 			case SQUARE_SHAPE:
-				painter->drawRect(x, y, drawWidth, drawHeight);
+				painter->drawRect(rawX(x), rawY(y), drawWidth, drawHeight);
 				break;
 		}
 	}
@@ -382,10 +423,10 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 			255*plan->getOutermostCasingColor()->b, 255*plan->getOutermostCasingColor()->a));
 	switch (mandatedShape) {
 		case CIRCLE_SHAPE:
-			painter->drawEllipse(x, y, drawWidth, drawHeight);
+			painter->drawEllipse(rawX(x), rawY(y), drawWidth, drawHeight);
 			break;
 		case SQUARE_SHAPE:
-			painter->drawRect(x, y, drawWidth, drawHeight);
+			painter->drawRect(rawX(x), rawY(y), drawWidth, drawHeight);
 			break;
 	}
 
@@ -415,20 +456,20 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		switch (plan->getCasingShape(i))
 		{
 			case CIRCLE_SHAPE:
-				painter->drawEllipse(casingX, casingY, casingWidth, casingHeight);
+				painter->drawEllipse(rawX(casingX), rawY(casingY), casingWidth, casingHeight);
 				if (highlighted)
 					break;
 				painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g, 
 					255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
-				painter->drawEllipse(casingX, casingY, casingWidth, casingHeight);
+				painter->drawEllipse(rawX(casingX), rawY(casingY), casingWidth, casingHeight);
 				break;
 			case SQUARE_SHAPE:
-				painter->drawRect(casingX, casingY, casingWidth, casingHeight);
+				painter->drawRect(rawX(casingX), rawY(casingY), casingWidth, casingHeight);
 				if (highlighted)
 					break;
 				painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g, 
 					255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
-				painter->drawRect(casingX, casingY, casingWidth, casingHeight);
+				painter->drawRect(rawX(casingX), rawY(casingY), casingWidth, casingHeight);
 				break;
 		}
 	}
@@ -472,7 +513,7 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 	painter.begin(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 	painter.fillRect(event->rect(), QColor(200, 200, 200));
-	drawSubplan(10, 10, width() - 20, height() - 20, plan, casingHighlighted, 
+	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan, casingHighlighted, 
 		plan->getOutermostCasingShape(), 2, &painter);
 	painter.end();
 }
