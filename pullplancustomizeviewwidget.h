@@ -26,8 +26,13 @@ protected:
 	void mouseMoveEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
+	void resizeEvent(QResizeEvent* event);
 
 private:
+	float adjustedX(float rawX);
+	float adjustedY(float rawX);
+	float rawX(float adjustedX);
+	float rawY(float adjustedY);
 	void drawSubplan(float x, float y, float width, float height, PullPlan* plan,
 		int mandatedShape, int borderLevels, QPainter* painter);
 	bool isValidMovePosition(QMouseEvent* event);
@@ -44,6 +49,7 @@ private:
     int activeBox_ymin;
     int activeBox_xmax;
     int activeBox_ymax;
+	float ulX, ulY, squareSize;
 
     static const int BOUNDING_BOX_SPACE = 5;
 

@@ -20,6 +20,47 @@ PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget
     this->setMouseTracking(true);
 }
 
+void PullPlanCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
+{
+        int width, height;
+
+        width = event->size().width();
+        height = event->size().height();
+
+        if (width > height) // wider than tall 
+        {
+                ulX = (width - height)/2.0;
+                ulY = 0;
+                squareSize = height;
+        }
+        else
+        {
+                ulX = 0;
+                ulY = (height - width)/2.0;
+                squareSize = width;
+        }
+}
+
+float PullPlanCustomizeViewWidget :: adjustedX(float rawX)
+{
+        return rawX - ulX;
+}
+
+float PullPlanCustomizeViewWidget :: adjustedY(float rawY)
+{
+        return rawY - ulY;
+}
+
+float PullPlanCustomizeViewWidget :: rawX(float adjustedX)
+{
+        return adjustedX + ulX;
+}
+
+float PullPlanCustomizeViewWidget :: rawY(float adjustedY)
+{
+        return adjustedY + ulY;
+}
+
 void PullPlanCustomizeViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 {
 	event->acceptProposedAction();
@@ -34,11 +75,11 @@ void PullPlanCustomizeViewWidget :: dropEvent(QDropEvent*)
 
 void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 {
-    int drawSize = width() - 20;
-    if (event->pos().x() < activeBox_xmin - 2*BOUNDING_BOX_SPACE ||
-            event->pos().y() < activeBox_ymin - 2*BOUNDING_BOX_SPACE ||
-            event->pos().x() > activeBox_xmax + 2*BOUNDING_BOX_SPACE ||
-            event->pos().y() > activeBox_ymax + 2*BOUNDING_BOX_SPACE )
+    int drawSize = squareSize - 20;
+    if (adjustedX(event->pos().x()) < activeBox_xmin - 2*BOUNDING_BOX_SPACE ||
+            adjustedY(event->pos().y()) < activeBox_ymin - 2*BOUNDING_BOX_SPACE ||
+            adjustedX(event->pos().x()) > activeBox_xmax + 2*BOUNDING_BOX_SPACE ||
+            adjustedY(event->pos().y()) > activeBox_ymax + 2*BOUNDING_BOX_SPACE )
     {
         activeBoxIndex = -1;
     }
@@ -49,8 +90,8 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
     if (activeBoxIndex != -1 && activeBoxIndex != INT_MAX)
     {
         SubpullTemplate* subpull = &(plan->subs[activeBoxIndex]);
-        float dx = fabs(event->pos().x() - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
-        float dy = fabs(event->pos().y() - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
+        float dx = fabs(adjustedX(event->pos().x()) - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
+        float dy = fabs(adjustedY(event->pos().y()) - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
         if (MAX(dx, dy) >= (subpull->diameter/2.0)*drawSize/2 + BOUNDING_BOX_SPACE)
         {
             activeBoxIndex = INT_MAX;
@@ -61,8 +102,8 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
         for (unsigned int i = 0; i < subplansSelected.size(); i++)
         {
             SubpullTemplate* subpull = &(plan->subs[subplansSelected[i]]);
-            float dx = fabs(event->pos().x() - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
-            float dy = fabs(event->pos().y() - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
+            float dx = fabs(adjustedX(event->pos().x()) - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
+            float dy = fabs(adjustedY(event->pos().y()) - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
             if (MAX(dx, dy) >= (subpull->diameter/2.0)*drawSize/2 + BOUNDING_BOX_SPACE)
             {
                 activeBoxIndex = subplansSelected[i];
@@ -76,8 +117,8 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 
         // Determine if drop hit the subplan
         //bool hit = false;
-        float dx = fabs(event->pos().x() - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
-        float dy = fabs(event->pos().y() - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
+        float dx = fabs(adjustedX(event->pos().x()) - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
+        float dy = fabs(adjustedY(event->pos().y()) - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
         switch (subpull->shape)
         {
             case CIRCLE_SHAPE:
@@ -162,8 +203,8 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 		{
             for (unsigned int i = 0; i < subplansSelected.size(); i++)
             {
-                plan->subs[subplansSelected[i]].location.x += (event->pos().x() - mouseStartingLoc->x())/(width()/2.0 - 10);
-                plan->subs[subplansSelected[i]].location.y += (event->pos().y() - mouseStartingLoc->y())/(width()/2.0 - 10);
+                plan->subs[subplansSelected[i]].location.x += (event->pos().x() - mouseStartingLoc->x())/(squareSize/2.0 - 10);
+                plan->subs[subplansSelected[i]].location.y += (event->pos().y() - mouseStartingLoc->y())/(squareSize/2.0 - 10);
             }
 //            plan->subs[hoveringIndex].location.x += (event->pos().x() - mouseStartingLoc->x())/(width()/2.0 - 10);
 //            plan->subs[hoveringIndex].location.y += (event->pos().y() - mouseStartingLoc->y())/(width()/2.0 - 10);
@@ -291,8 +332,8 @@ void PullPlanCustomizeViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 		mouseStartingLoc->setX(event->pos().x());
 		mouseStartingLoc->setY(event->pos().y());
 	}
-    plan->subs[hoveringIndex].location.x += (event->pos().x() - mouseStartingLoc->x())/(width()/2.0 - 10);
-    plan->subs[hoveringIndex].location.y += (event->pos().y() - mouseStartingLoc->y())/(width()/2.0 - 10);
+    plan->subs[hoveringIndex].location.x += (event->pos().x() - mouseStartingLoc->x())/(squareSize/2.0 - 10);
+    plan->subs[hoveringIndex].location.y += (event->pos().y() - mouseStartingLoc->y())/(squareSize/2.0 - 10);
     mouseStartingLoc->setX(event->pos().x());
     mouseStartingLoc->setY(event->pos().y());
     this->update();
@@ -329,7 +370,7 @@ void PullPlanCustomizeViewWidget :: boundActiveBox()
     activeBox_ymin = INT_MAX;
     activeBox_xmax = INT_MIN;
     activeBox_ymax = INT_MIN;
-    int drawSize = width() - 20;
+    int drawSize = squareSize - 20;
     for (unsigned int i = 0; i < subplansSelected.size(); i++)
     {
         SubpullTemplate* subpull = &(plan->subs[subplansSelected[i]]);
@@ -355,10 +396,10 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 	switch (mandatedShape)
 	{
 		case CIRCLE_SHAPE:
-			painter->drawEllipse(x, y, drawWidth, drawHeight);
+			painter->drawEllipse(rawX(x), rawY(y), drawWidth, drawHeight);
 			break;
 		case SQUARE_SHAPE:
-			painter->drawRect(x, y, drawWidth, drawHeight);
+			painter->drawRect(rawX(x), rawY(y), drawWidth, drawHeight);
 			break;
 	}
 
@@ -373,10 +414,10 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 		switch (mandatedShape)
 		{
 			case CIRCLE_SHAPE:
-				painter->drawEllipse(x, y, drawWidth, drawHeight);
+				painter->drawEllipse(rawX(x), rawY(y), drawWidth, drawHeight);
 				break;
 			case SQUARE_SHAPE:
-				painter->drawRect(x, y, drawWidth, drawHeight);
+				painter->drawRect(rawX(x), rawY(y), drawWidth, drawHeight);
 				break;
 		}
 	}
@@ -407,10 +448,10 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 	switch (mandatedShape)
 	{
 		case CIRCLE_SHAPE:
-			painter->drawEllipse(x, y, drawWidth, drawHeight);
+			painter->drawEllipse(rawX(x), rawY(y), drawWidth, drawHeight);
 			break;
 		case SQUARE_SHAPE:
-			painter->drawRect(x, y, drawWidth, drawHeight);
+			painter->drawRect(rawX(x), rawY(y), drawWidth, drawHeight);
 			break;
 	}
 
@@ -438,7 +479,7 @@ void PullPlanCustomizeViewWidget :: paintEvent(QPaintEvent *event)
 	painter.begin(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 	painter.fillRect(event->rect(), QColor(200, 200, 200));
-	drawSubplan(10, 10, width() - 20, height() - 20, plan, plan->getCasingShape(0), 2, &painter);
+	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan, plan->getCasingShape(0), 2, &painter);
 	painter.end();
 }
 

@@ -21,7 +21,6 @@ class PullPlanEditorViewWidget : public QWidget
 		void mousePressEvent(QMouseEvent* event);
 		void mouseMoveEvent(QMouseEvent* event);
 		void mouseReleaseEvent(QMouseEvent* event);
-		void resizeEvent(QResizeEvent* event);
 	
 	signals:
 		void someDataChanged();
@@ -32,6 +31,7 @@ class PullPlanEditorViewWidget : public QWidget
 		void dragEnterEvent(QDragEnterEvent* dee);
 		void dragMoveEvent(QDragMoveEvent* dme);
 		void paintEvent(QPaintEvent *event);
+		void resizeEvent(QResizeEvent* event);
 
 	private:
 		float adjustedX(float rawX);
