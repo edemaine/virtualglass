@@ -15,7 +15,14 @@ PullPlanTabWidget::PullPlanTabWidget(QWidget* parent) : QWidget(parent)
     pullPlanTabs->setCurrentWidget(pullPlanEditor);
 
     QHBoxLayout* pageLayout = new QHBoxLayout(this);
-    pageLayout->addWidget(pullPlanTabs, 1);
+
+    QVBoxLayout* editorLayout = new QVBoxLayout(this);
+    pageLayout->addLayout(editorLayout, 1);
+    editorLayout->addWidget(pullPlanTabs, 1);
+
+    QLabel* descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", this);
+    descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    editorLayout->addWidget(descriptionLabel, 0);
 
     QVBoxLayout* niceViewLayout = new QVBoxLayout(this);
     pageLayout->addLayout(niceViewLayout, 1);
