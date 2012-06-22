@@ -180,7 +180,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	int type;
 	sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &droppedPlan, &type);
 
-	populateHighlightedSubplans(adjustedX(event->pos().x()), adjustedX(event->pos().y()), droppedPlan, type);
+	populateHighlightedSubplans(adjustedX(event->pos().x()), adjustedY(event->pos().y()), droppedPlan, type);
 	if (subplansHighlighted.size() > 0)
 	{
 		event->accept();
@@ -191,7 +191,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	}
 	else
 	{
-		populateHighlightedCasings(adjustedX(event->pos().x()), adjustedX(event->pos().y()), type);
+		populateHighlightedCasings(adjustedX(event->pos().x()), adjustedY(event->pos().y()), type);
 		if (casingHighlighted)
 		{
 			event->accept();
