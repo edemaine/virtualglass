@@ -23,7 +23,6 @@ void gl_errors(string const &where) {
 NiceViewWidget :: NiceViewWidget(int cameraMode, QWidget *parent) : QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent), peelRenderer(NULL)
 {
 	leftMouseDown = false;
-	setMinimumWidth(200);
 	bgColor = QColor(200, 200, 200);
 	geometry = NULL;
 	this->cameraMode = cameraMode;
@@ -33,7 +32,7 @@ NiceViewWidget :: NiceViewWidget(int cameraMode, QWidget *parent) : QGLWidget(QG
 		case PULLPLAN_MODE:
 			theta = -PI/2.0;
 			phi = PI/2;
-			rho = 11.0;
+			rho = 11.0; 
 			lookAtLoc[0] = 0.0;
 			lookAtLoc[1] = 0.0;
 			lookAtLoc[2] = 5.0;
@@ -41,7 +40,7 @@ NiceViewWidget :: NiceViewWidget(int cameraMode, QWidget *parent) : QGLWidget(QG
 		case PICKUPPLAN_MODE:
 			theta = -PI/2.0;
 			phi = PI/2;
-			rho = 11.5;
+			// rho set in resizeGL() b/c it depends on window size 
 			lookAtLoc[0] = 0.0;
 			lookAtLoc[1] = 0.0;
 			lookAtLoc[2] = 0.0;
@@ -49,7 +48,7 @@ NiceViewWidget :: NiceViewWidget(int cameraMode, QWidget *parent) : QGLWidget(QG
 		case PIECE_MODE:
 			theta = -PI/2.0;
 			phi = PI/2;
-			rho = 16.0;
+			rho = 16.0; 
 			lookAtLoc[0] = 0.0;
 			lookAtLoc[1] = 0.0;
 			lookAtLoc[2] = 0.0;
@@ -198,6 +197,16 @@ Calls if the NiceViewWidget object is resized (in the GUI sense).
 */
 void NiceViewWidget :: resizeGL(int width, int height)
 {
+	if (this->cameraMode == PICKUPPLAN_MODE)
+	{
+		rho = 11.5;	
+		if (width < height)
+		{
+			rho *= height;
+			rho /= width;
+		}
+	}
+
 	glViewport(0, 0, width, height);
 	if (this->width() != width || this->height() != height) {
 		std::cerr << "resizeGL(" << width << ", " << height << ") called while this->width,height are (" << this->width() << ", " << this->height() << "). This may mess up aspect ratio." << std::endl;

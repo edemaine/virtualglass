@@ -20,6 +20,7 @@ class PickupPlanEditorViewWidget : public QWidget
 		QPixmap getPixmap();
 		void setFillRule(int r);
 		int getFillRule();
+                void resizeEvent(QResizeEvent* event);
 	
 	signals:
 		void someDataChanged();
@@ -27,7 +28,6 @@ class PickupPlanEditorViewWidget : public QWidget
 	protected:
 		void dragEnterEvent(QDragEnterEvent* dee);
 		void dropEvent(QDropEvent* de);
-		void paintEvent(QPaintEvent *event);
 
 	private:
 		Mesher mesher;
@@ -35,6 +35,13 @@ class PickupPlanEditorViewWidget : public QWidget
 		NiceViewWidget* niceViewWidget;
 		PickupPlan* pickup;
 		int fillRule;
+
+                float adjustedX(float rawX);
+                float adjustedY(float rawX);
+                float rawX(float adjustedX);
+                float rawY(float adjustedY);
+                float ulX, ulY, squareSize;
+
 };
 
 

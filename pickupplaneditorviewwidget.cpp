@@ -15,7 +15,48 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWi
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	this->setLayout(layout);
 	layout->setContentsMargins(0, 0, 0, 0);
-	layout->addWidget(niceViewWidget);
+	layout->addWidget(niceViewWidget, 1);
+}
+
+void PickupPlanEditorViewWidget :: resizeEvent(QResizeEvent* event)
+{
+        int width, height;
+
+        width = event->size().width();
+        height = event->size().height();
+
+        if (width > height) // wider than tall 
+        {
+                ulX = (width - height)/2.0;
+                ulY = 0;
+                squareSize = height;
+        }
+        else
+        {
+                ulX = 0;
+                ulY = (height - width)/2.0;
+                squareSize = width;
+        }
+}
+
+float PickupPlanEditorViewWidget :: adjustedX(float rawX)
+{
+        return rawX - ulX;
+}
+
+float PickupPlanEditorViewWidget :: adjustedY(float rawY)
+{
+        return rawY - ulY;
+}
+
+float PickupPlanEditorViewWidget :: rawX(float adjustedX)
+{
+        return adjustedX + ulX;
+}
+
+float PickupPlanEditorViewWidget :: rawY(float adjustedY)
+{
+        return adjustedY + ulY;
 }
 
 int PickupPlanEditorViewWidget :: getFillRule()
@@ -85,14 +126,14 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		}	
 
 		// Scale to pixels
-		ll.x = ll.x * (width() - 20)/2 + (width() - 20)/2 + 10;  
-		ll.y = ll.y * (height() - 20)/2 + (height() - 20)/2 + 10;  
-		ur.x = ur.x * (width() - 20)/2 + (width() - 20)/2 + 10;  
-		ur.y = ur.y * (height() - 20)/2 + (height() - 20)/2 + 10;  
+		ll.x = ll.x * (squareSize - 20)/2 + (squareSize - 20)/2 + 10;  
+		ll.y = ll.y * (squareSize - 20)/2 + (squareSize - 20)/2 + 10;  
+		ur.x = ur.x * (squareSize - 20)/2 + (squareSize - 20)/2 + 10;  
+		ur.y = ur.y * (squareSize - 20)/2 + (squareSize - 20)/2 + 10;  
 
 		// Need to invert event location, since upper left/lower left origins exist	
-                if (ll.x < event->pos().x() && event->pos().x() < ur.x
-                        && ll.y < (height() - event->pos().y()) && (height() - event->pos().y()) < ur.y)
+                if (ll.x < adjustedX(event->pos().x()) && adjustedX(event->pos().x()) < ur.x
+                        && ll.y < (squareSize - adjustedY(event->pos().y())) && (squareSize - adjustedY(event->pos().y())) < ur.y)
 		{
 			if (hitIndex == -1)
 			{
@@ -177,74 +218,4 @@ void PickupPlanEditorViewWidget :: setPickup(PickupPlan* pickup)
 	mesher.generateMesh(pickup, &geometry);
 	this->niceViewWidget->repaint();
 }
-
-void PickupPlanEditorViewWidget :: paintEvent(QPaintEvent * /*event*/)
-{
-	this->niceViewWidget->repaint();
-
-	QPainter painter;
-	painter.begin(this->niceViewWidget);
-        painter.setRenderHint(QPainter::Antialiasing);
-
-	QPen pen;
-	pen.setColor(Qt::black);
-	pen.setWidth(3);
-	painter.setPen(pen);
-	
-	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
-	{
-		if (pickup->subs[i].plan->isBase())
-		{
-			Color* c = pickup->subs[i].plan->getCasingColor(0);
-			painter.setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
-			pen.setStyle(Qt::NoPen);
-		}
-		else
-		{
-			painter.setBrush(Qt::NoBrush);
-			pen.setColor(Qt::white);
-			pen.setStyle(Qt::DotLine);
-		}
-		painter.setPen(pen);
-
-		SubpickupTemplate* sp = &(pickup->subs[i]);
-                Point ll;
-		float rWidth, rHeight;
-                switch (sp->orientation)
-                {
-                        case HORIZONTAL_ORIENTATION:
-                                ll.x = sp->location.x;
-                                ll.y = sp->location.y - sp->width/2;
-				rWidth = sp->length;
-				rHeight = sp->width;
-                                break;
-                        case VERTICAL_ORIENTATION:
-                                ll.x = sp->location.x - sp->width/2;
-                                ll.y = sp->location.y;
-				rWidth = sp->width;
-				rHeight = sp->length;
-                                break;
-                        case MURRINE_ORIENTATION:
-                                ll.x = sp->location.x - sp->width/2;
-                                ll.y = sp->location.y - sp->width/2;
-				rWidth = sp->width;
-				rHeight = sp->width;
-                                break;
-			default:
-				exit(1);
-                }
-
-                // Scale to pixels
-                ll.x = ll.x * width()/2 + width()/2 + 10;
-                ll.y = ll.y * height()/2 + height()/2 + 10;
-		rWidth *= width()/2;
-		rHeight *= height()/2;
-		
-		painter.drawRect(ll.x, ll.y, rWidth, rHeight);
-	}
-
-	painter.end();
-}
-
-
 
