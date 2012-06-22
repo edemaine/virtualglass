@@ -89,24 +89,24 @@ void PullPlanEditorWidget :: setupLayout()
 	QVBoxLayout* editorLayout = new QVBoxLayout(this);
 	pageLayout->addLayout(editorLayout);
 
-	editorLayout->addWidget(viewWidget, 0);
+	editorLayout->addWidget(viewWidget, 1);
 
 	QHBoxLayout* fillRuleLayout = new QHBoxLayout(this);
 	fillRuleLayout->addWidget(new QLabel("Fill rule:", this), 1);
 	QCheckBox* singleCheckBox = new QCheckBox("Single");
-	QCheckBox* eoCheckBox = new QCheckBox("Every other");
-	QCheckBox* etCheckBox = new QCheckBox("Every third");
+	//QCheckBox* eoCheckBox = new QCheckBox("Every other");
+	//QCheckBox* etCheckBox = new QCheckBox("Every third");
 	QCheckBox* gCheckBox = new QCheckBox("Group");
 	QCheckBox* aCheckBox = new QCheckBox("All");
 	fillRuleButtonGroup = new QButtonGroup();
 	fillRuleButtonGroup->addButton(singleCheckBox, 1);
-	fillRuleButtonGroup->addButton(eoCheckBox, 2);
-	fillRuleButtonGroup->addButton(etCheckBox, 3);
+	//fillRuleButtonGroup->addButton(eoCheckBox, 2);
+	//fillRuleButtonGroup->addButton(etCheckBox, 3);
 	fillRuleButtonGroup->addButton(gCheckBox, 4);
 	fillRuleButtonGroup->addButton(aCheckBox, 5);
 	fillRuleLayout->addWidget(singleCheckBox, 1);
-	fillRuleLayout->addWidget(eoCheckBox, 1);
-	fillRuleLayout->addWidget(etCheckBox, 1);
+	//fillRuleLayout->addWidget(eoCheckBox, 1);
+	//fillRuleLayout->addWidget(etCheckBox, 1);
 	fillRuleLayout->addWidget(gCheckBox, 1);
 	fillRuleLayout->addWidget(aCheckBox, 1);
 	editorLayout->addLayout(fillRuleLayout, 1);
@@ -183,7 +183,7 @@ void PullPlanEditorWidget :: setupLayout()
 	editorLayout->addLayout(paramLayout, 0);	
 
 	// Little description for the editor
-	editorLayout->addStretch(1);
+	editorLayout->addStretch(0);
 	QLabel* descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", this);
 	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	editorLayout->addWidget(descriptionLabel, 0);

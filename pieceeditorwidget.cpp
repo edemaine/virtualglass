@@ -149,25 +149,25 @@ void PieceEditorWidget :: setupLayout()
 
 	// Left (pickup) layout
 	QVBoxLayout* leftLayout = new QVBoxLayout(this);
-	piecePageLayout->addLayout(leftLayout);
-	leftLayout->addWidget(pickupViewWidget);
+	piecePageLayout->addLayout(leftLayout, 1);
+	leftLayout->addWidget(pickupViewWidget, 1);
 
 	QHBoxLayout* fillRuleLayout = new QHBoxLayout(this);
 	fillRuleLayout->addWidget(new QLabel("Fill rule:", this), 1);
 	QCheckBox* singleCheckBox = new QCheckBox("Single");
-	QCheckBox* eoCheckBox = new QCheckBox("Every other");
-	QCheckBox* etCheckBox = new QCheckBox("Every third");
+	//QCheckBox* eoCheckBox = new QCheckBox("Every other");
+	//QCheckBox* etCheckBox = new QCheckBox("Every third");
 	QCheckBox* gCheckBox = new QCheckBox("Group");
 	QCheckBox* aCheckBox = new QCheckBox("All");
 	fillRuleButtonGroup = new QButtonGroup();
 	fillRuleButtonGroup->addButton(singleCheckBox, 1);
-	fillRuleButtonGroup->addButton(eoCheckBox, 2);
-	fillRuleButtonGroup->addButton(etCheckBox, 3);
+	//fillRuleButtonGroup->addButton(eoCheckBox, 2);
+	//fillRuleButtonGroup->addButton(etCheckBox, 3);
 	fillRuleButtonGroup->addButton(gCheckBox, 4);
 	fillRuleButtonGroup->addButton(aCheckBox, 5);
 	fillRuleLayout->addWidget(singleCheckBox, 1);
-	fillRuleLayout->addWidget(eoCheckBox, 1);
-	fillRuleLayout->addWidget(etCheckBox, 1);
+	//fillRuleLayout->addWidget(eoCheckBox, 1);
+	//fillRuleLayout->addWidget(etCheckBox, 1);
 	fillRuleLayout->addWidget(gCheckBox, 1);
 	fillRuleLayout->addWidget(aCheckBox, 1);
 	leftLayout->addLayout(fillRuleLayout, 1);
@@ -215,7 +215,7 @@ void PieceEditorWidget :: setupLayout()
 	parameter1Layout->addWidget(pickupParameter1Slider, 1);
 	parameter1Layout->addWidget(rp1label, 0);
 
-	leftLayout->addStretch(1);
+	leftLayout->addStretch(0);
 	QLabel* pieceEditorDescriptionLabel = new QLabel("Pickup editor - drag canes in.", this);
 	pieceEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	leftLayout->addWidget(pieceEditorDescriptionLabel, 0);

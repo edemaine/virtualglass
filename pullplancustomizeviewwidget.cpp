@@ -5,7 +5,7 @@ PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget
 {
 	// setup draw widget
 	setAcceptDrops(true);
-	setFixedSize(500, 500);
+	setMinimumSize(200, 200);
 	setPullPlan(plan);
 	Color* color = new Color;
 	color->r = color->g = color->b = 1.0;

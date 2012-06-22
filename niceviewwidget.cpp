@@ -23,7 +23,7 @@ void gl_errors(string const &where) {
 NiceViewWidget :: NiceViewWidget(int cameraMode, QWidget *parent) : QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent), peelRenderer(NULL)
 {
 	leftMouseDown = false;
-	setMinimumWidth(400);
+	setMinimumWidth(200);
 	bgColor = QColor(200, 200, 200);
 	geometry = NULL;
 	this->cameraMode = cameraMode;

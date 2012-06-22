@@ -15,7 +15,7 @@ PullPlanTabWidget::PullPlanTabWidget(QWidget* parent) : QWidget(parent)
     pullPlanTabs->setCurrentWidget(pullPlanEditor);
 
     QHBoxLayout* pageLayout = new QHBoxLayout(this);
-    pageLayout->addWidget(pullPlanTabs, 0);
+    pageLayout->addWidget(pullPlanTabs, 1);
 
     QVBoxLayout* niceViewLayout = new QVBoxLayout(this);
     pageLayout->addLayout(niceViewLayout, 1);

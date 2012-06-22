@@ -5,7 +5,7 @@ PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* pa
 {
 	// setup draw widget
 	setAcceptDrops(true);
-	setFixedSize(500, 500);
+	setMinimumSize(200, 200);
 	this->plan = plan;
 	fill_rule = SINGLE_FILL_RULE;
 	isDraggingCasing = false;
