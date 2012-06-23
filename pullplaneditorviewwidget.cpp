@@ -358,15 +358,9 @@ void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan) {
 }
 
 
-void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, int drawWidth, 
-	int drawHeight, int borderLevels) {
+void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, bool outermostLevel) {
 
-	painter->setBrush(Qt::NoBrush);
-	if (MIN(drawWidth, drawHeight) < 10)
-	{
-                painter->setPen(Qt::NoPen);
-	}
-	else if (borderLevels > 0)
+	if (outermostLevel)
 	{
 		QPen pen;
 		pen.setWidth(3);
@@ -383,102 +377,81 @@ void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, int drawW
 
 }
 
+void PullPlanEditorViewWidget :: paintShape(float x, float y, float size, int shape, QPainter* painter)
+{
+	switch (shape)
+	{
+		case CIRCLE_SHAPE:
+			painter->drawEllipse(rawX(x), rawY(y), size, size);
+			break;
+		case SQUARE_SHAPE:
+			painter->drawRect(rawX(x), rawY(y), size, size);
+			break;
+	}
+	
+}
+
 
 void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, float drawHeight, 
-	PullPlan* plan, bool highlightThis, int mandatedShape, int borderLevels, QPainter* painter) {
+	PullPlan* plan, bool highlightThis, int mandatedShape, bool outermostLevel, QPainter* painter) {
 
 	// Fill the subplan area with some `cleared out' color
 	painter->setBrush(QColor(200, 200, 200));
 	painter->setPen(Qt::NoPen);
-	switch (mandatedShape)
+	paintShape(x, y, drawWidth, mandatedShape, painter);
+
+	// Do casing colors outermost to innermost to get concentric rings of each casing's color
+	// Skip outermost casing (that is done by your parent) and innermost (that is the `invisible'
+	// casing for you to resize your subcanes)
+	for (unsigned int i = plan->getCasingCount() - 1; plan->getCasingCount() > i && i > 0; --i) 
 	{
-		case CIRCLE_SHAPE:
-			painter->drawEllipse(rawX(x), rawY(y), drawWidth, drawHeight);
-			break;
-		case SQUARE_SHAPE:
-			painter->drawRect(rawX(x), rawY(y), drawWidth, drawHeight);
-			break;
+		int casingWidth = drawWidth * plan->getCasingThickness(i);
+		int casingHeight = drawHeight * plan->getCasingThickness(i);
+		int casingX = x + drawWidth / 2 - casingWidth / 2;
+		int casingY = y + drawHeight / 2 - casingHeight / 2;
+
+		// Fill with solid neutral grey (in case fill is transparent)
+		painter->setBrush(QColor(200, 200, 200));
+		painter->setPen(Qt::NoPen); // Will draw boundary after all filling is done
+		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
+		
+		// Fill with actual casing color (highlighting white or some other color)
+		if (outermostLevel && casingHighlighted && i == casingHighlightIndex)	
+		{
+			painter->setBrush(QColor(255*draggingColor.r, 255*draggingColor.g, 255*draggingColor.b, 
+				255*draggingColor.a));
+		}
+		else
+		{
+			painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g, 
+				255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
+		}
+		setBoundaryPainter(painter, outermostLevel);
+		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
 	}
 
-	// If it's a base color, fill region with color
+	// If you're supposed to become highlighted, do it. Note: this is not a casing highlight, that
+	// was already (just) done when processing casing...this is a subcane being highlighted.
+	if (highlightThis)
+	{
+		painter->setBrush(QColor(255*draggingColor.r, 255*draggingColor.g, 255*draggingColor.b, 
+			255*draggingColor.a));
+		painter->setPen(Qt::NoPen);
+		paintShape(x, y, drawWidth, mandatedShape, painter);
+		return;
+	}
+
+	// If you're a color bar, just fill region with color.
 	if (plan->isBase())
 	{
 		Color* c = plan->getOutermostCasingColor();
 		painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
 		painter->setPen(Qt::NoPen);
-
-		switch (mandatedShape)
-		{
-			case CIRCLE_SHAPE:
-				painter->drawEllipse(rawX(x), rawY(y), drawWidth, drawHeight);
-				break;
-			case SQUARE_SHAPE:
-				painter->drawRect(rawX(x), rawY(y), drawWidth, drawHeight);
-				break;
-		}
-	}
-
-	// Draw casings
-	setBoundaryPainter(painter, drawWidth, drawHeight, borderLevels);
-	if (borderLevels == 1 && highlightThis)
-		painter->setBrush(QColor(255*draggingColor.r, 255*draggingColor.g, 255*draggingColor.b, 
-			255*draggingColor.a));
-	else
-		painter->setBrush(QColor(255*plan->getOutermostCasingColor()->r, 255*plan->getOutermostCasingColor()->g, 
-			255*plan->getOutermostCasingColor()->b, 255*plan->getOutermostCasingColor()->a));
-	switch (mandatedShape) {
-		case CIRCLE_SHAPE:
-			painter->drawEllipse(rawX(x), rawY(y), drawWidth, drawHeight);
-			break;
-		case SQUARE_SHAPE:
-			painter->drawRect(rawX(x), rawY(y), drawWidth, drawHeight);
-			break;
-	}
-
-	if (borderLevels == 1 && highlightThis)
+		paintShape(x, y, drawWidth, mandatedShape, painter);
 		return;
-
-	for (unsigned int i = plan->getCasingCount() - 1; i > 0; --i) {
-
-		int casingWidth = drawWidth * plan->getCasingThickness(i);
-		int casingHeight = drawHeight * plan->getCasingThickness(i);
-		int casingX = x + drawWidth / 2 - casingWidth / 2;
-		int casingY = y + drawHeight / 2 - casingHeight / 2;
-	
-		setBoundaryPainter(painter, casingHeight, casingWidth, borderLevels);
-
-		// set fill to be white if highlighted or background grey if not
-		bool highlighted = false;
-		if ((borderLevels == 2 && casingHighlighted && i == casingHighlightIndex) 
-			|| (borderLevels == 1 && highlightThis))  
-		{
-			highlighted = true;
-			painter->setBrush(QColor(255*draggingColor.r, 255*draggingColor.g, 255*draggingColor.b, 
-				255*draggingColor.a));
-		}
-		else
-			painter->setBrush(QColor(200, 200, 200));
-		switch (plan->getCasingShape(i))
-		{
-			case CIRCLE_SHAPE:
-				painter->drawEllipse(rawX(casingX), rawY(casingY), casingWidth, casingHeight);
-				if (highlighted)
-					break;
-				painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g, 
-					255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
-				painter->drawEllipse(rawX(casingX), rawY(casingY), casingWidth, casingHeight);
-				break;
-			case SQUARE_SHAPE:
-				painter->drawRect(rawX(casingX), rawY(casingY), casingWidth, casingHeight);
-				if (highlighted)
-					break;
-				painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g, 
-					255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
-				painter->drawRect(rawX(casingX), rawY(casingY), casingWidth, casingHeight);
-				break;
-		}
 	}
 
+	// Recursively call drawing on subplans
 	for (unsigned int i = plan->subs.size()-1; i < plan->subs.size(); --i)
 	{
 		SubpullTemplate* sub = &(plan->subs[i]);
@@ -488,7 +461,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		float rWidth = sub->diameter * drawWidth/2;
 		float rHeight = sub->diameter * drawHeight/2;
 
-		if (borderLevels == 2) {
+		if (outermostLevel) {
 			bool highlighted = false;
 			for (unsigned int j = 0; j < subplansHighlighted.size(); ++j) {
 				if (subplansHighlighted[j] == i)
@@ -496,30 +469,40 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 			}
 			if (highlighted) {
 				drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
-					true, plan->subs[i].shape, 1, painter);
+					true, plan->subs[i].shape, false, painter);
 			}
 			else {
 				drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
-					false, plan->subs[i].shape, 1, painter);
+					false, plan->subs[i].shape, false, painter);
 
 			}
 		}
 		else {
 			drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
 				false, plan->subs[i].shape, 
-				borderLevels-1, painter);
+				false, painter);
 		}
+		
+		setBoundaryPainter(painter, outermostLevel);
+		painter->setBrush(Qt::NoBrush);
+		paintShape(rX, rY, rWidth, plan->subs[i].shape, painter);
 	}
 }
 
 void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 {
 	QPainter painter;
+
 	painter.begin(this);
 	painter.setRenderHint(QPainter::Antialiasing);
+
 	painter.fillRect(event->rect(), QColor(200, 200, 200));
-	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan, casingHighlighted, 
-		plan->getOutermostCasingShape(), 2, &painter);
+	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan, false, 
+		plan->getOutermostCasingShape(), true, &painter);
+
+	setBoundaryPainter(&painter, true);
+	paintShape(10, 10, squareSize - 20, plan->getOutermostCasingShape(), &painter);
+
 	painter.end();
 }
 

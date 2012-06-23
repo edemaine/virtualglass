@@ -35,14 +35,14 @@ class PullPlanEditorViewWidget : public QWidget
 		void resizeEvent(QResizeEvent* event);
 
 	private:
+		void paintShape(float x, float y, float size, int shape, QPainter* painter);
 		float adjustedX(float rawX);
 		float adjustedY(float rawX);
 		float rawX(float adjustedX);
 		float rawY(float adjustedY);
-		void setBoundaryPainter(QPainter* painter, int drawWidth, int drawHeight, 
-			int borderLevels);
+		void setBoundaryPainter(QPainter* painter, bool outermostLevel);
 		void drawSubplan(float x, float y, float width, float height, PullPlan* plan, 
-			bool highlightThis, int mandatedShape, int borderLevels, QPainter* painter);
+			bool highlightThis, int mandatedShape, bool outermostLevel, QPainter* painter);
 		PullPlan* plan;
 		int fill_rule;
 		Color draggingColor;
