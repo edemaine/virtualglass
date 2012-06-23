@@ -12,6 +12,11 @@ PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* pa
 	casingHighlighted = false;
 }
 
+QRect PullPlanEditorViewWidget :: usedRect()
+{
+	return QRect(ulX, ulY, squareSize, squareSize);
+}
+
 void PullPlanEditorViewWidget :: resizeEvent(QResizeEvent* event)
 {
 	int width, height;

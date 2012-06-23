@@ -290,7 +290,7 @@ void PullPlanEditorWidget :: seedTemplates()
 
 void PullPlanEditorWidget :: updateLibraryWidgetPixmaps(AsyncPullPlanLibraryWidget* w)
 {
-	w->updatePixmaps(QPixmap::grabWidget(viewWidget).scaled(100, 100));
+	w->updatePixmaps(QPixmap::grabWidget(viewWidget, viewWidget->usedRect()).scaled(100, 100));
 }
 
 void PullPlanEditorWidget :: openCustomizeWidget()
