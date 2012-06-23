@@ -15,8 +15,7 @@ PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 
 void PieceEditorWidget :: updateEverything()
 {
-	static_cast<QCheckBox*>(fillRuleButtonGroup->button(
-		pickupViewWidget->getFillRule()))->setCheckState(Qt::Checked);
+        fillRuleComboBox->setCurrentIndex(pickupViewWidget->getFillRule()-1);
 
 	// update pickup stuff
 	int value = piece->pickup->getParameter(0);
@@ -152,26 +151,6 @@ void PieceEditorWidget :: setupLayout()
 	piecePageLayout->addLayout(leftLayout, 1);
 	leftLayout->addWidget(pickupViewWidget, 1);
 
-	QHBoxLayout* fillRuleLayout = new QHBoxLayout(this);
-	fillRuleLayout->addWidget(new QLabel("Fill rule:", this), 1);
-	QCheckBox* singleCheckBox = new QCheckBox("Single");
-	//QCheckBox* eoCheckBox = new QCheckBox("Every other");
-	//QCheckBox* etCheckBox = new QCheckBox("Every third");
-	QCheckBox* gCheckBox = new QCheckBox("Group");
-	QCheckBox* aCheckBox = new QCheckBox("All");
-	fillRuleButtonGroup = new QButtonGroup();
-	fillRuleButtonGroup->addButton(singleCheckBox, 1);
-	//fillRuleButtonGroup->addButton(eoCheckBox, 2);
-	//fillRuleButtonGroup->addButton(etCheckBox, 3);
-	fillRuleButtonGroup->addButton(gCheckBox, 4);
-	fillRuleButtonGroup->addButton(aCheckBox, 5);
-	fillRuleLayout->addWidget(singleCheckBox, 1);
-	//fillRuleLayout->addWidget(eoCheckBox, 1);
-	//fillRuleLayout->addWidget(etCheckBox, 1);
-	fillRuleLayout->addWidget(gCheckBox, 1);
-	fillRuleLayout->addWidget(aCheckBox, 1);
-	leftLayout->addLayout(fillRuleLayout, 1);
-
 	QWidget* pickupTemplateLibraryWidget = new QWidget(this);
 	pickupTemplateLibraryLayout = new QHBoxLayout(pickupTemplateLibraryWidget);
 	pickupTemplateLibraryLayout->setSpacing(10);
@@ -186,14 +165,26 @@ void PieceEditorWidget :: setupLayout()
 	pickupTemplateLibraryScrollArea->setFixedHeight(130);
 	leftLayout->addWidget(pickupTemplateLibraryScrollArea, 0);
 
+        QHBoxLayout* fillRuleLayout = new QHBoxLayout(this);
+        fillRuleComboBox = new QComboBox(this);
+        fillRuleComboBox->addItem("Single");
+        fillRuleComboBox->addItem("Every second");
+        fillRuleComboBox->addItem("Every third");
+        fillRuleComboBox->addItem("Group");
+        fillRuleComboBox->addItem("All");
+        fillRuleLayout->addWidget(new QLabel("Fill rule:", this), 0);
+        fillRuleLayout->addWidget(fillRuleComboBox, 0);
+        fillRuleLayout->addStretch(1);
+        leftLayout->addLayout(fillRuleLayout);
+
 	QHBoxLayout* overlayLayout = new QHBoxLayout(this);	
 	overlayLayout->addWidget(new QLabel("Casing color:"));
 	overlayWidget = new OverlayColorWidget(&(piece->pickup->overlayColor), this);
 	overlayLayout->addWidget(overlayWidget);
-	overlayLayout->addStretch(1);
 	overlayLayout->addWidget(new QLabel("Underlay color:"));
 	underlayWidget = new OverlayColorWidget(&(piece->pickup->underlayColor), this);
 	overlayLayout->addWidget(underlayWidget);
+	overlayLayout->addStretch(1);
 	leftLayout->addLayout(overlayLayout);
 
 	pickupTemplateParameter1Label = new QLabel(piece->pickup->getParameterName(0));
@@ -304,9 +295,9 @@ void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
 	}
 }
 
-void PieceEditorWidget :: fillRuleButtonGroupChanged(int)
+void PieceEditorWidget :: fillRuleComboBoxChanged(int)
 {
-	pickupViewWidget->setFillRule(fillRuleButtonGroup->checkedId());
+        pickupViewWidget->setFillRule(fillRuleComboBox->currentIndex()+1);
 }
 
 void PieceEditorWidget :: setupConnections()
@@ -315,8 +306,8 @@ void PieceEditorWidget :: setupConnections()
 		this, SLOT(updateEverything()));
 	connect(underlayWidget, SIGNAL(colorChanged()),
 		this, SLOT(updateEverything()));
-	connect(fillRuleButtonGroup, SIGNAL(buttonClicked(int)),
-		this, SLOT(fillRuleButtonGroupChanged(int)));
+        connect(fillRuleComboBox, SIGNAL(currentIndexChanged(int)), 
+		this, SLOT(fillRuleComboBoxChanged(int)));
 	connect(pickupParameter1SpinBox, SIGNAL(valueChanged(int)),
 		this, SLOT(pickupParameter1SpinBoxChanged(int)));
 	connect(pickupParameter1Slider, SIGNAL(valueChanged(int)),

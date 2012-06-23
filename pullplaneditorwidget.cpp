@@ -14,8 +14,7 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 
 void PullPlanEditorWidget :: updateEverything()
 {
-	static_cast<QCheckBox*>(fillRuleButtonGroup->button(
-		viewWidget->getFillRule()))->setCheckState(Qt::Checked);
+	fillRuleComboBox->setCurrentIndex(viewWidget->getFillRule()-1);
 
 	switch (plan->getOutermostCasingShape())
 	{
@@ -91,26 +90,6 @@ void PullPlanEditorWidget :: setupLayout()
 
 	editorLayout->addWidget(viewWidget, 1);
 
-	QHBoxLayout* fillRuleLayout = new QHBoxLayout(this);
-	fillRuleLayout->addWidget(new QLabel("Fill rule:", this), 1);
-	QCheckBox* singleCheckBox = new QCheckBox("Single");
-	//QCheckBox* eoCheckBox = new QCheckBox("Every other");
-	//QCheckBox* etCheckBox = new QCheckBox("Every third");
-	QCheckBox* gCheckBox = new QCheckBox("Group");
-	QCheckBox* aCheckBox = new QCheckBox("All");
-	fillRuleButtonGroup = new QButtonGroup();
-	fillRuleButtonGroup->addButton(singleCheckBox, 1);
-	//fillRuleButtonGroup->addButton(eoCheckBox, 2);
-	//fillRuleButtonGroup->addButton(etCheckBox, 3);
-	fillRuleButtonGroup->addButton(gCheckBox, 4);
-	fillRuleButtonGroup->addButton(aCheckBox, 5);
-	fillRuleLayout->addWidget(singleCheckBox, 1);
-	//fillRuleLayout->addWidget(eoCheckBox, 1);
-	//fillRuleLayout->addWidget(etCheckBox, 1);
-	fillRuleLayout->addWidget(gCheckBox, 1);
-	fillRuleLayout->addWidget(aCheckBox, 1);
-	editorLayout->addLayout(fillRuleLayout, 1);
-	
 	// Setup pull template scrolling library
 	QWidget* templateLibraryWidget = new QWidget(this);
 	templateLibraryLayout = new QHBoxLayout(templateLibraryWidget);
@@ -125,6 +104,18 @@ void PullPlanEditorWidget :: setupLayout()
 	pullTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pullTemplateLibraryScrollArea->setFixedHeight(130);
 	editorLayout->addWidget(pullTemplateLibraryScrollArea, 0);
+
+	QHBoxLayout* fillRuleLayout = new QHBoxLayout(this);
+	fillRuleComboBox = new QComboBox(this);
+	fillRuleComboBox->addItem("Single");
+	fillRuleComboBox->addItem("Every second");
+	fillRuleComboBox->addItem("Every third");
+	fillRuleComboBox->addItem("Group");
+	fillRuleComboBox->addItem("All");
+	fillRuleLayout->addWidget(new QLabel("Fill rule:", this), 0);
+	fillRuleLayout->addWidget(fillRuleComboBox, 0);
+	fillRuleLayout->addStretch(1);
+	editorLayout->addLayout(fillRuleLayout, 0);
 
 	QHBoxLayout* pullTemplateShapeLayout = new QHBoxLayout(this);
 	QLabel* casingLabel = new QLabel("Casing:");
@@ -148,19 +139,19 @@ void PullPlanEditorWidget :: setupLayout()
 	twistLayout->addWidget(twistLabel1);
 
 	twistSpin = new QSpinBox(this);
-	twistSpin->setRange(0, 100);
+	twistSpin->setRange(-50, 50);
 	twistSpin->setSingleStep(1);
 	twistLayout->addWidget(twistSpin, 1);
 
-	QLabel* twistLabel2 = new QLabel("0", this);
+	QLabel* twistLabel2 = new QLabel("-50", this);
 	twistLayout->addWidget(twistLabel2);
 
 	twistSlider = new QSlider(Qt::Horizontal, this);
-	twistSlider->setRange(0, 100);
+	twistSlider->setRange(-50, 50);
 	twistSlider->setSliderPosition(0);
 	twistLayout->addWidget(twistSlider, 10);
 
-	QLabel* twistLabel3 = new QLabel("100", this);
+	QLabel* twistLabel3 = new QLabel("50", this);
 	twistLayout->addWidget(twistLabel3);
 
 	// Parameter spin stuff
@@ -221,14 +212,14 @@ void PullPlanEditorWidget :: addCasingButtonPressed()
 	emit someDataChanged();
 }
 
-void PullPlanEditorWidget :: fillRuleButtonGroupChanged(int)
+void PullPlanEditorWidget :: fillRuleComboBoxChanged(int)
 {
-	viewWidget->setFillRule(fillRuleButtonGroup->checkedId());
+	viewWidget->setFillRule(fillRuleComboBox->currentIndex()+1);
 }
 
 void PullPlanEditorWidget :: setupConnections()
 {
-	connect(fillRuleButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(fillRuleButtonGroupChanged(int)));
+	connect(fillRuleComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(fillRuleComboBoxChanged(int)));
 	connect(circleCasingPushButton, SIGNAL(clicked()), this, SLOT(circleCasingButtonPressed()));
 	connect(squareCasingPushButton, SIGNAL(clicked()), this, SLOT(squareCasingButtonPressed()));
 	connect(addCasingButton, SIGNAL(clicked()), this, SLOT(addCasingButtonPressed()));

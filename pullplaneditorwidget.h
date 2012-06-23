@@ -35,7 +35,7 @@ class PullPlanEditorWidget : public QWidget
 		void updateEverything();
 
 	private slots:
-		void fillRuleButtonGroupChanged(int);
+		void fillRuleComboBoxChanged(int);
 		void circleCasingButtonPressed();
 		void squareCasingButtonPressed();
 		void addCasingButtonPressed();
@@ -56,13 +56,13 @@ class PullPlanEditorWidget : public QWidget
 		QSlider* twistSlider;
 		vector<QLabel*> paramLabels;
 		vector<QSpinBox*> paramSpins;
-                QButtonGroup* fillRuleButtonGroup;
         	QHBoxLayout* templateLibraryLayout;
 		QPushButton* addCasingButton;
 		QPushButton* removeCasingButton;
 		QPushButton* customizePlanButton;
 		QPushButton* circleCasingPushButton;
 		QPushButton* squareCasingPushButton;
+		QComboBox* fillRuleComboBox;
 
 		void setupLayout();
 		void setupConnections();
