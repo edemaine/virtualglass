@@ -37,6 +37,7 @@ class PieceEditorWidget : public QWidget
 		void updateEverything();
 
 	private slots:
+                void pickupViewWidgetDataChanged();
                 void fillRuleComboBoxChanged(int);
 		void pieceTemplateParameterSlider1Changed(int);
 		void pieceTemplateParameterSlider2Changed(int);

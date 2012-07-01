@@ -319,8 +319,13 @@ void PieceEditorWidget :: setupConnections()
 	connect(pieceTemplateParameter3Slider, SIGNAL(valueChanged(int)),
 		this, SLOT(pieceTemplateParameterSlider3Changed(int)));
 
+	connect(pickupViewWidget, SIGNAL(someDataChanged()), this, SLOT(pickupViewWidgetDataChanged()));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
-	connect(pickupViewWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+}
+
+void PieceEditorWidget :: pickupViewWidgetDataChanged()
+{
+	emit someDataChanged();
 }
 
 void PieceEditorWidget :: seedTemplates()

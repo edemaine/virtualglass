@@ -3,10 +3,13 @@
 
 PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 {
-	this->plan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE);
-	this->plan->setTemplateType(CASED_CIRCLE_PULL_TEMPLATE);
+	plan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE);
+	plan->setTemplateType(CASED_CIRCLE_PULL_TEMPLATE);
 
-	this->viewWidget = new PullPlanEditorViewWidget(plan, this);	
+	viewWidget = new PullPlanEditorViewWidget(plan, this);	
+	customizeViewWidget = new PullPlanCustomizeViewWidget(plan, this);
+	niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);
+	niceViewWidget->setGeometry(&geometry);
 
 	setupLayout();
 	setupConnections();
@@ -82,21 +85,21 @@ void PullPlanEditorWidget :: highlightLibraryWidget(PullTemplateLibraryWidget* w
 
 void PullPlanEditorWidget :: setupLayout()
 {
-	// Setup the editor layout
-	QHBoxLayout* pageLayout = new QHBoxLayout(this);
-	this->setLayout(pageLayout);
-	QVBoxLayout* editorLayout = new QVBoxLayout(this);
-	pageLayout->addLayout(editorLayout);
+	// Editor layout
+	QWidget* editorWidget = new QWidget(this);
+	QVBoxLayout* editorLayout = new QVBoxLayout(editorWidget);
+	editorWidget->setLayout(editorLayout);
 
+	// Editor layout: interactive top-down visualization
 	editorLayout->addWidget(viewWidget, 1);
 
-	// Setup pull template scrolling library
-	QWidget* templateLibraryWidget = new QWidget(this);
+	// Editor layout: pull template scrolling library
+	QWidget* templateLibraryWidget = new QWidget(editorWidget);
 	templateLibraryLayout = new QHBoxLayout(templateLibraryWidget);
 	templateLibraryLayout->setSpacing(10);
 	templateLibraryWidget->setLayout(templateLibraryLayout);
 
-	QScrollArea* pullTemplateLibraryScrollArea = new QScrollArea(this);
+	QScrollArea* pullTemplateLibraryScrollArea = new QScrollArea(editorWidget);
 	pullTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
 	pullTemplateLibraryScrollArea->setWidget(templateLibraryWidget);
 	pullTemplateLibraryScrollArea->setWidgetResizable(true);
@@ -105,19 +108,21 @@ void PullPlanEditorWidget :: setupLayout()
 	pullTemplateLibraryScrollArea->setFixedHeight(130);
 	editorLayout->addWidget(pullTemplateLibraryScrollArea, 0);
 
-	QHBoxLayout* fillRuleLayout = new QHBoxLayout(this);
-	fillRuleComboBox = new QComboBox(this);
+	// Editor layout: fill rule layout
+	QHBoxLayout* fillRuleLayout = new QHBoxLayout(editorWidget);
+	fillRuleComboBox = new QComboBox(editorWidget);
 	fillRuleComboBox->addItem("Single");
 	fillRuleComboBox->addItem("Every second");
 	fillRuleComboBox->addItem("Every third");
 	fillRuleComboBox->addItem("Group");
 	fillRuleComboBox->addItem("All");
-	fillRuleLayout->addWidget(new QLabel("Fill rule:", this), 0);
+	fillRuleLayout->addWidget(new QLabel("Fill rule:", editorWidget), 0);
 	fillRuleLayout->addWidget(fillRuleComboBox, 0);
 	fillRuleLayout->addStretch(1);
 	editorLayout->addLayout(fillRuleLayout, 0);
 
-	QHBoxLayout* pullTemplateShapeLayout = new QHBoxLayout(this);
+	// Editor layout: casing buttons layout
+	QHBoxLayout* pullTemplateShapeLayout = new QHBoxLayout(editorWidget);
 	QLabel* casingLabel = new QLabel("Casing:");
 	circleCasingPushButton = new QPushButton(QString(QChar(9673))); 
 	squareCasingPushButton = new QPushButton(QString(QChar(9635)));
@@ -131,37 +136,39 @@ void PullPlanEditorWidget :: setupLayout()
 	pullTemplateShapeLayout->addStretch(1);
 	editorLayout->addLayout(pullTemplateShapeLayout, 0);
 
-	// Twist slider stuff
-	QHBoxLayout* twistLayout = new QHBoxLayout(this);
+	// Editor layout: twist layout
+	QHBoxLayout* twistLayout = new QHBoxLayout(editorWidget);
 	editorLayout->addLayout(twistLayout, 0);
 
-	QLabel* twistLabel1 = new QLabel("Twist:", this);
+	QLabel* twistLabel1 = new QLabel("Twist:", editorWidget);
 	twistLayout->addWidget(twistLabel1);
 
-	twistSpin = new QSpinBox(this);
+	twistSpin = new QSpinBox(editorWidget);
 	twistSpin->setRange(-50, 50);
 	twistSpin->setSingleStep(1);
 	twistLayout->addWidget(twistSpin, 1);
 
-	QLabel* twistLabel2 = new QLabel("-50", this);
+	QLabel* twistLabel2 = new QLabel("-50", editorWidget);
 	twistLayout->addWidget(twistLabel2);
 
-	twistSlider = new QSlider(Qt::Horizontal, this);
+	twistSlider = new QSlider(Qt::Horizontal, editorWidget);
 	twistSlider->setRange(-50, 50);
 	twistSlider->setSliderPosition(0);
+	twistSlider->setTickInterval(50);	
+	twistSlider->setTickPosition(QSlider::TicksBothSides);
 	twistLayout->addWidget(twistSlider, 10);
 
-	QLabel* twistLabel3 = new QLabel("50", this);
+	QLabel* twistLabel3 = new QLabel("50", editorWidget);
 	twistLayout->addWidget(twistLabel3);
 
-	// Parameter spin stuff
-	QHBoxLayout* paramLayout = new QHBoxLayout(this);
-	paramLabels.push_back(new QLabel("Param 1:", this));
-	paramLabels.push_back(new QLabel("Param 2:", this));
-	paramLabels.push_back(new QLabel("Param 3:", this));
-	paramSpins.push_back(new QSpinBox(this));
-	paramSpins.push_back(new QSpinBox(this));
-	paramSpins.push_back(new QSpinBox(this));
+	// Editor layout: parameter spin stuff
+	QHBoxLayout* paramLayout = new QHBoxLayout(editorWidget);
+	paramLabels.push_back(new QLabel("Param 1:", editorWidget));
+	paramLabels.push_back(new QLabel("Param 2:", editorWidget));
+	paramLabels.push_back(new QLabel("Param 3:", editorWidget));
+	paramSpins.push_back(new QSpinBox(editorWidget));
+	paramSpins.push_back(new QSpinBox(editorWidget));
+	paramSpins.push_back(new QSpinBox(editorWidget));
 	for (unsigned int i = 0; i < paramLabels.size(); ++i)
 	{
 		paramLayout->addWidget(paramLabels[i], 0);
@@ -172,9 +179,51 @@ void PullPlanEditorWidget :: setupLayout()
 		paramSpins[i]->hide();
 	}
 	editorLayout->addLayout(paramLayout, 0);	
-
-	// Little description for the editor
 	editorLayout->addStretch(0);
+
+	// Customize layout
+	QWidget* customizeWidget = new QWidget(this);
+	QVBoxLayout* customizeLayout = new QVBoxLayout(customizeWidget);
+	customizeWidget->setLayout(customizeLayout);
+
+	// Customize layout: interactive editor
+	customizeLayout->addWidget(customizeViewWidget, 1);
+
+	// Customize layout: button layout
+        QHBoxLayout* windowControlsLayout = new QHBoxLayout(customizeWidget);
+        confirmChangesButton = new QPushButton("Confirm changes", customizeWidget);
+        cancelChangesButton = new QPushButton("Cancel", customizeWidget);
+        windowControlsLayout->addWidget(confirmChangesButton);
+        windowControlsLayout->addWidget(cancelChangesButton);
+        customizeLayout->addLayout(windowControlsLayout, 0);
+	
+	// Combine editor and customize layouts into a pair of tabs with 
+	// descriptive text in the left layout
+	QWidget* leftWidget = new QWidget(this);
+	QVBoxLayout* leftLayout = new QVBoxLayout(leftWidget);
+	leftWidget->setLayout(leftLayout);
+	QTabWidget* tabs = new QTabWidget(leftWidget);
+	tabs->addTab(editorWidget, QString("Standard"));
+	tabs->addTab(customizeWidget, QString("Customize"));
+	leftLayout->addWidget(tabs, 1);
+	QLabel* descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", leftWidget);
+	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	leftLayout->addWidget(descriptionLabel, 0);
+
+	// Combine 3D viewer and descriptive text into the right layout
+	QWidget* rightWidget = new QWidget(this);
+	QVBoxLayout* rightLayout = new QVBoxLayout(rightWidget);
+	rightWidget->setLayout(rightLayout);
+	rightLayout->addWidget(niceViewWidget, 1);
+	QLabel* niceViewDescriptionLabel = new QLabel("3D view of cane.", rightWidget);
+	niceViewDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	rightLayout->addWidget(niceViewDescriptionLabel, 0);
+
+	// Combine left and right layouts
+	QHBoxLayout* pageLayout = new QHBoxLayout(this);
+	this->setLayout(pageLayout);
+	pageLayout->addWidget(leftWidget, 1);
+	pageLayout->addWidget(rightWidget, 1);
 }
 
 void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
@@ -291,11 +340,6 @@ void PullPlanEditorWidget :: seedTemplates()
 void PullPlanEditorWidget :: updateLibraryWidgetPixmaps(AsyncPullPlanLibraryWidget* w)
 {
 	w->updatePixmaps(QPixmap::grabWidget(viewWidget, viewWidget->usedRect()).scaled(100, 100));
-}
-
-void PullPlanEditorWidget :: openCustomizeWidget()
-{
-	pullPlanCustomizeWidget->openWindow(this->getPlan());
 }
 
 void PullPlanEditorWidget :: setPlan(PullPlan* p)

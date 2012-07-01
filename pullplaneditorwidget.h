@@ -5,13 +5,13 @@
 #include <QtGui>
 #include "pullplan.h"
 #include "pullplaneditorviewwidget.h"
+#include "pullplancustomizeviewwidget.h"
 #include "pulltemplatelibrarywidget.h"
 #include "qgraphicshighlighteffect.h"
 #include "asyncpullplanlibrarywidget.h"
 #include "niceviewwidget.h"
 #include "geometry.h"
 #include "mesh.h"
-#include "pullplancustomizewidget.h"
 
 class PullPlanEditorWidget : public QWidget
 {
@@ -44,14 +44,13 @@ class PullPlanEditorWidget : public QWidget
 		void twistSpinChanged(int);
 		void twistSliderChanged(int);
 		void paramSpinChanged(int);
-		void openCustomizeWidget();
 
 	private:
 		Geometry geometry;
 		Mesher mesher;
 		PullPlan* plan;
 		PullPlanEditorViewWidget* viewWidget;	
-		PullPlanCustomizeWidget* pullPlanCustomizeWidget;
+		PullPlanCustomizeViewWidget* customizeViewWidget;	
 		QSpinBox* twistSpin;
 		QSlider* twistSlider;
 		vector<QLabel*> paramLabels;
@@ -63,6 +62,9 @@ class PullPlanEditorWidget : public QWidget
 		QPushButton* circleCasingPushButton;
 		QPushButton* squareCasingPushButton;
 		QComboBox* fillRuleComboBox;
+                QPushButton* confirmChangesButton;
+                QPushButton* cancelChangesButton;
+		NiceViewWidget* niceViewWidget;
 
 		void setupLayout();
 		void setupConnections();
