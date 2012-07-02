@@ -20,8 +20,8 @@ void AsyncColorBarLibraryWidget :: paintEvent(QPaintEvent *event)
 {
 	AsyncPullPlanLibraryWidget::paintEvent(event);
 	QPainter painter(this);
-	//painter.drawText(QPointF(5, 95), colorName);
-	painter.drawText(rect(), Qt::AlignBottom | Qt::AlignLeft, colorName);
+	painter.setPen(QPen(Qt::black));
+	painter.drawText(rect().adjusted(5, 0, 0, -5), Qt::AlignBottom | Qt::AlignLeft, colorName);
 }
 
 void AsyncColorBarLibraryWidget :: updatePixmaps(QPixmap const &_editorPixmap)
@@ -30,7 +30,7 @@ void AsyncColorBarLibraryWidget :: updatePixmaps(QPixmap const &_editorPixmap)
 
 	//queue up an async update:
 	Camera camera;
-	camera.eye = make_vector(0.0f, 11.5f, 5.0f);
+	camera.eye = make_vector(0.0f, 11.0f, 5.0f);
 	camera.lookAt = make_vector(0.0f, 0.0f, 5.0f);
 	camera.up = make_vector(0.0f, 0.0f, 1.0f);
 	camera.isPerspective = false;

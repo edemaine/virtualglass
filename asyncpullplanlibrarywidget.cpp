@@ -31,7 +31,7 @@ void AsyncPullPlanLibraryWidget :: updatePixmaps(QPixmap const &_editorPixmap)
 
 	//queue up an async update:
 	Camera camera;
-	camera.eye = make_vector(0.0f, 11.5f, 5.0f);
+	camera.eye = make_vector(0.0f, 11.0f, 5.0f);
 	camera.lookAt = make_vector(0.0f, 0.0f, 5.0f);
 	camera.up = make_vector(0.0f, 0.0f, 1.0f);
 	camera.isPerspective = false;
