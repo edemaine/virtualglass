@@ -2,12 +2,11 @@
 #include "mesh.h"
 #include "qgraphicshighlighteffect.h"
 #include "pullplanrenderdata.h"
+#include "pullplanrenderpixmap.h"
 
 AsyncPullPlanLibraryWidget :: AsyncPullPlanLibraryWidget(PullPlan *_pullPlan, QWidget *parent) : AsyncRenderWidget(parent), pullPlan(_pullPlan)
 {
-	//setBackgroundRole(QPallette::Base);
 	setFixedSize(100, 100);
-	//setScaledContents(true);
 	setMouseTracking(true);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
@@ -15,9 +14,7 @@ AsyncPullPlanLibraryWidget :: AsyncPullPlanLibraryWidget(PullPlan *_pullPlan, QW
 	connect(graphicsEffect(), SIGNAL(enabledChanged(bool)), graphicsEffect(), SLOT(setStyleSheet(bool)));
 	connect(graphicsEffect(), SIGNAL(styleSheetString(QString)), this, SLOT(setStyleSheet(QString)));
 
-	QPixmap pixmap(100, 100);
-	pixmap.fill(Qt::white);
-	updatePixmaps(pixmap);
+	updatePixmaps();
 }
 
 PullPlan* AsyncPullPlanLibraryWidget :: getPullPlan()
@@ -25,9 +22,10 @@ PullPlan* AsyncPullPlanLibraryWidget :: getPullPlan()
 	return pullPlan;
 }
 
-void AsyncPullPlanLibraryWidget :: updatePixmaps(QPixmap const &_editorPixmap)
+void AsyncPullPlanLibraryWidget :: updatePixmaps()
 {
-	editorPixmap = _editorPixmap;
+	// This is fast enough to do in real time
+	editorPixmap = PullPlanRenderPixmap::getEditorPixmap(pullPlan);
 
 	//queue up an async update:
 	Camera camera;

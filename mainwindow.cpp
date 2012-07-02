@@ -535,6 +535,8 @@ void MainWindow :: updateLibrary()
 	{
 		case COLORBAR_MODE:
 		{
+			highlightLibraryWidget(colorEditorBarLibraryWidget, IS_DEPENDANCY);
+
 			AsyncPullPlanLibraryWidget* pplw;
 			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 			{
@@ -542,7 +544,10 @@ void MainWindow :: updateLibrary()
 					dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 				if (pplw->getPullPlan()->hasDependencyOn(
 					colorEditorBarLibraryWidget->getPullPlan()->getOutermostCasingColor()))
+				{
+					pplw->updatePixmaps();
 					highlightLibraryWidget(pplw, USES_DEPENDANCY);				
+				}
 			}
 
 			AsyncPieceLibraryWidget* plw;
@@ -552,15 +557,17 @@ void MainWindow :: updateLibrary()
 					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 				if (plw->getPiece()->hasDependencyOn(
 					colorEditorBarLibraryWidget->getPullPlan()->getOutermostCasingColor()))
+				{
+					plw->updatePixmap();
 					highlightLibraryWidget(plw, USES_DEPENDANCY);
+				}
 			}
 
-			highlightLibraryWidget(colorEditorBarLibraryWidget, IS_DEPENDANCY);
 			break;
 		}
 		case PULLPLAN_MODE:
 		{
-			pullPlanEditorWidget->updateLibraryWidgetPixmaps(pullPlanEditorPlanLibraryWidget);
+			pullPlanEditorPlanLibraryWidget->updatePixmaps();
 
 			AsyncColorBarLibraryWidget* cblw;
 			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
@@ -579,9 +586,13 @@ void MainWindow :: updateLibrary()
 						dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(pplw->getPullPlan()))
 						highlightLibraryWidget(pplw, IS_USED_BY_DEPENDANCY);
-				else if (pplw->getPullPlan()->hasDependencyOn(pullPlanEditorWidget->getPlan()))
-						highlightLibraryWidget(pplw, USES_DEPENDANCY);
+				else if (pplw->getPullPlan()->hasDependencyOn(pullPlanEditorWidget->getPlan()))	
+				{
+					pplw->updatePixmaps();
+					highlightLibraryWidget(pplw, USES_DEPENDANCY);
+				}
 			}
+			highlightLibraryWidget(pullPlanEditorPlanLibraryWidget, IS_DEPENDANCY);
 
 			AsyncPieceLibraryWidget* plw;
 			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
@@ -589,15 +600,18 @@ void MainWindow :: updateLibrary()
 				plw = dynamic_cast<AsyncPieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 				if (plw->getPiece()->hasDependencyOn(pullPlanEditorWidget->getPlan()))
+				{
+					plw->updatePixmap();
 					highlightLibraryWidget(plw, USES_DEPENDANCY);
+				}
 			}
 
-			highlightLibraryWidget(pullPlanEditorPlanLibraryWidget, IS_DEPENDANCY);
 			break;
 		}
 		case PIECE_MODE:
 		{
-			pieceEditorWidget->updateLibraryWidgetPixmaps(pieceEditorPieceLibraryWidget);
+			pieceEditorPieceLibraryWidget->updatePixmap();
+			highlightLibraryWidget(pieceEditorPieceLibraryWidget, IS_DEPENDANCY);
 
 			AsyncColorBarLibraryWidget* cblw;
 			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
@@ -618,7 +632,6 @@ void MainWindow :: updateLibrary()
 					highlightLibraryWidget(pplw, IS_USED_BY_DEPENDANCY);
 			}
 
-			highlightLibraryWidget(pieceEditorPieceLibraryWidget, IS_DEPENDANCY);
 			break;
 		}
 	}

@@ -337,11 +337,6 @@ void PullPlanEditorWidget :: seedTemplates()
 	}
 }
 
-void PullPlanEditorWidget :: updateLibraryWidgetPixmaps(AsyncPullPlanLibraryWidget* w)
-{
-	w->updatePixmaps(QPixmap::grabWidget(viewWidget, viewWidget->usedRect()).scaled(100, 100));
-}
-
 void PullPlanEditorWidget :: setPlan(PullPlan* p)
 {
 	plan = p;

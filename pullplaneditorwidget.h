@@ -21,7 +21,6 @@ class PullPlanEditorWidget : public QWidget
 		PullPlanEditorWidget(QWidget* parent=0);
 		PullPlan* getPlan();
 		void setPlan(PullPlan* p);
-		void updateLibraryWidgetPixmaps(AsyncPullPlanLibraryWidget* w);
 		void seedTemplates();
 		void mousePressEvent(QMouseEvent*);
 

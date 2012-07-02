@@ -350,7 +350,8 @@ void PieceEditorWidget :: seedTemplates()
 
 void PieceEditorWidget :: updateLibraryWidgetPixmaps(AsyncPieceLibraryWidget* w)
 {
-	w->updatePixmap(niceViewWidget->eyePosition());
+	//w->updateEyePosition(niceViewWidget->eyePosition());
+	w->updatePixmap();
 }
 
 void PieceEditorWidget :: setPickupParameter(int param, int value)

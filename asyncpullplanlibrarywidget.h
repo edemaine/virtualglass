@@ -12,7 +12,7 @@ class AsyncPullPlanLibraryWidget : public AsyncRenderWidget
 		PullPlan *getPullPlan();
 		const QPixmap *getEditorPixmap();
 		//other pixmap will be rendered asynchronously from copy of current pull plan (one hopes?)
-		void updatePixmaps(QPixmap const &editorPixmap);
+		void updatePixmaps();
 	protected:
 		PullPlan *pullPlan;
 		QPixmap editorPixmap;

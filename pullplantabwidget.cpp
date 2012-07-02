@@ -85,7 +85,7 @@ void PullPlanTabWidget :: seedTemplates()
 
 void PullPlanTabWidget :: updateLibraryWidgetPixmaps(AsyncPullPlanLibraryWidget* w)
 {
-    pullPlanEditor->updateLibraryWidgetPixmaps(w);
+    w->updatePixmaps();
 }
 
 void PullPlanTabWidget :: setPlan(PullPlan* p)

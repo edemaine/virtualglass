@@ -53,9 +53,9 @@ PullPlan* PullPlan :: copy() const {
 bool PullPlan :: hasDependencyOn(PullPlan* plan) {
 
 	if (this == plan)
-	return true;
+		return true;
 	if (this->isBase())
-	return false;
+		return false;
 
 	bool childrenAreDependent = false;
 	for (unsigned int i = 0; i < subs.size(); ++i) {

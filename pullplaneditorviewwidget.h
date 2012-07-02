@@ -22,6 +22,7 @@ class PullPlanEditorViewWidget : public QWidget
 		void mouseMoveEvent(QMouseEvent* event);
 		void mouseReleaseEvent(QMouseEvent* event);
 		QRect usedRect();
+		static QPixmap renderPullPlan(PullPlan* plan);
 	
 	signals:
 		void someDataChanged();

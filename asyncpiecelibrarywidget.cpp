@@ -9,8 +9,10 @@ AsyncPieceLibraryWidget :: AsyncPieceLibraryWidget(Piece* _piece, QWidget* paren
 	setFixedSize(100, 100);
 	setScaledContents(true);
 	setMouseTracking(true);
-
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
+	eyePosition.x = -16.0;
+	eyePosition.y = 0.0;
+	eyePosition.z = 0.0;
 
 	setGraphicsEffect(new QGraphicsHighlightEffect());
 	connect(graphicsEffect(),SIGNAL(enabledChanged(bool)),graphicsEffect(),SLOT(setStyleSheet(bool)));
@@ -22,16 +24,20 @@ Piece* AsyncPieceLibraryWidget :: getPiece()
 	return piece;
 }
 
-void AsyncPieceLibraryWidget :: updatePixmap(Vector3f eye_loc)
+void AsyncPieceLibraryWidget :: updateEyePosition(Vector3f _eyePosition)
+{
+	eyePosition = _eyePosition;
+}
+
+void AsyncPieceLibraryWidget :: updatePixmap()
 {
 	//queue up an async update:
 	Camera camera;
-	camera.eye = eye_loc;
+	camera.eye = eyePosition;
 	camera.lookAt = make_vector(0.0f, 0.0f, 0.0f);
 	camera.up = make_vector(0.0f, 0.0f, 1.0f);
 	camera.isPerspective = false;
 	camera.size = make_vector(300U, 300U);
 	setScene(camera, new PieceRenderData(piece));
-
 }
 

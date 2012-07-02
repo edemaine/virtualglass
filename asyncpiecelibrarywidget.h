@@ -14,10 +14,12 @@ class AsyncPieceLibraryWidget : public AsyncRenderWidget
 	public:
 		AsyncPieceLibraryWidget(Piece* _piece, QWidget* parent=0);
 		Piece* getPiece();
-		void updatePixmap(Vector3f eye_loc);
+		void updatePixmap();
+		void updateEyePosition(Vector3f eyePosition);
 
 	private:
 		Piece* piece;
+		Vector3f eyePosition;
 };
 
 #endif

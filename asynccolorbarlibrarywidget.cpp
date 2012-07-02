@@ -21,7 +21,7 @@ void AsyncColorBarLibraryWidget :: paintEvent(QPaintEvent *event)
 	AsyncPullPlanLibraryWidget::paintEvent(event);
 	QPainter painter(this);
 	painter.setPen(QPen(Qt::black));
-	painter.drawText(rect().adjusted(5, 0, 0, -5), Qt::AlignBottom | Qt::AlignLeft, colorName);
+	painter.drawText(rect().adjusted(5, 0, 0, -2), Qt::AlignBottom | Qt::AlignLeft, colorName);
 }
 
 void AsyncColorBarLibraryWidget :: updatePixmaps(QPixmap const &_editorPixmap)
