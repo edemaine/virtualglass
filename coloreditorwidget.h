@@ -8,7 +8,6 @@
 #include "niceviewwidget.h"
 #include "geometry.h"
 #include "mesh.h"
-#include "asynccolorbarlibrarywidget.h"
 #include "purecolorlibrarywidget.h"
 
 class ColorEditorWidget : public QWidget
@@ -16,9 +15,9 @@ class ColorEditorWidget : public QWidget
 	Q_OBJECT
 
 	public:
-		ColorEditorWidget(AsyncColorBarLibraryWidget* widget, QWidget* parent=0);
-		void setLibraryWidget(AsyncColorBarLibraryWidget* widget);
-		AsyncColorBarLibraryWidget* getLibraryWidget();
+		ColorEditorWidget(PullPlan* bar, QWidget* parent=0);
+		void setColorBar(PullPlan* bar);
+		PullPlan* getColorBar();
 		void seedColors();
 
 	signals:
@@ -26,8 +25,6 @@ class ColorEditorWidget : public QWidget
 
 	protected:
 		void mousePressEvent(QMouseEvent* event);
-                void highlightLibraryWidget(PureColorLibraryWidget* w);
-                void unhighlightLibraryWidget(PureColorLibraryWidget* w);
 
 	public slots:
 		void updateEverything();
@@ -37,7 +34,7 @@ class ColorEditorWidget : public QWidget
 	private:
 		Geometry geometry;
 		Mesher mesher;
-		AsyncColorBarLibraryWidget* libraryWidget;	
+		PullPlan* colorBar;
 		QComboBox* sourceComboBox;
 		NiceViewWidget* niceViewWidget;
                 QSlider* alphaSlider;
@@ -56,6 +53,9 @@ class ColorEditorWidget : public QWidget
 
 		void setupLayout();
 		void setupConnections();
+		void unhighlightPureColorLibraryWidget(PureColorLibraryWidget* w);
+		void highlightPureColorLibraryWidget(PureColorLibraryWidget* w);
+
 };
 
 

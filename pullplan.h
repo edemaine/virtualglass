@@ -10,6 +10,7 @@ class PullPlanLibraryWidget;
 #include <vector>
 #include "pulltemplate.h"
 #include "casing.h"
+#include <QString>
 
 using std::vector;
 
@@ -43,6 +44,8 @@ class PullPlan
 		Color* getCasingColor(unsigned int index);
 		unsigned int getCasingCount(); 
 		bool hasSquareCasing();
+		void setName(QString _name);
+		QString getName();
 
 		void setTwist(float t);
 		float getTwist();
@@ -65,12 +68,13 @@ class PullPlan
 		float twist;
 		vector<int> parameterValues;
 		vector<char*> parameterNames;
+		QString name;
 
 		// Methods
 		void initializeTemplate();
-        void updateSubs(vector<SubpullTemplate> oldSubs);
+		void updateSubs(vector<SubpullTemplate> oldSubs);
 		void pushNewSubpull(vector<SubpullTemplate>* newSubs,
-			int shape, Point location, float diameter, int group);
+		int shape, Point location, float diameter, int group);
 };
 
 PullPlan *deep_copy(const PullPlan *plan);

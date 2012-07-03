@@ -23,6 +23,7 @@ PullPlan :: PullPlan(int templateType) {
 	defaultColor = new Color;
 	defaultColor->r = defaultColor->g = defaultColor->b = 1.0;
 	defaultColor->a = 0.0;
+	name = "R-100"; // named after default color 
 	defaultCircleSubplan = defaultSquareSubplan = NULL;
 
 	this->twist = 0.0;
@@ -39,13 +40,15 @@ PullPlan* PullPlan :: copy() const {
 
 	assert(c->parameterValues.size() == this->parameterValues.size());
 	c->parameterValues = this->parameterValues;
-    vector<SubpullTemplate> oldSubs = this->subs;
-    c->updateSubs(oldSubs);
+	vector<SubpullTemplate> oldSubs = this->subs;
+	c->updateSubs(oldSubs);
 
 	assert(c->subs.size() == this->subs.size());
 	for (unsigned int i = 0; i < this->subs.size(); ++i) {
 		c->subs[i].plan = this->subs[i].plan;
 	}
+
+	c->name = this->name;
 
 	return c;
 }
@@ -190,9 +193,9 @@ void PullPlan :: setTemplateType(int templateType) {
 			break;
 	}
 
-    vector<SubpullTemplate> oldSubs = subs;
+	vector<SubpullTemplate> oldSubs = subs;
 	subs.clear(); // don't carry over any of the current stuff
-    updateSubs(oldSubs);
+	updateSubs(oldSubs);
 }
 
 void PullPlan :: setCasingColor(Color* c, unsigned int index) {
@@ -224,6 +227,16 @@ unsigned int PullPlan :: getCasingCount() {
 	return this->casings.size();
 }
 
+void PullPlan :: setName(QString _name)
+{
+	this->name = _name;
+}
+
+QString PullPlan :: getName()
+{
+	return this->name;
+}
+
 void PullPlan :: setTwist(float t) {
 
 	this->twist = t;
@@ -241,8 +254,8 @@ int PullPlan :: getTemplateType() {
 
 void PullPlan :: setParameter(int p, int v) {
 	parameterValues[p] = v;
-    vector<SubpullTemplate> oldSubs = this->subs;
-    updateSubs(oldSubs);
+	vector<SubpullTemplate> oldSubs = this->subs;
+	updateSubs(oldSubs);
 }
 
 int PullPlan :: getParameter(int p) {
@@ -315,9 +328,9 @@ void PullPlan :: setCasingThickness(float t, unsigned int index) {
 	// to valid relative sizes.
 	if (index >= this->casings.size())
 		return;
-    this->casings[index].thickness = t;
-    vector<SubpullTemplate> oldSubs = this->subs;
-    updateSubs(oldSubs);
+	this->casings[index].thickness = t;
+	vector<SubpullTemplate> oldSubs = this->subs;
+	updateSubs(oldSubs);
 }
 
 void PullPlan :: setOutermostCasingShape(int newShape) {
@@ -343,8 +356,8 @@ void PullPlan :: setOutermostCasingShape(int newShape) {
 	if (hasSquareCasing())
 		this->twist = 0.0;
 
-    vector<SubpullTemplate> oldSubs = this->subs;
-    updateSubs(oldSubs);
+	vector<SubpullTemplate> oldSubs = this->subs;
+	updateSubs(oldSubs);
 }
 
 float PullPlan :: getCasingThickness(unsigned int index) {

@@ -2,18 +2,8 @@
 #include "asynccolorbarlibrarywidget.h"
 #include "pullplanrenderdata.h"
 
-AsyncColorBarLibraryWidget :: AsyncColorBarLibraryWidget(PullPlan* _plan, QString _colorName,  QWidget* _parent): AsyncPullPlanLibraryWidget(_plan, _parent), colorName(_colorName)
+AsyncColorBarLibraryWidget :: AsyncColorBarLibraryWidget(PullPlan* _plan, QWidget* _parent): AsyncPullPlanLibraryWidget(_plan, _parent)
 {
-}
-
-QString AsyncColorBarLibraryWidget :: getColorName()
-{
-	return colorName;
-}
-
-void AsyncColorBarLibraryWidget :: setColorName(QString name)
-{
-	colorName = name;
 }
 
 void AsyncColorBarLibraryWidget :: paintEvent(QPaintEvent *event)
@@ -21,7 +11,7 @@ void AsyncColorBarLibraryWidget :: paintEvent(QPaintEvent *event)
 	AsyncPullPlanLibraryWidget::paintEvent(event);
 	QPainter painter(this);
 	painter.setPen(QPen(Qt::black));
-	painter.drawText(rect().adjusted(5, 0, 0, -2), Qt::AlignBottom | Qt::AlignLeft, colorName);
+	painter.drawText(rect().adjusted(5, 0, 0, -2), Qt::AlignBottom | Qt::AlignLeft, pullPlan->getName());
 }
 
 void AsyncColorBarLibraryWidget :: updatePixmaps()

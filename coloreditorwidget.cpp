@@ -1,11 +1,11 @@
 
 #include "coloreditorwidget.h"
 
-ColorEditorWidget :: ColorEditorWidget(AsyncColorBarLibraryWidget* libraryWidget, QWidget* parent) : QWidget(parent)
+ColorEditorWidget :: ColorEditorWidget(PullPlan* _colorBar, QWidget* parent) : QWidget(parent)
 {
-	this->niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);
-	this->libraryWidget = libraryWidget;
-	mesher.generateColorMesh(libraryWidget->getPullPlan(), &geometry);
+	niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);
+	colorBar = _colorBar;
+	mesher.generateColorMesh(colorBar, &geometry);
 	niceViewWidget->setGeometry(&geometry);
 
 	setupLayout();
@@ -13,15 +13,14 @@ ColorEditorWidget :: ColorEditorWidget(AsyncColorBarLibraryWidget* libraryWidget
 }
 
 
-AsyncColorBarLibraryWidget* ColorEditorWidget :: getLibraryWidget() {
+PullPlan* ColorEditorWidget :: getColorBar() {
 
-	return this->libraryWidget;
+	return colorBar;
 }
 
-void ColorEditorWidget :: setLibraryWidget(AsyncColorBarLibraryWidget* widget) {
+void ColorEditorWidget :: setColorBar(PullPlan* _colorBar) {
 
-	this->libraryWidget = widget;
-	this->libraryWidget->updatePixmaps();
+	colorBar = _colorBar;
 }
 
 
@@ -243,9 +242,9 @@ void ColorEditorWidget :: seedColors()
 
 void ColorEditorWidget :: alphaSliderPositionChanged(int)
 {
-	if (alphaSlider->sliderPosition() != (int) (libraryWidget->getPullPlan()->getOutermostCasingColor()->a * 255))
+	if (alphaSlider->sliderPosition() != (int) (colorBar->getOutermostCasingColor()->a * 255))
 	{
-		libraryWidget->getPullPlan()->getOutermostCasingColor()->a = (255 - alphaSlider->sliderPosition()) / 255.0;
+		colorBar->getOutermostCasingColor()->a = (255 - alphaSlider->sliderPosition()) / 255.0;
 		emit someDataChanged();
 	} 
 }
@@ -255,33 +254,32 @@ void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 	PureColorLibraryWidget* pclw = dynamic_cast<PureColorLibraryWidget*>(childAt(event->pos()));
 	if (pclw != NULL)
 	{
-		*(libraryWidget->getPullPlan()->getOutermostCasingColor()) = pclw->getColor();
-		libraryWidget->setColorName(pclw->getColorName().split(' ')[0]);
-		this->alphaSlider->setSliderPosition(255 - int(libraryWidget->getPullPlan()->getOutermostCasingColor()->a * 255));
+		*(colorBar->getOutermostCasingColor()) = pclw->getColor();
+		colorBar->setName(pclw->getColorName().split(' ')[0]);
+		this->alphaSlider->setSliderPosition(255 - int(colorBar->getOutermostCasingColor()->a * 255));
 		emit someDataChanged();	
 	}
 }
 
-void ColorEditorWidget :: unhighlightLibraryWidget(PureColorLibraryWidget* w)
+void ColorEditorWidget :: unhighlightPureColorLibraryWidget(PureColorLibraryWidget* w)
 {
-	w->graphicsEffect()->setEnabled(false);
+        w->graphicsEffect()->setEnabled(false);
 }
 
-void ColorEditorWidget :: highlightLibraryWidget(PureColorLibraryWidget* w)
+void ColorEditorWidget :: highlightPureColorLibraryWidget(PureColorLibraryWidget* w)
 {
-	w->graphicsEffect()->setEnabled(false);
-	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
-	w->graphicsEffect()->setEnabled(true);
+        w->graphicsEffect()->setEnabled(false);
+        ((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
+        w->graphicsEffect()->setEnabled(true);
 }
 
 void ColorEditorWidget :: updateEverything()
 {
 	geometry.clear();
-	mesher.generateColorMesh(libraryWidget->getPullPlan(), &geometry);
+	mesher.generateColorMesh(colorBar, &geometry);
 	niceViewWidget->repaint();
-	libraryWidget->updatePixmaps();
 
-	this->alphaSlider->setSliderPosition(255 - (int) (libraryWidget->getPullPlan()->getOutermostCasingColor()->a * 255));
+	this->alphaSlider->setSliderPosition(255 - (int) (colorBar->getOutermostCasingColor()->a * 255));
 
 	QLayoutItem* w;
 	PureColorLibraryWidget* pclw;
@@ -290,91 +288,91 @@ void ColorEditorWidget :: updateEverything()
 	{
 		w = colorLibrary6Layout->itemAt(j);
 		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-		pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
+		pColor = colorBar->getOutermostCasingColor();
 		if (pclw->getColor().r == pColor->r &&
 			pclw->getColor().g == pColor->g &&
 			pclw->getColor().b == pColor->b)
 		{
-			highlightLibraryWidget(pclw);
+			highlightPureColorLibraryWidget(pclw);
 			sourceComboBox->setCurrentIndex(5);
 		}
 		else
-			unhighlightLibraryWidget(pclw);
+			unhighlightPureColorLibraryWidget(pclw);
 	}
 	for (int j = 0; j < colorLibrary5Layout->count(); ++j)
 	{
 		w = colorLibrary5Layout->itemAt(j);
 		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-		pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
+		pColor = colorBar->getOutermostCasingColor();
 		if (pclw->getColor().r == pColor->r &&
 			pclw->getColor().g == pColor->g &&
 			pclw->getColor().b == pColor->b) 
 		{
-			highlightLibraryWidget(pclw);
+			highlightPureColorLibraryWidget(pclw);
 			sourceComboBox->setCurrentIndex(4);
 		}
 		else
-			unhighlightLibraryWidget(pclw);
+			unhighlightPureColorLibraryWidget(pclw);
 	}
 	for (int j = 0; j < colorLibrary4Layout->count(); ++j)
 	{
 		w = colorLibrary4Layout->itemAt(j);
 		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-		pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
+		pColor = colorBar->getOutermostCasingColor();
 		if (pclw->getColor().r == pColor->r &&
 			pclw->getColor().g == pColor->g &&
 			pclw->getColor().b == pColor->b)
 		{
-			highlightLibraryWidget(pclw);
+			highlightPureColorLibraryWidget(pclw);
 			sourceComboBox->setCurrentIndex(3);
 		}
 		else
-			unhighlightLibraryWidget(pclw);
+			unhighlightPureColorLibraryWidget(pclw);
 	}
 	for (int j = 0; j < colorLibrary3Layout->count(); ++j)
 	{
 		w = colorLibrary3Layout->itemAt(j);
 		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-		pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
+		pColor = colorBar->getOutermostCasingColor();
 		if (pclw->getColor().r == pColor->r &&
 			pclw->getColor().g == pColor->g &&
 			pclw->getColor().b == pColor->b)
 		{
-			highlightLibraryWidget(pclw);
+			highlightPureColorLibraryWidget(pclw);
 			sourceComboBox->setCurrentIndex(2);
 		}
 		else
-			unhighlightLibraryWidget(pclw);
+			unhighlightPureColorLibraryWidget(pclw);
 	}
 	for (int j = 0; j < colorLibrary2Layout->count(); ++j)
 	{
 		w = colorLibrary2Layout->itemAt(j);
 		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-		pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
+		pColor = colorBar->getOutermostCasingColor();
 		if (pclw->getColor().r == pColor->r &&
 			pclw->getColor().g == pColor->g &&
 			pclw->getColor().b == pColor->b)
 		{
-			highlightLibraryWidget(pclw);
+			highlightPureColorLibraryWidget(pclw);
 			sourceComboBox->setCurrentIndex(1);
 		}
 		else
-			unhighlightLibraryWidget(pclw);
+			unhighlightPureColorLibraryWidget(pclw);
 	}
 	for (int j = 0; j < colorLibrary1Layout->count(); ++j)
 	{
 		w = colorLibrary1Layout->itemAt(j);
 		pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-		pColor = libraryWidget->getPullPlan()->getOutermostCasingColor();
+		pColor = colorBar->getOutermostCasingColor();
 		if (pclw->getColor().r == pColor->r &&
 			pclw->getColor().g == pColor->g &&
 			pclw->getColor().b == pColor->b) 
 		{
-			highlightLibraryWidget(pclw);
+			highlightPureColorLibraryWidget(pclw);
 			sourceComboBox->setCurrentIndex(0);
 		}
 		else
-			unhighlightLibraryWidget(pclw);
+			unhighlightPureColorLibraryWidget(pclw);
 	}
 }
 

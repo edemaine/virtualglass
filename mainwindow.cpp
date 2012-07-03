@@ -93,7 +93,8 @@ void MainWindow :: deleteCurrentEditingObject()
 			for (i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
 				w = colorBarLibraryLayout->itemAt(i);
-				if (dynamic_cast<AsyncColorBarLibraryWidget*>(w->widget()) == colorEditorWidget->getLibraryWidget())
+				PullPlan* p = dynamic_cast<AsyncColorBarLibraryWidget*>(w->widget())->getPullPlan();
+				if (p == colorEditorWidget->getColorBar())
 				{
 					// this may be a memory leak, the library widget is never explicitly deleted
 					w = colorBarLibraryLayout->takeAt(i); 
@@ -103,8 +104,8 @@ void MainWindow :: deleteCurrentEditingObject()
 				}
 			}
 
-			colorEditorWidget->setLibraryWidget(dynamic_cast<AsyncColorBarLibraryWidget*>(colorBarLibraryLayout->itemAt(
-					MIN(colorBarLibraryLayout->count()-1, i))->widget()));
+			colorEditorWidget->setColorBar(dynamic_cast<AsyncColorBarLibraryWidget*>(colorBarLibraryLayout->itemAt(
+					MIN(colorBarLibraryLayout->count()-1, i))->widget())->getPullPlan());
 			emit someDataChanged();
 			break;
 		}
@@ -177,7 +178,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	if (cblw != NULL)
 	{
 		unhighlightAllLibraryWidgets();
-		colorEditorWidget->setLibraryWidget(cblw);
+		colorEditorWidget->setColorBar(cblw->getPullPlan());
 		editorStack->setCurrentIndex(COLORBAR_MODE);
 		emit someDataChanged();
 	}
@@ -365,8 +366,8 @@ void MainWindow :: setupColorEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
 	AsyncColorBarLibraryWidget* starterLibraryWidget = 
-		new AsyncColorBarLibraryWidget(new PullPlan(CIRCLE_BASE_PULL_TEMPLATE), "R-100", this);
-	colorEditorWidget = new ColorEditorWidget(starterLibraryWidget, editorStack);
+		new AsyncColorBarLibraryWidget(new PullPlan(CIRCLE_BASE_PULL_TEMPLATE), this);
+	colorEditorWidget = new ColorEditorWidget(starterLibraryWidget->getPullPlan(), editorStack);
 	colorBarLibraryLayout->addWidget(starterLibraryWidget);
 }
 
@@ -400,13 +401,12 @@ void MainWindow :: newColorBar()
 
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();
-	AsyncColorBarLibraryWidget* colorEditorBarLibraryWidget = 
-		new AsyncColorBarLibraryWidget(newEditorBar, "R-100");
-	colorBarLibraryLayout->addWidget(colorEditorBarLibraryWidget);
-	colorEditorWidget->setLibraryWidget(colorEditorBarLibraryWidget);
+	AsyncColorBarLibraryWidget* newColorBarLibraryWidget = 
+		new AsyncColorBarLibraryWidget(newEditorBar, this);
+	colorBarLibraryLayout->addWidget(newColorBarLibraryWidget);
 
 	// Give the new plan to the editor
-	colorEditorWidget->setLibraryWidget(colorEditorBarLibraryWidget);
+	colorEditorWidget->setColorBar(newColorBarLibraryWidget->getPullPlan());
 
 	// Load up the right editor
 	editorStack->setCurrentIndex(COLORBAR_MODE);
@@ -524,7 +524,18 @@ void MainWindow :: updateLibrary()
 	{
 		case COLORBAR_MODE:
 		{
-			highlightLibraryWidget(colorEditorWidget->getLibraryWidget(), IS_DEPENDANCY);
+                        AsyncColorBarLibraryWidget* cblw;
+                        for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
+                        {
+                                cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
+                                        dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
+                                if (colorEditorWidget->getColorBar() == cblw->getPullPlan())
+				{
+					cblw->updatePixmaps();
+                                        highlightLibraryWidget(cblw, IS_DEPENDANCY);
+				}
+                        }
+
 
 			AsyncPullPlanLibraryWidget* pplw;
 			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
@@ -532,7 +543,7 @@ void MainWindow :: updateLibrary()
 				pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 				if (pplw->getPullPlan()->hasDependencyOn(
-					colorEditorWidget->getLibraryWidget()->getPullPlan()->getOutermostCasingColor()))
+					colorEditorWidget->getColorBar()->getOutermostCasingColor()))
 				{
 					pplw->updatePixmaps();
 					highlightLibraryWidget(pplw, USES_DEPENDANCY);				
@@ -545,7 +556,7 @@ void MainWindow :: updateLibrary()
 				plw = dynamic_cast<AsyncPieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 				if (plw->getPiece()->hasDependencyOn(
-					colorEditorWidget->getLibraryWidget()->getPullPlan()->getOutermostCasingColor()))
+					colorEditorWidget->getColorBar()->getOutermostCasingColor()))
 				{
 					plw->updatePixmap();
 					highlightLibraryWidget(plw, USES_DEPENDANCY);
