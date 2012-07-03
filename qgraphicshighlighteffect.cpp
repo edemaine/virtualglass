@@ -6,7 +6,7 @@ QGraphicsHighlightEffect::QGraphicsHighlightEffect(QObject* parent) : QGraphicsE
 
 QRectF QGraphicsHighlightEffect::boundingRectFor( const QRectF &sourceRect) const
 {
-	return sourceRect.adjusted(0, 0, 0, 0); 
+	return sourceRect;
 }
 
 void QGraphicsHighlightEffect :: setStyleSheet(bool enableBorder)
@@ -27,14 +27,14 @@ void QGraphicsHighlightEffect :: setStyleSheet(bool enableBorder)
 				break;
 			case IS_USED_BY_DEPENDANCY:
 				color = QColor(0, 139, 69, 255);
-				emit styleSheetString("border: 2px dashed " + color.name() + ";");
+				emit styleSheetString("border: 2px dashed " + color.name() + ";"); 
 				break;
 		}
 	}
 	else
 	{
 		color = QColor(200, 200, 200, 0);
-		emit styleSheetString("border: 2px solid " + color.name());
+		emit styleSheetString("border: 2px solid " + color.name() + ";");
 	}
 }
 

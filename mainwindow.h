@@ -71,9 +71,6 @@ class MainWindow : public QMainWindow
 		QPoint dragStartPosition;
 		QStackedWidget* editorStack; //editorStack.currentIndex() gives with mode
 		QWidget* emptyEditorPage;
-		AsyncColorBarLibraryWidget* colorEditorBarLibraryWidget;
-		AsyncPullPlanLibraryWidget* pullPlanEditorPlanLibraryWidget;
-		AsyncPieceLibraryWidget* pieceEditorPieceLibraryWidget;
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
 		ColorEditorWidget* colorEditorWidget;

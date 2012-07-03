@@ -175,7 +175,7 @@ void ColorEditorWidget :: setupLayout()
 	pageLayout->addWidget(niceViewWidget, 10);
 
 	// Little description for the editor
-	QLabel* descriptionLabel = new QLabel("Color editor", this);
+	QLabel* descriptionLabel = new QLabel("Color editor.", this);
 	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	editorLayout->addWidget(descriptionLabel, 0);
 }

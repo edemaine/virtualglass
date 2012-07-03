@@ -4,7 +4,7 @@
 
 class PullPlanRenderPixmap
 {
-	static const int size = 300;
+	static const int size = 200;
 
 	public:
 		static QPixmap getEditorPixmap(PullPlan* plan);
