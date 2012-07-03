@@ -189,7 +189,7 @@ void PieceEditorWidget :: setupLayout()
 
 	pickupTemplateParameter1Label = new QLabel(piece->pickup->getParameterName(0));
 	pickupParameter1SpinBox = new QSpinBox(this);
-	pickupParameter1SpinBox->setRange(6, 40);
+	pickupParameter1SpinBox->setRange(2, 40);
 	pickupParameter1SpinBox->setSingleStep(1);
 	pickupParameter1SpinBox->setValue(1);
 	QLabel* lp1label = new QLabel("6", this);

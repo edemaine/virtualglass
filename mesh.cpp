@@ -471,152 +471,125 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 		points[i].y *= radius;
 	}
 
-	//Generate verts:
-	vector< Vector3ui > tris;
-	if (tris.empty() && points.size() >= 3) {
-		tris.resize(points.size() - 2);
-		for (unsigned int i = 0; i < tris.size(); ++i) {
-			tris[i].c[0] = 0;
-			tris[i].c[1] = i+1;
-			tris[i].c[2] = i+2;
-		}
-	}
-	vector< vector< unsigned int > > loops;
-	{ //make edge loops, given tris:
-		EdgeMap next_edge;
-		//First, make it easy to walk around edges:
-		for (vector< Vector3ui >::const_iterator tri = tris.begin(); tri != tris.end(); ++tri) {
-			for (unsigned int i = 0; i < 3; ++i) {
-				unsigned int a = tri->c[i];
-				unsigned int b = tri->c[(i+1)%3];
-				unsigned int c = tri->c[(i+2)%3];
-				//do edges incident to vertex b:
-				//next_edge[(a,b)] = (b,c)
-				assert(!next_edge.count(make_vector(a,b)));
-				next_edge.insert(make_pair(make_vector(a,b),make_vector(b,c)));
-			}
-		}
-		EdgeSet outside_edges;
-		for (EdgeMap::const_iterator n = next_edge.begin(); n != next_edge.end(); ++n) {
-			Vector2ui e = n->first;
-			//any edge without a reverse is an outside edge:
-			if (!next_edge.count(make_vector(e[1],e[0]))) {
-				outside_edges.insert(e);
-			}
-		}
-		while (!outside_edges.empty()) {
-			assert(outside_edges.size() >= 3);
-
-			Vector2ui seed = *outside_edges.begin();
-			outside_edges.erase(outside_edges.begin());
-			vector< unsigned int > loop;
-			Vector2ui edge = seed;
-			while (1) {
-				//Add edge to loop:
-				loop.push_back(edge[0]);
-				//Walk to next edge in triangle:
-				EdgeMap::iterator f = next_edge.find(edge);
-				assert(f != next_edge.end());
-				edge = f->second;
-				//Follow adjacent triangles:
-				while ((f = next_edge.find(make_vector(edge[1],edge[0]))) != next_edge.end()) {
-					edge = f->second;
-				}
-				//Should darn well lead to an outside edge:
-				EdgeSet::iterator o = outside_edges.find(edge);
-				if (o == outside_edges.end()) {
-					//we looped.
-					assert(edge == seed);
-					break;
-				} else {
-					outside_edges.erase(o);
-				}
-			}
-			assert(loop.size() >= 3);
-
-			loops.push_back(loop);
-		} //while there are still edge loops to walk.
-	}
-	for (vector< vector< unsigned int > >::const_iterator loop = loops.begin(); loop != loops.end(); ++loop)
+	// Create wall vertices row by row
+	unsigned int base = geometry->vertices.size();
+	for (unsigned int i = 0; i < axialResolution; ++i)
 	{
-		unsigned int base = geometry->vertices.size();
-		for (unsigned int i = 0; i < axialResolution; ++i)
-		{
-			for (unsigned int j = 0; j < loop->size(); ++j)
-			{
-				Point p;
-				p.xy = points[(*loop)[j]];
-				if (i == 0)
-					p.z = 5.0 * offset;
-				else
-					p.z = 5.0 * length * i / (axialResolution-1);
-				Point n;
-				//This is a terrible normal estimate, but I guess it gets re-estimated anyway.
-				n.x = p.x;
-				n.y = p.y;
-				n.z = 0.0f;
-				geometry->vertices.push_back(Vertex(p,n));
-			}
-		}
-		//Generate triangles linking them:
-		for (unsigned int i = 0; i + 1 < axialResolution; ++i)
-		{
-			for (unsigned int j = 0; j < loop->size(); ++j)
-			{
-				uint32_t p1 = base + i * loop->size() + j;
-				uint32_t p2 = base + (i+1) * loop->size() + j;
-				uint32_t p3 = base + i * loop->size() + (j+1) % loop->size();
-				uint32_t p4 = base + (i+1) * loop->size() + (j+1) % loop->size();
-				// Four points that define a (non-flat) quad are used
-				// to create two triangles.
-				geometry->triangles.push_back(Triangle(p2, p1, p4));
-				geometry->triangles.push_back(Triangle(p1, p3, p4));
-			}
-		}
-	} //for (loops)
-	assert(geometry->valid());
-
-	/*
-	Draw the polygon bottom, then top.
-	The mesh uses a set of n-2 triangles with a common vertex
-	to draw a regular n-gon.
-	*/
-	for (int side = 0; side <= 1; ++side) 
-	{
-		float z;
-		if (side)
-			z = 5.0 * length;
-		else
-			z = 5.0 * offset;
-		float nz = (side ? 1.0:-1.0);
-		uint32_t base = geometry->vertices.size();
 		for (unsigned int j = 0; j < points.size(); ++j)
 		{
 			Point p;
 			p.xy = points[j];
-			p.z = z;
-
+			if (i == 0)
+				p.z = 5.0 * offset;
+			else
+				p.z = 5.0 * length * i / (axialResolution-1);
 			Point n;
-			n.x = 0.0; n.y = 0.0; n.z = nz;
-			geometry->vertices.push_back(Vertex(p, n));
+			//This is a terrible normal estimate, but I guess it gets re-estimated anyway.
+			n.x = p.x;
+			n.y = p.y;
+			n.z = 0.0f;
+			geometry->vertices.push_back(Vertex(p,n));
 		}
+	}
+	//Generate triangles linking wall vertices in adjacent rows
+	for (unsigned int i = 0; i + 1 < axialResolution; ++i)
+	{
+		for (unsigned int j = 0; j < points.size(); ++j)
+		{
+			uint32_t p1 = base + i * points.size() + j;
+			uint32_t p2 = base + (i+1) * points.size() + j;
+			uint32_t p3 = base + i * points.size() + (j+1) % points.size();
+			uint32_t p4 = base + (i+1) * points.size() + (j+1) % points.size();
+			// Four points that define a (non-flat) quad are used
+			// to create two triangles.
+			geometry->triangles.push_back(Triangle(p2, p1, p4));
+			geometry->triangles.push_back(Triangle(p1, p3, p4));
+		}
+	}
+
+	// Build top and bottom triangles (two concentric rings) 
+	vector< Vector3ui > layer1Tris;
+	layer1Tris.resize(points.size());
+	for (unsigned int i = 0; i < points.size(); ++i) {
+		layer1Tris[i].c[0] = -1;
+		layer1Tris[i].c[1] = i;
+		layer1Tris[i].c[2] = (i+1) % points.size();
+	}
+
+	vector< Vector3ui > layer2Tris;
+	layer2Tris.resize(2*points.size());
+	for (unsigned int i = 0; i < points.size(); ++i) {
+		layer2Tris[2*i].c[0] = i-points.size();
+		layer2Tris[2*i].c[1] = i;
+		layer2Tris[2*i].c[2] = (i+1) % points.size();
+		layer2Tris[2*i+1].c[0] = i-points.size();
+		layer2Tris[2*i+1].c[1] = (i+1) % points.size();
+		layer2Tris[2*i+1].c[2] = (i+1) % points.size() - points.size();
+	}
+
+	/*
+	Build top and bottom walls (disks) of cylinder by generating
+	vertices and linking them with just-constructed triangle lists
+	*/
+	for (int side = 0; side <= 1; ++side) 
+	{
+		float z;
+		int o1, o2;
+
 		if (side)
 		{
-			for (unsigned int j = 0; j < tris.size(); ++j)
-			{
-				geometry->triangles.push_back(Triangle(base + tris[j].c[0], base + tris[j].c[1], base + tris[j].c[2]));
-			}
+			o1 = 1;
+			o2 = 2;
+			z = 5.0 * length;
 		}
 		else
 		{
-			for (unsigned int j = 0; j < tris.size(); ++j)
-			{
-				geometry->triangles.push_back(Triangle(base + tris[j].c[0], base + tris[j].c[2], base + tris[j].c[1]));
-			}
+			o1 = 2;
+			o2 = 1;
+			z = 5.0 * offset;
+		}
+
+		Point n;
+		n.x = 0.0; 
+		n.y = 0.0; 
+		n.z = (side ? 1.0:-1.0);
+
+		// throw down first layer of points and triangles (central layer)
+		Point p;
+		p.x = p.y = 0.0;
+		p.z = z;
+		geometry->vertices.push_back(Vertex(p, n));
+
+		uint32_t base = geometry->vertices.size();
+		for (unsigned int j = 0; j < points.size(); ++j)
+		{
+			p.xy = points[j];
+			p.x *= 0.5; // fit this ring of points inside full cylinder cap
+			p.y *= 0.5;
+			p.z = z;
+			geometry->vertices.push_back(Vertex(p, n));
+		}
+		for (unsigned int j = 0; j < layer1Tris.size(); ++j)
+		{
+			geometry->triangles.push_back(Triangle(base + layer1Tris[j].c[0], base + layer1Tris[j].c[o1], base + layer1Tris[j].c[o2]));
+		}
+
+		// throw down second layer of points and triangles (outer ring layer)
+		base = geometry->vertices.size();
+		for (unsigned int j = 0; j < points.size(); ++j)
+		{
+			p.xy = points[j];
+			p.z = z;
+			geometry->vertices.push_back(Vertex(p, n));
+		}
+		for (unsigned int j = 0; j < layer2Tris.size(); ++j)
+		{
+			geometry->triangles.push_back(Triangle(base + layer2Tris[j].c[0], base + layer2Tris[j].c[o1], base + layer2Tris[j].c[o2]));
 		}
 	}
 	assert(geometry->valid());
 
+	// Actually do the transformations on the basic canonical cylinder mesh
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorIndices);
