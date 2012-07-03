@@ -62,6 +62,20 @@ void PickupPlan :: updateSubs() {
 	Point p;
 	float width;
 	switch (this->templateType) {
+		case MURRINE_PICKUP_TEMPLATE:
+                        width = 2.0 / MAX(parameterValues[0], 1);
+			for (int r = 0; r < parameterValues[0]; ++r)
+			{
+				for (int c = 0; c < parameterValues[0]; ++c)
+				{
+					p.x = -1.0 + width / 2 + width * r;
+					p.y = -1.0 + width / 2 + width * c;
+					p.z = -width/2;
+					pushNewSubplan(&newSubs, p, MURRINE_ORIENTATION, parameterValues[1]*0.005 + 0.005, width-0.0001,
+						SQUARE_SHAPE, 1);
+				}
+			}
+                        break;
 		case MURRINE_COLUMN_PICKUP_TEMPLATE:
 			width = 2.0 / MAX(parameterValues[0], 1);
 			for (int i = 0; i < parameterValues[0]-1; ++i) {
@@ -233,6 +247,16 @@ void PickupPlan :: setTemplateType(int templateType) {
 			parameterNames.push_back(tmp);
 			parameterValues.push_back(14);
 			break;
+		case MURRINE_PICKUP_TEMPLATE:
+			tmp = new char[100];
+			sprintf(tmp, "Row/Column count:");
+			parameterNames.push_back(tmp);
+			parameterValues.push_back(10);
+			tmp = new char[100];
+			sprintf(tmp, "Thickness:");
+			parameterNames.push_back(tmp);
+			parameterValues.push_back(10);
+			break;
 		case RETICELLO_VERTICAL_HORIZONTAL_PICKUP_TEMPLATE:
 			tmp = new char[100];
 			sprintf(tmp, "Column count:");
@@ -260,6 +284,11 @@ void PickupPlan :: setTemplateType(int templateType) {
 int PickupPlan :: getTemplateType() {
 
 	return this->templateType;
+}
+
+unsigned int PickupPlan :: getParameterCount()
+{
+	return parameterValues.size();
 }
 
 char* PickupPlan :: getParameterName(int param) {

@@ -44,6 +44,8 @@ class PieceEditorWidget : public QWidget
 		void pieceTemplateParameterSlider3Changed(int);
 		void pickupParameter1SpinBoxChanged(int);
 		void pickupParameter1SliderChanged(int);
+		void pickupParameter2SpinBoxChanged(int);
+		void pickupParameter2SliderChanged(int);
 
 	private:
 		Geometry geometry;
@@ -57,19 +59,14 @@ class PieceEditorWidget : public QWidget
                 QLabel overlayColorLabel;
                 QLabel underlayColorLabel;
                 QComboBox* fillRuleComboBox;
-		QLabel* pickupTemplateParameter1Label;
-		QSpinBox* pickupParameter1SpinBox;
-		QSlider* pickupParameter1Slider;
-		QSlider* pickupTemplateParameter1Slider;
 
-		QLabel* pieceTemplateParameter1Label;
-		QLabel* pieceTemplateParameter2Label;
-		QLabel* pieceTemplateParameter3Label;
-		QSlider* pieceTemplateParameter1Slider;
-		QSlider* pieceTemplateParameter2Slider;
-		QSlider* pieceTemplateParameter3Slider;
+		vector<QLabel*> pickupParamLabels;
+		vector<QSpinBox*> pickupParamSpinboxes;
+		vector<QSlider*> pickupParamSliders;
+		vector<QWidget*> pickupParamWidgets;
 		vector<QLabel*> pieceParamLabels;
 		vector<QSlider*> pieceParamSliders;
+		vector<QWidget*> pieceParamWidgets;
 
 		QHBoxLayout* pickupTemplateLibraryLayout;
 		QHBoxLayout* pieceTemplateLibraryLayout;

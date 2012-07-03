@@ -21,6 +21,7 @@ class PickupPlan
 
                 void setParameter(int param, int newValue);
                 int getParameter(int param);
+                unsigned int getParameterCount();
                 char* getParameterName(int param);
 
 		PickupPlan* copy() const;
