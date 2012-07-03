@@ -11,8 +11,7 @@ class AsyncColorBarLibraryWidget : public AsyncPullPlanLibraryWidget
 		AsyncColorBarLibraryWidget(PullPlan* plan, QString colorName, QWidget* parent=0);
 		QString getColorName();
 		void setColorName(QString name);
-
-		void updatePixmaps(QPixmap const &editorPixmap);
+		void updatePixmaps();
 
 		//to overlay color name:
 		virtual void paintEvent(QPaintEvent *);

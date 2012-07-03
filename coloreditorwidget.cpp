@@ -19,9 +19,9 @@ AsyncColorBarLibraryWidget* ColorEditorWidget :: getLibraryWidget() {
 }
 
 void ColorEditorWidget :: setLibraryWidget(AsyncColorBarLibraryWidget* widget) {
-	
+
 	this->libraryWidget = widget;
-	updateLibraryWidgetPixmaps();
+	this->libraryWidget->updatePixmaps();
 }
 
 
@@ -186,16 +186,6 @@ void ColorEditorWidget :: setupConnections()
 	connect(sourceComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(sourceComboBoxChanged(int)));
 }
 
-void ColorEditorWidget :: updateLibraryWidgetPixmaps()
-{
-	Color c = *(libraryWidget->getPullPlan()->getOutermostCasingColor());
-
-	QPixmap editorPixmap(100, 100);
-	editorPixmap.fill(QColor(255*c.r, 255*c.g, 255*c.b, 255*MAX(0.1, c.a))); 
-
-	libraryWidget->updatePixmaps(editorPixmap);
-}
-
 void ColorEditorWidget :: seedColors()
 { 
 	Color caneColor;
@@ -289,7 +279,7 @@ void ColorEditorWidget :: updateEverything()
 	geometry.clear();
 	mesher.generateColorMesh(libraryWidget->getPullPlan(), &geometry);
 	niceViewWidget->repaint();
-	updateLibraryWidgetPixmaps();
+	libraryWidget->updatePixmaps();
 
 	this->alphaSlider->setSliderPosition(255 - (int) (libraryWidget->getPullPlan()->getOutermostCasingColor()->a * 255));
 

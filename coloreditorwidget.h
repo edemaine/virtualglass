@@ -20,7 +20,6 @@ class ColorEditorWidget : public QWidget
 		void setLibraryWidget(AsyncColorBarLibraryWidget* widget);
 		AsyncColorBarLibraryWidget* getLibraryWidget();
 		void seedColors();
-		void updateLibraryWidgetPixmaps();
 
 	signals:
 		void someDataChanged();

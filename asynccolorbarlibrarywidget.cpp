@@ -24,8 +24,11 @@ void AsyncColorBarLibraryWidget :: paintEvent(QPaintEvent *event)
 	painter.drawText(rect().adjusted(5, 0, 0, -2), Qt::AlignBottom | Qt::AlignLeft, colorName);
 }
 
-void AsyncColorBarLibraryWidget :: updatePixmaps(QPixmap const &_editorPixmap)
+void AsyncColorBarLibraryWidget :: updatePixmaps()
 {
+	Color c = *(getPullPlan()->getOutermostCasingColor());
+        QPixmap _editorPixmap(100, 100);
+        _editorPixmap.fill(QColor(255*c.r, 255*c.g, 255*c.b, 255*MAX(0.1, c.a)));
 	editorPixmap = _editorPixmap;
 
 	//queue up an async update:
