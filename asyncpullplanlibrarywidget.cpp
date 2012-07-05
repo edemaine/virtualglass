@@ -45,9 +45,8 @@ const QPixmap* AsyncPullPlanLibraryWidget :: getDragPixmap()
 void AsyncPullPlanLibraryWidget :: updateDragPixmap()
 {
         QPixmap _pixmap(200, 200);
-        _pixmap.fill(Qt::white);
+        _pixmap.fill(Qt::transparent); 
         QPainter painter(&_pixmap);
-        painter.fillRect(QRect(0, 0, 200, 200), QColor(200, 200, 200));
         drawSubplan(10, 10, 180, 180, pullPlan, pullPlan->getOutermostCasingShape(), true, &painter);
         setBoundaryPainter(&painter, true);
         paintShape(10, 10, 180, pullPlan->getOutermostCasingShape(), &painter);

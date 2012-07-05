@@ -139,27 +139,6 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 
 PullPlan* PullPlanEditorViewWidget :: getSubplanAt(float x, float y)
 {
-#ifdef UNDEF
-	// Determine if drop hit the subplan
-	bool hit = false;
-	float dx = fabs(x - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
-	float dy = fabs(y - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
-	switch (subpull->shape)
-	{
-		case CIRCLE_SHAPE:
-			if (pow(double(dx*dx + dy*dy), 0.5) < (subpull->diameter/2.0) * drawSize/2)
-				hit = true;
-			break;
-		case SQUARE_SHAPE:
-			if (MAX(dx, dy) < (subpull->diameter/2.0) * drawSize/2)
-				hit = true;
-			break;
-	}
-
-	if (!hit)
-		continue;
-#endif
-
         // Recursively call drawing on subplans
         for (unsigned int i = 0; i < plan->subs.size(); ++i)
         {
