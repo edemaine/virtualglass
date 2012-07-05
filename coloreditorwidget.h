@@ -38,18 +38,8 @@ class ColorEditorWidget : public QWidget
 		QComboBox* sourceComboBox;
 		NiceViewWidget* niceViewWidget;
                 QSlider* alphaSlider;
-		QScrollArea* colorLibrary1ScrollArea;
-		QScrollArea* colorLibrary2ScrollArea;
-		QScrollArea* colorLibrary3ScrollArea;
-		QScrollArea* colorLibrary4ScrollArea;
-		QScrollArea* colorLibrary5ScrollArea;
-		QScrollArea* colorLibrary6ScrollArea;
-                QVBoxLayout* colorLibrary1Layout;
-                QVBoxLayout* colorLibrary2Layout;
-                QVBoxLayout* colorLibrary3Layout;
-                QVBoxLayout* colorLibrary4Layout;
-                QVBoxLayout* colorLibrary5Layout;
-                QVBoxLayout* colorLibrary6Layout;
+		vector<QScrollArea*> colorLibraryScrollAreas;
+		vector<QVBoxLayout*> colorLibraryLayouts;
 
 		void setupLayout();
 		void setupConnections();
