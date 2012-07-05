@@ -9,6 +9,7 @@
 #include "mesh.h"
 #include "geometry.h"
 #include "pickupplan.h"
+#include "asyncpullplanlibrarywidget.h"
 
 class PickupPlanEditorViewWidget : public QWidget
 {
@@ -20,14 +21,15 @@ class PickupPlanEditorViewWidget : public QWidget
 		QPixmap getPixmap();
 		void setFillRule(int r);
 		int getFillRule();
-                void resizeEvent(QResizeEvent* event);
 	
 	signals:
 		void someDataChanged();
 
 	protected:
+                void mousePressEvent(QMouseEvent* event);
 		void dragEnterEvent(QDragEnterEvent* dee);
 		void dropEvent(QDropEvent* de);
+                void resizeEvent(QResizeEvent* event);
 
 	private:
 		Mesher mesher;
@@ -35,13 +37,13 @@ class PickupPlanEditorViewWidget : public QWidget
 		NiceViewWidget* niceViewWidget;
 		PickupPlan* pickup;
 		int fillRule;
+                float ulX, ulY, squareSize;
 
                 float adjustedX(float rawX);
                 float adjustedY(float rawX);
                 float rawX(float adjustedX);
                 float rawY(float adjustedY);
-                float ulX, ulY, squareSize;
-
+		PullPlan* getSubplanAt(float x, float y);
 };
 
 

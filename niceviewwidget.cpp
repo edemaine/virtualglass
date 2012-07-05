@@ -273,6 +273,15 @@ Currently catches all mouse press events
 */
 void NiceViewWidget :: mousePressEvent (QMouseEvent* e)
 {
+	// In pickup plan mode, user does not move camera location, zoom, etc.
+	// The widget is a passive `display' widget only, with an interactive layer
+	// on top of it (PickupPlanEditorViewWidget), which we pass the event up to.
+	if (cameraMode == PICKUPPLAN_MODE)
+	{
+		e->ignore(); 
+		return;
+	}
+
 	// Update instance variables for mouse location
 	mouseLocX = e->x();
 	mouseLocY = e->y();

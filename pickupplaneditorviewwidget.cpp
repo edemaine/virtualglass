@@ -18,6 +18,91 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWi
 	layout->addWidget(niceViewWidget, 1);
 }
 
+PullPlan* PickupPlanEditorViewWidget :: getSubplanAt(float x, float y)
+{
+	int hitIndex = -1;
+	float hitDepth = -100.0;
+	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
+	{
+		SubpickupTemplate* sp = &(pickup->subs[i]);
+		Point ll, ur;
+
+		switch (sp->orientation)
+		{
+			case HORIZONTAL_ORIENTATION:
+				ll.x = sp->location.x;
+				ll.y = sp->location.y - sp->width/2;
+				ur.x = sp->location.x + sp->length;	
+				ur.y = sp->location.y + sp->width/2;	
+				break;		
+			case VERTICAL_ORIENTATION:
+				ll.x = sp->location.x - sp->width/2;	
+				ll.y = sp->location.y;	
+				ur.x = sp->location.x + sp->width/2;	
+				ur.y = sp->location.y + sp->length;	
+				break;		
+			case MURRINE_ORIENTATION:
+				ll.x = sp->location.x - sp->width/2;	
+				ll.y = sp->location.y - sp->width/2;	
+				ur.x = sp->location.x + sp->width/2;	
+				ur.y = sp->location.y + sp->width/2;	
+				break;
+			default:
+				//some sort of "safe"-ish default.
+				ll.x = 0.0;
+				ll.y = 0.0;
+				ur.x = 0.0;
+				ur.y = 0.0;
+				break;
+		}	
+
+		// Need to invert event location, since upper left/lower left origins exist	
+                if (ll.x < x && x < ur.x && ll.y < -y && -y < ur.y)
+		{
+			if (hitIndex == -1)
+			{
+				hitIndex = i;
+				hitDepth = pickup->subs[i].location.z;
+			}
+			else if (hitDepth > pickup->subs[i].location.z)
+			{
+				hitIndex = i;
+				hitDepth = pickup->subs[i].location.z;
+			}
+		}
+	}
+
+	if (hitIndex != -1)
+		return pickup->subs[hitIndex].plan;
+	else
+		return NULL;
+}
+
+void PickupPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
+{
+        // Check for convenience subplan-to-subplan drag
+        float x = (adjustedX(event->pos().x()) - squareSize/2) / float(squareSize/2-10);
+        float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
+
+        PullPlan* selectedSubplan = getSubplanAt(x, y);
+        if (selectedSubplan != NULL)
+        {
+		AsyncPullPlanLibraryWidget plplw(selectedSubplan);
+
+                char buf[500];
+                sprintf(buf, "%p %d", selectedSubplan, PULL_PLAN_MIME);
+                QByteArray pointerData(buf);
+                QMimeData* mimeData = new QMimeData;
+                mimeData->setText(pointerData);
+
+                QDrag *drag = new QDrag(this);
+                drag->setMimeData(mimeData);
+                drag->setPixmap(*(plplw.getDragPixmap()));
+
+                drag->exec(Qt::CopyAction);
+        }
+}
+
 void PickupPlanEditorViewWidget :: resizeEvent(QResizeEvent* event)
 {
         int width, height;
@@ -88,6 +173,11 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
         sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &droppedPlan, &type);
         if (type != PULL_PLAN_MIME) // if the thing passed isn't a pull plan 
                 return;  
+
+	/*
+        float x = (adjustedX(event->pos().x()) - squareSize/2) / float(squareSize/2-10);
+        float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
+	*/
 
 	int hitIndex = -1;
 	float hitDepth = -100.0;
