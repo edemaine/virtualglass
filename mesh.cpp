@@ -1,14 +1,6 @@
 
 #include "mesh.h"
 
-#include <set>
-#include <map>
-
-using std::set;
-using std::map;
-using std::make_pair;
-
-
 Mesher :: Mesher()
 {
 }
@@ -269,9 +261,6 @@ Vertex Mesher :: applyTransforms(Vertex v, vector<PullPlan*>* ancestors, vector<
 	return v;
 }
 
-typedef map< Vector2ui, Vector2ui > EdgeMap;
-typedef set< Vector2ui > EdgeSet;
-
 void Mesher :: meshPickupCasingSlab(Geometry* geometry, Color* color, float y, float thickness)
 {
 	unsigned int slabResolution = 100;
@@ -418,7 +407,7 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 		return;
 
 	unsigned int angularResolution = MIN(MAX(TOTAL_ANGULAR_RESOLUTION / totalCaneLength, 10), 25);
-	unsigned int axialResolution = MIN(MAX(TOTAL_AXIAL_RESOLUTION / totalCaneLength * length, 30), 100);
+	unsigned int axialResolution = MIN(MAX(TOTAL_AXIAL_RESOLUTION / totalCaneLength * length, 10), 100);
 	
 	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
@@ -502,6 +491,7 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 			uint32_t p4 = base + (i+1) * points.size() + (j+1) % points.size();
 			// Four points that define a (non-flat) quad are used
 			// to create two triangles.
+			geometry->triangles.push_back(Triangle(p2, p1, p4));
 			geometry->triangles.push_back(Triangle(p2, p1, p4));
 			geometry->triangles.push_back(Triangle(p1, p3, p4));
 		}

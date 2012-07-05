@@ -261,18 +261,6 @@ void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 	}
 }
 
-void ColorEditorWidget :: unhighlightPureColorLibraryWidget(PureColorLibraryWidget* w)
-{
-        w->graphicsEffect()->setEnabled(false);
-}
-
-void ColorEditorWidget :: highlightPureColorLibraryWidget(PureColorLibraryWidget* w)
-{
-        w->graphicsEffect()->setEnabled(false);
-        ((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
-        w->graphicsEffect()->setEnabled(true);
-}
-
 void ColorEditorWidget :: updateEverything()
 {
 	geometry.clear();
@@ -293,11 +281,11 @@ void ColorEditorWidget :: updateEverything()
 			pclw->getColor().g == pColor->g &&
 			pclw->getColor().b == pColor->b)
 		{
-			highlightPureColorLibraryWidget(pclw);
+			pclw->setSelected(true);
 			sourceComboBox->setCurrentIndex(5);
 		}
 		else
-			unhighlightPureColorLibraryWidget(pclw);
+			pclw->setSelected(true);
 	}
 	for (int j = 0; j < colorLibrary5Layout->count(); ++j)
 	{
@@ -308,11 +296,11 @@ void ColorEditorWidget :: updateEverything()
 			pclw->getColor().g == pColor->g &&
 			pclw->getColor().b == pColor->b) 
 		{
-			highlightPureColorLibraryWidget(pclw);
+			pclw->setSelected(true);
 			sourceComboBox->setCurrentIndex(4);
 		}
 		else
-			unhighlightPureColorLibraryWidget(pclw);
+			pclw->setSelected(false);
 	}
 	for (int j = 0; j < colorLibrary4Layout->count(); ++j)
 	{
@@ -323,11 +311,11 @@ void ColorEditorWidget :: updateEverything()
 			pclw->getColor().g == pColor->g &&
 			pclw->getColor().b == pColor->b)
 		{
-			highlightPureColorLibraryWidget(pclw);
+			pclw->setSelected(true);
 			sourceComboBox->setCurrentIndex(3);
 		}
 		else
-			unhighlightPureColorLibraryWidget(pclw);
+			pclw->setSelected(false);
 	}
 	for (int j = 0; j < colorLibrary3Layout->count(); ++j)
 	{
@@ -338,11 +326,11 @@ void ColorEditorWidget :: updateEverything()
 			pclw->getColor().g == pColor->g &&
 			pclw->getColor().b == pColor->b)
 		{
-			highlightPureColorLibraryWidget(pclw);
+			pclw->setSelected(true);
 			sourceComboBox->setCurrentIndex(2);
 		}
 		else
-			unhighlightPureColorLibraryWidget(pclw);
+			pclw->setSelected(false);
 	}
 	for (int j = 0; j < colorLibrary2Layout->count(); ++j)
 	{
@@ -353,11 +341,11 @@ void ColorEditorWidget :: updateEverything()
 			pclw->getColor().g == pColor->g &&
 			pclw->getColor().b == pColor->b)
 		{
-			highlightPureColorLibraryWidget(pclw);
+			pclw->setSelected(true);
 			sourceComboBox->setCurrentIndex(1);
 		}
 		else
-			unhighlightPureColorLibraryWidget(pclw);
+			pclw->setSelected(false);
 	}
 	for (int j = 0; j < colorLibrary1Layout->count(); ++j)
 	{
@@ -368,11 +356,11 @@ void ColorEditorWidget :: updateEverything()
 			pclw->getColor().g == pColor->g &&
 			pclw->getColor().b == pColor->b) 
 		{
-			highlightPureColorLibraryWidget(pclw);
+			pclw->setSelected(true);
 			sourceComboBox->setCurrentIndex(0);
 		}
 		else
-			unhighlightPureColorLibraryWidget(pclw);
+			pclw->setSelected(false);
 	}
 }
 

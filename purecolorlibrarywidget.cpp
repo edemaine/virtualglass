@@ -7,23 +7,47 @@ PureColorLibraryWidget :: PureColorLibraryWidget(Color color, QString colorName,
 	setFixedSize(300, 40);
 	setScaledContents(true);
 	setMouseTracking(true);
-
-	QPixmap pixmap(300, 40);
-	QPainter painter(&pixmap);
-	painter.fillRect(pixmap.rect(), QBrush(Qt::white));
-	painter.fillRect(QRect(10, 10, 20, 20), QBrush(QColor(255*color.r, 255*color.g, 255*color.b, 255*color.a)));
-	painter.drawRect(QRect(10, 10, 20, 20));
-	painter.drawText(QPointF(40, 25), colorName);
-	painter.end();
-
-	setPixmap(pixmap);
         setAttribute(Qt::WA_LayoutUsesWidgetRect);
-	this->colorName = colorName;
 
+	isSelected = false;
+	this->colorName = colorName;
 	this->color = color;
-        setGraphicsEffect(new QGraphicsHighlightEffect());
-        connect(graphicsEffect(), SIGNAL(enabledChanged(bool)), graphicsEffect(), SLOT(setStyleSheet(bool)));
-        connect(graphicsEffect(), SIGNAL(styleSheetString(QString)), this, SLOT(setStyleSheet(QString)));
+
+	renderPixmap();
+}
+
+void PureColorLibraryWidget :: setSelected(bool s)
+{
+	if (s != isSelected)
+	{
+		isSelected = s;
+		renderPixmap();
+	}
+}
+
+void PureColorLibraryWidget :: renderPixmap()
+{
+        QPixmap pixmap(300, 40);
+        QPainter painter(&pixmap);
+        painter.fillRect(pixmap.rect(), QBrush(Qt::white));
+        painter.fillRect(QRect(10, 10, 20, 20), QBrush(QColor(255*color.r, 255*color.g, 255*color.b, 255*color.a)));
+        painter.drawRect(QRect(10, 10, 20, 20));
+        painter.drawText(QPointF(40, 25), colorName);
+
+	// do highlighting if selected
+	if (isSelected)
+	{
+		QPen pen;
+		pen.setWidth(2);
+		pen.setColor(Qt::blue);
+		painter.setPen(pen);
+		painter.drawRect(1, 1, 298, 38);
+	}
+	
+
+        painter.end();
+
+        setPixmap(pixmap);
 }
 
 void PureColorLibraryWidget :: setAlpha(float a)

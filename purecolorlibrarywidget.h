@@ -4,7 +4,6 @@
 #include <QtGui>
 #include <QObject>
 #include "pullplan.h"
-#include "qgraphicshighlighteffect.h"
 
 class PureColorLibraryWidget : public QLabel
 {
@@ -15,10 +14,14 @@ class PureColorLibraryWidget : public QLabel
 		Color getColor();
 		QString getColorName();
 		void setAlpha(float a);
+		void setSelected(bool s);
 
 	private:
+		void renderPixmap();
+	
 		Color color;
 		QString colorName;
+		bool isSelected;
 };
 
 #endif

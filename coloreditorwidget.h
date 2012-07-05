@@ -53,9 +53,6 @@ class ColorEditorWidget : public QWidget
 
 		void setupLayout();
 		void setupConnections();
-		void unhighlightPureColorLibraryWidget(PureColorLibraryWidget* w);
-		void highlightPureColorLibraryWidget(PureColorLibraryWidget* w);
-
 };
 
 

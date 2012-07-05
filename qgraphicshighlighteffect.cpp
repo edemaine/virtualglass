@@ -46,5 +46,6 @@ void QGraphicsHighlightEffect::setHighlightType(int dependancy)
 void QGraphicsHighlightEffect::draw( QPainter *painter )
 {
 	drawSource(painter);
-	return;
 }
+
+
