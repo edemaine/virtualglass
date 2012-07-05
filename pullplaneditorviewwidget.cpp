@@ -73,24 +73,31 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 {
 	float x = (adjustedX(event->pos().x()) - squareSize/2) / float(squareSize/2-10);
 	float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
-	float radius = sqrt(x * x + y * y); 
 
 	for (unsigned int i = 0; i < plan->getCasingCount() - 1; ++i) {
 		switch (plan->getCasingShape(i)) {
 			case CIRCLE_SHAPE:
+			{
+				float radius = sqrt(x * x + y * y); 
 				if (fabs(radius - plan->getCasingThickness(i)) < 0.05) {
 					isDraggingCasing = true; 
 					draggedCasingIndex = i;
 					return;
 				}
 				break;
+			}
 			case SQUARE_SHAPE:
-				if (fabs(radius - plan->getCasingThickness(i)) < 0.05) {
+			{
+				float horizontalCloseness = fabs(fabs(x) - plan->getCasingThickness(i));
+				float verticalCloseness = fabs(fabs(y) - plan->getCasingThickness(i));
+				if (horizontalCloseness < 0.05 || verticalCloseness < 0.05)
+				{
 					isDraggingCasing = true; 
 					draggedCasingIndex = i;
 					return;
 				}
 				break;
+			}
 		}
 	}
 }
@@ -101,7 +108,17 @@ void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 	{
 		float x = (adjustedX(event->pos().x()) - squareSize/2);
 		float y = (adjustedY(event->pos().y()) - squareSize/2);
-		float radius = sqrt(x * x + y * y) / (squareSize/2 - 10); 
+
+		float radius;
+		switch (plan->getCasingShape(draggedCasingIndex))
+		{
+			case CIRCLE_SHAPE:
+				radius = sqrt(x * x + y * y) / (squareSize/2 - 10); 
+				break;
+			case SQUARE_SHAPE:
+				radius = MAX(fabs(x), fabs(y)) / (squareSize/2 - 10);
+				break;
+		}
 
 		float min;
 		float max;
@@ -129,6 +146,7 @@ void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 		}
 
 		plan->setCasingThickness(MIN(MAX(radius, min), max), draggedCasingIndex);
+
 		emit someDataChanged();
 	}
 }
