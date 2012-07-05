@@ -8,7 +8,8 @@ class AsyncColorBarLibraryWidget : public AsyncPullPlanLibraryWidget
 	Q_OBJECT
 
 	public:
-		AsyncColorBarLibraryWidget(PullPlan* _plan, QWidget* _parent);
+		AsyncColorBarLibraryWidget(PullPlan* _plan, QWidget* _parent=NULL);
+		void updateDragPixmap();
 		void updatePixmaps();
 
 		//to overlay color name:

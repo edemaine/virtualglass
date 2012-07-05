@@ -6,6 +6,8 @@
 #include <vector>
 #include "constants.h"
 #include "pullplan.h"
+#include "asyncpullplanlibrarywidget.h"
+#include "asynccolorbarlibrarywidget.h"
 
 using std::vector;
 
@@ -49,6 +51,7 @@ class PullPlanEditorViewWidget : public QWidget
 		bool isOnCasing(int casingIndex, float x, float y);
 		float getShapeRadius(int shape, float x, float y);
 		void setMinMaxCasingRadii(float* min, float* max);
+		PullPlan* getSubplanAt(float x, float y);
 
 		PullPlan* plan;
 		int fill_rule;

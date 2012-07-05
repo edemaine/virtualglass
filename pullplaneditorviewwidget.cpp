@@ -92,6 +92,7 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	float x = (adjustedX(event->pos().x()) - squareSize/2) / float(squareSize/2-10);
 	float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
 
+	// Check for casing resize
 	for (unsigned int i = 0; i < plan->getCasingCount() - 1; ++i) 
 	{
 		if (isOnCasing(i, x, y))
@@ -101,6 +102,73 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 			return;
 		}	
 	}
+
+	// Check for convenience subplan-to-subplan drag
+	PullPlan* selectedSubplan = getSubplanAt(x, y);
+	if (selectedSubplan != NULL)
+	{
+		int type;
+		QPixmap pixmap;
+
+		if (selectedSubplan->isBase())
+		{
+			type = COLOR_BAR_MIME;
+			AsyncColorBarLibraryWidget cblw(selectedSubplan);		
+			pixmap = *(cblw.getDragPixmap());
+		}
+		else
+		{
+			type = PULL_PLAN_MIME;
+			AsyncPullPlanLibraryWidget plplw(selectedSubplan);		
+			pixmap = *(plplw.getDragPixmap());
+		}
+
+	        char buf[500];
+		sprintf(buf, "%p %d", selectedSubplan, type);
+		QByteArray pointerData(buf);
+		QMimeData* mimeData = new QMimeData;
+		mimeData->setText(pointerData);
+
+		QDrag *drag = new QDrag(this);
+		drag->setMimeData(mimeData);
+		drag->setPixmap(pixmap);
+
+		drag->exec(Qt::CopyAction);
+	}	
+}
+
+PullPlan* PullPlanEditorViewWidget :: getSubplanAt(float x, float y)
+{
+#ifdef UNDEF
+	// Determine if drop hit the subplan
+	bool hit = false;
+	float dx = fabs(x - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
+	float dy = fabs(y - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
+	switch (subpull->shape)
+	{
+		case CIRCLE_SHAPE:
+			if (pow(double(dx*dx + dy*dy), 0.5) < (subpull->diameter/2.0) * drawSize/2)
+				hit = true;
+			break;
+		case SQUARE_SHAPE:
+			if (MAX(dx, dy) < (subpull->diameter/2.0) * drawSize/2)
+				hit = true;
+			break;
+	}
+
+	if (!hit)
+		continue;
+#endif
+
+        // Recursively call drawing on subplans
+        for (unsigned int i = 0; i < plan->subs.size(); ++i)
+        {
+                SubpullTemplate* sub = &(plan->subs[i]);
+		if (getShapeRadius(sub->shape, x - sub->location.x, y - sub->location.y) < sub->diameter/2.0)
+			return sub->plan;
+	}			
+
+	return NULL;
 }
 
 void PullPlanEditorViewWidget :: setMinMaxCasingRadii(float* min, float* max)
@@ -239,7 +307,6 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	subplansHighlighted.clear();
 	casingHighlighted = false;
 	emit someDataChanged();
-
 }
 
 

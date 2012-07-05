@@ -4,6 +4,7 @@
 
 AsyncColorBarLibraryWidget :: AsyncColorBarLibraryWidget(PullPlan* _plan, QWidget* _parent): AsyncPullPlanLibraryWidget(_plan, _parent)
 {
+	updatePixmaps();
 }
 
 void AsyncColorBarLibraryWidget :: paintEvent(QPaintEvent *event)
@@ -14,13 +15,18 @@ void AsyncColorBarLibraryWidget :: paintEvent(QPaintEvent *event)
 	painter.drawText(rect().adjusted(5, 0, 0, -2), Qt::AlignBottom | Qt::AlignLeft, pullPlan->getName());
 }
 
-void AsyncColorBarLibraryWidget :: updatePixmaps()
+void AsyncColorBarLibraryWidget :: updateDragPixmap()
 {
 	// update the drag pixmap in the main thread, since it's fast
 	Color c = *(getPullPlan()->getOutermostCasingColor());
         QPixmap _dragPixmap(100, 100);
         _dragPixmap.fill(QColor(255*c.r, 255*c.g, 255*c.b, 255*MAX(0.1, c.a)));
 	dragPixmap = _dragPixmap;
+}
+
+void AsyncColorBarLibraryWidget :: updatePixmaps()
+{
+	updateDragPixmap();
 
 	//queue up an async update:
 	Camera camera;
