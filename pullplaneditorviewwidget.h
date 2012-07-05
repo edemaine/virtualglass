@@ -44,13 +44,17 @@ class PullPlanEditorViewWidget : public QWidget
 		void setBoundaryPainter(QPainter* painter, bool outermostLevel);
 		void drawSubplan(float x, float y, float width, float height, PullPlan* plan, 
 			bool highlightThis, int mandatedShape, bool outermostLevel, QPainter* painter);
+		void populateHighlightedSubplans(int x, int y, PullPlan* plan, int type);
+		void populateHighlightedCasings(int x, int y, int type);
+		bool isOnCasing(int casingIndex, float x, float y);
+		float getShapeRadius(int shape, float x, float y);
+		void setMinMaxCasingRadii(float* min, float* max);
+
 		PullPlan* plan;
 		int fill_rule;
 		Color draggingColor;
 		bool isDraggingCasing;
 		unsigned int draggedCasingIndex;
-		void populateHighlightedSubplans(int x, int y, PullPlan* plan, int type);
-		void populateHighlightedCasings(int x, int y, int type);
 		bool casingHighlighted;
 		unsigned int casingHighlightIndex;
 		vector<unsigned int> subplansHighlighted; 

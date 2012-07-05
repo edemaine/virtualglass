@@ -69,86 +69,96 @@ float PullPlanEditorViewWidget :: rawY(float adjustedY)
 	return adjustedY + ulY;
 }
 
+float PullPlanEditorViewWidget :: getShapeRadius(int shape, float x, float y)
+{
+	switch (shape)
+	{
+		case CIRCLE_SHAPE:
+			return sqrt(x * x + y * y); 
+		case SQUARE_SHAPE:
+			return MAX(fabs(x), fabs(y));
+	}
+
+	return -1;
+}
+
+bool PullPlanEditorViewWidget :: isOnCasing(int casingIndex, float x, float y)
+{
+	return fabs(plan->getCasingThickness(casingIndex) - getShapeRadius(plan->getCasingShape(casingIndex), x, y)) < 0.05; 
+}
+
 void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 {
 	float x = (adjustedX(event->pos().x()) - squareSize/2) / float(squareSize/2-10);
 	float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
 
-	for (unsigned int i = 0; i < plan->getCasingCount() - 1; ++i) {
-		switch (plan->getCasingShape(i)) {
-			case CIRCLE_SHAPE:
-			{
-				float radius = sqrt(x * x + y * y); 
-				if (fabs(radius - plan->getCasingThickness(i)) < 0.05) {
-					isDraggingCasing = true; 
-					draggedCasingIndex = i;
-					return;
-				}
-				break;
-			}
-			case SQUARE_SHAPE:
-			{
-				float horizontalCloseness = fabs(fabs(x) - plan->getCasingThickness(i));
-				float verticalCloseness = fabs(fabs(y) - plan->getCasingThickness(i));
-				if (horizontalCloseness < 0.05 || verticalCloseness < 0.05)
-				{
-					isDraggingCasing = true; 
-					draggedCasingIndex = i;
-					return;
-				}
-				break;
-			}
-		}
+	for (unsigned int i = 0; i < plan->getCasingCount() - 1; ++i) 
+	{
+		if (isOnCasing(i, x, y))
+		{
+			isDraggingCasing = true; 
+			draggedCasingIndex = i;
+			return;
+		}	
 	}
 }
 
+void PullPlanEditorViewWidget :: setMinMaxCasingRadii(float* min, float* max)
+{
+	/*
+	Goal here is to deal with casings of different shapes, and set upper and 
+	lower bounds for the radius of a particular casing based upon how much it
+	can change before bumping into the inscribed (next smallest) or 
+	circumscribed (next largest) casing. 
+
+	It's really just adjusting by sqrt(2) in case, say, the casing is square
+	and is surrounded by two circle casings.
+	*/
+	if (draggedCasingIndex == 0) {
+		int cs0 = plan->getCasingShape(draggedCasingIndex);
+		int cs1 = plan->getCasingShape(draggedCasingIndex+1);
+		int ct1 = plan->getCasingThickness(draggedCasingIndex+1);
+		*min = 0.01;
+		if (cs0 == SQUARE_SHAPE && cs1 == CIRCLE_SHAPE)
+			*max = ct1 / sqrt(2.0) - 0.05;
+		else
+			*max = ct1 - 0.05;
+        }
+	else {
+		int csi = plan->getCasingShape(draggedCasingIndex);
+		int csi_minus_1 = plan->getCasingShape(draggedCasingIndex-1);
+		int csi_plus_1 = plan->getCasingShape(draggedCasingIndex+1);
+		int cti_minus_1 = plan->getCasingThickness(draggedCasingIndex-1);
+		int cti_plus_1 = plan->getCasingThickness(draggedCasingIndex+1);
+		
+		if (csi == CIRCLE_SHAPE && csi_minus_1 == SQUARE_SHAPE)
+			*min = cti_minus_1 * sqrt(2.0) + 0.05;
+		else
+			*min = cti_minus_1 + 0.05;
+
+		if (csi == SQUARE_SHAPE && csi_plus_1 == CIRCLE_SHAPE)
+			*max = cti_plus_1 / sqrt(2.0) - 0.05;
+		else
+			*max = cti_plus_1 - 0.05;
+        }
+} 
+
 void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 {
-	if (isDraggingCasing)
-	{
-		float x = (adjustedX(event->pos().x()) - squareSize/2);
-		float y = (adjustedY(event->pos().y()) - squareSize/2);
+	if (!isDraggingCasing)
+		return;
 
-		float radius;
-		switch (plan->getCasingShape(draggedCasingIndex))
-		{
-			case CIRCLE_SHAPE:
-				radius = sqrt(x * x + y * y) / (squareSize/2 - 10); 
-				break;
-			case SQUARE_SHAPE:
-				radius = MAX(fabs(x), fabs(y)) / (squareSize/2 - 10);
-				break;
-		}
+	float x = (adjustedX(event->pos().x()) - squareSize/2);
+	float y = (adjustedY(event->pos().y()) - squareSize/2);
+	float radius = getShapeRadius(plan->getCasingShape(draggedCasingIndex), x, y) / (squareSize/2 - 10);
 
-		float min;
-		float max;
+	float min;
+	float max;
 
-		if (draggedCasingIndex == 0) {
-			min = 0.01;
-			if (plan->getCasingShape(0) == SQUARE_SHAPE 
-				&& plan->getCasingShape(1) == CIRCLE_SHAPE) 
-				max = plan->getCasingThickness(1) / sqrt(2.0) - 0.05;
-			else 
-				max = plan->getCasingThickness(1) - 0.05;
-		}
-		else {
-			if (plan->getCasingShape(draggedCasingIndex) == CIRCLE_SHAPE
-				&& plan->getCasingShape(draggedCasingIndex-1) == SQUARE_SHAPE) 
-				min = plan->getCasingThickness(draggedCasingIndex-1) * sqrt(2.0) + 0.05;
-			else
-				min = plan->getCasingThickness(draggedCasingIndex-1) + 0.05;
+	setMinMaxCasingRadii(&min, &max);	
+	plan->setCasingThickness(MIN(MAX(radius, min), max), draggedCasingIndex);
 
-			if (plan->getCasingShape(draggedCasingIndex) == SQUARE_SHAPE
-				&& plan->getCasingShape(draggedCasingIndex+1) == CIRCLE_SHAPE) 
-				max = plan->getCasingThickness(draggedCasingIndex+1) / sqrt(2.0) - 0.05;
-			else
-				max = plan->getCasingThickness(draggedCasingIndex+1) - 0.05;
-		}
-
-		plan->setCasingThickness(MIN(MAX(radius, min), max), draggedCasingIndex);
-
-		emit someDataChanged();
-	}
+	emit someDataChanged();
 }
 
 void PullPlanEditorViewWidget :: mouseReleaseEvent(QMouseEvent* /*event*/)
