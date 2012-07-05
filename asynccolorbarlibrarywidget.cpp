@@ -16,10 +16,11 @@ void AsyncColorBarLibraryWidget :: paintEvent(QPaintEvent *event)
 
 void AsyncColorBarLibraryWidget :: updatePixmaps()
 {
+	// update the drag pixmap in the main thread, since it's fast
 	Color c = *(getPullPlan()->getOutermostCasingColor());
-        QPixmap _editorPixmap(100, 100);
-        _editorPixmap.fill(QColor(255*c.r, 255*c.g, 255*c.b, 255*MAX(0.1, c.a)));
-	editorPixmap = _editorPixmap;
+        QPixmap _dragPixmap(100, 100);
+        _dragPixmap.fill(QColor(255*c.r, 255*c.g, 255*c.b, 255*MAX(0.1, c.a)));
+	dragPixmap = _dragPixmap;
 
 	//queue up an async update:
 	Camera camera;

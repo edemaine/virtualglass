@@ -73,7 +73,6 @@ HEADERS += primitives.h constants.h Vector.hpp \
 	asyncpullplanlibrarywidget.h \
 	asynccolorbarlibrarywidget.h \
 	asyncpiecelibrarywidget.h \
-	pullplanrenderpixmap.h \
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
 	yaml-cpp/include/yaml-cpp/traits.h \
@@ -150,7 +149,6 @@ SOURCES += main.cpp \
 	asyncpullplanlibrarywidget.cpp \
 	asynccolorbarlibrarywidget.cpp \
 	asyncpiecelibrarywidget.cpp \
-	pullplanrenderpixmap.cpp \
 
 
 SOURCES += yaml-cpp/src/tag.cpp \

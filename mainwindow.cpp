@@ -221,13 +221,13 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	if (cblw != NULL)
 	{
 		plan = cblw->getPullPlan();
-		pixmap = *cblw->getEditorPixmap();
+		pixmap = *cblw->getDragPixmap();
 		type = COLOR_BAR_MIME;
 	}
 	else if (plplw != NULL)
 	{
 		plan = plplw->getPullPlan();
-		pixmap = *plplw->getEditorPixmap();
+		pixmap = *plplw->getDragPixmap();
 		type = PULL_PLAN_MIME;
 	}
 	else
