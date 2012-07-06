@@ -73,7 +73,7 @@ float PullPlanEditorViewWidget :: getShapeRadius(int shape, float x, float y)
 
 bool PullPlanEditorViewWidget :: isOnCasing(int casingIndex, float x, float y)
 {
-	return fabs(plan->getCasingThickness(casingIndex) - getShapeRadius(plan->getCasingShape(casingIndex), x, y)) < 0.05; 
+	return fabs(plan->getCasingThickness(casingIndex) - getShapeRadius(plan->getCasingShape(casingIndex), x, y)) < 0.02; 
 }
 
 void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
@@ -395,10 +395,10 @@ void PullPlanEditorViewWidget :: paintShape(float x, float y, float size, int sh
 	switch (shape)
 	{
 		case CIRCLE_SHAPE:
-			painter->drawEllipse(rawX(x), rawY(y), size, size);
+			painter->drawEllipse(floor(rawX(x) + 0.5), floor(rawY(y) + 0.5), size, size);
 			break;
 		case SQUARE_SHAPE:
-			painter->drawRect(rawX(x), rawY(y), size, size);
+			painter->drawRect(floor(rawX(x) + 0.5), floor(rawY(y) + 0.5), size, size);
 			break;
 	}
 	
