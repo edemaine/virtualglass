@@ -148,40 +148,53 @@ void PullPlanEditorViewWidget :: setMinMaxCasingRadii(float* min, float* max)
 	can change before bumping into the inscribed (next smallest) or 
 	circumscribed (next largest) casing. 
 
-	It's really just adjusting by sqrt(2) in case, say, the casing is square
-	and is surrounded by two circle casings.
+	The major situation/issue to deal with is adjusting by sqrt(2) in the case
+	that the casing is square and is surrounded by two circle casings or vice versa.
+	We also allow adjacent casings of different shapes to get really close (0.01)
+	while casing of the same shape need to be spaced a little (0.05) for UX reasons:
+	if they are too close, it becomes hard to tell there are two casings, or to 
+	click on them reliably to resize them.
 	*/
-	if (draggedCasingIndex == 0) {
-		int cs0 = plan->getCasingShape(draggedCasingIndex);
-		int cs1 = plan->getCasingShape(draggedCasingIndex+1);
-		int ct1 = plan->getCasingThickness(draggedCasingIndex+1);
-		*min = 0.01;
-		if (cs0 == SQUARE_SHAPE && cs1 == CIRCLE_SHAPE)
-			*max = ct1 / sqrt(2.0) - 0.05;
-		else
-			*max = ct1 - 0.05;
-        }
-	else {
-		int csi = plan->getCasingShape(draggedCasingIndex);
-		int csi_minus_1 = plan->getCasingShape(draggedCasingIndex-1);
-		int csi_plus_1 = plan->getCasingShape(draggedCasingIndex+1);
-		int cti_minus_1 = plan->getCasingThickness(draggedCasingIndex-1);
-		int cti_plus_1 = plan->getCasingThickness(draggedCasingIndex+1);
-		
-		if (csi == CIRCLE_SHAPE && csi_minus_1 == SQUARE_SHAPE)
-			*min = cti_minus_1 * sqrt(2.0) + 0.05;
-		else
-			*min = cti_minus_1 + 0.05;
+	
+	int csi, csi_minus_1, csi_plus_1;
+	float cti_minus_1, cti_plus_1;
 
-		if (csi == SQUARE_SHAPE && csi_plus_1 == CIRCLE_SHAPE)
-			*max = cti_plus_1 / sqrt(2.0) - 0.05;
-		else
-			*max = cti_plus_1 - 0.05;
+	if (draggedCasingIndex == 0) 
+	{
+		csi = plan->getCasingShape(0);
+		csi_minus_1 = csi;
+		csi_plus_1 = plan->getCasingShape(1);
+	
+		cti_minus_1 = 0.0;
+		cti_plus_1 = plan->getCasingThickness(1);	
         }
+	else 
+	{
+		csi = plan->getCasingShape(draggedCasingIndex);
+		csi_minus_1 = plan->getCasingShape(draggedCasingIndex-1);
+		csi_plus_1 = plan->getCasingShape(draggedCasingIndex+1);
+		cti_minus_1 = plan->getCasingThickness(draggedCasingIndex-1);
+		cti_plus_1 = plan->getCasingThickness(draggedCasingIndex+1);
+        }
+		
+	if (csi == CIRCLE_SHAPE && csi_minus_1 == SQUARE_SHAPE)
+		*min = cti_minus_1 * sqrt(2.0) + 0.01;
+	else if (csi == SQUARE_SHAPE && csi_minus_1 == CIRCLE_SHAPE)
+		*min = cti_minus_1 + 0.01;
+	else
+		*min = cti_minus_1 + 0.02;
+
+	if (csi == SQUARE_SHAPE && csi_plus_1 == CIRCLE_SHAPE)
+		*max = cti_plus_1 / sqrt(2.0) - 0.01;
+	else if (csi == CIRCLE_SHAPE && csi_plus_1 == SQUARE_SHAPE)
+		*max = cti_plus_1 - 0.01;
+	else
+		*max = cti_plus_1 - 0.02;
 } 
 
 void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 {
+	// bug in here?
 	if (!isDraggingCasing)
 		return;
 

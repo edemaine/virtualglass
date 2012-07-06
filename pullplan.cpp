@@ -303,22 +303,20 @@ bool PullPlan :: hasSquareCasing() {
 
 void PullPlan :: addCasing(int shape) {
 
+	for (unsigned int i = 0; i < casings.size(); ++i) {
+		casings[i].thickness -= 0.1;
+	}
 	if (shape == CIRCLE_SHAPE && getOutermostCasingShape() == SQUARE_SHAPE) {		
 		for (unsigned int i = 0; i < casings.size(); ++i) {
 			casings[i].thickness *= 1 / SQRT_TWO;
-		}
-	}
-	else {
-		for (unsigned int i = 0; i < casings.size(); ++i) {
-			casings[i].thickness -= 0.1;
 		}
 	}
 	casings.push_back(Casing(1.0, shape, defaultColor));
 	if (hasSquareCasing())
 		this->twist = 0.0;
 
-    vector<SubpullTemplate> oldSubs = this->subs;
-    updateSubs(oldSubs);
+	vector<SubpullTemplate> oldSubs = this->subs;
+	updateSubs(oldSubs);
 }
 
 void PullPlan :: setCasingThickness(float t, unsigned int index) {
@@ -427,7 +425,7 @@ void PullPlan :: updateSubs(vector<SubpullTemplate> oldSubs)
 
 	switch (this->templateType) {
 		case CASED_CIRCLE_PULL_TEMPLATE:
-			pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, radius * 1.9, 0);
+			pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, radius * 2.0, 0);
 			break;
 		case CASED_SQUARE_PULL_TEMPLATE:
 			if (this->casings[0].shape == CIRCLE_SHAPE) {
