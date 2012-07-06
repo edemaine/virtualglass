@@ -39,16 +39,6 @@ void PullPlanEditorViewWidget :: resizeEvent(QResizeEvent* event)
 	}
 }
 
-int PullPlanEditorViewWidget :: getFillRule()
-{
-	return fill_rule;
-}
-
-void PullPlanEditorViewWidget :: setFillRule(int r)
-{
-	fill_rule = r;
-}
-
 float PullPlanEditorViewWidget :: adjustedX(float rawX)
 {
 	return rawX - ulX;

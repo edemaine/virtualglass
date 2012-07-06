@@ -34,7 +34,6 @@ class PullPlanEditorWidget : public QWidget
 		void updateEverything();
 
 	private slots:
-		void fillRuleComboBoxChanged(int);
 		void circleCasingButtonPressed();
 		void squareCasingButtonPressed();
 		void addCasingButtonPressed();
@@ -60,7 +59,6 @@ class PullPlanEditorWidget : public QWidget
 		QPushButton* customizePlanButton;
 		QPushButton* circleCasingPushButton;
 		QPushButton* squareCasingPushButton;
-		QComboBox* fillRuleComboBox;
                 QPushButton* confirmChangesButton;
                 QPushButton* cancelChangesButton;
 		NiceViewWidget* niceViewWidget;

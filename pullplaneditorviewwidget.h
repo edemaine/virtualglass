@@ -18,8 +18,6 @@ class PullPlanEditorViewWidget : public QWidget
 	public:
 		PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent=0);
 		void setPullPlan(PullPlan* plan);
-		void setFillRule(int r);
-		int getFillRule();
 		QRect usedRect();
 		static QPixmap renderPullPlan(PullPlan* plan);
 	

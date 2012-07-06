@@ -17,8 +17,6 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 
 void PullPlanEditorWidget :: updateEverything()
 {
-	fillRuleComboBox->setCurrentIndex(viewWidget->getFillRule()-1);
-
 	switch (plan->getOutermostCasingShape())
 	{
 		case CIRCLE_SHAPE:
@@ -107,19 +105,6 @@ void PullPlanEditorWidget :: setupLayout()
 	pullTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pullTemplateLibraryScrollArea->setFixedHeight(130);
 	editorLayout->addWidget(pullTemplateLibraryScrollArea, 0);
-
-	// Editor layout: fill rule layout
-	QHBoxLayout* fillRuleLayout = new QHBoxLayout(editorWidget);
-	fillRuleComboBox = new QComboBox(editorWidget);
-	fillRuleComboBox->addItem("Single");
-	fillRuleComboBox->addItem("Every second");
-	fillRuleComboBox->addItem("Every third");
-	fillRuleComboBox->addItem("Group");
-	fillRuleComboBox->addItem("All");
-	fillRuleLayout->addWidget(new QLabel("Fill rule:", editorWidget), 0);
-	fillRuleLayout->addWidget(fillRuleComboBox, 0);
-	fillRuleLayout->addStretch(1);
-	editorLayout->addLayout(fillRuleLayout, 0);
 
 	// Editor layout: casing buttons layout
 	QHBoxLayout* pullTemplateShapeLayout = new QHBoxLayout(editorWidget);
@@ -261,14 +246,8 @@ void PullPlanEditorWidget :: addCasingButtonPressed()
 	emit someDataChanged();
 }
 
-void PullPlanEditorWidget :: fillRuleComboBoxChanged(int)
-{
-	viewWidget->setFillRule(fillRuleComboBox->currentIndex()+1);
-}
-
 void PullPlanEditorWidget :: setupConnections()
 {
-	connect(fillRuleComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(fillRuleComboBoxChanged(int)));
 	connect(circleCasingPushButton, SIGNAL(clicked()), this, SLOT(circleCasingButtonPressed()));
 	connect(squareCasingPushButton, SIGNAL(clicked()), this, SLOT(squareCasingButtonPressed()));
 	connect(addCasingButton, SIGNAL(clicked()), this, SLOT(addCasingButtonPressed()));
