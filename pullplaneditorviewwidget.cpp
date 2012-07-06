@@ -7,7 +7,6 @@ PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* pa
 	setAcceptDrops(true);
 	setMinimumSize(200, 200);
 	this->plan = plan;
-	fill_rule = SINGLE_FILL_RULE;
 	isDraggingCasing = false;
 	casingHighlighted = false;
 }
@@ -309,21 +308,10 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, PullP
 		SubpullTemplate* subpull = &(plan->subs[i]);
 
 		// Determine if drop hit the subplan
-		bool hit = false;
-		float dx = fabs(x - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
-		float dy = fabs(y - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
-		switch (subpull->shape)
-		{
-			case CIRCLE_SHAPE:
-				if (pow(double(dx*dx + dy*dy), 0.5) < (subpull->diameter/2.0) * drawSize/2)
-					hit = true;
-				break;
-			case SQUARE_SHAPE:
-				if (MAX(dx, dy) < (subpull->diameter/2.0) * drawSize/2)
-					hit = true;
-				break;
-		}
-
+		float dx = x - (drawSize/2 * subpull->location.x + drawSize/2 + 10);
+		float dy = y - (drawSize/2 * subpull->location.y + drawSize/2 + 10);
+		bool hit = (getShapeRadius(subpull->shape, dx, dy) < (subpull->diameter/2.0) * drawSize/2);
+		
 		if (!hit)
 			continue;
 
@@ -338,60 +326,7 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, PullP
 		}
 
 		// If the shift button is down, fill in the entire group
-		switch (fill_rule)
-		{
-			case SINGLE_FILL_RULE:
-			{
-				subplansHighlighted.push_back(i);	
-				break;
-			}
-			case ALL_FILL_RULE:
-			{
-				for (unsigned int j = 0; j < plan->subs.size(); ++j)
-					subplansHighlighted.push_back(j);
-				break;
-			}
-			case GROUP_FILL_RULE:
-			{
-				int group = plan->subs[i].group;
-				for (unsigned int j = i; j < plan->subs.size(); ++j)
-				{
-					if (plan->subs[j].group == group)
-						subplansHighlighted.push_back(j);
-				}
-				break;
-			}
-			case EVERY_OTHER_FILL_RULE:
-			{
-				int group = plan->subs[i].group;
-				bool parity = true;
-				for (unsigned int j = i; j < plan->subs.size(); ++j)
-				{
-					if (plan->subs[j].group == group)
-					{
-						if (parity)
-							subplansHighlighted.push_back(j);
-						parity = !parity;
-					}
-				}
-				break;
-			}
-			case EVERY_THIRD_FILL_RULE:
-			{
-				int group = plan->subs[i].group;
-				int triarity = 0;
-				for (unsigned int j = i; j < plan->subs.size(); ++j)
-				{
-					if (plan->subs[j].group == group)
-					{
-						if (triarity == 0)
-							subplansHighlighted.push_back(j);
-						triarity = (triarity + 1) % 3;
-					}
-				}
-				break;
-			}
-		}
+		subplansHighlighted.push_back(i);
 	}
 }
 

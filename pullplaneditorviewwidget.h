@@ -52,7 +52,6 @@ class PullPlanEditorViewWidget : public QWidget
 		PullPlan* getSubplanAt(float x, float y);
 
 		PullPlan* plan;
-		int fill_rule;
 		Color draggingColor;
 		bool isDraggingCasing;
 		unsigned int draggedCasingIndex;

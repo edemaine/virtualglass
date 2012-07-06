@@ -35,12 +35,6 @@
 #define USES_DEPENDANCY 2
 #define IS_USED_BY_DEPENDANCY 3
 
-#define SINGLE_FILL_RULE 1
-#define EVERY_OTHER_FILL_RULE 2
-#define EVERY_THIRD_FILL_RULE 3
-#define GROUP_FILL_RULE 4
-#define ALL_FILL_RULE 5
-
 // Little functions
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
