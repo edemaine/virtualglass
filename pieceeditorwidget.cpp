@@ -15,8 +15,6 @@ PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 
 void PieceEditorWidget :: updateEverything()
 {
-        fillRuleComboBox->setCurrentIndex(pickupViewWidget->getFillRule()-1);
-
 	// update pickup stuff
 	for (int i = 0; i < pickupTemplateLibraryLayout->count(); ++i)
 	{
@@ -196,18 +194,6 @@ void PieceEditorWidget :: setupLayout()
 	pickupTemplateLibraryScrollArea->setFixedHeight(130);
 	leftLayout->addWidget(pickupTemplateLibraryScrollArea, 0);
 
-        QHBoxLayout* fillRuleLayout = new QHBoxLayout(this);
-        fillRuleComboBox = new QComboBox(this);
-        fillRuleComboBox->addItem("Single");
-        fillRuleComboBox->addItem("Every second");
-        fillRuleComboBox->addItem("Every third");
-        fillRuleComboBox->addItem("Group");
-        fillRuleComboBox->addItem("All");
-        fillRuleLayout->addWidget(new QLabel("Fill rule:", this), 0);
-        fillRuleLayout->addWidget(fillRuleComboBox, 0);
-        fillRuleLayout->addStretch(1);
-        leftLayout->addLayout(fillRuleLayout);
-
 	QHBoxLayout* overlayLayout = new QHBoxLayout(this);	
 	overlayLayout->addWidget(new QLabel("Casing color:"));
 	overlayWidget = new OverlayColorWidget(&(piece->pickup->overlayColor), this);
@@ -355,19 +341,12 @@ void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
 	}
 }
 
-void PieceEditorWidget :: fillRuleComboBoxChanged(int)
-{
-        pickupViewWidget->setFillRule(fillRuleComboBox->currentIndex()+1);
-}
-
 void PieceEditorWidget :: setupConnections()
 {
 	connect(overlayWidget, SIGNAL(colorChanged()),
 		this, SLOT(updateEverything()));
 	connect(underlayWidget, SIGNAL(colorChanged()),
 		this, SLOT(updateEverything()));
-        connect(fillRuleComboBox, SIGNAL(currentIndexChanged(int)), 
-		this, SLOT(fillRuleComboBoxChanged(int)));
 	connect(pickupParamSpinboxes[0], SIGNAL(valueChanged(int)),
 		this, SLOT(pickupParameter1SpinBoxChanged(int)));
 	connect(pickupParamSliders[0], SIGNAL(valueChanged(int)),

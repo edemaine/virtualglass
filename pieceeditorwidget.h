@@ -38,7 +38,6 @@ class PieceEditorWidget : public QWidget
 
 	private slots:
                 void pickupViewWidgetDataChanged();
-                void fillRuleComboBoxChanged(int);
 		void pieceTemplateParameterSlider1Changed(int);
 		void pieceTemplateParameterSlider2Changed(int);
 		void pieceTemplateParameterSlider3Changed(int);
@@ -58,7 +57,6 @@ class PieceEditorWidget : public QWidget
 		OverlayColorWidget* underlayWidget;
                 QLabel overlayColorLabel;
                 QLabel underlayColorLabel;
-                QComboBox* fillRuleComboBox;
 
 		vector<QLabel*> pickupParamLabels;
 		vector<QSpinBox*> pickupParamSpinboxes;

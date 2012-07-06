@@ -19,8 +19,6 @@ class PickupPlanEditorViewWidget : public QWidget
 		PickupPlanEditorViewWidget(PickupPlan* pickup, QWidget* parent=0);
 		void setPickup(PickupPlan* p);
 		QPixmap getPixmap();
-		void setFillRule(int r);
-		int getFillRule();
 	
 	signals:
 		void someDataChanged();
@@ -36,14 +34,13 @@ class PickupPlanEditorViewWidget : public QWidget
 		Geometry geometry;
 		NiceViewWidget* niceViewWidget;
 		PickupPlan* pickup;
-		int fillRule;
                 float ulX, ulY, squareSize;
 
                 float adjustedX(float rawX);
                 float adjustedY(float rawX);
                 float rawX(float adjustedX);
                 float rawY(float adjustedY);
-		PullPlan* getSubplanAt(float x, float y);
+		void getSubplanAt(float x, float y, PullPlan** plan, int* subplanIndex);
 };
 
 
