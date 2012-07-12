@@ -28,7 +28,7 @@ class PullPlanEditorWidget : public QWidget
 		void someDataChanged();
 		void newPullPlan(PullPlan* p);
 		void geometryChanged(Geometry g);
-		void pullPlanChanged(PullPlan* p);
+//		void pullPlanChanged(PullPlan* p);
 
 	public slots:
 		void updateEverything();
@@ -38,7 +38,12 @@ class PullPlanEditorWidget : public QWidget
 		void squareCasingButtonPressed();
 		void addCasingButtonPressed();
 		void removeCasingButtonPressed();
-		void viewWidgetDataChanged();
+        void addCircleButtonPressed();
+        void addSquareButtonPressed();
+        void copySelectedButtonPressed();
+        void deleteSelectedButtonPressed();
+        void viewWidgetDataChanged();
+        void customizeViewWidgetDataChanged();
 		void twistSpinChanged(int);
 		void twistSliderChanged(int);
 		void paramSpinChanged(int);
@@ -61,6 +66,10 @@ class PullPlanEditorWidget : public QWidget
 		QPushButton* squareCasingPushButton;
                 QPushButton* confirmChangesButton;
                 QPushButton* cancelChangesButton;
+                QPushButton* addCircleButton;
+                QPushButton* addSquareButton;
+                QPushButton* copySelectedButton;
+                QPushButton* deleteSelectedButton;
 		NiceViewWidget* niceViewWidget;
 
 		void setupLayout();

@@ -38,6 +38,8 @@ void PullPlanEditorWidget :: updateEverything()
 	viewWidget->setPullPlan(plan);
 	viewWidget->repaint();
 
+    customizeViewWidget->setPullPlan(plan);
+
 	unsigned int i = 0;
 	for (; i < plan->getParameterCount(); ++i)
 	{
@@ -55,7 +57,8 @@ void PullPlanEditorWidget :: updateEverything()
 	geometry.clear();
 	mesher.generatePullMesh(plan, &geometry);
 	emit geometryChanged(geometry);
-	emit pullPlanChanged(plan);
+//    niceViewWidget->repaint();
+//	emit pullPlanChanged(plan);
 
 	// Highlight correct pull template
 	for (int i = 0; i < templateLibraryLayout->count(); ++i)
@@ -171,16 +174,26 @@ void PullPlanEditorWidget :: setupLayout()
 	QVBoxLayout* customizeLayout = new QVBoxLayout(customizeWidget);
 	customizeWidget->setLayout(customizeLayout);
 
+    // Customize layout: top button layout
+    QHBoxLayout* addCaneLayout = new QHBoxLayout(customizeWidget);
+    addCircleButton = new QPushButton("Add New Circle");
+    addSquareButton = new QPushButton("Add New Square");
+    addCaneLayout->addWidget(addCircleButton);
+    addCaneLayout->addWidget(addSquareButton);
+    customizeLayout->addLayout(addCaneLayout, 0);
+
 	// Customize layout: interactive editor
 	customizeLayout->addWidget(customizeViewWidget, 1);
 
-	// Customize layout: button layout
-        QHBoxLayout* windowControlsLayout = new QHBoxLayout(customizeWidget);
-        confirmChangesButton = new QPushButton("Confirm changes", customizeWidget);
-        cancelChangesButton = new QPushButton("Cancel", customizeWidget);
-        windowControlsLayout->addWidget(confirmChangesButton);
-        windowControlsLayout->addWidget(cancelChangesButton);
-        customizeLayout->addLayout(windowControlsLayout, 0);
+    // Customize layout: bottom button layout
+    QHBoxLayout* windowControlsLayout = new QHBoxLayout(customizeWidget);
+    copySelectedButton = new QPushButton("Duplicate Selection");
+    deleteSelectedButton = new QPushButton("Delete Selection");
+    confirmChangesButton = new QPushButton("Confirm changes");
+    cancelChangesButton = new QPushButton("Cancel");
+    windowControlsLayout->addWidget(copySelectedButton);
+    windowControlsLayout->addWidget(deleteSelectedButton);
+    customizeLayout->addLayout(windowControlsLayout, 0);
 	
 	// Combine editor and customize layouts into a pair of tabs with 
 	// descriptive text in the left layout
@@ -246,13 +259,37 @@ void PullPlanEditorWidget :: addCasingButtonPressed()
 	emit someDataChanged();
 }
 
+void PullPlanEditorWidget :: copySelectedButtonPressed()
+{
+    customizeViewWidget->copySelectionPressed();
+}
+
+void PullPlanEditorWidget :: deleteSelectedButtonPressed()
+{
+    customizeViewWidget->deleteSelectionPressed();
+}
+
+void PullPlanEditorWidget :: addCircleButtonPressed()
+{
+    customizeViewWidget->addCirclePressed();
+}
+
+void PullPlanEditorWidget :: addSquareButtonPressed()
+{
+    customizeViewWidget->addSquarePressed();
+}
+
 void PullPlanEditorWidget :: setupConnections()
 {
 	connect(circleCasingPushButton, SIGNAL(clicked()), this, SLOT(circleCasingButtonPressed()));
 	connect(squareCasingPushButton, SIGNAL(clicked()), this, SLOT(squareCasingButtonPressed()));
 	connect(addCasingButton, SIGNAL(clicked()), this, SLOT(addCasingButtonPressed()));
 	connect(removeCasingButton, SIGNAL(clicked()), this, SLOT(removeCasingButtonPressed()));
-	connect(twistSlider, SIGNAL(valueChanged(int)), this, SLOT(twistSliderChanged(int)));
+    connect(copySelectedButton, SIGNAL(pressed()), this, SLOT(copySelectedButtonPressed()));
+    connect(deleteSelectedButton, SIGNAL(pressed()), this, SLOT(deleteSelectedButtonPressed()));
+    connect(addCircleButton, SIGNAL(pressed()), this, SLOT(addCircleButtonPressed()));
+    connect(addSquareButton, SIGNAL(pressed()), this, SLOT(addSquareButtonPressed()));
+    connect(twistSlider, SIGNAL(valueChanged(int)), this, SLOT(twistSliderChanged(int)));
 	connect(twistSpin, SIGNAL(valueChanged(int)), this, SLOT(twistSpinChanged(int)));
 
 	for (unsigned int i = 0; i < paramSpins.size(); ++i)
@@ -262,11 +299,18 @@ void PullPlanEditorWidget :: setupConnections()
 
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(viewWidgetDataChanged()));
+    connect(customizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(customizeViewWidgetDataChanged()));
+    connect(this, SIGNAL(geometryChanged(Geometry)), niceViewWidget, SLOT(repaint()));
 }
 
 void PullPlanEditorWidget :: viewWidgetDataChanged()
 {
 	emit someDataChanged();
+}
+
+void PullPlanEditorWidget :: customizeViewWidgetDataChanged()
+{
+    emit someDataChanged();
 }
 
 void PullPlanEditorWidget :: paramSpinChanged(int)

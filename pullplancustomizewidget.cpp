@@ -16,6 +16,13 @@ void PullPlanCustomizeWidget :: setupLayout()
 		QVBoxLayout* editorLayout = new QVBoxLayout(this);
 		pageLayout->addLayout(editorLayout);
 
+        QHBoxLayout* addCaneLayout = new QHBoxLayout(this);
+        addCircleButton = new QPushButton("Add New Circle");
+        addSquareButton = new QPushButton("Add New Square");
+        addCaneLayout->addWidget(addCircleButton);
+        addCaneLayout->addWidget(addSquareButton);
+        editorLayout->addLayout(addCaneLayout, 0);
+
 		editorLayout->addWidget(viewWidget, 0);
 
 /*		QHBoxLayout* pullTemplateShapeLayout = new QHBoxLayout(this);
@@ -32,12 +39,14 @@ void PullPlanCustomizeWidget :: setupLayout()
 		pullTemplateShapeLayout->addWidget(addCasingButton);
 		editorLayout->addLayout(pullTemplateShapeLayout, 0);*/
 
-	QHBoxLayout* windowControlsLayout = new QHBoxLayout(this);
-	confirmChangesButton = new QPushButton("Confirm changes");
+    QHBoxLayout* windowControlsLayout = new QHBoxLayout(this);
+    copySelectedButton = new QPushButton("Duplicate Selection");
+    deleteSelectedButton = new QPushButton("Delete Selection");
+    confirmChangesButton = new QPushButton("Confirm changes");
 	cancelButton = new QPushButton("Cancel");
-	windowControlsLayout->addWidget(confirmChangesButton);
-	windowControlsLayout->addWidget(cancelButton);
-	editorLayout->addLayout(windowControlsLayout, 0);
+    windowControlsLayout->addWidget(copySelectedButton);
+    windowControlsLayout->addWidget(deleteSelectedButton);
+    editorLayout->addLayout(windowControlsLayout, 0);
 }
 
 /*void PullPlanCustomizeWidget :: mousePressEvent(QMouseEvent* event)
@@ -55,6 +64,10 @@ void PullPlanCustomizeWidget :: setupConnections()
 {
 	connect(cancelButton, SIGNAL(pressed()), this, SLOT(cancelButtonPressed()));
     connect(viewWidget, SIGNAL(pullPlanChanged(PullPlan*)), this, SLOT(pullPlanChanged(PullPlan*)));
+    connect(copySelectedButton, SIGNAL(pressed()), this, SLOT(copySelectedPressed()));
+    connect(deleteSelectedButton, SIGNAL(pressed()), this, SLOT(deleteSelectedPressed()));
+    connect(addCircleButton, SIGNAL(pressed()), this, SLOT(addCirclePressed()));
+    connect(addSquareButton, SIGNAL(pressed()), this, SLOT(addSquarePressed()));
 /*	connect(fillRuleButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(fillRuleButtonGroupChanged(int)));
 	connect(addCasingButton, SIGNAL(pressed()), this, SLOT(addCasingButtonPressed()));
 		connect(shapeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(shapeButtonGroupChanged(int)));
@@ -100,4 +113,24 @@ void PullPlanCustomizeWidget :: cancelButtonPressed()
 {
 	viewWidget->revertAndClose();
 //	this->hide();
+}
+
+void PullPlanCustomizeWidget :: copySelectedPressed()
+{
+    viewWidget->copySelectionPressed();
+}
+
+void PullPlanCustomizeWidget :: deleteSelectedPressed()
+{
+    viewWidget->deleteSelectionPressed();
+}
+
+void PullPlanCustomizeWidget :: addCirclePressed()
+{
+    viewWidget->addCirclePressed();
+}
+
+void PullPlanCustomizeWidget :: addSquarePressed()
+{
+    viewWidget->addSquarePressed();
 }

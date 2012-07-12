@@ -186,16 +186,31 @@ void PullPlan :: setTemplateType(int templateType) {
 			parameterValues.push_back(2);
 			break;
 		case CUSTOM_CIRCLE_PULL_TEMPLATE:
-			break;
+            break;
 		case CUSTOM_SQUARE_PULL_TEMPLATE:
-			this->casings[0].shape = SQUARE_SHAPE;
-			casings[0].thickness = 1 / SQRT_TWO;
+            this->casings[0].shape = SQUARE_SHAPE;
+            casings[0].thickness = 1 / SQRT_TWO;
+//            this->removeCasing();
 			break;
 	}
 
 	vector<SubpullTemplate> oldSubs = subs;
 	subs.clear(); // don't carry over any of the current stuff
 	updateSubs(oldSubs);
+}
+
+void PullPlan :: setTemplateTypeToCustom()
+{
+    if (this->getCasingShape(0) == CIRCLE_SHAPE)
+    {
+        this->templateType = CUSTOM_CIRCLE_PULL_TEMPLATE;
+    }
+    else
+    {
+        this->templateType = CUSTOM_SQUARE_PULL_TEMPLATE;
+    }
+    this->parameterNames.clear();
+    this->parameterValues.clear();
 }
 
 void PullPlan :: setCasingColor(Color* c, unsigned int index) {

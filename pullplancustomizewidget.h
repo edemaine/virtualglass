@@ -24,6 +24,10 @@ class PullPlanCustomizeWidget : public QWidget
 	public slots:
 //		void updateEverything();
         void cancelButtonPressed();
+        void addCirclePressed();
+        void addSquarePressed();
+        void copySelectedPressed();
+        void deleteSelectedPressed();
         void pullPlanChanged(PullPlan* p);
 
 	private slots:
@@ -32,6 +36,10 @@ class PullPlanCustomizeWidget : public QWidget
 	private:
 		PullPlanCustomizeViewWidget* viewWidget;
 //		NiceViewWidget* niceViewWidget;
+        QPushButton* addCircleButton;
+        QPushButton* addSquareButton;
+        QPushButton* copySelectedButton;
+        QPushButton* deleteSelectedButton;
 		QPushButton* confirmChangesButton;
 		QPushButton* cancelButton;
 

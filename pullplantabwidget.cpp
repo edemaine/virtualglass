@@ -36,7 +36,7 @@ PullPlanTabWidget::PullPlanTabWidget(QWidget* parent) : QWidget(parent)
     this->setLayout(pageLayout);
 
     connect(pullPlanEditor, SIGNAL(geometryChanged(Geometry)), this, SLOT(updateGeometry(Geometry)));
-    connect(pullPlanEditor, SIGNAL(pullPlanChanged(PullPlan*)), this, SLOT(updateCustomizePlan(PullPlan*)));
+//    connect(pullPlanEditor, SIGNAL(pullPlanChanged(PullPlan*)), this, SLOT(updateCustomizePlan(PullPlan*)));
     connect(pullPlanCustomize, SIGNAL(newPullPlan(PullPlan*)), this, SLOT(updateEditorPlan(PullPlan*)));
 }
 
@@ -50,12 +50,15 @@ void PullPlanTabWidget :: updateCustomizePlan(PullPlan* p)
 {
     topPlan = p;
     pullPlanCustomize->setPullPlan(p);
+//    emit pullPlanChanged(p);
 }
 
 void PullPlanTabWidget :: updateGeometry(Geometry g)
 {
+    std::cout << "Point B" << std::endl;
     geometry = g;
     niceViewWidget->repaint();
+    emit geometryChanged(g);
 }
 
 void PullPlanTabWidget :: updateEverything()

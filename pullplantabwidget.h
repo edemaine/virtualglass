@@ -27,6 +27,8 @@ public:
 signals:
     void someDataChanged();
     void newPullPlan(PullPlan* p);
+    void geometryChanged(Geometry g);
+//    void pullPlanChanged(PullPlan* p);
 
 public slots:
     void updateEverything();
