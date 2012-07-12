@@ -1,5 +1,4 @@
 #include "pullplancustomizeviewwidget.h"
-#include <QtDebug>
 
 PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
 {

@@ -2,6 +2,8 @@
 #define PULLPLANCUSTOMIZEVIEWWIDGET_H
 
 #include <QtGui>
+#include <QtDebug>
+#include <cfloat>
 #include "constants.h"
 #include "pullplan.h"
 #include "primitives.h"
