@@ -46,9 +46,8 @@ void PullPlanCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
                 ulY = (height - width)/2.0;
                 squareSize = width;
         }
-        BOUNDING_BOX_SPACE = squareSize / 100;
-        if (BOUNDING_BOX_SPACE < 1)
-            BOUNDING_BOX_SPACE = 1;
+
+	BOUNDING_BOX_SPACE = MAX(squareSize / 100, 1);
         this->update();
 }
 
@@ -72,11 +71,6 @@ float PullPlanCustomizeViewWidget :: rawY(float adjustedY)
         return adjustedY + ulY;
 }
 
-void PullPlanCustomizeViewWidget :: dragEnterEvent(QDragEnterEvent* event)
-{
-	event->acceptProposedAction();
-}
-
 void PullPlanCustomizeViewWidget :: dropEvent(QDropEvent* event)
 {
 	mouseStartingLoc.x= FLT_MAX;
@@ -86,297 +80,325 @@ void PullPlanCustomizeViewWidget :: dropEvent(QDropEvent* event)
 
 void PullPlanCustomizeViewWidget :: updateIndexes(QPoint pos)
 {
-    int drawSize = squareSize - 20;
-    if (pow(double((adjustedX(pos.x()) - clickedLoc->x())*(adjustedX(pos.x()) - clickedLoc->x())+
-                   (adjustedY(pos.y()) - clickedLoc->y())*(adjustedY(pos.y()) - clickedLoc->y())),0.5) > BOUNDING_BOX_SPACE)
-    {
-        clickMoved = true;
-    }
-    if (adjustedX(pos.x()) < activeBox_xmin - 6*BOUNDING_BOX_SPACE ||
-        adjustedY(pos.y()) < activeBox_ymin - 6*BOUNDING_BOX_SPACE ||
-        adjustedX(pos.x()) > activeBox_xmax + 6*BOUNDING_BOX_SPACE ||
-        adjustedY(pos.y()) > activeBox_ymax + 6*BOUNDING_BOX_SPACE )
-    {
-        activeBoxIndex = -1;
-    }
-    else if (activeBoxIndex == -1)
-    {
-        activeBoxIndex = INT_MAX;
-    }
-    if (activeBoxIndex != -1 && activeBoxIndex != INT_MAX)
-    {
-        SubpullTemplate* subpull = &(plan->subs[activeBoxIndex]);
-        float dx = fabs(adjustedX(pos.x()) - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
-        float dy = fabs(adjustedY(pos.y()) - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
-        if (MAX(dx, dy) >= (subpull->diameter/2.0)*drawSize/2 + 3*BOUNDING_BOX_SPACE)
-        {
-            activeBoxIndex = INT_MAX;
-        }
-    }
-    if (activeBoxIndex == INT_MAX)
-    {
-        for (unsigned int i = 0; i < subplansSelected.size(); i++)
-        {
-            SubpullTemplate* subpull = &(plan->subs[subplansSelected[i]]);
-            float dx = fabs(adjustedX(pos.x()) - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
-            float dy = fabs(adjustedY(pos.y()) - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
-            switch (subpull->shape)
-            {
-            case CIRCLE_SHAPE:
-                if (pow(double(dx*dx + dy*dy), 0.5) < (subpull->diameter/2.0)*drawSize/2)
-                {
-                    activeBoxIndex = subplansSelected[i];
-                }
-                break;
-            case SQUARE_SHAPE:
-                if (MAX(dx, dy) < (subpull->diameter/2.0)*drawSize/2)
-                {
-                    activeBoxIndex = subplansSelected[i];
-                }
-                break;
-            }
-        }
-    }
-    if (activeBoxIndex == INT_MAX)
-    {
-        for (unsigned int i = 0; i < subplansSelected.size(); i++)
-        {
-            SubpullTemplate* subpull = &(plan->subs[subplansSelected[i]]);
-            float dx = fabs(adjustedX(pos.x()) - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
-            float dy = fabs(adjustedY(pos.y()) - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
-            if (MAX(dx, dy) < (subpull->diameter/2.0)*drawSize/2 + BOUNDING_BOX_SPACE)
-            {
-                activeBoxIndex = subplansSelected[i];
-                break;
-            }
-        }
-    }
-    hoveringIndex = -1;
-    for (unsigned int i = 0; i < plan->subs.size(); ++i)
-    {
-        SubpullTemplate* subpull = &(plan->subs[i]);
-        float dx = fabs(adjustedX(pos.x()) - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
-        float dy = fabs(adjustedY(pos.y()) - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
-        switch (subpull->shape)
-        {
-            case CIRCLE_SHAPE:
-                if (pow(double(dx*dx + dy*dy), 0.5) < (subpull->diameter/2.0)*drawSize/2)
-                {
-                    hoveringIndex = i;
-                }
-                break;
-            case SQUARE_SHAPE:
-                if (MAX(dx, dy) < (subpull->diameter/2.0)*drawSize/2)
-                {
-                    hoveringIndex = i;
-                }
-                break;
-        }
-        if (hoveringIndex != -1)
-        {
-            break;
-        }
-    }
+	int drawSize = squareSize - 20;
+	if (pow(double((adjustedX(pos.x()) - clickedLoc->x())*(adjustedX(pos.x()) - clickedLoc->x()) 
+		+ (adjustedY(pos.y()) - clickedLoc->y())*(adjustedY(pos.y()) - clickedLoc->y())),0.5) > BOUNDING_BOX_SPACE)
+	{
+		clickMoved = true;
+	}
+
+	if (adjustedX(pos.x()) < activeBox_xmin - 6*BOUNDING_BOX_SPACE ||
+		adjustedY(pos.y()) < activeBox_ymin - 6*BOUNDING_BOX_SPACE ||
+		adjustedX(pos.x()) > activeBox_xmax + 6*BOUNDING_BOX_SPACE ||
+		adjustedY(pos.y()) > activeBox_ymax + 6*BOUNDING_BOX_SPACE )
+	{
+		activeBoxIndex = -1;
+	}
+	else if (activeBoxIndex == -1)
+	{
+		activeBoxIndex = INT_MAX;
+	}
+
+	if (activeBoxIndex != -1 && activeBoxIndex != INT_MAX)
+	{
+		SubpullTemplate* subpull = &(plan->subs[activeBoxIndex]);
+		float dx = fabs(adjustedX(pos.x()) - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
+		float dy = fabs(adjustedY(pos.y()) - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
+		if (MAX(dx, dy) >= (subpull->diameter/2.0)*drawSize/2 + 3*BOUNDING_BOX_SPACE)
+		{
+			activeBoxIndex = INT_MAX;
+		}
+	}
+
+	if (activeBoxIndex == INT_MAX)
+	{
+		for (unsigned int i = 0; i < subplansSelected.size(); i++)
+		{
+			SubpullTemplate* subpull = &(plan->subs[subplansSelected[i]]);
+			float dx = fabs(adjustedX(pos.x()) - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
+			float dy = fabs(adjustedY(pos.y()) - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
+
+			switch (subpull->shape)
+			{
+				case CIRCLE_SHAPE:
+					if (pow(double(dx*dx + dy*dy), 0.5) < (subpull->diameter/2.0)*drawSize/2)
+					{
+						activeBoxIndex = subplansSelected[i];
+					}
+					break;
+				case SQUARE_SHAPE:
+					if (MAX(dx, dy) < (subpull->diameter/2.0)*drawSize/2)
+					{
+						activeBoxIndex = subplansSelected[i];
+					}
+					break;
+			}
+		}
+	}
+
+	if (activeBoxIndex == INT_MAX)
+	{
+		for (unsigned int i = 0; i < subplansSelected.size(); i++)
+		{
+			SubpullTemplate* subpull = &(plan->subs[subplansSelected[i]]);
+			float dx = fabs(adjustedX(pos.x()) - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
+			float dy = fabs(adjustedY(pos.y()) - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
+			if (MAX(dx, dy) < (subpull->diameter/2.0)*drawSize/2 + BOUNDING_BOX_SPACE)
+			{
+				activeBoxIndex = subplansSelected[i];
+				break;
+			}
+		}
+	}
+
+	hoveringIndex = -1;
+	for (unsigned int i = 0; i < plan->subs.size(); ++i)
+	{
+		SubpullTemplate* subpull = &(plan->subs[i]);
+		float dx = fabs(adjustedX(pos.x()) - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
+		float dy = fabs(adjustedY(pos.y()) - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
+		switch (subpull->shape)
+		{
+			case CIRCLE_SHAPE:
+				if (pow(double(dx*dx + dy*dy), 0.5) < (subpull->diameter/2.0)*drawSize/2)
+				{
+					hoveringIndex = i;
+				}
+				break;
+			case SQUARE_SHAPE:
+				if (MAX(dx, dy) < (subpull->diameter/2.0)*drawSize/2)
+				{
+					hoveringIndex = i;
+				}
+				break;
+		}
+		if (hoveringIndex != -1)
+		{
+			break;
+		}
+	}
 }
 
 void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 {
-    int drawSize = squareSize - 20;
-    if (event->buttons() == Qt::NoButton)
-    {
-        updateIndexes(event->pos());
-    }
-    if (event->buttons() != Qt::NoButton)
+	int drawSize = squareSize - 20;
+	if (event->buttons() == Qt::NoButton)
 	{
-        if (mode == MOVE_MODE)
-        {
-            if (pow(double((adjustedX(event->pos().x()) - clickedLoc->x())*(adjustedX(event->pos().x()) - clickedLoc->x())+
-                           (adjustedY(event->pos().y()) - clickedLoc->y())*(adjustedY(event->pos().y()) - clickedLoc->y())),0.5) > BOUNDING_BOX_SPACE)
-            {
-                clickMoved = true;
-            }
-            if (isValidMovePosition(event))
-            {
-                for (unsigned int i = 0; i < subplansSelected.size(); i++)
-                {
-                    plan->subs[subplansSelected[i]].location.x += (adjustedX(event->pos().x()) - mouseStartingLoc.x)/(squareSize/2.0 - 10);
-                    plan->subs[subplansSelected[i]].location.y += (adjustedY(event->pos().y()) - mouseStartingLoc.y)/(squareSize/2.0 - 10);
-                }
-                mouseStartingLoc.x=(adjustedX(event->pos().x()));
-                mouseStartingLoc.y=(adjustedY(event->pos().y()));
-            }
-        }
-        else if (mode == SCALE_MODE)
-        {
-            clickMoved = true;
-            if (activeBoxIndex == -1)
-            {
-                this->update();
-                return;
-            }
-            if (activeBoxIndex != INT_MAX)
-            {
-                SubpullTemplate* subpull = &(plan->subs[activeBoxIndex]);
-                float dx = fabs(adjustedX(event->pos().x()) - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
-                float dy = fabs(adjustedY(event->pos().y()) - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
-                float new_diameter = MAX(dx,dy);
-                new_diameter -= BOUNDING_BOX_SPACE;
-                new_diameter /= float(drawSize/2);
-                new_diameter *= 2.0;
-                float proportion = new_diameter / plan->subs[activeBoxIndex].diameter;
-                for (unsigned int i = 0; i < subplansSelected.size(); i++)
-                {
-                    plan->subs[subplansSelected[i]].diameter *= proportion;
-                }
-            }
-            else
-            {
-                float center_x = activeBox_xmin/2.0 + activeBox_xmax/2.0;
-                float center_y = activeBox_ymin/2.0 + activeBox_ymax/2.0;
-                float dx = fabs(adjustedX(event->pos().x()) - center_x)-3*BOUNDING_BOX_SPACE;
-                float dy = fabs(adjustedY(event->pos().y()) - center_y)-3*BOUNDING_BOX_SPACE;
-                float yx_proportion = (activeBox_ymax-activeBox_ymin)/(activeBox_xmax-activeBox_xmin);
-                // no = new/old
-                float no_proportion = 1.0;
-                if (dy > dx*yx_proportion)
-                {
-                    no_proportion = dy/(activeBox_ymax/2.0 - activeBox_ymin/2.0);
-                }
-                else
-                {
-                    no_proportion = dx/(activeBox_xmax/2.0 - activeBox_xmin/2.0);
-                }
-                for (unsigned int i = 0; i < subplansSelected.size(); i++)
-                {
-                    plan->subs[subplansSelected[i]].diameter *= no_proportion;
-                    plan->subs[subplansSelected[i]].location.x = (center_x - 10 - drawSize/2)/double(drawSize/2.0) + ((plan->subs[subplansSelected[i]].location.x - (center_x - 10 - drawSize/2)/double(drawSize/2.0))*no_proportion);
-                    plan->subs[subplansSelected[i]].location.y = (center_y - 10 - drawSize/2)/double(drawSize/2.0) + ((plan->subs[subplansSelected[i]].location.y - (center_y - 10 - drawSize/2)/double(drawSize/2.0))*no_proportion);
-                }
-            }
-        }
-        boundActiveBox();
-        this->update();
+		updateIndexes(event->pos());
+	}
 
-        // This is to turn a control point a different color when it's being hovered over. For now it does nothing.
-        activeControlPoint = -1;
-        if (activeBoxIndex != -1 && activeBoxIndex != INT_MAX)
-        {
-            SubpullTemplate* subpull = &(plan->subs[activeBoxIndex]);
-            float dx = fabs(adjustedX(event->pos().x()) - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
-            float dy = fabs(adjustedY(event->pos().y()) - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
-            if (fabs((subpull->diameter/2.0)*drawSize/2 - dx) < BOUNDING_BOX_SPACE &&
-                    fabs((subpull->diameter/2.0)*drawSize/2 - dy) < BOUNDING_BOX_SPACE)
-            {
-            }
-        }
-        else if (activeBoxIndex == INT_MAX)
-        {
-            if((fabs(float(adjustedX(event->pos().x()) - activeBox_xmin - 3*BOUNDING_BOX_SPACE)) < BOUNDING_BOX_SPACE ||
-                fabs(float(adjustedX(event->pos().x()) - activeBox_xmax - 3*BOUNDING_BOX_SPACE)) < BOUNDING_BOX_SPACE) &&
-                (fabs(float(adjustedY(event->pos().y()) - activeBox_ymin + 3*BOUNDING_BOX_SPACE)) < BOUNDING_BOX_SPACE ||
-                 fabs(float(adjustedY(event->pos().y()) - activeBox_ymax + 3*BOUNDING_BOX_SPACE)) < BOUNDING_BOX_SPACE))
-            {
-            }
-        }
+	if (event->buttons() == Qt::NoButton)
+	{
+		emit someDataChanged();
+		this->update();
 		return;
 	}
-    emit someDataChanged();
-    this->update();
+
+	switch (mode)
+	{
+		case MOVE_MODE:
+		{
+			if (pow(double((adjustedX(event->pos().x()) - clickedLoc->x()) 
+				* (adjustedX(event->pos().x()) - clickedLoc->x()) 
+				+ (adjustedY(event->pos().y()) - clickedLoc->y())
+				*(adjustedY(event->pos().y()) - clickedLoc->y())),0.5) > BOUNDING_BOX_SPACE)
+			{
+				clickMoved = true;
+			}
+
+			if (isValidMovePosition(event))
+			{
+				for (unsigned int i = 0; i < subplansSelected.size(); i++)
+				{
+					plan->subs[subplansSelected[i]].location.x += 
+						(adjustedX(event->pos().x()) - mouseStartingLoc.x)/(squareSize/2.0 - 10);
+					plan->subs[subplansSelected[i]].location.y += 
+						(adjustedY(event->pos().y()) - mouseStartingLoc.y)/(squareSize/2.0 - 10);
+				}
+				mouseStartingLoc.x=(adjustedX(event->pos().x()));
+				mouseStartingLoc.y=(adjustedY(event->pos().y()));
+			}
+			break;
+		}
+		case SCALE_MODE:
+		{
+			clickMoved = true;
+			if (activeBoxIndex == -1)
+			{
+				this->update();
+				return;
+			}
+
+			if (activeBoxIndex != INT_MAX)
+			{
+				SubpullTemplate* subpull = &(plan->subs[activeBoxIndex]);
+				float dx = fabs(adjustedX(event->pos().x()) 
+					- (drawSize/2 * subpull->location.x + drawSize/2 + 10));
+				float dy = fabs(adjustedY(event->pos().y()) 
+					- (drawSize/2 * subpull->location.y + drawSize/2 + 10));
+				float new_diameter = MAX(dx,dy);
+				new_diameter -= BOUNDING_BOX_SPACE;
+				new_diameter /= float(drawSize/2);
+				new_diameter *= 2.0;
+				float proportion = new_diameter / plan->subs[activeBoxIndex].diameter;
+				for (unsigned int i = 0; i < subplansSelected.size(); i++)
+				{
+					plan->subs[subplansSelected[i]].diameter *= proportion;
+				}
+			}
+			else
+			{
+				float center_x = activeBox_xmin/2.0 + activeBox_xmax/2.0;
+				float center_y = activeBox_ymin/2.0 + activeBox_ymax/2.0;
+				float dx = fabs(adjustedX(event->pos().x()) - center_x)-3*BOUNDING_BOX_SPACE;
+				float dy = fabs(adjustedY(event->pos().y()) - center_y)-3*BOUNDING_BOX_SPACE;
+				float yx_proportion = (activeBox_ymax-activeBox_ymin)/(activeBox_xmax-activeBox_xmin);
+				// no = new/old
+				float no_proportion = 1.0;
+
+				if (dy > dx*yx_proportion)
+				{
+					no_proportion = dy/(activeBox_ymax/2.0 - activeBox_ymin/2.0);
+				}
+				else
+				{
+					no_proportion = dx/(activeBox_xmax/2.0 - activeBox_xmin/2.0);
+				}
+
+				for (unsigned int i = 0; i < subplansSelected.size(); i++)
+				{
+					plan->subs[subplansSelected[i]].diameter *= no_proportion;
+					plan->subs[subplansSelected[i]].location.x = (center_x - 10 - drawSize/2)/double(drawSize/2.0) + ((plan->subs[subplansSelected[i]].location.x - (center_x - 10 - drawSize/2)/double(drawSize/2.0))*no_proportion);
+					plan->subs[subplansSelected[i]].location.y = (center_y - 10 - drawSize/2)/double(drawSize/2.0) + ((plan->subs[subplansSelected[i]].location.y - (center_y - 10 - drawSize/2)/double(drawSize/2.0))*no_proportion);
+				}
+			}
+			break;
+		}
+	}
+	boundActiveBox();
+	this->update();
+
+	// This is to turn a control point a different color when it's being hovered over. For now it does nothing.
+	activeControlPoint = -1;
+	if (activeBoxIndex != -1 && activeBoxIndex != INT_MAX)
+	{
+		SubpullTemplate* subpull = &(plan->subs[activeBoxIndex]);
+		float dx = fabs(adjustedX(event->pos().x()) - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
+		float dy = fabs(adjustedY(event->pos().y()) - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
+		if (fabs((subpull->diameter/2.0)*drawSize/2 - dx) < BOUNDING_BOX_SPACE &&
+		    fabs((subpull->diameter/2.0)*drawSize/2 - dy) < BOUNDING_BOX_SPACE)
+		{
+			// not yet implemented
+		}
+	}
+	else if (activeBoxIndex == INT_MAX)
+	{
+	    if((fabs(float(adjustedX(event->pos().x()) - activeBox_xmin - 3*BOUNDING_BOX_SPACE)) < BOUNDING_BOX_SPACE ||
+		fabs(float(adjustedX(event->pos().x()) - activeBox_xmax - 3*BOUNDING_BOX_SPACE)) < BOUNDING_BOX_SPACE) &&
+		(fabs(float(adjustedY(event->pos().y()) - activeBox_ymin + 3*BOUNDING_BOX_SPACE)) < BOUNDING_BOX_SPACE ||
+		 fabs(float(adjustedY(event->pos().y()) - activeBox_ymax + 3*BOUNDING_BOX_SPACE)) < BOUNDING_BOX_SPACE))
+	    {
+			// not yet implemented
+	    }
+	}
 }
 
 void PullPlanCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 {
-    int drawSize = squareSize - 20;
-    mode = MOVE_MODE;
-    clickedLoc->setX(adjustedX(event->pos().x()));
-    clickedLoc->setY(adjustedY(event->pos().y()));
-    clickMoved = false;
-    if (activeBoxIndex != -1 && activeBoxIndex != INT_MAX)
-    {
-        SubpullTemplate* subpull = &(plan->subs[activeBoxIndex]);
-        float dx = fabs(adjustedX(event->pos().x()) - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
-        float dy = fabs(adjustedY(event->pos().y()) - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
-        if (fabs((subpull->diameter/2.0)*drawSize/2+BOUNDING_BOX_SPACE - dx) < 2*BOUNDING_BOX_SPACE &&
-                fabs((subpull->diameter/2.0)*drawSize/2+BOUNDING_BOX_SPACE - dy) < 2*BOUNDING_BOX_SPACE)
-        {
-            mode = SCALE_MODE;
-        }
-    }
-    else if (activeBoxIndex == INT_MAX)
-    {
-        if((fabs(float(adjustedX(event->pos().x()) - activeBox_xmin + 3*BOUNDING_BOX_SPACE)) < 2*BOUNDING_BOX_SPACE ||
-            fabs(float(adjustedX(event->pos().x()) - activeBox_xmax - 3*BOUNDING_BOX_SPACE)) < 2*BOUNDING_BOX_SPACE) &&
-            (fabs(float(adjustedY(event->pos().y()) - activeBox_ymin + 3*BOUNDING_BOX_SPACE)) < 2*BOUNDING_BOX_SPACE ||
-             fabs(float(adjustedY(event->pos().y()) - activeBox_ymax - 3*BOUNDING_BOX_SPACE)) < 2*BOUNDING_BOX_SPACE))
-        {
-            mode = SCALE_MODE;
-        }
-    }
-    if (mode == MOVE_MODE)
-    {
-        if (event->modifiers() != Qt::ControlModifier)
-        {
-            subplansSelected.clear();
-        }
-        bool isIn = false;
-        for (unsigned int i = 0; i < subplansSelected.size(); i++)
-        {
-            if (hoveringIndex == int(subplansSelected.at(i)))
-            {
-                isIn = true;
-                break;
-            }
-        }
-        if (!isIn && hoveringIndex != -1)
-        {
-            subplansSelected.push_back((unsigned int)hoveringIndex);
-            clickMoved = true;
-            activeBoxIndex = hoveringIndex;
-        }
-    }
-    mouseStartingLoc.x=(adjustedX(event->pos().x()));
-    mouseStartingLoc.y=(adjustedY(event->pos().y()));
-    boundActiveBox();
-    this->update();
+	int drawSize = squareSize - 20;
+	mode = MOVE_MODE;
+	clickedLoc->setX(adjustedX(event->pos().x()));
+	clickedLoc->setY(adjustedY(event->pos().y()));
+	clickMoved = false;
+	if (activeBoxIndex != -1 && activeBoxIndex != INT_MAX)
+	{
+		SubpullTemplate* subpull = &(plan->subs[activeBoxIndex]);
+		float dx = fabs(adjustedX(event->pos().x()) - (drawSize/2 * subpull->location.x + drawSize/2 + 10));
+		float dy = fabs(adjustedY(event->pos().y()) - (drawSize/2 * subpull->location.y + drawSize/2 + 10));
+		if (fabs((subpull->diameter/2.0)*drawSize/2+BOUNDING_BOX_SPACE - dx) < 2*BOUNDING_BOX_SPACE &&
+			fabs((subpull->diameter/2.0)*drawSize/2+BOUNDING_BOX_SPACE - dy) < 2*BOUNDING_BOX_SPACE)
+		{
+			mode = SCALE_MODE;
+		}
+	}
+	else if (activeBoxIndex == INT_MAX)
+	{
+		if((fabs(float(adjustedX(event->pos().x()) - activeBox_xmin + 3*BOUNDING_BOX_SPACE)) < 2*BOUNDING_BOX_SPACE ||
+			fabs(float(adjustedX(event->pos().x()) - activeBox_xmax - 3*BOUNDING_BOX_SPACE)) < 2*BOUNDING_BOX_SPACE) &&
+			(fabs(float(adjustedY(event->pos().y()) - activeBox_ymin + 3*BOUNDING_BOX_SPACE)) < 2*BOUNDING_BOX_SPACE ||
+			fabs(float(adjustedY(event->pos().y()) - activeBox_ymax - 3*BOUNDING_BOX_SPACE)) < 2*BOUNDING_BOX_SPACE))
+		{
+			mode = SCALE_MODE;
+		}
+	}
+
+	if (mode == MOVE_MODE)
+	{
+		if (event->modifiers() != Qt::ControlModifier)
+		{
+			subplansSelected.clear();
+		}
+		bool isIn = false;
+		for (unsigned int i = 0; i < subplansSelected.size(); i++)
+		{
+			if (hoveringIndex == int(subplansSelected.at(i)))
+			{
+				isIn = true;
+				break;
+			}
+		}
+		if (!isIn && hoveringIndex != -1)
+		{
+			subplansSelected.push_back((unsigned int)hoveringIndex);
+			clickMoved = true;
+			activeBoxIndex = hoveringIndex;
+		}
+	}
+
+	mouseStartingLoc.x=(adjustedX(event->pos().x()));
+	mouseStartingLoc.y=(adjustedY(event->pos().y()));
+	boundActiveBox();
+	this->update();
 }
 
 void PullPlanCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent* event)
 {
-    if (!clickMoved)
-    {
-        for (unsigned int i = 0; i < subplansSelected.size(); i++)
-        {
-            if (hoveringIndex == int(subplansSelected.at(i)))
-            {
-                subplansSelected.erase(subplansSelected.begin()+i);
-                break;
-            }
-        }
-    }
-    mouseStartingLoc.x=(adjustedX(event->pos().x()));
-    mouseStartingLoc.y=(adjustedY(event->pos().y()));
-    emit someDataChanged();
-    boundActiveBox();
-    updateIndexes(event->pos());
-    this->update();
+	if (!clickMoved)
+	{
+		for (unsigned int i = 0; i < subplansSelected.size(); i++)
+		{
+			if (hoveringIndex == int(subplansSelected.at(i)))
+			{
+				subplansSelected.erase(subplansSelected.begin()+i);
+				break;
+			}
+		}
+	}
+	
+	mouseStartingLoc.x=(adjustedX(event->pos().x()));
+	mouseStartingLoc.y=(adjustedY(event->pos().y()));
+	emit someDataChanged();
+	boundActiveBox();
+	updateIndexes(event->pos());
+	this->update();
 }
 
 void PullPlanCustomizeViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 {
 	if (hoveringIndex == -1)
 		return;
-    if (mouseStartingLoc.x == FLT_MAX && mouseStartingLoc.y == FLT_MAX)
+	if (mouseStartingLoc.x == FLT_MAX && mouseStartingLoc.y == FLT_MAX)
 	{
-        mouseStartingLoc.x=(adjustedX(event->pos().x()));
-        mouseStartingLoc.y=(adjustedY(event->pos().y()));
-    }
-    plan->subs[hoveringIndex].location.x += (adjustedX(event->pos().x()) - mouseStartingLoc.x)/(squareSize/2.0 - 10);
-    plan->subs[hoveringIndex].location.y += (adjustedY(event->pos().y()) - mouseStartingLoc.y)/(squareSize/2.0 - 10);
-    mouseStartingLoc.x=(adjustedX(event->pos().x()));
-    mouseStartingLoc.y=(adjustedY(event->pos().y()));
-    boundActiveBox();
-    emit someDataChanged();
-    this->update();
+		mouseStartingLoc.x=(adjustedX(event->pos().x()));
+		mouseStartingLoc.y=(adjustedY(event->pos().y()));
+	}
+	plan->subs[hoveringIndex].location.x += (adjustedX(event->pos().x()) - mouseStartingLoc.x)/(squareSize/2.0 - 10);
+	plan->subs[hoveringIndex].location.y += (adjustedY(event->pos().y()) - mouseStartingLoc.y)/(squareSize/2.0 - 10);
+	mouseStartingLoc.x=(adjustedX(event->pos().x()));
+	mouseStartingLoc.y=(adjustedY(event->pos().y()));
+	boundActiveBox();
+	emit someDataChanged();
+	this->update();
 }
 
 void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
