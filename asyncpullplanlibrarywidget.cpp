@@ -6,7 +6,6 @@
 AsyncPullPlanLibraryWidget :: AsyncPullPlanLibraryWidget(PullPlan *_pullPlan, QWidget *parent) : AsyncRenderWidget(parent), pullPlan(_pullPlan)
 {
 	setFixedSize(100, 100);
-	setMouseTracking(true);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
 	setGraphicsEffect(new QGraphicsHighlightEffect());

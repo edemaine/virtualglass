@@ -392,13 +392,18 @@ void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, bool oute
 
 void PullPlanEditorViewWidget :: paintShape(float x, float y, float size, int shape, QPainter* painter)
 {
+        int roundedX, roundedY;
+
+        roundedX = floor(rawX(x) + 0.5);
+        roundedY = floor(rawY(y) + 0.5);
+
 	switch (shape)
 	{
 		case CIRCLE_SHAPE:
-			painter->drawEllipse(floor(rawX(x) + 0.5), floor(rawY(y) + 0.5), size, size);
+			painter->drawEllipse(roundedX, roundedY, size, size);
 			break;
 		case SQUARE_SHAPE:
-			painter->drawRect(floor(rawX(x) + 0.5), floor(rawY(y) + 0.5), size, size);
+			painter->drawRect(roundedX, roundedY, size, size);
 			break;
 	}
 	

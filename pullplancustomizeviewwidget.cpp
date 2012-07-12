@@ -12,22 +12,19 @@ PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget
 	tempCirclePlan = new PullPlan(CUSTOM_CIRCLE_PULL_TEMPLATE);
 	tempCirclePlan->setCasingColor(color, 0);
 	tempSquarePlan = new PullPlan(CUSTOM_SQUARE_PULL_TEMPLATE);
-    tempSquarePlan->setCasingColor(color, 0);
-    mouseStartingLoc.x = FLT_MAX;
-    mouseStartingLoc.y = FLT_MAX;
-    mouseStartingLoc.z = 0;
-    clickedLoc = new QPoint(INT_MAX, INT_MAX);
-    clickMoved = false;
-    subplansSelected.clear();
-    hoveringIndex = -1;
-    activeBoxIndex = -1;
-    activeControlPoint = -1;
-    mode = MOVE_MODE;
-    BOUNDING_BOX_SPACE = squareSize / 100;
-    if (BOUNDING_BOX_SPACE < 1)
-        BOUNDING_BOX_SPACE = 1;
-    boundActiveBox();
-    this->setMouseTracking(true);
+	tempSquarePlan->setCasingColor(color, 0);
+	mouseStartingLoc.x = FLT_MAX;
+	mouseStartingLoc.y = FLT_MAX;
+	clickedLoc = new QPoint(INT_MAX, INT_MAX);
+	clickMoved = false;
+	subplansSelected.clear();
+	hoveringIndex = -1;
+	activeBoxIndex = -1;
+	activeControlPoint = -1;
+	mode = MOVE_MODE;
+	BOUNDING_BOX_SPACE = MAX(squareSize / 100, 1);
+	boundActiveBox();
+	this->setMouseTracking(true);
 }
 
 void PullPlanCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
@@ -82,9 +79,9 @@ void PullPlanCustomizeViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 
 void PullPlanCustomizeViewWidget :: dropEvent(QDropEvent* event)
 {
-    mouseStartingLoc.x=(FLT_MAX);
-    mouseStartingLoc.y=(FLT_MAX);
-    event->setDropAction(Qt::CopyAction);
+	mouseStartingLoc.x= FLT_MAX;
+	mouseStartingLoc.y= FLT_MAX;
+	event->setDropAction(Qt::CopyAction);
 }
 
 void PullPlanCustomizeViewWidget :: updateIndexes(QPoint pos)
@@ -283,6 +280,7 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
         }
 		return;
 	}
+    emit someDataChanged();
     this->update();
 }
 
@@ -377,26 +375,26 @@ void PullPlanCustomizeViewWidget :: dragMoveEvent(QDragMoveEvent* event)
     mouseStartingLoc.x=(adjustedX(event->pos().x()));
     mouseStartingLoc.y=(adjustedY(event->pos().y()));
     boundActiveBox();
+    emit someDataChanged();
     this->update();
 }
 
 void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
 {
-    this->plan = plan;
-    if (this->isVisible())
-    {
-        this->plan->setTemplateTypeToCustom();
-    }
-    else
-    {
-        subplansSelected.clear();
-        activeControlPoint = -1;
-        hoveringIndex = -1;
-        activeBoxIndex = -1;
-    }
-    mouseStartingLoc.x = FLT_MAX;
-    mouseStartingLoc.y = FLT_MAX;
-    mouseStartingLoc.z = 0;
+	this->plan = plan;
+	if (this->isVisible())
+	{
+		this->plan->setTemplateTypeToCustom();
+	}
+	else
+	{
+		subplansSelected.clear();
+		activeControlPoint = -1;
+		hoveringIndex = -1;
+		activeBoxIndex = -1;
+	}
+	mouseStartingLoc.x = FLT_MAX;
+	mouseStartingLoc.y = FLT_MAX;
 }
 
 bool PullPlanCustomizeViewWidget :: isValidMovePosition(QMouseEvent*)
@@ -409,63 +407,58 @@ bool PullPlanCustomizeViewWidget :: isValidMovePosition(QMouseEvent*)
 
 void PullPlanCustomizeViewWidget :: boundActiveBox()
 {
-    activeBox_xmin = INT_MAX;
-    activeBox_ymin = INT_MAX;
-    activeBox_xmax = INT_MIN;
-    activeBox_ymax = INT_MIN;
-    int drawSize = squareSize - 20;
-    for (unsigned int i = 0; i < subplansSelected.size(); i++)
-    {
-        SubpullTemplate* subpull = &(plan->subs[subplansSelected[i]]);
-        float dx = drawSize/2 * subpull->location.x + drawSize/2 + 10;
-        float dy = drawSize/2 * subpull->location.y + drawSize/2 + 10;
-        if (dx - (subpull->diameter/2.0)*drawSize/2 < activeBox_xmin)
-            activeBox_xmin = dx - (subpull->diameter/2.0)*drawSize/2;
-        if (dy - (subpull->diameter/2.0)*drawSize/2 < activeBox_ymin)
-            activeBox_ymin = dy - (subpull->diameter/2.0)*drawSize/2;
-        if (dx + (subpull->diameter/2.0)*drawSize/2 > activeBox_xmax)
-            activeBox_xmax = dx + (subpull->diameter/2.0)*drawSize/2;
-        if (dy + (subpull->diameter/2.0)*drawSize/2 > activeBox_ymax)
-            activeBox_ymax = dy + (subpull->diameter/2.0)*drawSize/2;
-    }
+	activeBox_xmin = activeBox_ymin = INT_MAX;
+	activeBox_xmax = activeBox_ymax = INT_MIN;
+	int drawSize = squareSize - 20;
+	for (unsigned int i = 0; i < subplansSelected.size(); i++)
+	{
+		SubpullTemplate* subpull = &(plan->subs[subplansSelected[i]]);
+		float dx = drawSize/2 * subpull->location.x + drawSize/2 + 10;
+		float dy = drawSize/2 * subpull->location.y + drawSize/2 + 10;
+		if (dx - (subpull->diameter/2.0)*drawSize/2 < activeBox_xmin)
+		    activeBox_xmin = dx - (subpull->diameter/2.0)*drawSize/2;
+		if (dy - (subpull->diameter/2.0)*drawSize/2 < activeBox_ymin)
+		    activeBox_ymin = dy - (subpull->diameter/2.0)*drawSize/2;
+		if (dx + (subpull->diameter/2.0)*drawSize/2 > activeBox_xmax)
+		    activeBox_xmax = dx + (subpull->diameter/2.0)*drawSize/2;
+		if (dy + (subpull->diameter/2.0)*drawSize/2 > activeBox_ymax)
+		    activeBox_ymax = dy + (subpull->diameter/2.0)*drawSize/2;
+	}
 }
 
 void PullPlanCustomizeViewWidget :: setBoundaryPainter(QPainter* painter, bool outermostLevel, bool greyedOut = false) {
 
-    if (outermostLevel)
-    {
-        QPen pen;
-        pen.setWidth(3);
-        if (greyedOut)
-            pen.setColor(Qt::gray);
-        else
-            pen.setColor(Qt::black);
-        painter->setPen(pen);
-    }
-    else
-    {
-        QPen pen;
-        pen.setWidth(1);
-        if (greyedOut)
-            pen.setColor(Qt::gray);
-        else
-            pen.setColor(Qt::black);
-        painter->setPen(pen);
-    }
+	QPen pen;
 
+	if (outermostLevel)
+		pen.setWidth(3);
+	else
+		pen.setWidth(1);
+
+	if (greyedOut)
+	    pen.setColor(Qt::gray);
+	else
+	    pen.setColor(Qt::black);
+	
+	painter->setPen(pen);
 }
 
 void PullPlanCustomizeViewWidget :: paintShape(float x, float y, float size, int shape, QPainter* painter)
 {
-    switch (shape)
-    {
-        case CIRCLE_SHAPE:
-            painter->drawEllipse(rawX(x), rawY(y), size, size);
-            break;
-        case SQUARE_SHAPE:
-            painter->drawRect(rawX(x), rawY(y), size, size);
-            break;
-    }
+	int roundedX, roundedY;
+	
+	roundedX = floor(rawX(x) + 0.5);
+	roundedY = floor(rawY(y) + 0.5);
+ 
+	switch (shape)
+	{
+		case CIRCLE_SHAPE:
+		    painter->drawEllipse(roundedX, roundedY, size, size);
+		    break;
+		case SQUARE_SHAPE:
+		    painter->drawRect(roundedX, roundedY, size, size);
+		    break;
+	}
 
 }
 void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidth, float drawHeight,
@@ -474,28 +467,28 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 	// Fill the subplan area with some `cleared out' color
 	painter->setBrush(QColor(200, 200, 200));
 	painter->setPen(Qt::NoPen);
-    paintShape(x, y, drawWidth, mandatedShape, painter);
+	paintShape(x, y, drawWidth, mandatedShape, painter);
 
-    // Do casing colors outermost to innermost to get concentric rings of each casing's color
-    // Skip outermost casing (that is done by your parent) and innermost (that is the `invisible'
-    // casing for you to resize your subcanes)
-    for (unsigned int i = plan->getCasingCount() - 1; plan->getCasingCount() > i && i > 0; --i)
-    {
-        int casingWidth = drawWidth * plan->getCasingThickness(i);
-        int casingHeight = drawHeight * plan->getCasingThickness(i);
-        int casingX = x + drawWidth / 2 - casingWidth / 2;
-        int casingY = y + drawHeight / 2 - casingHeight / 2;
+	// Do casing colors outermost to innermost to get concentric rings of each casing's color
+	// Skip outermost casing (that is done by your parent) and innermost (that is the `invisible'
+	// casing for you to resize your subcanes)
+	for (unsigned int i = plan->getCasingCount() - 1; plan->getCasingCount() > i && i > 0; --i)
+	{
+		int casingWidth = drawWidth * plan->getCasingThickness(i);
+		int casingHeight = drawHeight * plan->getCasingThickness(i);
+		int casingX = x + drawWidth / 2 - casingWidth / 2;
+		int casingY = y + drawHeight / 2 - casingHeight / 2;
 
-        // Fill with solid neutral grey (in case fill is transparent)
-        painter->setBrush(QColor(200, 200, 200));
-        painter->setPen(Qt::NoPen); // Will draw boundary after all filling is done
-        paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
+		// Fill with solid neutral grey (in case fill is transparent)
+		painter->setBrush(QColor(200, 200, 200));
+		painter->setPen(Qt::NoPen); // Will draw boundary after all filling is done
+		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
 
-        painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g,
-            255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
-        setBoundaryPainter(painter, outermostLevel, outermostLevel);
-        paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
-    }
+		painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g,
+			255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
+		setBoundaryPainter(painter, outermostLevel, outermostLevel);
+		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
+	}
 
 	// If it's a base color, fill region with color
 	if (plan->isBase())
@@ -503,121 +496,121 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 		Color* c = plan->getCasingColor(0);
 		painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
 		painter->setPen(Qt::NoPen);
-        paintShape(x, y, drawWidth, mandatedShape, painter);
-        return;
-    }
+		paintShape(x, y, drawWidth, mandatedShape, painter);
+		return;
+	}
 
-    // Recursively call drawing on subplans
-    for (unsigned int i = plan->subs.size()-1; i < plan->subs.size(); --i)
-    {
-        SubpullTemplate* sub = &(plan->subs[i]);
+	// Recursively call drawing on subplans
+	for (unsigned int i = plan->subs.size()-1; i < plan->subs.size(); --i)
+	{
+		SubpullTemplate* sub = &(plan->subs[i]);
 
-        float rX = x + (sub->location.x - sub->diameter/2.0) * drawWidth/2 + drawWidth/2;
-        float rY = y + (sub->location.y - sub->diameter/2.0) * drawWidth/2 + drawHeight/2;
-        float rWidth = sub->diameter * drawWidth/2;
-        float rHeight = sub->diameter * drawHeight/2;
+		float rX = x + (sub->location.x - sub->diameter/2.0) * drawWidth/2 + drawWidth/2;
+		float rY = y + (sub->location.y - sub->diameter/2.0) * drawWidth/2 + drawHeight/2;
+		float rWidth = sub->diameter * drawWidth/2;
+		float rHeight = sub->diameter * drawHeight/2;
 
-        drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan,
-                    plan->subs[i].shape, false, painter);
+		drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan,
+			plan->subs[i].shape, false, painter);
 
-        setBoundaryPainter(painter, outermostLevel);
-        painter->setBrush(Qt::NoBrush);
-        paintShape(rX, rY, rWidth, plan->subs[i].shape, painter);
-    }
+		setBoundaryPainter(painter, outermostLevel);
+		painter->setBrush(Qt::NoBrush);
+		paintShape(rX, rY, rWidth, plan->subs[i].shape, painter);
+	}
 }
 
 void PullPlanCustomizeViewWidget :: drawActionControls(QPainter* painter)
 {
-    int drawSize = squareSize - 20;
+	int drawSize = squareSize - 20;
 
-    // Outline for individual selected plans
-    QPen pen;
-    pen.setWidth(2);
-    pen.setColor(Qt::black);
-    pen.setStyle(Qt::DotLine);
-    painter->setBrush(QColor(200, 200, 200, 0));
-    painter->setPen(pen);
-    for (unsigned int i = 0; i < subplansSelected.size(); i++)
-    {
-        SubpullTemplate* subpull = &(plan->subs[subplansSelected[i]]);
-        painter->drawRect(rawX((subpull->location.x - subpull->diameter/2.0)*drawSize/2+drawSize/2+10)-BOUNDING_BOX_SPACE,
-                          rawY((subpull->location.y - subpull->diameter/2.0)*drawSize/2+drawSize/2+10)-BOUNDING_BOX_SPACE,
-                          subpull->diameter*drawSize/2.0+2*BOUNDING_BOX_SPACE,
-                          subpull->diameter*drawSize/2.0+2*BOUNDING_BOX_SPACE);
-    }
+	// Outline for individual selected plans
+	QPen pen;
+	pen.setWidth(2);
+	pen.setColor(Qt::black);
+	pen.setStyle(Qt::DotLine);
+	painter->setBrush(QColor(200, 200, 200, 0));
+	painter->setPen(pen);
+	for (unsigned int i = 0; i < subplansSelected.size(); i++)
+	{
+		SubpullTemplate* subpull = &(plan->subs[subplansSelected[i]]);
+		painter->drawRect(rawX((subpull->location.x - subpull->diameter/2.0)*drawSize/2 + drawSize/2 + 10) - BOUNDING_BOX_SPACE, 
+			rawY((subpull->location.y - subpull->diameter/2.0)*drawSize/2+drawSize/2+10)-BOUNDING_BOX_SPACE,
+			subpull->diameter*drawSize/2.0 + 2*BOUNDING_BOX_SPACE,
+			subpull->diameter*drawSize/2.0 + 2*BOUNDING_BOX_SPACE);
+	}
 
-    // Outline for a group selection
-    if (subplansSelected.size() > 1)
-    {
-        painter->drawRect(rawX(activeBox_xmin)-3*BOUNDING_BOX_SPACE,
-                          rawY(activeBox_ymin)-3*BOUNDING_BOX_SPACE,
-                          (activeBox_xmax-activeBox_xmin)+6*BOUNDING_BOX_SPACE,
-                          (activeBox_ymax-activeBox_ymin)+6*BOUNDING_BOX_SPACE);
-    }
+	// Outline for a group selection
+	if (subplansSelected.size() > 1)
+	{
+		painter->drawRect(rawX(activeBox_xmin)-3*BOUNDING_BOX_SPACE,
+			rawY(activeBox_ymin)-3*BOUNDING_BOX_SPACE,
+			(activeBox_xmax-activeBox_xmin)+6*BOUNDING_BOX_SPACE,
+			(activeBox_ymax-activeBox_ymin)+6*BOUNDING_BOX_SPACE);
+	}
 
-    // White control points for resizing
-    painter->setBrush(QColor(0, 0, 0, 255));
-    pen.setWidth(2);
-    pen.setColor(Qt::white);
-    pen.setStyle(Qt::SolidLine);
-    painter->setPen(pen);
-    if (activeBoxIndex != -1 && activeBoxIndex != INT_MAX)
-    {
-        SubpullTemplate* subpull = &(plan->subs[activeBoxIndex]);
-        painter->drawEllipse(rawX((subpull->location.x - subpull->diameter/2.0)*drawSize/2+drawSize/2+10)-BOUNDING_BOX_SPACE*2,
-                          rawY((subpull->location.y - subpull->diameter/2.0)*drawSize/2+drawSize/2+10)-BOUNDING_BOX_SPACE*2,
-                          BOUNDING_BOX_SPACE*2,
-                          BOUNDING_BOX_SPACE*2);
-        painter->drawEllipse(rawX((subpull->location.x - subpull->diameter/2.0)*drawSize/2+drawSize/2+10)-BOUNDING_BOX_SPACE*2,
-                             rawY((subpull->location.y + subpull->diameter/2.0)*drawSize/2+drawSize/2+10)+BOUNDING_BOX_SPACE*0,
-                          BOUNDING_BOX_SPACE*2,
-                          BOUNDING_BOX_SPACE*2);
-        painter->drawEllipse(rawX((subpull->location.x + subpull->diameter/2.0)*drawSize/2+drawSize/2+10)+BOUNDING_BOX_SPACE*0,
-                             rawY((subpull->location.y - subpull->diameter/2.0)*drawSize/2+drawSize/2+10)-BOUNDING_BOX_SPACE*2,
-                          BOUNDING_BOX_SPACE*2,
-                          BOUNDING_BOX_SPACE*2);
-        painter->drawEllipse(rawX((subpull->location.x + subpull->diameter/2.0)*drawSize/2+drawSize/2+10)+BOUNDING_BOX_SPACE*0,
-                          rawY((subpull->location.y + subpull->diameter/2.0)*drawSize/2+drawSize/2+10)+BOUNDING_BOX_SPACE*0,
-                          BOUNDING_BOX_SPACE*2,
-                          BOUNDING_BOX_SPACE*2);
-    }
-    if (subplansSelected.size() > 1 && activeBoxIndex == INT_MAX)
-    {
-        painter->drawEllipse(rawX(activeBox_xmin)-4*BOUNDING_BOX_SPACE,
-                          rawY(activeBox_ymin)-4*BOUNDING_BOX_SPACE,
-                          BOUNDING_BOX_SPACE*2,
-                          BOUNDING_BOX_SPACE*2);
-        painter->drawEllipse(rawX(activeBox_xmin)-4*BOUNDING_BOX_SPACE,
-                             rawY(activeBox_ymax)+2*BOUNDING_BOX_SPACE,
-                          BOUNDING_BOX_SPACE*2,
-                          BOUNDING_BOX_SPACE*2);
-        painter->drawEllipse(rawX(activeBox_xmax)+2*BOUNDING_BOX_SPACE,
-                             rawY(activeBox_ymin)-4*BOUNDING_BOX_SPACE,
-                          BOUNDING_BOX_SPACE*2,
-                          BOUNDING_BOX_SPACE*2);
-        painter->drawEllipse(rawX(activeBox_xmax)+2*BOUNDING_BOX_SPACE,
-                          rawY(activeBox_ymax)+2*BOUNDING_BOX_SPACE,
-                          BOUNDING_BOX_SPACE*2,
-                          BOUNDING_BOX_SPACE*2);
-    }
+	// White control points for resizing
+	painter->setBrush(QColor(0, 0, 0, 255));
+	pen.setWidth(2);
+	pen.setColor(Qt::white);
+	pen.setStyle(Qt::SolidLine);
+	painter->setPen(pen);
+	if (activeBoxIndex != -1 && activeBoxIndex != INT_MAX)
+	{
+		SubpullTemplate* subpull = &(plan->subs[activeBoxIndex]);
+		painter->drawEllipse(rawX((subpull->location.x - subpull->diameter/2.0)*drawSize/2+drawSize/2+10)-BOUNDING_BOX_SPACE*2,
+			rawY((subpull->location.y - subpull->diameter/2.0)*drawSize/2+drawSize/2+10)-BOUNDING_BOX_SPACE*2,
+			BOUNDING_BOX_SPACE*2,
+			BOUNDING_BOX_SPACE*2);
+		painter->drawEllipse(rawX((subpull->location.x - subpull->diameter/2.0)*drawSize/2+drawSize/2+10)-BOUNDING_BOX_SPACE*2,
+			rawY((subpull->location.y + subpull->diameter/2.0)*drawSize/2+drawSize/2+10)+BOUNDING_BOX_SPACE*0,
+			BOUNDING_BOX_SPACE*2,
+			BOUNDING_BOX_SPACE*2);
+		painter->drawEllipse(rawX((subpull->location.x + subpull->diameter/2.0)*drawSize/2+drawSize/2+10)+BOUNDING_BOX_SPACE*0,
+			rawY((subpull->location.y - subpull->diameter/2.0)*drawSize/2+drawSize/2+10)-BOUNDING_BOX_SPACE*2,
+			BOUNDING_BOX_SPACE*2,
+			BOUNDING_BOX_SPACE*2);
+		painter->drawEllipse(rawX((subpull->location.x + subpull->diameter/2.0)*drawSize/2+drawSize/2+10)+BOUNDING_BOX_SPACE*0,
+			rawY((subpull->location.y + subpull->diameter/2.0)*drawSize/2+drawSize/2+10)+BOUNDING_BOX_SPACE*0,
+			BOUNDING_BOX_SPACE*2,
+			BOUNDING_BOX_SPACE*2);
+	}
+	if (subplansSelected.size() > 1 && activeBoxIndex == INT_MAX)
+	{
+		painter->drawEllipse(rawX(activeBox_xmin)-4*BOUNDING_BOX_SPACE,
+			rawY(activeBox_ymin)-4*BOUNDING_BOX_SPACE,
+			BOUNDING_BOX_SPACE*2,
+			BOUNDING_BOX_SPACE*2);
+		painter->drawEllipse(rawX(activeBox_xmin)-4*BOUNDING_BOX_SPACE,
+			rawY(activeBox_ymax)+2*BOUNDING_BOX_SPACE,
+			BOUNDING_BOX_SPACE*2,
+			BOUNDING_BOX_SPACE*2);
+		painter->drawEllipse(rawX(activeBox_xmax)+2*BOUNDING_BOX_SPACE,
+			rawY(activeBox_ymin)-4*BOUNDING_BOX_SPACE,
+			BOUNDING_BOX_SPACE*2,
+			BOUNDING_BOX_SPACE*2);
+		painter->drawEllipse(rawX(activeBox_xmax)+2*BOUNDING_BOX_SPACE,
+			rawY(activeBox_ymax)+2*BOUNDING_BOX_SPACE,
+			BOUNDING_BOX_SPACE*2,
+			BOUNDING_BOX_SPACE*2);
+	}
 }
 
 void PullPlanCustomizeViewWidget :: paintEvent(QPaintEvent *event)
 {
-    QPainter painter;
+	QPainter painter;
 
-    painter.begin(this);
-    painter.setRenderHint(QPainter::Antialiasing);
+	painter.begin(this);
+	painter.setRenderHint(QPainter::Antialiasing);
 
-    painter.fillRect(event->rect(), QColor(200, 200, 200));
-    drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan,
-        plan->getOutermostCasingShape(), true, &painter);
+	painter.fillRect(event->rect(), QColor(200, 200, 200));
+	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan,
+	plan->getOutermostCasingShape(), true, &painter);
 
-    setBoundaryPainter(&painter, true);
-    paintShape(10, 10, squareSize - 20, plan->getOutermostCasingShape(), &painter);
-    drawActionControls(&painter);
+	setBoundaryPainter(&painter, true);
+	paintShape(10, 10, squareSize - 20, plan->getOutermostCasingShape(), &painter);
+	drawActionControls(&painter);
 
-    painter.end();
+	painter.end();
 }
 
 void PullPlanCustomizeViewWidget :: revertAndClose()
@@ -628,99 +621,102 @@ void PullPlanCustomizeViewWidget :: revertAndClose()
 		hoveringIndex = -1;
 	}
 	//revertAllChanges();
-	this->setMouseTracking(false);
 }
 
 void PullPlanCustomizeViewWidget :: copySelectionPressed()
 {
-    if (subplansSelected.size() == 0)
-        return;
-    vector<SubpullTemplate*> newSubplans;
-    newSubplans.clear();
-    for (unsigned int i = 0; i < subplansSelected.size(); i++)
-    {
-        newSubplans.push_back(new SubpullTemplate(
-                                  plan->subs[subplansSelected[i]].plan,
-                                  plan->subs[subplansSelected[i]].shape,
-                                  plan->subs[subplansSelected[i]].location,
-                                  plan->subs[subplansSelected[i]].diameter,
-                                  plan->subs[subplansSelected[i]].group));
-        newSubplans.at(i)->location.x += 3*BOUNDING_BOX_SPACE/squareSize;
-        newSubplans.at(i)->location.y += 3*BOUNDING_BOX_SPACE/squareSize;
-    }
-    for (unsigned int i = 0; i < subplansSelected.size(); i++)
-    {
-        plan->subs.insert(plan->subs.begin()+i,*newSubplans.at(i));
-    }
-    subplansSelected.clear();
-    for (unsigned int i = 0; i < newSubplans.size(); i++)
-    {
-        subplansSelected.push_back(i);
-    }
-    emit someDataChanged();
-    boundActiveBox();
-    this->update();
+	if (subplansSelected.size() == 0)
+		return;
+	vector<SubpullTemplate*> newSubplans;
+	newSubplans.clear();
+	for (unsigned int i = 0; i < subplansSelected.size(); i++)
+	{
+		newSubplans.push_back(new SubpullTemplate(
+			plan->subs[subplansSelected[i]].plan,
+			plan->subs[subplansSelected[i]].shape,
+			plan->subs[subplansSelected[i]].location,
+			plan->subs[subplansSelected[i]].diameter,
+			plan->subs[subplansSelected[i]].group));
+		newSubplans.at(i)->location.x += 3*BOUNDING_BOX_SPACE/squareSize;
+		newSubplans.at(i)->location.y += 3*BOUNDING_BOX_SPACE/squareSize;
+	}
+	for (unsigned int i = 0; i < subplansSelected.size(); i++)
+	{
+		plan->subs.insert(plan->subs.begin()+i,*newSubplans.at(i));
+	}
+	subplansSelected.clear();
+	for (unsigned int i = 0; i < newSubplans.size(); i++)
+	{
+		subplansSelected.push_back(i);
+	}
+	emit someDataChanged();
+	boundActiveBox();
+	this->update();
 }
 
 void PullPlanCustomizeViewWidget :: deleteSelectionPressed()
 {
-    for (unsigned int i = 0; i < subplansSelected.size(); i++)
-    {
-        unsigned int n = subplansSelected[i];
-        plan->subs.erase(plan->subs.begin()+n);
-        for (unsigned int j = i+1; j < subplansSelected.size(); j++)
-        {
-            if (subplansSelected[j]>n)
-                subplansSelected[j] -= 1;
-        }
-    }
-    subplansSelected.clear();
-    hoveringIndex = -1;
-    activeBoxIndex = -1;
-    activeControlPoint = -1;
-    emit someDataChanged();
-    boundActiveBox();
-    this->update();
+	for (unsigned int i = 0; i < subplansSelected.size(); i++)
+	{
+		unsigned int n = subplansSelected[i];
+		plan->subs.erase(plan->subs.begin()+n);
+		for (unsigned int j = i+1; j < subplansSelected.size(); j++)
+		{
+			if (subplansSelected[j] > n)
+				subplansSelected[j] -= 1;
+		}
+	}
+	subplansSelected.clear();
+	hoveringIndex = -1;
+	activeBoxIndex = -1;
+	activeControlPoint = -1;
+	emit someDataChanged();
+	boundActiveBox();
+	this->update();
 }
 
 void PullPlanCustomizeViewWidget :: addCirclePressed()
 {
-    Point p = make_vector(0.0f, 0.0f, 0.0f);
-    float diameter = 0;
-    for (unsigned int i = 0; i < plan->subs.size(); i++)
-    {
-        diameter += plan->subs[i].diameter/plan->subs.size();
-    }
-    if (diameter == 0)
-    {
-        diameter = plan->getCasingThickness(0);
-    }
-    plan->subs.insert(plan->subs.begin(),SubpullTemplate(new PullPlan(CIRCLE_BASE_PULL_TEMPLATE),
-                                         CIRCLE_SHAPE, p, diameter, 0));
-    subplansSelected.clear();
-    subplansSelected.push_back(0);
-    emit someDataChanged();
-    boundActiveBox();
-    this->update();
+	Point p = make_vector(0.0f, 0.0f, 0.0f);
+	float diameter = 0;
+	for (unsigned int i = 0; i < plan->subs.size(); i++)
+	{
+		diameter += plan->subs[i].diameter/plan->subs.size();
+	}
+	if (diameter == 0)
+	{
+		diameter = plan->getCasingThickness(0);
+	}
+	plan->subs.insert(plan->subs.begin(),SubpullTemplate(new PullPlan(CIRCLE_BASE_PULL_TEMPLATE),
+		CIRCLE_SHAPE, p, diameter, 0));
+	subplansSelected.clear();
+	subplansSelected.push_back(0);
+	emit someDataChanged();
+	boundActiveBox();
+	this->update();
 }
 
 void PullPlanCustomizeViewWidget :: addSquarePressed()
 {
-    Point p = make_vector(0.0f, 0.0f, 0.0f);
-    float diameter = 0;
-    for (unsigned int i = 0; i < plan->subs.size(); i++)
-    {
-        diameter += plan->subs[i].diameter/plan->subs.size();
-    }
-    if (diameter == 0)
-    {
-        diameter = plan->getCasingThickness(0);
-    }
-    plan->subs.insert(plan->subs.begin(),SubpullTemplate(new PullPlan(SQUARE_BASE_PULL_TEMPLATE),
-                                         SQUARE_SHAPE, p, diameter, 0));
-    subplansSelected.clear();
-    subplansSelected.push_back(0);
-    emit someDataChanged();
-    boundActiveBox();
-    this->update();
+	Point p = make_vector(0.0f, 0.0f, 0.0f);
+	float diameter = 0;
+	for (unsigned int i = 0; i < plan->subs.size(); i++)
+	{
+		diameter += plan->subs[i].diameter/plan->subs.size();
+	}
+	if (diameter == 0)
+	{
+		diameter = plan->getCasingThickness(0);
+	}
+	plan->subs.insert(plan->subs.begin(),SubpullTemplate(new PullPlan(SQUARE_BASE_PULL_TEMPLATE),
+					 SQUARE_SHAPE, p, diameter, 0));
+	subplansSelected.clear();
+	subplansSelected.push_back(0);
+	emit someDataChanged();
+	boundActiveBox();
+	this->update();
 }
+
+
+
+

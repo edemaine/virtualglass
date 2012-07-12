@@ -8,7 +8,6 @@ AsyncPieceLibraryWidget :: AsyncPieceLibraryWidget(Piece* _piece, QWidget* paren
 	setBackgroundRole(QPalette::Base);
 	setFixedSize(100, 100);
 	setScaledContents(true);
-	setMouseTracking(true);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 	eyePosition.x = -16.0;
 	eyePosition.y = 0.0;

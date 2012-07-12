@@ -38,7 +38,7 @@ void PullPlanEditorWidget :: updateEverything()
 	viewWidget->setPullPlan(plan);
 	viewWidget->repaint();
 
-    customizeViewWidget->setPullPlan(plan);
+	customizeViewWidget->setPullPlan(plan);
 
 	unsigned int i = 0;
 	for (; i < plan->getParameterCount(); ++i)
@@ -57,8 +57,6 @@ void PullPlanEditorWidget :: updateEverything()
 	geometry.clear();
 	mesher.generatePullMesh(plan, &geometry);
 	emit geometryChanged(geometry);
-//    niceViewWidget->repaint();
-//	emit pullPlanChanged(plan);
 
 	// Highlight correct pull template
 	for (int i = 0; i < templateLibraryLayout->count(); ++i)
@@ -285,11 +283,11 @@ void PullPlanEditorWidget :: setupConnections()
 	connect(squareCasingPushButton, SIGNAL(clicked()), this, SLOT(squareCasingButtonPressed()));
 	connect(addCasingButton, SIGNAL(clicked()), this, SLOT(addCasingButtonPressed()));
 	connect(removeCasingButton, SIGNAL(clicked()), this, SLOT(removeCasingButtonPressed()));
-    connect(copySelectedButton, SIGNAL(pressed()), this, SLOT(copySelectedButtonPressed()));
-    connect(deleteSelectedButton, SIGNAL(pressed()), this, SLOT(deleteSelectedButtonPressed()));
-    connect(addCircleButton, SIGNAL(pressed()), this, SLOT(addCircleButtonPressed()));
-    connect(addSquareButton, SIGNAL(pressed()), this, SLOT(addSquareButtonPressed()));
-    connect(twistSlider, SIGNAL(valueChanged(int)), this, SLOT(twistSliderChanged(int)));
+	connect(copySelectedButton, SIGNAL(pressed()), this, SLOT(copySelectedButtonPressed()));
+	connect(deleteSelectedButton, SIGNAL(pressed()), this, SLOT(deleteSelectedButtonPressed()));
+	connect(addCircleButton, SIGNAL(pressed()), this, SLOT(addCircleButtonPressed()));
+	connect(addSquareButton, SIGNAL(pressed()), this, SLOT(addSquareButtonPressed()));
+	connect(twistSlider, SIGNAL(valueChanged(int)), this, SLOT(twistSliderChanged(int)));
 	connect(twistSpin, SIGNAL(valueChanged(int)), this, SLOT(twistSpinChanged(int)));
 
 	for (unsigned int i = 0; i < paramSpins.size(); ++i)
@@ -299,8 +297,8 @@ void PullPlanEditorWidget :: setupConnections()
 
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(viewWidgetDataChanged()));
-    connect(customizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(customizeViewWidgetDataChanged()));
-    connect(this, SIGNAL(geometryChanged(Geometry)), niceViewWidget, SLOT(repaint()));
+	connect(customizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(customizeViewWidgetDataChanged()));
+	connect(this, SIGNAL(geometryChanged(Geometry)), niceViewWidget, SLOT(repaint()));
 }
 
 void PullPlanEditorWidget :: viewWidgetDataChanged()
@@ -310,7 +308,7 @@ void PullPlanEditorWidget :: viewWidgetDataChanged()
 
 void PullPlanEditorWidget :: customizeViewWidgetDataChanged()
 {
-    emit someDataChanged();
+	emit someDataChanged();
 }
 
 void PullPlanEditorWidget :: paramSpinChanged(int)

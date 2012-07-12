@@ -7,7 +7,6 @@ PullTemplateLibraryWidget :: PullTemplateLibraryWidget(QPixmap view, int type, Q
 	setBackgroundRole(QPalette::Base);
 	setFixedSize(100, 100);
 	setScaledContents(true);
-	setMouseTracking(true);
 
 	setPixmap(view);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);

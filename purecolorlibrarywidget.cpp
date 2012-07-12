@@ -3,10 +3,8 @@
 
 PureColorLibraryWidget :: PureColorLibraryWidget(Color color, QString colorName, QWidget* parent): QLabel(parent)
 {
-	setBackgroundRole(QPalette::Base);
 	setFixedSize(300, 40);
 	setScaledContents(true);
-	setMouseTracking(true);
         setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
 	isSelected = false;
