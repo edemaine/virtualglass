@@ -33,6 +33,7 @@ protected:
 	void mousePressEvent(QMouseEvent* event);
 	void mouseReleaseEvent(QMouseEvent* event);
 	void resizeEvent(QResizeEvent* event);
+    void keyPressEvent(QKeyEvent* event);
 
 private:
 	float adjustedX(float rawX);

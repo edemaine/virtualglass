@@ -333,8 +333,8 @@ void PullPlanCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 	}
 
 	if (mode == MOVE_MODE)
-	{
-		if (event->modifiers() != Qt::ControlModifier)
+    {
+        if (event->modifiers() != Qt::ControlModifier && event->modifiers() != Qt::ShiftModifier)
 		{
 			subplansSelected.clear();
 		}
@@ -401,11 +401,26 @@ void PullPlanCustomizeViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 	this->update();
 }
 
+void PullPlanCustomizeViewWidget :: keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Delete)
+    {
+        deleteSelectionPressed();
+    }
+}
+
 void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
 {
 	this->plan = plan;
 	if (this->isVisible())
 	{
+        if (this->plan->getTemplateType() != CUSTOM_CIRCLE_PULL_TEMPLATE && this->plan->getTemplateType() != CUSTOM_SQUARE_PULL_TEMPLATE)
+        {
+            subplansSelected.clear();
+            activeControlPoint = -1;
+            hoveringIndex = -1;
+            activeBoxIndex = -1;
+        }
 		this->plan->setTemplateTypeToCustom();
 	}
 	else
@@ -414,9 +429,22 @@ void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
 		activeControlPoint = -1;
 		hoveringIndex = -1;
 		activeBoxIndex = -1;
-	}
+    }
+    for (unsigned int i = 0; i < subplansSelected.size(); i++)
+    {
+        if (subplansSelected[i] >= this->plan->subs.size())
+        {
+            subplansSelected.clear();
+            activeControlPoint = -1;
+            hoveringIndex = -1;
+            activeBoxIndex = -1;
+            break;
+        }
+    }
 	mouseStartingLoc.x = FLT_MAX;
 	mouseStartingLoc.y = FLT_MAX;
+    boundActiveBox();
+    this->repaint();
 }
 
 bool PullPlanCustomizeViewWidget :: isValidMovePosition(QMouseEvent*)
