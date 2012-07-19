@@ -180,7 +180,15 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	if (subplan != NULL)
 	{
 		event->accept();
-		pickup->subs[subplanIndex].plan = droppedPlan;
+		if ((QApplication::keyboardModifiers() & Qt::ShiftModifier))
+		{
+			for (unsigned int i = 0; i < pickup->subs.size(); ++i)
+			{
+				pickup->subs[i].plan = droppedPlan;
+			}
+		}
+		else
+			pickup->subs[subplanIndex].plan = droppedPlan;
 		emit someDataChanged();
 	}
 	else

@@ -213,7 +213,6 @@ void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 void PullPlanEditorViewWidget :: mouseReleaseEvent(QMouseEvent* /*event*/)
 {
 	isDraggingCasing = false;
-	emit someDataChanged();
 }
 
 void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
@@ -228,12 +227,15 @@ void PullPlanEditorViewWidget :: dragLeaveEvent(QDragLeaveEvent* /*event*/)
 	subplansHighlighted.clear();
 	casingHighlighted = false;
 	isDraggingPlan = false;
-	emit someDataChanged();
 }
 
 
-void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(int x, int y)
+void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings()
 {
+	QPoint mouse = mapFromGlobal(QCursor::pos());
+	int x = adjustedX(mouse.x());
+	int y = adjustedY(mouse.y());
+
         subplansHighlighted.clear();
         casingHighlighted = false;
 
@@ -253,19 +255,20 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(int x, int 
         else
         {
                 populateHighlightedCasings(x, y);
-                draggingColor = *(draggedPlan->getOutermostCasingColor());
+		if (casingHighlighted)
+			draggingColor = *(draggedPlan->getOutermostCasingColor());
         }
 }
 
-void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
+void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* /*event*/)
 {
-	updateHighlightedSubplansAndCasings(adjustedX(event->pos().x()), adjustedY(event->pos().y()));
-	emit someDataChanged();
+	updateHighlightedSubplansAndCasings();
+	repaint();
 }
 
 void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
-	populateHighlightedSubplans(adjustedX(event->pos().x()), adjustedY(event->pos().y()));
+	updateHighlightedSubplansAndCasings();
 	if (subplansHighlighted.size() > 0)
 	{
 		event->accept();
@@ -274,17 +277,13 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			plan->subs[subplansHighlighted[i]].plan = draggedPlan;
 		}
 	}
-	else
+	else if (casingHighlighted)
 	{
-		populateHighlightedCasings(adjustedX(event->pos().x()), adjustedY(event->pos().y()));
-		if (casingHighlighted)
-		{
-			event->accept();
-			// at this point we have already checked that the dropped plan is a color bar
-			// (that was done in populateHighlightedCasings()). So now we can just
-			// take the color w/o thinking.
-			plan->setCasingColor(draggedPlan->getOutermostCasingColor(), casingHighlightIndex);
-		}
+		event->accept();
+		// at this point we have already checked that the dropped plan is a color bar
+		// (that was done in updateHighlightedSubplansAndCasings()). So now we can just
+		// take the color w/o thinking.
+		plan->setCasingColor(draggedPlan->getOutermostCasingColor(), casingHighlightIndex);
 	}
 
 	isDraggingPlan = false;
@@ -331,8 +330,11 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y)
 		subplansHighlighted.push_back(i);
 	}
 	
-	// if user is hovering over a subplan and the shift key is currently held down,
-	// fill in all subplans
+	// if user is hovering over a subplan and the shift key is currently held down, fill in all subplans
+	// Note that this needs to wait until another event (say, a drag move) occurs to catch the shift button being down.
+	// The crazy thing is, on Windows a drag *blocks* the event loop, preventing the whole application from
+	// getting a keyPressEvent() until the drag is completed. So reading keyboardModifiers() actually 
+	// lets you notice that the shift key is down earlier, i.e. during the drag, which is the only time you care anyway.
 	if ((QApplication::keyboardModifiers() & Qt::ShiftModifier) && subplansHighlighted.size() > 0)
 	{
 		subplansHighlighted.clear();	
@@ -381,6 +383,7 @@ void PullPlanEditorViewWidget :: populateHighlightedCasings(int x, int y)
 void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan) {
 
 	this->plan = plan;
+	updateHighlightedSubplansAndCasings();
 }
 
 

@@ -166,10 +166,7 @@ void MainWindow :: deleteCurrentEditingObject()
 void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 {
 	// If this is a drag and not the end of a click, don't process (dropEvent will do it instead)
-	if ((event->pos() - dragStartPosition).manhattanLength() > QApplication::startDragDistance())
-	{
-		return;
-	}
+	if (isDragging && (event->pos() - dragStartPosition).manhattanLength() > QApplication::startDragDistance()) return;
 
 	AsyncColorBarLibraryWidget* cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(childAt(event->pos()));
 	AsyncPullPlanLibraryWidget* plplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(childAt(event->pos()));
