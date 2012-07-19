@@ -48,8 +48,6 @@ macx {
 
 # Input
 HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
-	pullplancustomizeviewwidget.h \
-	pullplancustomizewidget.h \
 
 HEADERS += primitives.h constants.h Vector.hpp \ 
 	overlaycolorwidget.h \
@@ -72,6 +70,9 @@ HEADERS += primitives.h constants.h Vector.hpp \
 	asyncpullplanlibrarywidget.h \
 	asynccolorbarlibrarywidget.h \
 	asyncpiecelibrarywidget.h \
+	pullplancustomizeviewwidget.h \
+	pullplancustomizewidget.h \
+	glassmime.h \
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
 	yaml-cpp/include/yaml-cpp/traits.h \
@@ -146,7 +147,7 @@ SOURCES += main.cpp \
 	asyncpullplanlibrarywidget.cpp \
 	asynccolorbarlibrarywidget.cpp \
 	asyncpiecelibrarywidget.cpp \
-
+	glassmime.cpp \
 
 SOURCES += yaml-cpp/src/tag.cpp \
 	yaml-cpp/src/stream.cpp \

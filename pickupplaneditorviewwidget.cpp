@@ -165,7 +165,8 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
         PullPlan* droppedPlan;
         int type;
-        sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &droppedPlan, &type);
+
+        decodeMimeData(event->mimeData()->text().toAscii().constData(), &droppedPlan, &type);
         if (type != PULL_PLAN_MIME) // if the thing passed isn't a pull plan 
                 return;  
 	

@@ -113,7 +113,7 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 		}
 
 	        char buf[500];
-		sprintf(buf, "%p %d", selectedSubplan, type);
+		encodeMimeData(buf, selectedSubplan, type);
 		QByteArray pointerData(buf);
 		QMimeData* mimeData = new QMimeData;
 		mimeData->setText(pointerData);
@@ -219,86 +219,88 @@ void PullPlanEditorViewWidget :: mouseReleaseEvent(QMouseEvent* /*event*/)
 void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 {
 	event->acceptProposedAction();
+        decodeMimeData(event->mimeData()->text().toAscii().constData(), &draggedPlan, &draggedPlanType);
+	isDraggingPlan = true;
 }
 
 void PullPlanEditorViewWidget :: dragLeaveEvent(QDragLeaveEvent* /*event*/)
 {
 	subplansHighlighted.clear();
 	casingHighlighted = false;
+	isDraggingPlan = false;
 	emit someDataChanged();
+}
+
+
+void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(int x, int y)
+{
+        subplansHighlighted.clear();
+        casingHighlighted = false;
+
+        populateHighlightedSubplans(x, y);
+        if (subplansHighlighted.size() > 0) 
+        {
+                switch (draggedPlanType) 
+                {
+                        case COLOR_BAR_MIME:
+                                draggingColor = *(draggedPlan->getOutermostCasingColor());
+                                break;
+                        default:
+                                draggingColor.r = draggingColor.g = draggingColor.b = draggingColor.a = 1.0;
+                                break;
+                }
+        }
+        else
+        {
+                populateHighlightedCasings(x, y);
+                draggingColor = *(draggedPlan->getOutermostCasingColor());
+        }
 }
 
 void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 {
-	PullPlan* draggedPlan;
-	int type;
-	sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &draggedPlan, &type);
-
-	subplansHighlighted.clear();
-	casingHighlighted = false;
-
-	populateHighlightedSubplans(adjustedX(event->pos().x()), adjustedY(event->pos().y()), draggedPlan, type);
-	if (subplansHighlighted.size() == 0) // anything highlighted must be casing from a color bar
-	{
-		populateHighlightedCasings(adjustedX(event->pos().x()), adjustedY(event->pos().y()), type);
-		draggingColor = *(draggedPlan->getOutermostCasingColor());
-	}
-	else
-	{
-		switch (type) {
-			case COLOR_BAR_MIME:
-				draggingColor = *(draggedPlan->getOutermostCasingColor());
-				break;
-			default:	
-				draggingColor.r = draggingColor.g = draggingColor.b = draggingColor.a = 1.0;
-				break;
-		}
-	}
+	updateHighlightedSubplansAndCasings(adjustedX(event->pos().x()), adjustedY(event->pos().y()));
 	emit someDataChanged();
 }
 
 void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
-	PullPlan* droppedPlan;
-	int type;
-	sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &droppedPlan, &type);
-
-	populateHighlightedSubplans(adjustedX(event->pos().x()), adjustedY(event->pos().y()), droppedPlan, type);
+	populateHighlightedSubplans(adjustedX(event->pos().x()), adjustedY(event->pos().y()));
 	if (subplansHighlighted.size() > 0)
 	{
 		event->accept();
 		for (unsigned int i = 0; i < subplansHighlighted.size(); ++i)
 		{
-			plan->subs[subplansHighlighted[i]].plan = droppedPlan;
+			plan->subs[subplansHighlighted[i]].plan = draggedPlan;
 		}
 	}
 	else
 	{
-		populateHighlightedCasings(adjustedX(event->pos().x()), adjustedY(event->pos().y()), type);
+		populateHighlightedCasings(adjustedX(event->pos().x()), adjustedY(event->pos().y()));
 		if (casingHighlighted)
 		{
 			event->accept();
 			// at this point we have already checked that the dropped plan is a color bar
 			// (that was done in populateHighlightedCasings()). So now we can just
 			// take the color w/o thinking.
-			plan->setCasingColor(droppedPlan->getOutermostCasingColor(), casingHighlightIndex);
+			plan->setCasingColor(draggedPlan->getOutermostCasingColor(), casingHighlightIndex);
 		}
 	}
 
+	isDraggingPlan = false;
 	subplansHighlighted.clear();
 	casingHighlighted = false;
 	emit someDataChanged();
 }
 
-
-void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, PullPlan* droppedPlan, int type)
+void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y)
 {
 	subplansHighlighted.clear();
 
-	if (!(type == COLOR_BAR_MIME || type == PULL_PLAN_MIME))
+	if (!isDraggingPlan || !(draggedPlanType == COLOR_BAR_MIME || draggedPlanType == PULL_PLAN_MIME))
 		return;
 
-	if (droppedPlan->hasDependencyOn(plan)) // don't allow circular DAGs
+	if (draggedPlan->hasDependencyOn(plan)) // don't allow circular DAGs
 		return;
 
 	int drawSize = squareSize - 20;
@@ -317,9 +319,9 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, PullP
 
 		// If the dropped plan is a complex plan and its casing shape doesn't match the shape of the
 		// subplan, reject
-		if (type == PULL_PLAN_MIME)
+		if (draggedPlanType == PULL_PLAN_MIME)
 		{
-			if (subpull->shape != droppedPlan->getOutermostCasingShape())
+			if (subpull->shape != draggedPlan->getOutermostCasingShape())
 			{
 				continue;
 			}
@@ -328,14 +330,25 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, PullP
 		// If the shift button is down, fill in the entire group
 		subplansHighlighted.push_back(i);
 	}
+	
+	// if user is hovering over a subplan and the shift key is currently held down,
+	// fill in all subplans
+	if ((QApplication::keyboardModifiers() & Qt::ShiftModifier) && subplansHighlighted.size() > 0)
+	{
+		subplansHighlighted.clear();	
+		for (unsigned int i = 0; i < plan->subs.size(); ++i)
+		{
+			subplansHighlighted.push_back(i);
+		}
+	}
 }
 
 
-void PullPlanEditorViewWidget :: populateHighlightedCasings(int x, int y, int type)
+void PullPlanEditorViewWidget :: populateHighlightedCasings(int x, int y)
 {
 	casingHighlighted = false;
 
-	if (type != COLOR_BAR_MIME)
+	if (!isDraggingPlan || draggedPlanType != COLOR_BAR_MIME)
 		return; 
 
 	// Deal w/casing

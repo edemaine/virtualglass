@@ -201,23 +201,37 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 
 void MainWindow :: mousePressEvent(QMouseEvent* event)
 {
-	if (event->button() == Qt::LeftButton)
+	AsyncColorBarLibraryWidget* cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(childAt(event->pos()));
+	AsyncPullPlanLibraryWidget* plplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(childAt(event->pos()));
+
+	if (event->button() == Qt::LeftButton && (cblw != NULL || plplw != NULL))
+	{
+		isDragging = true;
 		this->dragStartPosition = event->pos();
+	}
+	else
+		isDragging = false;
 }
 
 void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 {
-	void* plan = NULL;
-	QPixmap pixmap;
+	// If the left mouse button isn't down
+	if ((event->buttons() & Qt::LeftButton) == 0)
+	{
+		isDragging = false;	
+		return;
+	}
 
-	if (!(event->buttons() & Qt::LeftButton))
+	if (!isDragging || (event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
 		return;
-	if ((event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
-		return;
+
+	int type;
+	PullPlan* plan = NULL;
+	QPixmap pixmap;
 
 	AsyncColorBarLibraryWidget* cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(childAt(event->pos()));
 	AsyncPullPlanLibraryWidget* plplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(childAt(event->pos()));
-	int type;
+
 	if (cblw != NULL)
 	{
 		plan = cblw->getPullPlan();
@@ -234,7 +248,7 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 		return;
 
 	char buf[500];
-	sprintf(buf, "%p %d", plan, type);
+	encodeMimeData(buf, plan, type);
 	QByteArray pointerData(buf);
 	QMimeData* mimeData = new QMimeData;
 	mimeData->setText(pointerData);
@@ -244,12 +258,6 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	drag->setPixmap(pixmap);
 
 	drag->exec(Qt::CopyAction);
-
-}
-
-void MainWindow :: dragMoveEvent(QDragMoveEvent* event)
-{
-	event->acceptProposedAction();
 }
 
 void MainWindow :: setupConnections()

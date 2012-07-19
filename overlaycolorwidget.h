@@ -4,6 +4,7 @@
 #include <QtGui>
 #include <QObject>
 #include "pullplan.h"
+#include "glassmime.h"
 
 class OverlayColorWidget : public QWidget
 {

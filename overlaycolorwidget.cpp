@@ -29,7 +29,7 @@ void OverlayColorWidget :: dropEvent(QDropEvent* event)
 {
         PullPlan* droppedPlan;
         int type;
-        sscanf(event->mimeData()->text().toAscii().constData(), "%p %d", &droppedPlan, &type);		
+	decodeMimeData(event->mimeData()->text().toAscii().constData(), &droppedPlan, &type);		
 
 	if (type == COLOR_BAR_MIME) 
 	{

@@ -19,6 +19,7 @@
 #include "coloreditorwidget.h"
 #include "pieceeditorwidget.h"
 #include "qgraphicshighlighteffect.h"
+#include "glassmime.h"
 
 class MainWindow : public QMainWindow
 {
@@ -29,7 +30,6 @@ class MainWindow : public QMainWindow
 		void mousePressEvent(QMouseEvent* event);
 		void mouseReleaseEvent(QMouseEvent* event);
 		void mouseMoveEvent(QMouseEvent* event);
-		void dragMoveEvent(QDragMoveEvent* event);
 		void seedEverything();
 		void keyPressEvent(QKeyEvent* e);
 		QString windowTitle();
@@ -68,6 +68,7 @@ class MainWindow : public QMainWindow
 		QVBoxLayout* colorBarLibraryLayout;
 		QVBoxLayout* pullPlanLibraryLayout;
 		QVBoxLayout* pieceLibraryLayout;
+		bool isDragging;
 		QPoint dragStartPosition;
 		QStackedWidget* editorStack; //editorStack.currentIndex() gives with mode
 		QWidget* emptyEditorPage;

@@ -10,6 +10,7 @@
 #include "geometry.h"
 #include "pickupplan.h"
 #include "asyncpullplanlibrarywidget.h"
+#include "glassmime.h"
 
 class PickupPlanEditorViewWidget : public QWidget
 {
