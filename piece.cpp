@@ -29,14 +29,17 @@ bool Piece :: hasDependencyOn(Color* color)
 {
 	bool pickupPlansDependOn = false;
 
-	for (unsigned int i = 0; i < this->pickup->subs.size(); ++i)
+	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
 	{
-		if (this->pickup->subs[i].plan->hasDependencyOn(color))
+		if (pickup->subs[i].plan->hasDependencyOn(color))
 		{
 			pickupPlansDependOn = true;		
 			break;
 		}
 	}
+	
+	if (pickup->overlayColorBar->hasDependencyOn(color) || pickup->underlayColorBar->hasDependencyOn(color))
+		pickupPlansDependOn = true;
 
 	return pickupPlansDependOn;
 }

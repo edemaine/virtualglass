@@ -5,7 +5,6 @@
 #include <QtGui>
 #include "piece.h"
 #include "pullplan.h"
-#include "overlaycolorwidget.h"
 #include "pickupplaneditorviewwidget.h"
 #include "asyncpiecelibrarywidget.h"
 #include "pickuptemplatelibrarywidget.h"
@@ -52,11 +51,6 @@ class PieceEditorWidget : public QWidget
 		Piece* piece;
 		PickupPlanEditorViewWidget* pickupViewWidget;	
 		NiceViewWidget* niceViewWidget;
-
-		OverlayColorWidget* overlayWidget;
-		OverlayColorWidget* underlayWidget;
-                QLabel overlayColorLabel;
-                QLabel underlayColorLabel;
 
 		vector<QLabel*> pickupParamLabels;
 		vector<QSpinBox*> pickupParamSpinboxes;

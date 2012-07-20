@@ -27,8 +27,8 @@ class PickupPlan
 		PickupPlan* copy() const;
 
 		vector<SubpickupTemplate> subs;
-		Color* overlayColor;
-		Color* underlayColor;
+		PullPlan* overlayColorBar;
+		PullPlan* underlayColorBar;
 
 	private:
 		void updateSubs();
@@ -38,6 +38,7 @@ class PickupPlan
                 vector<int> parameterValues;
                 vector<char*> parameterNames;
 		PullPlan* defaultSubplan;
+	
 };
 
 PickupPlan *deep_copy(const PickupPlan *);

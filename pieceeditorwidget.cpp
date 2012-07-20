@@ -27,8 +27,6 @@ void PieceEditorWidget :: updateEverything()
 	}
 
 	pickupViewWidget->setPickup(piece->pickup);
-	overlayWidget->repaint();	
-	underlayWidget->repaint();	
 
 	unsigned int i = 0;
 	for (; i < piece->pickup->getParameterCount(); ++i)
@@ -194,16 +192,6 @@ void PieceEditorWidget :: setupLayout()
 	pickupTemplateLibraryScrollArea->setFixedHeight(130);
 	leftLayout->addWidget(pickupTemplateLibraryScrollArea, 0);
 
-	QHBoxLayout* overlayLayout = new QHBoxLayout(this);	
-	overlayLayout->addWidget(new QLabel("Casing color:"));
-	overlayWidget = new OverlayColorWidget(&(piece->pickup->overlayColor), this);
-	overlayLayout->addWidget(overlayWidget);
-	overlayLayout->addWidget(new QLabel("Underlay color:"));
-	underlayWidget = new OverlayColorWidget(&(piece->pickup->underlayColor), this);
-	overlayLayout->addWidget(underlayWidget);
-	overlayLayout->addStretch(1);
-	leftLayout->addLayout(overlayLayout);
-
 	QWidget* pickupParameter1Widget = new QWidget(this);
 	QLabel* pickupParameter1Label = new QLabel("Parameter 1");
 	pickupParamLabels.push_back(pickupParameter1Label);
@@ -343,10 +331,6 @@ void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 void PieceEditorWidget :: setupConnections()
 {
-	connect(overlayWidget, SIGNAL(colorChanged()),
-		this, SLOT(updateEverything()));
-	connect(underlayWidget, SIGNAL(colorChanged()),
-		this, SLOT(updateEverything()));
 	connect(pickupParamSpinboxes[0], SIGNAL(valueChanged(int)),
 		this, SLOT(pickupParameter1SpinBoxChanged(int)));
 	connect(pickupParamSliders[0], SIGNAL(valueChanged(int)),

@@ -268,7 +268,6 @@ void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* /*event*/)
 
 void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
-	updateHighlightedSubplansAndCasings();
 	if (subplansHighlighted.size() > 0)
 	{
 		event->accept();

@@ -50,7 +50,6 @@ macx {
 HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
 
 HEADERS += primitives.h constants.h Vector.hpp \ 
-	overlaycolorwidget.h \
 	pullplan.h pulltemplate.h subpulltemplate.h pickupplan.h \
 	piece.h piecetemplate.h \
 	pickuptemplate.h subpickuptemplate.h pickupplaneditorviewwidget.h \ 
@@ -129,7 +128,6 @@ SOURCES += main.cpp \
 	pullplancustomizewidget.cpp \
 	pullplan.cpp subpulltemplate.cpp \
 	piece.cpp piecetemplate.cpp \
-	overlaycolorwidget.cpp \
 	pickupplan.cpp subpickuptemplate.cpp pickupplaneditorviewwidget.cpp \
 	purecolorlibrarywidget.cpp casing.cpp \
 	controller.cpp geometry.cpp mesh.cpp \

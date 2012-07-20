@@ -23,7 +23,7 @@ class PullPlan
 		PullPlan(int pullTemplate);
 
 		void setTemplateType(int pullTemplateType);
-        void setTemplateTypeToCustom();
+		void setTemplateTypeToCustom();
 		int getTemplateType();
 		bool isBase();
 
