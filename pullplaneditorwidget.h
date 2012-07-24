@@ -47,6 +47,7 @@ class PullPlanEditorWidget : public QWidget
 		void twistSpinChanged(int);
 		void twistSliderChanged(int);
 		void paramSpinChanged(int);
+        void tabChanged(int);
 
 	private:
 		Geometry geometry;
@@ -70,6 +71,8 @@ class PullPlanEditorWidget : public QWidget
                 QPushButton* addSquareButton;
                 QPushButton* copySelectedButton;
                 QPushButton* deleteSelectedButton;
+        QTabWidget* tabs;
+        QLabel* descriptionLabel;
 		NiceViewWidget* niceViewWidget;
 
 		void setupLayout();

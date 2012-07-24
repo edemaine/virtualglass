@@ -596,6 +596,8 @@ void PullPlan :: updateSubs(vector<SubpullTemplate> oldSubs)
         {
             for (unsigned int i = 0; i < oldSubs.size(); i++)
             {
+                p.x = oldSubs[i].location.x * radius;
+                p.y = oldSubs[i].location.y * radius;
                 pushNewSubpull(&newSubs, oldSubs[i].shape, oldSubs[i].location, oldSubs[i].diameter, oldSubs[i].group);
             }
         }

@@ -198,13 +198,13 @@ void PullPlanEditorWidget :: setupLayout()
 	QWidget* leftWidget = new QWidget(this);
 	QVBoxLayout* leftLayout = new QVBoxLayout(leftWidget);
 	leftWidget->setLayout(leftLayout);
-	QTabWidget* tabs = new QTabWidget(leftWidget);
-	tabs->addTab(editorWidget, QString("Standard"));
-	tabs->addTab(customizeWidget, QString("Customize"));
+    tabs = new QTabWidget(leftWidget);
+    tabs->addTab(editorWidget, QString("Fill Arrangement"));
+    tabs->addTab(customizeWidget, QString("Rearrange Current"));
 	leftLayout->addWidget(tabs, 1);
-	QLabel* descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", leftWidget);
-	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	leftLayout->addWidget(descriptionLabel, 0);
+    descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", leftWidget);
+    descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    leftLayout->addWidget(descriptionLabel, 0);
 
 	// Combine 3D viewer and descriptive text into the right layout
 	QWidget* rightWidget = new QWidget(this);
@@ -231,6 +231,18 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
 		plan->setTemplateType(ptlw->getPullTemplateType());
 		emit someDataChanged();
 	}
+}
+
+void PullPlanEditorWidget :: tabChanged(int i)
+{
+    if (i == 0)
+    {
+        descriptionLabel->setText("Cane editor - drag color or other canes in.");
+    }
+    else
+    {
+        descriptionLabel->setText("Cane customizer - select and drag shapes around to customize cane layout.");
+    }
 }
 
 void PullPlanEditorWidget :: circleCasingButtonPressed()
@@ -299,6 +311,7 @@ void PullPlanEditorWidget :: setupConnections()
 	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(viewWidgetDataChanged()));
 	connect(customizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(customizeViewWidgetDataChanged()));
 	connect(this, SIGNAL(geometryChanged(Geometry)), niceViewWidget, SLOT(repaint()));
+    connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 }
 
 void PullPlanEditorWidget :: viewWidgetDataChanged()
