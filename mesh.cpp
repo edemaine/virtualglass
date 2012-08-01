@@ -727,7 +727,7 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 	// suggestion matches your shape, so it's still ok to use.
 	meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getOutermostCasingColor(), 
 		mandatedShape, offset, length, 1.0, ensureVisible, groupIndex);
-	for (unsigned int i = 1; i < plan->getCasingCount() - 1; ++i) {
+	for (unsigned int i = 0; i < plan->getCasingCount(); ++i) {
 		meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getCasingColor(i), 
 			plan->getCasingShape(i), offset, length, plan->getCasingThickness(i), ensureVisible, groupIndex);
 	}

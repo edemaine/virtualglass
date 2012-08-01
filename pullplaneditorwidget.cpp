@@ -172,39 +172,41 @@ void PullPlanEditorWidget :: setupLayout()
 	QVBoxLayout* customizeLayout = new QVBoxLayout(customizeWidget);
 	customizeWidget->setLayout(customizeLayout);
 
-    // Customize layout: top button layout
-    QHBoxLayout* addCaneLayout = new QHBoxLayout(customizeWidget);
-    addCircleButton = new QPushButton("Add New Circle");
-    addSquareButton = new QPushButton("Add New Square");
-    addCaneLayout->addWidget(addCircleButton);
-    addCaneLayout->addWidget(addSquareButton);
-    customizeLayout->addLayout(addCaneLayout, 0);
-
 	// Customize layout: interactive editor
 	customizeLayout->addWidget(customizeViewWidget, 1);
 
-    // Customize layout: bottom button layout
-    QHBoxLayout* windowControlsLayout = new QHBoxLayout(customizeWidget);
-    copySelectedButton = new QPushButton("Duplicate Selection");
-    deleteSelectedButton = new QPushButton("Delete Selection");
-    confirmChangesButton = new QPushButton("Confirm changes");
-    cancelChangesButton = new QPushButton("Cancel");
-    windowControlsLayout->addWidget(copySelectedButton);
-    windowControlsLayout->addWidget(deleteSelectedButton);
-    customizeLayout->addLayout(windowControlsLayout, 0);
+	// Customize layout: add cane layout
+	QHBoxLayout* addCaneLayout = new QHBoxLayout(customizeWidget);
+	addCircleButton = new QPushButton("Add New Circle");
+	addSquareButton = new QPushButton("Add New Square");
+	addCaneLayout->addWidget(addCircleButton);
+	addCaneLayout->addWidget(addSquareButton);
+	addCaneLayout->addStretch();
+	customizeLayout->addLayout(addCaneLayout, 0);
+
+	// Customize layout: duplicate/delete cane layout
+	QHBoxLayout* windowControlsLayout = new QHBoxLayout(customizeWidget);
+	copySelectedButton = new QPushButton("Duplicate Selection");
+	deleteSelectedButton = new QPushButton("Delete Selection");
+	confirmChangesButton = new QPushButton("Confirm changes");
+	cancelChangesButton = new QPushButton("Cancel");
+	windowControlsLayout->addWidget(copySelectedButton);
+	windowControlsLayout->addWidget(deleteSelectedButton);
+	windowControlsLayout->addStretch();
+	customizeLayout->addLayout(windowControlsLayout, 0);
 	
 	// Combine editor and customize layouts into a pair of tabs with 
 	// descriptive text in the left layout
 	QWidget* leftWidget = new QWidget(this);
 	QVBoxLayout* leftLayout = new QVBoxLayout(leftWidget);
 	leftWidget->setLayout(leftLayout);
-    tabs = new QTabWidget(leftWidget);
-    tabs->addTab(editorWidget, QString("Fill Arrangement"));
-    tabs->addTab(customizeWidget, QString("Rearrange Current"));
+	tabs = new QTabWidget(leftWidget);
+	tabs->addTab(editorWidget, QString("Fill Arrangement"));
+	tabs->addTab(customizeWidget, QString("Rearrange Current"));
 	leftLayout->addWidget(tabs, 1);
-    descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", leftWidget);
-    descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    leftLayout->addWidget(descriptionLabel, 0);
+	descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", leftWidget);
+	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	leftLayout->addWidget(descriptionLabel, 0);
 
 	// Combine 3D viewer and descriptive text into the right layout
 	QWidget* rightWidget = new QWidget(this);
@@ -311,7 +313,7 @@ void PullPlanEditorWidget :: setupConnections()
 	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(viewWidgetDataChanged()));
 	connect(customizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(customizeViewWidgetDataChanged()));
 	connect(this, SIGNAL(geometryChanged(Geometry)), niceViewWidget, SLOT(repaint()));
-    connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+	connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 }
 
 void PullPlanEditorWidget :: viewWidgetDataChanged()

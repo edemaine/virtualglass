@@ -432,10 +432,27 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	painter->setPen(Qt::NoPen);
 	paintShape(x, y, drawWidth, mandatedShape, painter);
 
+        if (highlightThis)
+        {
+                painter->setBrush(QColor(255*draggingColor.r, 255*draggingColor.g, 255*draggingColor.b,
+                        255*draggingColor.a));
+                painter->setPen(Qt::NoPen);
+                paintShape(x, y, drawWidth, mandatedShape, painter);
+                return;
+        }
+
+        // If you're a color bar, just fill region with color.
+        if (plan->isBase())
+        {
+                Color* c = plan->getOutermostCasingColor();
+                painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
+                painter->setPen(Qt::NoPen);
+                paintShape(x, y, drawWidth, mandatedShape, painter);
+                return;
+        }
+
 	// Do casing colors outermost to innermost to get concentric rings of each casing's color
-	// Skip outermost casing (that is done by your parent) and innermost (that is the `invisible'
-	// casing for you to resize your subcanes)
-	for (unsigned int i = plan->getCasingCount() - 1; plan->getCasingCount() > i; --i) 
+	for (unsigned int i = plan->getCasingCount() - 1; i < plan->getCasingCount(); --i) 
 	{
 		int casingWidth = drawWidth * plan->getCasingThickness(i);
 		int casingHeight = drawHeight * plan->getCasingThickness(i);
@@ -461,27 +478,6 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 
 		setBoundaryPainter(painter, outermostLevel);
 		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
-	}
-
-	// If you're supposed to become highlighted, do it. Note: this is not a casing highlight, that
-	// was already (just) done when processing casing...this is a subcane being highlighted.
-	if (highlightThis)
-	{
-		painter->setBrush(QColor(255*draggingColor.r, 255*draggingColor.g, 255*draggingColor.b, 
-			255*draggingColor.a));
-		painter->setPen(Qt::NoPen);
-		paintShape(x, y, drawWidth, mandatedShape, painter);
-		return;
-	}
-
-	// If you're a color bar, just fill region with color.
-	if (plan->isBase())
-	{
-		Color* c = plan->getOutermostCasingColor();
-		painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
-		painter->setPen(Qt::NoPen);
-		paintShape(x, y, drawWidth, mandatedShape, painter);
-		return;
 	}
 
 	// Recursively call drawing on subplans
@@ -533,6 +529,7 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan, false, 
 		plan->getOutermostCasingShape(), true, &painter);
 
+	painter.setBrush(Qt::NoBrush);
 	setBoundaryPainter(&painter, true);
 	paintShape(10, 10, squareSize - 20, plan->getOutermostCasingShape(), &painter);
 

@@ -268,7 +268,7 @@ int PullPlan :: getTemplateType() {
 
 void PullPlan :: setParameter(int p, int v) {
 	parameterValues[p] = v;
-	vector<SubpullTemplate> oldSubs = this->subs;
+	vector<SubpullTemplate> oldSubs = subs;
 	resetSubs(oldSubs);
 }
 
@@ -458,13 +458,7 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 
 	switch (this->templateType) {
 		case CASED_CIRCLE_PULL_TEMPLATE:
-			pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, radius * 2.0, 0);
-			break;
 		case CASED_SQUARE_PULL_TEMPLATE:
-			if (this->casings[0].shape == CIRCLE_SHAPE) {
-				radius *= 1.0 / pow(2, 0.5);
-			}
-			pushNewSubpull(&newSubs, SQUARE_SHAPE, p, radius * 2.0, 0);
 			break;
 		case HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE: 
 		{

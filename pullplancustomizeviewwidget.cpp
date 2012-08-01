@@ -519,6 +519,16 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 	painter->setPen(Qt::NoPen);
 	paintShape(x, y, drawWidth, mandatedShape, painter);
 
+	// If it's a base color, fill region with color
+	if (plan->isBase())
+	{
+		Color* c = plan->getCasingColor(0);
+		painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
+		painter->setPen(Qt::NoPen);
+		paintShape(x, y, drawWidth, mandatedShape, painter);
+		return;
+	}
+
 	// Do casing colors outermost to innermost to get concentric rings of each casing's color
 	// Skip outermost casing (that is done by your parent) and innermost (that is the `invisible'
 	// casing for you to resize your subcanes)
@@ -538,16 +548,6 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 			255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
 		setBoundaryPainter(painter, outermostLevel, outermostLevel);
 		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
-	}
-
-	// If it's a base color, fill region with color
-	if (plan->isBase())
-	{
-		Color* c = plan->getCasingColor(0);
-		painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
-		painter->setPen(Qt::NoPen);
-		paintShape(x, y, drawWidth, mandatedShape, painter);
-		return;
 	}
 
 	// Recursively call drawing on subplans
@@ -656,6 +656,7 @@ void PullPlanCustomizeViewWidget :: paintEvent(QPaintEvent *event)
 	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan, plan->getOutermostCasingShape(), 
 		true, &painter);
 
+	painter.setBrush(Qt::NoBrush);
 	setBoundaryPainter(&painter, true);
 	paintShape(10, 10, squareSize - 20, plan->getOutermostCasingShape(), &painter);
 	drawActionControls(&painter);

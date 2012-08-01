@@ -62,10 +62,20 @@ void AsyncPullPlanLibraryWidget :: drawSubplan(float x, float y, float drawWidth
         painter->setPen(Qt::NoPen);
         paintShape(x, y, drawWidth, mandatedShape, painter);
 
+        // If you're a color bar, just fill region with color.
+        if (plan->isBase())
+        {
+                Color* c = plan->getOutermostCasingColor();
+                painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
+                painter->setPen(Qt::NoPen);
+                paintShape(x, y, drawWidth, mandatedShape, painter);
+                return;
+        }
+
         // Do casing colors outermost to innermost to get concentric rings of each casing's color
         // Skip outermost casing (that is done by your parent) and innermost (that is the `invisible'
         // casing for you to resize your subcanes)
-        for (unsigned int i = plan->getCasingCount() - 1; plan->getCasingCount() > i && i > 0; --i)
+        for (unsigned int i = plan->getCasingCount() - 1; i < plan->getCasingCount(); --i)
         {
                 int casingWidth = drawWidth * plan->getCasingThickness(i);
                 int casingHeight = drawHeight * plan->getCasingThickness(i);
@@ -84,15 +94,6 @@ void AsyncPullPlanLibraryWidget :: drawSubplan(float x, float y, float drawWidth
                 paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
         }
 
-        // If you're a color bar, just fill region with color.
-        if (plan->isBase())
-        {
-                Color* c = plan->getOutermostCasingColor();
-                painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
-                painter->setPen(Qt::NoPen);
-                paintShape(x, y, drawWidth, mandatedShape, painter);
-                return;
-        }
 
         // Recursively call drawing on subplans
         for (unsigned int i = plan->subs.size()-1; i < plan->subs.size(); --i)

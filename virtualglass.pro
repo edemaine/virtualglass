@@ -70,7 +70,6 @@ HEADERS += primitives.h constants.h Vector.hpp \
 	asynccolorbarlibrarywidget.h \
 	asyncpiecelibrarywidget.h \
 	pullplancustomizeviewwidget.h \
-	pullplancustomizewidget.h \
 	glassmime.h \
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
@@ -125,7 +124,6 @@ HEADERS += yaml-cpp/src/token.h \
 SOURCES += main.cpp \ 
 	glew/glew.c \
 	pullplancustomizeviewwidget.cpp \
-	pullplancustomizewidget.cpp \
 	pullplan.cpp subpulltemplate.cpp \
 	piece.cpp piecetemplate.cpp \
 	pickupplan.cpp subpickuptemplate.cpp pickupplaneditorviewwidget.cpp \
