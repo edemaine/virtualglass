@@ -41,7 +41,7 @@ PullPlan* PullPlan :: copy() const {
 	assert(c->parameterValues.size() == this->parameterValues.size());
 	c->parameterValues = this->parameterValues;
 	vector<SubpullTemplate> oldSubs = this->subs;
-	c->updateSubs(oldSubs);
+	c->resetSubs(oldSubs);
 
 	assert(c->subs.size() == this->subs.size());
 	for (unsigned int i = 0; i < this->subs.size(); ++i) {
@@ -186,31 +186,30 @@ void PullPlan :: setTemplateType(int templateType) {
 			parameterValues.push_back(2);
 			break;
 		case CUSTOM_CIRCLE_PULL_TEMPLATE:
-            break;
+			break;
 		case CUSTOM_SQUARE_PULL_TEMPLATE:
-            this->casings[0].shape = SQUARE_SHAPE;
-            casings[0].thickness = 1 / SQRT_TWO;
-//            this->removeCasing();
+			this->casings[0].shape = SQUARE_SHAPE;
+			casings[0].thickness = 1 / SQRT_TWO;
 			break;
 	}
 
 	vector<SubpullTemplate> oldSubs = subs;
 	subs.clear(); // don't carry over any of the current stuff
-	updateSubs(oldSubs);
+	resetSubs(oldSubs);
 }
 
 void PullPlan :: setTemplateTypeToCustom()
 {
-    if (this->getCasingShape(0) == CIRCLE_SHAPE)
-    {
-        this->templateType = CUSTOM_CIRCLE_PULL_TEMPLATE;
-    }
-    else
-    {
-        this->templateType = CUSTOM_SQUARE_PULL_TEMPLATE;
-    }
-    this->parameterNames.clear();
-    this->parameterValues.clear();
+	if (this->getCasingShape(0) == CIRCLE_SHAPE)
+	{
+		this->templateType = CUSTOM_CIRCLE_PULL_TEMPLATE;
+	}
+	else
+	{
+		this->templateType = CUSTOM_SQUARE_PULL_TEMPLATE;
+	}
+	this->parameterNames.clear();
+	this->parameterValues.clear();
 }
 
 void PullPlan :: setCasingColor(Color* c, unsigned int index) {
@@ -270,7 +269,7 @@ int PullPlan :: getTemplateType() {
 void PullPlan :: setParameter(int p, int v) {
 	parameterValues[p] = v;
 	vector<SubpullTemplate> oldSubs = this->subs;
-	updateSubs(oldSubs);
+	resetSubs(oldSubs);
 }
 
 int PullPlan :: getParameter(int p) {
@@ -294,14 +293,18 @@ void PullPlan :: removeCasing() {
 	if (count < 3)
 		return;
 
+	float oldInnermostCasingThickness = casings[0].thickness;
+
+	// `puff out' the casing thicknesses so second outermost now has radius of 
+	// previous outermost one
 	float diff = casings[count-1].thickness - casings[count-2].thickness;
 	casings.pop_back();
-	for (unsigned int i = 0; i < casings.size(); ++i) {
+	for (unsigned int i = 0; i < casings.size(); ++i) 
 		casings[i].thickness += diff;
-	}
 
-    vector<SubpullTemplate> oldSubs = this->subs;
-    updateSubs(oldSubs);
+	// rescale subcanes
+	for (unsigned int i = 0; i < subs.size(); ++i)
+		subs[i].rescale(casings[0].thickness / oldInnermostCasingThickness);
 }
 
 
@@ -318,38 +321,52 @@ bool PullPlan :: hasSquareCasing() {
 
 void PullPlan :: addCasing(int shape) {
 
-	for (unsigned int i = 0; i < casings.size(); ++i) {
-		casings[i].thickness -= 0.1;
-	}
+	// rescale all but innermost casing
+	float oldInnermostCasingThickness = casings[0].thickness;
+	for (unsigned int i = 0; i < casings.size(); ++i) 
+		casings[i].thickness -= MIN(0.1, casings[i].thickness/2);
+	
+	// if casing addition is circle around a square, rescale everything down a bit more
 	if (shape == CIRCLE_SHAPE && getOutermostCasingShape() == SQUARE_SHAPE) {		
 		for (unsigned int i = 0; i < casings.size(); ++i) {
 			casings[i].thickness *= 1 / SQRT_TWO;
 		}
 	}
+
+	// add the new casing
 	casings.push_back(Casing(1.0, shape, defaultColor));
 	if (hasSquareCasing())
 		this->twist = 0.0;
 
-	vector<SubpullTemplate> oldSubs = this->subs;
-	updateSubs(oldSubs);
+	// update subpulls by rescaling them according to innermost casing rescaling
+	for (unsigned int i = 0; i < subs.size(); ++i) 
+		subs[i].rescale(casings[0].thickness / oldInnermostCasingThickness);
 }
 
 void PullPlan :: setCasingThickness(float t, unsigned int index) {
-	
 	// this currently doesn't enforce any overlapping issues with
 	// differently-shaped casings. It assumes they are being set 
 	// to valid relative sizes.
-	if (index >= this->casings.size())
+	if (index >= casings.size())
 		return;
-	this->casings[index].thickness = t;
-	vector<SubpullTemplate> oldSubs = this->subs;
-	updateSubs(oldSubs);
+	// if innermost casing, scale subcanes with changing casing thickness
+	if (index == 0) {
+		float scaleRatio = t / casings[0].thickness;
+		casings[0].thickness = t;
+		for (unsigned int i = 0; i < subs.size(); ++i) 
+			subs[i].rescale(scaleRatio);
+	}
+	// otherwise just change the casing
+	else
+		this->casings[index].thickness = t;
 }
 
 void PullPlan :: setOutermostCasingShape(int newShape) {
 
 	if (newShape == getOutermostCasingShape()) 
 		return; 
+
+	float oldInnermostCasingThickness = casings[0].thickness;
 
 	// simple case of only 1 casing
 	if (casings.size() == 1) {
@@ -364,13 +381,15 @@ void PullPlan :: setOutermostCasingShape(int newShape) {
 		for (unsigned int i = 0; i < casings.size() - 1; ++i) 
 			casings[i].thickness *= 1 / SQRT_TWO;
 	}
-	
+
+	// DO THE CHANGE
 	casings[casings.size()-1].shape = newShape;
 	if (hasSquareCasing())
 		this->twist = 0.0;
 
-	vector<SubpullTemplate> oldSubs = this->subs;
-	updateSubs(oldSubs);
+	// because innermost casing thickness might have changed, update subcane scales
+	for (unsigned int i = 0; i < subs.size(); ++i) 
+		subs[i].rescale(casings[0].thickness / oldInnermostCasingThickness);
 }
 
 float PullPlan :: getCasingThickness(unsigned int index) {
@@ -419,18 +438,17 @@ void PullPlan :: pushNewSubpull(vector<SubpullTemplate>* newSubs,
 }
 
 /*
-updateSubs()
+resetSubs()
 
 Description:
-This function is invoked after the template, a template parameter,
-or casing data is changed in the pull plan. The purpose is to
-recompute the locations and sizes of subcanes, as well as add or remove
-subplans if the number of subplans changed. For instance, changing
-a template parameter specifying the number of subcanes in a row changes
-the size and location of subplans, as well as increasing or decreasing
-the number of subplans.
+This function is invoked after the template or a template parameter,
+has changed in the pull plan. The purpose is to recompute the locations 
+and sizes of subcanes, as well as add or remove subplans if the number 
+of subplans changed. For instance, changing a template parameter 
+specifying the number of subcanes in a row changes the size and location 
+of subplans, as well as increasing or decreasing the number of subplans.
 */
-void PullPlan :: updateSubs(vector<SubpullTemplate> oldSubs)
+void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 {
 	Point p = make_vector(0.0f, 0.0f, 0.0f);
 	assert(!casings.empty());
@@ -462,8 +480,7 @@ void PullPlan :: updateSubs(vector<SubpullTemplate> oldSubs)
 		case HORIZONTAL_LINE_SQUARE_PULL_TEMPLATE:
 		{
 			assert(parameterValues.size() == 1);
-			if (this->casings[0].shape == CIRCLE_SHAPE)
-				radius *= 0.9;
+			radius *= 0.9;
 			int count = parameterValues[0];
 			for (int i = 0; i < count; ++i) {
 				float littleRadius = (2 * radius / count) / 2;
@@ -591,16 +608,18 @@ void PullPlan :: updateSubs(vector<SubpullTemplate> oldSubs)
 			}
 			break;
 		}
-        case CUSTOM_CIRCLE_PULL_TEMPLATE:
-        case CUSTOM_SQUARE_PULL_TEMPLATE:
-        {
-            for (unsigned int i = 0; i < oldSubs.size(); i++)
-            {
-                p.x = oldSubs[i].location.x * radius;
-                p.y = oldSubs[i].location.y * radius;
-                pushNewSubpull(&newSubs, oldSubs[i].shape, oldSubs[i].location, oldSubs[i].diameter, oldSubs[i].group);
-            }
-        }
+		case CUSTOM_CIRCLE_PULL_TEMPLATE:
+		case CUSTOM_SQUARE_PULL_TEMPLATE:
+		{
+			for (unsigned int i = 0; i < oldSubs.size(); i++)
+			{
+				p.x = oldSubs[i].location.x * radius;
+				p.y = oldSubs[i].location.y * radius;
+				pushNewSubpull(&newSubs, oldSubs[i].shape, oldSubs[i].location, 
+					oldSubs[i].diameter, oldSubs[i].group);
+			}
+			break;
+		}
 	}
 
 	subs = newSubs;

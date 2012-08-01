@@ -355,7 +355,7 @@ void PullPlanEditorViewWidget :: populateHighlightedCasings(int x, int y)
 	// Deal w/casing
 	float drawSize = (squareSize - 20);
 	float distanceFromCenter;
-	for (unsigned int i = 1; i < plan->getCasingCount(); ++i) {
+	for (unsigned int i = 0; i < plan->getCasingCount(); ++i) {
 		switch (plan->getCasingShape(i)) {
 			case CIRCLE_SHAPE:
 				distanceFromCenter = sqrt(pow(x - (drawSize/2.0 + 10.0), 2.0)
@@ -402,7 +402,6 @@ void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, bool oute
 		pen.setColor(Qt::black);
 		painter->setPen(pen);
 	}
-
 }
 
 void PullPlanEditorViewWidget :: paintShape(float x, float y, float size, int shape, QPainter* painter)
@@ -436,7 +435,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	// Do casing colors outermost to innermost to get concentric rings of each casing's color
 	// Skip outermost casing (that is done by your parent) and innermost (that is the `invisible'
 	// casing for you to resize your subcanes)
-	for (unsigned int i = plan->getCasingCount() - 1; plan->getCasingCount() > i && i > 0; --i) 
+	for (unsigned int i = plan->getCasingCount() - 1; plan->getCasingCount() > i; --i) 
 	{
 		int casingWidth = drawWidth * plan->getCasingThickness(i);
 		int casingHeight = drawHeight * plan->getCasingThickness(i);
@@ -459,6 +458,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 			painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g, 
 				255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
 		}
+
 		setBoundaryPainter(painter, outermostLevel);
 		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
 	}
@@ -516,8 +516,8 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 				false, painter);
 		}
 		
-		setBoundaryPainter(painter, outermostLevel);
 		painter->setBrush(Qt::NoBrush);
+		setBoundaryPainter(painter, outermostLevel); 
 		paintShape(rX, rY, rWidth, plan->subs[i].shape, painter);
 	}
 }

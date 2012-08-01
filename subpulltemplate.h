@@ -16,6 +16,8 @@ class SubpullTemplate
 		Point location;
 		float diameter;
 		int group;
+
+		void rescale(float ratio);
 };
 
 

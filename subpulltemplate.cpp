@@ -11,4 +11,11 @@ SubpullTemplate :: SubpullTemplate(PullPlan* plan, int shape, Point location, fl
 	this->group = group;
 }
 
+void SubpullTemplate :: rescale(float ratio) 
+{
+	this->location.x *= ratio;
+	this->location.y *= ratio;
+	this->diameter *= ratio;
+}
+
 

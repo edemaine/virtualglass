@@ -522,7 +522,7 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 	// Do casing colors outermost to innermost to get concentric rings of each casing's color
 	// Skip outermost casing (that is done by your parent) and innermost (that is the `invisible'
 	// casing for you to resize your subcanes)
-	for (unsigned int i = plan->getCasingCount() - 1; plan->getCasingCount() > i && i > 0; --i)
+	for (unsigned int i = plan->getCasingCount() - 1; plan->getCasingCount() > i; --i)
 	{
 		int casingWidth = drawWidth * plan->getCasingThickness(i);
 		int casingHeight = drawHeight * plan->getCasingThickness(i);
@@ -653,8 +653,8 @@ void PullPlanCustomizeViewWidget :: paintEvent(QPaintEvent *event)
 	painter.setRenderHint(QPainter::Antialiasing);
 
 	painter.fillRect(event->rect(), QColor(200, 200, 200));
-	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan,
-	plan->getOutermostCasingShape(), true, &painter);
+	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan, plan->getOutermostCasingShape(), 
+		true, &painter);
 
 	setBoundaryPainter(&painter, true);
 	paintShape(10, 10, squareSize - 20, plan->getOutermostCasingShape(), &painter);
