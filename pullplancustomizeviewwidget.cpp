@@ -334,10 +334,6 @@ void PullPlanCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 
 	if (mode == MOVE_MODE)
     {
-        if (event->modifiers() != Qt::ControlModifier && event->modifiers() != Qt::ShiftModifier)
-		{
-			subplansSelected.clear();
-		}
 		bool isIn = false;
 		for (unsigned int i = 0; i < subplansSelected.size(); i++)
 		{
@@ -348,9 +344,16 @@ void PullPlanCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 			}
 		}
 		if (!isIn && hoveringIndex != -1)
-		{
-			subplansSelected.push_back((unsigned int)hoveringIndex);
-			clickMoved = true;
+        {
+            if (event->modifiers() != Qt::ControlModifier && event->modifiers() != Qt::ShiftModifier)
+            {
+                subplansSelected.clear();
+            }
+            else
+            {
+                clickMoved = true;
+            }
+            subplansSelected.push_back((unsigned int)hoveringIndex);
 			activeBoxIndex = hoveringIndex;
 		}
 	}
@@ -365,14 +368,26 @@ void PullPlanCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent* event)
 {
 	if (!clickMoved)
 	{
-		for (unsigned int i = 0; i < subplansSelected.size(); i++)
-		{
-			if (hoveringIndex == int(subplansSelected.at(i)))
-			{
-				subplansSelected.erase(subplansSelected.begin()+i);
-				break;
-			}
-		}
+        if (event->modifiers() != Qt::ControlModifier && event->modifiers() != Qt::ShiftModifier)
+        {
+            subplansSelected.clear();
+            if (hoveringIndex != -1)
+            {
+                subplansSelected.push_back((unsigned int)hoveringIndex);
+                activeBoxIndex = hoveringIndex;
+            }
+        }
+        else
+        {
+            for (unsigned int i = 0; i < subplansSelected.size(); i++)
+            {
+                if (hoveringIndex == int(subplansSelected.at(i)))
+                {
+                    subplansSelected.erase(subplansSelected.begin()+i);
+                    break;
+                }
+            }
+        }
 	}
 	
 	mouseStartingLoc.x=(adjustedX(event->pos().x()));
