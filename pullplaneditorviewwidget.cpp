@@ -230,7 +230,7 @@ void PullPlanEditorViewWidget :: dragLeaveEvent(QDragLeaveEvent* /*event*/)
 }
 
 
-void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings()
+void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDropEvent* event)
 {
 	QPoint mouse = mapFromGlobal(QCursor::pos());
 	int x = adjustedX(mouse.x());
@@ -239,7 +239,7 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings()
         subplansHighlighted.clear();
         casingHighlighted = false;
 
-        populateHighlightedSubplans(x, y);
+        populateHighlightedSubplans(x, y, event);
         if (subplansHighlighted.size() > 0) 
         {
                 switch (draggedPlanType) 
@@ -260,9 +260,9 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings()
         }
 }
 
-void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* /*event*/)
+void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 {
-	updateHighlightedSubplansAndCasings();
+	updateHighlightedSubplansAndCasings(event);
 	repaint();
 }
 
@@ -291,7 +291,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	emit someDataChanged();
 }
 
-void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y)
+void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, QDropEvent* event)
 {
 	subplansHighlighted.clear();
 
@@ -334,7 +334,7 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y)
 	// The crazy thing is, on Windows a drag *blocks* the event loop, preventing the whole application from
 	// getting a keyPressEvent() until the drag is completed. So reading keyboardModifiers() actually 
 	// lets you notice that the shift key is down earlier, i.e. during the drag, which is the only time you care anyway.
-	if ((QApplication::keyboardModifiers() & Qt::ShiftModifier) && subplansHighlighted.size() > 0)
+	if (subplansHighlighted.size() > 0 && event && (event->keyboardModifiers() & Qt::ShiftModifier))
 	{
 		subplansHighlighted.clear();	
 		for (unsigned int i = 0; i < plan->subs.size(); ++i)
@@ -382,7 +382,7 @@ void PullPlanEditorViewWidget :: populateHighlightedCasings(int x, int y)
 void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan) {
 
 	this->plan = plan;
-	updateHighlightedSubplansAndCasings();
+	updateHighlightedSubplansAndCasings(0);
 }
 
 
