@@ -594,7 +594,6 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>*
 		return;
 
 	geometry->clear();
-	
 	generateMesh(piece->pickup, geometry, false, ancestors, ancestorIndices);		
 
 	switch (piece->getTemplate()->type)
@@ -621,10 +620,9 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>*
 			break;
 
 	}	
-
 }
 
-void Mesher :: generateMesh(PickupPlan* pickup, Geometry *geometry, bool ignoreCasing, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
+void Mesher :: generateMesh(PickupPlan* pickup, Geometry *geometry, bool ensureCasing, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
 {
 	if (pickup == NULL)
 		return;
@@ -635,7 +633,7 @@ void Mesher :: generateMesh(PickupPlan* pickup, Geometry *geometry, bool ignoreC
 		ancestors->clear();
 		ancestorIndices->clear();
 		generateMesh(pickup->subs[i].plan, pickup->subs[i].plan->getOutermostCasingShape(), geometry, 
-			ancestors, ancestorIndices, 0.0, pickup->subs[i].length, ignoreCasing, i); 
+			ancestors, ancestorIndices, 0.0, pickup->subs[i].length, ensureCasing, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
 		{
@@ -667,12 +665,12 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry)
 	geometry->compute_normals_from_triangles();
 }
 
-void Mesher :: generateMesh(PickupPlan* plan, Geometry* geometry)
+void Mesher :: generateMesh(PickupPlan* pickup, Geometry* geometry)
 {
-	totalCaneLength = computeTotalCaneLength(plan);
+	totalCaneLength = computeTotalCaneLength(pickup);
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
-	generateMesh(plan, geometry, true, &ancestors, &ancestorIndices);
+	generateMesh(pickup, geometry, true, &ancestors, &ancestorIndices);
 	geometry->compute_normals_from_triangles();
 }
 
@@ -727,9 +725,13 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 	// suggestion matches your shape, so it's still ok to use.
 	meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getOutermostCasingColor(), 
 		mandatedShape, offset, length, 1.0, ensureVisible, groupIndex);
-	for (unsigned int i = 0; i < plan->getCasingCount(); ++i) {
+	// for remaining casing and subcanes, each nested cane should stick out a bit more to get 
+	// cross-sections to look right in 3D views, i.e. you see everything nested
+	for (unsigned int i = 0; i < plan->getCasingCount()-1; ++i) {
+		float extension = (plan->getCasingCount() - 1 - i) * 0.001;
 		meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getCasingColor(i), 
-			plan->getCasingShape(i), offset, length, plan->getCasingThickness(i), ensureVisible, groupIndex);
+			plan->getCasingShape(i), offset - extension, length + extension,
+			plan->getCasingThickness(i), ensureVisible, groupIndex);
 	}
 	ancestors->pop_back();
 
@@ -754,7 +756,8 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 
 			ancestorIndices->push_back(i);
 			generateMesh(plan->subs[i].plan, plan->subs[i].shape, geometry, ancestors, 
-				ancestorIndices, offset - 0.001, length + 0.001, false, passGroupIndex);
+				ancestorIndices, offset - plan->getCasingCount() * 0.001, length + plan->getCasingCount() * 0.001, 
+					false, passGroupIndex);
 			ancestorIndices->pop_back();
 		}
 	}

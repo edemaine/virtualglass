@@ -45,10 +45,15 @@ void AsyncPullPlanLibraryWidget :: updateDragPixmap()
 {
         QPixmap _pixmap(200, 200);
         _pixmap.fill(Qt::transparent); 
+
         QPainter painter(&_pixmap);
+
         drawSubplan(10, 10, 180, 180, pullPlan, pullPlan->getOutermostCasingShape(), true, &painter);
+
+        painter.setBrush(Qt::NoBrush);
         setBoundaryPainter(&painter, true);
         paintShape(10, 10, 180, pullPlan->getOutermostCasingShape(), &painter);
+
         painter.end();
 
 	dragPixmap = _pixmap.scaled(100, 100);

@@ -29,7 +29,7 @@ class Mesher
 
 	private:
 		// Methods
-		void generateMesh(PickupPlan* plan, Geometry *geometry, bool ignoreCasing, vector<PullPlan*>* ancestors, 
+		void generateMesh(PickupPlan* plan, Geometry *geometry, bool ensureCasing, vector<PullPlan*>* ancestors, 
 			vector<int>* ancestorIndices);
 		void generateMesh(Piece* piece, Geometry *geometry, vector<PullPlan*>* ancestors, 
 			vector<int>* ancestorIndices);
