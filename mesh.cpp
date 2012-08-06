@@ -731,7 +731,7 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 		float extension = (plan->getCasingCount() - 1 - i) * 0.001;
 		meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getCasingColor(i), 
 			plan->getCasingShape(i), offset - extension, length + extension,
-			plan->getCasingThickness(i), ensureVisible, groupIndex);
+			plan->getCasingThickness(i), false, groupIndex);
 	}
 	ancestors->pop_back();
 
