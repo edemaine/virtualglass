@@ -356,11 +356,16 @@ void PullPlanCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
             subplansSelected.push_back((unsigned int)hoveringIndex);
 			activeBoxIndex = hoveringIndex;
 		}
+        if (activeBoxIndex == -1)
+        {
+            subplansSelected.clear();
+        }
 	}
 
 	mouseStartingLoc.x=(adjustedX(event->pos().x()));
-	mouseStartingLoc.y=(adjustedY(event->pos().y()));
+    mouseStartingLoc.y=(adjustedY(event->pos().y()));
 	boundActiveBox();
+    updateIndexes(event->pos());
 	this->update();
 }
 
