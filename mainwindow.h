@@ -49,6 +49,7 @@ class MainWindow : public QMainWindow
 		void updateLibrary();
 		void initializeRandomPiece();
 		void deleteCurrentEditingObject();
+		void setViewMode(int mode);
 
 		void unhighlightLibraryWidget(PieceTemplateLibraryWidget* w);
 		void unhighlightLibraryWidget(PickupTemplateLibraryWidget* w);

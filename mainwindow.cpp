@@ -16,9 +16,29 @@ MainWindow :: MainWindow()
 	show();
 
 	seedEverything();
-	editorStack->setCurrentIndex(EMPTY_MODE); 
+	setViewMode(EMPTY_MODE);
 	emit someDataChanged();
 	whatToDoLabel->setText("Click a library item at left to edit/view.");
+}
+
+void MainWindow :: setViewMode(int mode)
+{
+	editorStack->setCurrentIndex(mode);
+	copyColorBarButton->setEnabled(false);
+	copyPullPlanButton->setEnabled(false);
+	copyPieceButton->setEnabled(false);
+	switch (mode)
+	{
+		case COLORBAR_MODE:
+			copyColorBarButton->setEnabled(true);
+			break;
+		case PULLPLAN_MODE:
+			copyPullPlanButton->setEnabled(true);
+			break;
+		case PIECE_MODE:
+			copyPieceButton->setEnabled(true);
+			break;
+	}
 }
 
 QString MainWindow :: windowTitle()
@@ -37,17 +57,17 @@ QString MainWindow :: windowTitle()
 void MainWindow :: seedEverything()
 {
 	// Load color stuff
-	editorStack->setCurrentIndex(COLORBAR_MODE);
+	setViewMode(COLORBAR_MODE);
 	colorEditorWidget->seedColors();
 	emit someDataChanged();
 
 	// Load pull template types
-	editorStack->setCurrentIndex(PULLPLAN_MODE);
+	setViewMode(PULLPLAN_MODE);
 	emit someDataChanged();
 	pullPlanEditorWidget->seedTemplates();
 
 	// Load pickup and piece template types
-	editorStack->setCurrentIndex(PIECE_MODE);
+	setViewMode(PIECE_MODE);
 	emit someDataChanged();
 	pieceEditorWidget->seedTemplates();
 }
@@ -176,21 +196,21 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	{
 		unhighlightAllLibraryWidgets();
 		colorEditorWidget->setGlassColor(cblw->getGlassColor());
-		editorStack->setCurrentIndex(COLORBAR_MODE);
+		setViewMode(COLORBAR_MODE);
 		emit someDataChanged();
 	}
 	else if (plplw != NULL)
 	{
 		unhighlightAllLibraryWidgets();
 		pullPlanEditorWidget->setPlan(plplw->getPullPlan());
-		editorStack->setCurrentIndex(PULLPLAN_MODE);
+		setViewMode(PULLPLAN_MODE);
 		emit someDataChanged();
 	}
 	else if (plw != NULL)
 	{
 		unhighlightAllLibraryWidgets();
 		pieceEditorWidget->setPiece(plw->getPiece());
-		editorStack->setCurrentIndex(PIECE_MODE);
+		setViewMode(PIECE_MODE);
 		emit someDataChanged();
 	}
 }
@@ -399,7 +419,7 @@ void MainWindow :: newPiece()
 	pieceEditorWidget->setPiece(newEditorPiece);
 
 	// Load up the right editor
-	editorStack->setCurrentIndex(PIECE_MODE);
+	setViewMode(PIECE_MODE);
 
 	emit someDataChanged();
 }
@@ -427,7 +447,7 @@ void MainWindow :: newColorBar()
 	colorEditorWidget->setGlassColor(newGlassColor);
 
 	// Load up the right editor
-	editorStack->setCurrentIndex(COLORBAR_MODE);
+	setViewMode(COLORBAR_MODE);
 
 	// Trigger GUI updates
 	emit someDataChanged();
@@ -473,7 +493,7 @@ void MainWindow :: newPullPlan(PullPlan* newPlan)
 	pullPlanEditorWidget->setPlan(newPlan);
 
 	// Load up the right editor
-	editorStack->setCurrentIndex(PULLPLAN_MODE);
+	setViewMode(PULLPLAN_MODE);
 
 	// Trigger GUI updates
 	emit someDataChanged();
