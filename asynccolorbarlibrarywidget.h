@@ -10,8 +10,6 @@
 
 class AsyncColorBarLibraryWidget : public AsyncRenderWidget
 {
-	Q_OBJECT
-
 	public:
 		AsyncColorBarLibraryWidget(GlassColor* _color, QWidget* _parent=NULL);
 		GlassColor* getGlassColor();

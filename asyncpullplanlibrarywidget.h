@@ -9,7 +9,6 @@
 
 class AsyncPullPlanLibraryWidget : public AsyncRenderWidget
 {
-	Q_OBJECT
 	public:
 		AsyncPullPlanLibraryWidget(PullPlan *plan, QWidget * parent=NULL);
 		PullPlan *getPullPlan();

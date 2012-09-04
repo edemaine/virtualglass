@@ -2,13 +2,10 @@
 #define PURECOLORLIBRARYWIDGET_H
 
 #include <QtGui>
-#include <QObject>
 #include "pullplan.h"
 
 class PureColorLibraryWidget : public QLabel
 {
-	Q_OBJECT
-
 	public:
 		PureColorLibraryWidget(Color color, QString colorName, QWidget* parent=0);
 		Color getColor();
