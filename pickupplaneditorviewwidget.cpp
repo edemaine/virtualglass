@@ -184,7 +184,7 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	if (type == COLOR_BAR_MIME)
 	{
 		event->accept();
-		if ((QApplication::keyboardModifiers() & Qt::ShiftModifier))
+		if ((event->keyboardModifiers() & Qt::ShiftModifier))
 			pickup->overlayColorBar = droppedColor;
 		else
 			pickup->underlayColorBar = droppedColor;
@@ -203,7 +203,7 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	if (subplan != NULL)
 	{
 		event->accept();
-		if ((QApplication::keyboardModifiers() & Qt::ShiftModifier))
+		if ((event->keyboardModifiers() & Qt::ShiftModifier))
 		{
 			for (unsigned int i = 0; i < pickup->subs.size(); ++i)
 			{
