@@ -4,15 +4,15 @@
 
 #include "primitives.h"
 #include "constants.h"
+#include "glasscolor.h"
 
 class Casing
 {
 	public:
-		Casing();
-		Casing(float thickness, int shape, Color* color);
+		Casing(float thickness, int shape, GlassColor* glassColor);
 		float thickness;	
 		int shape;
-		Color* color;
+		GlassColor* glassColor;
 };
 
 #endif

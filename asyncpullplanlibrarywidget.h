@@ -3,6 +3,9 @@
 
 #include "asyncrenderwidget.h"
 #include "pullplan.h"
+#include "mesh.h"
+#include "qgraphicshighlighteffect.h"
+#include "pullplanrenderdata.h"
 
 class AsyncPullPlanLibraryWidget : public AsyncRenderWidget
 {
@@ -11,10 +14,9 @@ class AsyncPullPlanLibraryWidget : public AsyncRenderWidget
 		AsyncPullPlanLibraryWidget(PullPlan *plan, QWidget * parent=NULL);
 		PullPlan *getPullPlan();
 		const QPixmap *getDragPixmap();
-		//other pixmap will be rendered asynchronously from copy of current pull plan (one hopes?)
 		void updatePixmaps();
 
-	protected:
+	private:
 		PullPlan *pullPlan;
 		QPixmap dragPixmap;
 

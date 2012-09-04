@@ -37,7 +37,7 @@ float Mesher :: computeTotalCaneLength(PickupPlan* plan)
 
 float Mesher :: computeTotalCaneLength(PullPlan* plan)
 {
-	if (plan->isBase())
+	if (plan->subs.size() == 0)
 		return 1.0;
 	
 	float total = 0.0;
@@ -401,7 +401,7 @@ void Mesher :: meshPickupCasingSlab(Geometry* geometry, Color* color, float y, f
 The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
 */
 void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
-	Color* color, int mandatedShape, float offset, float length, float radius, bool ensureVisible, uint32_t group_tag)
+	Color* color, int shape, float offset, float length, float radius, bool ensureVisible, uint32_t group_tag)
 {
 	if (color->a < 0.0001 && !ensureVisible)
 		return;
@@ -416,7 +416,7 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 
 	Vector2f p;
 	vector< Vector2f > points;
-	switch (mandatedShape) // comes from plan or template of parent plan
+	switch (shape) 
 	{
 		case CIRCLE_SHAPE:
 			for (unsigned int i = 0; i < angularResolution; ++i)
@@ -632,7 +632,7 @@ void Mesher :: generateMesh(PickupPlan* pickup, Geometry *geometry, bool ensureC
 	{
 		ancestors->clear();
 		ancestorIndices->clear();
-		generateMesh(pickup->subs[i].plan, pickup->subs[i].plan->getOutermostCasingShape(), geometry, 
+		generateMesh(pickup->subs[i].plan, geometry, 
 			ancestors, ancestorIndices, 0.0, pickup->subs[i].length, ensureCasing, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
@@ -650,9 +650,9 @@ void Mesher :: generateMesh(PickupPlan* pickup, Geometry *geometry, bool ensureC
 			}
 		}
 	}
-	meshPickupCasingSlab(geometry, pickup->overlayColorBar->getOutermostCasingColor(), 0.0, pickup->subs[0].width*2.5 + 0.01);
-	if (pickup->underlayColorBar->getOutermostCasingColor()->a > 0.001) 
-		meshPickupCasingSlab(geometry, pickup->underlayColorBar->getOutermostCasingColor(), pickup->subs[0].width*2.5 + 0.01 + 0.06, 0.05);
+	meshPickupCasingSlab(geometry, pickup->overlayColorBar->getColor(), 0.0, pickup->subs[0].width*2.5 + 0.01);
+	if (pickup->underlayColorBar->getColor()->a > 0.001) 
+		meshPickupCasingSlab(geometry, pickup->underlayColorBar->getColor(), pickup->subs[0].width*2.5 + 0.01 + 0.06, 0.05);
 }
 
 
@@ -679,10 +679,7 @@ void Mesher :: generatePullMesh(PullPlan* plan, Geometry* geometry)
 	totalCaneLength = computeTotalCaneLength(plan);
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
-	if (plan->getTemplateType() == AMORPHOUS_BASE_PULL_TEMPLATE)
-		generateMesh(plan, CIRCLE_SHAPE, geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
-	else
-		generateMesh(plan, plan->getOutermostCasingShape(), geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
+	generateMesh(plan, geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 
 	// Make skinnier to more closely mimic the canes found in pickups
 	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
@@ -692,15 +689,14 @@ void Mesher :: generatePullMesh(PullPlan* plan, Geometry* geometry)
 	geometry->compute_normals_from_triangles();
 }
 
-void Mesher :: generateColorMesh(PullPlan* plan, Geometry* geometry)
+void Mesher :: generateColorMesh(GlassColor* gc, Geometry* geometry)
 {
-	totalCaneLength = computeTotalCaneLength(plan);
+	PullPlan dummyPlan(BASE_CIRCLE_PULL_TEMPLATE);
+	dummyPlan.setOutermostCasingColor(gc);
+	totalCaneLength = computeTotalCaneLength(&dummyPlan);
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
-	if (plan->getTemplateType() == AMORPHOUS_BASE_PULL_TEMPLATE)
-		generateMesh(plan, CIRCLE_SHAPE, geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
-	else
-		generateMesh(plan, plan->getOutermostCasingShape(), geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
+	generateMesh(&dummyPlan, geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
 	geometry->compute_normals_from_triangles();
 }
 
@@ -711,7 +707,7 @@ the transforms array is filled with with the transformations encountered at each
 leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
-void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometry, vector<PullPlan*>* ancestors, 
+void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*>* ancestors, 
 	vector<int>* ancestorIndices, float offset, float length, bool ensureVisible, int groupIndex)
 {
 	int passGroupIndex;
@@ -723,13 +719,13 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 	// for the outermost casing, use the shape suggestion from your parent, as you might 
 	// have an AMORPHOUS_SHAPE and need it specified for you. Even if you don't the shape
 	// suggestion matches your shape, so it's still ok to use.
-	meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getOutermostCasingColor(), 
-		mandatedShape, offset, length, 1.0, ensureVisible, groupIndex);
+	meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getOutermostCasingColor()->getColor(), 
+		plan->getOutermostCasingShape(), offset, length, 1.0, ensureVisible, groupIndex);
 	// for remaining casing and subcanes, each nested cane should stick out a bit more to get 
 	// cross-sections to look right in 3D views, i.e. you see everything nested
 	for (unsigned int i = 0; i < plan->getCasingCount()-1; ++i) {
 		float extension = (plan->getCasingCount() - 1 - i) * 0.001;
-		meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getCasingColor(i), 
+		meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getCasingColor(i)->getColor(), 
 			plan->getCasingShape(i), offset - extension, length + extension,
 			plan->getCasingThickness(i), false, groupIndex);
 	}
@@ -738,7 +734,7 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 	// Make recursive calls depending on the type of the current node
 	ancestors->push_back(plan);
 
-	if (plan->isBase())
+	if (plan->subs.size() == 0)
 	{
 		if (groupIndex == -1)
 			passGroupIndex = 0;
@@ -755,9 +751,9 @@ void Mesher :: generateMesh(PullPlan* plan, int mandatedShape, Geometry *geometr
 				passGroupIndex = groupIndex;
 
 			ancestorIndices->push_back(i);
-			generateMesh(plan->subs[i].plan, plan->subs[i].shape, geometry, ancestors, 
-				ancestorIndices, offset - plan->getCasingCount() * 0.001, length + plan->getCasingCount() * 0.001, 
-					false, passGroupIndex);
+			generateMesh(plan->subs[i].plan, geometry, ancestors, ancestorIndices, 
+				offset - plan->getCasingCount() * 0.001, length + plan->getCasingCount() * 0.001, 
+				false, passGroupIndex);
 			ancestorIndices->pop_back();
 		}
 	}

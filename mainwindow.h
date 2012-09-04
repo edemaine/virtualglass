@@ -80,6 +80,9 @@ class MainWindow : public QMainWindow
 		QPushButton* newColorBarButton;
 		QPushButton* newPullPlanButton;
 		QPushButton* newPieceButton;
+		QPushButton* copyColorBarButton;
+		QPushButton* copyPullPlanButton;
+		QPushButton* copyPieceButton;
 
 	private slots:
 		void updateEverything();
@@ -87,6 +90,9 @@ class MainWindow : public QMainWindow
 		void newPullPlan();
 		void newPullPlan(PullPlan* p);
 		void newPiece();
+		void copyColorBar();
+		void copyPullPlan();
+		void copyPiece();
 };
 
 

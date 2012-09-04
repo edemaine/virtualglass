@@ -1,7 +1,4 @@
 #include "asyncpullplanlibrarywidget.h"
-#include "mesh.h"
-#include "qgraphicshighlighteffect.h"
-#include "pullplanrenderdata.h"
 
 AsyncPullPlanLibraryWidget :: AsyncPullPlanLibraryWidget(PullPlan *_pullPlan, QWidget *parent) : AsyncRenderWidget(parent), pullPlan(_pullPlan)
 {
@@ -67,16 +64,6 @@ void AsyncPullPlanLibraryWidget :: drawSubplan(float x, float y, float drawWidth
         painter->setPen(Qt::NoPen);
         paintShape(x, y, drawWidth, mandatedShape, painter);
 
-        // If you're a color bar, just fill region with color.
-        if (plan->isBase())
-        {
-                Color* c = plan->getOutermostCasingColor();
-                painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
-                painter->setPen(Qt::NoPen);
-                paintShape(x, y, drawWidth, mandatedShape, painter);
-                return;
-        }
-
         // Do casing colors outermost to innermost to get concentric rings of each casing's color
         // Skip outermost casing (that is done by your parent) and innermost (that is the `invisible'
         // casing for you to resize your subcanes)
@@ -93,8 +80,9 @@ void AsyncPullPlanLibraryWidget :: drawSubplan(float x, float y, float drawWidth
                 paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
 
                 // Fill with actual casing color (highlighting white or some other color)
-		painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g,
-			255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
+		Color* c = plan->getCasingColor(i)->getColor();
+		QColor qc(255*c->r, 255*c->g, 255*c->b, 255*c->a);
+		painter->setBrush(qc);
                 setBoundaryPainter(painter, outermostLevel);
                 paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
         }

@@ -54,18 +54,20 @@ class PullPlanEditorViewWidget : public QWidget
 		PullPlan* getSubplanAt(float x, float y);
 
 		PullPlan* plan;
-		Color draggingColor;
+
+		bool isDraggingColor;
+		GlassColor* draggedColor;
 
 		bool isDraggingPlan;
-		int draggedPlanType;
 		PullPlan* draggedPlan;
 
 		bool isDraggingCasing;
 		unsigned int draggedCasingIndex;
 
-		bool casingHighlighted;
-		unsigned int casingHighlightIndex;
+		Color highlightColor;
+		vector<unsigned int> casingsHighlighted;
 		vector<unsigned int> subplansHighlighted; 
+
 		float ulX, ulY, squareSize;
 };
 

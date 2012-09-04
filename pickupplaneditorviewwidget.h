@@ -11,6 +11,7 @@
 #include "pickupplan.h"
 #include "asyncpullplanlibrarywidget.h"
 #include "glassmime.h"
+#include "glasscolor.h"
 
 class PickupPlanEditorViewWidget : public QWidget
 {

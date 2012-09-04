@@ -93,8 +93,8 @@ void MainWindow :: deleteCurrentEditingObject()
 			for (i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
 				w = colorBarLibraryLayout->itemAt(i);
-				PullPlan* p = dynamic_cast<AsyncColorBarLibraryWidget*>(w->widget())->getPullPlan();
-				if (p == colorEditorWidget->getColorBar())
+				GlassColor* gc = dynamic_cast<AsyncColorBarLibraryWidget*>(w->widget())->getGlassColor();
+				if (gc == colorEditorWidget->getGlassColor())
 				{
 					// this may be a memory leak, the library widget is never explicitly deleted
 					w = colorBarLibraryLayout->takeAt(i); 
@@ -104,8 +104,8 @@ void MainWindow :: deleteCurrentEditingObject()
 				}
 			}
 
-			colorEditorWidget->setColorBar(dynamic_cast<AsyncColorBarLibraryWidget*>(colorBarLibraryLayout->itemAt(
-					MIN(colorBarLibraryLayout->count()-1, i))->widget())->getPullPlan());
+			colorEditorWidget->setGlassColor(dynamic_cast<AsyncColorBarLibraryWidget*>(colorBarLibraryLayout->itemAt(
+					MIN(colorBarLibraryLayout->count()-1, i))->widget())->getGlassColor());
 			emit someDataChanged();
 			break;
 		}
@@ -175,7 +175,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	if (cblw != NULL)
 	{
 		unhighlightAllLibraryWidgets();
-		colorEditorWidget->setColorBar(cblw->getPullPlan());
+		colorEditorWidget->setGlassColor(cblw->getGlassColor());
 		editorStack->setCurrentIndex(COLORBAR_MODE);
 		emit someDataChanged();
 	}
@@ -222,30 +222,25 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	if (!isDragging || (event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
 		return;
 
-	int type;
-	PullPlan* plan = NULL;
-	QPixmap pixmap;
-
 	AsyncColorBarLibraryWidget* cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(childAt(event->pos()));
 	AsyncPullPlanLibraryWidget* plplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(childAt(event->pos()));
 
+	char buf[500];
+	QPixmap pixmap;
+	
 	if (cblw != NULL)
 	{
-		plan = cblw->getPullPlan();
+		encodeMimeData(buf, cblw->getGlassColor()->getColor(), COLOR_BAR_MIME);
 		pixmap = *cblw->getDragPixmap();
-		type = COLOR_BAR_MIME;
 	}
 	else if (plplw != NULL)
 	{
-		plan = plplw->getPullPlan();
+		encodeMimeData(buf, plplw->getPullPlan(), PULL_PLAN_MIME);
 		pixmap = *plplw->getDragPixmap();
-		type = PULL_PLAN_MIME;
 	}
 	else
 		return;
 
-	char buf[500];
-	encodeMimeData(buf, plan, type);
 	QByteArray pointerData(buf);
 	QMimeData* mimeData = new QMimeData;
 	mimeData->setText(pointerData);
@@ -262,12 +257,15 @@ void MainWindow :: setupConnections()
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 
 	connect(newColorBarButton, SIGNAL(pressed()), this, SLOT(newColorBar()));
+	connect(copyColorBarButton, SIGNAL(pressed()), this, SLOT(copyColorBar()));
 	connect(colorEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 
 	connect(newPullPlanButton, SIGNAL(pressed()), this, SLOT(newPullPlan()));
+	connect(copyPullPlanButton, SIGNAL(pressed()), this, SLOT(copyPullPlan()));
 	connect(pullPlanEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 
 	connect(newPieceButton, SIGNAL(pressed()), this, SLOT(newPiece()));
+	connect(copyPieceButton, SIGNAL(pressed()), this, SLOT(copyPiece()));
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }
 
@@ -300,15 +298,22 @@ void MainWindow :: setupLibrary()
 	superlibraryLayout->addWidget(newPullPlanButton, 0, 1);
 	superlibraryLayout->addWidget(newPieceButton, 0, 2);
 
+	copyColorBarButton = new QPushButton("Copy Color", libraryWidget);
+	copyPullPlanButton = new QPushButton("Copy Cane", libraryWidget);
+	copyPieceButton = new QPushButton("Copy Piece", libraryWidget);
+	superlibraryLayout->addWidget(copyColorBarButton, 1, 0);
+	superlibraryLayout->addWidget(copyPullPlanButton, 1, 1);
+	superlibraryLayout->addWidget(copyPieceButton, 1, 2);
+
 	colorBarLibraryLayout = new QVBoxLayout(libraryWidget);
 	colorBarLibraryLayout->setDirection(QBoxLayout::BottomToTop);
 	pullPlanLibraryLayout = new QVBoxLayout(libraryWidget);
 	pullPlanLibraryLayout->setDirection(QBoxLayout::BottomToTop);
 	pieceLibraryLayout = new QVBoxLayout(libraryWidget);
 	pieceLibraryLayout->setDirection(QBoxLayout::BottomToTop);
-	superlibraryLayout->addLayout(colorBarLibraryLayout, 1, 0, Qt::AlignTop);
-	superlibraryLayout->addLayout(pullPlanLibraryLayout, 1, 1, Qt::AlignTop);
-	superlibraryLayout->addLayout(pieceLibraryLayout, 1, 2, Qt::AlignTop);
+	superlibraryLayout->addLayout(colorBarLibraryLayout, 2, 0, Qt::AlignTop);
+	superlibraryLayout->addLayout(pullPlanLibraryLayout, 2, 1, Qt::AlignTop);
+	superlibraryLayout->addLayout(pieceLibraryLayout, 2, 2, Qt::AlignTop);
 
 	// make three qlabels for a legend
 	QGridLayout* legendLayout = new QGridLayout(libraryWidget);
@@ -371,8 +376,8 @@ void MainWindow :: setupColorEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
 	AsyncColorBarLibraryWidget* starterLibraryWidget = 
-		new AsyncColorBarLibraryWidget(new PullPlan(CIRCLE_BASE_PULL_TEMPLATE), this);
-	colorEditorWidget = new ColorEditorWidget(starterLibraryWidget->getPullPlan(), editorStack);
+		new AsyncColorBarLibraryWidget(new GlassColor(), this);
+	colorEditorWidget = new ColorEditorWidget(starterLibraryWidget->getGlassColor(), editorStack);
 	colorBarLibraryLayout->addWidget(starterLibraryWidget);
 }
 
@@ -391,7 +396,6 @@ void MainWindow :: newPiece()
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();
 	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(newEditorPiece));
-
 	pieceEditorWidget->setPiece(newEditorPiece);
 
 	// Load up the right editor
@@ -400,18 +404,27 @@ void MainWindow :: newPiece()
 	emit someDataChanged();
 }
 
+void MainWindow :: copyPiece()
+{
+	if (editorStack->currentIndex() != PIECE_MODE)
+		return;
+
+	// Create the new piece
+	Piece* newEditorPiece = pieceEditorWidget->getPiece()->copy();
+	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(newEditorPiece));
+	pieceEditorWidget->setPiece(newEditorPiece);
+
+	emit someDataChanged();
+}
+
 void MainWindow :: newColorBar()
 {
-	PullPlan* newEditorBar = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE);
+	GlassColor* newGlassColor = new GlassColor();
 
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();
-	AsyncColorBarLibraryWidget* newColorBarLibraryWidget = 
-		new AsyncColorBarLibraryWidget(newEditorBar, this);
-	colorBarLibraryLayout->addWidget(newColorBarLibraryWidget);
-
-	// Give the new plan to the editor
-	colorEditorWidget->setColorBar(newColorBarLibraryWidget->getPullPlan());
+	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(newGlassColor, this));
+	colorEditorWidget->setGlassColor(newGlassColor);
 
 	// Load up the right editor
 	editorStack->setCurrentIndex(COLORBAR_MODE);
@@ -420,10 +433,34 @@ void MainWindow :: newColorBar()
 	emit someDataChanged();
 }
 
+void MainWindow :: copyColorBar()
+{
+	if (editorStack->currentIndex() != COLORBAR_MODE)
+		return;
+
+	GlassColor* newEditorGlassColor = colorEditorWidget->getGlassColor()->copy();
+
+	// Create the new library entry
+	unhighlightAllLibraryWidgets();
+	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(newEditorGlassColor, this));
+	colorEditorWidget->setGlassColor(newEditorGlassColor);
+
+	// Trigger GUI updates
+	emit someDataChanged();
+}
+
 void MainWindow :: newPullPlan()
 {
-	PullPlan *newEditorPlan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE);
-	newEditorPlan->setTemplateType(CASED_CIRCLE_PULL_TEMPLATE);
+	PullPlan *newEditorPlan = new PullPlan(BASE_CIRCLE_PULL_TEMPLATE);
+	emit newPullPlan(newEditorPlan);
+}
+
+void MainWindow :: copyPullPlan()
+{
+	if (editorStack->currentIndex() != PULLPLAN_MODE)
+		return;
+
+	PullPlan *newEditorPlan = pullPlanEditorWidget->getPlan()->copy();
 	emit newPullPlan(newEditorPlan);
 }
 
@@ -534,7 +571,7 @@ void MainWindow :: updateLibrary()
                         {
                                 cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
                                         dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
-                                if (colorEditorWidget->getColorBar() == cblw->getPullPlan())
+                                if (colorEditorWidget->getGlassColor() == cblw->getGlassColor())
 				{
 					cblw->updatePixmaps();
                                         highlightLibraryWidget(cblw, IS_DEPENDANCY);
@@ -547,8 +584,7 @@ void MainWindow :: updateLibrary()
 			{
 				pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
-				if (pplw->getPullPlan()->hasDependencyOn(
-					colorEditorWidget->getColorBar()->getOutermostCasingColor()))
+				if (pplw->getPullPlan()->hasDependencyOn(colorEditorWidget->getGlassColor()))
 				{
 					pplw->updatePixmaps();
 					highlightLibraryWidget(pplw, USES_DEPENDANCY);				
@@ -560,8 +596,7 @@ void MainWindow :: updateLibrary()
 			{
 				plw = dynamic_cast<AsyncPieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
-				if (plw->getPiece()->hasDependencyOn(
-					colorEditorWidget->getColorBar()->getOutermostCasingColor()))
+				if (plw->getPiece()->hasDependencyOn(colorEditorWidget->getGlassColor()))
 				{
 					plw->updatePixmap();
 					highlightLibraryWidget(plw, USES_DEPENDANCY);
@@ -577,8 +612,7 @@ void MainWindow :: updateLibrary()
 			{
 				cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
-				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(
-					cblw->getPullPlan()->getOutermostCasingColor()))
+				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(cblw->getGlassColor()))
 					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
 			}
 
@@ -628,8 +662,7 @@ void MainWindow :: updateLibrary()
 			{
 				cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
-				if (pieceEditorWidget->getPiece()->hasDependencyOn(
-					cblw->getPullPlan()->getOutermostCasingColor()))
+				if (pieceEditorWidget->getPiece()->hasDependencyOn(cblw->getGlassColor()))
 					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
 			}
 

@@ -7,6 +7,7 @@
 #include <vector>
 #include "pickuptemplate.h"
 #include "pullplan.h"
+#include "glasscolor.h"
 
 using std::vector;
 
@@ -27,8 +28,8 @@ class PickupPlan
 		PickupPlan* copy() const;
 
 		vector<SubpickupTemplate> subs;
-		PullPlan* overlayColorBar;
-		PullPlan* underlayColorBar;
+		GlassColor* overlayColorBar;
+		GlassColor* underlayColorBar;
 
 	private:
 		void updateSubs();
@@ -38,6 +39,7 @@ class PickupPlan
                 vector<int> parameterValues;
                 vector<char*> parameterNames;
 		PullPlan* defaultSubplan;
+		GlassColor* defaultGlassColor;
 	
 };
 

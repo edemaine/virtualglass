@@ -20,10 +20,7 @@ using std::vector;
 
 PullPlan :: PullPlan(int templateType) {
 
-	defaultColor = new Color;
-	defaultColor->r = defaultColor->g = defaultColor->b = 1.0;
-	defaultColor->a = 0.0;
-	name = "R-100"; // named after default color 
+	defaultGlassColor = new GlassColor();
 	defaultCircleSubplan = defaultSquareSubplan = NULL;
 
 	this->twist = 0.0;
@@ -31,34 +28,11 @@ PullPlan :: PullPlan(int templateType) {
 	setTemplateType(templateType);
 }
 
-PullPlan* PullPlan :: copy() const {
-
-	PullPlan* c = new PullPlan(this->templateType);
-
-	c->casings = this->casings;
-	c->twist = this->twist;
-
-	assert(c->parameterValues.size() == this->parameterValues.size());
-	c->parameterValues = this->parameterValues;
-	vector<SubpullTemplate> oldSubs = this->subs;
-	c->resetSubs(oldSubs);
-
-	assert(c->subs.size() == this->subs.size());
-	for (unsigned int i = 0; i < this->subs.size(); ++i) {
-		c->subs[i].plan = this->subs[i].plan;
-	}
-
-	c->name = this->name;
-
-	return c;
-}
 
 bool PullPlan :: hasDependencyOn(PullPlan* plan) {
 
 	if (this == plan)
 		return true;
-	if (this->isBase())
-		return false;
 
 	bool childrenAreDependent = false;
 	for (unsigned int i = 0; i < subs.size(); ++i) {
@@ -71,31 +45,22 @@ bool PullPlan :: hasDependencyOn(PullPlan* plan) {
 	return childrenAreDependent;
 }
 
-bool PullPlan :: hasDependencyOn(Color* color) {
+bool PullPlan :: hasDependencyOn(GlassColor* glassColor) {
 
 	for (unsigned int i = 0; i < casings.size(); ++i) {
-		if (this->casings[i].color == color)
+		if (this->casings[i].glassColor == glassColor)
 			return true;
 	} 
-	if (this->isBase())
-		return false;
 
 	bool childrenAreDependent = false;
 	for (unsigned int i = 0; i < subs.size(); ++i) {
-		if (subs[i].plan->hasDependencyOn(color)) {
+		if (subs[i].plan->hasDependencyOn(glassColor)) {
 			childrenAreDependent = true;
 			break;
 		}
 	}
 
 	return childrenAreDependent;
-}
-
-bool PullPlan :: isBase() {
-
-	return (this->templateType == CIRCLE_BASE_PULL_TEMPLATE
-		|| this->templateType == SQUARE_BASE_PULL_TEMPLATE
-		|| this->templateType == AMORPHOUS_BASE_PULL_TEMPLATE);
 }
 
 void PullPlan :: setTemplateType(int templateType) {
@@ -107,35 +72,24 @@ void PullPlan :: setTemplateType(int templateType) {
 
 	// If the pull template has subplans and you
 	// haven't initialized your default subplans yet, do it
-	if (!isBase() && defaultCircleSubplan == NULL) {
+	if (defaultCircleSubplan == NULL && templateType != BASE_CIRCLE_PULL_TEMPLATE && templateType != BASE_SQUARE_PULL_TEMPLATE) {
 		// initialize default subplans
-		defaultCircleSubplan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE);
-		defaultSquareSubplan = new PullPlan(SQUARE_BASE_PULL_TEMPLATE);
+		defaultCircleSubplan = new PullPlan(BASE_CIRCLE_PULL_TEMPLATE);
+		defaultSquareSubplan = new PullPlan(BASE_SQUARE_PULL_TEMPLATE);
 	}
 
 	parameterNames.clear();
 	parameterValues.clear();
 	char* tmp;
 	casings.clear();
-	casings.push_back(Casing(1.0, CIRCLE_SHAPE, defaultColor));
-	if (!isBase()) {
-		casings.push_back(Casing(1.0, CIRCLE_SHAPE, defaultColor));
-		casings[0].thickness = 0.9;
-	}
+	casings.push_back(Casing(1.0, CIRCLE_SHAPE, defaultGlassColor));
+	casings.push_back(Casing(1.0, CIRCLE_SHAPE, defaultGlassColor));
+	casings[0].thickness = 0.9;
 	switch (templateType) {
-		case CIRCLE_BASE_PULL_TEMPLATE:
+		case BASE_CIRCLE_PULL_TEMPLATE:
 			break;
-		case SQUARE_BASE_PULL_TEMPLATE:
-			casings[0].shape = SQUARE_SHAPE;
-			casings[0].thickness = 1 / SQRT_TWO;
-			break;
-		case AMORPHOUS_BASE_PULL_TEMPLATE:
-			casings[0].shape = AMORPHOUS_SHAPE;
-			break;
-		case CASED_CIRCLE_PULL_TEMPLATE:
-			break;
-		case CASED_SQUARE_PULL_TEMPLATE:
-			casings[0].shape = SQUARE_SHAPE;
+		case BASE_SQUARE_PULL_TEMPLATE:
+			casings[0].shape  = SQUARE_SHAPE;
 			casings[0].thickness = 1 / SQRT_TWO;
 			break;
 		case HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE:
@@ -212,43 +166,33 @@ void PullPlan :: setTemplateTypeToCustom()
 	this->parameterValues.clear();
 }
 
-void PullPlan :: setCasingColor(Color* c, unsigned int index) {
+void PullPlan :: setCasingColor(GlassColor* gc, unsigned int index) {
 
 	if (index >= this->casings.size())
 		return;
-	this->casings[index].color = c;
+	this->casings[index].glassColor = gc;
 }
 
-void PullPlan :: setOutermostCasingColor(Color* color) {
+void PullPlan :: setOutermostCasingColor(GlassColor* gc) {
 
-	this->casings[casings.size()-1].color = color;
+	this->casings[casings.size()-1].glassColor = gc;
 }
 
-Color* PullPlan :: getOutermostCasingColor() {
+GlassColor* PullPlan :: getOutermostCasingColor() {
 
-	return this->casings[casings.size()-1].color;
+	return this->casings[casings.size()-1].glassColor;
 }
 
-Color* PullPlan :: getCasingColor(unsigned int index) {
+GlassColor* PullPlan :: getCasingColor(unsigned int index) {
 
 	if (index >= this->casings.size())
 		return NULL;
-	return this->casings[index].color;
+	return this->casings[index].glassColor;
 }
 
 unsigned int PullPlan :: getCasingCount() {
 
 	return this->casings.size();
-}
-
-void PullPlan :: setName(QString _name)
-{
-	this->name = _name;
-}
-
-QString PullPlan :: getName()
-{
-	return this->name;
 }
 
 void PullPlan :: setTwist(float t) {
@@ -334,7 +278,7 @@ void PullPlan :: addCasing(int shape) {
 	}
 
 	// add the new casing
-	casings.push_back(Casing(1.0, shape, defaultColor));
+	casings.push_back(Casing(1.0, shape, defaultGlassColor));
 	if (hasSquareCasing())
 		this->twist = 0.0;
 
@@ -457,8 +401,8 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 	vector<SubpullTemplate> newSubs;
 
 	switch (this->templateType) {
-		case CASED_CIRCLE_PULL_TEMPLATE:
-		case CASED_SQUARE_PULL_TEMPLATE:
+		case BASE_CIRCLE_PULL_TEMPLATE:
+		case BASE_SQUARE_PULL_TEMPLATE:
 			break;
 		case HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE: 
 		{
@@ -619,6 +563,25 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 	subs = newSubs;
 }
 
+PullPlan* PullPlan :: copy() const {
+
+	PullPlan* c = new PullPlan(templateType);
+
+	c->casings = casings;
+	c->twist = twist;
+
+	assert(c->parameterValues.size() == parameterValues.size());
+	c->parameterValues = parameterValues;
+	vector<SubpullTemplate> oldSubs = subs;
+	c->resetSubs(oldSubs);
+
+	assert(c->subs.size() == subs.size());
+	for (unsigned int i = 0; i < subs.size(); ++i) {
+		c->subs[i].plan = subs[i].plan;
+	}
+
+	return c;
+}
 
 PullPlan *deep_copy(const PullPlan *_plan) {
 	unordered_map< const PullPlan *, PullPlan * > copies;

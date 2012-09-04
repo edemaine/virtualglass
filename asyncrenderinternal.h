@@ -1,12 +1,25 @@
 #ifndef ASYNCRENDERINTERNAL_H
 #define ASYNCRENDERINTERNAL_H
 
+#include <QtGlobal>
+
+#if defined(Q_OS_MAC)
+#include "glew.h"
+#else
+#include <GL/glu.h>
+#endif
+
+#include "asyncrenderthread.h"
 #include "asyncrenderwidget.h"
-
+#include "geometry.h"
 #include <QGLWidget>
-
 #include <deque>
 #include <vector>
+#include <qgl.h>
+
+using std::deque;
+using std::vector;
+using std::make_pair;
 
 #ifdef UNORDERED_MAP_WORKAROUND
 #include <tr1/unordered_map>

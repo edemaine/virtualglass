@@ -7,8 +7,10 @@ PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* pa
 	setAcceptDrops(true);
 	setMinimumSize(200, 200);
 	this->plan = plan;
+
+	isDraggingColor = false;
+	isDraggingPlan = false;
 	isDraggingCasing = false;
-	casingHighlighted = false;
 }
 
 
@@ -99,18 +101,9 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 		int type;
 		QPixmap pixmap;
 
-		if (selectedSubplan->isBase())
-		{
-			type = COLOR_BAR_MIME;
-			AsyncColorBarLibraryWidget cblw(selectedSubplan);		
-			pixmap = *(cblw.getDragPixmap());
-		}
-		else
-		{
-			type = PULL_PLAN_MIME;
-			AsyncPullPlanLibraryWidget plplw(selectedSubplan);		
-			pixmap = *(plplw.getDragPixmap());
-		}
+		type = PULL_PLAN_MIME;
+		AsyncPullPlanLibraryWidget plplw(selectedSubplan);		
+		pixmap = *(plplw.getDragPixmap());
 
 	        char buf[500];
 		encodeMimeData(buf, selectedSubplan, type);
@@ -218,15 +211,29 @@ void PullPlanEditorViewWidget :: mouseReleaseEvent(QMouseEvent* /*event*/)
 void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 {
 	event->acceptProposedAction();
-        decodeMimeData(event->mimeData()->text().toAscii().constData(), &draggedPlan, &draggedPlanType);
-	isDraggingPlan = true;
+	void* ptr;
+	int type;
+        decodeMimeData(event->mimeData()->text().toAscii().constData(), &ptr, &type);
+	switch (type)
+	{
+		case COLOR_BAR_MIME:
+			isDraggingColor = true;
+			draggedColor = reinterpret_cast<GlassColor*>(ptr);
+			break;
+		case PULL_PLAN_MIME:
+			isDraggingPlan = true;
+			draggedPlan = reinterpret_cast<PullPlan*>(ptr);
+			break;
+		default:
+			return;
+	}
 }
 
 void PullPlanEditorViewWidget :: dragLeaveEvent(QDragLeaveEvent* /*event*/)
 {
 	subplansHighlighted.clear();
-	casingHighlighted = false;
-	isDraggingPlan = false;
+	casingsHighlighted.clear();
+	isDraggingPlan = isDraggingColor = false;
 }
 
 
@@ -237,26 +244,19 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDropEvent*
 	int y = adjustedY(mouse.y());
 
         subplansHighlighted.clear();
-        casingHighlighted = false;
+        casingsHighlighted.clear();
 
         populateHighlightedSubplans(x, y, event);
         if (subplansHighlighted.size() > 0) 
         {
-                switch (draggedPlanType) 
-                {
-                        case COLOR_BAR_MIME:
-                                draggingColor = *(draggedPlan->getOutermostCasingColor());
-                                break;
-                        default:
-                                draggingColor.r = draggingColor.g = draggingColor.b = draggingColor.a = 1.0;
-                                break;
-                }
+		highlightColor.r = highlightColor.g = highlightColor.b = highlightColor.a = 1.0;
+		return;
         }
-        else
+	populateHighlightedCasings(x, y);
+        if (casingsHighlighted.size() > 0) 
         {
-                populateHighlightedCasings(x, y);
-		if (casingHighlighted)
-			draggingColor = *(draggedPlan->getOutermostCasingColor());
+		highlightColor = *(draggedColor->getColor());
+		return;
         }
 }
 
@@ -276,18 +276,15 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			plan->subs[subplansHighlighted[i]].plan = draggedPlan;
 		}
 	}
-	else if (casingHighlighted)
+	else if (casingsHighlighted.size() > 0)
 	{
 		event->accept();
-		// at this point we have already checked that the dropped plan is a color bar
-		// (that was done in updateHighlightedSubplansAndCasings()). So now we can just
-		// take the color w/o thinking.
-		plan->setCasingColor(draggedPlan->getOutermostCasingColor(), casingHighlightIndex);
+		plan->setCasingColor(draggedColor, casingsHighlighted[0]);
 	}
 
-	isDraggingPlan = false;
+	isDraggingPlan = isDraggingColor = false;
 	subplansHighlighted.clear();
-	casingHighlighted = false;
+	casingsHighlighted.clear();
 	emit someDataChanged();
 }
 
@@ -295,7 +292,7 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, QDrop
 {
 	subplansHighlighted.clear();
 
-	if (!isDraggingPlan || !(draggedPlanType == COLOR_BAR_MIME || draggedPlanType == PULL_PLAN_MIME))
+	if (!isDraggingPlan)
 		return;
 
 	if (draggedPlan->hasDependencyOn(plan)) // don't allow circular DAGs
@@ -315,14 +312,9 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, QDrop
 		if (!hit)
 			continue;
 
-		// If the dropped plan is a complex plan and its casing shape doesn't match the shape of the
-		// subplan, reject
-		if (draggedPlanType == PULL_PLAN_MIME)
+		if (subpull->shape != draggedPlan->getOutermostCasingShape())
 		{
-			if (subpull->shape != draggedPlan->getOutermostCasingShape())
-			{
-				continue;
-			}
+			continue;
 		}
 
 		// If the shift button is down, fill in the entire group
@@ -347,9 +339,7 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, QDrop
 
 void PullPlanEditorViewWidget :: populateHighlightedCasings(int x, int y)
 {
-	casingHighlighted = false;
-
-	if (!isDraggingPlan || draggedPlanType != COLOR_BAR_MIME)
+	if (!isDraggingColor)
 		return; 
 
 	// Deal w/casing
@@ -362,16 +352,14 @@ void PullPlanEditorViewWidget :: populateHighlightedCasings(int x, int y)
 					+ pow(y - (drawSize/2.0 + 10.0), 2.0));
 				if (distanceFromCenter <= drawSize/2 * plan->getCasingThickness(i))
 				{
-					casingHighlighted = true;
-					casingHighlightIndex = i;
+					casingsHighlighted.push_back(i);
 					return;
 				}
 				break;
 			case SQUARE_SHAPE:
 				if (MAX(fabs(x - squareSize/2.0), fabs(y - squareSize/2.0)) < drawSize/2 * plan->getCasingThickness(i))
 				{
-					casingHighlighted = true;
-					casingHighlightIndex = i;
+					casingsHighlighted.push_back(i);
 					return;
 				}
 				break;
@@ -395,12 +383,9 @@ void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, bool oute
 		pen.setColor(Qt::black);
 		painter->setPen(pen);
 	}
-	else
+	else 
 	{
-		QPen pen;
-		pen.setWidth(1);
-		pen.setColor(Qt::black);
-		painter->setPen(pen);
+		painter->setPen(Qt::NoPen);
 	}
 }
 
@@ -434,18 +419,8 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 
         if (highlightThis)
         {
-                painter->setBrush(QColor(255*draggingColor.r, 255*draggingColor.g, 255*draggingColor.b,
-                        255*draggingColor.a));
-                painter->setPen(Qt::NoPen);
-                paintShape(x, y, drawWidth, mandatedShape, painter);
-                return;
-        }
-
-        // If you're a color bar, just fill region with color.
-        if (plan->isBase())
-        {
-                Color* c = plan->getOutermostCasingColor();
-                painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
+                painter->setBrush(QColor(255*highlightColor.r, 255*highlightColor.g, 255*highlightColor.b,
+                        255*highlightColor.a));
                 painter->setPen(Qt::NoPen);
                 paintShape(x, y, drawWidth, mandatedShape, painter);
                 return;
@@ -465,15 +440,16 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
 		
 		// Fill with actual casing color (highlighting white or some other color)
-		if (outermostLevel && casingHighlighted && i == casingHighlightIndex)	
+		if (outermostLevel && casingsHighlighted.size() > 0 && casingsHighlighted[0] == i)
 		{
-			painter->setBrush(QColor(255*draggingColor.r, 255*draggingColor.g, 255*draggingColor.b, 
-				255*draggingColor.a));
+			painter->setBrush(QColor(255*highlightColor.r, 255*highlightColor.g, 255*highlightColor.b, 
+				255*highlightColor.a));
 		}
 		else
 		{
-			painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g, 
-				255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
+			Color* c = plan->getCasingColor(i)->getColor();
+			QColor qc(255*c->r, 255*c->g, 255*c->b, 255*c->a);
+			painter->setBrush(qc);
 		}
 
 		setBoundaryPainter(painter, outermostLevel);

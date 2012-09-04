@@ -1,13 +1,13 @@
 
 #include "glassmime.h"
 
-void encodeMimeData(char* mimeData, PullPlan* plan, int type)
+void encodeMimeData(char* mimeData, void* ptr, int type)
 {
-        sprintf(mimeData, "%p %d", plan, type);
+        sprintf(mimeData, "%p %d", ptr, type);
 }
 
-void decodeMimeData(const char* mimeData, PullPlan** plan, int* type)
+void decodeMimeData(const char* mimeData, void** ptr, int* type)
 {
-	sscanf(mimeData, "%p %d", plan, type);
+	sscanf(mimeData, "%p %d", ptr, type);
 }
 

@@ -25,20 +25,20 @@ bool Piece :: hasDependencyOn(PullPlan* plan)
 }
 
 
-bool Piece :: hasDependencyOn(Color* color)
+bool Piece :: hasDependencyOn(GlassColor* glassColor)
 {
 	bool pickupPlansDependOn = false;
 
 	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
 	{
-		if (pickup->subs[i].plan->hasDependencyOn(color))
+		if (pickup->subs[i].plan->hasDependencyOn(glassColor))
 		{
 			pickupPlansDependOn = true;		
 			break;
 		}
 	}
 	
-	if (pickup->overlayColorBar->hasDependencyOn(color) || pickup->underlayColorBar->hasDependencyOn(color))
+	if (pickup->overlayColorBar == glassColor || pickup->underlayColorBar == glassColor)
 		pickupPlansDependOn = true;
 
 	return pickupPlansDependOn;

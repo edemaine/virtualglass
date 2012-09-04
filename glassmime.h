@@ -3,9 +3,9 @@
 #include "pullplan.h"
 
 
-void encodeMimeData(char* mimeData, PullPlan* plan, int type);
+void encodeMimeData(char* mimeData, void* ptr, int type);
 
-void decodeMimeData(const char* mimeData, PullPlan** plan, int* type);
+void decodeMimeData(const char* mimeData, void** ptr, int* type);
 
 
 

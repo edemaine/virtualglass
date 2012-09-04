@@ -6,13 +6,11 @@ PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget
 	setAcceptDrops(true);
 	setMinimumSize(200, 200);
 	setPullPlan(plan);
-	Color* color = new Color;
-	color->r = color->g = color->b = 1.0;
-	color->a = 1.0;
+	GlassColor* glassColor = new GlassColor();
 	tempCirclePlan = new PullPlan(CUSTOM_CIRCLE_PULL_TEMPLATE);
-	tempCirclePlan->setCasingColor(color, 0);
+	tempCirclePlan->setCasingColor(glassColor, 0);
 	tempSquarePlan = new PullPlan(CUSTOM_SQUARE_PULL_TEMPLATE);
-	tempSquarePlan->setCasingColor(color, 0);
+	tempSquarePlan->setCasingColor(glassColor, 0);
 	mouseStartingLoc.x = FLT_MAX;
 	mouseStartingLoc.y = FLT_MAX;
 	clickedLoc = new QPoint(INT_MAX, INT_MAX);
@@ -539,16 +537,6 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 	painter->setPen(Qt::NoPen);
 	paintShape(x, y, drawWidth, mandatedShape, painter);
 
-	// If it's a base color, fill region with color
-	if (plan->isBase())
-	{
-		Color* c = plan->getCasingColor(0);
-		painter->setBrush(QColor(255*c->r, 255*c->g, 255*c->b, 255*c->a));
-		painter->setPen(Qt::NoPen);
-		paintShape(x, y, drawWidth, mandatedShape, painter);
-		return;
-	}
-
 	// Do casing colors outermost to innermost to get concentric rings of each casing's color
 	// Skip outermost casing (that is done by your parent) and innermost (that is the `invisible'
 	// casing for you to resize your subcanes)
@@ -564,8 +552,9 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 		painter->setPen(Qt::NoPen); // Will draw boundary after all filling is done
 		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
 
-		painter->setBrush(QColor(255*plan->getCasingColor(i)->r, 255*plan->getCasingColor(i)->g,
-			255*plan->getCasingColor(i)->b, 255*plan->getCasingColor(i)->a));
+		Color* casingColor = plan->getCasingColor(i)->getColor();
+		QColor qc(255*casingColor->r, 255*casingColor->g, 255*casingColor->b, 255*casingColor->a);
+		painter->setBrush(qc);
 		setBoundaryPainter(painter, outermostLevel, outermostLevel);
 		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
 	}
@@ -758,7 +747,7 @@ void PullPlanCustomizeViewWidget :: addCirclePressed()
 	{
 		diameter = plan->getCasingThickness(0);
 	}
-	plan->subs.insert(plan->subs.begin(),SubpullTemplate(new PullPlan(CIRCLE_BASE_PULL_TEMPLATE),
+	plan->subs.insert(plan->subs.begin(), SubpullTemplate(new PullPlan(BASE_CIRCLE_PULL_TEMPLATE),
 		CIRCLE_SHAPE, p, diameter, 0));
 	subplansSelected.clear();
 	subplansSelected.push_back(0);
@@ -779,7 +768,7 @@ void PullPlanCustomizeViewWidget :: addSquarePressed()
 	{
 		diameter = plan->getCasingThickness(0);
 	}
-	plan->subs.insert(plan->subs.begin(),SubpullTemplate(new PullPlan(SQUARE_BASE_PULL_TEMPLATE),
+	plan->subs.insert(plan->subs.begin(),SubpullTemplate(new PullPlan(BASE_SQUARE_PULL_TEMPLATE),
 					 SQUARE_SHAPE, p, diameter, 0));
 	subplansSelected.clear();
 	subplansSelected.push_back(0);

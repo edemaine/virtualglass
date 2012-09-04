@@ -10,7 +10,7 @@ class PullPlanLibraryWidget;
 #include <vector>
 #include "pulltemplate.h"
 #include "casing.h"
-#include <QString>
+#include "glasscolor.h"
 
 using std::vector;
 
@@ -25,7 +25,6 @@ class PullPlan
 		void setTemplateType(int pullTemplateType);
 		void setTemplateTypeToCustom();
 		int getTemplateType();
-		bool isBase();
 
 		void setParameter(int param, int newValue);
 		int getParameter(int param);
@@ -34,19 +33,17 @@ class PullPlan
 
 		void setCasingThickness(float t, unsigned int index);
 		void setOutermostCasingShape(int shape);
-		void setCasingColor(Color* c, unsigned int index);
+		void setCasingColor(GlassColor* gc, unsigned int index);
 		void addCasing(int shape);
 		void removeCasing();
 		float getCasingThickness(unsigned int index);
 		int getCasingShape(unsigned int index);
 		int getOutermostCasingShape();
-		void setOutermostCasingColor(Color* color);
-		Color* getOutermostCasingColor();
-		Color* getCasingColor(unsigned int index);
+		void setOutermostCasingColor(GlassColor* gc);
+		GlassColor* getOutermostCasingColor();
+		GlassColor* getCasingColor(unsigned int index);
 		unsigned int getCasingCount(); 
 		bool hasSquareCasing();
-		void setName(QString _name);
-		QString getName();
 
 		void setTwist(float t);
 		float getTwist();
@@ -55,21 +52,20 @@ class PullPlan
 
 		vector<SubpullTemplate> subs;
 
-		bool hasDependencyOn(Color* color);
+		bool hasDependencyOn(GlassColor* color);
 		bool hasDependencyOn(PullPlan* pullPlan);
 
 	private:
 		// Variables
 		PullPlan* defaultCircleSubplan;
 		PullPlan* defaultSquareSubplan;
-		Color* defaultColor;
+		GlassColor* defaultGlassColor;
 
 		int templateType;
 		vector<Casing> casings;
 		float twist;
 		vector<int> parameterValues;
 		vector<char*> parameterNames;
-		QString name;
 
 		// Methods
 		void initializeTemplate();

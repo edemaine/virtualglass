@@ -4,9 +4,9 @@
 
 PickupPlan :: PickupPlan(int templateType) {
 
-	defaultSubplan = new PullPlan(CIRCLE_BASE_PULL_TEMPLATE);
-	overlayColorBar = defaultSubplan;
-	underlayColorBar = defaultSubplan;
+	defaultSubplan = new PullPlan(BASE_CIRCLE_PULL_TEMPLATE);
+	defaultGlassColor = new GlassColor();
+	underlayColorBar = overlayColorBar = defaultGlassColor;
 
 	this->templateType = -1; // to ensure setTemplateType goes through
 	setTemplateType(templateType);

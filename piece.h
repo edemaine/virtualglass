@@ -9,6 +9,7 @@ class PieceLibraryWidget;
 #include <vector>
 #include "piecetemplate.h"
 #include "pickupplan.h"
+#include "glasscolor.h"
 
 class Piece
 {
@@ -20,7 +21,7 @@ class Piece
 
 		Piece* copy() const;
 		PickupPlan* pickup;
-		bool hasDependencyOn(Color* color);
+		bool hasDependencyOn(GlassColor* color);
 		bool hasDependencyOn(PullPlan* pullPlan);
 		
 	//private:

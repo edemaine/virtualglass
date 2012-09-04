@@ -9,15 +9,16 @@
 #include "geometry.h"
 #include "mesh.h"
 #include "purecolorlibrarywidget.h"
+#include "glasscolor.h"
 
 class ColorEditorWidget : public QWidget
 {
 	Q_OBJECT
 
 	public:
-		ColorEditorWidget(PullPlan* bar, QWidget* parent=0);
-		void setColorBar(PullPlan* bar);
-		PullPlan* getColorBar();
+		ColorEditorWidget(GlassColor* _color, QWidget* parent=0);
+		void setGlassColor(GlassColor* _color);
+		GlassColor* getGlassColor();
 		void seedColors();
 
 	signals:
@@ -34,7 +35,7 @@ class ColorEditorWidget : public QWidget
 	private:
 		Geometry geometry;
 		Mesher mesher;
-		PullPlan* colorBar;
+		GlassColor* glassColor;	
 		QComboBox* sourceComboBox;
 		NiceViewWidget* niceViewWidget;
                 QSlider* alphaSlider;

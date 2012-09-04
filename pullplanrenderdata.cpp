@@ -35,16 +35,16 @@ Geometry *PullPlanRenderData::getGeometry() {
 	return geom;
 }
 
-ColorBarRenderData::ColorBarRenderData(PullPlan const *_plan) : PullPlanRenderData(_plan) {
+GlassColorRenderData::GlassColorRenderData(GlassColor const *_glassColor) : glassColor(deep_copy(_glassColor)) {
 }
 
-ColorBarRenderData::~ColorBarRenderData() {
+GlassColorRenderData::~GlassColorRenderData() {
 }
 
-Geometry *ColorBarRenderData::getGeometry() {
+Geometry *GlassColorRenderData::getGeometry() {
 	Geometry *geom = new Geometry();
 	Mesher mesher;
-	mesher.generateColorMesh(plan, geom);
+	mesher.generateColorMesh(glassColor, geom);
 	return geom;
 
 }

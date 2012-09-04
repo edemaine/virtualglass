@@ -1,22 +1,5 @@
-#include "asyncrenderthread.h"
-#include "asyncrenderwidget.h"
+
 #include "asyncrenderinternal.h"
-
-#include "geometry.h"
-#include <qgl.h>
-
-#if defined(Q_OS_MAC)
-#include "glew.h"
-#else
-#include <GL/glu.h>
-#endif
-
-#include <deque>
-#include <vector>
-
-using std::deque;
-using std::vector;
-using std::make_pair;
 
 using namespace AsyncRenderInternal;
 

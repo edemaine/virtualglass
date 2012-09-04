@@ -163,24 +163,36 @@ void PickupPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 
 void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
+	void* droppedObject;
+        GlassColor* droppedColor;
         PullPlan* droppedPlan;
-        int type;
+	int type;
 
-        decodeMimeData(event->mimeData()->text().toAscii().constData(), &droppedPlan, &type);
-        if (type != COLOR_BAR_MIME && type != PULL_PLAN_MIME) 
-                return;  
-	else if (type == COLOR_BAR_MIME)
+        decodeMimeData(event->mimeData()->text().toAscii().constData(), &droppedObject, &type);
+	switch (type)
+	{
+		case COLOR_BAR_MIME:
+			droppedColor = reinterpret_cast<GlassColor*>(droppedObject);
+			break;
+		case PULL_PLAN_MIME:
+			droppedPlan = reinterpret_cast<PullPlan*>(droppedObject);
+			break;
+		default:
+			return;
+	}
+
+	if (type == COLOR_BAR_MIME)
 	{
 		event->accept();
 		if ((QApplication::keyboardModifiers() & Qt::ShiftModifier))
-			pickup->overlayColorBar = droppedPlan;
+			pickup->overlayColorBar = droppedColor;
 		else
-			pickup->underlayColorBar = droppedPlan;
+			pickup->underlayColorBar = droppedColor;
 		emit someDataChanged();
 		return;
 	}
+
 	// otherwise it's a pull plan, and we do some complicated things now
-	
         float x = (adjustedX(event->pos().x()) - squareSize/2) / float(squareSize/2-10);
         float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
 

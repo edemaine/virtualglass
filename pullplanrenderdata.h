@@ -15,12 +15,15 @@ class PullPlanRenderData : public RenderData
 		PullPlan *plan;
 };
 
-class ColorBarRenderData : public PullPlanRenderData
+class GlassColorRenderData : public RenderData
 {
 	public:
-		ColorBarRenderData(PullPlan const *_plan);
-		virtual ~ColorBarRenderData();
+		GlassColorRenderData(GlassColor const *_gc);
+		virtual ~GlassColorRenderData();
 		virtual Geometry *getGeometry();
+	protected:
+		GlassColor* glassColor;
+
 };
 
 

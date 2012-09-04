@@ -1,11 +1,11 @@
 
 #include "coloreditorwidget.h"
 
-ColorEditorWidget :: ColorEditorWidget(PullPlan* _colorBar, QWidget* parent) : QWidget(parent)
+ColorEditorWidget :: ColorEditorWidget(GlassColor* _glassColor, QWidget* parent) : QWidget(parent)
 {
 	niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);
-	colorBar = _colorBar;
-	mesher.generateColorMesh(colorBar, &geometry);
+	glassColor = _glassColor;
+	mesher.generateColorMesh(glassColor, &geometry);
 	niceViewWidget->setGeometry(&geometry);
 
 	setupLayout();
@@ -15,14 +15,14 @@ ColorEditorWidget :: ColorEditorWidget(PullPlan* _colorBar, QWidget* parent) : Q
 }
 
 
-PullPlan* ColorEditorWidget :: getColorBar() {
+GlassColor* ColorEditorWidget :: getGlassColor() {
 
-	return colorBar;
+	return glassColor;
 }
 
-void ColorEditorWidget :: setColorBar(PullPlan* _colorBar) {
+void ColorEditorWidget :: setGlassColor(GlassColor* _gc) {
 
-	colorBar = _colorBar;
+	glassColor = _gc;
 }
 
 
@@ -154,9 +154,9 @@ void ColorEditorWidget :: seedColors()
 
 void ColorEditorWidget :: alphaSliderPositionChanged(int)
 {
-	if (alphaSlider->sliderPosition() != (int) (colorBar->getOutermostCasingColor()->a * 255))
+	if (alphaSlider->sliderPosition() != (int) (glassColor->getColor()->a * 255))
 	{
-		colorBar->getOutermostCasingColor()->a = (255 - alphaSlider->sliderPosition()) / 255.0;
+		glassColor->getColor()->a = (255 - alphaSlider->sliderPosition()) / 255.0;
 		emit someDataChanged();
 	} 
 }
@@ -166,9 +166,10 @@ void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 	PureColorLibraryWidget* pclw = dynamic_cast<PureColorLibraryWidget*>(childAt(event->pos()));
 	if (pclw != NULL)
 	{
-		*(colorBar->getOutermostCasingColor()) = pclw->getColor();
-		colorBar->setName(pclw->getColorName().split(' ')[0]);
-		this->alphaSlider->setSliderPosition(255 - int(colorBar->getOutermostCasingColor()->a * 255));
+ 		Color widgetColor = pclw->getColor();
+		glassColor->setColor(pclw->getColor());
+		glassColor->setName(pclw->getColorName().split(' ')[0]);
+		this->alphaSlider->setSliderPosition(255 - int(glassColor->getColor()->a * 255));
 		emit someDataChanged();	
 	}
 }
@@ -176,40 +177,26 @@ void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 void ColorEditorWidget :: updateEverything()
 {
 	geometry.clear();
-	mesher.generateColorMesh(colorBar, &geometry);
+	mesher.generateColorMesh(glassColor, &geometry);
 	niceViewWidget->repaint();
 
-	this->alphaSlider->setSliderPosition(255 - (int) (colorBar->getOutermostCasingColor()->a * 255));
+	this->alphaSlider->setSliderPosition(255 - (int) (glassColor->getColor()->a * 255));
 
 	QLayoutItem* w;
 	PureColorLibraryWidget* pclw;
-	Color* pColor;
-	bool sourceIsOk = false;
-	int aSource = -1;
 	for (unsigned int i = colorLibraryLayouts.size() - 1; i <= colorLibraryLayouts.size(); --i)
 	{
 		for (int j = 0; j < colorLibraryLayouts[i]->count(); ++j)
 		{
+			// this generically checks that the RGBa values are the same, 
+			// but we could do something fancier, checking that the names match
 			w = colorLibraryLayouts[i]->itemAt(j);
 			pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-			pColor = colorBar->getOutermostCasingColor();
-			if (pclw->getColor().r == pColor->r &&
-				pclw->getColor().g == pColor->g &&
-				pclw->getColor().b == pColor->b)
-			{
+			if (glassColor->getName() == pclw->getColorName().split(' ')[0])
 				pclw->setSelected(true);
-				if (sourceComboBox->currentIndex() == int(i))
-					sourceIsOk = true;
-				aSource = i;
-			}
 			else
 				pclw->setSelected(false);
 		}
-	}
-
-	if (!sourceIsOk)
-	{
-		sourceComboBox->setCurrentIndex(aSource);
 	}
 }
 

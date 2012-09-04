@@ -71,6 +71,7 @@ HEADERS += primitives.h constants.h Vector.hpp \
 	asyncpiecelibrarywidget.h \
 	pullplancustomizeviewwidget.h \
 	glassmime.h \
+	glasscolor.h \
 
 HEADERS += yaml-cpp/include/yaml-cpp/yaml.h \
 	yaml-cpp/include/yaml-cpp/traits.h \
@@ -144,6 +145,7 @@ SOURCES += main.cpp \
 	asynccolorbarlibrarywidget.cpp \
 	asyncpiecelibrarywidget.cpp \
 	glassmime.cpp \
+	glasscolor.cpp \
 
 SOURCES += yaml-cpp/src/tag.cpp \
 	yaml-cpp/src/stream.cpp \
