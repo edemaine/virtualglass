@@ -3,11 +3,7 @@
 
 #include <QtGlobal>
 
-#if defined(Q_OS_MAC)
 #include "glew.h"
-#else
-#include <GL/glu.h>
-#endif
 
 #include "asyncrenderthread.h"
 #include "asyncrenderwidget.h"

@@ -3,6 +3,9 @@
 
 #include "Vector.hpp"
 
+#ifdef _WIN32
+#  include <windows.h>
+#endif
 #include <QtGui>
 
 class Geometry;

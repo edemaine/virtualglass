@@ -166,7 +166,6 @@ void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 	PureColorLibraryWidget* pclw = dynamic_cast<PureColorLibraryWidget*>(childAt(event->pos()));
 	if (pclw != NULL)
 	{
- 		Color widgetColor = pclw->getColor();
 		glassColor->setColor(pclw->getColor());
 		glassColor->setName(pclw->getColorName().split(' ')[0]);
 		this->alphaSlider->setSliderPosition(255 - int(glassColor->getColor()->a * 255));
