@@ -12,8 +12,7 @@
 #include "piece.h"
 #include "glasscolor.h"
 
-#define TOTAL_ANGULAR_RESOLUTION 800
-#define TOTAL_AXIAL_RESOLUTION 3500
+#define TOTAL_AXIAL_RESOLUTION 6000
 
 class Mesher
 {
@@ -45,11 +44,9 @@ class Mesher
 			bool ensureVisible, uint32_t group_tag);
 		void meshPickupCasingSlab(Geometry* geometry, Color* color, float y, float thickness);
 		void applyResizeTransform(Vertex* v, float scale);
-		void applyMoveAndResizeTransform(Vertex* v, PullPlan* parentPlan, int subplan);
+		void applySubplanTransform(Vertex* v, PullPlan* parentPlan, int subplan);
+		void applySubplanTransform(Geometry* geometry, PullPlan* parentPlan, int subplan);
 		void applyCasingResizeTransform(Vertex* v, PullPlan* parentPlan);
-		void applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentPlan, int subplan);
-		void applyTwistTransform(Vertex* v, PullPlan* p);
-		void applyTwistTransform(Geometry* geometry, PullPlan* p);
 		Vertex applyTransforms(Vertex p, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices);
 		void applyPickupTransform(Vertex* p, SubpickupTemplate* spt);
 		void applyVaseTransform(Vertex* p, vector<int>* parameterValues);

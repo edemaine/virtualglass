@@ -361,9 +361,9 @@ void PullPlanCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 	}
 
 	mouseStartingLoc.x=(adjustedX(event->pos().x()));
-    mouseStartingLoc.y=(adjustedY(event->pos().y()));
+	mouseStartingLoc.y=(adjustedY(event->pos().y()));
 	boundActiveBox();
-    updateIndexes(event->pos());
+	updateIndexes(event->pos());
 	this->update();
 }
 
@@ -371,30 +371,30 @@ void PullPlanCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent* event)
 {
 	if (!clickMoved)
 	{
-        if (event->modifiers() != Qt::ControlModifier && event->modifiers() != Qt::ShiftModifier)
-        {
-            subplansSelected.clear();
-            if (hoveringIndex != -1)
-            {
-                subplansSelected.push_back((unsigned int)hoveringIndex);
-                activeBoxIndex = hoveringIndex;
-            }
-        }
-        else
-        {
-            for (unsigned int i = 0; i < subplansSelected.size(); i++)
-            {
-                if (hoveringIndex == int(subplansSelected.at(i)))
-                {
-                    subplansSelected.erase(subplansSelected.begin()+i);
-                    break;
-                }
-            }
-        }
+		if (event->modifiers() != Qt::ControlModifier && event->modifiers() != Qt::ShiftModifier)
+		{
+			subplansSelected.clear();
+			if (hoveringIndex != -1)
+			{
+				subplansSelected.push_back((unsigned int)hoveringIndex);
+				activeBoxIndex = hoveringIndex;
+			}
+		}
+		else
+		{
+			for (unsigned int i = 0; i < subplansSelected.size(); i++)
+			{
+				if (hoveringIndex == int(subplansSelected.at(i)))
+				{
+					subplansSelected.erase(subplansSelected.begin()+i);
+					break;
+				}
+			}
+        	}
 	}
 	
-	mouseStartingLoc.x=(adjustedX(event->pos().x()));
-	mouseStartingLoc.y=(adjustedY(event->pos().y()));
+	mouseStartingLoc.x = (adjustedX(event->pos().x()));
+	mouseStartingLoc.y = (adjustedY(event->pos().y()));
 	emit someDataChanged();
 	boundActiveBox();
 	updateIndexes(event->pos());
@@ -496,19 +496,20 @@ void PullPlanCustomizeViewWidget :: boundActiveBox()
 
 void PullPlanCustomizeViewWidget :: setBoundaryPainter(QPainter* painter, bool outermostLevel, bool greyedOut = false) {
 
-	QPen pen;
 
 	if (outermostLevel)
+	{
+		QPen pen;
 		pen.setWidth(3);
+		if (greyedOut)
+		    pen.setColor(Qt::gray);
+		else
+		    pen.setColor(Qt::black);
+		painter->setPen(pen);
+	}
 	else
-		pen.setWidth(1);
+		painter->setPen(Qt::NoPen);
 
-	if (greyedOut)
-	    pen.setColor(Qt::gray);
-	else
-	    pen.setColor(Qt::black);
-	
-	painter->setPen(pen);
 }
 
 void PullPlanCustomizeViewWidget :: paintShape(float x, float y, float size, int shape, QPainter* painter)

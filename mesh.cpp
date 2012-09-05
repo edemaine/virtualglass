@@ -48,11 +48,11 @@ float Mesher :: computeTotalCaneLength(PullPlan* plan)
 	return total;	
 }
 
-void Mesher :: applyMoveAndResizeTransform(Geometry* geometry, PullPlan* parentPlan, int subplan)
+void Mesher :: applySubplanTransform(Geometry* geometry, PullPlan* parentPlan, int subplan)
 {
 	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
 	{
-		applyMoveAndResizeTransform(&(geometry->vertices[v]), parentPlan, subplan);
+		applySubplanTransform(&(geometry->vertices[v]), parentPlan, subplan);
 	}
 }
 
@@ -63,7 +63,8 @@ void Mesher :: applyResizeTransform(Vertex* v, float scale)
 	v->position.y *= scale; 
 }
 
-void Mesher :: applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int subplan)
+// Does move, resize, and twist
+void Mesher :: applySubplanTransform(Vertex* v, PullPlan* parentNode, int subplan)
 {
 	SubpullTemplate* subTemp = &(parentNode->subs[subplan]);
 	Point locationInParent = subTemp->location;
@@ -76,27 +77,13 @@ void Mesher :: applyMoveAndResizeTransform(Vertex* v, PullPlan* parentNode, int 
 	// Adjust to location in parent
 	v->position.x += locationInParent.x;
 	v->position.y += locationInParent.y;
-}
 
-void Mesher :: applyTwistTransform(Geometry* geometry, PullPlan* transformNode)
-{
-	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
-	{
-		applyTwistTransform(&(geometry->vertices[v]), transformNode);
-	}
-}
-
-void Mesher :: applyTwistTransform(Vertex* v, PullPlan* transformNode)
-{
-	float twist = transformNode->getTwist();
-
-	// Apply twist
-	float preTheta = atan2(v->position.y, v->position.x);
-	float r = length(v->position.xy);
-	float transformTheta = twist / 10.0 * v->position.z;
-	float postTheta = preTheta + transformTheta;
-	v->position.x = r * cos(postTheta);
-	v->position.y = r * sin(postTheta);
+	// Adjust location in parent for twist
+	float r = sqrt(locationInParent.x * locationInParent.x + locationInParent.y * locationInParent.y);
+	float preTheta = atan2(locationInParent.y, locationInParent.x); 
+	float postTheta = parentNode->getTwist() / 10.0 * v->position.z + preTheta;
+	v->position.x += (r * cos(postTheta) - r * cos(preTheta));
+	v->position.y += (r * sin(postTheta) - r * sin(preTheta));
 }
 
 void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
@@ -255,8 +242,7 @@ Vertex Mesher :: applyTransforms(Vertex v, vector<PullPlan*>* ancestors, vector<
 {
 	for (int i = ancestors->size() - 2; i >= 0; --i)
 	{
-		applyMoveAndResizeTransform(&v, (*ancestors)[i], (*ancestorIndices)[i]);
-		applyTwistTransform(&v,(*ancestors)[i]);
+		applySubplanTransform(&v, (*ancestors)[i], (*ancestorIndices)[i]);
 	}
 	return v;
 }
@@ -406,8 +392,8 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 	if (color->a < 0.0001 && !ensureVisible)
 		return;
 
-	unsigned int angularResolution = MIN(MAX(TOTAL_ANGULAR_RESOLUTION / totalCaneLength, 10), 25);
-	unsigned int axialResolution = MIN(MAX(TOTAL_AXIAL_RESOLUTION / totalCaneLength * length, 10), 100);
+	unsigned int angularResolution = 6; 
+	unsigned int axialResolution = MIN(MAX(TOTAL_AXIAL_RESOLUTION / totalCaneLength * length, 20), 100);
 	
 	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
