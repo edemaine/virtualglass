@@ -183,10 +183,6 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 	if (event->buttons() == Qt::NoButton)
 	{
 		updateIndexes(event->pos());
-	}
-
-	if (event->buttons() == Qt::NoButton)
-	{
 		emit someDataChanged();
 		this->update();
 		return;
@@ -331,7 +327,7 @@ void PullPlanCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 	}
 
 	if (mode == MOVE_MODE)
-    {
+	{
 		bool isIn = false;
 		for (unsigned int i = 0; i < subplansSelected.size(); i++)
 		{
@@ -342,22 +338,22 @@ void PullPlanCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 			}
 		}
 		if (!isIn && hoveringIndex != -1)
-        {
-            if (event->modifiers() != Qt::ControlModifier && event->modifiers() != Qt::ShiftModifier)
-            {
-                subplansSelected.clear();
-            }
-            else
-            {
-                clickMoved = true;
-            }
-            subplansSelected.push_back((unsigned int)hoveringIndex);
+        	{
+			if (event->modifiers() != Qt::ControlModifier && event->modifiers() != Qt::ShiftModifier)
+			{
+				subplansSelected.clear();
+			}
+			else
+			{
+				clickMoved = true;
+			}
+			subplansSelected.push_back((unsigned int)hoveringIndex);
 			activeBoxIndex = hoveringIndex;
 		}
-        if (activeBoxIndex == -1)
-        {
-            subplansSelected.clear();
-        }
+		if (activeBoxIndex == -1)
+		{
+			subplansSelected.clear();
+		}
 	}
 
 	mouseStartingLoc.x=(adjustedX(event->pos().x()));
@@ -495,7 +491,6 @@ void PullPlanCustomizeViewWidget :: boundActiveBox()
 }
 
 void PullPlanCustomizeViewWidget :: setBoundaryPainter(QPainter* painter, bool outermostLevel, bool greyedOut = false) {
-
 
 	if (outermostLevel)
 	{

@@ -1,0 +1,18 @@
+
+***** Revision r732 *****
+
+-Fill rules have been reimplemented with a simple interface:
+drag and drop to fill one subcane, hold shift while dragging to fill all.
+
+-Overlay and underlay colors in the pickup editor are now only displayed 
+within the visualization: drag a color object onto the pickup to color
+the underlay, hold shift while dragging to color the casing. 
+
+-Resizing of subcanes in the cane editor is now done via a visible 
+innermost casing that can be dragged and filled like any other casing.
+The resizing also works with custom cane layouts.
+
+-Various bug fixes in the custom cane editor and casing/underlay colors in
+the pickup editor. 
+
+
