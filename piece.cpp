@@ -38,7 +38,7 @@ bool Piece :: hasDependencyOn(GlassColor* glassColor)
 		}
 	}
 	
-	if (pickup->overlayColorBar == glassColor || pickup->underlayColorBar == glassColor)
+	if (pickup->overlayGlassColor == glassColor || pickup->underlayGlassColor == glassColor)
 		pickupPlansDependOn = true;
 
 	return pickupPlansDependOn;

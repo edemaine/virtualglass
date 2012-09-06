@@ -6,7 +6,7 @@ PickupPlan :: PickupPlan(int templateType) {
 
 	defaultSubplan = new PullPlan(BASE_CIRCLE_PULL_TEMPLATE);
 	defaultGlassColor = new GlassColor();
-	underlayColorBar = overlayColorBar = defaultGlassColor;
+	casingGlassColor = underlayGlassColor = overlayGlassColor = defaultGlassColor;
 
 	this->templateType = -1; // to ensure setTemplateType goes through
 	setTemplateType(templateType);
@@ -27,9 +27,8 @@ PickupPlan* PickupPlan :: copy() const {
 		c->subs[i].plan = this->subs[i].plan;
 	}
 
-
-	c->overlayColorBar = this->overlayColorBar;
-	c->underlayColorBar = this->underlayColorBar;
+	c->overlayGlassColor = this->overlayGlassColor;
+	c->underlayGlassColor = this->underlayGlassColor;
 
 	return c;
 }

@@ -185,9 +185,9 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	{
 		event->accept();
 		if ((event->keyboardModifiers() & Qt::ShiftModifier))
-			pickup->overlayColorBar = droppedColor;
+			pickup->overlayGlassColor = droppedColor;
 		else
-			pickup->underlayColorBar = droppedColor;
+			pickup->underlayGlassColor = droppedColor;
 		emit someDataChanged();
 		return;
 	}

@@ -28,8 +28,9 @@ class PickupPlan
 		PickupPlan* copy() const;
 
 		vector<SubpickupTemplate> subs;
-		GlassColor* overlayColorBar;
-		GlassColor* underlayColorBar;
+		GlassColor* overlayGlassColor;
+		GlassColor* underlayGlassColor;
+		GlassColor* casingGlassColor;
 
 	private:
 		void updateSubs();

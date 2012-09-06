@@ -636,9 +636,12 @@ void Mesher :: generateMesh(PickupPlan* pickup, Geometry *geometry, bool ensureC
 			}
 		}
 	}
-	meshPickupCasingSlab(geometry, pickup->overlayColorBar->getColor(), 0.0, pickup->subs[0].width*2.5 + 0.01);
-	if (pickup->underlayColorBar->getColor()->a > 0.001) 
-		meshPickupCasingSlab(geometry, pickup->underlayColorBar->getColor(), pickup->subs[0].width*2.5 + 0.01 + 0.06, 0.05);
+
+	meshPickupCasingSlab(geometry, pickup->casingGlassColor->getColor(), 0.0, pickup->subs[0].width*2.5 + 0.01);
+	if (pickup->underlayGlassColor->getColor()->a > 0.001) 
+		meshPickupCasingSlab(geometry, pickup->underlayGlassColor->getColor(), pickup->subs[0].width*2.5 + 0.01 + 0.06, 0.05);
+	if (pickup->overlayGlassColor->getColor()->a > 0.001) 
+		meshPickupCasingSlab(geometry, pickup->overlayGlassColor->getColor(), -(pickup->subs[0].width*2.5 + 0.01 + 0.06), 0.05);
 }
 
 
