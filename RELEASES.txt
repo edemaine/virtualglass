@@ -1,57 +1,40 @@
 
 ***** Revision r732 *****
 
--Fill rules have been reimplemented with a simple interface:
-drag and drop to fill one subcane, hold shift while dragging to fill all.
+-Fill rules have been reimplemented with a simple interface: drag and drop to fill one subcane, hold shift while dragging to fill all.
 
--Overlay and underlay colors in the pickup editor are now only displayed 
-within the visualization: drag a color object onto the pickup to color
-the underlay, hold shift while dragging to color the casing. 
+-Overlay and underlay colors in the pickup editor are now only displayed within the visualization: drag a color object onto the pickup to color the underlay, hold shift while dragging to color the casing. 
 
--Resizing of subcanes in the cane editor is now done via a visible 
-innermost casing that can be dragged and filled like any other casing.
-The resizing also works with custom cane layouts.
+-Resizing of subcanes in the cane editor is now done via a visible innermost casing that can be dragged and filled like any other casing. The resizing also works with custom cane layouts.
 
--Various bug fixes in the custom cane editor and casing/underlay colors in
-the pickup editor. 
+-Various bug fixes in the custom cane editor and casing/underlay colors in the pickup editor. 
+
 
 ***** Revision r723 *****
 
--Cane layout customization is here! The cane editor now
-has two modes: Standard and Customize. The Customize mode
-allows for freeform placement and resizing of subcanes and
-addition of new subcanes to allow totally custom cane layouts.
+-Cane layout customization is here! The cane editor now has two modes: Standard and Customize. The Customize mode allows for freeform placement and resizing of subcanes and addition of new subcanes to allow totally custom cane layouts.
 
--An entirely murrine pickup layout has been added, and the 
-rendering of murrine cane has been improved.
+-An entirely murrine pickup layout has been added, and the rendering of murrine cane has been improved.
 
+-Subcanes in the cane and pickup editors can now be dragged to other subcane locations, just like library objects.
 
--Subcanes in the cane and pickup editors can now be dragged to other subcane
-locations, just like library objects.
+-Automatic updating of library icons has been added. Upon modifying a color or cane, all objects using it immediately have their library and drag icons updated.
 
--Automatic updating of library icons has been added. 
-Upon modifying a color or cane, all objects using it 
-immediately have their library and drag icons updated.
+-Various bug fixes related to cane casing drag-resizing and rendering in cane editor.
 
--Various bug fixes related to cane casing drag-resizing and 
-rendering in cane editor.
 
 ***** Revision r694 *****
 
--Canes can now be twisted in both directions: 
-clockwise and counterclockwise.
+-Canes can now be twisted in both directions: clockwise and counterclockwise.
 
--Fixed various bugs in the cane editor and drag icons
-for library objects.
+-Fixed various bugs in the cane editor and drag icons for library objects.
 
 
 ***** Revision r690 *****
 
--The application window is now completely resizable
-to accomodate screen resolutions large and small, wide and narrow.
+-The application window is now completely resizable to accomodate screen resolutions large and small, wide and narrow.
 
--Fill rules have been reduced to `Single', `Group', and `All'.
-The rules `Every other' and `Every third' have been removed.
+-Fill rules have been reduced to `Single', `Group', and `All'. The rules `Every other' and `Every third' have been removed.
 
 
 ***** Revision r680 *****
