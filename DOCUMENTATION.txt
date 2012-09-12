@@ -1,0 +1,26 @@
+
+||||||||| Software documentation for the VirtualGlass source code |||||||||
+
+*** Regarding the overall representation of real glass-related objects in the system (canes, color, pieces, etc.):
+
+For the glass-related types, there are four primary types:
+
+-GlassColor
+-PullPlan
+-PickupPlan
+-Piece
+
+They each live in the lower-case .cpp and .h files named after them (e.g. glasscolor.cpp and glasscolor.h).
+
+GlassColor corresponds physically to a bulk quantity of a particular type of colored glass, similar to how a painter might order a big tube of a certain color paint. Each instance contains just a couple of instance variables corresponding to the color (including transparency) and name of the color.
+
+PullPlan corresponds to a cane; a long thin piece of glass used as a building block in making glass art. Each instance is a specification or blueprint for a cane. Real-life cane consists of a number of smaller pieces of cane (i.e. subcanes) bundled together and then coated several times in casing glass, either clear or colored. 
+
+As such, a PullPlan object contains information about 1. the size and geometric layout of the subcanes bundled together (the ``vector<SubpullTemplate> subs;'' instance variable) and 2. the number, individual thickness, and color of the casings (the ``vector<Casing> casings;'' instance variable). There is also a number of premade subcane layouts called pull templates (see pulltemplate.h and the ``int templateType;'' instance variable) that have preprogrammed subcane locations and sizes. For flexibility, these templates have parameters (the ``vector<int> parameterValues;'' and ``vector<char*> parameterNames;'' instance variables). For instance, the HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE template type has a parameter specifying the number of subcanes placed horizontally next to each other.
+
+PickupPlan corresponds to a slab of canes arranged and melted together to form a single sheet of patterned glass. The PickupPlan object shares much in common with the PullPlan object in that it has subplans (``vector<SubpickupTemplate> subs;''), templates (``int templateType''), and parameters for the templates (``vector<int> parameterValues'', ``vector<char*> parameterNames''). In place of unlimited casings, it has just three (``GlassColor* overlayGlassColor'', ``GlassColor* underlayGlassColor'', ``GlassColor* casingGlassColor''). These correspond to coating the top, bottom, and interior of the slab with melted glass.
+
+The library on the left of the graphical user interface (GUI) that you see when VirtualGlass is running contains graphical objects that correspond to GlassColor, PullPlan, and Piece objects (but no PickupPlan objects). The reason is that a piece is just a pickup that has been manipulated into a 3D form by blowing, stretching, and pinching with metal tools. Each Piece object contains a PickupPlan object and a template (see piecetemplate.h) specifying the 3D form that the pickup is transformed into. As with PullPlan and PickupPlan, Piece templates also have parameters that allow a user to tweak a piece template somewhat (stretching or pinching certain parts of the piece, for instance).
+
+
+
