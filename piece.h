@@ -3,8 +3,6 @@
 #ifndef PIECE_H
 #define PIECE_H
 
-class PieceLibraryWidget;
-
 #include <stdlib.h>
 #include <vector>
 #include "piecetemplate.h"

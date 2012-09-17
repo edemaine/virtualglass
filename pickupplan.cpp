@@ -4,7 +4,7 @@
 
 PickupPlan :: PickupPlan(int templateType) {
 
-	defaultSubplan = new PullPlan(BASE_CIRCLE_PULL_TEMPLATE);
+	defaultSubplan = new PullPlan(PullTemplate::baseCircle);
 	defaultGlassColor = new GlassColor();
 	casingGlassColor = underlayGlassColor = overlayGlassColor = defaultGlassColor;
 

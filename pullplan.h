@@ -3,11 +3,10 @@
 #ifndef PULLPLAN_H
 #define PULLPLAN_H
 
-class PullPlanLibraryWidget;
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
+#include "subpulltemplate.h"
 #include "pulltemplate.h"
 #include "casing.h"
 #include "glasscolor.h"
@@ -20,9 +19,9 @@ class SubpullTemplate;
 class PullPlan
 {
 	public:
-		PullPlan(int pullTemplate);
+		PullPlan(enum PullTemplate::Type pullTemplate);
 
-		void setTemplateType(int pullTemplateType);
+		void setTemplateType(enum PullTemplate::Type pullTemplate, bool force=false);
 		void setTemplateTypeToCustom();
 		int getTemplateType();
 
@@ -61,7 +60,7 @@ class PullPlan
 		PullPlan* defaultSquareSubplan;
 		GlassColor* defaultGlassColor;
 
-		int templateType;
+		enum PullTemplate::Type templateType;
 		vector<Casing> casings;
 		float twist;
 		vector<int> parameterValues;

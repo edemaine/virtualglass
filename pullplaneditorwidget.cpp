@@ -3,7 +3,7 @@
 
 PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 {
-	plan = new PullPlan(BASE_CIRCLE_PULL_TEMPLATE);
+	plan = new PullPlan(PullTemplate::baseCircle);
 
 	viewWidget = new PullPlanEditorViewWidget(plan, this);	
 	customizeViewWidget = new PullPlanCustomizeViewWidget(plan, this);
@@ -60,7 +60,8 @@ void PullPlanEditorWidget :: updateEverything()
 	// Highlight correct pull template
 	for (int i = 0; i < templateLibraryLayout->count(); ++i)
 	{
-		if (i + FIRST_PULL_TEMPLATE == plan->getTemplateType())
+		// assuming baseCircle is the first PullTemplate enum value...
+		if (i + PullTemplate::baseCircle == plan->getTemplateType())
 			highlightLibraryWidget(dynamic_cast<PullTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(templateLibraryLayout->itemAt(i))->widget()));
 		else
@@ -358,16 +359,16 @@ void PullPlanEditorWidget :: twistSpinChanged(int)
 	emit someDataChanged();
 }
 
-
-
 void PullPlanEditorWidget :: seedTemplates()
 {
 	char filename[100];
-	for (int i = FIRST_PULL_TEMPLATE; i <= LAST_PULL_TEMPLATE; ++i)
+	// assuming baseCircle and surroundingSquare are the 
+	// first and last standard templates that should be seeded
+	for (int i = PullTemplate::baseCircle; i <= PullTemplate::surroundingSquare; ++i)
 	{
-		sprintf(filename, ":/images/pulltemplate%d.png", i - FIRST_PULL_TEMPLATE + 1);
+		sprintf(filename, ":/images/pulltemplate%d.png", i - PullTemplate::baseCircle + 1);
 		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
-			QPixmap::fromImage(QImage(filename)), i);
+			QPixmap::fromImage(QImage(filename)), static_cast<PullTemplate::Type>(i));
 		templateLibraryLayout->addWidget(ptlw);
 	}
 }

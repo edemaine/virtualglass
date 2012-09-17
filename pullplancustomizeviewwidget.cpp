@@ -7,9 +7,9 @@ PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget
 	setMinimumSize(200, 200);
 	setPullPlan(plan);
 	GlassColor* glassColor = new GlassColor();
-	tempCirclePlan = new PullPlan(CUSTOM_CIRCLE_PULL_TEMPLATE);
+	tempCirclePlan = new PullPlan(PullTemplate::customCircle);
 	tempCirclePlan->setCasingColor(glassColor, 0);
-	tempSquarePlan = new PullPlan(CUSTOM_SQUARE_PULL_TEMPLATE);
+	tempSquarePlan = new PullPlan(PullTemplate::customSquare);
 	tempSquarePlan->setCasingColor(glassColor, 0);
 	mouseStartingLoc.x = FLT_MAX;
 	mouseStartingLoc.y = FLT_MAX;
@@ -428,13 +428,14 @@ void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
 	this->plan = plan;
 	if (this->isVisible())
 	{
-        if (this->plan->getTemplateType() != CUSTOM_CIRCLE_PULL_TEMPLATE && this->plan->getTemplateType() != CUSTOM_SQUARE_PULL_TEMPLATE)
-        {
-            subplansSelected.clear();
-            activeControlPoint = -1;
-            hoveringIndex = -1;
-            activeBoxIndex = -1;
-        }
+		if (this->plan->getTemplateType() != PullTemplate::customCircle 
+			&& this->plan->getTemplateType() != PullTemplate::customSquare)
+		{
+			subplansSelected.clear();
+			activeControlPoint = -1;
+			hoveringIndex = -1;
+			activeBoxIndex = -1;
+		}
 		this->plan->setTemplateTypeToCustom();
 	}
 	else
@@ -443,22 +444,22 @@ void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
 		activeControlPoint = -1;
 		hoveringIndex = -1;
 		activeBoxIndex = -1;
-    }
-    for (unsigned int i = 0; i < subplansSelected.size(); i++)
-    {
-        if (subplansSelected[i] >= this->plan->subs.size())
-        {
-            subplansSelected.clear();
-            activeControlPoint = -1;
-            hoveringIndex = -1;
-            activeBoxIndex = -1;
-            break;
-        }
-    }
+	}
+	for (unsigned int i = 0; i < subplansSelected.size(); i++)
+	{
+		if (subplansSelected[i] >= this->plan->subs.size())
+		{
+			subplansSelected.clear();
+			activeControlPoint = -1;
+			hoveringIndex = -1;
+			activeBoxIndex = -1;
+			break;
+		}
+	}
 	mouseStartingLoc.x = FLT_MAX;
 	mouseStartingLoc.y = FLT_MAX;
-    boundActiveBox();
-    this->repaint();
+	boundActiveBox();
+	this->repaint();
 }
 
 bool PullPlanCustomizeViewWidget :: isValidMovePosition(QMouseEvent*)
@@ -743,7 +744,7 @@ void PullPlanCustomizeViewWidget :: addCirclePressed()
 	{
 		diameter = plan->getCasingThickness(0);
 	}
-	plan->subs.insert(plan->subs.begin(), SubpullTemplate(new PullPlan(BASE_CIRCLE_PULL_TEMPLATE),
+	plan->subs.insert(plan->subs.begin(), SubpullTemplate(new PullPlan(PullTemplate::baseCircle),
 		CIRCLE_SHAPE, p, diameter, 0));
 	subplansSelected.clear();
 	subplansSelected.push_back(0);
@@ -764,8 +765,8 @@ void PullPlanCustomizeViewWidget :: addSquarePressed()
 	{
 		diameter = plan->getCasingThickness(0);
 	}
-	plan->subs.insert(plan->subs.begin(),SubpullTemplate(new PullPlan(BASE_SQUARE_PULL_TEMPLATE),
-					 SQUARE_SHAPE, p, diameter, 0));
+	plan->subs.insert(plan->subs.begin(),SubpullTemplate(new PullPlan(PullTemplate::baseSquare),
+		SQUARE_SHAPE, p, diameter, 0));
 	subplansSelected.clear();
 	subplansSelected.push_back(0);
 	emit someDataChanged();

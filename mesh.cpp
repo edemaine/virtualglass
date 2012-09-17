@@ -680,7 +680,7 @@ void Mesher :: generatePullMesh(PullPlan* plan, Geometry* geometry)
 
 void Mesher :: generateColorMesh(GlassColor* gc, Geometry* geometry)
 {
-	PullPlan dummyPlan(BASE_CIRCLE_PULL_TEMPLATE);
+	PullPlan dummyPlan(PullTemplate::baseCircle);
 	dummyPlan.setOutermostCasingColor(gc);
 	totalCaneLength = computeTotalCaneLength(&dummyPlan);
 	vector<PullPlan*> ancestors;

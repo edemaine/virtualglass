@@ -2,34 +2,43 @@
 #ifndef PULLTEMPLATE_H
 #define PULLTEMPLATE_H
 
-#include <vector>
-#include "primitives.h"
-#include "subpulltemplate.h"
-#include "constants.h"
-
 // Pull template types
-#define BASE_CIRCLE_PULL_TEMPLATE 4
-#define BASE_SQUARE_PULL_TEMPLATE 5
-#define HORIZONTAL_LINE_CIRCLE_PULL_TEMPLATE 6
-#define HORIZONTAL_LINE_SQUARE_PULL_TEMPLATE 7
-#define TRIPOD_PULL_TEMPLATE 8
-#define CROSS_PULL_TEMPLATE 9
-#define SQUARE_OF_CIRCLES_PULL_TEMPLATE 10
-#define SQUARE_OF_SQUARES_PULL_TEMPLATE 11
-#define SURROUNDING_CIRCLE_PULL_TEMPLATE 12
-#define SURROUNDING_SQUARE_PULL_TEMPLATE 13
+namespace PullTemplate
+{
+	enum Type
+	{
+		baseCircle,
+		baseSquare,
+		horizontalLineCircle, 
+		horizontalLineSquare,
+		tripod,
+		cross,
+		squareOfCircles,
+		squareOfSquares,
+		surroundingCircle,
+		surroundingSquare,
+		customCircle,
+		customSquare
+	};
 
-#define CUSTOM_CIRCLE_PULL_TEMPLATE 100
-#define CUSTOM_SQUARE_PULL_TEMPLATE 101
-
-#define FIRST_PULL_TEMPLATE BASE_CIRCLE_PULL_TEMPLATE
-#define LAST_PULL_TEMPLATE SURROUNDING_SQUARE_PULL_TEMPLATE 
-
-// Custimization modes
-
-#define MOVE_MODE 1
-#define SCALE_MODE 2
-
+/*
+	const char* pullTemplateNames[] = 
+	{
+		"Base Circle",
+		"Base Square",
+		"Horizontal Line Circle",
+		"Horizontal Line Square",
+		"Tripod",
+		"Cross",
+		"Square of Circles",
+		"Square of Squares",
+		"Surrounding Circle",
+		"Surrounding Square",
+		"Custom Circle",
+		"Custom Square"
+	};
+*/
+}
 
 #endif
 

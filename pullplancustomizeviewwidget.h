@@ -7,6 +7,10 @@
 #include "constants.h"
 #include "pullplan.h"
 #include "primitives.h"
+#include "pulltemplate.h"
+
+#define MOVE_MODE 1
+#define SCALE_MODE 2
 
 class PullPlanCustomizeViewWidget : public QWidget
 {

@@ -471,7 +471,7 @@ void MainWindow :: copyColorBar()
 
 void MainWindow :: newPullPlan()
 {
-	PullPlan *newEditorPlan = new PullPlan(BASE_CIRCLE_PULL_TEMPLATE);
+	PullPlan *newEditorPlan = new PullPlan(PullTemplate::baseCircle);
 	emit newPullPlan(newEditorPlan);
 }
 

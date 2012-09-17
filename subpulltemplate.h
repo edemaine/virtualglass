@@ -3,7 +3,6 @@
 #define SUBPULLTEMPLATE_H
 
 #include "primitives.h"
-#include "pullplan.h"
 
 class PullPlan;
 

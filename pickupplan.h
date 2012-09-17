@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 #include <vector>
+#include "pulltemplate.h"
 #include "pickuptemplate.h"
 #include "pullplan.h"
 #include "glasscolor.h"

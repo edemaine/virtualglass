@@ -2,15 +2,16 @@
 #define PULLTEMPLATELIBRARYWIDGET_H
 
 #include <QtGui>
+#include "pulltemplate.h"
 
 class PullTemplateLibraryWidget : public QLabel
 {
 	public:
-		PullTemplateLibraryWidget(QPixmap view, int pullTemplateType, QWidget* parent=0);
-		int getPullTemplateType();
+		PullTemplateLibraryWidget(QPixmap view, enum PullTemplate::Type type, QWidget* parent=0);
+		enum PullTemplate::Type getPullTemplateType();
 
 	private:
-		int pullTemplateType;
+		enum PullTemplate::Type type;
 };
 
 #endif
