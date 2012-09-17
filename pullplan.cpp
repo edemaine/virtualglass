@@ -481,18 +481,26 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 			// ith subcane is always at the same location regardless of
 			// parameters. This is needed for delete to work correctly.
 			for (int s = 0; s < count; ++s) {
-				for (int i = 0; i < count; ++i) {
-					for (int j = 0; j < count; ++j) {
-						if ((i != s && j != s))
-							continue;
-						p.x = -radius + littleRadius + 2 * littleRadius * i;
-						p.y = -radius + littleRadius + 2 * littleRadius * j;
-						if (this->templateType == SQUARE_OF_CIRCLES_PULL_TEMPLATE)
-							pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 0);
-						else
-							pushNewSubpull(&newSubs, SQUARE_SHAPE, p, 2 * littleRadius, 0);
-					}
+				int i, j;
+				for (i = 0; i < s; ++i) {
+					j = s;
+					p.x = -radius + littleRadius + 2 * littleRadius * i;
+					p.y = -radius + littleRadius + 2 * littleRadius * j;
+					if (this->templateType == SQUARE_OF_CIRCLES_PULL_TEMPLATE)
+						pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 0);
+					else
+						pushNewSubpull(&newSubs, SQUARE_SHAPE, p, 2 * littleRadius, 0);
 				}
+				for (j = s; j >= 0; --j) {
+					i = s;
+					p.x = -radius + littleRadius + 2 * littleRadius * i;
+					p.y = -radius + littleRadius + 2 * littleRadius * j;
+					if (this->templateType == SQUARE_OF_CIRCLES_PULL_TEMPLATE)
+						pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 0);
+					else
+						pushNewSubpull(&newSubs, SQUARE_SHAPE, p, 2 * littleRadius, 0);
+				}
+				
 			}
 			break;
 		}
