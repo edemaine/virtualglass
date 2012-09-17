@@ -2,16 +2,17 @@
 #define PICKUPTEMPLATELIBRARYWIDGET_H
 
 #include <QtGui>
+#include "pickuptemplate.h"
 #include "qgraphicshighlighteffect.h"
 
 class PickupTemplateLibraryWidget : public QLabel
 {
 	public:
-		PickupTemplateLibraryWidget(QPixmap view, int pickupTemplateType, QWidget* parent=0);
-		int getPickupTemplateType();
+		PickupTemplateLibraryWidget(QPixmap view, enum PickupTemplate::Type type, QWidget* parent=0);
+		enum PickupTemplate::Type getPickupTemplateType();
 
 	private:
-		int pickupTemplateType;
+		enum PickupTemplate::Type type;
 };
 
 #endif

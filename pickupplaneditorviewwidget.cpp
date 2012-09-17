@@ -28,19 +28,19 @@ void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** sub
 
 		switch (sp->orientation)
 		{
-			case HORIZONTAL_ORIENTATION:
+			case PickupCane::horizontal:
 				ll.x = sp->location.x;
 				ll.y = sp->location.y - sp->width/2;
 				ur.x = sp->location.x + sp->length;	
 				ur.y = sp->location.y + sp->width/2;	
 				break;		
-			case VERTICAL_ORIENTATION:
+			case PickupCane::vertical:
 				ll.x = sp->location.x - sp->width/2;	
 				ll.y = sp->location.y;	
 				ur.x = sp->location.x + sp->width/2;	
 				ur.y = sp->location.y + sp->length;	
 				break;		
-			case MURRINE_ORIENTATION:
+			case PickupCane::murrine:
 				ll.x = sp->location.x - sp->width/2;	
 				ll.y = sp->location.y - sp->width/2;	
 				ur.x = sp->location.x + sp->width/2;	

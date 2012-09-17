@@ -21,6 +21,9 @@ namespace PullTemplate
 		customSquare
 	};
 
+	enum Type firstPullTemplate();
+	enum Type lastPullTemplate();
+
 /*
 	const char* pullTemplateNames[] = 
 	{

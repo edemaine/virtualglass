@@ -96,14 +96,14 @@ void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 	float tmp;
 	switch (spt->orientation)
 	{
-		case HORIZONTAL_ORIENTATION:
+		case PickupCane::horizontal:
 			tmp = v->position.x;
 			v->position.x = v->position.z;
 			v->position.z = -tmp;
 			break;
-		case VERTICAL_ORIENTATION:
+		case PickupCane::vertical:
 			break;
-		case MURRINE_ORIENTATION:
+		case PickupCane::murrine:
 			tmp = v->position.y;
 			v->position.y = v->position.z;
 			v->position.z = -tmp;

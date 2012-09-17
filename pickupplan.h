@@ -3,8 +3,10 @@
 #ifndef PICKUPPLAN_H
 #define PICKUPPLAN_H
 
+#include <cstdio>
 #include <stdlib.h>
 #include <vector>
+#include "subpickuptemplate.h"
 #include "pulltemplate.h"
 #include "pickuptemplate.h"
 #include "pullplan.h"
@@ -15,11 +17,11 @@ using std::vector;
 class PickupPlan
 {
 	public:
-		PickupPlan(int pickupTemplate);
+		PickupPlan(enum PickupTemplate::Type type);
 		PickupPlan();
 
-		void setTemplateType(int templateType);
-		int getTemplateType();
+		void setTemplateType(enum PickupTemplate::Type type, bool force=false);
+		enum PickupTemplate::Type getTemplateType();
 
                 void setParameter(int param, int newValue);
                 int getParameter(int param);
@@ -36,8 +38,8 @@ class PickupPlan
 	private:
 		void updateSubs();
 		void pushNewSubplan(vector<SubpickupTemplate>* newSubs, Point location,
-			int orientation, float length, float width, int shape, int group); 
-		int templateType;	
+			enum PickupCane::Orientation ori, float length, float width, int shape, int group); 
+		enum PickupTemplate::Type type;
                 vector<int> parameterValues;
                 vector<char*> parameterNames;
 		PullPlan* defaultSubplan;

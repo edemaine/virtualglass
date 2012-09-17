@@ -18,7 +18,7 @@ void PieceEditorWidget :: updateEverything()
 	// update pickup stuff
 	for (int i = 0; i < pickupTemplateLibraryLayout->count(); ++i)
 	{
-		if (i + FIRST_PICKUP_TEMPLATE == piece->pickup->getTemplateType())
+		if (i + PickupTemplate::firstPickupTemplate() == piece->pickup->getTemplateType())
 			highlightLibraryWidget(dynamic_cast<PickupTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget()));
 		else
@@ -358,11 +358,12 @@ void PieceEditorWidget :: pickupViewWidgetDataChanged()
 void PieceEditorWidget :: seedTemplates()
 {
 	char filename[100];
-	for (int i = FIRST_PICKUP_TEMPLATE; i <= LAST_PICKUP_TEMPLATE; ++i)
+
+	for (int i = PickupTemplate::firstPickupTemplate(); i <= PickupTemplate::lastPickupTemplate(); ++i)
 	{
 		sprintf(filename, ":/images/pickuptemplate%d.png", i);
 		PickupTemplateLibraryWidget *pktlw = new PickupTemplateLibraryWidget(
-			QPixmap::fromImage(QImage(filename)), i);
+			QPixmap::fromImage(QImage(filename)), static_cast<PickupTemplate::Type>(i));
 		pickupTemplateLibraryLayout->addWidget(pktlw);
 	}
 
@@ -370,7 +371,7 @@ void PieceEditorWidget :: seedTemplates()
 	{
 		sprintf(filename, ":/images/piecetemplate%d.png", i);
 		PieceTemplateLibraryWidget *ptlw = new PieceTemplateLibraryWidget(
-			QPixmap::fromImage(QImage(filename)), i);
+			QPixmap::fromImage(QImage(filename)), static_cast<PickupTemplate::Type>(i));
 		pieceTemplateLibraryLayout->addWidget(ptlw);
 	}
 }
@@ -393,9 +394,9 @@ void PieceEditorWidget :: setPieceTemplate(PieceTemplate* t)
 	emit someDataChanged();
 }
 
-void PieceEditorWidget :: setPickupTemplateType(int templateType)
+void PieceEditorWidget :: setPickupTemplateType(enum PickupTemplate::Type _type)
 {
-	piece->pickup->setTemplateType(templateType);
+	piece->pickup->setTemplateType(_type);
 	emit someDataChanged();
 }
 

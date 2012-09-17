@@ -60,8 +60,7 @@ void PullPlanEditorWidget :: updateEverything()
 	// Highlight correct pull template
 	for (int i = 0; i < templateLibraryLayout->count(); ++i)
 	{
-		// assuming baseCircle is the first PullTemplate enum value...
-		if (i + PullTemplate::baseCircle == plan->getTemplateType())
+		if (i + PullTemplate::firstPullTemplate() == plan->getTemplateType())
 			highlightLibraryWidget(dynamic_cast<PullTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(templateLibraryLayout->itemAt(i))->widget()));
 		else
@@ -362,11 +361,10 @@ void PullPlanEditorWidget :: twistSpinChanged(int)
 void PullPlanEditorWidget :: seedTemplates()
 {
 	char filename[100];
-	// assuming baseCircle and surroundingSquare are the 
-	// first and last standard templates that should be seeded
-	for (int i = PullTemplate::baseCircle; i <= PullTemplate::surroundingSquare; ++i)
+
+	for (int i = PullTemplate::firstPullTemplate(); i <= PullTemplate::lastPullTemplate(); ++i)
 	{
-		sprintf(filename, ":/images/pulltemplate%d.png", i - PullTemplate::baseCircle + 1);
+		sprintf(filename, ":/images/pulltemplate%d.png", i - PullTemplate::firstPullTemplate() + 1);
 		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
 			QPixmap::fromImage(QImage(filename)), static_cast<PullTemplate::Type>(i));
 		templateLibraryLayout->addWidget(ptlw);
