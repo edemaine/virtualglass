@@ -363,9 +363,9 @@ void PullPlanEditorWidget :: seedTemplates()
 {
 	char filename[100];
 
-	for (int i = PullTemplate::firstTemplate(); i <= PullTemplate::lastTemplate(); ++i)
+	for (int i = PullTemplate::firstSeedTemplate(); i <= PullTemplate::lastSeedTemplate(); ++i)
 	{
-		sprintf(filename, ":/images/pulltemplate%d.png", i - PullTemplate::firstTemplate() + 1);
+		sprintf(filename, ":/images/pulltemplate%d.png", i);
 		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
 			QPixmap::fromImage(QImage(filename)), static_cast<PullTemplate::Type>(i));
 		templateLibraryLayout->addWidget(ptlw);

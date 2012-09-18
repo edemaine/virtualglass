@@ -360,7 +360,7 @@ void PieceEditorWidget :: seedTemplates()
 {
 	char filename[100];
 
-	for (int i = PickupTemplate::firstTemplate(); i <= PickupTemplate::lastTemplate(); ++i)
+	for (int i = PickupTemplate::firstSeedTemplate(); i <= PickupTemplate::lastSeedTemplate(); ++i)
 	{
 		sprintf(filename, ":/images/pickuptemplate%d.png", i);
 		PickupTemplateLibraryWidget *pktlw = new PickupTemplateLibraryWidget(
@@ -368,7 +368,7 @@ void PieceEditorWidget :: seedTemplates()
 		pickupTemplateLibraryLayout->addWidget(pktlw);
 	}
 
-	for (int i = PieceTemplate::firstTemplate(); i <= PieceTemplate::lastTemplate(); ++i)
+	for (int i = PieceTemplate::firstSeedTemplate(); i <= PieceTemplate::lastSeedTemplate(); ++i)
 	{
 		sprintf(filename, ":/images/piecetemplate%d.png", i);
 		PieceTemplateLibraryWidget *ptlw = new PieceTemplateLibraryWidget(

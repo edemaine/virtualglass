@@ -5,6 +5,8 @@
 // Pull template types
 namespace PullTemplate
 {
+        // When adding a new template, be sure to update the names[] array below
+        // and the first/last template functions in pulltemplate.cpp
 	enum Type
 	{
 		baseCircle=1,
@@ -23,24 +25,10 @@ namespace PullTemplate
 
 	enum Type firstTemplate();
 	enum Type lastTemplate();
+	enum Type firstSeedTemplate();
+	enum Type lastSeedTemplate();
 
-/*
-	const char* pullTemplateNames[] = 
-	{
-		"Base Circle",
-		"Base Square",
-		"Horizontal Line Circle",
-		"Horizontal Line Square",
-		"Tripod",
-		"Cross",
-		"Square of Circles",
-		"Square of Squares",
-		"Surrounding Circle",
-		"Surrounding Square",
-		"Custom Circle",
-		"Custom Square"
-	};
-*/
+	const char* enumToString(enum Type t);
 }
 
 #endif
