@@ -3,7 +3,7 @@
 
 PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 {
-	this->piece = new Piece(TUMBLER_PIECE_TEMPLATE);
+	this->piece = new Piece(PieceTemplate::tumbler);
 
 	this->pickupViewWidget = new PickupPlanEditorViewWidget(piece->pickup, this);	
 	this->niceViewWidget = new NiceViewWidget(PIECE_MODE, this);
@@ -16,14 +16,15 @@ PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 void PieceEditorWidget :: updateEverything()
 {
 	// update pickup stuff
+	PickupTemplateLibraryWidget* pktlw;
 	for (int i = 0; i < pickupTemplateLibraryLayout->count(); ++i)
 	{
-		if (i + PickupTemplate::firstPickupTemplate() == piece->pickup->getTemplateType())
-			highlightLibraryWidget(dynamic_cast<PickupTemplateLibraryWidget*>(
-				dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget()));
+		pktlw = dynamic_cast<PickupTemplateLibraryWidget*>(
+				dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget());
+		if (pktlw->type == piece->pickup->getTemplateType())
+			highlightLibraryWidget(pktlw);
 		else
-			unhighlightLibraryWidget(dynamic_cast<PickupTemplateLibraryWidget*>(
-				dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget()));
+			unhighlightLibraryWidget(pktlw);
 	}
 
 	pickupViewWidget->setPickup(piece->pickup);
@@ -41,16 +42,16 @@ void PieceEditorWidget :: updateEverything()
 		pickupParamWidgets[i]->hide();
 	}
 
-
 	// update piece stuff
+	PieceTemplateLibraryWidget* ptlw;
 	for (int i = 0; i < pieceTemplateLibraryLayout->count(); ++i)
 	{
-		if (i + FIRST_PIECE_TEMPLATE == piece->getTemplateType())
-			highlightLibraryWidget(dynamic_cast<PieceTemplateLibraryWidget*>(
-				dynamic_cast<QWidgetItem *>(pieceTemplateLibraryLayout->itemAt(i))->widget()));
+		ptlw = dynamic_cast<PieceTemplateLibraryWidget*>(
+			dynamic_cast<QWidgetItem *>(pieceTemplateLibraryLayout->itemAt(i))->widget());
+		if (ptlw->type == piece->getTemplateType())
+			highlightLibraryWidget(ptlw);
 		else
-			unhighlightLibraryWidget(dynamic_cast<PieceTemplateLibraryWidget*>(
-				dynamic_cast<QWidgetItem *>(pieceTemplateLibraryLayout->itemAt(i))->widget()));
+			unhighlightLibraryWidget(ptlw);
 	}
 
 	geometry.clear();
@@ -313,17 +314,17 @@ void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 	if (pktlw != NULL)
 	{
-		if (pktlw->getPickupTemplateType() != piece->pickup->getTemplateType())
+		if (pktlw->type != piece->pickup->getTemplateType())
 		{
-			piece->pickup->setTemplateType(pktlw->getPickupTemplateType());
+			piece->pickup->setTemplateType(pktlw->type);
 			emit someDataChanged();
 		}
 	}
 	else if (ptlw != NULL)
 	{
-		if (ptlw->getPieceTemplateType() != piece->getTemplateType())
+		if (ptlw->type != piece->getTemplateType())
 		{
-			piece->setTemplateType(ptlw->getPieceTemplateType());
+			piece->setTemplateType(ptlw->type);
 			emit someDataChanged();
 		}
 	}
@@ -359,7 +360,7 @@ void PieceEditorWidget :: seedTemplates()
 {
 	char filename[100];
 
-	for (int i = PickupTemplate::firstPickupTemplate(); i <= PickupTemplate::lastPickupTemplate(); ++i)
+	for (int i = PickupTemplate::firstTemplate(); i <= PickupTemplate::lastTemplate(); ++i)
 	{
 		sprintf(filename, ":/images/pickuptemplate%d.png", i);
 		PickupTemplateLibraryWidget *pktlw = new PickupTemplateLibraryWidget(
@@ -367,11 +368,11 @@ void PieceEditorWidget :: seedTemplates()
 		pickupTemplateLibraryLayout->addWidget(pktlw);
 	}
 
-	for (int i = FIRST_PIECE_TEMPLATE; i <= LAST_PIECE_TEMPLATE; ++i)
+	for (int i = PieceTemplate::firstTemplate(); i <= PieceTemplate::lastTemplate(); ++i)
 	{
 		sprintf(filename, ":/images/piecetemplate%d.png", i);
 		PieceTemplateLibraryWidget *ptlw = new PieceTemplateLibraryWidget(
-			QPixmap::fromImage(QImage(filename)), static_cast<PickupTemplate::Type>(i));
+			QPixmap::fromImage(QImage(filename)), static_cast<PieceTemplate::Type>(i));
 		pieceTemplateLibraryLayout->addWidget(ptlw);
 	}
 }
@@ -388,9 +389,9 @@ void PieceEditorWidget :: setPickupParameter(int param, int value)
 	emit someDataChanged();
 }
 
-void PieceEditorWidget :: setPieceTemplateType(int templateType)
+void PieceEditorWidget :: setPieceTemplateType(enum PieceTemplate::Type _type)
 {
-	piece->setTemplateType(templateType);
+	piece->setTemplateType(_type);
 	emit someDataChanged();
 }
 

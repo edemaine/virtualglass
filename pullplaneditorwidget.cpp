@@ -58,14 +58,15 @@ void PullPlanEditorWidget :: updateEverything()
 	emit geometryChanged(geometry);
 
 	// Highlight correct pull template
+	PullTemplateLibraryWidget* ptlw; 
 	for (int i = 0; i < templateLibraryLayout->count(); ++i)
 	{
-		if (i + PullTemplate::firstPullTemplate() == plan->getTemplateType())
-			highlightLibraryWidget(dynamic_cast<PullTemplateLibraryWidget*>(
-				dynamic_cast<QWidgetItem *>(templateLibraryLayout->itemAt(i))->widget()));
+		ptlw = dynamic_cast<PullTemplateLibraryWidget*>(
+				dynamic_cast<QWidgetItem *>(templateLibraryLayout->itemAt(i))->widget());
+		if (ptlw->type == plan->getTemplateType())
+			highlightLibraryWidget(ptlw);
 		else
-			unhighlightLibraryWidget(dynamic_cast<PullTemplateLibraryWidget*>(
-				dynamic_cast<QWidgetItem *>(templateLibraryLayout->itemAt(i))->widget()));
+			unhighlightLibraryWidget(ptlw);
 	}
 }
 
@@ -229,7 +230,7 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 	if (ptlw != NULL)
 	{
-		plan->setTemplateType(ptlw->getPullTemplateType());
+		plan->setTemplateType(ptlw->type);
 		emit someDataChanged();
 	}
 }
@@ -362,9 +363,9 @@ void PullPlanEditorWidget :: seedTemplates()
 {
 	char filename[100];
 
-	for (int i = PullTemplate::firstPullTemplate(); i <= PullTemplate::lastPullTemplate(); ++i)
+	for (int i = PullTemplate::firstTemplate(); i <= PullTemplate::lastTemplate(); ++i)
 	{
-		sprintf(filename, ":/images/pulltemplate%d.png", i - PullTemplate::firstPullTemplate() + 1);
+		sprintf(filename, ":/images/pulltemplate%d.png", i - PullTemplate::firstTemplate() + 1);
 		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
 			QPixmap::fromImage(QImage(filename)), static_cast<PullTemplate::Type>(i));
 		templateLibraryLayout->addWidget(ptlw);

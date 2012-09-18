@@ -17,9 +17,3 @@ PickupTemplateLibraryWidget :: PickupTemplateLibraryWidget(QPixmap _view, enum P
         connect(graphicsEffect(), SIGNAL(styleSheetString(QString)), this, SLOT(setStyleSheet(QString)));
 }
 
-enum PickupTemplate::Type PickupTemplateLibraryWidget :: getPickupTemplateType()
-{
-	return type;
-}
-
-

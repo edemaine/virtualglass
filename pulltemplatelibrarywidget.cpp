@@ -17,9 +17,4 @@ PullTemplateLibraryWidget :: PullTemplateLibraryWidget(QPixmap _view, enum PullT
         connect(graphicsEffect(), SIGNAL(styleSheetString(QString)), this, SLOT(setStyleSheet(QString)));
 }
 
-enum PullTemplate::Type PullTemplateLibraryWidget :: getPullTemplateType()
-{
-	return type;
-}
-
 

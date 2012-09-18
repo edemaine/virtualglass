@@ -78,6 +78,7 @@ SOURCES += main.cpp \
 	pullplancustomizeviewwidget.cpp \
 	pullplan.cpp subpulltemplate.cpp \
 	piece.cpp \
+	piecetemplate.cpp \
 	pulltemplate.cpp \
 	pickuptemplate.cpp \
 	pickupplan.cpp subpickuptemplate.cpp pickupplaneditorviewwidget.cpp \

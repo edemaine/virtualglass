@@ -18,7 +18,7 @@ namespace PickupTemplate
 {
 	enum Type
 	{
-		verticals,
+		verticals=1,
 		reticelloVerticalHorizontal,
 		murrineColumn,
 		verticalsAndHorizontals,
@@ -28,8 +28,8 @@ namespace PickupTemplate
 		murrine
 	};
 
-	enum Type firstPickupTemplate();
-	enum Type lastPickupTemplate();
+	enum Type firstTemplate();
+	enum Type lastTemplate();
 }
 
 #endif

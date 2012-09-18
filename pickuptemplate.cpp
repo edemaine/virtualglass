@@ -3,12 +3,12 @@
 
 namespace PickupTemplate
 {
-	enum Type firstPickupTemplate()
+	enum Type firstTemplate()
 	{
 		return verticals;
 	}
 
-	enum Type lastPickupTemplate()
+	enum Type lastTemplate()
 	{
 		return murrine;
 	}

@@ -4,12 +4,12 @@
 // Pull template types
 namespace PullTemplate
 {
-	enum Type firstPullTemplate()
+	enum Type firstTemplate()
 	{
 		return baseCircle;
 	}
 
-	enum Type lastPullTemplate()
+	enum Type lastTemplate()
 	{
 		return surroundingSquare;
 	}

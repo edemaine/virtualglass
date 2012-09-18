@@ -2,14 +2,20 @@
 #ifndef PIECETEMPLATE_H
 #define PIECETEMPLATE_H
 
-#define TUMBLER_PIECE_TEMPLATE 1
-#define BOWL_PIECE_TEMPLATE 2
-#define VASE_PIECE_TEMPLATE 3
-#define POT_PIECE_TEMPLATE 4
-#define WAVY_PLATE_PIECE_TEMPLATE 5
-
-#define FIRST_PIECE_TEMPLATE TUMBLER_PIECE_TEMPLATE
-#define LAST_PIECE_TEMPLATE WAVY_PLATE_PIECE_TEMPLATE
+namespace PieceTemplate
+{
+	enum Type
+	{
+		tumbler=1,
+		bowl,
+		vase,
+		pot,
+		wavyPlate
+	};
+	
+	enum Type firstTemplate();
+	enum Type lastTemplate();
+}
 
 #endif
 

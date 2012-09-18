@@ -590,23 +590,23 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>*
 
 	switch (piece->getTemplateType())
 	{
-		case VASE_PIECE_TEMPLATE:
+		case PieceTemplate::vase:
 			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
 				applyVaseTransform(&(geometry->vertices[i]), &pValues);
 			break;
-		case TUMBLER_PIECE_TEMPLATE:
+		case PieceTemplate::tumbler:
 			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
 				applyTumblerTransform(&(geometry->vertices[i]), &pValues);
 			break;
-		case BOWL_PIECE_TEMPLATE:
+		case PieceTemplate::bowl:
 			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
 				applyBowlTransform(&(geometry->vertices[i]), &pValues);
 			break;
-		case POT_PIECE_TEMPLATE:
+		case PieceTemplate::pot:
 			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
 				applyPotTransform(&(geometry->vertices[i]), &pValues);
 			break;
-		case WAVY_PLATE_PIECE_TEMPLATE:
+		case PieceTemplate::wavyPlate:
 			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
 				applyWavyPlateTransform(&(geometry->vertices[i]), &pValues);
 			break;

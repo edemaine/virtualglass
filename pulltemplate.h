@@ -7,7 +7,7 @@ namespace PullTemplate
 {
 	enum Type
 	{
-		baseCircle,
+		baseCircle=1,
 		baseSquare,
 		horizontalLineCircle, 
 		horizontalLineSquare,
@@ -21,8 +21,8 @@ namespace PullTemplate
 		customSquare
 	};
 
-	enum Type firstPullTemplate();
-	enum Type lastPullTemplate();
+	enum Type firstTemplate();
+	enum Type lastTemplate();
 
 /*
 	const char* pullTemplateNames[] = 

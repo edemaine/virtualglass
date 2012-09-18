@@ -2,16 +2,14 @@
 #define PIECETEMPLATELIBRARYWIDGET_H
 
 #include <QtGui>
+#include "piecetemplate.h"
 #include "qgraphicshighlighteffect.h"
 
 class PieceTemplateLibraryWidget : public QLabel
 {
 	public:
-		PieceTemplateLibraryWidget(QPixmap view, int pieceTemplateType, QWidget* parent=0);
-		int getPieceTemplateType();
-
-	private:
-		int pieceTemplateType;
+		PieceTemplateLibraryWidget(QPixmap view, enum PieceTemplate::Type type, QWidget* parent=0);
+		enum PieceTemplate::Type type;
 };
 
 #endif

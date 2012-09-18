@@ -1,9 +1,9 @@
 
 #include "piece.h"
 
-Piece :: Piece(int templateType)
+Piece :: Piece(enum PieceTemplate::Type _type)
 {
-	setTemplateType(templateType);
+	setTemplateType(_type);
 	// initialize the piece's pickup to be something boring and base
 	this->pickup = new PickupPlan(PickupTemplate::verticals);
 }
@@ -51,12 +51,11 @@ but does not include the pull plans used.
 */
 Piece* Piece :: copy() const
 {
-	Piece* c = new Piece(this->templateType);
+	Piece* c = new Piece(type);
 
-	c->templateType = this->templateType;
-        for (unsigned int i = 0; i < this->parameterNames.size(); ++i)
+        for (unsigned int i = 0; i < parameterNames.size(); ++i)
         {
-                c->parameterValues[i] = this->parameterValues[i];
+                c->parameterValues.push_back(parameterValues[i]);
         }
 
 	c->pickup = this->pickup->copy();
@@ -89,19 +88,19 @@ void Piece :: setParameter(unsigned int index, int value)
 	parameterValues[index] = value;
 }
 
-void Piece :: setTemplateType(int _templateType, bool force)
+void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
 {
-        if (!force && this->templateType == _templateType)
+        if (!force && this->type == _type)
                 return;
 
-	this->templateType = _templateType;
+	this->type = _type;
 
 	parameterNames.clear();
         parameterValues.clear();
         char* tmp;
-        switch (this->templateType)
+        switch (type)
         {
-                case VASE_PIECE_TEMPLATE:
+                case PieceTemplate::vase:
                         tmp = new char[100];
                         sprintf(tmp, "Lip width");
                         parameterNames.push_back(tmp);
@@ -115,7 +114,7 @@ void Piece :: setTemplateType(int _templateType, bool force)
                         parameterNames.push_back(tmp);
                         parameterValues.push_back(0);
                         break;
-                case TUMBLER_PIECE_TEMPLATE:
+                case PieceTemplate::tumbler:
                         tmp = new char[100];
                         sprintf(tmp, "Size");
                         parameterNames.push_back(tmp);
@@ -125,7 +124,7 @@ void Piece :: setTemplateType(int _templateType, bool force)
                         parameterNames.push_back(tmp);
                         parameterValues.push_back(0);
                         break;
-                case BOWL_PIECE_TEMPLATE:
+                case PieceTemplate::bowl:
                         tmp = new char[100];
                         sprintf(tmp, "Openness");
                         parameterNames.push_back(tmp);
@@ -139,7 +138,7 @@ void Piece :: setTemplateType(int _templateType, bool force)
                         parameterNames.push_back(tmp);
                         parameterValues.push_back(0);
                         break;
-                case POT_PIECE_TEMPLATE:
+                case PieceTemplate::pot:
                         tmp = new char[100];
                         sprintf(tmp, "Body radius");
                         parameterNames.push_back(tmp);
@@ -149,7 +148,7 @@ void Piece :: setTemplateType(int _templateType, bool force)
                         parameterValues.push_back(0);
                         parameterValues.push_back(0);
                         break;
-                case WAVY_PLATE_PIECE_TEMPLATE:
+                case PieceTemplate::wavyPlate:
                         tmp = new char[100];
                         sprintf(tmp, "Wave count");
                         parameterNames.push_back(tmp);
@@ -163,9 +162,9 @@ void Piece :: setTemplateType(int _templateType, bool force)
 
 }
 
-int Piece :: getTemplateType()
+enum PieceTemplate::Type Piece :: getTemplateType()
 {
-	return this->templateType;
+	return type;
 }
 
 Piece *deep_copy(const Piece *_piece) {

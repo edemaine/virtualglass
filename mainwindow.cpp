@@ -411,7 +411,7 @@ void MainWindow :: setupPullPlanEditor()
 void MainWindow :: newPiece()
 {
 	// Create the new piece
-	Piece* newEditorPiece = new Piece(TUMBLER_PIECE_TEMPLATE);
+	Piece* newEditorPiece = new Piece(PieceTemplate::tumbler);
 
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();

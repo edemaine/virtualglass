@@ -14,10 +14,10 @@ using std::vector;
 class Piece
 {
 	public:
-		Piece(int templateType);
+		Piece(enum PieceTemplate::Type type);
 
-		void setTemplateType(int templateType, bool force=false);
-		int getTemplateType();
+		void setTemplateType(enum PieceTemplate::Type type, bool force=false);
+		enum PieceTemplate::Type getTemplateType();
 
 		Piece* copy() const;
 		PickupPlan* pickup;
@@ -31,7 +31,7 @@ class Piece
 	
 	private:
 		// Variables
-		int templateType;
+		enum PieceTemplate::Type type;
 		vector<int> parameterValues;
                 vector<char*> parameterNames;
 };
