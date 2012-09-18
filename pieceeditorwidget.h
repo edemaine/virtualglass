@@ -24,7 +24,7 @@ class PieceEditorWidget : public QWidget
 		void updateLibraryWidgetPixmaps(AsyncPieceLibraryWidget* w);
 		void seedTemplates();
 		void setPiece(Piece* p);
-		void setPieceTemplate(PieceTemplate* t);
+		void setPieceTemplateType(int templateType);
 		void setPickupTemplateType(enum PickupTemplate::Type type);
 		void setPickupParameter(int param, int value);
 		void mousePressEvent(QMouseEvent*);

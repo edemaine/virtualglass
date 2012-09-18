@@ -77,7 +77,7 @@ SOURCES += main.cpp \
 	glew/glew.c \
 	pullplancustomizeviewwidget.cpp \
 	pullplan.cpp subpulltemplate.cpp \
-	piece.cpp piecetemplate.cpp \
+	piece.cpp \
 	pulltemplate.cpp \
 	pickuptemplate.cpp \
 	pickupplan.cpp subpickuptemplate.cpp pickupplaneditorviewwidget.cpp \

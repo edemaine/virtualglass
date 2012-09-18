@@ -9,22 +9,31 @@
 #include "pickupplan.h"
 #include "glasscolor.h"
 
+using std::vector;
+
 class Piece
 {
 	public:
-		Piece(int pieceTemplate);
+		Piece(int templateType);
 
-		void setTemplate(PieceTemplate* pt);
-		PieceTemplate* getTemplate();
+		void setTemplateType(int templateType, bool force=false);
+		int getTemplateType();
 
 		Piece* copy() const;
 		PickupPlan* pickup;
 		bool hasDependencyOn(GlassColor* color);
 		bool hasDependencyOn(PullPlan* pullPlan);
-		
-	//private:
+
+		unsigned getParameterCount();
+		int getParameter(unsigned int index);
+		char* getParameterName(unsigned int index);
+		void setParameter(unsigned int index, int value);
+	
+	private:
 		// Variables
-		PieceTemplate* pieceTemplate;
+		int templateType;
+		vector<int> parameterValues;
+                vector<char*> parameterNames;
 };
 
 Piece *deep_copy(const Piece *);

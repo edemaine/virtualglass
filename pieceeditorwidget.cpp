@@ -45,7 +45,7 @@ void PieceEditorWidget :: updateEverything()
 	// update piece stuff
 	for (int i = 0; i < pieceTemplateLibraryLayout->count(); ++i)
 	{
-		if (i + FIRST_PIECE_TEMPLATE == piece->getTemplate()->type)
+		if (i + FIRST_PIECE_TEMPLATE == piece->getTemplateType())
 			highlightLibraryWidget(dynamic_cast<PieceTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(pieceTemplateLibraryLayout->itemAt(i))->widget()));
 		else
@@ -56,12 +56,12 @@ void PieceEditorWidget :: updateEverything()
 	geometry.clear();
 	mesher.generateMesh(piece, &geometry);
 	niceViewWidget->repaint();
-	
+
 	i = 0;
-	for (; i < piece->getTemplate()->parameterNames.size(); ++i)
+	for (; i < piece->getParameterCount(); ++i)
 	{
-		pieceParamLabels[i]->setText(piece->getTemplate()->parameterNames[i]);
-		pieceParamSliders[i]->setValue(piece->getTemplate()->parameterValues[i]);
+		pieceParamLabels[i]->setText(piece->getParameterName(i));
+		pieceParamSliders[i]->setValue(piece->getParameter(i));
 		pieceParamWidgets[i]->show();
 	}
 	for (; i < 3; ++i)
@@ -98,9 +98,9 @@ void PieceEditorWidget :: pieceTemplateParameterSlider3Changed(int)
 {
 	int value = pieceParamSliders[2]->sliderPosition();
 
-	if (value == piece->getTemplate()->parameterValues[2])
+	if (value == piece->getParameter(2))
 		return;
-	piece->getTemplate()->parameterValues[2] = value;
+	piece->setParameter(2, value);
 	emit someDataChanged();
 }
 
@@ -108,9 +108,9 @@ void PieceEditorWidget :: pieceTemplateParameterSlider2Changed(int)
 {
 	int value = pieceParamSliders[1]->sliderPosition();
 
-	if (value == piece->getTemplate()->parameterValues[1])
+	if (value == piece->getParameter(1))
 		return;
-	piece->getTemplate()->parameterValues[1] = value;
+	piece->setParameter(1, value);
 	emit someDataChanged();
 }
 
@@ -118,9 +118,9 @@ void PieceEditorWidget :: pieceTemplateParameterSlider1Changed(int)
 {
 	int value = pieceParamSliders[0]->sliderPosition();
 
-	if (value == piece->getTemplate()->parameterValues[0])
+	if (value == piece->getParameter(0))
 		return;
-	piece->getTemplate()->parameterValues[0] = value;
+	piece->setParameter(0, value);
 	emit someDataChanged();
 }
 
@@ -321,9 +321,9 @@ void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
 	}
 	else if (ptlw != NULL)
 	{
-		if (ptlw->getPieceTemplateType() != piece->getTemplate()->type)
+		if (ptlw->getPieceTemplateType() != piece->getTemplateType())
 		{
-			piece->setTemplate(new PieceTemplate(ptlw->getPieceTemplateType()));
+			piece->setTemplateType(ptlw->getPieceTemplateType());
 			emit someDataChanged();
 		}
 	}
@@ -388,9 +388,9 @@ void PieceEditorWidget :: setPickupParameter(int param, int value)
 	emit someDataChanged();
 }
 
-void PieceEditorWidget :: setPieceTemplate(PieceTemplate* t)
+void PieceEditorWidget :: setPieceTemplateType(int templateType)
 {
-	piece->setTemplate(t);
+	piece->setTemplateType(templateType);
 	emit someDataChanged();
 }
 

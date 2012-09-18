@@ -582,27 +582,33 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>*
 	geometry->clear();
 	generateMesh(piece->pickup, geometry, false, ancestors, ancestorIndices);		
 
-	switch (piece->getTemplate()->type)
+	vector<int> pValues;
+	for (unsigned int i = 0; i < piece->getParameterCount(); ++i)
+	{
+		pValues.push_back(piece->getParameter(i));
+	}
+
+	switch (piece->getTemplateType())
 	{
 		case VASE_PIECE_TEMPLATE:
 			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
-				applyVaseTransform(&(geometry->vertices[i]), &(piece->getTemplate()->parameterValues));
+				applyVaseTransform(&(geometry->vertices[i]), &pValues);
 			break;
 		case TUMBLER_PIECE_TEMPLATE:
 			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
-				applyTumblerTransform(&(geometry->vertices[i]), &(piece->getTemplate()->parameterValues));
+				applyTumblerTransform(&(geometry->vertices[i]), &pValues);
 			break;
 		case BOWL_PIECE_TEMPLATE:
 			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
-				applyBowlTransform(&(geometry->vertices[i]), &(piece->getTemplate()->parameterValues));
+				applyBowlTransform(&(geometry->vertices[i]), &pValues);
 			break;
 		case POT_PIECE_TEMPLATE:
 			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
-				applyPotTransform(&(geometry->vertices[i]), &(piece->getTemplate()->parameterValues));
+				applyPotTransform(&(geometry->vertices[i]), &pValues);
 			break;
 		case WAVY_PLATE_PIECE_TEMPLATE:
 			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
-				applyWavyPlateTransform(&(geometry->vertices[i]), &(piece->getTemplate()->parameterValues));
+				applyWavyPlateTransform(&(geometry->vertices[i]), &pValues);
 			break;
 
 	}	
