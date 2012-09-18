@@ -5,7 +5,9 @@
 
 #include <cstdio>
 #include <stdlib.h>
+#include <string>
 #include <vector>
+#include "templateparameter.h"
 #include "subpickuptemplate.h"
 #include "pulltemplate.h"
 #include "pickuptemplate.h"
@@ -23,10 +25,9 @@ class PickupPlan
 		void setTemplateType(enum PickupTemplate::Type type, bool force=false);
 		enum PickupTemplate::Type getTemplateType();
 
-                void setParameter(int param, int newValue);
-                int getParameter(int param);
                 unsigned int getParameterCount();
-                char* getParameterName(int param);
+                void getParameter(unsigned int index, TemplateParameter* dest);
+                void setParameter(unsigned int index, int value);
 
 		PickupPlan* copy() const;
 
@@ -40,8 +41,7 @@ class PickupPlan
 		void pushNewSubplan(vector<SubpickupTemplate>* newSubs, Point location,
 			enum PickupCane::Orientation ori, float length, float width, int shape, int group); 
 		enum PickupTemplate::Type type;
-                vector<int> parameterValues;
-                vector<char*> parameterNames;
+		vector<TemplateParameter> parameters;
 		PullPlan* defaultSubplan;
 		GlassColor* defaultGlassColor;
 	

@@ -46,10 +46,9 @@ macx {
 	LIBS += -lexpat
 }
 
-# Input
 HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
-
-HEADERS += primitives.h constants.h Vector.hpp \ 
+	primitives.h constants.h Vector.hpp \ 
+	templateparameter.h \
 	pullplan.h pulltemplate.h subpulltemplate.h pickupplan.h \
 	piece.h piecetemplate.h \
 	pickuptemplate.h subpickuptemplate.h pickupplaneditorviewwidget.h \ 
@@ -75,6 +74,7 @@ HEADERS += primitives.h constants.h Vector.hpp \
 
 SOURCES += main.cpp \ 
 	glew/glew.c \
+	templateparameter.cpp \
 	pullplancustomizeviewwidget.cpp \
 	pullplan.cpp subpulltemplate.cpp \
 	piece.cpp \

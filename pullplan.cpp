@@ -77,9 +77,7 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) {
 		defaultSquareSubplan = new PullPlan(PullTemplate::baseSquare);
 	}
 
-	parameterNames.clear();
-	parameterValues.clear();
-	char* tmp;
+	parameters.clear();
 	casings.clear();
 	casings.push_back(Casing(1.0, CIRCLE_SHAPE, defaultGlassColor));
 	casings.push_back(Casing(1.0, CIRCLE_SHAPE, defaultGlassColor));
@@ -92,51 +90,30 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) {
 			casings[0].thickness = 1 / SQRT_TWO;
 			break;
 		case PullTemplate::horizontalLineCircle:
-			tmp = new char[100];
-			sprintf(tmp, "Row count:");
-			parameterNames.push_back(tmp);
-			parameterValues.push_back(3);
+			parameters.push_back(TemplateParameter(3, string("Row count")));
 			break;
 		case PullTemplate::horizontalLineSquare:
-			tmp = new char[100];
-			sprintf(tmp, "Row count:");
-			parameterNames.push_back(tmp);
-			parameterValues.push_back(3);
+			parameters.push_back(TemplateParameter(3, string("Row count")));
 			break;
 		case PullTemplate::surroundingCircle:
-			tmp = new char[100];
-			sprintf(tmp, "Count:");
-			parameterNames.push_back(tmp);
-			parameterValues.push_back(8);
+			parameters.push_back(TemplateParameter(8, string("Count")));
 			break;
 		case PullTemplate::cross:
-			tmp = new char[100];
-			sprintf(tmp, "Radial count:");
-			parameterNames.push_back(tmp);
-			parameterValues.push_back(3);
+			parameters.push_back(TemplateParameter(3, string("Radial count")));
 			break;
 		case PullTemplate::squareOfSquares:
 		case PullTemplate::squareOfCircles:
 			casings[0].shape = SQUARE_SHAPE;
 			casings[0].thickness = 1 / SQRT_TWO;
-			tmp = new char[100];
-			sprintf(tmp, "Row count:");
-			parameterNames.push_back(tmp);
-			parameterValues.push_back(4);
+			parameters.push_back(TemplateParameter(4, string("Row count")));
 			break;
 		case PullTemplate::tripod:
-			tmp = new char[100];
-			sprintf(tmp, "Radial count:");
-			parameterNames.push_back(tmp);
-			parameterValues.push_back(3);
+			parameters.push_back(TemplateParameter(3, string("Radial count")));
 			break;
 		case PullTemplate::surroundingSquare:
 			casings[0].shape = SQUARE_SHAPE;
 			casings[0].thickness = 1 / SQRT_TWO;
-			tmp = new char[100];
-			sprintf(tmp, "Column count:");
-			parameterNames.push_back(tmp);
-			parameterValues.push_back(2);
+			parameters.push_back(TemplateParameter(2, string("Column count")));
 			break;
 		case PullTemplate::customCircle:
 			break;
@@ -153,16 +130,15 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) {
 
 void PullPlan :: setTemplateTypeToCustom()
 {
-	if (this->getCasingShape(0) == CIRCLE_SHAPE)
+	if (casings[0].shape == CIRCLE_SHAPE)
 	{
-		this->templateType = PullTemplate::customCircle;
+		templateType = PullTemplate::customCircle;
 	}
 	else
 	{
-		this->templateType = PullTemplate::customSquare;
+		templateType = PullTemplate::customSquare;
 	}
-	this->parameterNames.clear();
-	this->parameterValues.clear();
+	parameters.clear();
 }
 
 void PullPlan :: setCasingColor(GlassColor* gc, unsigned int index) {
@@ -209,25 +185,24 @@ int PullPlan :: getTemplateType() {
 	return this->templateType;
 }
 
-void PullPlan :: setParameter(int p, int v) {
-	parameterValues[p] = v;
+unsigned int PullPlan :: getParameterCount()
+{
+	return parameters.size();
+}
+
+void PullPlan :: getParameter(unsigned int _index, TemplateParameter* dest)
+{
+        assert(_index < parameters.size());
+        dest->value = parameters[_index].value;
+        dest->name = parameters[_index].name; // this is a copy, since it's a std::string
+}
+
+void PullPlan :: setParameter(unsigned int _index, int value)
+{
+	assert(_index < parameters.size());
+	parameters[_index].value = value;
 	vector<SubpullTemplate> oldSubs = subs;
 	resetSubs(oldSubs);
-}
-
-int PullPlan :: getParameter(int p) {
-
-	return parameterValues[p];
-}
-
-char* PullPlan :: getParameterName(int p) {
-
-	return parameterNames[p];
-}
-
-unsigned int PullPlan :: getParameterCount() {
-
-	return this->parameterNames.size();
 }
 
 void PullPlan :: removeCasing() {
@@ -405,8 +380,8 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 			break;
 		case PullTemplate::horizontalLineCircle:
 		{
-			assert(parameterValues.size() == 1);
-			int count = parameterValues[0];
+			assert(parameters.size() == 1);
+			int count = parameters[0].value;
 			for (int i = 0; i < count; ++i) {
 				float littleRadius = (2 * radius / count) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
@@ -416,9 +391,9 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 		}
 		case PullTemplate::horizontalLineSquare:
 		{
-			assert(parameterValues.size() == 1);
+			assert(parameters.size() == 1);
 			radius *= 0.9;
-			int count = parameterValues[0];
+			int count = parameters[0].value;
 			for (int i = 0; i < count; ++i) {
 				float littleRadius = (2 * radius / count) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
@@ -428,8 +403,8 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 		}
 		case PullTemplate::surroundingCircle:
 		{
-			assert(parameterValues.size() == 1);
-			int count = parameterValues[0];
+			assert(parameters.size() == 1);
+			int count = parameters[0].value;
 			float theta = TWO_PI / count;
 			float k = sin(theta/2) / (1 + sin(theta/2));
 
@@ -444,8 +419,8 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 		}
 		case PullTemplate::cross:
 		{
-			assert(parameterValues.size() == 1);
-			int count = parameterValues[0]-1;
+			assert(parameters.size() == 1);
+			int count = parameters[0].value-1;
 			float littleRadius = (radius / (count + 0.5)) / 2.0;
 
 			p.x = p.y = 0.0;
@@ -469,11 +444,11 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 		case PullTemplate::squareOfCircles:
 		case PullTemplate::squareOfSquares:
 		{
-			assert(parameterValues.size() == 1);
+			assert(parameters.size() == 1);
 			if (this->casings[0].shape == CIRCLE_SHAPE)
 				radius *= 1 / SQRT_TWO;
 
-			int count = parameterValues[0];
+			int count = parameters[0].value;
 			float littleRadius = radius / count;
 
 			// We add the subtemplates in this funny way so that the
@@ -505,8 +480,8 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 		}
 		case PullTemplate::tripod:
 		{
-			assert(parameterValues.size() == 1);
-			int count = parameterValues[0];
+			assert(parameters.size() == 1);
+			int count = parameters[0].value;
 			float littleRadius = radius / (2 * count - 1);
 
 			p.x = p.y = 0.0;
@@ -522,11 +497,11 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 		}
 		case PullTemplate::surroundingSquare:
 		{
-			assert(parameterValues.size() == 1);
+			assert(parameters.size() == 1);
 			if (this->casings[0].shape == CIRCLE_SHAPE)
 				radius *= 1 / SQRT_TWO;
 
-			int count = parameterValues[0];
+			int count = parameters[0].value;
 			float littleRadius = radius / (count + 2);
 
 			p.x = p.y = 0.0;
@@ -577,8 +552,11 @@ PullPlan* PullPlan :: copy() const {
 	c->casings = casings;
 	c->twist = twist;
 
-	assert(c->parameterValues.size() == parameterValues.size());
-	c->parameterValues = parameterValues;
+	assert(c->parameters.size() == parameters.size());
+	for (unsigned int i = 0; i < parameters.size(); ++i)
+	{
+		c->parameters[i].value = parameters[i].value;
+	}
 	vector<SubpullTemplate> oldSubs = subs;
 	c->resetSubs(oldSubs);
 

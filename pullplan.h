@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
+#include "templateparameter.h"
 #include "subpulltemplate.h"
 #include "pulltemplate.h"
 #include "casing.h"
@@ -25,10 +26,9 @@ class PullPlan
 		void setTemplateTypeToCustom();
 		int getTemplateType();
 
-		void setParameter(int param, int newValue);
-		int getParameter(int param);
-		char* getParameterName(int param);
 		unsigned int getParameterCount();
+                void getParameter(unsigned int index, TemplateParameter* dest);
+                void setParameter(unsigned int index, int value);
 
 		void setCasingThickness(float t, unsigned int index);
 		void setOutermostCasingShape(int shape);
@@ -63,14 +63,13 @@ class PullPlan
 		enum PullTemplate::Type templateType;
 		vector<Casing> casings;
 		float twist;
-		vector<int> parameterValues;
-		vector<char*> parameterNames;
+		vector<TemplateParameter> parameters;
 
 		// Methods
 		void initializeTemplate();
 		void resetSubs(vector<SubpullTemplate> oldSubs);
 		void pushNewSubpull(vector<SubpullTemplate>* newSubs,
-		int shape, Point location, float diameter, int group);
+			int shape, Point location, float diameter, int group);
 };
 
 PullPlan *deep_copy(const PullPlan *plan);

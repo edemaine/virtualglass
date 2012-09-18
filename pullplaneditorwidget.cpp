@@ -42,9 +42,11 @@ void PullPlanEditorWidget :: updateEverything()
 	unsigned int i = 0;
 	for (; i < plan->getParameterCount(); ++i)
 	{
-		paramLabels[i]->setText(plan->getParameterName(i));
+		TemplateParameter tp;
+		plan->getParameter(i, &tp);
+		paramLabels[i]->setText(tp.name.c_str());
 		paramLabels[i]->show();
-		paramSpins[i]->setValue(plan->getParameter(i));
+		paramSpins[i]->setValue(tp.value);
 		paramSpins[i]->show();
 	}
 	for (; i < paramLabels.size(); ++i)
@@ -331,7 +333,9 @@ void PullPlanEditorWidget :: paramSpinChanged(int)
 	// update template
 	for (unsigned int i = 0; i < plan->getParameterCount(); ++i)
 	{
-		if (plan->getParameter(i) != paramSpins[i]->value())
+		TemplateParameter tp;
+		plan->getParameter(i, &tp);
+		if (tp.value != paramSpins[i]->value())
 		{
 			plan->setParameter(i, paramSpins[i]->value());
 			emit someDataChanged();

@@ -116,23 +116,6 @@ void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 	v->position.y = v->position.y + spt->location.z * 5.0;
 }
 
-void Mesher :: applyBowlTransform(Vertex* v, vector<int>* parameterValues)
-{
-	int radius = (*parameterValues)[0];
-	float size = 1.0 + 0.01 * (*parameterValues)[1];
-	int twist = (*parameterValues)[2];
-
-	float theta = PI * v->position.x / 5.0 + PI * v->position.z * twist / 500.0;
-	float totalR = 4.0 + radius * 0.1;
-	float totalPhi = 10.0 / totalR;
-	float r = totalR*size - v->position.y/size;
-	float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
-
-	v->position.x = r * cos(theta) * cos(phi);
-	v->position.y = r * sin(theta) * cos(phi);
-	v->position.z = r * sin(phi) + (totalR - totalR * sin(totalPhi - PI / 2))/2.0;
-}
-
 float Mesher :: splineVal(float r1, float r2, float r3, float r4, float t)
 {
 	return pow((1.0 - t), 3) * r1 + 3 * pow(1.0 - t, 2) * t * r2 + 3 * pow(1.0 - t, 2) * t * r3 + pow(t, 3) * r4;
@@ -143,99 +126,131 @@ float Mesher :: splineVal(float r1, float r2, float r3, float t)
 	return pow((1.0 - t), 2) * r1 + 2 * (1.0 - t) * t * r2 + pow(t, 2) * r3;
 }
 
-void Mesher :: applyWavyPlateTransform(Vertex* v, vector<int>* parameterValues)
-{
-	// Do a rollup
-	// send x value to theta value 
-	// -5.0 goes to -PI, 5.0 goes to PI
-	// everything gets a base radius of 5.0
-	float theta = PI * v->position.x / 5.0;
-
-	float totalR = 4.0 + 100 * 0.1;
-	float totalPhi = 10.0 / totalR;
-
-	float r = totalR - v->position.y;
-	float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
-
-	int waveCount = (*parameterValues)[0] / 10;
-	float waveSize = (*parameterValues)[1] / 30.0;
-
-	float waveAdjust = cos(waveCount * theta) * waveSize * (phi + PI/2);
-
-	v->position.x = (r + waveAdjust) * cos(theta) * cos(phi);
-	v->position.y = (r + waveAdjust) * sin(theta) * cos(phi);
-	v->position.z = (r + waveAdjust) * sin(phi) + (totalR - totalR * sin(totalPhi - PI / 2))/2.0;
-
-}
-
-void Mesher :: applyPotTransform(Vertex* v, vector<int>* parameterValues)
-{
-	// compute theta within a rollup, starting with pickup geometry
-	float theta = PI * v->position.x / 5.0;
-
-	// Deform into a spline-based vase
-	float body_radius = (*parameterValues)[0] * 0.03 + 1.0;
-	float lip_radius = (*parameterValues)[1] * 0.03 + 0.1;
-	float radius = 2.0 * splineVal(lip_radius, body_radius, lip_radius, (v->position.z - -5.0)/10.0);
-
-	if (radius < 1.0)
-	{
-		v->position.x = (radius - v->position.y * radius) * cos(theta);
-		v->position.y = (radius - v->position.y * radius) * sin(theta);
-	}
-	else
-	{
-		v->position.x = (radius - v->position.y / radius) * cos(theta);
-		v->position.y = (radius - v->position.y / radius) * sin(theta);
-	}
-}
-
-void Mesher :: applyVaseTransform(Vertex* v, vector<int>* parameterValues)
-{
-	// compute theta within a rollup, starting with pickup geometry
-	float theta = PI * v->position.x / 5.0;
-
-	// Deform into a spline-based vase
-	float lip_radius = (*parameterValues)[0] * 0.03 + 0.5; 
-	float body_radius = (*parameterValues)[1] * 0.03 + 1.0; 
-	float twist_theta = PI * v->position.z * (*parameterValues)[2] / 500.0; 
-	float radius = 2.0 * splineVal(0.1, body_radius, 0.5, lip_radius, (v->position.z - -5.0)/10.0);
-
-	if (radius < 1.0)
-	{
-		v->position.x = (radius - v->position.y * radius) * cos(theta + twist_theta); 
-		v->position.y = (radius - v->position.y * radius) * sin(theta + twist_theta); 
-	}
-	else
-	{
-		v->position.x = (radius - v->position.y / radius) * cos(theta + twist_theta); 
-		v->position.y = (radius - v->position.y / radius) * sin(theta + twist_theta); 
-	}
-}
-
 float Mesher :: asymptoteVal(float s, float t)
 {
 	return 1 - (s / (t + s)); 
 }
 
-void Mesher :: applyTumblerTransform(Vertex* v, vector<int>* parameterValues)
+void Mesher :: applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type, vector<TemplateParameter> params)
 {
-	// compute theta within a rollup, starting with pickup geometry
-	float theta = PI * v->position.x / 5.0;
-
-	// Deform into a spline-based vase
-	float radius = (((*parameterValues)[0] + 40) * 0.05) * asymptoteVal(0.01 * ((*parameterValues)[1]*0.1 + 1), (v->position.z - -5.0)/10.0);
-
-	if (radius < 1.0)
+	for (uint32_t i = 0; i < geom->vertices.size(); ++i)
 	{
-		v->position.x = (radius - v->position.y * radius) * cos(theta); 
-		v->position.y = (radius - v->position.y * radius) * sin(theta); 
-	}
-	else
-	{
-		v->position.x = (radius - v->position.y / radius) * cos(theta); 
-		v->position.y = (radius - v->position.y / radius) * sin(theta); 
-	}
+		Vertex* v = &(geom->vertices[i]);
+		switch (type)
+		{
+			case PieceTemplate::tumbler:
+			{
+				// compute theta within a rollup, starting with pickup geometry
+				float theta = PI * v->position.x / 5.0;
+
+				// Deform into a spline-based vase
+				float radius = ((params[0].value + 40) * 0.05) 
+					* asymptoteVal(0.01 * (params[1].value*0.1 + 1), (v->position.z - -5.0)/10.0);
+
+				if (radius < 1.0)
+				{
+					v->position.x = (radius - v->position.y * radius) * cos(theta); 
+					v->position.y = (radius - v->position.y * radius) * sin(theta); 
+				}
+				else
+				{
+					v->position.x = (radius - v->position.y / radius) * cos(theta); 
+					v->position.y = (radius - v->position.y / radius) * sin(theta); 
+				}
+				break;
+			}
+			case PieceTemplate::bowl:
+			{
+				int radius = params[0].value;
+				float size = 1.0 + 0.01 * params[1].value;
+				int twist = params[2].value;
+
+				float theta = PI * v->position.x / 5.0 + PI * v->position.z * twist / 500.0;
+				float totalR = 4.0 + radius * 0.1;
+				float totalPhi = 10.0 / totalR;
+				float r = totalR*size - v->position.y/size;
+				float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
+
+				v->position.x = r * cos(theta) * cos(phi);
+				v->position.y = r * sin(theta) * cos(phi);
+				v->position.z = r * sin(phi) + (totalR - totalR * sin(totalPhi - PI / 2))/2.0;
+
+				break;
+			}		
+			case PieceTemplate::vase:
+			{
+				// compute theta within a rollup, starting with pickup geometry
+				float theta = PI * v->position.x / 5.0;
+
+				// Deform into a spline-based vase
+				float lip_radius = params[0].value * 0.03 + 0.5; 
+				float body_radius = params[1].value * 0.03 + 1.0; 
+				float twist_theta = PI * v->position.z * params[2].value / 500.0; 
+				float radius = 2.0 * splineVal(0.1, body_radius, 0.5, lip_radius, (v->position.z - -5.0)/10.0);
+
+				if (radius < 1.0)
+				{
+					v->position.x = (radius - v->position.y * radius) * cos(theta + twist_theta); 
+					v->position.y = (radius - v->position.y * radius) * sin(theta + twist_theta); 
+				}
+				else
+				{
+					v->position.x = (radius - v->position.y / radius) * cos(theta + twist_theta); 
+					v->position.y = (radius - v->position.y / radius) * sin(theta + twist_theta); 
+				}
+
+				break;
+			}		
+			case PieceTemplate::pot:
+			{
+				// compute theta within a rollup, starting with pickup geometry
+				float theta = PI * v->position.x / 5.0;
+
+				// Deform into a spline-based vase
+				float body_radius = params[0].value * 0.03 + 1.0;
+				float lip_radius = params[1].value * 0.03 + 0.1;
+				float radius = 2.0 * splineVal(lip_radius, body_radius, lip_radius, (v->position.z - -5.0)/10.0);
+
+				if (radius < 1.0)
+				{
+					v->position.x = (radius - v->position.y * radius) * cos(theta);
+					v->position.y = (radius - v->position.y * radius) * sin(theta);
+				}
+				else
+				{
+					v->position.x = (radius - v->position.y / radius) * cos(theta);
+					v->position.y = (radius - v->position.y / radius) * sin(theta);
+				}
+
+				break;
+			}		
+			case PieceTemplate::wavyPlate:
+			{
+				// Do a rollup
+				// send x value to theta value 
+				// -5.0 goes to -PI, 5.0 goes to PI
+				// everything gets a base radius of 5.0
+				float theta = PI * v->position.x / 5.0;
+
+				float totalR = 4.0 + 100 * 0.1;
+				float totalPhi = 10.0 / totalR;
+
+				float r = totalR - v->position.y;
+				float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
+
+				int waveCount = params[0].value / 10;
+				float waveSize = params[1].value / 30.0;
+
+				float waveAdjust = cos(waveCount * theta) * waveSize * (phi + PI/2);
+
+				v->position.x = (r + waveAdjust) * cos(theta) * cos(phi);
+				v->position.y = (r + waveAdjust) * sin(theta) * cos(phi);
+				v->position.z = (r + waveAdjust) * sin(phi) + (totalR - totalR * sin(totalPhi - PI / 2))/2.0;
+
+				break;
+			}
+		} // end switch
+	} // end loop over vertices
 }
 
 Vertex Mesher :: applyTransforms(Vertex v, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
@@ -581,37 +596,14 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>*
 
 	geometry->clear();
 	generateMesh(piece->pickup, geometry, false, ancestors, ancestorIndices);		
-
-	vector<int> pValues;
+	vector<TemplateParameter> params;
 	for (unsigned int i = 0; i < piece->getParameterCount(); ++i)
 	{
-		pValues.push_back(piece->getParameter(i));
+		TemplateParameter tp;
+		piece->getParameter(i, &tp);
+		params.push_back(tp);
 	}
-
-	switch (piece->getTemplateType())
-	{
-		case PieceTemplate::vase:
-			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
-				applyVaseTransform(&(geometry->vertices[i]), &pValues);
-			break;
-		case PieceTemplate::tumbler:
-			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
-				applyTumblerTransform(&(geometry->vertices[i]), &pValues);
-			break;
-		case PieceTemplate::bowl:
-			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
-				applyBowlTransform(&(geometry->vertices[i]), &pValues);
-			break;
-		case PieceTemplate::pot:
-			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
-				applyPotTransform(&(geometry->vertices[i]), &pValues);
-			break;
-		case PieceTemplate::wavyPlate:
-			for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
-				applyWavyPlateTransform(&(geometry->vertices[i]), &pValues);
-			break;
-
-	}	
+	applyPieceTransform(geometry, piece->getTemplateType(), params);
 }
 
 void Mesher :: generateMesh(PickupPlan* pickup, Geometry *geometry, bool ensureCasing, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)

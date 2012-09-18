@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 #include <vector>
+#include "templateparameter.h"
 #include "piecetemplate.h"
 #include "pickupplan.h"
 #include "glasscolor.h"
@@ -24,16 +25,14 @@ class Piece
 		bool hasDependencyOn(GlassColor* color);
 		bool hasDependencyOn(PullPlan* pullPlan);
 
-		unsigned getParameterCount();
-		int getParameter(unsigned int index);
-		char* getParameterName(unsigned int index);
+		unsigned int getParameterCount();
+		void getParameter(unsigned int index, TemplateParameter* dest);
 		void setParameter(unsigned int index, int value);
 	
 	private:
 		// Variables
 		enum PieceTemplate::Type type;
-		vector<int> parameterValues;
-                vector<char*> parameterNames;
+		vector<TemplateParameter> parameters;
 };
 
 Piece *deep_copy(const Piece *);

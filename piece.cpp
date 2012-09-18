@@ -53,9 +53,9 @@ Piece* Piece :: copy() const
 {
 	Piece* c = new Piece(type);
 
-        for (unsigned int i = 0; i < parameterNames.size(); ++i)
+        for (unsigned int i = 0; i < parameters.size(); ++i)
         {
-                c->parameterValues.push_back(parameterValues[i]);
+                c->parameters[i].value = parameters[i].value;
         }
 
 	c->pickup = this->pickup->copy();
@@ -65,27 +65,20 @@ Piece* Piece :: copy() const
 
 unsigned int Piece :: getParameterCount()
 {
-	return parameterNames.size();
+	return parameters.size();
 }
 
-char* Piece :: getParameterName(unsigned int index)
+void Piece :: getParameter(unsigned int _index, TemplateParameter* dest)
 {
-	// right now this is a total hack...we just pass pointers
-	// along, but they can be modified by the caller
-	assert(index < parameterNames.size());
-	return parameterNames[index];
+	assert(_index < parameters.size());
+	dest->value = parameters[_index].value;
+	dest->name = parameters[_index].name; // this is a copy, since it's a std::string
 }
 
-int Piece :: getParameter(unsigned int index)
+void Piece :: setParameter(unsigned int _index, int _value)
 {
-	assert(index < parameterValues.size());
-	return parameterValues[index];
-}
-
-void Piece :: setParameter(unsigned int index, int value)
-{
-	assert(index < parameterValues.size());
-	parameterValues[index] = value;
+	assert(_index < parameters.size());
+	parameters[_index].value = _value;
 }
 
 void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
@@ -95,68 +88,32 @@ void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
 
 	this->type = _type;
 
-	parameterNames.clear();
-        parameterValues.clear();
-        char* tmp;
+	parameters.clear();
         switch (type)
         {
+		// Is it possible to just make a string const and hope it's 
+		// kept around as long as the TemplateParameter is?
                 case PieceTemplate::vase:
-                        tmp = new char[100];
-                        sprintf(tmp, "Lip width");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(0);
-                        tmp = new char[100];
-                        sprintf(tmp, "Body width");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(0);
-                        tmp = new char[100];
-                        sprintf(tmp, "Twist");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(0);
+			parameters.push_back(TemplateParameter(0, string("Lip width")));
+			parameters.push_back(TemplateParameter(0, string("Body width")));
+			parameters.push_back(TemplateParameter(0, string("Twist")));
                         break;
                 case PieceTemplate::tumbler:
-                        tmp = new char[100];
-                        sprintf(tmp, "Size");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(0);
-                        tmp = new char[100];
-                        sprintf(tmp, "Roundedness");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(0);
+			parameters.push_back(TemplateParameter(0, string("Size")));
+			parameters.push_back(TemplateParameter(0, string("Roundedness")));
                         break;
                 case PieceTemplate::bowl:
-                        tmp = new char[100];
-                        sprintf(tmp, "Openness");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(0);
-                        tmp = new char[100];
-                        sprintf(tmp, "Size");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(0);
-                        tmp = new char[100];
-                        sprintf(tmp, "Twist");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(0);
+			parameters.push_back(TemplateParameter(0, string("Openness")));
+			parameters.push_back(TemplateParameter(0, string("Size")));
+			parameters.push_back(TemplateParameter(0, string("Twist")));
                         break;
                 case PieceTemplate::pot:
-                        tmp = new char[100];
-                        sprintf(tmp, "Body radius");
-                        parameterNames.push_back(tmp);
-                        tmp = new char[100];
-                        sprintf(tmp, "Lip radius");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(0);
-                        parameterValues.push_back(0);
+			parameters.push_back(TemplateParameter(0, string("Body radius")));
+			parameters.push_back(TemplateParameter(0, string("Lip radius")));
                         break;
                 case PieceTemplate::wavyPlate:
-                        tmp = new char[100];
-                        sprintf(tmp, "Wave count");
-                        parameterNames.push_back(tmp);
-                        tmp = new char[100];
-                        sprintf(tmp, "Wave depth");
-                        parameterNames.push_back(tmp);
-                        parameterValues.push_back(0);
-                        parameterValues.push_back(0);
+			parameters.push_back(TemplateParameter(0, string("Wave count")));
+			parameters.push_back(TemplateParameter(0, string("Wave depth")));
                         break;
         }
 

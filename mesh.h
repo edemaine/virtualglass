@@ -49,11 +49,7 @@ class Mesher
 		void applyCasingResizeTransform(Vertex* v, PullPlan* parentPlan);
 		Vertex applyTransforms(Vertex p, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices);
 		void applyPickupTransform(Vertex* p, SubpickupTemplate* spt);
-		void applyVaseTransform(Vertex* p, vector<int>* parameterValues);
-		void applyTumblerTransform(Vertex* p, vector<int>* parameterValues);
-		void applyBowlTransform(Vertex* p, vector<int>* parameterValues);
-		void applyPotTransform(Vertex* p, vector<int>* parameterValues);
-		void applyWavyPlateTransform(Vertex* p, vector<int>* parameterValues);
+		void applyPieceTransform(Geometry* geometry, enum PieceTemplate::Type type, vector<TemplateParameter> params);
 		float computeTotalCaneLength(Piece* piece);
 		float computeTotalCaneLength(PickupPlan* plan);
 		float computeTotalCaneLength(PullPlan* plan);
