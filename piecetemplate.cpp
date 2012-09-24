@@ -15,22 +15,22 @@ namespace PieceTemplate
 
 	enum Type firstSeedTemplate()
 	{
-		return tumbler;
+		return TUMBLER;
 	}
 
 	enum Type lastSeedTemplate()
 	{
-		return wavyPlate;
+		return WAVY_PLATE;
 	}
 
 	enum Type firstTemplate()
 	{
-		return tumbler;
+		return TUMBLER;
 	}
 
 	enum Type lastTemplate()
 	{
-		return wavyPlate;
+		return WAVY_PLATE;
 	}
 
 	const char* enumToString(enum Type t)

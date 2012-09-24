@@ -3,11 +3,11 @@
 
 PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 {
-	plan = new PullPlan(PullTemplate::baseCircle);
+	plan = new PullPlan(PullTemplate::BASE_CIRCLE);
 
 	viewWidget = new PullPlanEditorViewWidget(plan, this);	
 	customizeViewWidget = new PullPlanCustomizeViewWidget(plan, this);
-	niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);
+	niceViewWidget = new NiceViewWidget(NiceViewWidget::PULLPLAN_CAMERA_MODE, this);
 	niceViewWidget->setGeometry(&geometry);
 
 	setupLayout();

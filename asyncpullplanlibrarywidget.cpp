@@ -45,7 +45,7 @@ void AsyncPullPlanLibraryWidget :: updateDragPixmap()
 
         QPainter painter(&_pixmap);
 
-        drawSubplan(10, 10, 180, 180, pullPlan, pullPlan->getOutermostCasingShape(), true, &painter);
+        drawSubplan(10, 10, 180, 180, pullPlan, true, &painter);
 
         painter.setBrush(Qt::NoBrush);
         setBoundaryPainter(&painter, true);
@@ -57,12 +57,12 @@ void AsyncPullPlanLibraryWidget :: updateDragPixmap()
 }
 
 void AsyncPullPlanLibraryWidget :: drawSubplan(float x, float y, float drawWidth, float drawHeight,
-        PullPlan* plan, int mandatedShape, bool outermostLevel, QPainter* painter) {
+        PullPlan* plan, bool outermostLevel, QPainter* painter) {
 
         // Fill the subplan area with some `cleared out' color
         painter->setBrush(QColor(200, 200, 200));
         painter->setPen(Qt::NoPen);
-        paintShape(x, y, drawWidth, mandatedShape, painter);
+        paintShape(x, y, drawWidth, plan->getOutermostCasingShape(), painter);
 
         // Do casing colors outermost to innermost to get concentric rings of each casing's color
         // Skip outermost casing (that is done by your parent) and innermost (that is the `invisible'
@@ -98,15 +98,7 @@ void AsyncPullPlanLibraryWidget :: drawSubplan(float x, float y, float drawWidth
                 float rWidth = sub->diameter * drawWidth/2;
                 float rHeight = sub->diameter * drawHeight/2;
 
-                if (outermostLevel) {
-			drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan,
-				plan->subs[i].shape, true, painter);
-                }
-                else {
-                        drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan,
-                                plan->subs[i].shape, false, painter);
-                }
-
+		drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, outermostLevel, painter);
                 setBoundaryPainter(painter, outermostLevel);
                 painter->setBrush(Qt::NoBrush);
                 paintShape(rX, rY, rWidth, plan->subs[i].shape, painter);
@@ -132,7 +124,7 @@ void AsyncPullPlanLibraryWidget :: setBoundaryPainter(QPainter* painter, bool ou
 
 }
 
-void AsyncPullPlanLibraryWidget :: paintShape(float x, float y, float size, int shape, QPainter* painter)
+void AsyncPullPlanLibraryWidget :: paintShape(float x, float y, float size, enum GeometricShape shape, QPainter* painter)
 {
         switch (shape)
         {

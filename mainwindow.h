@@ -7,6 +7,7 @@
 #include <QObject>
 
 #include "constants.h"
+#include "dependancy.h"
 #include "niceviewwidget.h"
 #include "asyncpiecelibrarywidget.h"
 #include "asyncpullplanlibrarywidget.h"
@@ -38,6 +39,15 @@ class MainWindow : public QMainWindow
 		void someDataChanged();
 
 	private:
+		// enums
+		enum ViewMode
+		{
+			EMPTY_VIEW_MODE=0, // must start at 0 to match usage as QStackedWidget index
+			COLORBAR_VIEW_MODE,
+			PULLPLAN_VIEW_MODE,
+			PIECE_VIEW_MODE
+		};
+
 		// Methods
 		void setupLibrary();
 		void setupEditors();
@@ -49,7 +59,7 @@ class MainWindow : public QMainWindow
 		void updateLibrary();
 		void initializeRandomPiece();
 		void deleteCurrentEditingObject();
-		void setViewMode(int mode);
+		void setViewMode(enum ViewMode m);
 
 		void unhighlightLibraryWidget(PieceTemplateLibraryWidget* w);
 		void unhighlightLibraryWidget(PickupTemplateLibraryWidget* w);
@@ -58,9 +68,9 @@ class MainWindow : public QMainWindow
 		void unhighlightLibraryWidget(AsyncPieceLibraryWidget* w);
 		void highlightLibraryWidget(PieceTemplateLibraryWidget* w);
 		void highlightLibraryWidget(PickupTemplateLibraryWidget* w);
-		void highlightLibraryWidget(AsyncColorBarLibraryWidget* w, int dependancy);
-		void highlightLibraryWidget(AsyncPullPlanLibraryWidget* w, int dependancy);
-		void highlightLibraryWidget(AsyncPieceLibraryWidget* w, int dependancy);
+		void highlightLibraryWidget(AsyncColorBarLibraryWidget* w, enum Dependancy d);
+		void highlightLibraryWidget(AsyncPullPlanLibraryWidget* w, enum Dependancy d);
+		void highlightLibraryWidget(AsyncPieceLibraryWidget* w, enum Dependancy d);
 		void unhighlightAllLibraryWidgets();
 
 		// Variables

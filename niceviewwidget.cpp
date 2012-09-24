@@ -20,7 +20,8 @@ void gl_errors(string const &where) {
 
 
 
-NiceViewWidget :: NiceViewWidget(int cameraMode, QWidget *parent) : QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent), peelRenderer(NULL)
+NiceViewWidget :: NiceViewWidget(enum CameraMode cameraMode, QWidget *parent) 
+	: QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent), peelRenderer(NULL)
 {
 	leftMouseDown = false;
 	bgColor = QColor(200, 200, 200);
@@ -29,7 +30,7 @@ NiceViewWidget :: NiceViewWidget(int cameraMode, QWidget *parent) : QGLWidget(QG
 
 	switch (cameraMode)
 	{
-		case PULLPLAN_MODE:
+		case PULLPLAN_CAMERA_MODE:
 			theta = -PI/2.0;
 			phi = PI/2;
 			rho = 11.0; 
@@ -37,7 +38,7 @@ NiceViewWidget :: NiceViewWidget(int cameraMode, QWidget *parent) : QGLWidget(QG
 			lookAtLoc[1] = 0.0;
 			lookAtLoc[2] = 5.0;
 			break;
-		case PICKUPPLAN_MODE:
+		case PICKUPPLAN_CAMERA_MODE:
 			theta = -PI/2.0;
 			phi = PI/2;
 			// rho set in resizeGL() b/c it depends on window size 
@@ -45,7 +46,7 @@ NiceViewWidget :: NiceViewWidget(int cameraMode, QWidget *parent) : QGLWidget(QG
 			lookAtLoc[1] = 0.0;
 			lookAtLoc[2] = 0.0;
 			break;
-		case PIECE_MODE:
+		case PIECE_CAMERA_MODE:
 			theta = -PI/2.0;
 			phi = PI/2;
 			rho = 16.0; 
@@ -197,7 +198,7 @@ Calls if the NiceViewWidget object is resized (in the GUI sense).
 */
 void NiceViewWidget :: resizeGL(int width, int height)
 {
-	if (this->cameraMode == PICKUPPLAN_MODE)
+	if (this->cameraMode == PICKUPPLAN_CAMERA_MODE)
 	{
 		rho = 11.5;	
 		if (width < height)
@@ -241,21 +242,19 @@ void NiceViewWidget :: setGLMatrices()
 	float w = viewport[2];
 	float h = viewport[3];
 
-	if (cameraMode == PIECE_MODE)
+	switch (cameraMode)
 	{
-		gluPerspective(45.0, w / h, 0.01, 100.0);
-	}
-	else if (cameraMode == PULLPLAN_MODE) 
-	{
-		float a = h / w;
-		float s = 2.2f / rho;
-		glScalef(a * s, s,-0.01);
-	}
-	else // pickup plan mode
-	{
-		float a = h / w;
-		float s = 2.2f / rho;
-		glScalef(a * s, s,-0.01);
+		case PIECE_CAMERA_MODE:
+			gluPerspective(45.0, w / h, 0.01, 100.0);
+			break;
+		case PULLPLAN_CAMERA_MODE:
+		case PICKUPPLAN_CAMERA_MODE:
+			{
+				float a = h / w;
+				float s = 2.2f / rho;
+				glScalef(a * s, s,-0.01);
+			}
+			break;
 	}
 
 	glMatrixMode(GL_MODELVIEW);
@@ -276,7 +275,7 @@ void NiceViewWidget :: mousePressEvent (QMouseEvent* e)
 	// In pickup plan mode, user does not move camera location, zoom, etc.
 	// The widget is a passive `display' widget only, with an interactive layer
 	// on top of it (PickupPlanEditorViewWidget), which we pass the event up to.
-	if (cameraMode == PICKUPPLAN_MODE)
+	if (cameraMode == PICKUPPLAN_CAMERA_MODE)
 	{
 		e->ignore(); 
 		return;
@@ -340,13 +339,13 @@ void NiceViewWidget :: mouseMoveEvent (QMouseEvent* e)
 	mouseLocY = e->y();
 	relY = (mouseLocY - oldMouseLocY) / windowHeight;
 
-	if (cameraMode == PICKUPPLAN_MODE)
+	if (cameraMode == PICKUPPLAN_CAMERA_MODE)
 		return;
 
 	if (leftMouseDown)
 	{
 		theta -= (relX * 100.0 * PI / 180.0);
-		if (cameraMode == PIECE_MODE)
+		if (cameraMode == PIECE_CAMERA_MODE)
 			phi = MIN(PI-0.0001, MAX(0.0001, phi - (relY * 100.0 * PI / 180.0)));
 		update();
 	}
@@ -355,7 +354,7 @@ void NiceViewWidget :: mouseMoveEvent (QMouseEvent* e)
 
 void NiceViewWidget :: wheelEvent(QWheelEvent *e)
 {
-	if (cameraMode == PICKUPPLAN_MODE || cameraMode == PULLPLAN_MODE)
+	if (cameraMode == PICKUPPLAN_CAMERA_MODE || cameraMode == PULLPLAN_CAMERA_MODE)
 		return;
 
 	if (e->delta() > 0)
@@ -370,7 +369,7 @@ void NiceViewWidget :: wheelEvent(QWheelEvent *e)
 
 void NiceViewWidget :: zoom(float z)
 {
-	if (cameraMode == PICKUPPLAN_MODE)
+	if (cameraMode == PICKUPPLAN_CAMERA_MODE)
 		return;
 
 	this->rho+=z;

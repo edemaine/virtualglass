@@ -15,15 +15,15 @@ using std::vector;
 class Piece
 {
 	public:
-		Piece(enum PieceTemplate::Type type);
+		Piece(enum PieceTemplate::Type t);
 
-		void setTemplateType(enum PieceTemplate::Type type, bool force=false);
+		void setTemplateType(enum PieceTemplate::Type t, bool force=false);
 		enum PieceTemplate::Type getTemplateType();
 
 		Piece* copy() const;
 		PickupPlan* pickup;
-		bool hasDependencyOn(GlassColor* color);
-		bool hasDependencyOn(PullPlan* pullPlan);
+		bool hasDependencyOn(GlassColor* c);
+		bool hasDependencyOn(PullPlan* p);
 
 		unsigned int getParameterCount();
 		void getParameter(unsigned int index, TemplateParameter* dest);

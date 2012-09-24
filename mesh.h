@@ -11,6 +11,7 @@
 #include "subpickuptemplate.h"
 #include "piece.h"
 #include "glasscolor.h"
+#include "shape.h"
 
 #define TOTAL_AXIAL_RESOLUTION 6000
 
@@ -39,10 +40,10 @@ class Mesher
 		float asymptoteVal(float s, float t);
 		float splineVal(float r1, float r2, float r3, float t);
 		float splineVal(float r1, float r2, float r3, float r4, float t);
-		void meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
-			Color* color, int shape, float offset, float length, float radius, 
+		void meshPolygonalBaseCane(Geometry* g, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
+			Color* c, enum GeometricShape s, float offset, float length, float radius, 
 			bool ensureVisible, uint32_t group_tag);
-		void meshPickupCasingSlab(Geometry* geometry, Color* color, float y, float thickness);
+		void meshPickupCasingSlab(Geometry* g, Color* c, float y, float thickness);
 		void applyResizeTransform(Vertex* v, float scale);
 		void applySubplanTransform(Vertex* v, PullPlan* parentPlan, int subplan);
 		void applySubplanTransform(Geometry* geometry, PullPlan* parentPlan, int subplan);

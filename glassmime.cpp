@@ -1,13 +1,18 @@
 
 #include "glassmime.h"
 
-void encodeMimeData(char* mimeData, void* ptr, int type)
+namespace GlassMime
 {
-        sprintf(mimeData, "%p %d", ptr, type);
-}
+	void encode(char* mimeData, void* ptr, enum Type type)
+	{
+		sprintf(mimeData, "%p %d", ptr, type);
+	}
 
-void decodeMimeData(const char* mimeData, void** ptr, int* type)
-{
-	sscanf(mimeData, "%p %d", ptr, type);
+	void decode(const char* mimeData, void** ptr, enum Type* type)
+	{
+		int tmp; 
+		sscanf(mimeData, "%p %d", ptr, &tmp);
+		*type = static_cast<enum Type>(tmp);
+	}
 }
 

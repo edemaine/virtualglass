@@ -26,19 +26,27 @@ class NiceViewWidget : public QGLWidget
 	Q_OBJECT
 
 public:
-	NiceViewWidget(int cameraMode, QWidget* parent=0);
+        enum CameraMode
+        {
+                PULLPLAN_CAMERA_MODE,
+		PICKUPPLAN_CAMERA_MODE,
+               	PIECE_CAMERA_MODE 
+        };
+
+	NiceViewWidget(enum CameraMode cameraMode, QWidget* parent=0);
 	virtual ~NiceViewWidget();
 	bool peelEnabled();
 	void setGeometry(Geometry* g);
 
 	Vector3f eyePosition();
 
+
 private:
 	bool leftMouseDown;
 	QColor bgColor;
 	Geometry *geometry;
 
-	int cameraMode;
+	enum CameraMode cameraMode;
 
 	float lookAtLoc[3];
 	float theta, phi, rho;

@@ -8,11 +8,11 @@ namespace PieceTemplate
 	// names[] array and the first/last template functions in piecetemplate.cpp
 	enum Type
 	{
-		tumbler=1,
-		bowl,
-		vase,
-		pot,
-		wavyPlate
+		TUMBLER=1,
+		BOWL,
+		VASE,
+		POT,
+		WAVY_PLATE
 	};
 	
 	enum Type firstSeedTemplate();

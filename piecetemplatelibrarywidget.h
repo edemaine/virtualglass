@@ -8,7 +8,7 @@
 class PieceTemplateLibraryWidget : public QLabel
 {
 	public:
-		PieceTemplateLibraryWidget(QPixmap view, enum PieceTemplate::Type type, QWidget* parent=0);
+		PieceTemplateLibraryWidget(QPixmap view, enum PieceTemplate::Type t, QWidget* parent=0);
 		enum PieceTemplate::Type type;
 };
 

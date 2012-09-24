@@ -19,10 +19,10 @@ using std::vector;
 class PickupPlan
 {
 	public:
-		PickupPlan(enum PickupTemplate::Type type);
+		PickupPlan(enum PickupTemplate::Type t);
 		PickupPlan();
 
-		void setTemplateType(enum PickupTemplate::Type type, bool force=false);
+		void setTemplateType(enum PickupTemplate::Type t, bool force=false);
 		enum PickupTemplate::Type getTemplateType();
 
                 unsigned int getParameterCount();
@@ -39,7 +39,7 @@ class PickupPlan
 	private:
 		void updateSubs();
 		void pushNewSubplan(vector<SubpickupTemplate>* newSubs, Point location,
-			enum PickupCane::Orientation ori, float length, float width, int shape, int group); 
+			enum PickupCaneOrientation ori, float length, float width, enum GeometricShape s, int group); 
 		enum PickupTemplate::Type type;
 		vector<TemplateParameter> parameters;
 		PullPlan* defaultSubplan;

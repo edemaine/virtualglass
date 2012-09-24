@@ -5,7 +5,7 @@ Piece :: Piece(enum PieceTemplate::Type _type)
 {
 	setTemplateType(_type);
 	// initialize the piece's pickup to be something boring and base
-	this->pickup = new PickupPlan(PickupTemplate::verticals);
+	this->pickup = new PickupPlan(PickupTemplate::VERTICAL);
 }
 
 bool Piece :: hasDependencyOn(PullPlan* plan)
@@ -93,25 +93,25 @@ void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
         {
 		// Is it possible to just make a string const and hope it's 
 		// kept around as long as the TemplateParameter is?
-                case PieceTemplate::vase:
+                case PieceTemplate::VASE:
 			parameters.push_back(TemplateParameter(0, string("Lip width")));
 			parameters.push_back(TemplateParameter(0, string("Body width")));
 			parameters.push_back(TemplateParameter(0, string("Twist")));
                         break;
-                case PieceTemplate::tumbler:
+                case PieceTemplate::TUMBLER:
 			parameters.push_back(TemplateParameter(0, string("Size")));
 			parameters.push_back(TemplateParameter(0, string("Roundedness")));
                         break;
-                case PieceTemplate::bowl:
+                case PieceTemplate::BOWL:
 			parameters.push_back(TemplateParameter(0, string("Openness")));
 			parameters.push_back(TemplateParameter(0, string("Size")));
 			parameters.push_back(TemplateParameter(0, string("Twist")));
                         break;
-                case PieceTemplate::pot:
+                case PieceTemplate::POT:
 			parameters.push_back(TemplateParameter(0, string("Body radius")));
 			parameters.push_back(TemplateParameter(0, string("Lip radius")));
                         break;
-                case PieceTemplate::wavyPlate:
+                case PieceTemplate::WAVY_PLATE:
 			parameters.push_back(TemplateParameter(0, string("Wave count")));
 			parameters.push_back(TemplateParameter(0, string("Wave depth")));
                         break;

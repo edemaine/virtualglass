@@ -1,9 +1,8 @@
 #ifndef QGRAPHICSHIGHLIGHTEFFECT_H
 #define QGRAPHICSHIGHLIGHTEFFECT_H
 
-#include <QGraphicsEffect>
 #include <QtGui>
-#include "constants.h"
+#include "dependancy.h" 
 
 class QGraphicsHighlightEffect : public QGraphicsEffect
 {
@@ -12,7 +11,7 @@ class QGraphicsHighlightEffect : public QGraphicsEffect
 public:
 	explicit QGraphicsHighlightEffect(QObject *parent = 0);
 	virtual QRectF boundingRectFor(const QRectF &sourceRect) const;
-	void setHighlightType(int dependancy);
+	void setHighlightType(enum Dependancy d);
 
 signals:
 	void styleSheetString(QString string);
@@ -21,10 +20,10 @@ public slots:
 	void setStyleSheet(bool enableBorder);
 
 protected:
-	virtual void draw( QPainter *painter ); // , QGraphicsEffectSource *source );
+	virtual void draw( QPainter *painter ); 
 
 private:
-	int dependancy;	
+	enum Dependancy dependancy;	
 };
 
 #endif // QGRAPHICSHIGHLIGHTEFFECT_H

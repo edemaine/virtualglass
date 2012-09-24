@@ -4,7 +4,6 @@
 
 #include <QtGui>
 #include "pickupplan.h"
-#include "constants.h"
 #include "niceviewwidget.h"
 #include "mesh.h"
 #include "geometry.h"

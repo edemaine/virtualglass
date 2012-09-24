@@ -11,6 +11,8 @@
 #include "pulltemplate.h"
 #include "casing.h"
 #include "glasscolor.h"
+#include "shape.h"
+#include "constants.h"
 
 using std::vector;
 
@@ -20,9 +22,9 @@ class SubpullTemplate;
 class PullPlan
 {
 	public:
-		PullPlan(enum PullTemplate::Type pullTemplate);
+		PullPlan(enum PullTemplate::Type t);
 
-		void setTemplateType(enum PullTemplate::Type pullTemplate, bool force=false);
+		void setTemplateType(enum PullTemplate::Type t, bool force=false);
 		void setTemplateTypeToCustom();
 		int getTemplateType();
 
@@ -31,13 +33,13 @@ class PullPlan
                 void setParameter(unsigned int index, int value);
 
 		void setCasingThickness(float t, unsigned int index);
-		void setOutermostCasingShape(int shape);
+		void setOutermostCasingShape(enum GeometricShape s);
 		void setCasingColor(GlassColor* gc, unsigned int index);
-		void addCasing(int shape);
+		void addCasing(enum GeometricShape s);
 		void removeCasing();
 		float getCasingThickness(unsigned int index);
-		int getCasingShape(unsigned int index);
-		int getOutermostCasingShape();
+		enum GeometricShape getCasingShape(unsigned int index);
+		enum GeometricShape getOutermostCasingShape();
 		void setOutermostCasingColor(GlassColor* gc);
 		GlassColor* getOutermostCasingColor();
 		GlassColor* getCasingColor(unsigned int index);
@@ -69,7 +71,7 @@ class PullPlan
 		void initializeTemplate();
 		void resetSubs(vector<SubpullTemplate> oldSubs);
 		void pushNewSubpull(vector<SubpullTemplate>* newSubs,
-			int shape, Point location, float diameter, int group);
+			enum GeometricShape s, Point location, float diameter, int group);
 };
 
 PullPlan *deep_copy(const PullPlan *plan);

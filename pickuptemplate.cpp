@@ -6,7 +6,7 @@ namespace PickupTemplate
         const char* names[] =
         {
                 "Undefined",
-                "Verticals",
+                "Vertical",
                 "Reticello Vertical Horizontal",
                 "Murrine Column",
                 "Verticals and Horizontals",
@@ -18,22 +18,22 @@ namespace PickupTemplate
 
 	enum Type firstTemplate()
 	{
-		return verticals;
+		return VERTICAL;
 	}
 
 	enum Type lastTemplate()
 	{
-		return murrine;
+		return MURRINE;
 	}
 
 	enum Type firstSeedTemplate()
 	{
-		return verticals;
+		return VERTICAL;
 	}
 
 	enum Type lastSeedTemplate()
 	{
-		return murrine;
+		return MURRINE;
 	}
 
         const char* enumToString(enum Type t)

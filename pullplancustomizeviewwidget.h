@@ -4,13 +4,11 @@
 #include <QtGui>
 #include <QtDebug>
 #include <cfloat>
-#include "constants.h"
 #include "pullplan.h"
 #include "primitives.h"
 #include "pulltemplate.h"
-
-#define MOVE_MODE 1
-#define SCALE_MODE 2
+#include "shape.h"
+#include "constants.h"
 
 class PullPlanCustomizeViewWidget : public QWidget
 {
@@ -37,16 +35,22 @@ protected:
 	void mousePressEvent(QMouseEvent* event);
 	void mouseReleaseEvent(QMouseEvent* event);
 	void resizeEvent(QResizeEvent* event);
-    void keyPressEvent(QKeyEvent* event);
+	void keyPressEvent(QKeyEvent* event);
 
 private:
+	enum GUIMode
+	{
+		MOVE_MODE,
+		SCALE_MODE
+	};
+
 	float adjustedX(float rawX);
 	float adjustedY(float rawX);
 	float rawX(float adjustedX);
 	float rawY(float adjustedY);
 	void drawSubplan(float x, float y, float drawWidth, float drawHeight,
-        PullPlan* plan, int mandatedShape, bool outermostLevel, QPainter* painter);
-	void paintShape(float x, float y, float size, int shape, QPainter* painter);
+        	PullPlan* plan, bool outermostLevel, QPainter* painter);
+	void paintShape(float x, float y, float size, enum GeometricShape s, QPainter* painter);
 	void setBoundaryPainter(QPainter* painter, bool outermostLevel, bool greyedOut);
 	void drawActionControls(QPainter* painter);
 	bool isValidMovePosition(QMouseEvent* event);
@@ -55,7 +59,7 @@ private:
 
 	PullPlan* plan;
 	PullPlan* hoveringPlan;
-	int mode;
+	GUIMode mode;
 	int hoveringIndex;
 	int activeBoxIndex;
 	PullPlan* tempCirclePlan;

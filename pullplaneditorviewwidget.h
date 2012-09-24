@@ -4,7 +4,7 @@
 
 #include <QtGui>
 #include <vector>
-#include "constants.h"
+#include "shape.h"
 #include "pullplan.h"
 #include "asyncpullplanlibrarywidget.h"
 #include "asynccolorbarlibrarywidget.h"
@@ -37,19 +37,19 @@ class PullPlanEditorViewWidget : public QWidget
 		void resizeEvent(QResizeEvent* event);
 
 	private:
-		void paintShape(float x, float y, float size, int shape, QPainter* painter);
+		void paintShape(float x, float y, float size, enum GeometricShape s, QPainter* p);
 		float adjustedX(float rawX);
 		float adjustedY(float rawX);
 		float rawX(float adjustedX);
 		float rawY(float adjustedY);
 		void setBoundaryPainter(QPainter* painter, bool outermostLevel);
 		void drawSubplan(float x, float y, float width, float height, PullPlan* plan, 
-			bool highlightThis, int mandatedShape, bool outermostLevel, QPainter* painter);
+			bool highlightThis, bool outermostLevel, QPainter* painter);
 		void updateHighlightedSubplansAndCasings(QDropEvent* event);
 		void populateHighlightedSubplans(int x, int y, QDropEvent* event);
 		void populateHighlightedCasings(int x, int y);
 		bool isOnCasing(int casingIndex, float x, float y);
-		float getShapeRadius(int shape, float x, float y);
+		float getShapeRadius(enum GeometricShape s, float x, float y);
 		void setMinMaxCasingRadii(float* min, float* max);
 		PullPlan* getSubplanAt(float x, float y);
 

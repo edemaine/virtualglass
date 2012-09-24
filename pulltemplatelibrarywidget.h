@@ -7,7 +7,7 @@
 class PullTemplateLibraryWidget : public QLabel
 {
 	public:
-		PullTemplateLibraryWidget(QPixmap view, enum PullTemplate::Type type, QWidget* parent=0);
+		PullTemplateLibraryWidget(QPixmap view, enum PullTemplate::Type t, QWidget* parent=0);
 		enum PullTemplate::Type type;
 };
 

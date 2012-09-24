@@ -7,9 +7,9 @@ PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget
 	setMinimumSize(200, 200);
 	setPullPlan(plan);
 	GlassColor* glassColor = new GlassColor();
-	tempCirclePlan = new PullPlan(PullTemplate::customCircle);
+	tempCirclePlan = new PullPlan(PullTemplate::CUSTOM_CIRCLE);
 	tempCirclePlan->setCasingColor(glassColor, 0);
-	tempSquarePlan = new PullPlan(PullTemplate::customSquare);
+	tempSquarePlan = new PullPlan(PullTemplate::CUSTOM_SQUARE);
 	tempSquarePlan->setCasingColor(glassColor, 0);
 	mouseStartingLoc.x = FLT_MAX;
 	mouseStartingLoc.y = FLT_MAX;
@@ -428,8 +428,8 @@ void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
 	this->plan = plan;
 	if (this->isVisible())
 	{
-		if (this->plan->getTemplateType() != PullTemplate::customCircle 
-			&& this->plan->getTemplateType() != PullTemplate::customSquare)
+		if (this->plan->getTemplateType() != PullTemplate::CUSTOM_CIRCLE 
+			&& this->plan->getTemplateType() != PullTemplate::CUSTOM_SQUARE)
 		{
 			subplansSelected.clear();
 			activeControlPoint = -1;
@@ -508,7 +508,7 @@ void PullPlanCustomizeViewWidget :: setBoundaryPainter(QPainter* painter, bool o
 
 }
 
-void PullPlanCustomizeViewWidget :: paintShape(float x, float y, float size, int shape, QPainter* painter)
+void PullPlanCustomizeViewWidget :: paintShape(float x, float y, float size, enum GeometricShape shape, QPainter* painter)
 {
 	int roundedX, roundedY;
 	
@@ -527,12 +527,12 @@ void PullPlanCustomizeViewWidget :: paintShape(float x, float y, float size, int
 
 }
 void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidth, float drawHeight,
-                                                PullPlan* plan, int mandatedShape, bool outermostLevel, QPainter* painter)
+	PullPlan* plan, bool outermostLevel, QPainter* painter)
 {
 	// Fill the subplan area with some `cleared out' color
 	painter->setBrush(QColor(200, 200, 200));
 	painter->setPen(Qt::NoPen);
-	paintShape(x, y, drawWidth, mandatedShape, painter);
+	paintShape(x, y, drawWidth, plan->getOutermostCasingShape(), painter);
 
 	// Do casing colors outermost to innermost to get concentric rings of each casing's color
 	// Skip outermost casing (that is done by your parent) and innermost (that is the `invisible'
@@ -566,8 +566,7 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 		float rWidth = sub->diameter * drawWidth/2;
 		float rHeight = sub->diameter * drawHeight/2;
 
-		drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan,
-			plan->subs[i].shape, false, painter);
+		drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, false, painter);
 
 		setBoundaryPainter(painter, outermostLevel);
 		painter->setBrush(Qt::NoBrush);
@@ -659,8 +658,7 @@ void PullPlanCustomizeViewWidget :: paintEvent(QPaintEvent *event)
 	painter.setRenderHint(QPainter::Antialiasing);
 
 	painter.fillRect(event->rect(), QColor(200, 200, 200));
-	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan, plan->getOutermostCasingShape(), 
-		true, &painter);
+	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan, true, &painter);
 
 	painter.setBrush(Qt::NoBrush);
 	setBoundaryPainter(&painter, true);
@@ -744,7 +742,7 @@ void PullPlanCustomizeViewWidget :: addCirclePressed()
 	{
 		diameter = plan->getCasingThickness(0);
 	}
-	plan->subs.insert(plan->subs.begin(), SubpullTemplate(new PullPlan(PullTemplate::baseCircle),
+	plan->subs.insert(plan->subs.begin(), SubpullTemplate(new PullPlan(PullTemplate::BASE_CIRCLE),
 		CIRCLE_SHAPE, p, diameter, 0));
 	subplansSelected.clear();
 	subplansSelected.push_back(0);
@@ -765,7 +763,7 @@ void PullPlanCustomizeViewWidget :: addSquarePressed()
 	{
 		diameter = plan->getCasingThickness(0);
 	}
-	plan->subs.insert(plan->subs.begin(),SubpullTemplate(new PullPlan(PullTemplate::baseSquare),
+	plan->subs.insert(plan->subs.begin(),SubpullTemplate(new PullPlan(PullTemplate::BASE_SQUARE),
 		SQUARE_SHAPE, p, diameter, 0));
 	subplansSelected.clear();
 	subplansSelected.push_back(0);

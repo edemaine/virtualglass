@@ -60,7 +60,7 @@ float PullPlanEditorViewWidget :: rawY(float adjustedY)
 	return adjustedY + ulY;
 }
 
-float PullPlanEditorViewWidget :: getShapeRadius(int shape, float x, float y)
+float PullPlanEditorViewWidget :: getShapeRadius(enum GeometricShape shape, float x, float y)
 {
 	switch (shape)
 	{
@@ -98,15 +98,12 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	PullPlan* selectedSubplan = getSubplanAt(x, y);
 	if (selectedSubplan != NULL)
 	{
-		int type;
-		QPixmap pixmap;
-
-		type = PULL_PLAN_MIME;
+		enum GlassMime::Type type = GlassMime::pullplan;
 		AsyncPullPlanLibraryWidget plplw(selectedSubplan);		
-		pixmap = *(plplw.getDragPixmap());
+		QPixmap pixmap = *(plplw.getDragPixmap());
 
 	        char buf[500];
-		encodeMimeData(buf, selectedSubplan, type);
+		GlassMime::encode(buf, selectedSubplan, type);
 		QByteArray pointerData(buf);
 		QMimeData* mimeData = new QMimeData;
 		mimeData->setText(pointerData);
@@ -212,20 +209,18 @@ void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 {
 	event->acceptProposedAction();
 	void* ptr;
-	int type;
-        decodeMimeData(event->mimeData()->text().toAscii().constData(), &ptr, &type);
+	enum GlassMime::Type type;
+        GlassMime::decode(event->mimeData()->text().toAscii().constData(), &ptr, &type);
 	switch (type)
 	{
-		case COLOR_BAR_MIME:
+		case GlassMime::colorbar:
 			isDraggingColor = true;
 			draggedColor = reinterpret_cast<GlassColor*>(ptr);
 			break;
-		case PULL_PLAN_MIME:
+		case GlassMime::pullplan:
 			isDraggingPlan = true;
 			draggedPlan = reinterpret_cast<PullPlan*>(ptr);
 			break;
-		default:
-			return;
 	}
 }
 
@@ -389,7 +384,7 @@ void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, bool oute
 	}
 }
 
-void PullPlanEditorViewWidget :: paintShape(float x, float y, float size, int shape, QPainter* painter)
+void PullPlanEditorViewWidget :: paintShape(float x, float y, float size, enum GeometricShape shape, QPainter* painter)
 {
         int roundedX, roundedY;
 
@@ -410,19 +405,19 @@ void PullPlanEditorViewWidget :: paintShape(float x, float y, float size, int sh
 
 
 void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, float drawHeight, 
-	PullPlan* plan, bool highlightThis, int mandatedShape, bool outermostLevel, QPainter* painter) {
+	PullPlan* plan, bool highlightThis, bool outermostLevel, QPainter* painter) {
 
 	// Fill the subplan area with some `cleared out' color
 	painter->setBrush(QColor(200, 200, 200));
 	painter->setPen(Qt::NoPen);
-	paintShape(x, y, drawWidth, mandatedShape, painter);
+	paintShape(x, y, drawWidth, plan->getOutermostCasingShape(), painter);
 
         if (highlightThis)
         {
                 painter->setBrush(QColor(255*highlightColor.r, 255*highlightColor.g, 255*highlightColor.b,
                         255*highlightColor.a));
                 painter->setPen(Qt::NoPen);
-                paintShape(x, y, drawWidth, mandatedShape, painter);
+                paintShape(x, y, drawWidth, plan->getOutermostCasingShape(), painter);
                 return;
         }
 
@@ -472,20 +467,13 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 				if (subplansHighlighted[j] == i)
 					highlighted = true;
 			}
-			if (highlighted) {
-				drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
-					true, plan->subs[i].shape, false, painter);
-			}
-			else {
-				drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
-					false, plan->subs[i].shape, false, painter);
 
-			}
+			drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
+				highlighted, false, painter);
 		}
 		else {
 			drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
-				false, plan->subs[i].shape, 
-				false, painter);
+				false, false, painter);
 		}
 		
 		painter->setBrush(Qt::NoBrush);
@@ -502,8 +490,7 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 	painter.setRenderHint(QPainter::Antialiasing);
 
 	painter.fillRect(event->rect(), QColor(200, 200, 200));
-	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan, false, 
-		plan->getOutermostCasingShape(), true, &painter);
+	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan, false, true, &painter);
 
 	painter.setBrush(Qt::NoBrush);
 	setBoundaryPainter(&painter, true);

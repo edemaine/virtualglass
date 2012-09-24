@@ -8,7 +8,7 @@
 class PickupTemplateLibraryWidget : public QLabel
 {
 	public:
-		PickupTemplateLibraryWidget(QPixmap view, enum PickupTemplate::Type type, QWidget* parent=0);
+		PickupTemplateLibraryWidget(QPixmap view, enum PickupTemplate::Type t, QWidget* parent=0);
 		enum PickupTemplate::Type type;
 };
 

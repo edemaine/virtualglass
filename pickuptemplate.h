@@ -2,17 +2,6 @@
 #ifndef PICKUPTEMPLATE_H
 #define PICKUPTEMPLATE_H
 
-// Pickup cane orientations
-namespace PickupCane
-{
-	enum Orientation
-	{
-		horizontal,
-		vertical,
-		murrine
-	};
-}
-
 // Pickup template types
 namespace PickupTemplate
 {
@@ -20,14 +9,14 @@ namespace PickupTemplate
 	// and the first/last template functions in pickuptemplate.cpp
 	enum Type
 	{
-		verticals=1,
-		reticelloVerticalHorizontal,
-		murrineColumn,
-		verticalsAndHorizontals,
-		verticalHorizontalVertical,
-		verticalWithLipWrap,
-		murrineRow,
-		murrine
+		VERTICAL=1,
+		RETICELLO_VERTICAL_HORIZONTAL,
+		MURRINE_COLUMN,
+		VERTICALS_AND_HORIZONTALS,
+		VERTICAL_HORIZONTAL_VERTICAL,
+		VERTICAL_WITH_LIP_WRAP,
+		MURRINE_ROW,
+		MURRINE
 	};
 
 	enum Type firstTemplate();

@@ -3,7 +3,7 @@
 
 ColorEditorWidget :: ColorEditorWidget(GlassColor* _glassColor, QWidget* parent) : QWidget(parent)
 {
-	niceViewWidget = new NiceViewWidget(PULLPLAN_MODE, this);
+	niceViewWidget = new NiceViewWidget(NiceViewWidget::PULLPLAN_CAMERA_MODE, this);
 	glassColor = _glassColor;
 	mesher.generateColorMesh(glassColor, &geometry);
 	niceViewWidget->setGeometry(&geometry);

@@ -23,22 +23,22 @@ namespace PullTemplate
 
 	enum Type firstSeedTemplate()
 	{
-		return baseCircle;
+		return BASE_CIRCLE;
 	}
 
 	enum Type lastSeedTemplate()
 	{
-		return surroundingSquare;
+		return SURROUNDING_SQUARE;
 	}
 
 	enum Type firstTemplate()
 	{
-		return baseCircle;
+		return BASE_CIRCLE;
 	}
 
 	enum Type lastTemplate()
 	{
-		return customSquare;
+		return CUSTOM_SQUARE;
 	}
 
 	const char* enumToString(enum Type t)

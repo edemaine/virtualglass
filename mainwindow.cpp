@@ -16,26 +16,29 @@ MainWindow :: MainWindow()
 	show();
 
 	seedEverything();
-	setViewMode(EMPTY_MODE);
+	setViewMode(EMPTY_VIEW_MODE);
 	emit someDataChanged();
 	whatToDoLabel->setText("Click a library item at left to edit/view.");
 }
 
-void MainWindow :: setViewMode(int mode)
+void MainWindow :: setViewMode(enum ViewMode _mode)
 {
-	editorStack->setCurrentIndex(mode);
+	editorStack->setCurrentIndex(_mode);
 	copyColorBarButton->setEnabled(false);
 	copyPullPlanButton->setEnabled(false);
 	copyPieceButton->setEnabled(false);
-	switch (mode)
+	switch (_mode)
 	{
-		case COLORBAR_MODE:
+		case EMPTY_VIEW_MODE:
+			// leave all copy buttons disabled
+			break;
+		case COLORBAR_VIEW_MODE:
 			copyColorBarButton->setEnabled(true);
 			break;
-		case PULLPLAN_MODE:
+		case PULLPLAN_VIEW_MODE:
 			copyPullPlanButton->setEnabled(true);
 			break;
-		case PIECE_MODE:
+		case PIECE_VIEW_MODE:
 			copyPieceButton->setEnabled(true);
 			break;
 	}
@@ -57,17 +60,17 @@ QString MainWindow :: windowTitle()
 void MainWindow :: seedEverything()
 {
 	// Load color stuff
-	setViewMode(COLORBAR_MODE);
+	setViewMode(COLORBAR_VIEW_MODE);
 	colorEditorWidget->seedColors();
 	emit someDataChanged();
 
 	// Load pull template types
-	setViewMode(PULLPLAN_MODE);
+	setViewMode(PULLPLAN_VIEW_MODE);
 	emit someDataChanged();
 	pullPlanEditorWidget->seedTemplates();
 
 	// Load pickup and piece template types
-	setViewMode(PIECE_MODE);
+	setViewMode(PIECE_VIEW_MODE);
 	emit someDataChanged();
 	pieceEditorWidget->seedTemplates();
 }
@@ -104,7 +107,7 @@ void MainWindow :: deleteCurrentEditingObject()
 
 	switch (editorStack->currentIndex())
 	{
-		case COLORBAR_MODE:
+		case COLORBAR_VIEW_MODE:
 		{
 			if (colorBarLibraryLayout->count() == 1)
 				return;
@@ -129,7 +132,7 @@ void MainWindow :: deleteCurrentEditingObject()
 			emit someDataChanged();
 			break;
 		}
-		case PULLPLAN_MODE:
+		case PULLPLAN_VIEW_MODE:
 		{
 			if (pullPlanLibraryLayout->count() == 1)
 				return;
@@ -154,7 +157,7 @@ void MainWindow :: deleteCurrentEditingObject()
 			emit someDataChanged();
 			break;
 		}
-		case PIECE_MODE:
+		case PIECE_VIEW_MODE:
 		{
 			if (pieceLibraryLayout->count() == 1)
 				return;
@@ -196,21 +199,21 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	{
 		unhighlightAllLibraryWidgets();
 		colorEditorWidget->setGlassColor(cblw->getGlassColor());
-		setViewMode(COLORBAR_MODE);
+		setViewMode(COLORBAR_VIEW_MODE);
 		emit someDataChanged();
 	}
 	else if (plplw != NULL)
 	{
 		unhighlightAllLibraryWidgets();
 		pullPlanEditorWidget->setPlan(plplw->getPullPlan());
-		setViewMode(PULLPLAN_MODE);
+		setViewMode(PULLPLAN_VIEW_MODE);
 		emit someDataChanged();
 	}
 	else if (plw != NULL)
 	{
 		unhighlightAllLibraryWidgets();
 		pieceEditorWidget->setPiece(plw->getPiece());
-		setViewMode(PIECE_MODE);
+		setViewMode(PIECE_VIEW_MODE);
 		emit someDataChanged();
 	}
 }
@@ -250,12 +253,12 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	
 	if (cblw != NULL)
 	{
-		encodeMimeData(buf, cblw->getGlassColor()->getColor(), COLOR_BAR_MIME);
+		GlassMime::encode(buf, cblw->getGlassColor()->getColor(), GlassMime::colorbar);
 		pixmap = *cblw->getDragPixmap();
 	}
 	else if (plplw != NULL)
 	{
-		encodeMimeData(buf, plplw->getPullPlan(), PULL_PLAN_MIME);
+		GlassMime::encode(buf, plplw->getPullPlan(), GlassMime::pullplan);
 		pixmap = *plplw->getDragPixmap();
 	}
 	else
@@ -362,6 +365,9 @@ void MainWindow :: setupEditors()
 	editorStack = new QStackedWidget(centralWidget);
 	centralLayout->addWidget(editorStack, 2);
 
+	// The order that the editors are added to the stacked widget
+	// must match their order values in the enum EditorGUI::Mode
+	// in mainwindow.h
 	setupEmptyPaneEditor();
 	editorStack->addWidget(emptyEditorPage);
 
@@ -411,7 +417,7 @@ void MainWindow :: setupPullPlanEditor()
 void MainWindow :: newPiece()
 {
 	// Create the new piece
-	Piece* newEditorPiece = new Piece(PieceTemplate::tumbler);
+	Piece* newEditorPiece = new Piece(PieceTemplate::TUMBLER);
 
 	// Create the new library entry
 	unhighlightAllLibraryWidgets();
@@ -419,14 +425,14 @@ void MainWindow :: newPiece()
 	pieceEditorWidget->setPiece(newEditorPiece);
 
 	// Load up the right editor
-	setViewMode(PIECE_MODE);
+	setViewMode(PIECE_VIEW_MODE);
 
 	emit someDataChanged();
 }
 
 void MainWindow :: copyPiece()
 {
-	if (editorStack->currentIndex() != PIECE_MODE)
+	if (editorStack->currentIndex() != PIECE_VIEW_MODE)
 		return;
 
 	// Create the new piece
@@ -447,7 +453,7 @@ void MainWindow :: newColorBar()
 	colorEditorWidget->setGlassColor(newGlassColor);
 
 	// Load up the right editor
-	setViewMode(COLORBAR_MODE);
+	setViewMode(COLORBAR_VIEW_MODE);
 
 	// Trigger GUI updates
 	emit someDataChanged();
@@ -455,7 +461,7 @@ void MainWindow :: newColorBar()
 
 void MainWindow :: copyColorBar()
 {
-	if (editorStack->currentIndex() != COLORBAR_MODE)
+	if (editorStack->currentIndex() != COLORBAR_VIEW_MODE)
 		return;
 
 	GlassColor* newEditorGlassColor = colorEditorWidget->getGlassColor()->copy();
@@ -471,13 +477,13 @@ void MainWindow :: copyColorBar()
 
 void MainWindow :: newPullPlan()
 {
-	PullPlan *newEditorPlan = new PullPlan(PullTemplate::baseCircle);
+	PullPlan *newEditorPlan = new PullPlan(PullTemplate::BASE_CIRCLE);
 	emit newPullPlan(newEditorPlan);
 }
 
 void MainWindow :: copyPullPlan()
 {
-	if (editorStack->currentIndex() != PULLPLAN_MODE)
+	if (editorStack->currentIndex() != PULLPLAN_VIEW_MODE)
 		return;
 
 	PullPlan *newEditorPlan = pullPlanEditorWidget->getPlan()->copy();
@@ -493,7 +499,7 @@ void MainWindow :: newPullPlan(PullPlan* newPlan)
 	pullPlanEditorWidget->setPlan(newPlan);
 
 	// Load up the right editor
-	setViewMode(PULLPLAN_MODE);
+	setViewMode(PULLPLAN_VIEW_MODE);
 
 	// Trigger GUI updates
 	emit someDataChanged();
@@ -539,24 +545,24 @@ void MainWindow :: highlightLibraryWidget(PickupTemplateLibraryWidget* w)
 	w->graphicsEffect()->setEnabled(true);
 }
 
-void MainWindow :: highlightLibraryWidget(AsyncColorBarLibraryWidget* w, int dependancy)
+void MainWindow :: highlightLibraryWidget(AsyncColorBarLibraryWidget* w, enum Dependancy d)
 {
 	w->graphicsEffect()->setEnabled(false);
-	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(dependancy);
+	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(d);
 	w->graphicsEffect()->setEnabled(true);
 }
 
-void MainWindow :: highlightLibraryWidget(AsyncPullPlanLibraryWidget* w, int dependancy)
+void MainWindow :: highlightLibraryWidget(AsyncPullPlanLibraryWidget* w, enum Dependancy d)
 {
 	w->graphicsEffect()->setEnabled(false);
-	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(dependancy);
+	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(d);
 	w->graphicsEffect()->setEnabled(true);
 }
 
-void MainWindow :: highlightLibraryWidget(AsyncPieceLibraryWidget* w, int dependancy)
+void MainWindow :: highlightLibraryWidget(AsyncPieceLibraryWidget* w, enum Dependancy d)
 {
 	w->graphicsEffect()->setEnabled(false);
-	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(dependancy);
+	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(d);
 	w->graphicsEffect()->setEnabled(true);
 }
 
@@ -564,13 +570,13 @@ void MainWindow :: updateEverything()
 {
 	switch (editorStack->currentIndex())
 	{
-		case COLORBAR_MODE:
+		case COLORBAR_VIEW_MODE:
 			colorEditorWidget->updateEverything();
 			break;
-		case PULLPLAN_MODE:
+		case PULLPLAN_VIEW_MODE:
 			pullPlanEditorWidget->updateEverything();
 			break;
-		case PIECE_MODE:
+		case PIECE_VIEW_MODE:
 			pieceEditorWidget->updateEverything();
 			break;
 	}
@@ -584,7 +590,7 @@ void MainWindow :: updateLibrary()
 
 	switch (editorStack->currentIndex())
 	{
-		case COLORBAR_MODE:
+		case COLORBAR_VIEW_MODE:
 		{
                         AsyncColorBarLibraryWidget* cblw;
                         for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
@@ -607,7 +613,7 @@ void MainWindow :: updateLibrary()
 				if (pplw->getPullPlan()->hasDependencyOn(colorEditorWidget->getGlassColor()))
 				{
 					pplw->updatePixmaps();
-					highlightLibraryWidget(pplw, USES_DEPENDANCY);				
+					highlightLibraryWidget(pplw, USES_DEPENDANCY);
 				}
 			}
 
@@ -625,7 +631,7 @@ void MainWindow :: updateLibrary()
 
 			break;
 		}
-		case PULLPLAN_MODE:
+		case PULLPLAN_VIEW_MODE:
 		{
 			AsyncColorBarLibraryWidget* cblw;
 			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
@@ -633,7 +639,7 @@ void MainWindow :: updateLibrary()
 				cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(cblw->getGlassColor()))
-					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
+					highlightLibraryWidget(cblw, USEDBY_DEPENDANCY);
 			}
 
 			AsyncPullPlanLibraryWidget* pplw;
@@ -652,7 +658,7 @@ void MainWindow :: updateLibrary()
 				}
 				else if (pullPlanEditorWidget->getPlan()->hasDependencyOn(pplw->getPullPlan()))
 				{
-					highlightLibraryWidget(pplw, IS_USED_BY_DEPENDANCY);
+					highlightLibraryWidget(pplw, USEDBY_DEPENDANCY);
 				}
 				else if (pplw->getPullPlan()->hasDependencyOn(pullPlanEditorWidget->getPlan()))	
 				{
@@ -675,7 +681,7 @@ void MainWindow :: updateLibrary()
 
 			break;
 		}
-		case PIECE_MODE:
+		case PIECE_VIEW_MODE:
 		{
 			AsyncColorBarLibraryWidget* cblw;
 			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
@@ -683,7 +689,7 @@ void MainWindow :: updateLibrary()
 				cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 				if (pieceEditorWidget->getPiece()->hasDependencyOn(cblw->getGlassColor()))
-					highlightLibraryWidget(cblw, IS_USED_BY_DEPENDANCY);
+					highlightLibraryWidget(cblw, USEDBY_DEPENDANCY);
 			}
 
 			AsyncPullPlanLibraryWidget* pplw;
@@ -692,7 +698,7 @@ void MainWindow :: updateLibrary()
 				pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 				if (pieceEditorWidget->getPiece()->hasDependencyOn(pplw->getPullPlan()))
-					highlightLibraryWidget(pplw, IS_USED_BY_DEPENDANCY);
+					highlightLibraryWidget(pplw, USEDBY_DEPENDANCY);
 			}
 
                         AsyncPieceLibraryWidget* plw;

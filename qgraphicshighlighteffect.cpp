@@ -25,7 +25,7 @@ void QGraphicsHighlightEffect :: setStyleSheet(bool enableBorder)
 				color = QColor(200, 100, 0, 255);
 				emit styleSheetString("border: 2px dotted " + color.name() + ";");
 				break;
-			case IS_USED_BY_DEPENDANCY:
+			case USEDBY_DEPENDANCY:
 				color = QColor(0, 139, 69, 255);
 				emit styleSheetString("border: 2px dashed " + color.name() + ";"); 
 				break;
@@ -38,9 +38,9 @@ void QGraphicsHighlightEffect :: setStyleSheet(bool enableBorder)
 	}
 }
 
-void QGraphicsHighlightEffect::setHighlightType(int dependancy)
+void QGraphicsHighlightEffect::setHighlightType(enum Dependancy _d)
 {
-	this->dependancy = dependancy;
+	this->dependancy = _d;
 }
 
 void QGraphicsHighlightEffect::draw( QPainter *painter )

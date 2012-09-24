@@ -48,6 +48,7 @@ macx {
 
 HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
 	primitives.h constants.h Vector.hpp \ 
+	dependancy.h \
 	templateparameter.h \
 	pullplan.h pulltemplate.h subpulltemplate.h pickupplan.h \
 	piece.h piecetemplate.h \

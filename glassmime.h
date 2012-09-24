@@ -1,13 +1,25 @@
 
+#ifndef GLASSMIME_H
+#define GLASSMIME_H
+
 #include <QtGui>
 #include "pullplan.h"
 
+namespace GlassMime
+{
+	enum Type
+	{
+		colorbar,
+		pullplan
+	};
 
-void encodeMimeData(char* mimeData, void* ptr, int type);
+	void encode(char* mimeData, void* ptr, enum Type type);
 
-void decodeMimeData(const char* mimeData, void** ptr, int* type);
+	void decode(const char* mimeData, void** ptr, enum Type* type);
+}
 
 
+#endif
 
 
 

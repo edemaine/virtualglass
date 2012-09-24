@@ -96,14 +96,14 @@ void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 	float tmp;
 	switch (spt->orientation)
 	{
-		case PickupCane::horizontal:
+		case HORIZONTAL_PICKUP_CANE_ORIENTATION:
 			tmp = v->position.x;
 			v->position.x = v->position.z;
 			v->position.z = -tmp;
 			break;
-		case PickupCane::vertical:
+		case VERTICAL_PICKUP_CANE_ORIENTATION:
 			break;
-		case PickupCane::murrine:
+		case MURRINE_PICKUP_CANE_ORIENTATION:
 			tmp = v->position.y;
 			v->position.y = v->position.z;
 			v->position.z = -tmp;
@@ -138,7 +138,7 @@ void Mesher :: applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type
 		Vertex* v = &(geom->vertices[i]);
 		switch (type)
 		{
-			case PieceTemplate::tumbler:
+			case PieceTemplate::TUMBLER:
 			{
 				// compute theta within a rollup, starting with pickup geometry
 				float theta = PI * v->position.x / 5.0;
@@ -159,7 +159,7 @@ void Mesher :: applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type
 				}
 				break;
 			}
-			case PieceTemplate::bowl:
+			case PieceTemplate::BOWL:
 			{
 				int radius = params[0].value;
 				float size = 1.0 + 0.01 * params[1].value;
@@ -177,7 +177,7 @@ void Mesher :: applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type
 
 				break;
 			}		
-			case PieceTemplate::vase:
+			case PieceTemplate::VASE:
 			{
 				// compute theta within a rollup, starting with pickup geometry
 				float theta = PI * v->position.x / 5.0;
@@ -201,7 +201,7 @@ void Mesher :: applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type
 
 				break;
 			}		
-			case PieceTemplate::pot:
+			case PieceTemplate::POT:
 			{
 				// compute theta within a rollup, starting with pickup geometry
 				float theta = PI * v->position.x / 5.0;
@@ -224,7 +224,7 @@ void Mesher :: applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type
 
 				break;
 			}		
-			case PieceTemplate::wavyPlate:
+			case PieceTemplate::WAVY_PLATE:
 			{
 				// Do a rollup
 				// send x value to theta value 
@@ -402,7 +402,7 @@ void Mesher :: meshPickupCasingSlab(Geometry* geometry, Color* color, float y, f
 The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
 */
 void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
-	Color* color, int shape, float offset, float length, float radius, bool ensureVisible, uint32_t group_tag)
+	Color* color, enum GeometricShape shape, float offset, float length, float radius, bool ensureVisible, uint32_t group_tag)
 {
 	if (color->a < 0.0001 && !ensureVisible)
 		return;
@@ -427,7 +427,7 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 				points.push_back(p);
 			}
 			break;
-		case SQUARE_SHAPE: 
+		case SQUARE_SHAPE:
 			for (unsigned int i = 0; i < angularResolution / 4; ++i)
 			{
 				p.x = 1.0;
@@ -678,7 +678,7 @@ void Mesher :: generatePullMesh(PullPlan* plan, Geometry* geometry)
 
 void Mesher :: generateColorMesh(GlassColor* gc, Geometry* geometry)
 {
-	PullPlan dummyPlan(PullTemplate::baseCircle);
+	PullPlan dummyPlan(PullTemplate::BASE_CIRCLE);
 	dummyPlan.setOutermostCasingColor(gc);
 	totalCaneLength = computeTotalCaneLength(&dummyPlan);
 	vector<PullPlan*> ancestors;
@@ -703,13 +703,10 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*
 		return;
 
 	ancestors->push_back(plan); 
-	// for the outermost casing, use the shape suggestion from your parent, as you might 
-	// have an AMORPHOUS_SHAPE and need it specified for you. Even if you don't the shape
-	// suggestion matches your shape, so it's still ok to use.
 	meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getOutermostCasingColor()->getColor(), 
 		plan->getOutermostCasingShape(), offset, length, 1.0, ensureVisible, groupIndex);
 	// for remaining casing and subcanes, each nested cane should stick out a bit more to get 
-	// cross-sections to look right in 3D views, i.e. you see everything nested
+	// cross-sections to look right in 3D views, i.e. inner things aren't totally buried in outer things
 	for (unsigned int i = 0; i < plan->getCasingCount()-1; ++i) {
 		float extension = (plan->getCasingCount() - 1 - i) * 0.001;
 		meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getCasingColor(i)->getColor(), 

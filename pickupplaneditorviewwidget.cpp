@@ -6,7 +6,7 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWi
 	setAcceptDrops(true);
 	setMinimumSize(200, 200);
 	this->pickup = pickup;
-	this->niceViewWidget = new NiceViewWidget(PICKUPPLAN_MODE, this);
+	this->niceViewWidget = new NiceViewWidget(NiceViewWidget::PICKUPPLAN_CAMERA_MODE, this);
 	mesher.generateMesh(pickup, &geometry);
 	this->niceViewWidget->setGeometry(&geometry);
 	this->niceViewWidget->repaint();
@@ -28,30 +28,23 @@ void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** sub
 
 		switch (sp->orientation)
 		{
-			case PickupCane::horizontal:
+			case HORIZONTAL_PICKUP_CANE_ORIENTATION:
 				ll.x = sp->location.x;
 				ll.y = sp->location.y - sp->width/2;
 				ur.x = sp->location.x + sp->length;	
 				ur.y = sp->location.y + sp->width/2;	
 				break;		
-			case PickupCane::vertical:
+			case VERTICAL_PICKUP_CANE_ORIENTATION:
 				ll.x = sp->location.x - sp->width/2;	
 				ll.y = sp->location.y;	
 				ur.x = sp->location.x + sp->width/2;	
 				ur.y = sp->location.y + sp->length;	
 				break;		
-			case PickupCane::murrine:
+			case MURRINE_PICKUP_CANE_ORIENTATION:
 				ll.x = sp->location.x - sp->width/2;	
 				ll.y = sp->location.y - sp->width/2;	
 				ur.x = sp->location.x + sp->width/2;	
 				ur.y = sp->location.y + sp->width/2;	
-				break;
-			default:
-				//some sort of "safe"-ish default.
-				ll.x = 0.0;
-				ll.y = 0.0;
-				ur.x = 0.0;
-				ur.y = 0.0;
 				break;
 		}	
 
@@ -97,7 +90,7 @@ void PickupPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 		AsyncPullPlanLibraryWidget plplw(subplan);
 
                 char buf[500];
-                sprintf(buf, "%p %d", subplan, PULL_PLAN_MIME);
+                sprintf(buf, "%p %d", subplan, GlassMime::pullplan);
                 QByteArray pointerData(buf);
                 QMimeData* mimeData = new QMimeData;
                 mimeData->setText(pointerData);
@@ -166,22 +159,20 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	void* droppedObject;
         GlassColor* droppedColor;
         PullPlan* droppedPlan;
-	int type;
+	enum GlassMime::Type type;
 
-        decodeMimeData(event->mimeData()->text().toAscii().constData(), &droppedObject, &type);
+        GlassMime::decode(event->mimeData()->text().toAscii().constData(), &droppedObject, &type);
 	switch (type)
 	{
-		case COLOR_BAR_MIME:
+		case GlassMime::colorbar:
 			droppedColor = reinterpret_cast<GlassColor*>(droppedObject);
 			break;
-		case PULL_PLAN_MIME:
+		case GlassMime::pullplan:
 			droppedPlan = reinterpret_cast<PullPlan*>(droppedObject);
 			break;
-		default:
-			return;
 	}
 
-	if (type == COLOR_BAR_MIME)
+	if (type == GlassMime::colorbar)
 	{
 		event->accept();
 		if ((event->keyboardModifiers() & Qt::ShiftModifier))

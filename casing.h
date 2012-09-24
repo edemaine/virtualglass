@@ -3,15 +3,15 @@
 #define CASING_H
 
 #include "primitives.h"
-#include "constants.h"
+#include "shape.h"
 #include "glasscolor.h"
 
 class Casing
 {
 	public:
-		Casing(float thickness, int shape, GlassColor* glassColor);
+		Casing(float thickness, enum GeometricShape s, GlassColor* gc);
 		float thickness;	
-		int shape;
+		enum GeometricShape shape;
 		GlassColor* glassColor;
 };
 

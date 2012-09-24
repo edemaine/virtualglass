@@ -3,10 +3,10 @@
 
 PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 {
-	this->piece = new Piece(PieceTemplate::tumbler);
+	this->piece = new Piece(PieceTemplate::TUMBLER);
 
 	this->pickupViewWidget = new PickupPlanEditorViewWidget(piece->pickup, this);	
-	this->niceViewWidget = new NiceViewWidget(PIECE_MODE, this);
+	this->niceViewWidget = new NiceViewWidget(NiceViewWidget::PIECE_CAMERA_MODE, this);
 	niceViewWidget->setGeometry(&geometry);
 
 	setupLayout();

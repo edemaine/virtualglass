@@ -10,8 +10,10 @@
 #include "qgraphicshighlighteffect.h"
 #include "asyncpullplanlibrarywidget.h"
 #include "niceviewwidget.h"
+#include "shape.h"
 #include "geometry.h"
 #include "mesh.h"
+#include "dependancy.h"
 
 class PullPlanEditorWidget : public QWidget
 {
@@ -28,7 +30,6 @@ class PullPlanEditorWidget : public QWidget
 		void someDataChanged();
 		void newPullPlan(PullPlan* p);
 		void geometryChanged(Geometry g);
-//		void pullPlanChanged(PullPlan* p);
 
 	public slots:
 		void updateEverything();

@@ -9,18 +9,18 @@ namespace PullTemplate
         // and the first/last template functions in pulltemplate.cpp
 	enum Type
 	{
-		baseCircle=1,
-		baseSquare,
-		horizontalLineCircle, 
-		horizontalLineSquare,
-		tripod,
-		cross,
-		squareOfCircles,
-		squareOfSquares,
-		surroundingCircle,
-		surroundingSquare,
-		customCircle,
-		customSquare
+		BASE_CIRCLE=1,
+		BASE_SQUARE,
+		HORIZONTAL_LINE_CIRCLE,
+		HORIZONTAL_LINE_SQUARE,
+		TRIPOD,
+		CROSS,
+		SQUARE_OF_CIRCLES,
+		SQUARE_OF_SQUARES,
+		SURROUNDING_CIRCLE,
+		SURROUNDING_SQUARE,
+		CUSTOM_CIRCLE,
+		CUSTOM_SQUARE
 	};
 
 	enum Type firstTemplate();
