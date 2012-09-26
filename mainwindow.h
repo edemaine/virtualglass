@@ -72,6 +72,8 @@ class MainWindow : public QMainWindow
 		void highlightLibraryWidget(AsyncPullPlanLibraryWidget* w, enum Dependancy d);
 		void highlightLibraryWidget(AsyncPieceLibraryWidget* w, enum Dependancy d);
 		void unhighlightAllLibraryWidgets();
+		bool glassColorIsDependancy(GlassColor* color);
+		bool pullPlanIsDependancy(PullPlan* plan);
 
 		// Variables
 		QLabel* whatToDoLabel;

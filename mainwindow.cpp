@@ -119,10 +119,19 @@ void MainWindow :: deleteCurrentEditingObject()
 				GlassColor* gc = dynamic_cast<AsyncColorBarLibraryWidget*>(w->widget())->getGlassColor();
 				if (gc == colorEditorWidget->getGlassColor())
 				{
-					// this may be a memory leak, the library widget is never explicitly deleted
-					w = colorBarLibraryLayout->takeAt(i); 
-					delete w->widget();
-					delete w;
+					if (glassColorIsDependancy(gc))
+					{
+						QMessageBox msgBox;
+						msgBox.setText("This color cannot be deleted: other objects use it.");
+						msgBox.exec();
+					}
+					else
+					{
+						// this may be a memory leak, the library widget is never explicitly deleted
+						w = colorBarLibraryLayout->takeAt(i); 
+						delete w->widget();
+						delete w;
+					}
 					break;	
 				}
 			}
@@ -144,10 +153,19 @@ void MainWindow :: deleteCurrentEditingObject()
 				PullPlan* p = dynamic_cast<AsyncPullPlanLibraryWidget*>(w->widget())->getPullPlan();
 				if (p == pullPlanEditorWidget->getPlan())
 				{
-					// this may be a memory leak, the library widget is never explicitly deleted
-					w = pullPlanLibraryLayout->takeAt(i);
-					delete w->widget();
-					delete w;
+					if (pullPlanIsDependancy(p))
+					{
+						QMessageBox msgBox;
+						msgBox.setText("This cane cannot be deleted: other objects use it.");
+						msgBox.exec();
+					}
+					else
+					{
+						// this may be a memory leak, the library widget is never explicitly deleted
+						w = pullPlanLibraryLayout->takeAt(i);
+						delete w->widget();
+						delete w;
+					}
 					break;
 				}
 			}
@@ -582,6 +600,71 @@ void MainWindow :: updateEverything()
 	}
 
 	updateLibrary();
+}
+
+// returns whether the pull plan is a dependancy of something in the library
+// (either a pull plan or a piece)
+bool MainWindow :: glassColorIsDependancy(GlassColor* color)
+{
+	AsyncPullPlanLibraryWidget* pplw;
+	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
+	{
+		pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
+			dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
+		if (pplw->getPullPlan()->hasDependencyOn(color))
+		{
+			return true;
+		}
+	}
+
+	AsyncPieceLibraryWidget* plw;
+	for (int i = 0; i < pieceLibraryLayout->count(); ++i)
+	{
+		plw = dynamic_cast<AsyncPieceLibraryWidget*>(
+			dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
+		if (plw->getPiece()->hasDependencyOn(color))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+// returns whether the pull plan is a dependancy of something in the library
+// (either another pull plan or a piece)
+bool MainWindow :: pullPlanIsDependancy(PullPlan* plan)
+{
+	AsyncPullPlanLibraryWidget* pplw;
+	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
+	{
+		pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
+				dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
+		// Check whether the pull plan in the library is:
+		// 1. the parameter plan
+		// 2. a plan with the plan currently being edited as a subplan
+		if (pplw->getPullPlan() == plan)
+		{
+			continue;
+		}
+		else if (pplw->getPullPlan()->hasDependencyOn(plan))
+		{
+			return true;
+		}
+	}
+
+	AsyncPieceLibraryWidget* plw;
+	for (int i = 0; i < pieceLibraryLayout->count(); ++i)
+	{
+		plw = dynamic_cast<AsyncPieceLibraryWidget*>(
+			dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
+		if (plw->getPiece()->hasDependencyOn(plan))
+		{
+			return true;
+		}
+	}
+
+	return false;	
 }
 
 void MainWindow :: updateLibrary()
