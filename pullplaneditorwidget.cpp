@@ -74,14 +74,12 @@ void PullPlanEditorWidget :: updateEverything()
 
 void PullPlanEditorWidget :: unhighlightLibraryWidget(PullTemplateLibraryWidget* w)
 {
-	w->graphicsEffect()->setEnabled(false);
+	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(false);
 }
 
 void PullPlanEditorWidget :: highlightLibraryWidget(PullTemplateLibraryWidget* w)
 {
-	w->graphicsEffect()->setEnabled(false);
-	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
-	w->graphicsEffect()->setEnabled(true);
+	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
 }
 
 void PullPlanEditorWidget :: setupLayout()

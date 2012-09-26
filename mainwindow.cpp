@@ -526,62 +526,52 @@ void MainWindow :: newPullPlan(PullPlan* newPlan)
 
 void MainWindow :: unhighlightLibraryWidget(PieceTemplateLibraryWidget* w)
 {
-	w->graphicsEffect()->setEnabled(false);
+	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(false);
 }
 
 void MainWindow :: unhighlightLibraryWidget(PickupTemplateLibraryWidget* w)
 {
-	w->graphicsEffect()->setEnabled(false);
+	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(false);
 }
 
 void MainWindow :: unhighlightLibraryWidget(AsyncColorBarLibraryWidget* w)
 {
-	w->graphicsEffect()->setEnabled(false);
+	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(false);
 }
 
 void MainWindow :: unhighlightLibraryWidget(AsyncPullPlanLibraryWidget* w)
 {
-	w->graphicsEffect()->setEnabled(false);
+	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(false);
 }
 
 void MainWindow :: unhighlightLibraryWidget(AsyncPieceLibraryWidget* w)
 {
-	w->graphicsEffect()->setEnabled(false);
+	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(false);
 }
 
 void MainWindow :: highlightLibraryWidget(PieceTemplateLibraryWidget* w)
 {
-	w->graphicsEffect()->setEnabled(false);
-	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
-	w->graphicsEffect()->setEnabled(true);
+	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
 }
 
 void MainWindow :: highlightLibraryWidget(PickupTemplateLibraryWidget* w)
 {
-	w->graphicsEffect()->setEnabled(false);
-	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
-	w->graphicsEffect()->setEnabled(true);
+	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
 }
 
 void MainWindow :: highlightLibraryWidget(AsyncColorBarLibraryWidget* w, enum Dependancy d)
 {
-	w->graphicsEffect()->setEnabled(false);
-	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(d);
-	w->graphicsEffect()->setEnabled(true);
+	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(true, d);
 }
 
 void MainWindow :: highlightLibraryWidget(AsyncPullPlanLibraryWidget* w, enum Dependancy d)
 {
-	w->graphicsEffect()->setEnabled(false);
-	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(d);
-	w->graphicsEffect()->setEnabled(true);
+	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(true, d);
 }
 
 void MainWindow :: highlightLibraryWidget(AsyncPieceLibraryWidget* w, enum Dependancy d)
 {
-	w->graphicsEffect()->setEnabled(false);
-	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(d);
-	w->graphicsEffect()->setEnabled(true);
+	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(true, d);
 }
 
 void MainWindow :: updateEverything()

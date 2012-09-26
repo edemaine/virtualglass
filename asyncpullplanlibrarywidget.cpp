@@ -6,7 +6,6 @@ AsyncPullPlanLibraryWidget :: AsyncPullPlanLibraryWidget(PullPlan *_pullPlan, QW
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
 	setGraphicsEffect(new QGraphicsHighlightEffect());
-	connect(graphicsEffect(), SIGNAL(enabledChanged(bool)), graphicsEffect(), SLOT(setStyleSheet(bool)));
 	connect(graphicsEffect(), SIGNAL(styleSheetString(QString)), this, SLOT(setStyleSheet(QString)));
 
 	updatePixmaps();
@@ -22,7 +21,11 @@ void AsyncPullPlanLibraryWidget :: updatePixmaps()
 	// This is fast enough to do in real time
 	updateDragPixmap();
 
-	//queue up an async update:
+        // indicate to the user that the image is being updated
+        // busy-ness is turned off inherited AsyncRenderWidget::renderFinished()
+        static_cast<QGraphicsHighlightEffect*>(graphicsEffect())->setBusy(true);
+
+	// queue up an async update:
 	Camera camera;
 	camera.eye = make_vector(0.0f, 11.0f, 5.0f);
 	camera.lookAt = make_vector(0.0f, 0.0f, 5.0f);

@@ -2,6 +2,7 @@
 #define ASYNCRENDERWIDGET_H
 
 #include "Vector.hpp"
+#include "qgraphicshighlighteffect.h"
 
 #ifdef _WIN32
 #  include <windows.h>

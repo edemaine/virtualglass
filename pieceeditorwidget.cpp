@@ -77,26 +77,22 @@ void PieceEditorWidget :: updateEverything()
 
 void PieceEditorWidget :: unhighlightLibraryWidget(PieceTemplateLibraryWidget* w)
 {
-	w->graphicsEffect()->setEnabled(false);
+	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(false);
 }
 
 void PieceEditorWidget :: highlightLibraryWidget(PieceTemplateLibraryWidget* w)
 {
-	w->graphicsEffect()->setEnabled(false);
-	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
-	w->graphicsEffect()->setEnabled(true);
+	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
 }
 
 void PieceEditorWidget :: unhighlightLibraryWidget(PickupTemplateLibraryWidget* w)
 {
-	w->graphicsEffect()->setEnabled(false);
+	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(false);
 }
 
 void PieceEditorWidget :: highlightLibraryWidget(PickupTemplateLibraryWidget* w)
 {
-	w->graphicsEffect()->setEnabled(false);
-	((QGraphicsHighlightEffect*) w->graphicsEffect())->setHighlightType(IS_DEPENDANCY);
-	w->graphicsEffect()->setEnabled(true);
+	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
 }
 
 void PieceEditorWidget :: pieceTemplateParameterSlider3Changed(int)

@@ -11,19 +11,21 @@ class QGraphicsHighlightEffect : public QGraphicsEffect
 public:
 	explicit QGraphicsHighlightEffect(QObject *parent = 0);
 	virtual QRectF boundingRectFor(const QRectF &sourceRect) const;
-	void setHighlightType(enum Dependancy d);
+	void setBusy(bool isBusy);
+	void setDependancy(bool hasDependancy, enum Dependancy _d=IS_DEPENDANCY);
 
 signals:
 	void styleSheetString(QString string);
-
-public slots:
-	void setStyleSheet(bool enableBorder);
 
 protected:
 	virtual void draw( QPainter *painter ); 
 
 private:
-	enum Dependancy dependancy;	
+	bool hasDependancy;
+	enum Dependancy dependancy;
+	bool isBusy;	
+
+	void setStyleSheet();
 };
 
 #endif // QGRAPHICSHIGHLIGHTEFFECT_H

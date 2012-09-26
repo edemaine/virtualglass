@@ -14,7 +14,6 @@ AsyncPieceLibraryWidget :: AsyncPieceLibraryWidget(Piece* _piece, QWidget* paren
 	eyePosition.z = 0.0;
 
 	setGraphicsEffect(new QGraphicsHighlightEffect());
-	connect(graphicsEffect(),SIGNAL(enabledChanged(bool)),graphicsEffect(),SLOT(setStyleSheet(bool)));
 	connect(graphicsEffect(),SIGNAL(styleSheetString(QString)),this,SLOT(setStyleSheet(QString)));
 }
 
@@ -30,6 +29,10 @@ void AsyncPieceLibraryWidget :: updateEyePosition(Vector3f _eyePosition)
 
 void AsyncPieceLibraryWidget :: updatePixmap()
 {
+        // indicate to the user that the image is being updated
+        // busy-ness is turned off inherited AsyncRenderWidget::renderFinished()
+	static_cast<QGraphicsHighlightEffect*>(graphicsEffect())->setBusy(true);
+
 	//queue up an async update:
 	Camera camera;
 	camera.eye = eyePosition;
