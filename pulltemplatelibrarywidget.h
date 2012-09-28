@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include "pulltemplate.h"
+#include "libraryitemeffect.h"
 
 class PullTemplateLibraryWidget : public QLabel
 {

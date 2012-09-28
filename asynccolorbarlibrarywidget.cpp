@@ -6,7 +6,7 @@ AsyncColorBarLibraryWidget :: AsyncColorBarLibraryWidget(GlassColor* _glassColor
         setFixedSize(100, 100);
         setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
-        setGraphicsEffect(new QGraphicsHighlightEffect());
+        setGraphicsEffect(new LibraryItemEffect());
         connect(graphicsEffect(), SIGNAL(styleSheetString(QString)), this, SLOT(setStyleSheet(QString)));
 
 	glassColor = _glassColor;
@@ -47,7 +47,7 @@ void AsyncColorBarLibraryWidget :: updatePixmaps()
 
 	// indicate to the user that the image is being updated
 	// busy-ness is turned off inherited AsyncRenderWidget::renderFinished()
-        static_cast<QGraphicsHighlightEffect*>(graphicsEffect())->setBusy(true);
+        static_cast<LibraryItemEffect*>(graphicsEffect())->setBusy(true);
 
 	//queue up an async update (though as of 9/12 the rendering
 	//is real-time anyway):

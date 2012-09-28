@@ -77,22 +77,22 @@ void PieceEditorWidget :: updateEverything()
 
 void PieceEditorWidget :: unhighlightLibraryWidget(PieceTemplateLibraryWidget* w)
 {
-	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(false);
+	static_cast<LibraryItemEffect*>(w->graphicsEffect())->setDependancy(false);
 }
 
 void PieceEditorWidget :: highlightLibraryWidget(PieceTemplateLibraryWidget* w)
 {
-	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
+	static_cast<LibraryItemEffect*>(w->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
 }
 
 void PieceEditorWidget :: unhighlightLibraryWidget(PickupTemplateLibraryWidget* w)
 {
-	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(false);
+	static_cast<LibraryItemEffect*>(w->graphicsEffect())->setDependancy(false);
 }
 
 void PieceEditorWidget :: highlightLibraryWidget(PickupTemplateLibraryWidget* w)
 {
-	static_cast<QGraphicsHighlightEffect*>(w->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
+	static_cast<LibraryItemEffect*>(w->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
 }
 
 void PieceEditorWidget :: pieceTemplateParameterSlider3Changed(int)

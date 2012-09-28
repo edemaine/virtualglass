@@ -1,4 +1,4 @@
-#include "qgraphicshighlighteffect.h"
+#include "libraryitemeffect.h"
 
 LibraryItemEffect::LibraryItemEffect(QObject* parent) : QGraphicsEffect(parent)
 {

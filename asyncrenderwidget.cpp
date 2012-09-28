@@ -37,7 +37,7 @@ void AsyncRenderWidget::renderFinished(Camera const &/*unused: camera */, Render
 	delete geometry;
 	delete image;
 
-        static_cast<QGraphicsHighlightEffect*>(graphicsEffect())->setBusy(false);
+        static_cast<LibraryItemEffect*>(graphicsEffect())->setBusy(false);
 }
 
 

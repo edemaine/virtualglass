@@ -5,7 +5,7 @@ AsyncPullPlanLibraryWidget :: AsyncPullPlanLibraryWidget(PullPlan *_pullPlan, QW
 	setFixedSize(100, 100);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
-	setGraphicsEffect(new QGraphicsHighlightEffect());
+	setGraphicsEffect(new LibraryItemEffect());
 	connect(graphicsEffect(), SIGNAL(styleSheetString(QString)), this, SLOT(setStyleSheet(QString)));
 
 	updatePixmaps();
@@ -23,7 +23,7 @@ void AsyncPullPlanLibraryWidget :: updatePixmaps()
 
         // indicate to the user that the image is being updated
         // busy-ness is turned off inherited AsyncRenderWidget::renderFinished()
-        static_cast<QGraphicsHighlightEffect*>(graphicsEffect())->setBusy(true);
+        static_cast<LibraryItemEffect*>(graphicsEffect())->setBusy(true);
 
 	// queue up an async update:
 	Camera camera;

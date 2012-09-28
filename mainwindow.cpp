@@ -81,19 +81,19 @@ void MainWindow :: unhighlightAllLibraryWidgets()
 	for (int j = 0; j < colorBarLibraryLayout->count(); ++j)
 	{
 		w = colorBarLibraryLayout->itemAt(j);
-		static_cast<QGraphicsHighlightEffect*>(
+		static_cast<LibraryItemEffect*>(
 			static_cast<AsyncColorBarLibraryWidget*>(w->widget())->graphicsEffect())->setDependancy(false); 
 	}
 	for (int j = 0; j < pullPlanLibraryLayout->count(); ++j)
 	{
 		w = pullPlanLibraryLayout->itemAt(j);
-		static_cast<QGraphicsHighlightEffect*>(
+		static_cast<LibraryItemEffect*>(
 			static_cast<AsyncPullPlanLibraryWidget*>(w->widget())->graphicsEffect())->setDependancy(false); 
 	}
 	for (int j = 0; j < pieceLibraryLayout->count(); ++j)
 	{
 		w = pieceLibraryLayout->itemAt(j);
-		static_cast<QGraphicsHighlightEffect*>(
+		static_cast<LibraryItemEffect*>(
 			static_cast<AsyncPieceLibraryWidget*>(w->widget())->graphicsEffect())->setDependancy(false); 
 	}
 }
@@ -625,7 +625,7 @@ void MainWindow :: updateLibrary()
                                 if (colorEditorWidget->getGlassColor() == cblw->getGlassColor())
 				{
 					cblw->updatePixmaps();
-					static_cast<QGraphicsHighlightEffect*>(cblw->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
+					static_cast<LibraryItemEffect*>(cblw->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
 				}
                         }
 
@@ -638,7 +638,7 @@ void MainWindow :: updateLibrary()
 				if (pplw->getPullPlan()->hasDependencyOn(colorEditorWidget->getGlassColor()))
 				{
 					pplw->updatePixmaps();
-					static_cast<QGraphicsHighlightEffect*>(pplw->graphicsEffect())->setDependancy(true, USES_DEPENDANCY);
+					static_cast<LibraryItemEffect*>(pplw->graphicsEffect())->setDependancy(true, USES_DEPENDANCY);
 				}
 			}
 
@@ -650,7 +650,7 @@ void MainWindow :: updateLibrary()
 				if (plw->getPiece()->hasDependencyOn(colorEditorWidget->getGlassColor()))
 				{
 					plw->updatePixmap();
-					static_cast<QGraphicsHighlightEffect*>(plw->graphicsEffect())->setDependancy(true, USES_DEPENDANCY);
+					static_cast<LibraryItemEffect*>(plw->graphicsEffect())->setDependancy(true, USES_DEPENDANCY);
 				}
 			}
 
@@ -664,7 +664,7 @@ void MainWindow :: updateLibrary()
 				cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(cblw->getGlassColor()))
-					static_cast<QGraphicsHighlightEffect*>(cblw->graphicsEffect())->setDependancy(true, USEDBY_DEPENDANCY);
+					static_cast<LibraryItemEffect*>(cblw->graphicsEffect())->setDependancy(true, USEDBY_DEPENDANCY);
 			}
 
 			AsyncPullPlanLibraryWidget* pplw;
@@ -679,16 +679,16 @@ void MainWindow :: updateLibrary()
 				if (pullPlanEditorWidget->getPlan() == pplw->getPullPlan())
 				{
 					pplw->updatePixmaps();
-					static_cast<QGraphicsHighlightEffect*>(pplw->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
+					static_cast<LibraryItemEffect*>(pplw->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
 				}
 				else if (pullPlanEditorWidget->getPlan()->hasDependencyOn(pplw->getPullPlan()))
 				{
-					static_cast<QGraphicsHighlightEffect*>(pplw->graphicsEffect())->setDependancy(true, USEDBY_DEPENDANCY);
+					static_cast<LibraryItemEffect*>(pplw->graphicsEffect())->setDependancy(true, USEDBY_DEPENDANCY);
 				}
 				else if (pplw->getPullPlan()->hasDependencyOn(pullPlanEditorWidget->getPlan()))	
 				{
 					pplw->updatePixmaps();
-					static_cast<QGraphicsHighlightEffect*>(pplw->graphicsEffect())->setDependancy(true, USES_DEPENDANCY);
+					static_cast<LibraryItemEffect*>(pplw->graphicsEffect())->setDependancy(true, USES_DEPENDANCY);
 				}
 			}
 
@@ -700,7 +700,7 @@ void MainWindow :: updateLibrary()
 				if (plw->getPiece()->hasDependencyOn(pullPlanEditorWidget->getPlan()))
 				{
 					plw->updatePixmap();
-					static_cast<QGraphicsHighlightEffect*>(plw->graphicsEffect())->setDependancy(true, USES_DEPENDANCY);
+					static_cast<LibraryItemEffect*>(plw->graphicsEffect())->setDependancy(true, USES_DEPENDANCY);
 				}
 			}
 
@@ -714,7 +714,7 @@ void MainWindow :: updateLibrary()
 				cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 				if (pieceEditorWidget->getPiece()->hasDependencyOn(cblw->getGlassColor()))
-					static_cast<QGraphicsHighlightEffect*>(cblw->graphicsEffect())->setDependancy(true, USEDBY_DEPENDANCY);
+					static_cast<LibraryItemEffect*>(cblw->graphicsEffect())->setDependancy(true, USEDBY_DEPENDANCY);
 			}
 
 			AsyncPullPlanLibraryWidget* pplw;
@@ -723,7 +723,7 @@ void MainWindow :: updateLibrary()
 				pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
 					dynamic_cast<QWidgetItem*>(pullPlanLibraryLayout->itemAt(i))->widget());
 				if (pieceEditorWidget->getPiece()->hasDependencyOn(pplw->getPullPlan()))
-					static_cast<QGraphicsHighlightEffect*>(pplw->graphicsEffect())->setDependancy(true, USEDBY_DEPENDANCY);
+					static_cast<LibraryItemEffect*>(pplw->graphicsEffect())->setDependancy(true, USEDBY_DEPENDANCY);
 			}
 
                         AsyncPieceLibraryWidget* plw;
@@ -734,7 +734,7 @@ void MainWindow :: updateLibrary()
                                 if (plw->getPiece() == pieceEditorWidget->getPiece())
                                 {
                                         plw->updatePixmap();
-					static_cast<QGraphicsHighlightEffect*>(plw->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
+					static_cast<LibraryItemEffect*>(plw->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
                                 }
                         }
 

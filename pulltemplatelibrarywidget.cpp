@@ -1,6 +1,5 @@
 
 #include "pulltemplatelibrarywidget.h"
-#include "qgraphicshighlighteffect.h"
 
 PullTemplateLibraryWidget :: PullTemplateLibraryWidget(QPixmap _view, enum PullTemplate::Type _type, QWidget* _parent): QLabel(_parent)
 {
@@ -12,7 +11,7 @@ PullTemplateLibraryWidget :: PullTemplateLibraryWidget(QPixmap _view, enum PullT
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 	this->type = _type;
 
-        setGraphicsEffect(new QGraphicsHighlightEffect());
+        setGraphicsEffect(new LibraryItemEffect());
         connect(graphicsEffect(), SIGNAL(enabledChanged(bool)), graphicsEffect(), SLOT(setStyleSheet(bool)));
         connect(graphicsEffect(), SIGNAL(styleSheetString(QString)), this, SLOT(setStyleSheet(QString)));
 }
