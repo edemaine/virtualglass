@@ -48,7 +48,7 @@ macx {
 
 HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
 	primitives.h constants.h Vector.hpp \ 
-	libraryitem.h \
+	librarywidget.h \
 	dependancy.h \
 	shape.h \
 	templateparameter.h \
@@ -76,7 +76,7 @@ HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
 
 SOURCES += main.cpp \ 
 	glew/glew.c \
-	libraryitem.cpp \
+	librarywidget.cpp \
 	templateparameter.cpp \
 	pullplancustomizeviewwidget.cpp \
 	pullplan.cpp subpulltemplate.cpp \

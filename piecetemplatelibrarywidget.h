@@ -3,9 +3,9 @@
 
 #include <QtGui>
 #include "piecetemplate.h"
-#include "libraryitem.h"
+#include "librarywidget.h"
 
-class PieceTemplateLibraryWidget : public LibraryItem
+class PieceTemplateLibraryWidget : public LibraryWidget
 {
 	public:
 		PieceTemplateLibraryWidget(QPixmap view, enum PieceTemplate::Type t, QWidget* parent=0);

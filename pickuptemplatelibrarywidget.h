@@ -3,9 +3,9 @@
 
 #include <QtGui>
 #include "pickuptemplate.h"
-#include "libraryitem.h"
+#include "librarywidget.h"
 
-class PickupTemplateLibraryWidget : public LibraryItem
+class PickupTemplateLibraryWidget : public LibraryWidget
 {
 	public:
 		PickupTemplateLibraryWidget(QPixmap view, enum PickupTemplate::Type t, QWidget* parent=0);

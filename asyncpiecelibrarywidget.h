@@ -4,7 +4,7 @@
 #include <QtGui>
 #include "asyncrenderwidget.h"
 #include "piecerenderdata.h"
-#include "libraryitem.h"
+#include "librarywidget.h"
 
 class Piece;
 

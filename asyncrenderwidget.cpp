@@ -4,7 +4,7 @@
 
 using namespace AsyncRenderInternal;
 
-AsyncRenderWidget::AsyncRenderWidget(QWidget *_parent) : LibraryItem(_parent), id(0) {
+AsyncRenderWidget::AsyncRenderWidget(QWidget *_parent) : LibraryWidget(_parent), id(0) {
 	Controller::controller().registerWidget(this);
 }
 

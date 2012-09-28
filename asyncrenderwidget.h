@@ -2,7 +2,7 @@
 #define ASYNCRENDERWIDGET_H
 
 #include "Vector.hpp"
-#include "libraryitem.h"
+#include "librarywidget.h"
 
 #ifdef _WIN32
 #  include <windows.h>
@@ -32,7 +32,7 @@ public:
 	Vector2ui size; //size of desired image, in pixels
 };
 
-class AsyncRenderWidget : public LibraryItem
+class AsyncRenderWidget : public LibraryWidget
 {
 	Q_OBJECT
 public:
