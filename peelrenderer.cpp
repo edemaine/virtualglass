@@ -281,8 +281,6 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const &geometry) {
 			for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g) {
 				assert(g->color);
 				Color c = *(g->color);
-				if (g->ensureVisible && c.a < 0.05)
-					c.a = 0.05;
 				glColor4f(c.r, c.g, c.b, c.a);
 				glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 							   GL_UNSIGNED_INT, &(geometry.triangles[g->triangle_begin].v1));

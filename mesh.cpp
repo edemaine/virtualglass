@@ -395,71 +395,65 @@ void Mesher :: meshPickupCasingSlab(Geometry* geometry, Color* color, float y, f
 	assert(geometry->valid());
 
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, color, true, -1));
+		first_vert, geometry->vertices.size() - first_vert, color, -1));
 }
 
-/*
-The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
-*/
-void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
-	Color* color, enum GeometricShape shape, float offset, float length, float radius, bool ensureVisible, uint32_t group_tag)
+void Mesher :: getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution, enum GeometricShape shape, float radius)
 {
-	if (color->a < 0.0001 && !ensureVisible)
-		return;
-
-	unsigned int angularResolution = 6; 
-	unsigned int axialResolution = MIN(MAX(TOTAL_AXIAL_RESOLUTION / totalCaneLength * length, 20), 100);
-	
-	//need to know first vertex position so we can transform 'em all later
-	uint32_t first_vert = geometry->vertices.size();
-	//need to remember the first triangle so we can tag it later
-	uint32_t first_triangle = geometry->triangles.size();
-
 	Vector2f p;
-	vector< Vector2f > points;
-	switch (shape) 
-	{
-		case CIRCLE_SHAPE:
-			for (unsigned int i = 0; i < angularResolution; ++i)
-			{
-				p.x = cos(TWO_PI * i / angularResolution);
-				p.y = sin(TWO_PI * i / angularResolution);
-				points.push_back(p);
-			}
-			break;
-		case SQUARE_SHAPE:
-			for (unsigned int i = 0; i < angularResolution / 4; ++i)
-			{
-				p.x = 1.0;
-				p.y = -1.0 + 8.0 * i / angularResolution;
-				points.push_back(p);
-			}
-			for (unsigned int i = 0; i < angularResolution / 4; ++i)
-			{
-				p.x = 1.0 - 8.0 * i / angularResolution;
-				p.y = 1.0;
-				points.push_back(p);
-			}
-			for (unsigned int i = 0; i < angularResolution / 4; ++i)
-			{
-				p.x = -1.0;
-				p.y = 1.0 - 8.0 * i / angularResolution;
-				points.push_back(p);
-			}
-			for (unsigned int i = 0; i < angularResolution / 4; ++i)
-			{
-				p.x = -1.0 + 8.0 * i / angularResolution;
-				p.y = -1.0;
-				points.push_back(p);
-			}
-			break;
-	}
+
+	points->clear();	
+	switch (shape)
+        {
+                case CIRCLE_SHAPE:
+                        for (unsigned int i = 0; i < angularResolution; ++i)
+                        {
+                                p.x = cos(TWO_PI * i / angularResolution);
+                                p.y = sin(TWO_PI * i / angularResolution);
+                                points->push_back(p);
+                        }
+                        break;
+                case SQUARE_SHAPE:
+                        for (unsigned int i = 0; i < angularResolution / 4; ++i)
+                        {
+                                p.x = 1.0;
+                                p.y = -1.0 + 8.0 * i / angularResolution;
+                                points->push_back(p);
+                        }
+                        for (unsigned int i = 0; i < angularResolution / 4; ++i)
+                        {
+                                p.x = 1.0 - 8.0 * i / angularResolution;
+                                p.y = 1.0;
+                                points->push_back(p);
+                        }
+                        for (unsigned int i = 0; i < angularResolution / 4; ++i)
+                        {
+                                p.x = -1.0;
+                                p.y = 1.0 - 8.0 * i / angularResolution;
+                                points->push_back(p);
+                        }
+                        for (unsigned int i = 0; i < angularResolution / 4; ++i)
+                        {
+                                p.x = -1.0 + 8.0 * i / angularResolution;
+                                p.y = -1.0;
+                                points->push_back(p);
+                        }
+                        break;
+        }
 
 	// scale for radius 
-	for (unsigned int i = 0; i < points.size(); ++i) {
-		points[i].x *= radius;
-		points[i].y *= radius;
+	for (unsigned int i = 0; i < points->size(); ++i) {
+		(*points)[i].x *= radius;
+		(*points)[i].y *= radius;
 	}
+
+} 
+
+void Mesher :: meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float length, float radius, 
+	unsigned int angularResolution, unsigned int axialResolution, bool flipOrientation)
+{
+	vector< Vector2f > points;
+	getTemplatePoints(&points, angularResolution, shape, radius);
 
 	// Create wall vertices row by row
 	unsigned int base = geometry->vertices.size();
@@ -470,7 +464,7 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 			Point p;
 			p.xy = points[j];
 			if (i == 0)
-				p.z = 5.0 * offset;
+				p.z = 0.0;
 			else
 				p.z = 5.0 * length * i / (axialResolution-1);
 			Point n;
@@ -492,11 +486,87 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 			uint32_t p4 = base + (i+1) * points.size() + (j+1) % points.size();
 			// Four points that define a (non-flat) quad are used
 			// to create two triangles.
-			geometry->triangles.push_back(Triangle(p2, p1, p4));
-			geometry->triangles.push_back(Triangle(p2, p1, p4));
-			geometry->triangles.push_back(Triangle(p1, p3, p4));
+			if (flipOrientation)
+			{	
+				geometry->triangles.push_back(Triangle(p1, p2, p4));
+				geometry->triangles.push_back(Triangle(p3, p1, p4));
+			}
+			else
+			{
+				geometry->triangles.push_back(Triangle(p2, p1, p4));
+				geometry->triangles.push_back(Triangle(p1, p3, p4));
+			}
 		}
 	}
+} 
+
+void Mesher :: meshBaseCasing(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
+	Color* color, enum GeometricShape outerShape, enum GeometricShape innerShape, float length, float outerRadius, float innerRadius,
+	uint32_t group_tag)
+{
+	unsigned int angularResolution = 8; 
+	unsigned int axialResolution = MIN(MAX(TOTAL_AXIAL_RESOLUTION / totalCaneLength * length, 20), 100);
+	
+	//need to know first vertex position so we can transform 'em all later
+	uint32_t first_vert = geometry->vertices.size();
+	//need to remember the first triangle so we can tag it later
+	uint32_t first_triangle = geometry->triangles.size();
+
+	// assuming meshCylinderWall vertices end with the top row in 
+	unsigned int outerPointsBottomStart = geometry->vertices.size();
+	meshCylinderWall(geometry, outerShape, length, outerRadius, angularResolution, axialResolution);
+	unsigned int outerPointsTopStart = geometry->vertices.size() - angularResolution;
+	unsigned int innerPointsBottomStart = geometry->vertices.size();
+	meshCylinderWall(geometry, innerShape, length, innerRadius, angularResolution, axialResolution, true);
+	unsigned int innerPointsTopStart = geometry->vertices.size() - angularResolution;
+
+	for (unsigned int i = 0; i < angularResolution; ++i)
+	{
+		uint32_t p1 = innerPointsTopStart + i;
+		uint32_t p2 = innerPointsTopStart + (i+1) % angularResolution;
+		uint32_t p3 = outerPointsTopStart + i;
+		uint32_t p4 = outerPointsTopStart + (i+1) % angularResolution;
+		geometry->triangles.push_back(Triangle(p4, p1, p3));
+		geometry->triangles.push_back(Triangle(p2, p1, p4));
+
+		p1 = innerPointsBottomStart + i;
+		p2 = innerPointsBottomStart + (i+1) % angularResolution;
+		p3 = outerPointsBottomStart + i;
+		p4 = outerPointsBottomStart + (i+1) % angularResolution;
+		geometry->triangles.push_back(Triangle(p1, p4, p3));
+		geometry->triangles.push_back(Triangle(p1, p2, p4));
+	}
+
+	assert(geometry->valid());
+
+	// Actually do the transformations on the basic canonical cylinder mesh
+	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
+	{
+		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorIndices);
+	}
+	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
+		first_vert, geometry->vertices.size() - first_vert, color, group_tag));
+}
+
+/*
+The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
+*/
+void Mesher :: meshBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
+	Color* color, enum GeometricShape shape, float length, float radius, uint32_t group_tag)
+{
+	unsigned int angularResolution = 8; 
+	unsigned int axialResolution = MIN(MAX(TOTAL_AXIAL_RESOLUTION / totalCaneLength * length, 20), 100);
+	
+	//need to know first vertex position so we can transform 'em all later
+	uint32_t first_vert = geometry->vertices.size();
+	//need to remember the first triangle so we can tag it later
+	uint32_t first_triangle = geometry->triangles.size();
+
+	meshCylinderWall(geometry, shape, length, radius, angularResolution, axialResolution);
+
+	// now mesh top and bottom
+	vector< Vector2f > points;
+	getTemplatePoints(&points, angularResolution, shape, radius);
 
 	// Build top and bottom triangles (two concentric rings) 
 	vector< Vector3ui > layer1Tris;
@@ -537,7 +607,7 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 		{
 			o1 = 2;
 			o2 = 1;
-			z = 5.0 * offset;
+			z = 0.0;
 		}
 
 		Point n;
@@ -586,7 +656,7 @@ void Mesher :: meshPolygonalBaseCane(Geometry* geometry, vector<PullPlan*>* ance
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors, ancestorIndices);
 	}
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, color, ensureVisible, group_tag));
+		first_vert, geometry->vertices.size() - first_vert, color, group_tag));
 }
 
 void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
@@ -595,7 +665,7 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>*
 		return;
 
 	geometry->clear();
-	generateMesh(piece->pickup, geometry, false, ancestors, ancestorIndices);		
+	generateMesh(piece->pickup, geometry, ancestors, ancestorIndices);		
 	vector<TemplateParameter> params;
 	for (unsigned int i = 0; i < piece->getParameterCount(); ++i)
 	{
@@ -606,7 +676,7 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry, vector<PullPlan*>*
 	applyPieceTransform(geometry, piece->getTemplateType(), params);
 }
 
-void Mesher :: generateMesh(PickupPlan* pickup, Geometry *geometry, bool ensureCasing, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
+void Mesher :: generateMesh(PickupPlan* pickup, Geometry *geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
 {
 	if (pickup == NULL)
 		return;
@@ -617,7 +687,7 @@ void Mesher :: generateMesh(PickupPlan* pickup, Geometry *geometry, bool ensureC
 		ancestors->clear();
 		ancestorIndices->clear();
 		generateMesh(pickup->subs[i].plan, geometry, 
-			ancestors, ancestorIndices, 0.0, pickup->subs[i].length, ensureCasing, i); 
+			ancestors, ancestorIndices, pickup->subs[i].length, i); 
 
 		for (uint32_t g = 0; g < geometry->groups.size(); ++g)
 		{
@@ -657,7 +727,7 @@ void Mesher :: generateMesh(PickupPlan* pickup, Geometry* geometry)
 	totalCaneLength = computeTotalCaneLength(pickup);
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
-	generateMesh(pickup, geometry, true, &ancestors, &ancestorIndices);
+	generateMesh(pickup, geometry, &ancestors, &ancestorIndices);
 	geometry->compute_normals_from_triangles();
 }
 
@@ -666,7 +736,7 @@ void Mesher :: generatePullMesh(PullPlan* plan, Geometry* geometry)
 	totalCaneLength = computeTotalCaneLength(plan);
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
-	generateMesh(plan, geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
+	generateMesh(plan, geometry, &ancestors, &ancestorIndices, 2.0);
 
 	// Make skinnier to more closely mimic the canes found in pickups
 	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
@@ -683,7 +753,7 @@ void Mesher :: generateColorMesh(GlassColor* gc, Geometry* geometry)
 	totalCaneLength = computeTotalCaneLength(&dummyPlan);
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
-	generateMesh(&dummyPlan, geometry, &ancestors, &ancestorIndices, 0.0, 2.0, true);
+	generateMesh(&dummyPlan, geometry, &ancestors, &ancestorIndices, 2.0);
 	geometry->compute_normals_from_triangles();
 }
 
@@ -695,7 +765,7 @@ leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
 void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*>* ancestors, 
-	vector<int>* ancestorIndices, float offset, float length, bool ensureVisible, int groupIndex)
+	vector<int>* ancestorIndices, float length, int groupIndex)
 {
 	int passGroupIndex;
 
@@ -703,16 +773,15 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*
 		return;
 
 	ancestors->push_back(plan); 
-	meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getOutermostCasingColor()->getColor(), 
-		plan->getOutermostCasingShape(), offset, length, 1.0, ensureVisible, groupIndex);
-	// for remaining casing and subcanes, each nested cane should stick out a bit more to get 
-	// cross-sections to look right in 3D views, i.e. inner things aren't totally buried in outer things
-	for (unsigned int i = 0; i < plan->getCasingCount()-1; ++i) {
-		float extension = (plan->getCasingCount() - 1 - i) * 0.001;
-		meshPolygonalBaseCane(geometry, ancestors, ancestorIndices, plan->getCasingColor(i)->getColor(), 
-			plan->getCasingShape(i), offset - extension, length + extension,
-			plan->getCasingThickness(i), false, groupIndex);
+	for (unsigned int i = 1; i < plan->getCasingCount(); ++i) {
+		meshBaseCasing(geometry, ancestors, ancestorIndices, plan->getCasingColor(i)->getColor(), 
+			plan->getCasingShape(i), plan->getCasingShape(i-1), length,
+			plan->getCasingThickness(i), plan->getCasingThickness(i-1)+0.05, groupIndex);
 	}
+	// shouldn't really be a cane if there are subplans, but geometry would be pretty intense in that case
+	meshBaseCane(geometry, ancestors, ancestorIndices, plan->getCasingColor(0)->getColor(), 
+		plan->getCasingShape(0), length-0.001,
+		plan->getCasingThickness(0), groupIndex);
 	ancestors->pop_back();
 
 	// Make recursive calls depending on the type of the current node
@@ -736,8 +805,7 @@ void Mesher :: generateMesh(PullPlan* plan, Geometry *geometry, vector<PullPlan*
 
 			ancestorIndices->push_back(i);
 			generateMesh(plan->subs[i].plan, geometry, ancestors, ancestorIndices, 
-				offset - plan->getCasingCount() * 0.001, length + plan->getCasingCount() * 0.001, 
-				false, passGroupIndex);
+				length, passGroupIndex);
 			ancestorIndices->pop_back();
 		}
 	}
