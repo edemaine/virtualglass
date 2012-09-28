@@ -1,13 +1,13 @@
-#include "libraryitem.h"
+#include "librarywidget.h"
 
 
-LibraryItem :: LibraryItem(QWidget* _parent) : QLabel(_parent)
+LibraryWidget :: LibraryWidget(QWidget* _parent) : QLabel(_parent)
 {
 	isBusy = false;
 	hasDependancy = false;
 }
 
-void LibraryItem :: updateStyleSheet() 
+void LibraryWidget :: updateStyleSheet() 
 {
 	QColor color;
 
@@ -51,13 +51,13 @@ void LibraryItem :: updateStyleSheet()
 	setStyleSheet(style);
 }
 
-void LibraryItem::setBusy(bool _b)
+void LibraryWidget::setBusy(bool _b)
 {
 	isBusy = _b;
 	updateStyleSheet();
 }
 
-void LibraryItem::setDependancy(bool _hd, enum Dependancy _d)
+void LibraryWidget::setDependancy(bool _hd, enum Dependancy _d)
 {
 	hasDependancy = _hd;
 	dependancy = _d;

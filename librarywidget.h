@@ -1,14 +1,14 @@
-#ifndef LIBRARYITEM_H
-#define LIBRARYITEM_H
+#ifndef LIBRARYWIDGET_H
+#define LIBRARYWIDGET_H
 
 #include <QtGui>
 #include "dependancy.h" 
 
-class LibraryItem : public QLabel
+class LibraryWidget : public QLabel
 {
 
 public:
-	LibraryItem(QWidget* parent);
+	LibraryWidget(QWidget* parent);
 	void setBusy(bool isBusy);
 	void setDependancy(bool hasDependancy, enum Dependancy _d=IS_DEPENDANCY);
 
@@ -21,4 +21,4 @@ private:
 	bool isBusy;
 };
 
-#endif // LIBRARYITEM_H
+#endif // LIBRARYWIDGET_H
