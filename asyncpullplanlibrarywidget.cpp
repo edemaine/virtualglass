@@ -3,8 +3,6 @@
 AsyncPullPlanLibraryWidget :: AsyncPullPlanLibraryWidget(PullPlan *_pullPlan, QWidget *_parent) : AsyncRenderWidget(_parent), pullPlan(_pullPlan)
 {
 	setFixedSize(100, 100);
-	setAttribute(Qt::WA_LayoutUsesWidgetRect);
-
 	updatePixmaps();
 }
 

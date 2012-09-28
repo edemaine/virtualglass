@@ -3,10 +3,7 @@
 
 AsyncPieceLibraryWidget :: AsyncPieceLibraryWidget(Piece* _piece, QWidget* _parent): AsyncRenderWidget(_parent), piece(_piece)
 {
-	setBackgroundRole(QPalette::Base);
 	setFixedSize(100, 100);
-	setScaledContents(true);
-	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 	eyePosition.x = -16.0;
 	eyePosition.y = 0.0;
 	eyePosition.z = 0.0;

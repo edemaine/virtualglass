@@ -4,9 +4,7 @@
 AsyncColorBarLibraryWidget :: AsyncColorBarLibraryWidget(GlassColor* _glassColor, QWidget* _parent): AsyncRenderWidget(_parent) 
 {
         setFixedSize(100, 100);
-        setAttribute(Qt::WA_LayoutUsesWidgetRect);
 	glassColor = _glassColor;
-
         updatePixmaps();
 }
 
