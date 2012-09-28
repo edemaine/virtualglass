@@ -4,7 +4,6 @@
 #include "asyncrenderwidget.h"
 #include "pullplan.h"
 #include "mesh.h"
-#include "libraryitemeffect.h"
 #include "pullplanrenderdata.h"
 #include "shape.h"
 

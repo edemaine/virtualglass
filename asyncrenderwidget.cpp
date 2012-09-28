@@ -4,7 +4,7 @@
 
 using namespace AsyncRenderInternal;
 
-AsyncRenderWidget::AsyncRenderWidget(QWidget *_parent) : QLabel(_parent), id(0) {
+AsyncRenderWidget::AsyncRenderWidget(QWidget *_parent) : LibraryItem(_parent), id(0) {
 	Controller::controller().registerWidget(this);
 }
 
@@ -37,7 +37,7 @@ void AsyncRenderWidget::renderFinished(Camera const &/*unused: camera */, Render
 	delete geometry;
 	delete image;
 
-        static_cast<LibraryItemEffect*>(graphicsEffect())->setBusy(false);
+        this->setBusy(false);
 }
 
 

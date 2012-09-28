@@ -7,7 +7,6 @@
 #include "pullplaneditorviewwidget.h"
 #include "pullplancustomizeviewwidget.h"
 #include "pulltemplatelibrarywidget.h"
-#include "libraryitemeffect.h"
 #include "asyncpullplanlibrarywidget.h"
 #include "niceviewwidget.h"
 #include "shape.h"
@@ -72,14 +71,12 @@ class PullPlanEditorWidget : public QWidget
                 QPushButton* addSquareButton;
                 QPushButton* copySelectedButton;
                 QPushButton* deleteSelectedButton;
-        QTabWidget* tabs;
-        QLabel* descriptionLabel;
+		QTabWidget* tabs;
+		QLabel* descriptionLabel;
 		NiceViewWidget* niceViewWidget;
 
 		void setupLayout();
 		void setupConnections();
-		void highlightLibraryWidget(PullTemplateLibraryWidget* w);
-		void unhighlightLibraryWidget(PullTemplateLibraryWidget* w);
 };
 
 

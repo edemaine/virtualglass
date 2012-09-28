@@ -19,7 +19,6 @@
 #include "pullplaneditorwidget.h"
 #include "coloreditorwidget.h"
 #include "pieceeditorwidget.h"
-#include "libraryitemeffect.h"
 #include "glassmime.h"
 
 class MainWindow : public QMainWindow

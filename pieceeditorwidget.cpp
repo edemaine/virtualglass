@@ -22,9 +22,9 @@ void PieceEditorWidget :: updateEverything()
 		pktlw = dynamic_cast<PickupTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget());
 		if (pktlw->type == piece->pickup->getTemplateType())
-			highlightLibraryWidget(pktlw);
+			pktlw->setDependancy(true, IS_DEPENDANCY);
 		else
-			unhighlightLibraryWidget(pktlw);
+			pktlw->setDependancy(false);
 	}
 
 	pickupViewWidget->setPickup(piece->pickup);
@@ -51,9 +51,9 @@ void PieceEditorWidget :: updateEverything()
 		ptlw = dynamic_cast<PieceTemplateLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(pieceTemplateLibraryLayout->itemAt(i))->widget());
 		if (ptlw->type == piece->getTemplateType())
-			highlightLibraryWidget(ptlw);
+			ptlw->setDependancy(true, IS_DEPENDANCY);
 		else
-			unhighlightLibraryWidget(ptlw);
+			ptlw->setDependancy(false);
 	}
 
 	geometry.clear();
@@ -75,25 +75,6 @@ void PieceEditorWidget :: updateEverything()
 	}
 }
 
-void PieceEditorWidget :: unhighlightLibraryWidget(PieceTemplateLibraryWidget* w)
-{
-	static_cast<LibraryItemEffect*>(w->graphicsEffect())->setDependancy(false);
-}
-
-void PieceEditorWidget :: highlightLibraryWidget(PieceTemplateLibraryWidget* w)
-{
-	static_cast<LibraryItemEffect*>(w->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
-}
-
-void PieceEditorWidget :: unhighlightLibraryWidget(PickupTemplateLibraryWidget* w)
-{
-	static_cast<LibraryItemEffect*>(w->graphicsEffect())->setDependancy(false);
-}
-
-void PieceEditorWidget :: highlightLibraryWidget(PickupTemplateLibraryWidget* w)
-{
-	static_cast<LibraryItemEffect*>(w->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
-}
 
 void PieceEditorWidget :: pieceTemplateParameterSlider3Changed(int)
 {

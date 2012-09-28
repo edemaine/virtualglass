@@ -6,7 +6,6 @@
 #include "pullplan.h"
 #include "primitives.h"
 #include "glasscolor.h"
-#include "libraryitemeffect.h"
 #include "shape.h"
 
 class AsyncColorBarLibraryWidget : public AsyncRenderWidget

@@ -70,6 +70,30 @@ void LibraryItemEffect::setDependancy(bool _hd, enum Dependancy _d)
 
 void LibraryItemEffect::draw( QPainter *painter )
 {
+#ifdef UNDEF
+	QPoint offset;
+
+	const QPixmap pixmap = sourcePixmap(Qt::DeviceCoordinates, &offset);
+
+	painter->setWorldTransform(QTransform());
+	painter->drawPixmap(offset, pixmap); 
+
+     QPoint offset;
+     if (sourceIsPixmap()) {
+         // No point in drawing in device coordinates (pixmap will be scaled anyways).
+         const QPixmap pixmap = sourcePixmap(Qt::LogicalCoordinates, &offset);
+     
+         painter->drawPixmap(offset, pixmap);
+     } else {
+         // Draw pixmap in device coordinates to avoid pixmap scaling;
+         const QPixmap pixmap = sourcePixmap(Qt::DeviceCoordinates, &offset);
+         painter->setWorldTransform(QTransform());
+    
+         painter->drawPixmap(offset, pixmap);
+     }
+#endif
+	
+	painter->fillRect(0, 0, 50, 50, QColor(0, 0, 129));
 	drawSource(painter);
 }
 

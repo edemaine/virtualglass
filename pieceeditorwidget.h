@@ -9,7 +9,6 @@
 #include "asyncpiecelibrarywidget.h"
 #include "pickuptemplatelibrarywidget.h"
 #include "piecetemplatelibrarywidget.h"
-#include "libraryitemeffect.h"
 #include "niceviewwidget.h"
 #include "geometry.h"
 #include "mesh.h"
@@ -69,10 +68,6 @@ class PieceEditorWidget : public QWidget
 
 		void setupLayout();
 		void setupConnections();
-		void highlightLibraryWidget(PickupTemplateLibraryWidget* w);
-		void unhighlightLibraryWidget(PickupTemplateLibraryWidget* w);
-		void highlightLibraryWidget(PieceTemplateLibraryWidget* w);
-		void unhighlightLibraryWidget(PieceTemplateLibraryWidget* w);
 };
 
 

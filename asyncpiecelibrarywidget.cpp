@@ -1,9 +1,7 @@
 
 #include "asyncpiecelibrarywidget.h"
-#include "libraryitemeffect.h"
-#include "piecerenderdata.h"
 
-AsyncPieceLibraryWidget :: AsyncPieceLibraryWidget(Piece* _piece, QWidget* parent): AsyncRenderWidget(parent), piece(_piece)
+AsyncPieceLibraryWidget :: AsyncPieceLibraryWidget(Piece* _piece, QWidget* _parent): AsyncRenderWidget(_parent), piece(_piece)
 {
 	setBackgroundRole(QPalette::Base);
 	setFixedSize(100, 100);
@@ -12,9 +10,6 @@ AsyncPieceLibraryWidget :: AsyncPieceLibraryWidget(Piece* _piece, QWidget* paren
 	eyePosition.x = -16.0;
 	eyePosition.y = 0.0;
 	eyePosition.z = 0.0;
-
-	setGraphicsEffect(new LibraryItemEffect());
-	connect(graphicsEffect(),SIGNAL(styleSheetString(QString)),this,SLOT(setStyleSheet(QString)));
 }
 
 Piece* AsyncPieceLibraryWidget :: getPiece()
@@ -31,7 +26,7 @@ void AsyncPieceLibraryWidget :: updatePixmap()
 {
         // indicate to the user that the image is being updated
         // busy-ness is turned off inherited AsyncRenderWidget::renderFinished()
-	static_cast<LibraryItemEffect*>(graphicsEffect())->setBusy(true);
+	setBusy(true);
 
 	//queue up an async update:
 	Camera camera;

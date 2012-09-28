@@ -1,7 +1,7 @@
 
 #include "piecetemplatelibrarywidget.h"
 
-PieceTemplateLibraryWidget :: PieceTemplateLibraryWidget(QPixmap _view, enum PieceTemplate::Type _type, QWidget* _parent): QLabel(_parent)
+PieceTemplateLibraryWidget :: PieceTemplateLibraryWidget(QPixmap _view, enum PieceTemplate::Type _type, QWidget* _parent): LibraryItem(_parent)
 {
 	setBackgroundRole(QPalette::Base);
 	setFixedSize(100, 100);
@@ -12,9 +12,6 @@ PieceTemplateLibraryWidget :: PieceTemplateLibraryWidget(QPixmap _view, enum Pie
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 	this->type = _type;
 
-        setGraphicsEffect(new LibraryItemEffect());
-        connect(graphicsEffect(), SIGNAL(enabledChanged(bool)), graphicsEffect(), SLOT(setStyleSheet(bool)));
-        connect(graphicsEffect(), SIGNAL(styleSheetString(QString)), this, SLOT(setStyleSheet(QString)));
 }
 
 

@@ -4,7 +4,6 @@
 
 #include <QtGui>
 #include "pullplan.h"
-#include "libraryitemeffect.h"
 #include "niceviewwidget.h"
 #include "geometry.h"
 #include "mesh.h"

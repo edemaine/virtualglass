@@ -48,6 +48,7 @@ macx {
 
 HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
 	primitives.h constants.h Vector.hpp \ 
+	libraryitem.h \
 	dependancy.h \
 	shape.h \
 	templateparameter.h \
@@ -60,7 +61,6 @@ HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
 	pullplaneditorviewwidget.h pullplaneditorwidget.h \
 	pieceeditorwidget.h coloreditorwidget.h \
 	controller.h geometry.h mesh.h \ 
-	libraryitemeffect.h \
 	peelrenderer.h \
 	asyncrenderwidget.h \
 	asyncrenderinternal.h \
@@ -76,6 +76,7 @@ HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
 
 SOURCES += main.cpp \ 
 	glew/glew.c \
+	libraryitem.cpp \
 	templateparameter.cpp \
 	pullplancustomizeviewwidget.cpp \
 	pullplan.cpp subpulltemplate.cpp \
@@ -89,7 +90,6 @@ SOURCES += main.cpp \
 	mainwindow.cpp niceviewwidget.cpp \
 	pulltemplatelibrarywidget.cpp pickuptemplatelibrarywidget.cpp piecetemplatelibrarywidget.cpp \
 	pullplaneditorviewwidget.cpp pullplaneditorwidget.cpp \ 
-	libraryitemeffect.cpp \
 	pieceeditorwidget.cpp coloreditorwidget.cpp \
 	peelrenderer.cpp \
 	asyncrenderwidget.cpp \

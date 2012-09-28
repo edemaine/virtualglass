@@ -66,20 +66,10 @@ void PullPlanEditorWidget :: updateEverything()
 		ptlw = dynamic_cast<PullTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(templateLibraryLayout->itemAt(i))->widget());
 		if (ptlw->type == plan->getTemplateType())
-			highlightLibraryWidget(ptlw);
+			ptlw->setDependancy(true, IS_DEPENDANCY);
 		else
-			unhighlightLibraryWidget(ptlw);
+		        ptlw->setDependancy(false);
 	}
-}
-
-void PullPlanEditorWidget :: unhighlightLibraryWidget(PullTemplateLibraryWidget* w)
-{
-	static_cast<LibraryItemEffect*>(w->graphicsEffect())->setDependancy(false);
-}
-
-void PullPlanEditorWidget :: highlightLibraryWidget(PullTemplateLibraryWidget* w)
-{
-	static_cast<LibraryItemEffect*>(w->graphicsEffect())->setDependancy(true, IS_DEPENDANCY);
 }
 
 void PullPlanEditorWidget :: setupLayout()

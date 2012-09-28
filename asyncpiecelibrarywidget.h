@@ -3,6 +3,8 @@
 
 #include <QtGui>
 #include "asyncrenderwidget.h"
+#include "piecerenderdata.h"
+#include "libraryitem.h"
 
 class Piece;
 
