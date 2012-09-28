@@ -3,7 +3,7 @@
 
 #include <QtGui>
 #include "piecetemplate.h"
-#include "qgraphicshighlighteffect.h"
+#include "libraryitemeffect.h"
 
 class PieceTemplateLibraryWidget : public QLabel
 {

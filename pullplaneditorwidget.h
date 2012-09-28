@@ -7,7 +7,7 @@
 #include "pullplaneditorviewwidget.h"
 #include "pullplancustomizeviewwidget.h"
 #include "pulltemplatelibrarywidget.h"
-#include "qgraphicshighlighteffect.h"
+#include "libraryitemeffect.h"
 #include "asyncpullplanlibrarywidget.h"
 #include "niceviewwidget.h"
 #include "shape.h"

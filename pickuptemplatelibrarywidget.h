@@ -3,7 +3,7 @@
 
 #include <QtGui>
 #include "pickuptemplate.h"
-#include "qgraphicshighlighteffect.h"
+#include "libraryitemeffect.h"
 
 class PickupTemplateLibraryWidget : public QLabel
 {

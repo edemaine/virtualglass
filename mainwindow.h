@@ -19,7 +19,7 @@
 #include "pullplaneditorwidget.h"
 #include "coloreditorwidget.h"
 #include "pieceeditorwidget.h"
-#include "qgraphicshighlighteffect.h"
+#include "libraryitemeffect.h"
 #include "glassmime.h"
 
 class MainWindow : public QMainWindow
@@ -61,16 +61,6 @@ class MainWindow : public QMainWindow
 		void deleteCurrentEditingObject();
 		void setViewMode(enum ViewMode m);
 
-		void unhighlightLibraryWidget(PieceTemplateLibraryWidget* w);
-		void unhighlightLibraryWidget(PickupTemplateLibraryWidget* w);
-		void unhighlightLibraryWidget(AsyncColorBarLibraryWidget* w);
-		void unhighlightLibraryWidget(AsyncPullPlanLibraryWidget* w);
-		void unhighlightLibraryWidget(AsyncPieceLibraryWidget* w);
-		void highlightLibraryWidget(PieceTemplateLibraryWidget* w);
-		void highlightLibraryWidget(PickupTemplateLibraryWidget* w);
-		void highlightLibraryWidget(AsyncColorBarLibraryWidget* w, enum Dependancy d);
-		void highlightLibraryWidget(AsyncPullPlanLibraryWidget* w, enum Dependancy d);
-		void highlightLibraryWidget(AsyncPieceLibraryWidget* w, enum Dependancy d);
 		void unhighlightAllLibraryWidgets();
 		bool glassColorIsDependancy(GlassColor* color);
 		bool pullPlanIsDependancy(PullPlan* plan);

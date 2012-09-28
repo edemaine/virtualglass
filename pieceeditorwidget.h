@@ -9,7 +9,7 @@
 #include "asyncpiecelibrarywidget.h"
 #include "pickuptemplatelibrarywidget.h"
 #include "piecetemplatelibrarywidget.h"
-#include "qgraphicshighlighteffect.h"
+#include "libraryitemeffect.h"
 #include "niceviewwidget.h"
 #include "geometry.h"
 #include "mesh.h"

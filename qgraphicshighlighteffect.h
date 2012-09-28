@@ -1,15 +1,15 @@
-#ifndef QGRAPHICSHIGHLIGHTEFFECT_H
-#define QGRAPHICSHIGHLIGHTEFFECT_H
+#ifndef LIBRARYITEMEFFECT_H
+#define LIBRARYITEMEFFECT_H
 
 #include <QtGui>
 #include "dependancy.h" 
 
-class QGraphicsHighlightEffect : public QGraphicsEffect
+class LibraryItemEffect : public QGraphicsEffect
 {
 	Q_OBJECT
 
 public:
-	explicit QGraphicsHighlightEffect(QObject *parent = 0);
+	explicit LibraryItemEffect(QObject *parent = 0);
 	virtual QRectF boundingRectFor(const QRectF &sourceRect) const;
 	void setBusy(bool isBusy);
 	void setDependancy(bool hasDependancy, enum Dependancy _d=IS_DEPENDANCY);
@@ -28,4 +28,4 @@ private:
 	void setStyleSheet();
 };
 
-#endif // QGRAPHICSHIGHLIGHTEFFECT_H
+#endif // LIBRARYITEMEFFECT_H

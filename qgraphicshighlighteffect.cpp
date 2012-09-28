@@ -1,17 +1,17 @@
 #include "qgraphicshighlighteffect.h"
 
-QGraphicsHighlightEffect::QGraphicsHighlightEffect(QObject* parent) : QGraphicsEffect(parent)
+LibraryItemEffect::LibraryItemEffect(QObject* parent) : QGraphicsEffect(parent)
 {
 	isBusy = false;
 	hasDependancy = false;
 }
 
-QRectF QGraphicsHighlightEffect::boundingRectFor( const QRectF &sourceRect) const
+QRectF LibraryItemEffect::boundingRectFor( const QRectF &sourceRect) const
 {
 	return sourceRect;
 }
 
-void QGraphicsHighlightEffect :: setStyleSheet()
+void LibraryItemEffect :: setStyleSheet()
 {
 	QColor color;
 
@@ -55,20 +55,20 @@ void QGraphicsHighlightEffect :: setStyleSheet()
 	emit styleSheetString(style);
 }
 
-void QGraphicsHighlightEffect::setBusy(bool _b)
+void LibraryItemEffect::setBusy(bool _b)
 {
 	isBusy = _b;
 	setStyleSheet();
 }
 
-void QGraphicsHighlightEffect::setDependancy(bool _hd, enum Dependancy _d)
+void LibraryItemEffect::setDependancy(bool _hd, enum Dependancy _d)
 {
 	hasDependancy = _hd;
 	dependancy = _d;
 	setStyleSheet();
 }
 
-void QGraphicsHighlightEffect::draw( QPainter *painter )
+void LibraryItemEffect::draw( QPainter *painter )
 {
 	drawSource(painter);
 }
