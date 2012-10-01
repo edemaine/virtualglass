@@ -69,8 +69,8 @@ class PullPlan
 
 		// Methods
 		void initializeTemplate();
-		void resetSubs(vector<SubpullTemplate> oldSubs);
-		void pushNewSubpull(vector<SubpullTemplate>* newSubs,
+		void resetSubs(bool hardReset);
+		void pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs,
 			enum GeometricShape s, Point location, float diameter, int group);
 };
 

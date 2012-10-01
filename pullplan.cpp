@@ -75,7 +75,7 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) {
 		// initialize default subplans
 		defaultCircleSubplan = new PullPlan(PullTemplate::BASE_CIRCLE);
 		defaultSquareSubplan = new PullPlan(PullTemplate::BASE_CIRCLE);
-		defaultSquareSubplan->setOutermostCasingShape(CIRCLE_SHAPE);
+		defaultSquareSubplan->setOutermostCasingShape(SQUARE_SHAPE);
 	}
 
 	parameters.clear();
@@ -124,9 +124,7 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) {
 			break;
 	}
 
-	vector<SubpullTemplate> oldSubs = subs;
-	subs.clear(); // don't carry over any of the current stuff
-	resetSubs(oldSubs);
+	resetSubs(true);
 }
 
 void PullPlan :: setTemplateTypeToCustom()
@@ -201,8 +199,7 @@ void PullPlan :: setParameter(unsigned int _index, int value)
 {
 	assert(_index < parameters.size());
 	parameters[_index].value = value;
-	vector<SubpullTemplate> oldSubs = subs;
-	resetSubs(oldSubs);
+	resetSubs(false);
 }
 
 void PullPlan :: removeCasing() {
@@ -325,30 +322,31 @@ enum GeometricShape PullPlan :: getCasingShape(unsigned int index) {
 	return this->casings[index].shape;
 }
 
-void PullPlan :: pushNewSubpull(vector<SubpullTemplate>* newSubs,
+void PullPlan :: pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs,
 	enum GeometricShape _shape, Point p, float diameter, int group) 
 {
+	PullPlan* plan;
 
-	assert(_shape == CIRCLE_SHAPE || _shape == SQUARE_SHAPE);
-
-	if (newSubs->size() < subs.size()) 
+	// if it's not a hard reset and there are still old subplans to use and the next one matches shape
+	// with the shape we want to have, then use it
+	if (!hardReset && newSubs->size() < subs.size() && _shape == subs[newSubs->size()].shape) 
 	{
-		newSubs->push_back(SubpullTemplate(subs[newSubs->size()].plan, _shape, p, diameter, group));
+		plan = subs[newSubs->size()].plan;
 	}
-	else 
-	{ // you've run out of existing subplans copy from
+	else // otherwise just use whichever filler subplan matches the shape
+	{
 		switch (_shape) 
 		{
 			case CIRCLE_SHAPE:
-				newSubs->push_back(SubpullTemplate(defaultCircleSubplan, 
-					CIRCLE_SHAPE, p, diameter, group));
+				plan = defaultCircleSubplan;
 				break;
 			case SQUARE_SHAPE:
-				newSubs->push_back(SubpullTemplate(defaultSquareSubplan, 
-					SQUARE_SHAPE, p, diameter, group));
+				plan = defaultSquareSubplan;
 				break;
 		}
 	}
+
+	newSubs->push_back(SubpullTemplate(plan, _shape, p, diameter, group));
 }
 
 /*
@@ -362,15 +360,15 @@ of subplans changed. For instance, changing a template parameter
 specifying the number of subcanes in a row changes the size and location 
 of subplans, as well as increasing or decreasing the number of subplans.
 */
-void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
+void PullPlan :: resetSubs(bool hardReset)
 {
 	Point p = make_vector(0.0f, 0.0f, 0.0f);
 	assert(!casings.empty());
 	float radius = casings[0].thickness;
 
 	vector<SubpullTemplate> newSubs;
-
-	switch (this->templateType) {
+	
+	switch (templateType) {
 		case PullTemplate::BASE_CIRCLE:
 		case PullTemplate::BASE_SQUARE:
 			break;
@@ -381,7 +379,7 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 			for (int i = 0; i < count; ++i) {
 				float littleRadius = (2 * radius / count) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
-				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
 			}
 			break;
 		}
@@ -393,7 +391,7 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 			for (int i = 0; i < count; ++i) {
 				float littleRadius = (2 * radius / count) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
-				pushNewSubpull(&newSubs, SQUARE_SHAPE, p, littleRadius * 2.0, 0);
+				pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, littleRadius * 2.0, 0);
 			}
 			break;
 		}
@@ -405,11 +403,11 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 			float k = sin(theta/2) / (1 + sin(theta/2));
 
 			p.x = p.y = 0.0;
-			pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, (1 - 2 * k) * 2 * radius, 0);
+			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, (1 - 2 * k) * 2 * radius, 0);
 			for (int i = 0; i < count; ++i) {
 				p.x = (1.0 - k) * radius * cos(TWO_PI / count * i);
 				p.y = (1.0 - k) * radius * sin(TWO_PI / count * i);
-				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * k * radius, 0);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * k * radius, 0);
 			}
 			break;
 		}
@@ -420,20 +418,20 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 			float littleRadius = (radius / (count + 0.5)) / 2.0;
 
 			p.x = p.y = 0.0;
-			pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
 			for (int i = 0; i < count; ++i) {
 				p.x = (i+1) * 2 * littleRadius;
 				p.y = 0.0;
-				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
 				p.x = 0.0;
 				p.y = (i+1) * 2 * littleRadius;
-				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
 				p.x = -((i+1) * 2 * littleRadius);
 				p.y = 0.0;
-				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
 				p.x = 0.0;
 				p.y = -((i+1) * 2 * littleRadius);
-				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
 			}
 			break;
 		}
@@ -457,18 +455,18 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 					p.x = -radius + littleRadius + 2 * littleRadius * i;
 					p.y = -radius + littleRadius + 2 * littleRadius * j;
 					if (this->templateType == PullTemplate::SQUARE_OF_CIRCLES)
-						pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 0);
+						pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 0);
 					else
-						pushNewSubpull(&newSubs, SQUARE_SHAPE, p, 2 * littleRadius, 0);
+						pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius, 0);
 				}
 				for (j = s; j >= 0; --j) {
 					i = s;
 					p.x = -radius + littleRadius + 2 * littleRadius * i;
 					p.y = -radius + littleRadius + 2 * littleRadius * j;
 					if (this->templateType == PullTemplate::SQUARE_OF_CIRCLES)
-						pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 0);
+						pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 0);
 					else
-						pushNewSubpull(&newSubs, SQUARE_SHAPE, p, 2 * littleRadius, 0);
+						pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius, 0);
 				}
 				
 			}
@@ -481,12 +479,12 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 			float littleRadius = radius / (2 * count - 1);
 
 			p.x = p.y = 0.0;
-			pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 0);
+			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 0);
 			for (int i = 1; i < count; ++i) {
 				for (int theta = 0; theta < 3; ++theta) {
 					p.x = (littleRadius * 2 * i) * cos(TWO_PI / 3 * theta);
 					p.y = (littleRadius * 2 * i) * sin(TWO_PI / 3 * theta);
-					pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, littleRadius * 2, 0);
+					pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2, 0);
 				}
 			}
 			break;
@@ -501,38 +499,38 @@ void PullPlan :: resetSubs(vector<SubpullTemplate> oldSubs)
 			float littleRadius = radius / (count + 2);
 
 			p.x = p.y = 0.0;
-			pushNewSubpull(&newSubs, SQUARE_SHAPE, p, 2 * littleRadius * count, 0);
+			pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius * count, 0);
 			for (int i = 0; i < count + 1; ++i) {
 				p.x = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * i;
 				p.y = -2 * littleRadius * (count + 1) / 2.0;
-				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
 			}
 			for (int j = 0; j < count + 1; ++j) {
 				p.x = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * (count + 1);
 				p.y = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * j;
-				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
 			}
 			for (int i = count + 1; i >= 1; --i) {
 				p.x = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * i;
 				p.y = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * (count + 1);
-				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
 			}
 			for (int j = count + 1; j >= 1; --j) {
 				p.x = -2 * littleRadius * (count + 1) / 2.0;
 				p.y = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * j;
-				pushNewSubpull(&newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
 			}
 			break;
 		}
 		case PullTemplate::CUSTOM_CIRCLE:
 		case PullTemplate::CUSTOM_SQUARE:
 		{
-			for (unsigned int i = 0; i < oldSubs.size(); i++)
+			for (unsigned int i = 0; i < subs.size(); i++)
 			{
-				p.x = oldSubs[i].location.x * radius;
-				p.y = oldSubs[i].location.y * radius;
-				pushNewSubpull(&newSubs, oldSubs[i].shape, oldSubs[i].location, 
-					oldSubs[i].diameter, oldSubs[i].group);
+				p.x = subs[i].location.x * radius;
+				p.y = subs[i].location.y * radius;
+				pushNewSubpull(hardReset, &newSubs, subs[i].shape, subs[i].location, 
+					subs[i].diameter, subs[i].group);
 			}
 			break;
 		}
@@ -547,14 +545,19 @@ PullPlan* PullPlan :: copy() const {
 
 	c->casings = casings;
 	c->twist = twist;
-
 	for (unsigned int i = 0; i < parameters.size(); ++i)
 	{
 		c->parameters[i] = parameters[i];
 	}
-	vector<SubpullTemplate> oldSubs = subs;
-	c->resetSubs(oldSubs);
-
+	// need to copy SubpullTemplate list in the case that it's a custom
+	// template, in which case the only record of the subpull
+	// location, shape, size, etc. is the SubpullTemplate list
+	c->subs.clear();
+	for (unsigned int i = 0; i < subs.size(); ++i)
+	{
+		c->subs.push_back(subs[i]);
+	}
+		
 	assert(c->subs.size() == subs.size());
 	for (unsigned int i = 0; i < subs.size(); ++i) {
 		c->subs[i].plan = subs[i].plan;
