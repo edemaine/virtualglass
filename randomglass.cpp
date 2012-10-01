@@ -63,7 +63,7 @@ PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimp
 	return plan;
 }
 
-PickupPlan* randomPickupPlan(PullPlan* pullPlan)
+PickupPlan* randomPickup(PullPlan* pullPlan)
 {
         int randomTemplateNumber = qrand() % (PickupTemplate::lastSeedTemplate() - PickupTemplate::firstSeedTemplate())
                 + PickupTemplate::firstSeedTemplate();
@@ -74,7 +74,8 @@ PickupPlan* randomPickupPlan(PullPlan* pullPlan)
 	for (unsigned int i = 0; i < pickup->getParameterCount(); ++i)
 	{
 		pickup->getParameter(i, &p);
-		pickup->setParameter(i, qrand() % (p.upperLimit - p.lowerLimit) + p.lowerLimit);
+		// not setting to upper intervals of parameter values for efficiency reasons 
+		pickup->setParameter(i, qrand() % ((p.upperLimit - p.lowerLimit)/3) + p.lowerLimit);
 	}	
 
 	// set subplans

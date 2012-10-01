@@ -10,6 +10,7 @@ MainWindow :: MainWindow()
 	centralLayout = new QHBoxLayout(centralWidget);
 	setupLibrary();
 	setupEditors();
+	setupMenus();
 	setupConnections();
 
 	setWindowTitle(windowTitle());
@@ -20,6 +21,347 @@ MainWindow :: MainWindow()
 	emit someDataChanged();
 	whatToDoLabel->setText("Click a library item at left to edit/view.");
 }
+
+//markus
+#ifdef UNDEF 
+void MainWindow::contextMenuEvent(QContextMenuEvent *event)
+{
+	QMenu menu(this);
+	menu.exec(event->globalPos());
+}
+
+int MainWindow::getM(){
+	return m;
+}
+
+void MainWindow::setM(int _m){
+	m = _m;
+}
+
+void MainWindow::prepareJson(PullPlan* plan, Json::Value* root1, string nestedValue) {
+	//prepare json
+	Json::Value *nested_value1 = new Json::Value;
+	//check dependency from piece to plan to save only dependent canes
+	Json::Value *value9 = new Json::Value;
+	*value9 = (plan->getTemplateType());
+	Json::Value *value10 = new Json::Value;
+	*value10 = (plan->hasSquareCasing());
+	Json::Value *value11 = new Json::Value;
+	*value11 = (plan->getCasingCount());
+	Json::Value *value23 = new Json::Value;
+	*value23 = (plan->getTwist());
+
+	Json::Value *nested_value = new Json::Value;
+
+	std::stringstream *templateTypeSstr = new std::stringstream;
+	*templateTypeSstr << "templatetype" << getM();
+	string templateType = (*templateTypeSstr).str();
+
+	std::stringstream *hasSquareCasingSstr = new std::stringstream;
+	*hasSquareCasingSstr << "hasSquareCasing" <<getM();
+	string hasSquareCasing = (*hasSquareCasingSstr).str();
+
+	std::stringstream *casingcountSstr = new std::stringstream;
+	*casingcountSstr << "casingcount" <<getM();
+	string casingCount = (*casingcountSstr).str();
+
+	std::stringstream *twistsSstr = new std::stringstream;
+	*twistsSstr << "twists" <<getM();
+	string twists = (*twistsSstr).str();
+
+	(*nested_value)[templateType] = *value9;
+	(*nested_value)[hasSquareCasing] = *value10;
+	(*nested_value)[casingCount] = *value11;
+	(*nested_value)[twists] = *value23;
+
+	std::stringstream *pullplannrSstr = new std::stringstream;
+	*pullplannrSstr << "pullplannr" <<getM();
+	string pullPlanNr = (*pullplannrSstr).str();
+
+	(*nested_value1)[pullPlanNr] = *nested_value;
+
+	//for (unsigned int j=0; j< plan->subs.size() ;j++){
+	//    SubpullTemplate* sub = &(plan->subs[j]);
+	//    cout << sub->group;
+	//}
+
+	for (unsigned int i=0; i<(plan->getCasingCount()); i++){
+		Json::Value *value13 = new Json::Value;
+		*value13 = (plan->getCasingThickness(i));
+		Json::Value *value14 = new Json::Value;
+		*value14 = (plan->getCasingShape(i));
+		Json::Value *value15 = new Json::Value;
+		*value15 = (plan->getCasingColor(i)->getName());
+		Json::Value *value16 = new Json::Value;
+		*value16 = ((plan->getCasingColor(i)->getColor())->operator [](0));
+		Json::Value *value17 = new Json::Value;
+		*value17 = ((plan->getCasingColor(i)->getColor())->operator [](1));
+		Json::Value *value18 = new Json::Value;
+		*value18 = ((plan->getCasingColor(i)->getColor())->operator [](2));
+		Json::Value *value19 = new Json::Value;
+		*value19 = ((plan->getCasingColor(i)->getColor())->operator [](3));
+		//Json::Value value12(plan->subs.size());
+
+		Json::Value *nested_value = new Json::Value;
+		(*nested_value)["CasingThickness"] = *value13;
+		(*nested_value)["CasingShape"] = *value14;
+		(*nested_value)["getCasingColor"] = *value15;
+		(*nested_value)["R"] = *value16;
+		(*nested_value)["G"] = *value17;
+		(*nested_value)["B"] = *value18;
+		(*nested_value)["alpha"] = *value19;
+		//nested_value["subsSize"] = value12;
+
+		std::stringstream *casingcountSstr = new std::stringstream;
+		*casingcountSstr << "casingcount" <<i;
+		string casingCount = (*casingcountSstr).str();
+		(*nested_value1)[casingCount] = *nested_value;
+	}
+
+	Json::Value *value20 = new Json::Value;
+	*value20 =(plan->getParameterCount());
+
+	std::stringstream *parametercountSstr = new std::stringstream;
+	*parametercountSstr << "Pullparametercount" <<getM();
+	string parameterCount = (*parametercountSstr).str();
+
+	(*nested_value1)[parameterCount] = *value20;
+
+	for(unsigned int i=0; i<(plan->getParameterCount()); i++){
+		Json::Value *value21 = new Json::Value;
+		Json::Value *value22 = new Json::Value;
+		*value21 = (plan->getParameterName(i));
+		*value22 = (plan->getParameter(i));
+		Json::Value *nested_value = new Json::Value;
+
+		std::stringstream *parameternameSstr = new std::stringstream;
+		*parameternameSstr << "parametername" <<i;
+		string parameterName = (*parameternameSstr).str();
+
+		std::stringstream *parameterValueSstr = new std::stringstream;
+		*parameterValueSstr << "parametervalue" <<i;
+		string parameterValue = (*parameterValueSstr).str();
+
+		std::stringstream *parameterSstr = new std::stringstream;
+		*parameterSstr << "parameter" <<i;
+		string parameter = (*parameterSstr).str();
+
+		(*nested_value)[parameterName] = *value21;
+		(*nested_value)[parameterValue] = *value22;
+		(*nested_value1)[parameter] = *nested_value;
+	}
+	std::stringstream *Sstr = new std::stringstream;
+	*Sstr << nestedValue <<getM();
+	string name = (*Sstr).str();
+
+	(*root1)[name] = *nested_value1;
+}
+
+void MainWindow::buildCaneTree(PullPlan* plan, PullPlan* planPrev, map<PullPlan*,int> cane, Json::Value* root1) {
+	if(cane.find(plan)->first) {
+		setM((getM())+1);
+		std::stringstream *Sstr = new std::stringstream;
+		*Sstr << "subcane" <<getM();
+		string name = (*Sstr).str();
+
+		(*root1)[name] = cane.find(plan)->second;
+		//setM((getM())+1);
+	}
+	else {
+		if((plan->subs.size())==0){
+			//if case: no canes in library
+			if (planPrev!=NULL)
+				vector< PullPlan* > caneVec;
+				//cane identifier
+				caneVec.push_back(plan);
+				//prevPointer
+				caneVec.push_back(planPrev);
+				////special case: buildCaneMap calls buildCaneTree
+				caneVec.push_back(NULL);
+				setM((getM())+1);
+				prepareJson(plan, root1, "subcane");
+			}
+		}
+		else{
+			vector< PullPlan > caneVec;
+			//cane pointer (identifier)
+			caneVec.push_back(*plan);
+			if (planPrev==NULL){
+				caneVec.push_back(NULL);
+				}
+			else{
+				//prevPointer
+				caneVec.push_back(*planPrev);
+			}
+			for(int i=0; i<int(plan->subs.size()); i++){
+				SubpullTemplate subplan = plan->subs[i];
+				//pointer next
+				caneVec.push_back(*subplan.plan);
+				//add subcane to ma
+				setM(1+getM());
+				cane.insert(pair<PullPlan*, int>(subplan.plan,getM()));
+				//go down and build tree
+				buildCaneTree(subplan.plan, plan, cane, root1);
+				prepareJson(plan, root1, "subcane");
+            		}
+		}
+	}
+}
+
+void MainWindow::buildCaneMap(PullPlan* plan, Json::Value* root1, map<PullPlan*,int> cane){
+	if(cane.find(plan)->first){
+		setM((getM())+1);
+		std::stringstream *Sstr = new std::stringstream;
+		*Sstr << "cane" <<getM();
+		string name = (*Sstr).str();
+
+		(*root1)[name] = cane.find(plan)->second;
+		//setM((getM())+1);
+	}
+	else{
+		//add first cane (pickup->sub)
+		setM(1+getM());
+		cane.insert(pair<PullPlan*, int>(plan,getM()));
+		buildCaneTree(plan, NULL, cane, root1);
+		prepareJson(plan, root1, "cane");
+	}
+}
+
+QString MainWindow::writeJson(Json::Value root){
+	Json::StyledWriter writer;
+	std::string outputConfig = writer.write( root );
+	QString output = QString::fromStdString(outputConfig);
+	return output;
+}
+
+#endif 
+
+void MainWindow::open()
+{
+#ifdef UNDEF
+	//open file dialog
+	QString filename = QFileDialog::getOpenFileName(this, tr("Open Document"), 
+		QDir::currentPath(), tr("VirtualGlass file (*.glass);;All files (*.*)") );
+#endif
+}
+
+void MainWindow::save(){
+    //open
+}
+
+void MainWindow::saveAs(){
+
+#ifdef UNDEF
+	//save file dialog
+	QString filename = QFileDialog::getSaveFileName(this, tr("Save your glass piece"), QDir::currentPath(), tr("VirtualGlass (*.glass)") );
+	//improve: prevent character set error in filename
+	//improve: empty file name -> "no savefile choosen"
+
+	QFile saveFile(filename);
+	saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
+	QTextStream fileOutput(&saveFile);
+
+
+	//read version and date from version.txt; write this into json file (root0)
+	//first line; versionNo and date
+	ifstream readHdl;
+	//date has always 12 characters
+	char date[11];
+	char versionNo[4];
+
+	readHdl.open(":/version.txt");
+	readHdl.getline(versionNo,4,'\n');
+	string versionStr;
+	versionStr.assign(versionNo, 4);
+	readHdl.getline(date,11,'\n');
+	string dateStr = date;
+	readHdl.close();
+	//write json file (root0)
+	Json::Value root0;
+	Json::Value value1(versionStr);
+	Json::Value value2(dateStr);
+
+	root0["date"] = value1;
+	root0["version"] = value2;
+	fileOutput << writeJson(root0);
+
+	//write pickuptemplate into json file (root1)
+	Json::Value root1;
+	Json::Value value3((pieceEditorWidget->getPiece())->pickup->getTemplateType());
+	Json::Value value4((pieceEditorWidget->getPiece())->pickup->getParameterCount());
+	// Json::Value value5((pieceEditorWidget->getPiece())->pickup->getParameterName(i));
+	//Json::Value value6((pieceEditorWidget->getPiece())->pickup->getParameter(i));
+	Json::Value value7(((pieceEditorWidget->getPiece())->pickup->overlayGlassColor->getName()));
+	Json::Value value8(((pieceEditorWidget->getPiece())->pickup->underlayGlassColor->getName()));
+
+	root1["PickupTemplateType"] = value3;
+	root1["PickupParameterCount"] = value4;
+	//root1["PickupParameterName"] = value5;
+	//root1["PickupParameterValue"] = value6;
+	root1["PickupoverlayGlassColor"] = value7;
+	root1["PickupunderlayGlassColor"] = value8;
+
+	//##pointer
+	//fileOutput << "getPiece " << pieceEditorWidget->getPiece() << "\n";
+	//fileOutput << "getTemplate " << (pieceEditorWidget->getPiece())->getTemplate()<< "\n";
+	//fileOutput << "getPlan/pull" << pullPlanEditorWidget->getPlan()<< "\n";
+
+	//pullupplan
+	//loop over all canes
+	setM(0);
+	map<PullPlan*,int> cane;
+	AsyncPullPlanLibraryWidget* pplw;
+	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i){
+		pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
+			dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
+		PullPlan* plan = pplw->getPullPlan();
+		//        setM(0);
+		buildCaneMap(plan, &root1, cane);
+	}
+	fileOutput << writeJson(root1);
+	fileOutput << "eof";
+
+	saveFile.close();
+#endif 
+}
+
+void MainWindow::setupMenus()
+{
+	//open
+	openAction = new QAction(tr("&Open"), this);
+	openAction->setShortcuts(QKeySequence::Open);
+	openAction->setStatusTip(tr("Open an existing file"));
+
+	//save
+	saveAction = new QAction(tr("&Save"), this);
+	saveAction->setShortcuts(QKeySequence::Save);
+	saveAction->setStatusTip(tr("Save the document to disk"));
+
+	//saveAs
+	saveAsAction = new QAction(tr("&SaveAs"), this);
+	saveAsAction->setShortcuts(QKeySequence::SaveAs);
+	saveAsAction->setStatusTip(tr("Save the document to disk"));
+
+	// File menu
+	fileMenu = menuBar()->addMenu(tr("&File")); //create File menu
+	fileMenu->addAction(openAction); //add openButton
+	fileMenu->addAction(saveAction); //add saveButton
+	fileMenu->addAction(saveAsAction); //add saveAsButton
+
+	// Simple example cane
+	simpleCaneAction = new QAction(tr("&Simple Cane"), this);
+	simpleCaneAction->setStatusTip(tr("Generate a simple example cane in the library."));
+
+	// Simple example cane
+	simplePieceAction = new QAction(tr("&Simple Piece"), this);
+	simplePieceAction->setStatusTip(tr("Generate a simple example piece in the library."));
+
+	// Examples menu
+	examplesMenu = menuBar()->addMenu(tr("&Examples")); //create randomize menu
+	examplesMenu->addAction(simpleCaneAction);
+	examplesMenu->addAction(simplePieceAction);
+}
+
 
 void MainWindow :: setViewMode(enum ViewMode _mode)
 {
@@ -308,6 +650,45 @@ void MainWindow :: setupConnections()
 	connect(newPieceButton, SIGNAL(pressed()), this, SLOT(newPiece()));
 	connect(copyPieceButton, SIGNAL(pressed()), this, SLOT(copyPiece()));
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+
+	connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
+	connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
+	connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveAs()));
+
+	connect(simpleCaneAction, SIGNAL(triggered()), this, SLOT(simpleCaneExampleActionTriggered()));
+	connect(simplePieceAction, SIGNAL(triggered()), this, SLOT(simplePieceExampleActionTriggered()));
+}
+
+void MainWindow :: simpleCaneExampleActionTriggered()
+{
+	GlassColor* randomGC = randomGlassColor();
+	PullPlan* randomPP = randomSimplePullPlan(CIRCLE_SHAPE, randomGC);
+
+	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC));
+
+	AsyncPullPlanLibraryWidget* pplw = new AsyncPullPlanLibraryWidget(randomPP);
+	pullPlanLibraryLayout->addWidget(pplw);
+
+	pullPlanEditorWidget->setPlan(randomPP);	
+	setViewMode(PULLPLAN_VIEW_MODE);
+	emit someDataChanged();
+}
+
+void MainWindow :: simplePieceExampleActionTriggered()
+{
+	GlassColor* randomGC = randomGlassColor();
+	PullPlan* randomSPP = randomSimplePullPlan(SQUARE_SHAPE, randomGC);
+	Piece* randomP = randomPiece(randomPickup(randomSPP));
+
+	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomSPP));
+	
+	AsyncPieceLibraryWidget* plw = new AsyncPieceLibraryWidget(randomP);
+	pieceLibraryLayout->addWidget(plw);
+
+	pieceEditorWidget->setPiece(randomP);	
+	setViewMode(PIECE_VIEW_MODE);
+	emit someDataChanged();
 }
 
 void MainWindow :: setupLibrary()

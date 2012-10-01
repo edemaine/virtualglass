@@ -5,6 +5,7 @@
 
 #include <QtGui>
 #include <QObject>
+// <json/json.h>
 
 #include "constants.h"
 #include "dependancy.h"
@@ -20,6 +21,7 @@
 #include "coloreditorwidget.h"
 #include "pieceeditorwidget.h"
 #include "glassmime.h"
+#include "randomglass.h"
 
 class MainWindow : public QMainWindow
 {
@@ -33,6 +35,9 @@ class MainWindow : public QMainWindow
 		void seedEverything();
 		void keyPressEvent(QKeyEvent* e);
 		QString windowTitle();
+
+	//protected:
+		//void contextMenuEvent(QContextMenuEvent *event);
 
 	signals:
 		void someDataChanged();
@@ -55,16 +60,24 @@ class MainWindow : public QMainWindow
 		void setupPullPlanEditor();
 		void setupPieceEditor();
 		void setupConnections();
+		void setupMenus();
 		void updateLibrary();
 		void initializeRandomPiece();
 		void deleteCurrentEditingObject();
 		void setViewMode(enum ViewMode m);
+		//QString writeJson(Json::Value);
+		//void prepareJson(PullPlan*, Json::Value*, string nestedValue);
+		//void buildCaneTree(PullPlan* , PullPlan* , map<PullPlan*,int>, Json::Value*);
+		//void buildCaneMap(PullPlan*, Json::Value*, map<PullPlan*,int>);
+		//int getM();
+		//void setM(int m);
 
 		void unhighlightAllLibraryWidgets();
 		bool glassColorIsDependancy(GlassColor* color);
 		bool pullPlanIsDependancy(PullPlan* plan);
 
 		// Variables
+		//int m;
 		QLabel* whatToDoLabel;
 		NiceViewWidget* colorBarNiceViewWidget;
 		QVBoxLayout* colorBarLibraryLayout;
@@ -85,6 +98,13 @@ class MainWindow : public QMainWindow
 		QPushButton* copyColorBarButton;
 		QPushButton* copyPullPlanButton;
 		QPushButton* copyPieceButton;
+		QMenu *examplesMenu;
+		QAction *simpleCaneAction;
+		QAction *simplePieceAction;
+		QMenu *fileMenu;
+		QAction *openAction;
+		QAction *saveAction;
+		QAction *saveAsAction;
 
 	private slots:
 		void updateEverything();
@@ -95,6 +115,12 @@ class MainWindow : public QMainWindow
 		void copyColorBar();
 		void copyPullPlan();
 		void copyPiece();
+		void open();
+		void save();
+		void saveAs();
+		void simpleCaneExampleActionTriggered();
+		void simplePieceExampleActionTriggered();
+
 };
 
 
