@@ -90,30 +90,30 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) {
 			casings[0].thickness = 1 / SQRT_TWO;
 			break;
 		case PullTemplate::HORIZONTAL_LINE_CIRCLE:
-			parameters.push_back(TemplateParameter(3, string("Row count")));
+			parameters.push_back(TemplateParameter(3, string("Row count"), 2, 30));
 			break;
 		case PullTemplate::HORIZONTAL_LINE_SQUARE:
-			parameters.push_back(TemplateParameter(3, string("Row count")));
+			parameters.push_back(TemplateParameter(3, string("Row count"), 2, 30));
 			break;
 		case PullTemplate::SURROUNDING_CIRCLE:
-			parameters.push_back(TemplateParameter(8, string("Count")));
+			parameters.push_back(TemplateParameter(8, string("Count"), 3, 30));
 			break;
 		case PullTemplate::CROSS:
-			parameters.push_back(TemplateParameter(3, string("Radial count")));
+			parameters.push_back(TemplateParameter(3, string("Radial count"), 2, 20));
 			break;
 		case PullTemplate::SQUARE_OF_SQUARES:
 		case PullTemplate::SQUARE_OF_CIRCLES:
 			casings[0].shape = SQUARE_SHAPE;
 			casings[0].thickness = 1 / SQRT_TWO;
-			parameters.push_back(TemplateParameter(4, string("Row count")));
+			parameters.push_back(TemplateParameter(4, string("Row count"), 2, 8));
 			break;
 		case PullTemplate::TRIPOD:
-			parameters.push_back(TemplateParameter(3, string("Radial count")));
+			parameters.push_back(TemplateParameter(3, string("Radial count"), 2, 20));
 			break;
 		case PullTemplate::SURROUNDING_SQUARE:
 			casings[0].shape = SQUARE_SHAPE;
 			casings[0].thickness = 1 / SQRT_TWO;
-			parameters.push_back(TemplateParameter(2, string("Column count")));
+			parameters.push_back(TemplateParameter(2, string("Column count"), 2, 10));
 			break;
 		case PullTemplate::CUSTOM_CIRCLE:
 			break;
@@ -193,8 +193,7 @@ unsigned int PullPlan :: getParameterCount()
 void PullPlan :: getParameter(unsigned int _index, TemplateParameter* dest)
 {
         assert(_index < parameters.size());
-        dest->value = parameters[_index].value;
-        dest->name = parameters[_index].name; // this is a copy, since it's a std::string
+	*dest = parameters[_index];
 }
 
 void PullPlan :: setParameter(unsigned int _index, int value)
@@ -265,7 +264,7 @@ void PullPlan :: setCasingThickness(float t, unsigned int index) {
 	// this currently doesn't enforce any overlapping issues with
 	// differently-shaped casings. It assumes they are being set 
 	// to valid relative sizes.
-	if (index >= casings.size())
+	if (index >= casings.size()-1)
 		return;
 	// if innermost casing, scale subcanes with changing casing thickness
 	if (index == 0) {
@@ -548,10 +547,9 @@ PullPlan* PullPlan :: copy() const {
 	c->casings = casings;
 	c->twist = twist;
 
-	assert(c->parameters.size() == parameters.size());
 	for (unsigned int i = 0; i < parameters.size(); ++i)
 	{
-		c->parameters[i].value = parameters[i].value;
+		c->parameters[i] = parameters[i];
 	}
 	vector<SubpullTemplate> oldSubs = subs;
 	c->resetSubs(oldSubs);

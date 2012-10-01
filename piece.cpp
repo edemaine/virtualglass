@@ -55,7 +55,7 @@ Piece* Piece :: copy() const
 
         for (unsigned int i = 0; i < parameters.size(); ++i)
         {
-                c->parameters[i].value = parameters[i].value;
+                c->parameters[i] = parameters[i];
         }
 
 	c->pickup = this->pickup->copy();
@@ -71,13 +71,13 @@ unsigned int Piece :: getParameterCount()
 void Piece :: getParameter(unsigned int _index, TemplateParameter* dest)
 {
 	assert(_index < parameters.size());
-	dest->value = parameters[_index].value;
-	dest->name = parameters[_index].name; // this is a copy, since it's a std::string
+	*dest = parameters[_index];
 }
 
 void Piece :: setParameter(unsigned int _index, int _value)
 {
 	assert(_index < parameters.size());
+	assert(parameters[_index].lowerLimit <= _value <= parameters[_index].upperLimit);
 	parameters[_index].value = _value;
 }
 
@@ -94,26 +94,26 @@ void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
 		// Is it possible to just make a string const and hope it's 
 		// kept around as long as the TemplateParameter is?
                 case PieceTemplate::VASE:
-			parameters.push_back(TemplateParameter(0, string("Lip width")));
-			parameters.push_back(TemplateParameter(0, string("Body width")));
-			parameters.push_back(TemplateParameter(0, string("Twist")));
+			parameters.push_back(TemplateParameter(0, string("Lip width"), 0, 100));
+			parameters.push_back(TemplateParameter(0, string("Body width"), 0, 100));
+			parameters.push_back(TemplateParameter(0, string("Twist"), 0, 100));
                         break;
                 case PieceTemplate::TUMBLER:
-			parameters.push_back(TemplateParameter(0, string("Size")));
-			parameters.push_back(TemplateParameter(0, string("Roundedness")));
+			parameters.push_back(TemplateParameter(0, string("Size"), 0, 100));
+			parameters.push_back(TemplateParameter(0, string("Roundedness"), 0, 100));
                         break;
                 case PieceTemplate::BOWL:
-			parameters.push_back(TemplateParameter(0, string("Openness")));
-			parameters.push_back(TemplateParameter(0, string("Size")));
-			parameters.push_back(TemplateParameter(0, string("Twist")));
+			parameters.push_back(TemplateParameter(0, string("Openness"), 0, 100));
+			parameters.push_back(TemplateParameter(0, string("Size"), 0, 100));
+			parameters.push_back(TemplateParameter(0, string("Twist"), 0, 100));
                         break;
                 case PieceTemplate::POT:
-			parameters.push_back(TemplateParameter(0, string("Body radius")));
-			parameters.push_back(TemplateParameter(0, string("Lip radius")));
+			parameters.push_back(TemplateParameter(0, string("Body radius"), 0, 100));
+			parameters.push_back(TemplateParameter(0, string("Lip radius"), 0, 100));
                         break;
                 case PieceTemplate::WAVY_PLATE:
-			parameters.push_back(TemplateParameter(0, string("Wave count")));
-			parameters.push_back(TemplateParameter(0, string("Wave depth")));
+			parameters.push_back(TemplateParameter(0, string("Wave count"), 0, 100));
+			parameters.push_back(TemplateParameter(0, string("Wave depth"), 0, 100));
                         break;
         }
 

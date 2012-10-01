@@ -32,10 +32,17 @@ void PieceEditorWidget :: updateEverything()
 	unsigned int i = 0;
 	for (; i < piece->pickup->getParameterCount(); ++i)
 	{
+		// get parameter info
 		TemplateParameter tp;
 		piece->pickup->getParameter(i, &tp);
+
+		// setup name
 		pickupParamLabels[i]->setText(tp.name.c_str());
+
+		// setup spinbox and slider values and ranges
+		pickupParamSpinboxes[i]->setRange(tp.lowerLimit, tp.upperLimit);
 		pickupParamSpinboxes[i]->setValue(tp.value);
+		pickupParamSliders[i]->setRange(tp.lowerLimit, tp.upperLimit);
 		pickupParamSliders[i]->setValue(tp.value);
 		pickupParamWidgets[i]->show();
 	}
@@ -66,6 +73,7 @@ void PieceEditorWidget :: updateEverything()
 		TemplateParameter tp;
 		piece->getParameter(i, &tp);
 		pieceParamLabels[i]->setText(tp.name.c_str());
+		pieceParamSliders[i]->setRange(tp.lowerLimit, tp.upperLimit);
 		pieceParamSliders[i]->setValue(tp.value);
 		pieceParamWidgets[i]->show();
 	}
@@ -188,12 +196,8 @@ void PieceEditorWidget :: setupLayout()
 	QLabel* pickupParameter1Label = new QLabel("Parameter 1");
 	pickupParamLabels.push_back(pickupParameter1Label);
 	QSpinBox* pickupParameter1SpinBox = new QSpinBox(pickupParameter1Widget);
-	pickupParameter1SpinBox->setRange(6, 40);
-	pickupParameter1SpinBox->setSingleStep(1);
 	pickupParamSpinboxes.push_back(pickupParameter1SpinBox);
 	QSlider* pickupParameter1Slider = new QSlider(Qt::Horizontal, pickupParameter1Widget);
-	pickupParameter1Slider->setRange(6, 40);
-	pickupParameter1Slider->setValue(1);
 	pickupParamSliders.push_back(pickupParameter1Slider);
 	QHBoxLayout* pickupParameter1Layout = new QHBoxLayout(pickupParameter1Widget);
 	pickupParameter1Widget->setLayout(pickupParameter1Layout);
@@ -208,11 +212,8 @@ void PieceEditorWidget :: setupLayout()
 	QLabel* pickupParameter2Label = new QLabel("Parameter 2");
 	pickupParamLabels.push_back(pickupParameter2Label);
 	QSpinBox* pickupParameter2SpinBox = new QSpinBox(pickupParameter2Widget);
-	pickupParameter2SpinBox->setRange(6, 40);
-	pickupParameter2SpinBox->setSingleStep(1);
 	pickupParamSpinboxes.push_back(pickupParameter2SpinBox);
 	QSlider* pickupParameter2Slider = new QSlider(Qt::Horizontal, pickupParameter2Widget);
-	pickupParameter2Slider->setRange(6, 40);
 	pickupParamSliders.push_back(pickupParameter2Slider);
 	QHBoxLayout* pickupParameter2Layout = new QHBoxLayout(pickupParameter2Widget);
 	pickupParameter2Widget->setLayout(pickupParameter2Layout);
@@ -252,8 +253,6 @@ void PieceEditorWidget :: setupLayout()
 	pieceParamLabels.push_back(pieceTemplateParameter1Label);
 	QSlider* pieceTemplateParameter1Slider = new QSlider(Qt::Horizontal, pieceParameter1Widget);
 	pieceParamSliders.push_back(pieceTemplateParameter1Slider);
-	pieceTemplateParameter1Slider->setRange(0, 100);
-	pieceTemplateParameter1Slider->setSliderPosition(0);
 	QHBoxLayout* pieceParameter1Layout = new QHBoxLayout(pieceParameter1Widget);
 	pieceParameter1Widget->setLayout(pieceParameter1Layout);
 	pieceParameter1Layout->setContentsMargins(0, 0, 0, 0);
@@ -267,8 +266,6 @@ void PieceEditorWidget :: setupLayout()
 	pieceParamLabels.push_back(pieceTemplateParameter2Label);
 	QSlider* pieceTemplateParameter2Slider = new QSlider(Qt::Horizontal, pieceParameter2Widget);
 	pieceParamSliders.push_back(pieceTemplateParameter2Slider);
-	pieceTemplateParameter2Slider->setRange(0, 100);
-	pieceTemplateParameter2Slider->setSliderPosition(0);
 	QHBoxLayout* pieceParameter2Layout = new QHBoxLayout(pieceParameter2Widget);
 	pieceParameter2Widget->setLayout(pieceParameter2Layout);
 	pieceParameter2Layout->setContentsMargins(0, 0, 0, 0);
@@ -282,8 +279,6 @@ void PieceEditorWidget :: setupLayout()
 	pieceParamLabels.push_back(pieceTemplateParameter3Label);
 	QSlider* pieceTemplateParameter3Slider = new QSlider(Qt::Horizontal, pieceParameter3Widget);
 	pieceParamSliders.push_back(pieceTemplateParameter3Slider);
-	pieceTemplateParameter3Slider->setRange(0, 100);
-	pieceTemplateParameter3Slider->setSliderPosition(0);
 	QHBoxLayout* pieceParameter3Layout = new QHBoxLayout(pieceParameter3Widget);
 	pieceParameter3Widget->setLayout(pieceParameter3Layout);
 	pieceParameter3Layout->setContentsMargins(0, 0, 0, 0);

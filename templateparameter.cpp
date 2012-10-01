@@ -3,14 +3,19 @@
 
 TemplateParameter :: TemplateParameter()
 {
-	this->value = 0;
-	this->name = string("Unnamed");
+	value = 0;
+	name = string("Unnamed");
+	lowerLimit = upperLimit = 0;
 }
 
-TemplateParameter :: TemplateParameter(int _value, string _name)
+TemplateParameter :: TemplateParameter(int _value, string _name, int _lowerLimit, int _upperLimit)
 {
-	this->value = _value;
-	this->name = _name;
+	value = _value;
+	name = _name;
+	lowerLimit = _lowerLimit;
+	upperLimit = _upperLimit;
 }
+
+
 
 

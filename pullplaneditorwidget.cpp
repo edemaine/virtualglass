@@ -46,6 +46,7 @@ void PullPlanEditorWidget :: updateEverything()
 		plan->getParameter(i, &tp);
 		paramLabels[i]->setText(tp.name.c_str());
 		paramLabels[i]->show();
+		paramSpins[i]->setRange(tp.lowerLimit, tp.upperLimit);
 		paramSpins[i]->setValue(tp.value);
 		paramSpins[i]->show();
 	}
@@ -149,8 +150,6 @@ void PullPlanEditorWidget :: setupLayout()
 	{
 		paramLayout->addWidget(paramLabels[i], 0);
 		paramLayout->addWidget(paramSpins[i], 0);
-		paramSpins[i]->setRange(2, 30);
-		paramSpins[i]->setSingleStep(1);
 		paramLabels[i]->hide();
 		paramSpins[i]->hide();
 	}

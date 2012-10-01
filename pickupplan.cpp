@@ -16,7 +16,7 @@ PickupPlan* PickupPlan :: copy() const {
 
 	for (unsigned int i = 0; i < parameters.size(); ++i)
 	{
-		c->parameters[i].value = parameters[i].value;
+		c->parameters[i] = parameters[i];
 	}
 	c->updateSubs();
 
@@ -214,29 +214,29 @@ void PickupPlan :: setTemplateType(enum PickupTemplate::Type _type, bool force) 
 	parameters.clear();
 	switch (type) {
 		case PickupTemplate::VERTICALS_AND_HORIZONTALS:
-			parameters.push_back(TemplateParameter(14, string("Column count")));
+			parameters.push_back(TemplateParameter(10, string("Column count"), 6, 30));
 			break;
 		case PickupTemplate::VERTICAL:
-			parameters.push_back(TemplateParameter(14, string("Column count")));
+			parameters.push_back(TemplateParameter(10, string("Column count"), 6, 30));
 			break;
 		case PickupTemplate::MURRINE_COLUMN:
-			parameters.push_back(TemplateParameter(14, string("Column count")));
+			parameters.push_back(TemplateParameter(10, string("Column count"), 6, 30));
 			break;
 		case PickupTemplate::MURRINE_ROW:
-			parameters.push_back(TemplateParameter(14, string("Column count")));
+			parameters.push_back(TemplateParameter(10, string("Column count"), 6, 30));
 			break;
 		case PickupTemplate::MURRINE:
-			parameters.push_back(TemplateParameter(10, string("Row/Column count")));
-			parameters.push_back(TemplateParameter(10, string("Thickness")));
+			parameters.push_back(TemplateParameter(5, string("Row/Column count"), 5, 10));
+			parameters.push_back(TemplateParameter(10, string("Thickness"), 1, 40));
 			break;
 		case PickupTemplate::RETICELLO_VERTICAL_HORIZONTAL:
-			parameters.push_back(TemplateParameter(14, string("Column count")));
+			parameters.push_back(TemplateParameter(10, string("Column count"), 6, 30));
 			break;
 		case PickupTemplate::VERTICAL_HORIZONTAL_VERTICAL:
-			parameters.push_back(TemplateParameter(14, string("Column count")));
+			parameters.push_back(TemplateParameter(10, string("Column count"), 6, 20));
 			break;
 		case PickupTemplate::VERTICAL_WITH_LIP_WRAP:
-			parameters.push_back(TemplateParameter(14, string("Column count")));
+			parameters.push_back(TemplateParameter(10, string("Column count"), 6, 30));
 			break;
 	}
 
@@ -257,8 +257,7 @@ unsigned int PickupPlan :: getParameterCount()
 void PickupPlan :: getParameter(unsigned int _index, TemplateParameter* dest)
 {
 	assert(_index < parameters.size());
-	dest->value = parameters[_index].value;
-	dest->name = parameters[_index].name;
+	*dest = parameters[_index];
 }
 
 void PickupPlan :: setParameter(unsigned int _index, int _value)
