@@ -62,8 +62,6 @@ private:
 	GUIMode mode;
 	int hoveringIndex;
 	int activeBoxIndex;
-	PullPlan* tempCirclePlan;
-	PullPlan* tempSquarePlan;
 	Point mouseStartingLoc;
 	QPoint* clickedLoc;
 	bool clickMoved;

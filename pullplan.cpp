@@ -74,7 +74,8 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) {
 	if (defaultCircleSubplan == NULL && templateType != PullTemplate::BASE_CIRCLE && templateType != PullTemplate::BASE_SQUARE) {
 		// initialize default subplans
 		defaultCircleSubplan = new PullPlan(PullTemplate::BASE_CIRCLE);
-		defaultSquareSubplan = new PullPlan(PullTemplate::BASE_SQUARE);
+		defaultSquareSubplan = new PullPlan(PullTemplate::BASE_CIRCLE);
+		defaultSquareSubplan->setOutermostCasingShape(CIRCLE_SHAPE);
 	}
 
 	parameters.clear();

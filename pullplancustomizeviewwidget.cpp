@@ -6,11 +6,6 @@ PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget
 	setAcceptDrops(true);
 	setMinimumSize(200, 200);
 	setPullPlan(plan);
-	GlassColor* glassColor = new GlassColor();
-	tempCirclePlan = new PullPlan(PullTemplate::CUSTOM_CIRCLE);
-	tempCirclePlan->setCasingColor(glassColor, 0);
-	tempSquarePlan = new PullPlan(PullTemplate::CUSTOM_SQUARE);
-	tempSquarePlan->setCasingColor(glassColor, 0);
 	mouseStartingLoc.x = FLT_MAX;
 	mouseStartingLoc.y = FLT_MAX;
 	clickedLoc = new QPoint(INT_MAX, INT_MAX);
