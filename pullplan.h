@@ -25,7 +25,6 @@ class PullPlan
 		PullPlan(enum PullTemplate::Type t);
 
 		void setTemplateType(enum PullTemplate::Type t, bool force=false);
-		void setTemplateTypeToCustom();
 		int getTemplateType();
 
 		unsigned int getParameterCount();

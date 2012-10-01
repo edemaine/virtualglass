@@ -418,20 +418,29 @@ void PullPlanCustomizeViewWidget :: keyPressEvent(QKeyEvent* event)
     }
 }
 
-void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
+void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* _plan)
 {
-	this->plan = plan;
-	if (this->isVisible())
+	plan = _plan;
+	if (isVisible())
 	{
-		if (this->plan->getTemplateType() != PullTemplate::CUSTOM_CIRCLE 
-			&& this->plan->getTemplateType() != PullTemplate::CUSTOM_SQUARE)
+		if (plan->getTemplateType() != PullTemplate::CUSTOM_CIRCLE 
+			&& plan->getTemplateType() != PullTemplate::CUSTOM_SQUARE)
 		{
 			subplansSelected.clear();
 			activeControlPoint = -1;
 			hoveringIndex = -1;
 			activeBoxIndex = -1;
 		}
-		this->plan->setTemplateTypeToCustom();
+		
+		switch (plan->getCasingShape(0))
+		{
+			case CIRCLE_SHAPE:
+				plan->setTemplateType(PullTemplate::CUSTOM_CIRCLE);
+				break;
+			case SQUARE_SHAPE:
+				plan->setTemplateType(PullTemplate::CUSTOM_SQUARE);
+				break;
+		}
 	}
 	else
 	{
@@ -442,7 +451,7 @@ void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* plan)
 	}
 	for (unsigned int i = 0; i < subplansSelected.size(); i++)
 	{
-		if (subplansSelected[i] >= this->plan->subs.size())
+		if (subplansSelected[i] >= plan->subs.size())
 		{
 			subplansSelected.clear();
 			activeControlPoint = -1;

@@ -20,10 +20,19 @@ using std::vector;
 
 PullPlan :: PullPlan(PullTemplate::Type templateType) {
 
+	// setup default subobjects
 	defaultGlassColor = new GlassColor();
 	defaultCircleSubplan = defaultSquareSubplan = NULL;
 
-	this->twist = 0.0;
+	// setup default casings
+	casings.push_back(Casing(0.9, CIRCLE_SHAPE, defaultGlassColor));
+	casings.push_back(Casing(1.0, CIRCLE_SHAPE, defaultGlassColor));
+
+	// setup default twist
+	twist = 0.0;
+
+	// setup template (subplans and parameters) `forcefully', i.e.
+	// occuring regardless of what current template type is
 	setTemplateType(templateType, true);
 }
 
@@ -79,10 +88,6 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) {
 	}
 
 	parameters.clear();
-	casings.clear();
-	casings.push_back(Casing(1.0, CIRCLE_SHAPE, defaultGlassColor));
-	casings.push_back(Casing(1.0, CIRCLE_SHAPE, defaultGlassColor));
-	casings[0].thickness = 0.9;
 	switch (templateType) {
 		case PullTemplate::BASE_CIRCLE:
 			break;
@@ -125,19 +130,6 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) {
 	}
 
 	resetSubs(true);
-}
-
-void PullPlan :: setTemplateTypeToCustom()
-{
-	if (casings[0].shape == CIRCLE_SHAPE)
-	{
-		templateType = PullTemplate::CUSTOM_CIRCLE;
-	}
-	else
-	{
-		templateType = PullTemplate::CUSTOM_SQUARE;
-	}
-	parameters.clear();
 }
 
 void PullPlan :: setCasingColor(GlassColor* gc, unsigned int index) {
@@ -529,7 +521,11 @@ void PullPlan :: resetSubs(bool hardReset)
 			{
 				p.x = subs[i].location.x * radius;
 				p.y = subs[i].location.y * radius;
-				pushNewSubpull(hardReset, &newSubs, subs[i].shape, subs[i].location, 
+				// never do a hard reset of custom, because 
+				// it's a `soft' template change from a rigid one 
+				// to a custom one, so mapping from old cane locations/subcanes
+				// to new ones is direct and very natural
+				pushNewSubpull(false, &newSubs, subs[i].shape, subs[i].location, 
 					subs[i].diameter, subs[i].group);
 			}
 			break;
