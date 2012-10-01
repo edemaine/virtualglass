@@ -308,9 +308,7 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, QDrop
 			continue;
 
 		if (subpull->shape != draggedPlan->getOutermostCasingShape())
-		{
 			continue;
-		}
 
 		// If the shift button is down, fill in the entire group
 		subplansHighlighted.push_back(i);
@@ -326,7 +324,9 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, QDrop
 		subplansHighlighted.clear();	
 		for (unsigned int i = 0; i < plan->subs.size(); ++i)
 		{
-			subplansHighlighted.push_back(i);
+			SubpullTemplate* subpull = &(plan->subs[i]);
+			if (subpull->shape == draggedPlan->getOutermostCasingShape())
+				subplansHighlighted.push_back(i);
 		}
 	}
 }
