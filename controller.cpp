@@ -15,6 +15,7 @@ Controller::Controller(int argc, char **argv)
 	qsrand(QDateTime::currentDateTime().toTime_t());
 
 	mainWindow = new MainWindow();
+	mainWindow->showMaximized();
 }
 
 int Controller::startUp()
