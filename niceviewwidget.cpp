@@ -7,6 +7,7 @@ it is involved in modifying the cane.
 
 #include "niceviewwidget.h"
 
+#include <stdexcept>
 
 namespace {
 void gl_errors(string const &where) {
@@ -19,6 +20,7 @@ void gl_errors(string const &where) {
 }
 
 
+bool NiceViewWidget::peelEnable = true;
 
 NiceViewWidget :: NiceViewWidget(enum CameraMode cameraMode, QWidget *parent) 
 	: QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent), peelRenderer(NULL)
@@ -59,8 +61,6 @@ NiceViewWidget :: NiceViewWidget(enum CameraMode cameraMode, QWidget *parent)
 	mouseLocX = 0;
 	mouseLocY = 0;
 
-	selectBuffer = NULL;
-
 	initializeGLCalled = false;
 
 	geometry = NULL;
@@ -71,11 +71,6 @@ NiceViewWidget :: ~NiceViewWidget()
 	//Deallocate all the depth peeling resources we may have created:
 	makeCurrent();
 
-	if (selectBuffer) {
-		delete selectBuffer;
-		selectBuffer = NULL;
-	}
-
 	if (peelRenderer) {
 		GLEWContext *ctx = peelRenderer->glewContext;
 		delete peelRenderer;
@@ -84,30 +79,34 @@ NiceViewWidget :: ~NiceViewWidget()
 	}
 }
 
+void NiceViewWidget :: initializePeel()
+{
+        assert(!peelRenderer);
+        // set up glew:
+        GLEWContext *glewContext = new GLEWContext;
+#define glewGetContext() glewContext
+        GLenum err = glewInit();
+#undef glewGetContext
+        if (err != GLEW_OK) {
+                std::cerr << "WARNING: Failure initializing glew: " << glewGetErrorString(err) << std::endl;
+                std::cerr << " ... we will continue, but code that uses extensions will cause a crash" << std::endl;
+                delete glewContext;
+        } else {
+                try {
+                        peelRenderer = new PeelRenderer(glewContext);
+                } catch (...) {
+                        std::cerr << "Caught exception constructing peelRenderer, will fall back to regular rendering." << std::endl;
+                        peelRenderer = NULL;
+                        delete glewContext;
+                }
+        }
+} 
+
 void NiceViewWidget :: initializeGL()
 {
 	initializeGLCalled = true;
-	assert(!peelRenderer);
-	// set up glew:
-	GLEWContext *glewContext = new GLEWContext;
-#define glewGetContext() glewContext
-	GLenum err = glewInit();
-#undef glewGetContext
-	if (err != GLEW_OK) {
-		std::cerr << "WARNING: Failure initializing glew: " << glewGetErrorString(err) << std::endl;
-		std::cerr << " ... we will continue, but code that uses extensions will cause a crash" << std::endl;
-		delete glewContext;
-		glewContext = NULL;
-	} else {
-		try {
-			peelRenderer = new PeelRenderer(glewContext);
-		} catch (...) {
-			std::cerr << "Caught exception constructing peelRenderer, will fall back to regular rendering." << std::endl;
-			peelRenderer = NULL;
-			delete glewContext;
-			glewContext = NULL;
-		}
-	}
+	initializePeel();
+
 	// For shadow/lighting
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
@@ -139,55 +138,53 @@ QImage NiceViewWidget :: renderImage() {
 
 /*
 Handles the drawing of a triangle mesh.
-The triangles array is created and lives in the
-Mesh object, and the NiceViewWidget object simply
-receives a pointer to this array.
 */
 void NiceViewWidget :: paintGL()
 {
+	// it don't mean a thing, if it aint got that mesh-ing
+	if (!geometry) 
+		return;
+
 	setGLMatrices();
 
-	if (peelRenderer && geometry) {
+	// we've got geometry, now check that peeling is a-peeling
+	if (peelRenderer && peelEnable) 
 		peelRenderer->render(make_vector< float >(bgColor.redF(), bgColor.greenF(), bgColor.blueF()), *geometry);
-	} else {
-		this->qglClearColor(bgColor);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	else 
 		paintWithoutDepthPeeling();
-	}
 }
 
 void NiceViewWidget :: paintWithoutDepthPeeling()
 {
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);
-	if (geometry) {
-		//glEnable(GL_LIGHTING);
-		//Check that Vertex and Triangle have proper size:
-		assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3));
-		assert(sizeof(Triangle) == sizeof(GLuint) * 3);
+	this->qglClearColor(bgColor);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].position));
-		glNormalPointer(GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].normal));
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glEnableClientState(GL_NORMAL_ARRAY);
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+        glEnable(GL_CULL_FACE);
+        glDisable(GL_DEPTH_TEST);
+        glEnable (GL_BLEND);
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
-			assert(g->color);
-			Color* c = g->color;
-			glColor4f(c->r, c->g, c->b, c->a);
-			glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
-				GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
-		}
+	//Check that Vertex and Triangle have proper size:
+	assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3));
+	assert(sizeof(Triangle) == sizeof(GLuint) * 3);
 
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_NORMAL_ARRAY);
+	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].position));
+	glNormalPointer(GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].normal));
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
 
-		//glDisable(GL_LIGHTING);
+	for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) {
+		assert(g->color);
+		Color* c = g->color;
+		glColor4f(c->r, c->g, c->b, c->a);
+		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
+			GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
 	}
 
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
 
 	//called automatically: swapBuffers();
 }
@@ -214,19 +211,6 @@ void NiceViewWidget :: resizeGL(int width, int height)
 	}
 	//I think paintGL will get called now...
 }
-
-void NiceViewWidget :: zoomIn()
-{
-	rho *= 0.8;
-	update();
-}
-
-void NiceViewWidget :: zoomOut()
-{
-	rho *= 1.2;
-	update();
-}
-
 
 /*
 Called to set up projection and modelview matrices
@@ -358,20 +342,9 @@ void NiceViewWidget :: wheelEvent(QWheelEvent *e)
 		return;
 
 	if (e->delta() > 0)
-	{
-		zoomIn();
-	}
+		rho *= 0.8;
 	else if (e->delta() < 0)
-	{
-		zoomOut();
-	}
+		rho *= 1.2;	
+	update();	
 }
 
-void NiceViewWidget :: zoom(float z)
-{
-	if (cameraMode == PICKUPPLAN_CAMERA_MODE)
-		return;
-
-	this->rho+=z;
-	update();
-}

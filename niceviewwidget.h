@@ -32,49 +32,19 @@ public:
 		PICKUPPLAN_CAMERA_MODE,
                	PIECE_CAMERA_MODE 
         };
+	
+	static bool peelEnable;
 
 	NiceViewWidget(enum CameraMode cameraMode, QWidget* parent=0);
 	virtual ~NiceViewWidget();
-	bool peelEnabled();
 	void setGeometry(Geometry* g);
-
 	Vector3f eyePosition();
-
-
-private:
-	bool leftMouseDown;
-	QColor bgColor;
-	Geometry *geometry;
-
-	enum CameraMode cameraMode;
-
-	float lookAtLoc[3];
-	float theta, phi, rho;
-
-	int mouseLocX, mouseLocY;
-
-	QGLFramebufferObject *selectBuffer;
-
-	bool initializeGLCalled;
-
-	PeelRenderer *peelRenderer;
-
-public:
 	QImage renderImage();
-private:
-
-	void setGLMatrices();
-	void drawTriangle(Triangle* t);
-	void updateTriangles();
-
-public slots:
-	void zoomIn();
-	void zoomOut();
-	void zoom(float z);
 
 protected:
 	void initializeGL();
-	void paintWithDepthPeeling();
+	void initializePeel();
+	void destructPeel();
 	void paintWithoutDepthPeeling();
 	void paintGL();
 	void resizeGL(int width, int height);
@@ -82,6 +52,20 @@ protected:
 	void mouseReleaseEvent(QMouseEvent* e);
 	void mouseMoveEvent(QMouseEvent* e);
 	void wheelEvent(QWheelEvent* e);
+
+private:
+	bool leftMouseDown;
+	QColor bgColor;
+	Geometry *geometry;
+	enum CameraMode cameraMode;
+	float lookAtLoc[3];
+	float theta, phi, rho;
+	int mouseLocX, mouseLocY;
+	QGLFramebufferObject *selectBuffer;
+	bool initializeGLCalled;
+	PeelRenderer *peelRenderer;
+
+	void setGLMatrices();
 };
 
 #endif

@@ -360,6 +360,16 @@ void MainWindow::setupMenus()
 	examplesMenu = menuBar()->addMenu(tr("&Examples")); //create randomize menu
 	examplesMenu->addAction(simpleCaneAction);
 	examplesMenu->addAction(simplePieceAction);
+
+	// toggle depth peeling
+	depthPeelAction = new QAction(tr("&Depth peeling"), this);
+	depthPeelAction->setCheckable(true);
+	depthPeelAction->setChecked(NiceViewWidget::peelEnable);
+	depthPeelAction->setStatusTip(tr("Toggle high-quality transparency rendering in 3D views"));
+
+	// Performance menu
+	perfMenu = menuBar()->addMenu(tr("Performance"));
+	perfMenu->addAction(depthPeelAction);	
 }
 
 
@@ -631,7 +641,7 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	QDrag *drag = new QDrag(this);
 	drag->setMimeData(mimeData);
 	drag->setPixmap(pixmap);
-
+	
 	drag->exec(Qt::CopyAction);
 }
 
@@ -657,6 +667,14 @@ void MainWindow :: setupConnections()
 
 	connect(simpleCaneAction, SIGNAL(triggered()), this, SLOT(simpleCaneExampleActionTriggered()));
 	connect(simplePieceAction, SIGNAL(triggered()), this, SLOT(simplePieceExampleActionTriggered()));
+
+	connect(depthPeelAction, SIGNAL(triggered()), this, SLOT(depthPeelActionTriggered()));
+}
+
+void MainWindow :: depthPeelActionTriggered()
+{
+	NiceViewWidget::peelEnable = !(NiceViewWidget::peelEnable);
+	depthPeelAction->setChecked(NiceViewWidget::peelEnable);
 }
 
 void MainWindow :: simpleCaneExampleActionTriggered()

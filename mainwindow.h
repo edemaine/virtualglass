@@ -105,6 +105,8 @@ class MainWindow : public QMainWindow
 		QAction *openAction;
 		QAction *saveAction;
 		QAction *saveAsAction;
+		QMenu *perfMenu;
+		QAction *depthPeelAction;
 
 	private slots:
 		void updateEverything();
@@ -120,7 +122,7 @@ class MainWindow : public QMainWindow
 		void saveAs();
 		void simpleCaneExampleActionTriggered();
 		void simplePieceExampleActionTriggered();
-
+		void depthPeelActionTriggered();
 };
 
 

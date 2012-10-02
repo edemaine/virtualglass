@@ -3,9 +3,15 @@
 
 Controller::Controller(int argc, char **argv)
 {
+	// make X Windows stuff thread-safe?
 	QCoreApplication::setAttribute(Qt::AA_X11InitThreads);
+
 	app = new QApplication(argc, argv);
+
+	// drag distance used in drag-n-drop of canes, colors
 	app->setStartDragDistance(3);
+
+	// make a decent seed
 	qsrand(QDateTime::currentDateTime().toTime_t());
 
 	mainWindow = new MainWindow();

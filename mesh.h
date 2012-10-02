@@ -22,9 +22,6 @@ class Mesher
 		void generateColorMesh(GlassColor* glassColor, Geometry* geometry);
 		void generateMesh(PickupPlan* plan, Geometry* geometry);
 		void generateMesh(Piece* piece, Geometry* geometry);
-		void updateTotalCaneLength(Piece* piece);
-		void updateTotalCaneLength(PickupPlan* plan);
-		void updateTotalCaneLength(PullPlan* plan);
 
 	private:
 		// Methods

@@ -118,10 +118,8 @@ namespace {
 	}
 }
 
-void PeelRenderer::render(Vector3f bgColor, Geometry const &geometry) {
+void PeelRenderer::render(Vector3f bgColor, Geometry const & geometry) {
 	assert(QGLContext::currentContext() == expectedGLContext);
-		//std::cout << "Painting with context " << context() << "." << std::endl;
-	//std::cout << " valid:" << context()->isValid() << std::endl;
 
 	gl_errors("(before depth peeling)");
 	//viewport is {x,y,w,h} in window.
@@ -129,6 +127,7 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const &geometry) {
 	GLint viewport[4] = {0,0,0,0};
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	if (viewport[2] != GLint(bufferSize.x) || viewport[3] != GLint(bufferSize.y)) {
+
 		bufferSize.x = viewport[2];
 		bufferSize.y = viewport[3];
 		std::cerr << "(re-)Allocating RenderThread peel textures for " << bufferSize << "." << std::endl;
@@ -171,7 +170,6 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const &geometry) {
 		//nothing to render.
 		return;
 	}
-
 	if (buffer == 0) {
 		glGenFramebuffers(1, &buffer);
 	}
