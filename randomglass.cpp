@@ -9,7 +9,7 @@ GlassColor* randomGlassColor()
 	c.g = (qrand() % 256) / 255.0;
 	c.b = (qrand() % 256) / 255.0;
 
-	return new GlassColor(c, "???");
+	return new GlassColor(c, "");
 }
 
 PullPlan* randomSimplePullPlan(enum GeometricShape outermostCasingShape, GlassColor* color)

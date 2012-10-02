@@ -13,8 +13,6 @@
 #include "glasscolor.h"
 #include "shape.h"
 
-#define TOTAL_AXIAL_RESOLUTION 4000
-
 class Mesher
 {
 
@@ -57,12 +55,7 @@ class Mesher
 		Vertex applyTransforms(Vertex p, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices);
 		void applyPickupTransform(Vertex* p, SubpickupTemplate* spt);
 		void applyPieceTransform(Geometry* geometry, enum PieceTemplate::Type type, vector<TemplateParameter> params);
-		float computeTotalCaneLength(Piece* piece);
-		float computeTotalCaneLength(PickupPlan* plan);
-		float computeTotalCaneLength(PullPlan* plan);
-
-		// Variables
-		float totalCaneLength;
+		float totalShrink(vector<PullPlan*>* ancestors, vector<int>* ancestorIndices);
 };
 #endif
 

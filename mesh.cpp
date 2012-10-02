@@ -5,48 +5,6 @@ Mesher :: Mesher()
 {
 }
 
-void Mesher:: updateTotalCaneLength(Piece* piece)
-{
-	totalCaneLength = computeTotalCaneLength(piece);
-}
-
-void Mesher:: updateTotalCaneLength(PickupPlan* plan)
-{
-	totalCaneLength = computeTotalCaneLength(plan);
-}
-
-void Mesher:: updateTotalCaneLength(PullPlan* plan)
-{
-	totalCaneLength = computeTotalCaneLength(plan);
-}
-
-float Mesher :: computeTotalCaneLength(Piece* piece)
-{
-	return computeTotalCaneLength(piece->pickup);
-}
-
-float Mesher :: computeTotalCaneLength(PickupPlan* plan)
-{
-	float total = 0.0;
-	for (unsigned int i = 0; i < plan->subs.size(); ++i)
-	{
-		total += computeTotalCaneLength(plan->subs[i].plan) * plan->subs[i].length / 2.0;
-	}
-	return total;
-}
-
-float Mesher :: computeTotalCaneLength(PullPlan* plan)
-{
-	if (plan->subs.size() == 0)
-		return 1.0;
-	
-	float total = 0.0;
-	for (unsigned int i = 0; i < plan->subs.size(); ++i)
-	{
-		total += computeTotalCaneLength(plan->subs[i].plan);
-	}
-	return total;	
-}
 
 void Mesher :: applySubplanTransform(Geometry* geometry, PullPlan* parentPlan, int subplan)
 {
@@ -504,8 +462,9 @@ void Mesher :: meshBaseCasing(Geometry* geometry, vector<PullPlan*>* ancestors, 
 	Color* color, enum GeometricShape outerShape, enum GeometricShape innerShape, float length, float outerRadius, float innerRadius,
 	uint32_t group_tag)
 {
-	unsigned int angularResolution = 8; 
-	unsigned int axialResolution = MIN(MAX(TOTAL_AXIAL_RESOLUTION / totalCaneLength * length, 20), 100);
+        float finalDiameter = totalShrink(ancestors, ancestorIndices);
+        unsigned int angularResolution = MIN(MAX(finalDiameter*10, 4), 10);
+        unsigned int axialResolution = MIN(MAX(length * 40, 5), 80);
 	
 	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
@@ -548,14 +507,28 @@ void Mesher :: meshBaseCasing(Geometry* geometry, vector<PullPlan*>* ancestors, 
 		first_vert, geometry->vertices.size() - first_vert, color, group_tag));
 }
 
+float Mesher :: totalShrink(vector<PullPlan*>* ancestors, vector<int>* ancestorIndices)
+{
+	float shrink = 1.0;	
+
+        for (unsigned int i = ancestors->size() - 2; i < ancestors->size(); --i)
+        {
+		shrink *= (*ancestors)[i]->subs[(*ancestorIndices)[i]].diameter;
+        }
+
+	return shrink;
+}
+
+
 /*
 The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
 */
 void Mesher :: meshBaseCane(Geometry* geometry, vector<PullPlan*>* ancestors, vector<int>* ancestorIndices, 
 	Color* color, enum GeometricShape shape, float length, float radius, uint32_t group_tag)
 {
-	unsigned int angularResolution = 8; 
-	unsigned int axialResolution = MIN(MAX(TOTAL_AXIAL_RESOLUTION / totalCaneLength * length, 20), 100);
+	float finalDiameter = totalShrink(ancestors, ancestorIndices);
+	unsigned int angularResolution = MIN(MAX(finalDiameter*10, 4), 10); 
+	unsigned int axialResolution = MIN(MAX(length * 40, 5), 80);
 	
 	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
@@ -715,7 +688,6 @@ void Mesher :: generateMesh(PickupPlan* pickup, Geometry *geometry, vector<PullP
 
 void Mesher :: generateMesh(Piece* piece, Geometry* geometry)
 {
-	totalCaneLength = computeTotalCaneLength(piece);
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
 	generateMesh(piece, geometry, &ancestors, &ancestorIndices);
@@ -724,7 +696,6 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry)
 
 void Mesher :: generateMesh(PickupPlan* pickup, Geometry* geometry)
 {
-	totalCaneLength = computeTotalCaneLength(pickup);
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
 	generateMesh(pickup, geometry, &ancestors, &ancestorIndices);
@@ -733,7 +704,6 @@ void Mesher :: generateMesh(PickupPlan* pickup, Geometry* geometry)
 
 void Mesher :: generatePullMesh(PullPlan* plan, Geometry* geometry)
 {
-	totalCaneLength = computeTotalCaneLength(plan);
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
 	generateMesh(plan, geometry, &ancestors, &ancestorIndices, 2.0);
@@ -750,7 +720,6 @@ void Mesher :: generateColorMesh(GlassColor* gc, Geometry* geometry)
 {
 	PullPlan dummyPlan(PullTemplate::BASE_CIRCLE);
 	dummyPlan.setOutermostCasingColor(gc);
-	totalCaneLength = computeTotalCaneLength(&dummyPlan);
 	vector<PullPlan*> ancestors;
 	vector<int> ancestorIndices;
 	generateMesh(&dummyPlan, geometry, &ancestors, &ancestorIndices, 2.0);
