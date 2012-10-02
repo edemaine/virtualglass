@@ -12,7 +12,8 @@ namespace PieceTemplate
 		BOWL,
 		VASE,
 		POT,
-		WAVY_PLATE
+		WAVY_PLATE,
+		PICKUP
 	};
 	
 	enum Type firstSeedTemplate();

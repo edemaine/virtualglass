@@ -10,7 +10,8 @@ namespace PieceTemplate
                 "Bowl",
                 "Vase",
                 "Pot",
-                "Wavy Plate"
+                "Wavy Plate",
+		"Pickup"
         };
 
 	enum Type firstSeedTemplate()
@@ -20,7 +21,7 @@ namespace PieceTemplate
 
 	enum Type lastSeedTemplate()
 	{
-		return WAVY_PLATE;
+		return PICKUP;
 	}
 
 	enum Type firstTemplate()
@@ -30,7 +31,7 @@ namespace PieceTemplate
 
 	enum Type lastTemplate()
 	{
-		return WAVY_PLATE;
+		return PICKUP;
 	}
 
 	const char* enumToString(enum Type t)

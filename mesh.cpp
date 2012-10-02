@@ -207,6 +207,10 @@ void Mesher :: applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type
 
 				break;
 			}
+			case PieceTemplate::PICKUP:
+			{
+				break; 
+			}
 		} // end switch
 	} // end loop over vertices
 }

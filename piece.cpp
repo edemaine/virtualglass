@@ -115,6 +115,8 @@ void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
 			parameters.push_back(TemplateParameter(0, string("Wave count"), 0, 100));
 			parameters.push_back(TemplateParameter(0, string("Wave depth"), 0, 100));
                         break;
+                case PieceTemplate::PICKUP:
+			break;
         }
 
 }
