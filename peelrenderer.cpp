@@ -279,6 +279,8 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const & geometry) {
 			for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g) {
 				assert(g->color);
 				Color* c = g->color;
+				if (!g->ensureVisible && c->a < 0.01) // don't even draw it if it's not going to be visible
+					continue;
 				if (g->ensureVisible) 
 					glColor4f(c->r, c->g, c->b, MAX(c->a, 0.1));
 				else
