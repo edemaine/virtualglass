@@ -222,13 +222,11 @@ Vertex Mesher :: applyTransforms(Vertex v, vector<ancestor>* ancestors)
 	return v;
 }
 
-void Mesher :: meshPickupCasingSlab(Geometry* geometry, Color* color, float y, float thickness)
+void Mesher :: meshPickupCasingSlab(Geometry* geometry, Color* color, float y, float thickness, bool ensureVisible)
 {
 	unsigned int slabResolution = 100;
 
-	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
-	//need to remember the first triangle so we can tag it later
 	uint32_t first_triangle = geometry->triangles.size();
 
 	Vector2f p;
@@ -355,7 +353,7 @@ void Mesher :: meshPickupCasingSlab(Geometry* geometry, Color* color, float y, f
 	assert(geometry->valid());
 
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, color, -1));
+		first_vert, geometry->vertices.size() - first_vert, color, ensureVisible));
 }
 
 void Mesher :: getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution, 
@@ -463,15 +461,13 @@ void Mesher :: meshCylinderWall(Geometry* geometry, enum GeometricShape shape, f
 
 void Mesher :: meshBaseCasing(Geometry* geometry, vector<ancestor>* ancestors, Color* color, 
 	enum GeometricShape outerShape, enum GeometricShape innerShape, float length, float outerRadius, 
-	float innerRadius, uint32_t group_tag, bool ensureVisible)
+	float innerRadius, bool ensureVisible)
 {
         float finalDiameter = totalShrink(ancestors);
         unsigned int angularResolution = MIN(MAX(finalDiameter*10, 4), 10);
         unsigned int axialResolution = MIN(MAX(length * 40, 5), 80);
 	
-	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
-	//need to remember the first triangle so we can tag it later
 	uint32_t first_triangle = geometry->triangles.size();
 
 	// assuming meshCylinderWall vertices end with the top row in 
@@ -507,7 +503,7 @@ void Mesher :: meshBaseCasing(Geometry* geometry, vector<ancestor>* ancestors, C
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors);
 	}
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, color, group_tag, ensureVisible));
+		first_vert, geometry->vertices.size() - first_vert, color, ensureVisible));
 }
 
 float Mesher :: totalShrink(vector<ancestor>* ancestors)
@@ -528,15 +524,13 @@ float Mesher :: totalShrink(vector<ancestor>* ancestors)
 The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
 */
 void Mesher :: meshBaseCane(Geometry* geometry, vector<ancestor>* ancestors, 
-	Color* color, enum GeometricShape shape, float length, float radius, uint32_t group_tag)
+	Color* color, enum GeometricShape shape, float length, float radius)
 {
 	float finalDiameter = totalShrink(ancestors);
 	unsigned int angularResolution = MIN(MAX(finalDiameter*10, 4), 10); 
 	unsigned int axialResolution = MIN(MAX(length * 40, 5), 80);
 	
-	//need to know first vertex position so we can transform 'em all later
 	uint32_t first_vert = geometry->vertices.size();
-	//need to remember the first triangle so we can tag it later
 	uint32_t first_triangle = geometry->triangles.size();
 
 	meshCylinderWall(geometry, shape, length, radius, angularResolution, axialResolution);
@@ -634,7 +628,7 @@ void Mesher :: meshBaseCane(Geometry* geometry, vector<ancestor>* ancestors,
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors);
 	}
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, color, group_tag));
+		first_vert, geometry->vertices.size() - first_vert, color));
 }
 
 void Mesher :: recurseMesh(Piece* piece, Geometry* geometry, vector<ancestor>* ancestors)
@@ -654,7 +648,7 @@ void Mesher :: recurseMesh(Piece* piece, Geometry* geometry, vector<ancestor>* a
 	applyPieceTransform(geometry, piece->getTemplateType(), params);
 }
 
-void Mesher :: recurseMesh(PickupPlan* pickup, Geometry *geometry, vector<ancestor>* ancestors)
+void Mesher :: recurseMesh(PickupPlan* pickup, Geometry *geometry, vector<ancestor>* ancestors, bool isTopLevel)
 {
 	if (pickup == NULL)
 		return;
@@ -665,7 +659,7 @@ void Mesher :: recurseMesh(PickupPlan* pickup, Geometry *geometry, vector<ancest
 		ancestors->clear();
 		uint32_t startPlanVerts = geometry->vertices.size();
 		recurseMesh(pickup->subs[i].plan, geometry, 
-			ancestors, pickup->subs[i].length, i); 
+			ancestors, pickup->subs[i].length, isTopLevel); 
 		uint32_t endPlanVerts = geometry->vertices.size();
 		
 		for (uint32_t v = startPlanVerts; v < endPlanVerts; ++v)
@@ -674,11 +668,15 @@ void Mesher :: recurseMesh(PickupPlan* pickup, Geometry *geometry, vector<ancest
 		}
 	}
 
-	meshPickupCasingSlab(geometry, pickup->casingGlassColor->getColor(), 0.0, pickup->subs[0].width*2.5 + 0.01);
-	if (pickup->underlayGlassColor->getColor()->a > 0.01) 
-		meshPickupCasingSlab(geometry, pickup->underlayGlassColor->getColor(), pickup->subs[0].width*2.5 + 0.01 + 0.06, 0.05);
-	if (pickup->overlayGlassColor->getColor()->a > 0.01) 
-		meshPickupCasingSlab(geometry, pickup->overlayGlassColor->getColor(), -(pickup->subs[0].width*2.5 + 0.01 + 0.06), 0.05);
+	// top level means that you want a pickup (and not a piece formed from a pickup)
+	// in this case, the slab is not ensureVisible'd, but the canes are, as the pickup
+	// serves as a guide for where to put subcanes, which must be visible
+	meshPickupCasingSlab(geometry, pickup->casingGlassColor->getColor(), 0.0, 
+		pickup->subs[0].width*2.5, !isTopLevel);
+
+	// overlay/underlays
+	meshPickupCasingSlab(geometry, pickup->underlayGlassColor->getColor(), pickup->subs[0].width*2.5 + 0.1, 0.05);
+	meshPickupCasingSlab(geometry, pickup->overlayGlassColor->getColor(), -(pickup->subs[0].width*2.5 + 0.1), 0.05);
 }
 
 void Mesher :: generateMesh(Piece* piece, Geometry* geometry)
@@ -691,14 +689,14 @@ void Mesher :: generateMesh(Piece* piece, Geometry* geometry)
 void Mesher :: generateMesh(PickupPlan* pickup, Geometry* geometry)
 {
 	vector<ancestor> ancestors;
-	recurseMesh(pickup, geometry, &ancestors);
+	recurseMesh(pickup, geometry, &ancestors, true);
 	geometry->compute_normals_from_triangles();
 }
 
 void Mesher :: generatePullMesh(PullPlan* plan, Geometry* geometry)
 {
 	vector<ancestor> ancestors;
-	recurseMesh(plan, geometry, &ancestors, 2.0);
+	recurseMesh(plan, geometry, &ancestors, 2.0, true);
 
 	// Make skinnier to more closely mimic the canes found in pickups
 	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
@@ -713,7 +711,7 @@ void Mesher :: generateColorMesh(GlassColor* gc, Geometry* geometry)
 	PullPlan dummyPlan(PullTemplate::BASE_CIRCLE);
 	dummyPlan.setOutermostCasingColor(gc);
 	vector<ancestor> ancestors;
-	recurseMesh(&dummyPlan, geometry, &ancestors, 2.0);
+	recurseMesh(&dummyPlan, geometry, &ancestors, 2.0, true);
 	geometry->compute_normals_from_triangles();
 }
 
@@ -724,11 +722,8 @@ the transforms array is filled with with the transformations encountered at each
 leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
-void Mesher :: recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>* ancestors, 
-	float length, int groupIndex)
+void Mesher :: recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>* ancestors, float length, bool isTopLevel)
 {
-	int passGroupIndex;
-
 	if (plan == NULL)
 		return;
 
@@ -736,42 +731,25 @@ void Mesher :: recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>*
 	ancestors->push_back(me); 
 	// if you're the root node of the cane, mark yourself as `needing to be visible'
 	// to fake incidence of refraction
-	bool ensureVisible = (ancestors->size() == 1); 
+	bool ensureVisible = (ancestors->size() == 1) && isTopLevel; 
 	for (unsigned int i = 1; i < plan->getCasingCount(); ++i) {
 		meshBaseCasing(geometry, ancestors, plan->getCasingColor(i)->getColor(), 
 			plan->getCasingShape(i), plan->getCasingShape(i-1), length,
-			plan->getCasingThickness(i), plan->getCasingThickness(i-1)+0.05, 
-			groupIndex, ensureVisible);
+			plan->getCasingThickness(i), plan->getCasingThickness(i-1)+0.05, ensureVisible);
 	}
 	// punting on actually doing this geometry right and just making it a cylinder
 	// (that intersects its subcanes)
 	meshBaseCane(geometry, ancestors, plan->getCasingColor(0)->getColor(), 
-		plan->getCasingShape(0), length-0.001,
-		plan->getCasingThickness(0), groupIndex);
+		plan->getCasingShape(0), length-0.001, plan->getCasingThickness(0));
 	ancestors->pop_back();
 
 	// Make recursive calls depending on the type of the current node
-	if (plan->subs.size() == 0)
+	for (unsigned int i = 0; i < plan->subs.size(); ++i)
 	{
-		if (groupIndex == -1)
-			passGroupIndex = 0;
-		else
-			passGroupIndex = groupIndex;
-	}
-	else 
-	{
-		for (unsigned int i = 0; i < plan->subs.size(); ++i)
-		{
-			if (groupIndex == -1)
-				passGroupIndex = i;
-			else
-				passGroupIndex = groupIndex;
-
-			me.child = i;
-			ancestors->push_back(me);
-			recurseMesh(plan->subs[i].plan, geometry, ancestors, length, passGroupIndex);
-			ancestors->pop_back();
-		}
+		me.child = i;
+		ancestors->push_back(me);
+		recurseMesh(plan->subs[i].plan, geometry, ancestors, length);
+		ancestors->pop_back();
 	}
 }
 

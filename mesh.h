@@ -32,24 +32,24 @@ class Mesher
 		};
 
 		// Methods
-		void recurseMesh(PickupPlan* plan, Geometry *geometry, vector<ancestor>* ancestors);
+		void recurseMesh(PickupPlan* plan, Geometry *geometry, vector<ancestor>* ancestors, bool isTopLevel=false);
 		void recurseMesh(Piece* piece, Geometry *geometry, vector<ancestor>* ancestors);
-		void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>* ancestors,
-			float length, int groupIndex = -1);
+		void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>* ancestors, 
+			float length, bool isTopLevel=false);
 
 		float asymptoteVal(float s, float t);
 		float splineVal(float r1, float r2, float r3, float t);
 		float splineVal(float r1, float r2, float r3, float r4, float t);
 		void meshBaseCasing(Geometry* g, vector<ancestor>* ancestors, 
 			Color* c, enum GeometricShape outerShape, enum GeometricShape innerShape, 
-			float length, float outerRadius, float innerRadius, uint32_t group_tag, bool ensureVisible=false);
+			float length, float outerRadius, float innerRadius, bool ensureVisible=false);
 		void meshBaseCane(Geometry* g, vector<ancestor>* ancestors, Color* c, 
-			enum GeometricShape s, float length, float radius, uint32_t group_tag);
+			enum GeometricShape s, float length, float radius);
 		void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float length, float radius, 
 			unsigned int angularResolution, unsigned int axialResolution, bool flipOrientation=false);
 		void getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution, 
 			enum GeometricShape shape, float radius);
-		void meshPickupCasingSlab(Geometry* g, Color* c, float y, float thickness);
+		void meshPickupCasingSlab(Geometry* g, Color* c, float y, float thickness, bool ensureVisible=false);
 		void applyResizeTransform(Vertex* v, float scale);
 		void applySubplanTransform(Vertex* v, ancestor a);
 		void applySubplanTransform(Geometry* geometry, ancestor a);
