@@ -6,7 +6,7 @@ GlassColor :: GlassColor()
 {
 	Color c;
 	c.r = c.g = c.b = 1.0;
-	c.a = 0.01;
+	c.a = 0.001;
 	color = c;
 	name = "Clear";	
 }
