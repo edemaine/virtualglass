@@ -675,6 +675,7 @@ void MainWindow :: depthPeelActionTriggered()
 {
 	NiceViewWidget::peelEnable = !(NiceViewWidget::peelEnable);
 	depthPeelAction->setChecked(NiceViewWidget::peelEnable);
+	emit someDataChanged();
 }
 
 void MainWindow :: simpleCaneExampleActionTriggered()
