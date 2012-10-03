@@ -678,15 +678,21 @@ void Mesher :: recurseMesh(PickupPlan* pickup, Geometry *geometry, vector<ancest
 		}
 	}
 
+	float thickness;
+	// base thickness of casing off of representative (first) cane in pickup
+	if (pickup->subs[0].orientation == MURRINE_PICKUP_CANE_ORIENTATION)
+		thickness = pickup->subs[0].length*2.5;	
+	else
+		thickness = pickup->subs[0].width*2.5;
+ 
 	// top level means that you want a pickup (and not a piece formed from a pickup)
 	// in this case, the slab is not ensureVisible'd, but the canes are, as the pickup
 	// serves as a guide for where to put subcanes, which must be visible
-	meshPickupCasingSlab(geometry, pickup->casingGlassColor->getColor(), 0.0, 
-		pickup->subs[0].width*2.5, !isTopLevel);
+	meshPickupCasingSlab(geometry, pickup->casingGlassColor->getColor(), 0.0, thickness, !isTopLevel);
 
 	// overlay/underlays
-	meshPickupCasingSlab(geometry, pickup->underlayGlassColor->getColor(), pickup->subs[0].width*2.5 + 0.1, 0.05);
-	meshPickupCasingSlab(geometry, pickup->overlayGlassColor->getColor(), -(pickup->subs[0].width*2.5 + 0.1), 0.05);
+	meshPickupCasingSlab(geometry, pickup->underlayGlassColor->getColor(), thickness + 0.1, 0.05);
+	meshPickupCasingSlab(geometry, pickup->overlayGlassColor->getColor(), -(thickness + 0.1), 0.05);
 }
 
 void Mesher :: generateMesh(Piece* piece, Geometry* geometry)

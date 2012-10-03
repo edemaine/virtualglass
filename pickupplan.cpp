@@ -52,19 +52,20 @@ void PickupPlan :: updateSubs() {
 	vector<SubpickupTemplate> newSubs;
 
 	Point p;
-	float width;
+	float width, length;
 	switch (this->type) {
 		case PickupTemplate::MURRINE:
                         width = 2.0 / MAX(parameters[0].value, 1);
+			length = parameters[1].value*0.005 + 0.005;
 			for (int r = 0; r < parameters[0].value; ++r)
 			{
 				for (int c = 0; c < parameters[0].value; ++c)
 				{
 					p.x = -1.0 + width / 2 + width * r;
 					p.y = -1.0 + width / 2 + width * c;
-					p.z = -width/2;
-					pushNewSubplan(&newSubs, p, MURRINE_PICKUP_CANE_ORIENTATION, parameters[1].value*0.005 + 0.005, width-0.0001,
-						SQUARE_SHAPE, 1);
+					p.z = -length/2;
+					pushNewSubplan(&newSubs, p, MURRINE_PICKUP_CANE_ORIENTATION, 
+						/*width*/ length, width-0.0001, SQUARE_SHAPE, 1);
 				}
 			}
                         break;
