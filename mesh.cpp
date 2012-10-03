@@ -361,14 +361,21 @@ void Mesher :: getTemplatePoints(vector<Vector2f>* points, unsigned int angularR
 {
 	Vector2f p;
 
-	points->clear();	
+	// force angularResolution to be the closest multiple of 4
+	// so square mesh has consistent resolution along each side
+	assert(angularResolution % 4 == 0);
+
+	points->clear();
+	// all shapes start at angle -PI/4 (i.e. x = 1.0, y = -1.0)
+	// this consistency is necessary for meshBaseCasing() which stitches the tops
+	// of them together	
 	switch (shape)
         {
                 case CIRCLE_SHAPE:
                         for (unsigned int i = 0; i < angularResolution; ++i)
                         {
-                                p.x = cos(TWO_PI * i / angularResolution);
-                                p.y = sin(TWO_PI * i / angularResolution);
+                                p.x = cos(TWO_PI * i / angularResolution - PI/4);
+                                p.y = sin(TWO_PI * i / angularResolution - PI/4);
                                 points->push_back(p);
                         }
                         break;
@@ -412,6 +419,7 @@ void Mesher :: meshCylinderWall(Geometry* geometry, enum GeometricShape shape, f
 	unsigned int angularResolution, unsigned int axialResolution, bool flipOrientation)
 {
 	vector< Vector2f > points;
+	assert(angularResolution % 4 == 0);
 	getTemplatePoints(&points, angularResolution, shape, radius);
 
 	// Create wall vertices row by row
@@ -464,13 +472,14 @@ void Mesher :: meshBaseCasing(Geometry* geometry, vector<ancestor>* ancestors, C
 	float innerRadius, bool ensureVisible)
 {
         float finalDiameter = totalShrink(ancestors);
-        unsigned int angularResolution = MIN(MAX(finalDiameter*10, 4), 10);
+        unsigned int angularResolution = MIN(MAX(finalDiameter*10, 4), 12);
+	angularResolution = ((angularResolution + 2) / 4) * 4; // round to nearest multiple of 4
         unsigned int axialResolution = MIN(MAX(length * 40, 5), 80);
 	
 	uint32_t first_vert = geometry->vertices.size();
 	uint32_t first_triangle = geometry->triangles.size();
 
-	// assuming meshCylinderWall vertices end with the top row in 
+	// assuming meshCylinderWall vertices end with the top row  
 	unsigned int outerPointsBottomStart = geometry->vertices.size();
 	meshCylinderWall(geometry, outerShape, length, outerRadius, angularResolution, axialResolution);
 	unsigned int outerPointsTopStart = geometry->vertices.size() - angularResolution;
@@ -528,6 +537,7 @@ void Mesher :: meshBaseCane(Geometry* geometry, vector<ancestor>* ancestors,
 {
 	float finalDiameter = totalShrink(ancestors);
 	unsigned int angularResolution = MIN(MAX(finalDiameter*10, 4), 10); 
+	angularResolution = ((angularResolution + 2) / 4) * 4;
 	unsigned int axialResolution = MIN(MAX(length * 40, 5), 80);
 	
 	uint32_t first_vert = geometry->vertices.size();
