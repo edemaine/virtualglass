@@ -45,8 +45,8 @@ class PullPlan
 		unsigned int getCasingCount(); 
 		bool hasSquareCasing();
 
-		void setTwist(float t);
-		float getTwist();
+		void setTwist(int t);
+		int getTwist();
 
 		PullPlan* copy() const;
 

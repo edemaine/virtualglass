@@ -29,8 +29,6 @@ PullPlan* randomSimplePullPlan(enum GeometricShape outermostCasingShape, GlassCo
 
 PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimplePlan)
 {
-	// TEMPORARILY MANGLED FOR ATTEMPTING TO FIND A BUG
-
 	// set template
 	// select a random template that is `complex', and is dependent upon the templates available
 	// at revision 785 these are the templates between HORIZONTAL_LINE_CIRCLE and SURROUNDING_SQUARE
@@ -39,6 +37,7 @@ PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimp
 	PullPlan* plan = new PullPlan(static_cast<PullTemplate::Type>(randomTemplateNumber));
 	
 	// set parameters
+	plan->setTwist(qrand() % 50 - 25);
 	TemplateParameter p;
 	for (unsigned int i = 0; i < plan->getParameterCount(); ++i)
 	{

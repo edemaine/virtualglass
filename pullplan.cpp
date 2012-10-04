@@ -29,7 +29,7 @@ PullPlan :: PullPlan(PullTemplate::Type templateType) {
 	casings.push_back(Casing(1.0, CIRCLE_SHAPE, defaultGlassColor));
 
 	// setup default twist
-	twist = 0.0;
+	twist = 0;
 
 	// setup template (subplans and parameters) `forcefully', i.e.
 	// occuring regardless of what current template type is
@@ -176,12 +176,12 @@ unsigned int PullPlan :: getCasingCount() {
 	return this->casings.size();
 }
 
-void PullPlan :: setTwist(float t) {
+void PullPlan :: setTwist(int t) {
 
 	this->twist = t;
 }
 
-float PullPlan :: getTwist() {
+int PullPlan :: getTwist() {
 
 	return this->twist;
 }
