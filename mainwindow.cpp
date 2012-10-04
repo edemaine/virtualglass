@@ -4,6 +4,7 @@
 
 MainWindow :: MainWindow()
 {
+	setWindowTitle(windowTitle());
 	centralWidget = new QWidget(this);
 	this->setCentralWidget(centralWidget);
 
@@ -13,13 +14,9 @@ MainWindow :: MainWindow()
 	setupMenus();
 	setupConnections();
 
-	setWindowTitle(windowTitle());
-	show();
-
 	seedEverything();
 	setViewMode(EMPTY_VIEW_MODE);
-	emit someDataChanged();
-	whatToDoLabel->setText("Click a library item at left to edit/view.");
+	show();
 }
 
 //markus
@@ -327,39 +324,50 @@ void MainWindow::saveAs(){
 
 void MainWindow::setupMenus()
 {
-	//open
-	openAction = new QAction(tr("&Open"), this);
+	//file:open
+	openAction = new QAction("&Open", this);
 	openAction->setShortcuts(QKeySequence::Open);
-	openAction->setStatusTip(tr("Open an existing file"));
+	openAction->setStatusTip("Open an existing file");
 
-	//save
-	saveAction = new QAction(tr("&Save"), this);
+	//file:save
+	saveAction = new QAction("&Save", this);
 	saveAction->setShortcuts(QKeySequence::Save);
-	saveAction->setStatusTip(tr("Save the document to disk"));
+	saveAction->setStatusTip("Save the document to disk");
 
-	//saveAs
-	saveAsAction = new QAction(tr("&SaveAs"), this);
+	//file:saveAs
+	saveAsAction = new QAction("&SaveAs", this);
 	saveAsAction->setShortcuts(QKeySequence::SaveAs);
-	saveAsAction->setStatusTip(tr("Save the document to disk"));
+	saveAsAction->setStatusTip("Save the document to disk");
 
-	// File menu
-	fileMenu = menuBar()->addMenu(tr("&File")); //create File menu
+	//File menu
+	fileMenu = menuBar()->addMenu("&File"); //create File menu
 	fileMenu->addAction(openAction); //add openButton
 	fileMenu->addAction(saveAction); //add saveButton
 	fileMenu->addAction(saveAsAction); //add saveAsButton
 
-	// Simple example cane
-	simpleCaneAction = new QAction(tr("&Simple Cane"), this);
-	simpleCaneAction->setStatusTip(tr("Generate a simple example cane in the library."));
+	//examples:random:simple cane
+	randomSimpleCaneAction = new QAction("&Simple Cane", this);
+	randomSimpleCaneAction->setStatusTip("Randomly generate a simple example cane.");
 
-	// Simple example cane
-	simplePieceAction = new QAction(tr("&Simple Piece"), this);
-	simplePieceAction->setStatusTip(tr("Generate a simple example piece in the library."));
+	//examples:random:simple piece
+	randomSimplePieceAction = new QAction("&Simple Piece", this);
+	randomSimplePieceAction->setStatusTip("Randomly generate a simple example piece.");
 
-	// Examples menu
-	examplesMenu = menuBar()->addMenu(tr("&Examples")); //create randomize menu
-	examplesMenu->addAction(simpleCaneAction);
-	examplesMenu->addAction(simplePieceAction);
+	//examples:random:complex cane
+	randomComplexCaneAction = new QAction("&Complex Cane", this);
+	randomComplexCaneAction->setStatusTip("Ranomly generate a complex example cane.");
+
+	//examples:random:complex piece
+	randomComplexPieceAction = new QAction("&Complex Piece", this);
+	randomComplexPieceAction->setStatusTip("Randomly generate a complex example piece.");
+
+	// Examples menu and Examples:Random menu
+	examplesMenu = menuBar()->addMenu("&Examples"); //create randomize menu
+	randomExamplesMenu = examplesMenu->addMenu("&Random");
+	randomExamplesMenu->addAction(randomSimpleCaneAction);
+	randomExamplesMenu->addAction(randomSimplePieceAction);
+	randomExamplesMenu->addAction(randomComplexCaneAction);
+	randomExamplesMenu->addAction(randomComplexPieceAction);
 
 	// toggle depth peeling
 	depthPeelAction = new QAction(tr("&Depth peeling"), this);
@@ -394,6 +402,7 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			copyPieceButton->setEnabled(true);
 			break;
 	}
+	emit someDataChanged();
 }
 
 QString MainWindow :: windowTitle()
@@ -418,12 +427,10 @@ void MainWindow :: seedEverything()
 
 	// Load pull template types
 	setViewMode(PULLPLAN_VIEW_MODE);
-	emit someDataChanged();
 	pullPlanEditorWidget->seedTemplates();
 
 	// Load pickup and piece template types
 	setViewMode(PIECE_VIEW_MODE);
-	emit someDataChanged();
 	pieceEditorWidget->seedTemplates();
 }
 
@@ -567,24 +574,18 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 
 	if (cblw != NULL)
 	{
-		unhighlightAllLibraryWidgets();
 		colorEditorWidget->setGlassColor(cblw->getGlassColor());
 		setViewMode(COLORBAR_VIEW_MODE);
-		emit someDataChanged();
 	}
 	else if (plplw != NULL)
 	{
-		unhighlightAllLibraryWidgets();
 		pullPlanEditorWidget->setPlan(plplw->getPullPlan());
 		setViewMode(PULLPLAN_VIEW_MODE);
-		emit someDataChanged();
 	}
 	else if (plw != NULL)
 	{
-		unhighlightAllLibraryWidgets();
 		pieceEditorWidget->setPiece(plw->getPiece());
 		setViewMode(PIECE_VIEW_MODE);
-		emit someDataChanged();
 	}
 }
 
@@ -665,8 +666,11 @@ void MainWindow :: setupConnections()
 	connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
 	connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveAs()));
 
-	connect(simpleCaneAction, SIGNAL(triggered()), this, SLOT(simpleCaneExampleActionTriggered()));
-	connect(simplePieceAction, SIGNAL(triggered()), this, SLOT(simplePieceExampleActionTriggered()));
+	connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
+	connect(randomSimplePieceAction, SIGNAL(triggered()), this, SLOT(randomSimplePieceExampleActionTriggered()));
+
+	connect(randomComplexCaneAction, SIGNAL(triggered()), this, SLOT(randomComplexCaneExampleActionTriggered()));
+	connect(randomComplexPieceAction, SIGNAL(triggered()), this, SLOT(randomComplexPieceExampleActionTriggered()));
 
 	connect(depthPeelAction, SIGNAL(triggered()), this, SLOT(depthPeelActionTriggered()));
 }
@@ -678,7 +682,7 @@ void MainWindow :: depthPeelActionTriggered()
 	emit someDataChanged();
 }
 
-void MainWindow :: simpleCaneExampleActionTriggered()
+void MainWindow :: randomSimpleCaneExampleActionTriggered()
 {
 	GlassColor* randomGC = randomGlassColor();
 	PullPlan* randomPP = randomSimplePullPlan(CIRCLE_SHAPE, randomGC);
@@ -690,10 +694,29 @@ void MainWindow :: simpleCaneExampleActionTriggered()
 
 	pullPlanEditorWidget->setPlan(randomPP);	
 	setViewMode(PULLPLAN_VIEW_MODE);
-	emit someDataChanged();
 }
 
-void MainWindow :: simplePieceExampleActionTriggered()
+void MainWindow :: randomComplexCaneExampleActionTriggered()
+{
+	GlassColor* randomGC = randomGlassColor();
+	PullPlan* randomCPP = randomSimplePullPlan(CIRCLE_SHAPE, randomGC);
+	PullPlan* randomSPP = randomSimplePullPlan(SQUARE_SHAPE, randomGC);
+	PullPlan* randomComplexPP = randomComplexPullPlan(randomCPP, randomSPP);
+
+	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomComplexPP));
+	// add simple plans only if they are used
+	// memory leak! as unused ones never appear in library
+	if (randomComplexPP->hasDependencyOn(randomCPP))
+		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomCPP));
+	if (randomComplexPP->hasDependencyOn(randomSPP))
+		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomSPP));
+
+	pullPlanEditorWidget->setPlan(randomComplexPP);	
+	setViewMode(PULLPLAN_VIEW_MODE);
+}
+
+void MainWindow :: randomSimplePieceExampleActionTriggered()
 {
 	GlassColor* randomGC = randomGlassColor();
 	PullPlan* randomSPP = randomSimplePullPlan(SQUARE_SHAPE, randomGC);
@@ -707,7 +730,30 @@ void MainWindow :: simplePieceExampleActionTriggered()
 
 	pieceEditorWidget->setPiece(randomP);	
 	setViewMode(PIECE_VIEW_MODE);
-	emit someDataChanged();
+}
+
+void MainWindow :: randomComplexPieceExampleActionTriggered()
+{
+	GlassColor* randomGC = randomGlassColor();
+        PullPlan* randomCPP = randomSimplePullPlan(CIRCLE_SHAPE, randomGC);
+        PullPlan* randomSPP = randomSimplePullPlan(SQUARE_SHAPE, randomGC);
+        PullPlan* randomComplexPP = randomComplexPullPlan(randomCPP, randomSPP);
+	Piece* randomP = randomPiece(randomPickup(randomSPP));
+
+	// change every other plan in the pickup to be the complex cane
+	// instead of the square one
+	for (unsigned int i = 0; i < randomP->pickup->subs.size(); i+=2)
+		randomP->pickup->subs[i].plan = randomComplexPP;
+	
+	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC));
+	if (randomComplexPP->hasDependencyOn(randomCPP)) // memory leak
+		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomCPP));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomSPP));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomComplexPP));
+	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(randomP));
+		
+	pieceEditorWidget->setPiece(randomP);	
+	setViewMode(PIECE_VIEW_MODE);
 }
 
 void MainWindow :: setupLibrary()
@@ -811,7 +857,7 @@ void MainWindow :: setupEmptyPaneEditor()
 	emptyEditorPage = new QWidget(editorStack);
 	QHBoxLayout* editorLayout = new QHBoxLayout(emptyEditorPage);
 	emptyEditorPage->setLayout(editorLayout);
-	whatToDoLabel = new QLabel("Loading...", emptyEditorPage);
+	whatToDoLabel = new QLabel("Click a library item at left to edit/view.", emptyEditorPage);
 	whatToDoLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	editorLayout->addWidget(whatToDoLabel, 0);
 }
@@ -838,14 +884,11 @@ void MainWindow :: newPiece()
 	Piece* newEditorPiece = new Piece(PieceTemplate::TUMBLER);
 
 	// Create the new library entry
-	unhighlightAllLibraryWidgets();
 	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(newEditorPiece));
 	pieceEditorWidget->setPiece(newEditorPiece);
 
 	// Load up the right editor
 	setViewMode(PIECE_VIEW_MODE);
-
-	emit someDataChanged();
 }
 
 void MainWindow :: copyPiece()
@@ -866,15 +909,11 @@ void MainWindow :: newColorBar()
 	GlassColor* newGlassColor = new GlassColor();
 
 	// Create the new library entry
-	unhighlightAllLibraryWidgets();
 	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(newGlassColor, this));
 	colorEditorWidget->setGlassColor(newGlassColor);
 
 	// Load up the right editor
 	setViewMode(COLORBAR_VIEW_MODE);
-
-	// Trigger GUI updates
-	emit someDataChanged();
 }
 
 void MainWindow :: copyColorBar()
@@ -885,7 +924,6 @@ void MainWindow :: copyColorBar()
 	GlassColor* newEditorGlassColor = colorEditorWidget->getGlassColor()->copy();
 
 	// Create the new library entry
-	unhighlightAllLibraryWidgets();
 	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(newEditorGlassColor, this));
 	colorEditorWidget->setGlassColor(newEditorGlassColor);
 
@@ -910,7 +948,6 @@ void MainWindow :: copyPullPlan()
 
 void MainWindow :: newPullPlan(PullPlan* newPlan)
 {
-	unhighlightAllLibraryWidgets();
 	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(newPlan));
 
 	// Give the new plan to the editor
@@ -918,9 +955,6 @@ void MainWindow :: newPullPlan(PullPlan* newPlan)
 
 	// Load up the right editor
 	setViewMode(PULLPLAN_VIEW_MODE);
-
-	// Trigger GUI updates
-	emit someDataChanged();
 }
 
 void MainWindow :: updateEverything()

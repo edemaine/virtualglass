@@ -3,7 +3,7 @@
 #include "subpickuptemplate.h"
 
 SubpickupTemplate :: SubpickupTemplate(PullPlan* _plan, Point _location, int _orientation, float _length, 
-	float _width, enum GeometricShape _shape, int _group)
+	float _width, enum GeometricShape _shape)
 {
 	plan = _plan;
 	location = _location;
@@ -11,7 +11,6 @@ SubpickupTemplate :: SubpickupTemplate(PullPlan* _plan, Point _location, int _or
 	length = _length;
 	width = _width;
 	shape = _shape;
-	group = _group;
 }
 
 

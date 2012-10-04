@@ -46,7 +46,9 @@ void PullPlanEditorWidget :: updateEverything()
 		plan->getParameter(i, &tp);
 		paramLabels[i]->setText(tp.name.c_str());
 		paramLabels[i]->show();
+                disconnect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
 		paramSpins[i]->setRange(tp.lowerLimit, tp.upperLimit);
+                connect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
 		paramSpins[i]->setValue(tp.value);
 		paramSpins[i]->show();
 	}
@@ -292,11 +294,8 @@ void PullPlanEditorWidget :: setupConnections()
 	connect(addSquareButton, SIGNAL(pressed()), this, SLOT(addSquareButtonPressed()));
 	connect(twistSlider, SIGNAL(valueChanged(int)), this, SLOT(twistSliderChanged(int)));
 	connect(twistSpin, SIGNAL(valueChanged(int)), this, SLOT(twistSpinChanged(int)));
-
 	for (unsigned int i = 0; i < paramSpins.size(); ++i)
-	{
 		connect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
-	}
 
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(viewWidgetDataChanged()));

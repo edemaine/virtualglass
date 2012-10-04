@@ -98,9 +98,12 @@ class MainWindow : public QMainWindow
 		QPushButton* copyColorBarButton;
 		QPushButton* copyPullPlanButton;
 		QPushButton* copyPieceButton;
+		QMenu *randomExamplesMenu;
 		QMenu *examplesMenu;
-		QAction *simpleCaneAction;
-		QAction *simplePieceAction;
+		QAction *randomSimpleCaneAction;
+		QAction *randomSimplePieceAction;
+		QAction *randomComplexCaneAction;
+		QAction *randomComplexPieceAction;
 		QMenu *fileMenu;
 		QAction *openAction;
 		QAction *saveAction;
@@ -120,8 +123,10 @@ class MainWindow : public QMainWindow
 		void open();
 		void save();
 		void saveAs();
-		void simpleCaneExampleActionTriggered();
-		void simplePieceExampleActionTriggered();
+		void randomSimpleCaneExampleActionTriggered();
+		void randomSimplePieceExampleActionTriggered();
+		void randomComplexCaneExampleActionTriggered();
+		void randomComplexPieceExampleActionTriggered();
 		void depthPeelActionTriggered();
 };
 

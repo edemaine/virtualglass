@@ -36,13 +36,9 @@ class PieceEditorWidget : public QWidget
 
 	private slots:
                 void pickupViewWidgetDataChanged();
-		void pieceTemplateParameterSlider1Changed(int);
-		void pieceTemplateParameterSlider2Changed(int);
-		void pieceTemplateParameterSlider3Changed(int);
-		void pickupParameter1SpinBoxChanged(int);
-		void pickupParameter1SliderChanged(int);
-		void pickupParameter2SpinBoxChanged(int);
-		void pickupParameter2SliderChanged(int);
+		void pieceParameterSliderChanged(int);
+		void pickupParameterSpinBoxChanged(int);
+		void pickupParameterSliderChanged(int);
 
 	private:
 		Geometry geometry;

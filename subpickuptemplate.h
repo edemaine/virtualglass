@@ -18,14 +18,13 @@ class SubpickupTemplate
 {
 	public:
 		SubpickupTemplate(PullPlan* plan, Point location, int orientation, 
-			float length, float width, enum GeometricShape shape, int group);
+			float length, float width, enum GeometricShape shape);
 		PullPlan* plan;
 		Point location;
 		int orientation;
 		float length;
 		float width;
 		enum GeometricShape shape;
-		int group;
 };
 
 

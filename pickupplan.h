@@ -39,7 +39,7 @@ class PickupPlan
 	private:
 		void updateSubs();
 		void pushNewSubplan(vector<SubpickupTemplate>* newSubs, Point location,
-			enum PickupCaneOrientation ori, float length, float width, enum GeometricShape s, int group); 
+			enum PickupCaneOrientation ori, float length, float width, enum GeometricShape s); 
 		enum PickupTemplate::Type type;
 		vector<TemplateParameter> parameters;
 		PullPlan* defaultSubplan;

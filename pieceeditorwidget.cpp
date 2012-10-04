@@ -40,9 +40,21 @@ void PieceEditorWidget :: updateEverything()
 		pickupParamLabels[i]->setText(tp.name.c_str());
 
 		// setup spinbox and slider values and ranges
+
+		// have to disconnect signals to avoid (bug?) valueChanged()
+		// signals from being sent when the ranges are set
+		disconnect(pickupParamSpinboxes[i], SIGNAL(valueChanged(int)),
+			this, SLOT(pickupParameterSpinBoxChanged(int)));
+		disconnect(pickupParamSliders[i], SIGNAL(valueChanged(int)),
+			this, SLOT(pickupParameterSliderChanged(int)));
 		pickupParamSpinboxes[i]->setRange(tp.lowerLimit, tp.upperLimit);
-		pickupParamSpinboxes[i]->setValue(tp.value);
 		pickupParamSliders[i]->setRange(tp.lowerLimit, tp.upperLimit);
+		connect(pickupParamSpinboxes[i], SIGNAL(valueChanged(int)),
+			this, SLOT(pickupParameterSpinBoxChanged(int)));
+		connect(pickupParamSliders[i], SIGNAL(valueChanged(int)),
+			this, SLOT(pickupParameterSliderChanged(int)));
+
+		pickupParamSpinboxes[i]->setValue(tp.value);
 		pickupParamSliders[i]->setValue(tp.value);
 		pickupParamWidgets[i]->show();
 	}
@@ -73,7 +85,15 @@ void PieceEditorWidget :: updateEverything()
 		TemplateParameter tp;
 		piece->getParameter(i, &tp);
 		pieceParamLabels[i]->setText(tp.name.c_str());
+
+		// disconnect to avoid (bug?) valueChanged() signals from
+		// being sent when the range is changed	
+		disconnect(pieceParamSliders[i], SIGNAL(valueChanged(int)),
+			this, SLOT(pieceParameterSliderChanged(int)));
 		pieceParamSliders[i]->setRange(tp.lowerLimit, tp.upperLimit);
+		disconnect(pieceParamSliders[i], SIGNAL(valueChanged(int)),
+			this, SLOT(pieceParameterSliderChanged(int)));
+		
 		pieceParamSliders[i]->setValue(tp.value);
 		pieceParamWidgets[i]->show();
 	}
@@ -83,89 +103,46 @@ void PieceEditorWidget :: updateEverything()
 	}
 }
 
-
-void PieceEditorWidget :: pieceTemplateParameterSlider3Changed(int)
+void PieceEditorWidget :: pieceParameterSliderChanged(int)
 {
-	int value = pieceParamSliders[2]->sliderPosition();
-
-	TemplateParameter tp;
-	piece->getParameter(2, &tp);
-	if (value == tp.value)
-		return;
-	piece->setParameter(2, value);
-	emit someDataChanged();
+	for (unsigned int i = 0; i < piece->getParameterCount(); ++i)
+	{
+		TemplateParameter tp;
+		piece->getParameter(i, &tp);
+		if (tp.value != pieceParamSliders[i]->value())
+		{
+			piece->setParameter(i, pieceParamSliders[i]->value());
+			emit someDataChanged();
+		}
+	}
 }
 
-void PieceEditorWidget :: pieceTemplateParameterSlider2Changed(int)
+void PieceEditorWidget :: pickupParameterSpinBoxChanged(int)
 {
-	int value = pieceParamSliders[1]->sliderPosition();
-
-	TemplateParameter tp;
-	piece->getParameter(1, &tp);
-	if (value == tp.value)
-		return;
-	piece->setParameter(1, value);
-	emit someDataChanged();
+	for (unsigned int i = 0; i < piece->pickup->getParameterCount(); ++i)
+	{
+		TemplateParameter tp;
+		piece->pickup->getParameter(i, &tp);
+                if (tp.value != pickupParamSpinboxes[i]->value())
+                {
+                        piece->pickup->setParameter(i, pickupParamSpinboxes[i]->value());
+                        emit someDataChanged();
+                }
+	}
 }
 
-void PieceEditorWidget :: pieceTemplateParameterSlider1Changed(int)
+void PieceEditorWidget :: pickupParameterSliderChanged(int)
 {
-	int value = pieceParamSliders[0]->sliderPosition();
-
-	TemplateParameter tp;
-	piece->getParameter(0, &tp);
-	if (value == tp.value)
-		return;
-	piece->setParameter(0, value);
-	emit someDataChanged();
-}
-
-void PieceEditorWidget :: pickupParameter1SpinBoxChanged(int)
-{
-	int value = pickupParamSpinboxes[0]->value();
-
-	TemplateParameter tp;
-	piece->pickup->getParameter(0, &tp);
-	if (value == tp.value)
-		return;
-	piece->pickup->setParameter(0, value);
-	emit someDataChanged();
-}
-
-void PieceEditorWidget :: pickupParameter2SpinBoxChanged(int)
-{
-	int value = pickupParamSpinboxes[1]->value();
-
-	TemplateParameter tp;
-	piece->pickup->getParameter(1, &tp);
-	if (value == tp.value)
-		return;
-	piece->pickup->setParameter(1, value);
-	emit someDataChanged();
-}
-
-void PieceEditorWidget :: pickupParameter1SliderChanged(int)
-{
-	int value = pickupParamSliders[0]->sliderPosition();
-
-	TemplateParameter tp;
-	piece->pickup->getParameter(0, &tp);
-	if (value == tp.value)
-		return;
-	piece->pickup->setParameter(0, value);
-	emit someDataChanged();
-}
-
-void PieceEditorWidget :: pickupParameter2SliderChanged(int)
-{
-	int value = pickupParamSliders[1]->sliderPosition();
-
-	TemplateParameter tp;
-	piece->pickup->getParameter(1, &tp);
-	if (value == tp.value)
-		return;
-	piece->pickup->setParameter(1, value);
-	emit someDataChanged();
+	for (unsigned int i = 0; i < piece->pickup->getParameterCount(); ++i)
+	{
+		TemplateParameter tp;
+		piece->pickup->getParameter(i, &tp);
+                if (tp.value != pickupParamSliders[i]->value())
+                {
+                        piece->pickup->setParameter(i, pickupParamSliders[i]->value());
+                        emit someDataChanged();
+                }
+	}
 }
 
 void PieceEditorWidget :: setupLayout()
@@ -318,20 +295,21 @@ void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 void PieceEditorWidget :: setupConnections()
 {
-	connect(pickupParamSpinboxes[0], SIGNAL(valueChanged(int)),
-		this, SLOT(pickupParameter1SpinBoxChanged(int)));
-	connect(pickupParamSliders[0], SIGNAL(valueChanged(int)),
-		this, SLOT(pickupParameter1SliderChanged(int)));
-	connect(pickupParamSpinboxes[1], SIGNAL(valueChanged(int)),
-		this, SLOT(pickupParameter2SpinBoxChanged(int)));
-	connect(pickupParamSliders[1], SIGNAL(valueChanged(int)),
-		this, SLOT(pickupParameter2SliderChanged(int)));
-	connect(pieceParamSliders[0], SIGNAL(valueChanged(int)),
-		this, SLOT(pieceTemplateParameterSlider1Changed(int)));
-	connect(pieceParamSliders[1], SIGNAL(valueChanged(int)),
-		this, SLOT(pieceTemplateParameterSlider2Changed(int)));
-	connect(pieceParamSliders[2], SIGNAL(valueChanged(int)),
-		this, SLOT(pieceTemplateParameterSlider3Changed(int)));
+	for (unsigned int i = 0; i < pickupParamSpinboxes.size(); ++i)
+	{
+		connect(pickupParamSpinboxes[i], SIGNAL(valueChanged(int)),
+			this, SLOT(pickupParameterSpinBoxChanged(int)));
+	}
+	for (unsigned int i = 0; i < pickupParamSliders.size(); ++i)
+	{
+		connect(pickupParamSliders[i], SIGNAL(valueChanged(int)),
+			this, SLOT(pickupParameterSliderChanged(int)));
+	}
+	for (unsigned int i = 0; i < pieceParamSliders.size(); ++i)
+	{
+		connect(pieceParamSliders[i], SIGNAL(valueChanged(int)),
+			this, SLOT(pieceParameterSliderChanged(int)));
+	}
 
 	connect(pickupViewWidget, SIGNAL(someDataChanged()), this, SLOT(pickupViewWidgetDataChanged()));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));

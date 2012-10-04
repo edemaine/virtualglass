@@ -2,13 +2,12 @@
 
 #include "subpulltemplate.h"
 
-SubpullTemplate :: SubpullTemplate(PullPlan* plan, enum GeometricShape _s, Point location, float diameter, int group)
+SubpullTemplate :: SubpullTemplate(PullPlan* plan, enum GeometricShape _s, Point location, float diameter)
 {
 	this->plan = plan;
 	this->shape = _s;
 	this->location = location;
 	this->diameter = diameter;
-	this->group = group;
 }
 
 void SubpullTemplate :: rescale(float ratio) 

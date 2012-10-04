@@ -330,7 +330,7 @@ enum GeometricShape PullPlan :: getCasingShape(unsigned int index) {
 }
 
 void PullPlan :: pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs,
-	enum GeometricShape _shape, Point p, float diameter, int group) 
+	enum GeometricShape _shape, Point p, float diameter) 
 {
 	PullPlan* plan;
 
@@ -353,7 +353,7 @@ void PullPlan :: pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs
 		}
 	}
 
-	newSubs->push_back(SubpullTemplate(plan, _shape, p, diameter, group));
+	newSubs->push_back(SubpullTemplate(plan, _shape, p, diameter));
 }
 
 /*
@@ -386,7 +386,7 @@ void PullPlan :: resetSubs(bool hardReset)
 			for (int i = 0; i < count; ++i) {
 				float littleRadius = (2 * radius / count) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
-				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0);
 			}
 			break;
 		}
@@ -398,7 +398,7 @@ void PullPlan :: resetSubs(bool hardReset)
 			for (int i = 0; i < count; ++i) {
 				float littleRadius = (2 * radius / count) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
-				pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, littleRadius * 2.0, 0);
+				pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, littleRadius * 2.0);
 			}
 			break;
 		}
@@ -410,11 +410,11 @@ void PullPlan :: resetSubs(bool hardReset)
 			float k = sin(theta/2) / (1 + sin(theta/2));
 
 			p.x = p.y = 0.0;
-			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, (1 - 2 * k) * 2 * radius, 0);
+			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, (1 - 2 * k) * 2 * radius);
 			for (int i = 0; i < count; ++i) {
 				p.x = (1.0 - k) * radius * cos(TWO_PI / count * i);
 				p.y = (1.0 - k) * radius * sin(TWO_PI / count * i);
-				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * k * radius, 0);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * k * radius);
 			}
 			break;
 		}
@@ -425,20 +425,20 @@ void PullPlan :: resetSubs(bool hardReset)
 			float littleRadius = (radius / (count + 0.5)) / 2.0;
 
 			p.x = p.y = 0.0;
-			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0);
 			for (int i = 0; i < count; ++i) {
 				p.x = (i+1) * 2 * littleRadius;
 				p.y = 0.0;
-				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0);
 				p.x = 0.0;
 				p.y = (i+1) * 2 * littleRadius;
-				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0);
 				p.x = -((i+1) * 2 * littleRadius);
 				p.y = 0.0;
-				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0);
 				p.x = 0.0;
 				p.y = -((i+1) * 2 * littleRadius);
-				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0, 0);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0);
 			}
 			break;
 		}
@@ -462,18 +462,18 @@ void PullPlan :: resetSubs(bool hardReset)
 					p.x = -radius + littleRadius + 2 * littleRadius * i;
 					p.y = -radius + littleRadius + 2 * littleRadius * j;
 					if (this->templateType == PullTemplate::SQUARE_OF_CIRCLES)
-						pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 0);
+						pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 					else
-						pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius, 0);
+						pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius);
 				}
 				for (j = s; j >= 0; --j) {
 					i = s;
 					p.x = -radius + littleRadius + 2 * littleRadius * i;
 					p.y = -radius + littleRadius + 2 * littleRadius * j;
 					if (this->templateType == PullTemplate::SQUARE_OF_CIRCLES)
-						pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 0);
+						pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 					else
-						pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius, 0);
+						pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius);
 				}
 				
 			}
@@ -486,12 +486,12 @@ void PullPlan :: resetSubs(bool hardReset)
 			float littleRadius = radius / (2 * count - 1);
 
 			p.x = p.y = 0.0;
-			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 0);
+			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 			for (int i = 1; i < count; ++i) {
 				for (int theta = 0; theta < 3; ++theta) {
 					p.x = (littleRadius * 2 * i) * cos(TWO_PI / 3 * theta);
 					p.y = (littleRadius * 2 * i) * sin(TWO_PI / 3 * theta);
-					pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2, 0);
+					pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2);
 				}
 			}
 			break;
@@ -506,26 +506,26 @@ void PullPlan :: resetSubs(bool hardReset)
 			float littleRadius = radius / (count + 2);
 
 			p.x = p.y = 0.0;
-			pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius * count, 0);
+			pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius * count);
 			for (int i = 0; i < count + 1; ++i) {
 				p.x = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * i;
 				p.y = -2 * littleRadius * (count + 1) / 2.0;
-				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 			}
 			for (int j = 0; j < count + 1; ++j) {
 				p.x = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * (count + 1);
 				p.y = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * j;
-				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 			}
 			for (int i = count + 1; i >= 1; --i) {
 				p.x = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * i;
 				p.y = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * (count + 1);
-				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 			}
 			for (int j = count + 1; j >= 1; --j) {
 				p.x = -2 * littleRadius * (count + 1) / 2.0;
 				p.y = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * j;
-				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius, 1);
+				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 			}
 			break;
 		}
@@ -540,8 +540,7 @@ void PullPlan :: resetSubs(bool hardReset)
 				// it's a `soft' template change from a rigid one 
 				// to a custom one, so mapping from old cane locations/subcanes
 				// to new ones is direct and very natural
-				pushNewSubpull(false, &newSubs, subs[i].shape, subs[i].location, 
-					subs[i].diameter, subs[i].group);
+				pushNewSubpull(false, &newSubs, subs[i].shape, subs[i].location, subs[i].diameter);
 			}
 			break;
 		}

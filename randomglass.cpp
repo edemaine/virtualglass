@@ -16,16 +16,12 @@ PullPlan* randomSimplePullPlan(enum GeometricShape outermostCasingShape, GlassCo
 {
 	PullPlan* plan;
 	if (qrand() % 2)
-	{
 		plan = new PullPlan(PullTemplate::BASE_CIRCLE);
-	}
 	else
-	{
 		plan = new PullPlan(PullTemplate::BASE_SQUARE);
-	} 	
 
 	plan->setCasingColor(color, 0);
-	plan->setCasingThickness((qrand() % 50) * 0.01 + 0.25, 0);
+	plan->setCasingThickness((qrand() % 25) * 0.01 + 0.25, 0);
 	plan->setOutermostCasingShape(outermostCasingShape);
 
 	return plan;
@@ -33,9 +29,13 @@ PullPlan* randomSimplePullPlan(enum GeometricShape outermostCasingShape, GlassCo
 
 PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimplePlan)
 {
+	// TEMPORARILY MANGLED FOR ATTEMPTING TO FIND A BUG
+
 	// set template
-	int randomTemplateNumber = qrand() % (PullTemplate::lastSeedTemplate() - PullTemplate::firstSeedTemplate()) 
-		+ PullTemplate::firstSeedTemplate();
+	// select a random template that is `complex', and is dependent upon the templates available
+	// at revision 785 these are the templates between HORIZONTAL_LINE_CIRCLE and SURROUNDING_SQUARE
+	int randomTemplateNumber = qrand() % (PullTemplate::SURROUNDING_SQUARE - PullTemplate::HORIZONTAL_LINE_CIRCLE) 
+		+ PullTemplate::HORIZONTAL_LINE_CIRCLE;
 	PullPlan* plan = new PullPlan(static_cast<PullTemplate::Type>(randomTemplateNumber));
 	
 	// set parameters
@@ -43,10 +43,11 @@ PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimp
 	for (unsigned int i = 0; i < plan->getParameterCount(); ++i)
 	{
 		plan->getParameter(i, &p);
-		plan->setParameter(i, qrand() % (p.upperLimit - p.lowerLimit) + p.lowerLimit);
+		plan->setParameter(i, qrand() % ((p.upperLimit - p.lowerLimit)/2) + p.lowerLimit);
 	}	
 
 	// set subplans
+	plan->getParameter(0, &p);	
 	for (unsigned int i = 0; i < plan->subs.size(); ++i)
 	{
 		switch (plan->subs[i].shape)

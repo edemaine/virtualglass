@@ -70,7 +70,7 @@ class PullPlan
 		void initializeTemplate();
 		void resetSubs(bool hardReset);
 		void pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs,
-			enum GeometricShape s, Point location, float diameter, int group);
+			enum GeometricShape s, Point location, float diameter);
 };
 
 PullPlan *deep_copy(const PullPlan *plan);

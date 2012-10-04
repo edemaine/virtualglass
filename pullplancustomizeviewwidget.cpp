@@ -694,8 +694,7 @@ void PullPlanCustomizeViewWidget :: copySelectionPressed()
 			plan->subs[subplansSelected[i]].plan,
 			plan->subs[subplansSelected[i]].shape,
 			plan->subs[subplansSelected[i]].location,
-			plan->subs[subplansSelected[i]].diameter,
-			plan->subs[subplansSelected[i]].group));
+			plan->subs[subplansSelected[i]].diameter));
 		newSubplans.at(i)->location.x += 3*BOUNDING_BOX_SPACE/squareSize;
 		newSubplans.at(i)->location.y += 3*BOUNDING_BOX_SPACE/squareSize;
 	}
@@ -746,8 +745,8 @@ void PullPlanCustomizeViewWidget :: addCirclePressed()
 	{
 		diameter = plan->getCasingThickness(0);
 	}
-	plan->subs.insert(plan->subs.begin(), SubpullTemplate(new PullPlan(PullTemplate::BASE_CIRCLE),
-		CIRCLE_SHAPE, p, diameter, 0));
+	plan->subs.insert(plan->subs.begin(), 
+		SubpullTemplate(new PullPlan(PullTemplate::BASE_CIRCLE), CIRCLE_SHAPE, p, diameter));
 	subplansSelected.clear();
 	subplansSelected.push_back(0);
 	emit someDataChanged();
@@ -767,8 +766,8 @@ void PullPlanCustomizeViewWidget :: addSquarePressed()
 	{
 		diameter = plan->getCasingThickness(0);
 	}
-	plan->subs.insert(plan->subs.begin(),SubpullTemplate(new PullPlan(PullTemplate::BASE_SQUARE),
-		SQUARE_SHAPE, p, diameter, 0));
+	plan->subs.insert(plan->subs.begin(),
+		SubpullTemplate(new PullPlan(PullTemplate::BASE_SQUARE), SQUARE_SHAPE, p, diameter));
 	subplansSelected.clear();
 	subplansSelected.push_back(0);
 	emit someDataChanged();
