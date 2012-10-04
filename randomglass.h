@@ -18,7 +18,7 @@ PullPlan* randomSimplePullPlan(enum GeometricShape outermostCasingShape, GlassCo
 
 PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimplePlan);
 
-PickupPlan* randomPickup(PullPlan* plan);
+PickupPlan* randomPickup(PullPlan* plan1, PullPlan* plan2=NULL);
 
 Piece* randomPiece(PickupPlan* pickup);
 

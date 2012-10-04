@@ -734,22 +734,25 @@ void MainWindow :: randomSimplePieceExampleActionTriggered()
 
 void MainWindow :: randomComplexPieceExampleActionTriggered()
 {
-	GlassColor* randomGC = randomGlassColor();
-        PullPlan* randomCPP = randomSimplePullPlan(CIRCLE_SHAPE, randomGC);
-        PullPlan* randomSPP = randomSimplePullPlan(SQUARE_SHAPE, randomGC);
-        PullPlan* randomComplexPP = randomComplexPullPlan(randomCPP, randomSPP);
-	Piece* randomP = randomPiece(randomPickup(randomSPP));
+	GlassColor* randomGC1 = randomGlassColor();
+	GlassColor* randomGC2 = randomGlassColor();
+        PullPlan* randomCPP = randomSimplePullPlan(CIRCLE_SHAPE, randomGC1);
+        PullPlan* randomSPP = randomSimplePullPlan(SQUARE_SHAPE, randomGC2);
+        PullPlan* randomComplexPP1 = randomComplexPullPlan(randomCPP, randomSPP);
+        PullPlan* randomComplexPP2 = randomComplexPullPlan(randomCPP, randomSPP);
+	Piece* randomP = randomPiece(randomPickup(randomComplexPP1, randomComplexPP2));
 
-	// change every other plan in the pickup to be the complex cane
-	// instead of the square one
-	for (unsigned int i = 0; i < randomP->pickup->subs.size(); i+=2)
-		randomP->pickup->subs[i].plan = randomComplexPP;
-	
-	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC));
-	if (randomComplexPP->hasDependencyOn(randomCPP)) // memory leak
+	if (randomP->hasDependencyOn(randomGC1)) // memory leak if returns no
+		colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC1));
+	if (randomP->hasDependencyOn(randomGC2)) // memory leak if returns no
+		colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC2));
+	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC2));
+	if (randomP->hasDependencyOn(randomCPP)) // memory leak if returns no
 		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomCPP));
-	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomSPP));
-	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomComplexPP));
+	if (randomP->hasDependencyOn(randomSPP)) // memory leak if returns no
+		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomSPP));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomComplexPP1));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomComplexPP2));
 	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(randomP));
 		
 	pieceEditorWidget->setPiece(randomP);	

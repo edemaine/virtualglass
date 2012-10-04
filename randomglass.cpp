@@ -63,7 +63,7 @@ PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimp
 	return plan;
 }
 
-PickupPlan* randomPickup(PullPlan* pullPlan)
+PickupPlan* randomPickup(PullPlan* pullPlan1, PullPlan* pullPlan2)
 {
         int randomTemplateNumber = qrand() % (PickupTemplate::lastSeedTemplate() - PickupTemplate::firstSeedTemplate())
                 + PickupTemplate::firstSeedTemplate();
@@ -81,8 +81,17 @@ PickupPlan* randomPickup(PullPlan* pullPlan)
 	// set subplans
 	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
 	{
-		pickup->subs[i].plan = pullPlan;
+		pickup->subs[i].plan = pullPlan1;
 	}
+	// if a second plan is provided, alternate with the first one
+	if (pullPlan2 != NULL)
+	{
+		for (unsigned int i = 0; i < pickup->subs.size(); i+=2)
+		{
+			pickup->subs[i].plan = pullPlan2;
+		}
+	}
+
 
 	return pickup;
 }
