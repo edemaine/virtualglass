@@ -752,7 +752,7 @@ void Mesher :: recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>*
 		meshBaseCasing(geometry, ancestors, plan->getCasingColor(i)->getColor(), 
 			plan->getCasingShape(i), plan->getCasingShape(i-1), length,
 			plan->getCasingThickness(i), plan->getCasingThickness(i-1)+0.05, 
-			ensureVisible && (i == plan->getCasingCount()-1));
+			ensureVisible);
 	}
 	// punting on actually doing this geometry right and just making it a cylinder
 	// (that intersects its subcanes)
