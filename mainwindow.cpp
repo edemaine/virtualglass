@@ -836,7 +836,7 @@ void MainWindow :: setupLibrary()
 	l1->setStyleSheet("border: 2px dashed " + QColor(0, 139, 69, 255).name() + ";");
 	QLabel* l2 = new QLabel("Selected");
 	l2->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	l2->setStyleSheet("border: 3px solid " + QColor(0, 0, 255, 255).name() + ";");
+	l2->setStyleSheet("border: 2px solid " + QColor(0, 0, 255, 255).name() + ";");
 	QLabel* l3 = new QLabel("Uses Selected");
 	l3->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	l3->setStyleSheet("border: 2px dotted " + QColor(200, 100, 0, 255).name() + ";");
