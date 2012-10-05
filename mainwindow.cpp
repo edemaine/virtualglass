@@ -346,6 +346,10 @@ void MainWindow::setupMenus()
 	fileMenu->addAction(saveAsAction); //add saveAsButton
 
 	//examples:random:simple cane
+	web1PieceAction = new QAction("Web example 1", this);
+	web1PieceAction->setStatusTip("The first example found on virtualglass.org");
+
+	//examples:random:simple cane
 	randomSimpleCaneAction = new QAction("&Simple Cane", this);
 	randomSimpleCaneAction->setStatusTip("Randomly generate a simple example cane.");
 
@@ -363,10 +367,12 @@ void MainWindow::setupMenus()
 
 	// Examples menu and Examples:Random menu
 	examplesMenu = menuBar()->addMenu("&Examples"); //create randomize menu
+	examplesMenu->addAction(web1PieceAction);
 	randomExamplesMenu = examplesMenu->addMenu("&Random");
 	randomExamplesMenu->addAction(randomSimpleCaneAction);
-	randomExamplesMenu->addAction(randomSimplePieceAction);
 	randomExamplesMenu->addAction(randomComplexCaneAction);
+	randomExamplesMenu->addSeparator();
+	randomExamplesMenu->addAction(randomSimplePieceAction);
 	randomExamplesMenu->addAction(randomComplexPieceAction);
 
 	// toggle depth peeling
@@ -672,6 +678,8 @@ void MainWindow :: setupConnections()
 	connect(randomComplexCaneAction, SIGNAL(triggered()), this, SLOT(randomComplexCaneExampleActionTriggered()));
 	connect(randomComplexPieceAction, SIGNAL(triggered()), this, SLOT(randomComplexPieceExampleActionTriggered()));
 
+	connect(web1PieceAction, SIGNAL(triggered()), this, SLOT(web1PieceExampleActionTriggered()));
+
 	connect(depthPeelAction, SIGNAL(triggered()), this, SLOT(depthPeelActionTriggered()));
 }
 
@@ -680,6 +688,23 @@ void MainWindow :: depthPeelActionTriggered()
 	NiceViewWidget::peelEnable = !(NiceViewWidget::peelEnable);
 	depthPeelAction->setChecked(NiceViewWidget::peelEnable);
 	emit someDataChanged();
+}
+
+void MainWindow :: web1PieceExampleActionTriggered()
+{
+	GlassColor* gc;
+	PullPlan *pp1, *pp2;
+	Piece* p;
+
+	web1Piece(&gc, &pp1, &pp2, &p);
+	
+	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(gc));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pp1));	
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pp2));	
+	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(p));	
+
+	pieceEditorWidget->setPiece(p);
+	setViewMode(PIECE_VIEW_MODE);
 }
 
 void MainWindow :: randomSimpleCaneExampleActionTriggered()
@@ -746,7 +771,6 @@ void MainWindow :: randomComplexPieceExampleActionTriggered()
 		colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC1));
 	if (randomP->hasDependencyOn(randomGC2)) // memory leak if returns no
 		colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC2));
-	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC2));
 	if (randomP->hasDependencyOn(randomCPP)) // memory leak if returns no
 		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomCPP));
 	if (randomP->hasDependencyOn(randomSPP)) // memory leak if returns no

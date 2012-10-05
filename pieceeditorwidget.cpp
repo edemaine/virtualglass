@@ -35,30 +35,26 @@ void PieceEditorWidget :: updateEverything()
 		// get parameter info
 		TemplateParameter tp;
 		piece->pickup->getParameter(i, &tp);
-
-		// setup name
 		pickupParamLabels[i]->setText(tp.name.c_str());
 
-		// setup spinbox and slider values and ranges
-
-		// have to disconnect signals to avoid (bug?) valueChanged()
-		// signals from being sent when the ranges are set
+		// temporarily disconnect the signals because 
+		// it appears that (bugged?) setRange() calls valueChanged()
 		disconnect(pickupParamSpinboxes[i], SIGNAL(valueChanged(int)),
 			this, SLOT(pickupParameterSpinBoxChanged(int)));
 		disconnect(pickupParamSliders[i], SIGNAL(valueChanged(int)),
 			this, SLOT(pickupParameterSliderChanged(int)));
 		pickupParamSpinboxes[i]->setRange(tp.lowerLimit, tp.upperLimit);
+		pickupParamSpinboxes[i]->setValue(tp.value);
 		pickupParamSliders[i]->setRange(tp.lowerLimit, tp.upperLimit);
+		pickupParamSliders[i]->setValue(tp.value);
 		connect(pickupParamSpinboxes[i], SIGNAL(valueChanged(int)),
 			this, SLOT(pickupParameterSpinBoxChanged(int)));
 		connect(pickupParamSliders[i], SIGNAL(valueChanged(int)),
 			this, SLOT(pickupParameterSliderChanged(int)));
 
-		pickupParamSpinboxes[i]->setValue(tp.value);
-		pickupParamSliders[i]->setValue(tp.value);
 		pickupParamWidgets[i]->show();
 	}
-	for (; i < 2; ++i)
+	for (; i < pickupParamWidgets.size(); ++i)
 	{
 		pickupParamWidgets[i]->hide();
 	}
@@ -85,19 +81,17 @@ void PieceEditorWidget :: updateEverything()
 		TemplateParameter tp;
 		piece->getParameter(i, &tp);
 		pieceParamLabels[i]->setText(tp.name.c_str());
-
-		// disconnect to avoid (bug?) valueChanged() signals from
-		// being sent when the range is changed	
+		// temporarily disconnect the signals because 
+		// it appears that (bugged?) setRange() calls valueChanged()
 		disconnect(pieceParamSliders[i], SIGNAL(valueChanged(int)),
 			this, SLOT(pieceParameterSliderChanged(int)));
 		pieceParamSliders[i]->setRange(tp.lowerLimit, tp.upperLimit);
-		disconnect(pieceParamSliders[i], SIGNAL(valueChanged(int)),
-			this, SLOT(pieceParameterSliderChanged(int)));
-		
 		pieceParamSliders[i]->setValue(tp.value);
+		connect(pieceParamSliders[i], SIGNAL(valueChanged(int)),
+			this, SLOT(pieceParameterSliderChanged(int)));
 		pieceParamWidgets[i]->show();
 	}
-	for (; i < 3; ++i)
+	for (; i < pieceParamWidgets.size(); ++i)
 	{
 		pieceParamWidgets[i]->hide();
 	}

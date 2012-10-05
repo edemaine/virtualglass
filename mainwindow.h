@@ -22,6 +22,7 @@
 #include "pieceeditorwidget.h"
 #include "glassmime.h"
 #include "randomglass.h"
+#include "exampleglass.h"
 
 class MainWindow : public QMainWindow
 {
@@ -104,6 +105,7 @@ class MainWindow : public QMainWindow
 		QAction *randomSimplePieceAction;
 		QAction *randomComplexCaneAction;
 		QAction *randomComplexPieceAction;
+		QAction *web1PieceAction;
 		QMenu *fileMenu;
 		QAction *openAction;
 		QAction *saveAction;
@@ -127,6 +129,7 @@ class MainWindow : public QMainWindow
 		void randomSimplePieceExampleActionTriggered();
 		void randomComplexCaneExampleActionTriggered();
 		void randomComplexPieceExampleActionTriggered();
+		void web1PieceExampleActionTriggered();
 		void depthPeelActionTriggered();
 };
 
