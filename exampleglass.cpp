@@ -4,11 +4,11 @@
 void web1Piece(GlassColor** gc, PullPlan** pp1, PullPlan** pp2, Piece** p)
 {
 	Color c;
-	c.r = 20/255.0;
-	c.g = 0.0;
-	c.b = 180/255.0;
-	c.a = 0.3;
-	*gc = new GlassColor(c, "");
+	c.r = 19/255.0;
+	c.g = 74/255.0;
+	c.b = 223/255.0;
+	c.a = 0.5;
+	*gc = new GlassColor(c, "R-45");
 
 	*pp1 = new PullPlan(PullTemplate::BASE_SQUARE);	
 	(*pp1)->setOutermostCasingShape(SQUARE_SHAPE);
