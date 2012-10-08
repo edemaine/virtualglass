@@ -345,9 +345,13 @@ void MainWindow::setupMenus()
 	fileMenu->addAction(saveAction); //add saveButton
 	fileMenu->addAction(saveAsAction); //add saveAsButton
 
-	//examples:random:simple cane
-	web1PieceAction = new QAction("Web example 1", this);
-	web1PieceAction->setStatusTip("The first example found on virtualglass.org");
+	//examples:webtutorial1
+	web1PieceAction = new QAction("Tutorial 1", this);
+	web1PieceAction->setStatusTip("The first tutorial found on virtualglass.org");
+
+	//examples:webtutorial2
+	web2PieceAction = new QAction("Tutorial 2", this);
+	web2PieceAction->setStatusTip("The second tutorial found on virtualglass.org");
 
 	//examples:random:simple cane
 	randomSimpleCaneAction = new QAction("&Simple Cane", this);
@@ -366,8 +370,10 @@ void MainWindow::setupMenus()
 	randomComplexPieceAction->setStatusTip("Randomly generate a complex example piece.");
 
 	// Examples menu and Examples:Random menu
-	examplesMenu = menuBar()->addMenu("&Examples"); //create randomize menu
-	examplesMenu->addAction(web1PieceAction);
+	examplesMenu = menuBar()->addMenu("&Examples"); //create menu for cane/piece examples
+	webExamplesMenu = examplesMenu->addMenu("&Web");
+	webExamplesMenu->addAction(web1PieceAction); 
+	webExamplesMenu->addAction(web2PieceAction); 
 	randomExamplesMenu = examplesMenu->addMenu("&Random");
 	randomExamplesMenu->addAction(randomSimpleCaneAction);
 	randomExamplesMenu->addAction(randomComplexCaneAction);
@@ -679,6 +685,7 @@ void MainWindow :: setupConnections()
 	connect(randomComplexPieceAction, SIGNAL(triggered()), this, SLOT(randomComplexPieceExampleActionTriggered()));
 
 	connect(web1PieceAction, SIGNAL(triggered()), this, SLOT(web1PieceExampleActionTriggered()));
+	connect(web2PieceAction, SIGNAL(triggered()), this, SLOT(web2PieceExampleActionTriggered()));
 
 	connect(depthPeelAction, SIGNAL(triggered()), this, SLOT(depthPeelActionTriggered()));
 }
@@ -693,10 +700,26 @@ void MainWindow :: depthPeelActionTriggered()
 void MainWindow :: web1PieceExampleActionTriggered()
 {
 	GlassColor* gc;
+	PullPlan *pp;
+	Piece* p;
+
+	web1Piece(&gc, &pp, &p);
+
+	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(gc));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pp));	
+	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(p));	
+
+	pieceEditorWidget->setPiece(p);
+	setViewMode(PIECE_VIEW_MODE);
+}
+
+void MainWindow :: web2PieceExampleActionTriggered()
+{
+	GlassColor* gc;
 	PullPlan *pp1, *pp2;
 	Piece* p;
 
-	web1Piece(&gc, &pp1, &pp2, &p);
+	web2Piece(&gc, &pp1, &pp2, &p);
 	
 	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(gc));
 	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pp1));	

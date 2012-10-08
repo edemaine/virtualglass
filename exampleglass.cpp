@@ -1,7 +1,30 @@
 
 #include "exampleglass.h"
 
-void web1Piece(GlassColor** gc, PullPlan** pp1, PullPlan** pp2, Piece** p)
+void web1Piece(GlassColor** gc, PullPlan** pp, Piece** p)
+{
+	Color c;
+	c.r = 29/255.0;
+	c.g = 160/255.0;
+	c.b = 91/255.0;
+	c.a = 0.5;
+	*gc = new GlassColor(c, "R-27");
+
+	*pp = new PullPlan(PullTemplate::BASE_CIRCLE);	
+	(*pp)->setCasingColor(*gc, 0);
+	(*pp)->setCasingThickness(0.4, 0);
+
+	*p = new Piece(PieceTemplate::BOWL);
+	(*p)->pickup->setTemplateType(PickupTemplate::VERTICAL);
+	(*p)->pickup->setParameter(0, 15);	
+	for (unsigned int i = 0; i < (*p)->pickup->subs.size(); ++i)
+		(*p)->pickup->subs[i].plan = (*pp);
+	(*p)->setParameter(0, 20);
+	(*p)->setParameter(1, 65);
+	(*p)->setParameter(2, 40);
+}
+
+void web2Piece(GlassColor** gc, PullPlan** pp1, PullPlan** pp2, Piece** p)
 {
 	Color c;
 	c.r = 19/255.0;

@@ -12,7 +12,9 @@
 #include "piecetemplate.h"
 #include "shape.h"
 
-void web1Piece(GlassColor** gc, PullPlan** pp1, PullPlan** pp2, Piece** p);
+void web1Piece(GlassColor** gc, PullPlan** pp, Piece** p);
+
+void web2Piece(GlassColor** gc, PullPlan** pp1, PullPlan** pp2, Piece** p);
 
 #endif
 
