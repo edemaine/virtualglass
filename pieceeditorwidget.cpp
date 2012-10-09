@@ -142,14 +142,15 @@ void PieceEditorWidget :: pickupParameterSliderChanged(int)
 
 void PieceEditorWidget :: setupLayout()
 {
-	QHBoxLayout* piecePageLayout = new QHBoxLayout(this);
-	this->setLayout(piecePageLayout);
+	QGridLayout* editorLayout = new QGridLayout(this);
+	this->setLayout(editorLayout);
 
-	// Left (pickup) layout
-	QVBoxLayout* leftLayout = new QVBoxLayout(this);
-	piecePageLayout->addLayout(leftLayout, 1);
-	leftLayout->addWidget(pickupViewWidget, 1);
+	// two 3D views in the first row (and stretched to take up all the slack space 
+	editorLayout->addWidget(pickupViewWidget, 0, 0); 
+	editorLayout->addWidget(niceViewWidget, 0, 1); 
+	editorLayout->setRowStretch(0, 10);
 
+	// pickup template and piece template selectors in the second row
 	QWidget* pickupTemplateLibraryWidget = new QWidget(this);
 	pickupTemplateLibraryLayout = new QHBoxLayout(pickupTemplateLibraryWidget);
 	pickupTemplateLibraryLayout->setSpacing(10);
@@ -162,7 +163,27 @@ void PieceEditorWidget :: setupLayout()
 	pickupTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	pickupTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pickupTemplateLibraryScrollArea->setFixedHeight(130);
-	leftLayout->addWidget(pickupTemplateLibraryScrollArea, 0);
+	editorLayout->addWidget(pickupTemplateLibraryScrollArea, 1, 0);
+
+	QWidget* pieceTemplateLibraryWidget = new QWidget(this);
+	pieceTemplateLibraryLayout = new QHBoxLayout(pieceTemplateLibraryWidget);
+	pieceTemplateLibraryLayout->setSpacing(10);
+	pieceTemplateLibraryWidget->setLayout(pieceTemplateLibraryLayout);
+
+	QScrollArea* pieceTemplateLibraryScrollArea = new QScrollArea(this);
+	pieceTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
+	pieceTemplateLibraryScrollArea->setWidget(pieceTemplateLibraryWidget);
+	pieceTemplateLibraryScrollArea->setWidgetResizable(true);
+	pieceTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	pieceTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	pieceTemplateLibraryScrollArea->setFixedHeight(130);
+	editorLayout->addWidget(pieceTemplateLibraryScrollArea, 1, 1);
+
+	// layouts containing pickup and piece template parameters in the third row
+
+	// Pickup parameter layout
+	QVBoxLayout* pickupParamLayout = new QVBoxLayout(this);
+	editorLayout->addLayout(pickupParamLayout, 2, 0);
 
 	pickupParamStacks.push_back(new QStackedWidget(this));
 	QWidget* pickupParameter1Widget = new QWidget(pickupParamStacks[0]);
@@ -180,7 +201,7 @@ void PieceEditorWidget :: setupLayout()
 	pickupParameter1Layout->addWidget(pickupParameter1Slider);
 	pickupParamStacks[0]->addWidget(pickupParameter1Widget);
 	pickupParamStacks[0]->addWidget(new QWidget(pickupParamStacks[0]));
-	leftLayout->addWidget(pickupParamStacks[0]);
+	pickupParamLayout->addWidget(pickupParamStacks[0]);
 
 	pickupParamStacks.push_back(new QStackedWidget(this));
 	QWidget* pickupParameter2Widget = new QWidget(pickupParamStacks[1]);
@@ -198,30 +219,15 @@ void PieceEditorWidget :: setupLayout()
 	pickupParameter2Layout->addWidget(pickupParameter2Slider);
 	pickupParamStacks[1]->addWidget(pickupParameter2Widget);
 	pickupParamStacks[1]->addWidget(new QWidget(pickupParamStacks[1]));
-	leftLayout->addWidget(pickupParamStacks[1]);
+	pickupParamLayout->addWidget(pickupParamStacks[1]);
 
 	QLabel* pieceEditorDescriptionLabel = new QLabel("Pickup editor - drag canes in.", this);
 	pieceEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	leftLayout->addWidget(pieceEditorDescriptionLabel, 0);
+	pickupParamLayout->addWidget(pieceEditorDescriptionLabel);
 
-	// Right (piece) layout
-	QVBoxLayout* rightLayout = new QVBoxLayout(this);
-	piecePageLayout->addLayout(rightLayout, 1);
-	rightLayout->addWidget(niceViewWidget, 10);
-
-	QWidget* pieceTemplateLibraryWidget = new QWidget(this);
-	pieceTemplateLibraryLayout = new QHBoxLayout(pieceTemplateLibraryWidget);
-	pieceTemplateLibraryLayout->setSpacing(10);
-	pieceTemplateLibraryWidget->setLayout(pieceTemplateLibraryLayout);
-
-	QScrollArea* pieceTemplateLibraryScrollArea = new QScrollArea(this);
-	pieceTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
-	pieceTemplateLibraryScrollArea->setWidget(pieceTemplateLibraryWidget);
-	pieceTemplateLibraryScrollArea->setWidgetResizable(true);
-	pieceTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	pieceTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	pieceTemplateLibraryScrollArea->setFixedHeight(130);
-	rightLayout->addWidget(pieceTemplateLibraryScrollArea, 0);
+	// Piece parameter layout 
+	QVBoxLayout* pieceParamLayout = new QVBoxLayout(this);
+	editorLayout->addLayout(pieceParamLayout, 2, 1);
 
 	pieceParamStacks.push_back(new QStackedWidget(this));
 	QWidget* pieceParameter1Widget = new QWidget(pieceParamStacks[0]);
@@ -236,7 +242,7 @@ void PieceEditorWidget :: setupLayout()
 	pieceParameter1Layout->addWidget(pieceParameter1Slider);
 	pieceParamStacks[0]->addWidget(pieceParameter1Widget);
 	pieceParamStacks[0]->addWidget(new QWidget());
-	rightLayout->addWidget(pieceParamStacks[0]);
+	pieceParamLayout->addWidget(pieceParamStacks[0]);
 
 	pieceParamStacks.push_back(new QStackedWidget(this));
 	QWidget* pieceParameter2Widget = new QWidget(pieceParamStacks[1]);
@@ -251,7 +257,7 @@ void PieceEditorWidget :: setupLayout()
 	pieceParameter2Layout->addWidget(pieceTemplateParameter2Slider);
 	pieceParamStacks[1]->addWidget(pieceParameter2Widget);
 	pieceParamStacks[1]->addWidget(new QWidget());
-	rightLayout->addWidget(pieceParamStacks[1]);
+	pieceParamLayout->addWidget(pieceParamStacks[1]);
 
 	pieceParamStacks.push_back(new QStackedWidget(this));
 	QWidget* pieceParameter3Widget = new QWidget(pieceParamStacks[2]);
@@ -266,11 +272,11 @@ void PieceEditorWidget :: setupLayout()
 	pieceParameter3Layout->addWidget(pieceParameter3Slider);
 	pieceParamStacks[2]->addWidget(pieceParameter3Widget);
 	pieceParamStacks[2]->addWidget(new QWidget());
-	rightLayout->addWidget(pieceParamStacks[2]);
+	pieceParamLayout->addWidget(pieceParamStacks[2]);
 	
 	QLabel* niceViewDescriptionLabel = new QLabel("Piece editor.", this);
 	niceViewDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	rightLayout->addWidget(niceViewDescriptionLabel, 0);
+	pieceParamLayout->addWidget(niceViewDescriptionLabel);
 }
 
 
