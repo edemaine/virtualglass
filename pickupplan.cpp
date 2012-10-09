@@ -220,7 +220,7 @@ void PickupPlan :: setTemplateType(enum PickupTemplate::Type _type, bool force) 
 			parameters.push_back(TemplateParameter(10, string("Column count"), 6, 30));
 			break;
 		case PickupTemplate::MURRINE:
-			parameters.push_back(TemplateParameter(5, string("Row/Column count"), 5, 10));
+			parameters.push_back(TemplateParameter(6, string("Row/Column count"), 6, 14));
 			parameters.push_back(TemplateParameter(10, string("Thickness"), 1, 40));
 			break;
 		case PickupTemplate::RETICELLO_VERTICAL_HORIZONTAL:

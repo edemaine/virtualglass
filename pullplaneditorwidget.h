@@ -38,16 +38,16 @@ class PullPlanEditorWidget : public QWidget
 		void squareCasingButtonPressed();
 		void addCasingButtonPressed();
 		void removeCasingButtonPressed();
-        void addCircleButtonPressed();
-        void addSquareButtonPressed();
-        void copySelectedButtonPressed();
-        void deleteSelectedButtonPressed();
-        void viewWidgetDataChanged();
-        void customizeViewWidgetDataChanged();
+		void addCircleButtonPressed();
+		void addSquareButtonPressed();
+		void copySelectedButtonPressed();
+		void deleteSelectedButtonPressed();
+		void viewWidgetDataChanged();
+		void customizeViewWidgetDataChanged();
 		void twistSpinChanged(int);
 		void twistSliderChanged(int);
 		void paramSpinChanged(int);
-        void tabChanged(int);
+		void tabChanged(int);
 
 	private:
 		Geometry geometry;
@@ -59,6 +59,7 @@ class PullPlanEditorWidget : public QWidget
 		QSlider* twistSlider;
 		vector<QLabel*> paramLabels;
 		vector<QSpinBox*> paramSpins;
+		QStackedWidget* paramStack;
         	QHBoxLayout* templateLibraryLayout;
 		QPushButton* addCasingButton;
 		QPushButton* removeCasingButton;

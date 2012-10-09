@@ -52,11 +52,11 @@ void PieceEditorWidget :: updateEverything()
 		connect(pickupParamSliders[i], SIGNAL(valueChanged(int)),
 			this, SLOT(pickupParameterSliderChanged(int)));
 
-		pickupParamWidgets[i]->show();
+		pickupParamStacks[i]->setCurrentIndex(0); // show
 	}
-	for (; i < pickupParamWidgets.size(); ++i)
+	for (; i < pickupParamStacks.size(); ++i)
 	{
-		pickupParamWidgets[i]->hide();
+		pickupParamStacks[i]->setCurrentIndex(1); // hide
 	}
 
 	// update piece stuff
@@ -89,11 +89,12 @@ void PieceEditorWidget :: updateEverything()
 		pieceParamSliders[i]->setValue(tp.value);
 		connect(pieceParamSliders[i], SIGNAL(valueChanged(int)),
 			this, SLOT(pieceParameterSliderChanged(int)));
-		pieceParamWidgets[i]->show();
+
+		pieceParamStacks[i]->setCurrentIndex(0); // show
 	}
-	for (; i < pieceParamWidgets.size(); ++i)
+	for (; i < pieceParamStacks.size(); ++i)
 	{
-		pieceParamWidgets[i]->hide();
+		pieceParamStacks[i]->setCurrentIndex(1); // hide
 	}
 }
 
@@ -163,7 +164,8 @@ void PieceEditorWidget :: setupLayout()
 	pickupTemplateLibraryScrollArea->setFixedHeight(130);
 	leftLayout->addWidget(pickupTemplateLibraryScrollArea, 0);
 
-	QWidget* pickupParameter1Widget = new QWidget(this);
+	pickupParamStacks.push_back(new QStackedWidget(this));
+	QWidget* pickupParameter1Widget = new QWidget(pickupParamStacks[0]);
 	QLabel* pickupParameter1Label = new QLabel("Parameter 1");
 	pickupParamLabels.push_back(pickupParameter1Label);
 	QSpinBox* pickupParameter1SpinBox = new QSpinBox(pickupParameter1Widget);
@@ -173,13 +175,15 @@ void PieceEditorWidget :: setupLayout()
 	QHBoxLayout* pickupParameter1Layout = new QHBoxLayout(pickupParameter1Widget);
 	pickupParameter1Widget->setLayout(pickupParameter1Layout);
 	pickupParameter1Layout->setContentsMargins(0, 0, 0, 0);
-	pickupParameter1Layout->addWidget(pickupParameter1Label, 0);
-	pickupParameter1Layout->addWidget(pickupParameter1SpinBox, 0);
-	pickupParameter1Layout->addWidget(pickupParameter1Slider, 1);
-	leftLayout->addWidget(pickupParameter1Widget, 0);
-	pickupParamWidgets.push_back(pickupParameter1Widget);
+	pickupParameter1Layout->addWidget(pickupParameter1Label);
+	pickupParameter1Layout->addWidget(pickupParameter1SpinBox);
+	pickupParameter1Layout->addWidget(pickupParameter1Slider);
+	pickupParamStacks[0]->addWidget(pickupParameter1Widget);
+	pickupParamStacks[0]->addWidget(new QWidget(pickupParamStacks[0]));
+	leftLayout->addWidget(pickupParamStacks[0]);
 
-	QWidget* pickupParameter2Widget = new QWidget(this);
+	pickupParamStacks.push_back(new QStackedWidget(this));
+	QWidget* pickupParameter2Widget = new QWidget(pickupParamStacks[1]);
 	QLabel* pickupParameter2Label = new QLabel("Parameter 2");
 	pickupParamLabels.push_back(pickupParameter2Label);
 	QSpinBox* pickupParameter2SpinBox = new QSpinBox(pickupParameter2Widget);
@@ -189,13 +193,13 @@ void PieceEditorWidget :: setupLayout()
 	QHBoxLayout* pickupParameter2Layout = new QHBoxLayout(pickupParameter2Widget);
 	pickupParameter2Widget->setLayout(pickupParameter2Layout);
 	pickupParameter2Layout->setContentsMargins(0, 0, 0, 0);
-	pickupParameter2Layout->addWidget(pickupParameter2Label, 0);
-	pickupParameter2Layout->addWidget(pickupParameter2SpinBox, 0);
-	pickupParameter2Layout->addWidget(pickupParameter2Slider, 1);
-	leftLayout->addWidget(pickupParameter2Widget, 0);
-	pickupParamWidgets.push_back(pickupParameter2Widget);
+	pickupParameter2Layout->addWidget(pickupParameter2Label);
+	pickupParameter2Layout->addWidget(pickupParameter2SpinBox);
+	pickupParameter2Layout->addWidget(pickupParameter2Slider);
+	pickupParamStacks[1]->addWidget(pickupParameter2Widget);
+	pickupParamStacks[1]->addWidget(new QWidget(pickupParamStacks[1]));
+	leftLayout->addWidget(pickupParamStacks[1]);
 
-	leftLayout->addStretch(0);
 	QLabel* pieceEditorDescriptionLabel = new QLabel("Pickup editor - drag canes in.", this);
 	pieceEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	leftLayout->addWidget(pieceEditorDescriptionLabel, 0);
@@ -219,20 +223,23 @@ void PieceEditorWidget :: setupLayout()
 	pieceTemplateLibraryScrollArea->setFixedHeight(130);
 	rightLayout->addWidget(pieceTemplateLibraryScrollArea, 0);
 
-	QWidget* pieceParameter1Widget = new QWidget(this);
-	QLabel* pieceTemplateParameter1Label = new QLabel("Parameter 1");
-	pieceParamLabels.push_back(pieceTemplateParameter1Label);
-	QSlider* pieceTemplateParameter1Slider = new QSlider(Qt::Horizontal, pieceParameter1Widget);
-	pieceParamSliders.push_back(pieceTemplateParameter1Slider);
+	pieceParamStacks.push_back(new QStackedWidget(this));
+	QWidget* pieceParameter1Widget = new QWidget(pieceParamStacks[0]);
+	QLabel* pieceParameter1Label = new QLabel("Parameter 1");
+	pieceParamLabels.push_back(pieceParameter1Label);
+	QSlider* pieceParameter1Slider = new QSlider(Qt::Horizontal, pieceParameter1Widget);
+	pieceParamSliders.push_back(pieceParameter1Slider);
 	QHBoxLayout* pieceParameter1Layout = new QHBoxLayout(pieceParameter1Widget);
 	pieceParameter1Widget->setLayout(pieceParameter1Layout);
 	pieceParameter1Layout->setContentsMargins(0, 0, 0, 0);
-	pieceParameter1Layout->addWidget(pieceTemplateParameter1Label);
-	pieceParameter1Layout->addWidget(pieceTemplateParameter1Slider);
-	pieceParamWidgets.push_back(pieceParameter1Widget);
-	rightLayout->addWidget(pieceParameter1Widget);
+	pieceParameter1Layout->addWidget(pieceParameter1Label);
+	pieceParameter1Layout->addWidget(pieceParameter1Slider);
+	pieceParamStacks[0]->addWidget(pieceParameter1Widget);
+	pieceParamStacks[0]->addWidget(new QWidget());
+	rightLayout->addWidget(pieceParamStacks[0]);
 
-	QWidget* pieceParameter2Widget = new QWidget(this);
+	pieceParamStacks.push_back(new QStackedWidget(this));
+	QWidget* pieceParameter2Widget = new QWidget(pieceParamStacks[1]);
 	QLabel* pieceTemplateParameter2Label = new QLabel("Parameter 2");
 	pieceParamLabels.push_back(pieceTemplateParameter2Label);
 	QSlider* pieceTemplateParameter2Slider = new QSlider(Qt::Horizontal, pieceParameter2Widget);
@@ -242,21 +249,24 @@ void PieceEditorWidget :: setupLayout()
 	pieceParameter2Layout->setContentsMargins(0, 0, 0, 0);
 	pieceParameter2Layout->addWidget(pieceTemplateParameter2Label);
 	pieceParameter2Layout->addWidget(pieceTemplateParameter2Slider);
-	pieceParamWidgets.push_back(pieceParameter2Widget);
-	rightLayout->addWidget(pieceParameter2Widget);
+	pieceParamStacks[1]->addWidget(pieceParameter2Widget);
+	pieceParamStacks[1]->addWidget(new QWidget());
+	rightLayout->addWidget(pieceParamStacks[1]);
 
-	QWidget* pieceParameter3Widget = new QWidget(this);
-	QLabel* pieceTemplateParameter3Label = new QLabel("Parameter 3");
-	pieceParamLabels.push_back(pieceTemplateParameter3Label);
-	QSlider* pieceTemplateParameter3Slider = new QSlider(Qt::Horizontal, pieceParameter3Widget);
-	pieceParamSliders.push_back(pieceTemplateParameter3Slider);
+	pieceParamStacks.push_back(new QStackedWidget(this));
+	QWidget* pieceParameter3Widget = new QWidget(pieceParamStacks[2]);
+	QLabel* pieceParameter3Label = new QLabel("Parameter 3");
+	pieceParamLabels.push_back(pieceParameter3Label);
+	QSlider* pieceParameter3Slider = new QSlider(Qt::Horizontal, pieceParameter3Widget);
+	pieceParamSliders.push_back(pieceParameter3Slider);
 	QHBoxLayout* pieceParameter3Layout = new QHBoxLayout(pieceParameter3Widget);
 	pieceParameter3Widget->setLayout(pieceParameter3Layout);
 	pieceParameter3Layout->setContentsMargins(0, 0, 0, 0);
-	pieceParameter3Layout->addWidget(pieceTemplateParameter3Label);
-	pieceParameter3Layout->addWidget(pieceTemplateParameter3Slider);
-	pieceParamWidgets.push_back(pieceParameter3Widget);
-	rightLayout->addWidget(pieceParameter3Widget);
+	pieceParameter3Layout->addWidget(pieceParameter3Label);
+	pieceParameter3Layout->addWidget(pieceParameter3Slider);
+	pieceParamStacks[2]->addWidget(pieceParameter3Widget);
+	pieceParamStacks[2]->addWidget(new QWidget());
+	rightLayout->addWidget(pieceParamStacks[2]);
 	
 	QLabel* niceViewDescriptionLabel = new QLabel("Piece editor.", this);
 	niceViewDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);

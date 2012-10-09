@@ -39,23 +39,37 @@ void PullPlanEditorWidget :: updateEverything()
 
 	customizeViewWidget->setPullPlan(plan);
 
+	// we always keep the first parameter shown so that the stack widget
+	// occupies the correct region, even if the template has no parameters
+	// parameters 2..k are hidden, though
+	if (plan->getParameterCount() > 0)
+		paramStack->setCurrentIndex(0);
+	else 
+		paramStack->setCurrentIndex(1);
+	
 	unsigned int i = 0;
 	for (; i < plan->getParameterCount(); ++i)
 	{
 		TemplateParameter tp;
 		plan->getParameter(i, &tp);
 		paramLabels[i]->setText(tp.name.c_str());
-		paramLabels[i]->show();
                 disconnect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
 		paramSpins[i]->setRange(tp.lowerLimit, tp.upperLimit);
                 connect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
 		paramSpins[i]->setValue(tp.value);
-		paramSpins[i]->show();
+		if (i != 0)
+		{
+			paramLabels[i]->show();
+			paramSpins[i]->show();
+		}
 	}
 	for (; i < paramLabels.size(); ++i)
 	{
-		paramLabels[i]->hide();
-		paramSpins[i]->hide();
+		if (i != 0)
+		{
+			paramLabels[i]->hide();
+			paramSpins[i]->hide();
+		}
 	}
 
 	geometry.clear();
@@ -141,22 +155,25 @@ void PullPlanEditorWidget :: setupLayout()
 	twistLayout->addWidget(twistLabel3);
 
 	// Editor layout: parameter spin stuff
-	QHBoxLayout* paramLayout = new QHBoxLayout(editorWidget);
-	paramLabels.push_back(new QLabel("Param 1:", editorWidget));
-	paramLabels.push_back(new QLabel("Param 2:", editorWidget));
-	paramLabels.push_back(new QLabel("Param 3:", editorWidget));
-	paramSpins.push_back(new QSpinBox(editorWidget));
-	paramSpins.push_back(new QSpinBox(editorWidget));
-	paramSpins.push_back(new QSpinBox(editorWidget));
+	paramStack = new QStackedWidget(editorWidget); 
+	QWidget* paramWidget = new QWidget(paramStack);
+	paramStack->addWidget(paramWidget);
+	QHBoxLayout* paramLayout = new QHBoxLayout(paramWidget);
+	paramWidget->setLayout(paramLayout);
+        paramLayout->setContentsMargins(0, 0, 0, 0);
+	paramLabels.push_back(new QLabel("Param 1:", paramWidget));
+	paramLabels.push_back(new QLabel("Param 2:", paramWidget));
+	paramLabels.push_back(new QLabel("Param 3:", paramWidget));
+	paramSpins.push_back(new QSpinBox(paramWidget));
+	paramSpins.push_back(new QSpinBox(paramWidget));
+	paramSpins.push_back(new QSpinBox(paramWidget));
 	for (unsigned int i = 0; i < paramLabels.size(); ++i)
 	{
-		paramLayout->addWidget(paramLabels[i], 0);
-		paramLayout->addWidget(paramSpins[i], 0);
-		paramLabels[i]->hide();
-		paramSpins[i]->hide();
+		paramLayout->addWidget(paramLabels[i]);
+		paramLayout->addWidget(paramSpins[i]);
 	}
-	editorLayout->addLayout(paramLayout, 0);	
-	editorLayout->addStretch(0);
+	paramStack->addWidget(new QWidget(paramStack));
+	editorLayout->addWidget(paramStack);	
 
 	// Customize layout
 	QWidget* customizeWidget = new QWidget(this);

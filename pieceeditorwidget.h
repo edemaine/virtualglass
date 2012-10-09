@@ -50,10 +50,10 @@ class PieceEditorWidget : public QWidget
 		vector<QLabel*> pickupParamLabels;
 		vector<QSpinBox*> pickupParamSpinboxes;
 		vector<QSlider*> pickupParamSliders;
-		vector<QWidget*> pickupParamWidgets;
+		vector<QStackedWidget*> pickupParamStacks;
 		vector<QLabel*> pieceParamLabels;
 		vector<QSlider*> pieceParamSliders;
-		vector<QWidget*> pieceParamWidgets;
+		vector<QStackedWidget*> pieceParamStacks;
 
 		QHBoxLayout* pickupTemplateLibraryLayout;
 		QHBoxLayout* pieceTemplateLibraryLayout;
