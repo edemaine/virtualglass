@@ -6,7 +6,6 @@
 #include "asyncpiecelibrarywidget.h"
 #include "asyncpullplanlibrarywidget.h"
 #include "asynccolorbarlibrarywidget.h"
-#include "globalglass.h"
 #include "pullplan.h"
 #include "pickupplan.h"
 #include "piece.h"
@@ -449,8 +448,6 @@ QString MainWindow :: windowTitle()
 
 void MainWindow :: seedEverything()
 {
-	GlobalGlass::initialize();
-
 	// Load color stuff
 	setViewMode(COLORBAR_VIEW_MODE);
 	colorEditorWidget->seedColors();

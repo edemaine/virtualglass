@@ -5,9 +5,19 @@ its extent. As this object handles mouse clicks and movement,
 it is involved in modifying the cane.
 */
 
+#ifdef _WIN32
+#  include <windows.h>
+#endif
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <algorithm>
+#include <stdexcept>
+#include "constants.h"
 #include "niceviewwidget.h"
 
-#include <stdexcept>
+using namespace std;
 
 namespace {
 void gl_errors(string const &where) {

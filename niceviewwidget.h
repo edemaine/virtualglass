@@ -2,20 +2,13 @@
 #define NICEVIEWWIDGET_H
 
 #include "glew.h"
-
 #ifdef _WIN32
 #  include <windows.h>
 #endif
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include <algorithm>
 #include <QtGui>
 #include <QGLFramebufferObject>
 #include <qgl.h>
 #include "primitives.h"
-#include "constants.h"
 #include "geometry.h"
 #include "peelrenderer.h"
 

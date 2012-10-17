@@ -29,9 +29,8 @@ using std::string;
 PullPlan :: PullPlan(PullTemplate::Type _templateType)
 {
 	// setup default casings
-	assert(GlobalGlass::ready);
-	casings.push_back(Casing(0.9, CIRCLE_SHAPE, GlobalGlass::color));
-	casings.push_back(Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color));
+	casings.push_back(Casing(0.9, CIRCLE_SHAPE, GlobalGlass::color()));
+	casings.push_back(Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
 
 	// setup default twist
 	twist = 0;
@@ -252,8 +251,7 @@ void PullPlan :: addCasing(enum GeometricShape _shape) {
 	}
 
 	// add the new casing
-	assert(GlobalGlass::ready);
-	casings.push_back(Casing(1.0, _shape, GlobalGlass::color));
+	casings.push_back(Casing(1.0, _shape, GlobalGlass::color()));
 	if (hasSquareCasing())
 		this->twist = 0.0;
 
@@ -342,12 +340,10 @@ void PullPlan :: pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs
 		switch (_shape) 
 		{
 			case CIRCLE_SHAPE:
-				assert(GlobalGlass::ready);
-				plan = GlobalGlass::circlePlan;
+				plan = GlobalGlass::circlePlan();
 				break;
 			case SQUARE_SHAPE:
-				assert(GlobalGlass::ready);
-				plan = GlobalGlass::squarePlan;
+				plan = GlobalGlass::squarePlan();
 				break;
 		}
 	}

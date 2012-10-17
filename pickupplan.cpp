@@ -14,7 +14,7 @@ using std::string;
 
 PickupPlan :: PickupPlan(enum PickupTemplate::Type _type) {
 
-	casingGlassColor = underlayGlassColor = overlayGlassColor = GlobalGlass::color;
+	casingGlassColor = underlayGlassColor = overlayGlassColor = GlobalGlass::color();
 	setTemplateType(_type, true);
 }
 
@@ -50,7 +50,7 @@ void PickupPlan :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
 	}
 	else // you've run out of existing subplans copy from
 	{
-		newSubs->push_back(SubpickupTemplate(GlobalGlass::circlePlan,
+		newSubs->push_back(SubpickupTemplate(GlobalGlass::circlePlan(),
 			location, ori, length, width, shape));
 	}
 }
