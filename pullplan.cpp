@@ -1,8 +1,4 @@
 
-#include <cstdio>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string>
 #include "casing.h"
 #include "glasscolor.h"
 #include "constants.h"
@@ -24,7 +20,6 @@ using std::unordered_set;
 
 using std::pair;
 using std::make_pair;
-using std::string;
 
 PullPlan :: PullPlan(PullTemplate::Type _templateType)
 {

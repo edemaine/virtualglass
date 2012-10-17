@@ -1,6 +1,4 @@
 
-#include <cstdio>
-#include <string>
 #include "constants.h"
 #include "templateparameter.h"
 #include "subpickuptemplate.h"
@@ -9,8 +7,6 @@
 #include "pullplan.h"
 #include "glasscolor.h"
 #include "pickupplan.h"
-
-using std::string;
 
 PickupPlan :: PickupPlan(enum PickupTemplate::Type _type) {
 
