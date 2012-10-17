@@ -1,4 +1,7 @@
 
+#include <QImage>
+#include "geometry.h"
+#include "asyncrenderthread.h"
 #include "asyncrenderinternal.h"
 
 using namespace AsyncRenderInternal;

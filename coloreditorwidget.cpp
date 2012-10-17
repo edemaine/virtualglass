@@ -1,12 +1,23 @@
 
+
+#include <QtGui>
+#include "pullplan.h"
+#include "niceviewwidget.h"
+#include "geometry.h"
+#include "mesh.h"
+#include "purecolorlibrarywidget.h"
+#include "glasscolor.h"
 #include "coloreditorwidget.h"
 
 ColorEditorWidget :: ColorEditorWidget(GlassColor* _glassColor, QWidget* parent) : QWidget(parent)
 {
+	geometry = new Geometry();
+	mesher = new Mesher();
+
 	niceViewWidget = new NiceViewWidget(NiceViewWidget::PULLPLAN_CAMERA_MODE, this);
 	glassColor = _glassColor;
-	mesher.generateColorMesh(glassColor, &geometry);
-	niceViewWidget->setGeometry(&geometry);
+	mesher->generateColorMesh(glassColor, geometry);
+	niceViewWidget->setGeometry(geometry);
 
 	setupLayout();
 	setupConnections();
@@ -175,8 +186,8 @@ void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 void ColorEditorWidget :: updateEverything()
 {
-	geometry.clear();
-	mesher.generateColorMesh(glassColor, &geometry);
+	geometry->clear();
+	mesher->generateColorMesh(glassColor, geometry);
 	niceViewWidget->repaint();
 
 	this->alphaSlider->setSliderPosition(255 - (int) (glassColor->getColor()->a * 255));

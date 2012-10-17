@@ -1,17 +1,14 @@
 #ifndef ASYNCRENDERINTERNAL_H
 #define ASYNCRENDERINTERNAL_H
 
-#include <QtGlobal>
-
+#include <QThread>
+#include <QMutex>
+#include <QWaitCondition>
 #include "glew.h"
-
-#include "asyncrenderthread.h"
+#include <qgl.h>
 #include "asyncrenderwidget.h"
-#include "geometry.h"
-#include <QGLWidget>
 #include <deque>
 #include <vector>
-#include <qgl.h>
 
 using std::deque;
 using std::vector;
@@ -26,25 +23,26 @@ using std::unordered_map;
 #endif
 
 class Geometry;
+class QImage;
 
 namespace AsyncRenderInternal {
-
 
 //------------------------------------------
 // Jobs are passed between threads to get stuff rendered.
 class Job
 {
-public:
-	Job(uint32_t _requesterId, Camera const &_camera, RenderData *_data, Geometry *_geometry = NULL) : requesterId(_requesterId), camera(_camera), data(_data), geometry(_geometry), result(NULL) {
-	}
+	public:
+		Job(uint32_t _requesterId, Camera const &_camera, RenderData *_data, Geometry *_geometry = NULL) 
+			: requesterId(_requesterId), camera(_camera), data(_data), geometry(_geometry), result(NULL) {
+		}
 
-	//deletes data,geometry,result and sets 'em to NULL:
-	void deleteData();
-	uint32_t requesterId;
-	Camera camera;
-	RenderData *data;
-	Geometry *geometry;
-	QImage *result;
+		//deletes data,geometry,result and sets 'em to NULL:
+		void deleteData();
+		uint32_t requesterId;
+		Camera camera;
+		RenderData *data;
+		Geometry *geometry;
+		QImage *result;
 };
 
 //------------------------------------------
@@ -56,38 +54,39 @@ class Controller : public QObject
 	Q_OBJECT
 	friend class RenderThread;
 	friend class ComputeThread;
-//there's a singleton, global render controller you get with this static member function:
-public:
-	static Controller &controller();
-private:
-	Controller();
-	virtual ~Controller();
-	std::vector< QThread * > threads; //kept around so we can wait() on 'em later.
-	bool quitThreads; //how we tell threads to suicide later.
 
-//These functions are called by AsyncRenderWidget constructor/destructor to assign ids to active widgets:
-public:
-	void registerWidget(AsyncRenderWidget *widget);
-	void unregisterWidget(AsyncRenderWidget *widget);
-private:
-	unordered_map< uint32_t, AsyncRenderWidget * > idToWidget;
-	uint32_t freshId;
+	//there's a singleton, global render controller you get with this static member function:
+	public:
+		static Controller &controller();
+	private:
+		Controller();
+		virtual ~Controller();
+		std::vector< QThread * > threads; //kept around so we can wait() on 'em later.
+		bool quitThreads; //how we tell threads to suicide later.
 
-//These functions are called to actually kick off async rendering:
-public:
-	void queue(AsyncRenderWidget *widget, Camera const &camera, RenderData *data);
-	void queue(AsyncRenderWidget *widget, Camera const &camera, Geometry *geometry);
-private:
-	std::deque< Job * > computeQueue;
-	std::deque< Job * > renderQueue;
-	QMutex computeQueueLock;
-	QWaitCondition computeQueueHasData;
-	QMutex renderQueueLock;
-	QWaitCondition renderQueueHasData;
+	//These functions are called by AsyncRenderWidget constructor/destructor to assign ids to active widgets:
+	public:
+		void registerWidget(AsyncRenderWidget *widget);
+		void unregisterWidget(AsyncRenderWidget *widget);
+	private:
+		unordered_map< uint32_t, AsyncRenderWidget * > idToWidget;
+		uint32_t freshId;
 
-//Slot used by render threads to return jobs:
-public slots:
-	void jobFinished(Job *job);
+	//These functions are called to actually kick off async rendering:
+	public:
+		void queue(AsyncRenderWidget *widget, Camera const &camera, RenderData *data);
+		void queue(AsyncRenderWidget *widget, Camera const &camera, Geometry *geometry);
+	private:
+		std::deque< Job * > computeQueue;
+		std::deque< Job * > renderQueue;
+		QMutex computeQueueLock;
+		QWaitCondition computeQueueHasData;
+		QMutex renderQueueLock;
+		QWaitCondition renderQueueHasData;
+
+	//Slot used by render threads to return jobs:
+	public slots:
+		void jobFinished(Job *job);
 };
 
 //------------------------------------------
@@ -96,12 +95,12 @@ public slots:
 
 class ComputeThread : public QThread
 {
-public:
-	ComputeThread(Controller *controller);
-	virtual ~ComputeThread();
-	virtual void run();
+	public:
+		ComputeThread(Controller *controller);
+		virtual ~ComputeThread();
+		virtual void run();
 
-	Controller *controller;
+		Controller *controller;
 };
 
 //------------------------------------------

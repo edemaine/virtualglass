@@ -1,5 +1,5 @@
 
-
+#include <QtGui>
 #include "constants.h"
 #include "dependancy.h"
 #include "niceviewwidget.h"

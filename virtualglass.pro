@@ -63,7 +63,7 @@ HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
 	pulltemplatelibrarywidget.h pickuptemplatelibrarywidget.h piecetemplatelibrarywidget.h \
 	pullplaneditorviewwidget.h pullplaneditorwidget.h \
 	pieceeditorwidget.h coloreditorwidget.h \
-	controller.h geometry.h mesh.h \ 
+	geometry.h mesh.h \ 
 	peelrenderer.h \
 	asyncrenderwidget.h \
 	asyncrenderinternal.h \
@@ -92,7 +92,7 @@ SOURCES += main.cpp \
 	pickuptemplate.cpp \
 	pickupplan.cpp subpickuptemplate.cpp pickupplaneditorviewwidget.cpp \
 	purecolorlibrarywidget.cpp casing.cpp \
-	controller.cpp geometry.cpp mesh.cpp \
+	geometry.cpp mesh.cpp \
 	mainwindow.cpp niceviewwidget.cpp \
 	pulltemplatelibrarywidget.cpp pickuptemplatelibrarywidget.cpp piecetemplatelibrarywidget.cpp \
 	pullplaneditorviewwidget.cpp pullplaneditorwidget.cpp \ 

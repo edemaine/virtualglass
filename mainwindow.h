@@ -3,8 +3,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtGui>
-#include <QObject>
+#include <QMainWindow>
 // <json/json.h>
 
 class GlassColor;
@@ -19,6 +18,17 @@ class PullPlanEditorWidget;
 class ColorEditorWidget;
 class PieceEditorWidget;
 
+class QMouseEvent;
+class QKeyEvent;
+class QLabel;
+class QVBoxLayout; 
+class QHBoxLayout; 
+class QPoint;
+class QStackedWidget;
+class QWidget;
+class QPushButton;
+class QMenu;
+class QAction;
 
 class MainWindow : public QMainWindow
 {

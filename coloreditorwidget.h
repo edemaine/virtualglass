@@ -2,14 +2,22 @@
 #ifndef COLOREDITORWIDGET_H
 #define COLOREDITORWIDGET_H
 
-#include <QtGui>
-#include "pullplan.h"
-#include "niceviewwidget.h"
-#include "geometry.h"
-#include "mesh.h"
-#include "purecolorlibrarywidget.h"
-#include "glasscolor.h"
+#include <vector>
+#include <QWidget>
+#include <QScrollArea>
+#include <QVBoxLayout>
 
+class GlassColor;
+class PullPlan;
+class Mesher;
+class Geometry;
+class PureColorLibraryWidget;
+class NiceViewWidget;
+class QComboBox;
+class QSlider;
+
+using std::vector;
+             
 class ColorEditorWidget : public QWidget
 {
 	Q_OBJECT
@@ -32,8 +40,8 @@ class ColorEditorWidget : public QWidget
 		void sourceComboBoxChanged(int);		
 
 	private:
-		Geometry geometry;
-		Mesher mesher;
+		Geometry* geometry;
+		Mesher* mesher;
 		GlassColor* glassColor;	
 		QComboBox* sourceComboBox;
 		NiceViewWidget* niceViewWidget;

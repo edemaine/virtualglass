@@ -1,5 +1,6 @@
-#include "librarywidget.h"
 
+#include <QtGui>
+#include "librarywidget.h"
 
 LibraryWidget :: LibraryWidget(QWidget* _parent) : QLabel(_parent)
 {

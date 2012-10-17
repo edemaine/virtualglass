@@ -4,55 +4,54 @@
 #include "Vector.hpp"
 #include "librarywidget.h"
 
-#ifdef _WIN32
-#  include <windows.h>
-#endif
-#include <QtGui>
-
 class Geometry;
+
+class QWidget;
+class QImage;
 
 class RenderData
 {
-public:
-	virtual ~RenderData() { }
-	//may be called in a separate thread:
-	virtual Geometry *getGeometry() = 0;
+	public:
+		virtual ~RenderData() { }
+		//may be called in a separate thread:
+		virtual Geometry *getGeometry() = 0;
 };
 
 class Camera
 {
-public:
-	//camera is at eye, looking at 'lookAt' with up vector close to 'up'
-	//if isPerspective camera has 45 degree vertical fov
-	//else camera vertically spans length(eye - lookAt) / 2.2 of the scene
-	Vector3f eye;
-	Vector3f lookAt;
-	Vector3f up;
-	bool isPerspective;
-	Vector2ui size; //size of desired image, in pixels
+	public:
+		//camera is at eye, looking at 'lookAt' with up vector close to 'up'
+		//if isPerspective camera has 45 degree vertical fov
+		//else camera vertically spans length(eye - lookAt) / 2.2 of the scene
+		Vector3f eye;
+		Vector3f lookAt;
+		Vector3f up;
+		bool isPerspective;
+		Vector2ui size; //size of desired image, in pixels
 };
 
 class AsyncRenderWidget : public LibraryWidget
 {
 	Q_OBJECT
-public:
-	AsyncRenderWidget(QWidget *parent=NULL);
-	virtual ~AsyncRenderWidget();
 
-	//The AsyncRenderWidget now owns the 'RenderData' instance and will delete it:
-	//It is an error to pass NULL as data.
-	void setScene(Camera const &camera, RenderData *data);
+	public:
+		AsyncRenderWidget(QWidget *parent=NULL);
+		virtual ~AsyncRenderWidget();
 
-	//Adjust just the camera, keep previous geometry:
-	void setCamera(Camera const &);
+		//The AsyncRenderWidget now owns the 'RenderData' instance and will delete it:
+		//It is an error to pass NULL as data.
+		void setScene(Camera const &camera, RenderData *data);
 
-	//deletes current geometry without supplying new geometry:
-	void clearGeometry();
+		//Adjust just the camera, keep previous geometry:
+		void setCamera(Camera const &);
 
-	uint32_t id; //used to track this widget.
+		//deletes current geometry without supplying new geometry:
+		void clearGeometry();
 
-	//callback invoked by render thread; widget is responsible for deleting everything:
-	void renderFinished(Camera const &camera, RenderData *data, Geometry *geometry, QImage *image);
+		uint32_t id; //used to track this widget.
+
+		//callback invoked by render thread; widget is responsible for deleting everything:
+		void renderFinished(Camera const &camera, RenderData *data, Geometry *geometry, QImage *image);
 
 };
 
