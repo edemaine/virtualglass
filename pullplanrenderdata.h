@@ -3,7 +3,9 @@
 
 #include "asyncrenderinternal.h"
 
+class GlassColor;
 class PullPlan;
+class Geometry;
 
 class PullPlanRenderData : public RenderData
 {

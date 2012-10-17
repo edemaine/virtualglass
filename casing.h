@@ -4,7 +4,8 @@
 
 #include "primitives.h"
 #include "shape.h"
-#include "glasscolor.h"
+
+class GlassColor;
 
 class Casing
 {

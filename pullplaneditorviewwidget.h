@@ -4,11 +4,13 @@
 
 #include <QtGui>
 #include <vector>
+#include "primitives.h"
 #include "shape.h"
-#include "pullplan.h"
-#include "asyncpullplanlibrarywidget.h"
-#include "asynccolorbarlibrarywidget.h"
-#include "glassmime.h"
+
+class GlassColor;
+class PullPlan;
+class AsyncPullPlanLibraryWidget;
+class AsyncColorBarLibraryWidget;
 
 using std::vector;
 

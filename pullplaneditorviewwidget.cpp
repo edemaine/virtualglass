@@ -1,4 +1,10 @@
 
+#include "constants.h"
+#include "glasscolor.h"
+#include "pullplan.h"
+#include "glassmime.h"
+#include "asyncpullplanlibrarywidget.h"
+#include "asynccolorbarlibrarywidget.h"
 #include "pullplaneditorviewwidget.h"
 
 PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)

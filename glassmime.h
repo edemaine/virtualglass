@@ -2,9 +2,6 @@
 #ifndef GLASSMIME_H
 #define GLASSMIME_H
 
-#include <QtGui>
-#include "pullplan.h"
-
 namespace GlassMime
 {
 	enum Type

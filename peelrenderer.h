@@ -4,7 +4,7 @@
 #include <glew.h>
 #include <QGLContext>
 
-#include "geometry.h"
+class Geometry;
 
 //Make sure you call all functions of PeelRenderer (including the constructor and destructor) while the same OpenGL context is current.
 class PeelRenderer

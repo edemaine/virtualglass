@@ -1,4 +1,7 @@
 
+#include "constants.h"
+#include "glasscolor.h"
+#include "pullplanrenderdata.h"
 #include "asynccolorbarlibrarywidget.h"
 
 AsyncColorBarLibraryWidget :: AsyncColorBarLibraryWidget(GlassColor* _glassColor, QWidget* _parent): AsyncRenderWidget(_parent) 

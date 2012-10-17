@@ -1,4 +1,5 @@
 
+#include <stdio.h>
 #include "glassmime.h"
 
 namespace GlassMime

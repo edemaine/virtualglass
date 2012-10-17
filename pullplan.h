@@ -3,21 +3,18 @@
 #ifndef PULLPLAN_H
 #define PULLPLAN_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <vector>
-#include "templateparameter.h"
-#include "subpulltemplate.h"
 #include "pulltemplate.h"
-#include "casing.h"
-#include "glasscolor.h"
 #include "shape.h"
-#include "constants.h"
+#include "primitives.h"
+#include "subpulltemplate.h"
+#include "casing.h"
+#include <vector>
 
 using std::vector;
 
 class PullPlan;
-class SubpullTemplate;
+class TemplateParameter;
+class GlassColor;
 
 class PullPlan
 {
@@ -56,11 +53,6 @@ class PullPlan
 		bool hasDependencyOn(PullPlan* pullPlan);
 
 	private:
-		// Variables
-		PullPlan* defaultCircleSubplan;
-		PullPlan* defaultSquareSubplan;
-		GlassColor* defaultGlassColor;
-
 		enum PullTemplate::Type templateType;
 		vector<Casing> casings;
 		float twist;

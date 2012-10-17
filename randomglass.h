@@ -2,15 +2,11 @@
 #ifndef RANDOMGLASS_H
 #define RANDOMGLASS_H
 
-#include <QtGlobal>
-#include "glasscolor.h"
-#include "pullplan.h"
-#include "pulltemplate.h"
-#include "pickupplan.h"
-#include "pickuptemplate.h"
-#include "piece.h"
-#include "piecetemplate.h"
 #include "shape.h"
+
+class GlassColor;
+class PullPlan;
+class PickupPlan;
 
 GlassColor* randomGlassColor();
 

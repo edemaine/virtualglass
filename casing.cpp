@@ -1,4 +1,5 @@
 
+#include "glasscolor.h"
 #include "casing.h"
 
 Casing :: Casing(float _thickness, enum GeometricShape _shape, GlassColor* _glassColor) {

@@ -1,8 +1,9 @@
 
+#include "glasscolor.h"
 #include "pullplan.h"
-#include "pullplanrenderdata.h"
 #include "geometry.h"
 #include "mesh.h"
+#include "pullplanrenderdata.h"
 
 #ifdef UNORDERED_MAP_WORKAROUND
 #include <tr1/unordered_map>

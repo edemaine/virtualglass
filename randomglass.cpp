@@ -1,4 +1,14 @@
 
+
+#include <QtGlobal>
+#include "glasscolor.h"
+#include "pullplan.h"
+#include "pulltemplate.h"
+#include "pickupplan.h"
+#include "pickuptemplate.h"
+#include "subpulltemplate.h"
+#include "piece.h"
+#include "piecetemplate.h"
 #include "randomglass.h"
 
 GlassColor* randomGlassColor()

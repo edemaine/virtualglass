@@ -1,5 +1,22 @@
 
 
+#include "constants.h"
+#include "dependancy.h"
+#include "niceviewwidget.h"
+#include "asyncpiecelibrarywidget.h"
+#include "asyncpullplanlibrarywidget.h"
+#include "asynccolorbarlibrarywidget.h"
+#include "globalglass.h"
+#include "pullplan.h"
+#include "pickupplan.h"
+#include "piece.h"
+#include "pullplaneditorwidget.h"
+#include "coloreditorwidget.h"
+#include "pieceeditorwidget.h"
+#include "randomglass.h"
+#include "glassmime.h"
+#include "exampleglass.h"
+#include "pulltemplate.h"
 #include "mainwindow.h"
 
 MainWindow :: MainWindow()
@@ -432,6 +449,8 @@ QString MainWindow :: windowTitle()
 
 void MainWindow :: seedEverything()
 {
+	GlobalGlass::initialize();
+
 	// Load color stuff
 	setViewMode(COLORBAR_VIEW_MODE);
 	colorEditorWidget->seedColors();

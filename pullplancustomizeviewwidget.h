@@ -4,11 +4,14 @@
 #include <QtGui>
 #include <QtDebug>
 #include <cfloat>
-#include "pullplan.h"
+#include <vector>
 #include "primitives.h"
-#include "pulltemplate.h"
 #include "shape.h"
-#include "constants.h"
+
+class GlassColor;
+class PullPlan;
+
+using std::vector;
 
 class PullPlanCustomizeViewWidget : public QWidget
 {

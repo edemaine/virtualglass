@@ -3,16 +3,17 @@
 #define PULLPLANEDITORWIDGET_H
 
 #include <QtGui>
-#include "pullplan.h"
-#include "pullplaneditorviewwidget.h"
-#include "pullplancustomizeviewwidget.h"
-#include "pulltemplatelibrarywidget.h"
-#include "asyncpullplanlibrarywidget.h"
-#include "niceviewwidget.h"
 #include "shape.h"
-#include "geometry.h"
 #include "mesh.h"
-#include "dependancy.h"
+
+class PullPlan;
+class Geometry;
+class Mesher;
+class PullPlanEditorViewWidget;
+class PullPlanCustomizeViewWidget;
+class NiceViewWidget;
+class AsyncPullPlanLibraryWidget;
+class PullTemplateLibraryWidget;
 
 class PullPlanEditorWidget : public QWidget
 {

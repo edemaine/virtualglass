@@ -1,5 +1,15 @@
 
+#include "pullplan.h"
+#include "geometry.h"
 #include "pullplaneditorwidget.h"
+#include "pullplaneditorviewwidget.h"
+#include "pullplancustomizeviewwidget.h"
+#include "niceviewwidget.h"
+#include "pulltemplatelibrarywidget.h"
+#include "asyncpullplanlibrarywidget.h"
+#include "mesh.h"
+#include "dependancy.h"
+#include "templateparameter.h"
 
 PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 {

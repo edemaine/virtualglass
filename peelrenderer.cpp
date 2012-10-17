@@ -1,6 +1,8 @@
-#include "peelrenderer.h"
 
 #include <stdexcept>
+#include "constants.h"
+#include "geometry.h"
+#include "peelrenderer.h"
 
 #define glewGetContext() glewContext
 

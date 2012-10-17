@@ -1,12 +1,20 @@
 
+#include <cstdio>
+#include <string>
+#include "constants.h"
+#include "templateparameter.h"
+#include "subpickuptemplate.h"
+#include "pulltemplate.h"
+#include "globalglass.h"
+#include "pullplan.h"
+#include "glasscolor.h"
 #include "pickupplan.h"
+
+using std::string;
 
 PickupPlan :: PickupPlan(enum PickupTemplate::Type _type) {
 
-	defaultSubplan = new PullPlan(PullTemplate::BASE_CIRCLE);
-	defaultGlassColor = new GlassColor();
-	casingGlassColor = underlayGlassColor = overlayGlassColor = defaultGlassColor;
-
+	casingGlassColor = underlayGlassColor = overlayGlassColor = GlobalGlass::color;
 	setTemplateType(_type, true);
 }
 
@@ -42,7 +50,7 @@ void PickupPlan :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
 	}
 	else // you've run out of existing subplans copy from
 	{
-		newSubs->push_back(SubpickupTemplate(defaultSubplan,
+		newSubs->push_back(SubpickupTemplate(GlobalGlass::circlePlan,
 			location, ori, length, width, shape));
 	}
 }

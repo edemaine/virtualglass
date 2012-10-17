@@ -1,6 +1,14 @@
 
-#include "pullplan.h"
 #include <cstdio>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string>
+#include "casing.h"
+#include "glasscolor.h"
+#include "constants.h"
+#include "templateparameter.h"
+#include "globalglass.h"
+#include "pullplan.h"
 
 #ifdef UNORDERED_MAP_WORKAROUND
 #include <tr1/unordered_map>
@@ -16,24 +24,21 @@ using std::unordered_set;
 
 using std::pair;
 using std::make_pair;
-using std::vector;
+using std::string;
 
-PullPlan :: PullPlan(PullTemplate::Type templateType) {
-
-	// setup default subobjects
-	defaultGlassColor = new GlassColor();
-	defaultCircleSubplan = defaultSquareSubplan = NULL;
-
+PullPlan :: PullPlan(PullTemplate::Type _templateType)
+{
 	// setup default casings
-	casings.push_back(Casing(0.9, CIRCLE_SHAPE, defaultGlassColor));
-	casings.push_back(Casing(1.0, CIRCLE_SHAPE, defaultGlassColor));
+	assert(GlobalGlass::ready);
+	casings.push_back(Casing(0.9, CIRCLE_SHAPE, GlobalGlass::color));
+	casings.push_back(Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color));
 
 	// setup default twist
 	twist = 0;
 
 	// setup template (subplans and parameters) `forcefully', i.e.
 	// occuring regardless of what current template type is
-	setTemplateType(templateType, true);
+	setTemplateType(_templateType, true);
 }
 
 
@@ -77,15 +82,6 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) {
 		return;
 
 	this->templateType = templateType;
-
-	// If the pull template has subplans and you
-	// haven't initialized your default subplans yet, do it
-	if (defaultCircleSubplan == NULL && templateType != PullTemplate::BASE_CIRCLE && templateType != PullTemplate::BASE_SQUARE) {
-		// initialize default subplans
-		defaultCircleSubplan = new PullPlan(PullTemplate::BASE_CIRCLE);
-		defaultSquareSubplan = new PullPlan(PullTemplate::BASE_CIRCLE);
-		defaultSquareSubplan->setOutermostCasingShape(SQUARE_SHAPE);
-	}
 
 	// setup starter casings (casing 0 may be changed depending upon template)
 	parameters.clear();
@@ -256,7 +252,8 @@ void PullPlan :: addCasing(enum GeometricShape _shape) {
 	}
 
 	// add the new casing
-	casings.push_back(Casing(1.0, _shape, defaultGlassColor));
+	assert(GlobalGlass::ready);
+	casings.push_back(Casing(1.0, _shape, GlobalGlass::color));
 	if (hasSquareCasing())
 		this->twist = 0.0;
 
@@ -345,10 +342,12 @@ void PullPlan :: pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs
 		switch (_shape) 
 		{
 			case CIRCLE_SHAPE:
-				plan = defaultCircleSubplan;
+				assert(GlobalGlass::ready);
+				plan = GlobalGlass::circlePlan;
 				break;
 			case SQUARE_SHAPE:
-				plan = defaultSquareSubplan;
+				assert(GlobalGlass::ready);
+				plan = GlobalGlass::squarePlan;
 				break;
 		}
 	}

@@ -4,14 +4,16 @@
 #define MESH_H
 
 #include <vector>
-#include "pullplan.h"
 #include "geometry.h"
-#include "subpulltemplate.h"
-#include "pickupplan.h"
 #include "subpickuptemplate.h"
-#include "piece.h"
-#include "glasscolor.h"
+#include "piecetemplate.h"
 #include "shape.h"
+
+class GlassColor;
+class PickupPlan;
+class PullPlan;
+class Piece;
+class SubpullTemplate;
 
 class Mesher
 {

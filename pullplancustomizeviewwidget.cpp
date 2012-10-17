@@ -1,3 +1,9 @@
+
+#include "constants.h"
+#include "glasscolor.h"
+#include "pullplan.h"
+#include "pulltemplate.h"
+#include "subpulltemplate.h"
 #include "pullplancustomizeviewwidget.h"
 
 PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)

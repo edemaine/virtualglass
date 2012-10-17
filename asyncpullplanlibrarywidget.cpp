@@ -1,3 +1,8 @@
+
+
+#include "pullplan.h"
+#include "glasscolor.h"
+#include "pullplanrenderdata.h"
 #include "asyncpullplanlibrarywidget.h"
 
 AsyncPullPlanLibraryWidget :: AsyncPullPlanLibraryWidget(PullPlan *_pullPlan, QWidget *_parent) : AsyncRenderWidget(_parent), pullPlan(_pullPlan)

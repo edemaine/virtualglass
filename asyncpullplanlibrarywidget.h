@@ -2,10 +2,9 @@
 #define ASYNCPULLPLANLIBRARYWIDGET_H
 
 #include "asyncrenderwidget.h"
-#include "pullplan.h"
-#include "mesh.h"
-#include "pullplanrenderdata.h"
 #include "shape.h"
+
+class PullPlan;
 
 class AsyncPullPlanLibraryWidget : public AsyncRenderWidget
 {

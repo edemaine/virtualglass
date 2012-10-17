@@ -7,22 +7,18 @@
 #include <QObject>
 // <json/json.h>
 
-#include "constants.h"
-#include "dependancy.h"
-#include "niceviewwidget.h"
-#include "asyncpiecelibrarywidget.h"
-#include "asyncpullplanlibrarywidget.h"
-#include "asynccolorbarlibrarywidget.h"
-#include "pulltemplate.h"
-#include "pullplan.h"
-#include "pickupplan.h"
-#include "piece.h"
-#include "pullplaneditorwidget.h"
-#include "coloreditorwidget.h"
-#include "pieceeditorwidget.h"
-#include "glassmime.h"
-#include "randomglass.h"
-#include "exampleglass.h"
+class GlassColor;
+class PullPlan;
+class PickupPlan;
+class Piece;
+class NiceViewWidget;
+class AsyncPieceLibraryWidget;
+class AsyncPullPlanLibraryWidget;
+class AsyncColorBarLibraryWidget;
+class PullPlanEditorWidget;
+class ColorEditorWidget;
+class PieceEditorWidget;
+
 
 class MainWindow : public QMainWindow
 {

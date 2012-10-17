@@ -3,16 +3,13 @@
 #ifndef PICKUPPLAN_H
 #define PICKUPPLAN_H
 
-#include <cstdio>
-#include <stdlib.h>
-#include <string>
 #include <vector>
-#include "templateparameter.h"
-#include "subpickuptemplate.h"
-#include "pulltemplate.h"
+#include "shape.h"
 #include "pickuptemplate.h"
-#include "pullplan.h"
-#include "glasscolor.h"
+#include "subpickuptemplate.h"
+
+class GlassColor;
+class TemplateParameter;
 
 using std::vector;
 
@@ -42,9 +39,6 @@ class PickupPlan
 			enum PickupCaneOrientation ori, float length, float width, enum GeometricShape s); 
 		enum PickupTemplate::Type type;
 		vector<TemplateParameter> parameters;
-		PullPlan* defaultSubplan;
-		GlassColor* defaultGlassColor;
-	
 };
 
 PickupPlan *deep_copy(const PickupPlan *);

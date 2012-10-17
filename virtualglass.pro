@@ -48,6 +48,7 @@ macx {
 
 HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
 	primitives.h constants.h Vector.hpp \ 
+	globalglass.h \
 	exampleglass.h \
 	randomglass.h \
 	librarywidget.h \
@@ -84,6 +85,7 @@ SOURCES += main.cpp \
 	templateparameter.cpp \
 	pullplancustomizeviewwidget.cpp \
 	pullplan.cpp subpulltemplate.cpp \
+	globalglass.cpp \
 	piece.cpp \
 	piecetemplate.cpp \
 	pulltemplate.cpp \

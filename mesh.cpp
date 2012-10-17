@@ -1,10 +1,16 @@
 
+#include "constants.h"
+#include "glasscolor.h"
+#include "pullplan.h"
+#include "pickupplan.h"
+#include "piece.h"
+#include "subpulltemplate.h"
 #include "mesh.h"
 
-Mesher :: Mesher()
+Mesher :: Mesher() 
 {
+	// yeah, um..
 }
-
 
 void Mesher :: applySubplanTransform(Geometry* geometry, ancestor a)
 {
@@ -208,9 +214,7 @@ void Mesher :: applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type
 				break;
 			}
 			case PieceTemplate::PICKUP:
-			{
 				break; 
-			}
 		} // end switch
 	} // end loop over vertices
 }

@@ -1,12 +1,9 @@
 #ifndef ASYNCCOLORBARLIBRARYWIDGET_H
 #define ASYNCCOLORBARLIBRARYWIDGET_H
 
-#include "pullplanrenderdata.h"
 #include "asyncrenderwidget.h"
-#include "pullplan.h"
-#include "primitives.h"
-#include "glasscolor.h"
-#include "shape.h"
+
+class GlassColor;
 
 class AsyncColorBarLibraryWidget : public AsyncRenderWidget
 {
