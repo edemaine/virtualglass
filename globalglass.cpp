@@ -28,7 +28,10 @@ namespace GlobalGlass
         PullPlan* squarePlan()
 	{
 		if (_squarePlan == 0)
+		{
 			_squarePlan = new PullPlan(PullTemplate::BASE_CIRCLE);
+			_squarePlan->setOutermostCasingShape(SQUARE_SHAPE);
+		}
 		return _squarePlan;
 	}
 }
