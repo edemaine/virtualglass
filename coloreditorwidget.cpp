@@ -7,6 +7,7 @@
 #include "mesh.h"
 #include "purecolorlibrarywidget.h"
 #include "glasscolor.h"
+#include "colorreader.h"
 #include "coloreditorwidget.h"
 
 ColorEditorWidget :: ColorEditorWidget(GlassColor* _glassColor, QWidget* parent) : QWidget(parent)
@@ -126,33 +127,20 @@ void ColorEditorWidget :: loadColors(QString fileName)
 	sourceComboBox->addItem(file.readLine().trimmed());
 
 	// Create each library item and add it to the listLayout
-	Color caneColor;
-	QString caneName;
+	Color colorRGB;
+	QString colorName;
 	while (!file.atEnd())
 	{
-		QByteArray line = file.readLine();
+		QString line = file.readLine();
 		line = line.trimmed();
 		if (line.isEmpty())
 			continue;
 
 		if (line.at(0) == '[')
 		{
-			line.remove(0,1);
-			line.remove(line.lastIndexOf(']'),1);
-			line = line.trimmed();
-			caneName = line;
-		}
-		else if (line.at(0) == '-')
-		{
-			line.remove(0,1);
-			line = line.trimmed();
-			QList<QByteArray> colorData = line.split(',');
-			caneColor.r = colorData[0].toInt() / 255.0;
-			caneColor.g = colorData[1].toInt() / 255.0;
-			caneColor.b = colorData[2].toInt() / 255.0;
-			caneColor.a = colorData[3].toInt() / 255.0;
-
-			PureColorLibraryWidget* pclw = new PureColorLibraryWidget(caneColor, caneName, this);
+			colorName = lineToColorName(line);
+			colorRGB = lineToColorRGB(file.readLine()); 
+			PureColorLibraryWidget* pclw = new PureColorLibraryWidget(colorRGB, colorName, this);
 			listLayout->addWidget(pclw);
 		}
 	}
@@ -174,7 +162,7 @@ void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 	if (pclw != NULL)
 	{
 		glassColor->setColor(pclw->getColor());
-		glassColor->setName(pclw->getColorName().split(' ')[0]);
+		glassColor->setName(shortColorName(pclw->getColorName()));
 		this->alphaSlider->setSliderPosition(255 - int(glassColor->getColor()->a * 255));
 		emit someDataChanged();	
 	}
