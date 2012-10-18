@@ -17,6 +17,7 @@ class NiceViewWidget;
 class QVBoxLayout;
 class QComboBox;
 class QSlider;
+class QStackedWidget;
 
 using std::vector;
              
@@ -50,6 +51,8 @@ class ColorEditorWidget : public QWidget
                 QSlider* alphaSlider;
 		vector<QScrollArea*> colorLibraryScrollAreas;
 		vector<QVBoxLayout*> colorLibraryLayouts;
+		QStackedWidget* collectionStack;
+		int prevCollection;
 
 		void setupLayout();
 		void setupConnections();

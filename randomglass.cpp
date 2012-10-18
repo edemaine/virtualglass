@@ -17,7 +17,7 @@
 GlassColor* randomGlassColor()
 {
 	// Sample from reichenbach transparents
-        QFile file(":/reichenbach-transparent-colors.txt");
+        QFile file(":/reichenbach-transparent-colors.vgc");
 
 	// First see how many colors are in there
 	file.open(QIODevice::ReadOnly | QIODevice::Text);

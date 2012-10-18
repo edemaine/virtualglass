@@ -24,12 +24,12 @@
 	<file>images/pulltemplate8.png</file>
 	<file>images/pulltemplate9.png</file>
 	<file>images/pulltemplate10.png</file>
-	<file>reichenbach-opaque-colors.txt</file>
-	<file>reichenbach-transparent-colors.txt</file>
-	<file>gaffer-opaque-colors.txt</file>
-	<file>gaffer-transparent-colors.txt</file>
-	<file>kugler-opaque-colors.txt</file>
-	<file>kugler-transparent-colors.txt</file>
+	<file>reichenbach-opaque-colors.vgc</file>
+	<file>reichenbach-transparent-colors.vgc</file>
+	<file>gaffer-opaque-colors.vgc</file>
+	<file>gaffer-transparent-colors.vgc</file>
+	<file>kugler-opaque-colors.vgc</file>
+	<file>kugler-transparent-colors.vgc</file>
 	<file>COPYRIGHT.txt</file>
 	<file>version.txt</file>
 </qresource>
