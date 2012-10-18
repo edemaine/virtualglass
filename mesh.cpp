@@ -104,23 +104,49 @@ void Mesher :: applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type
 		{
 			case PieceTemplate::TUMBLER:
 			{
-				// compute theta within a rollup, starting with pickup geometry
-				float theta = PI * v->position.x / 5.0;
+				float diskTheta = PI * v->position.x / 5.0;
+				float diskR = v->position.z + 5.0;
+				float caneLoc = v->position.y;
 
-				// Deform into a spline-based vase
-				float radius = ((params[0].value + 40) * 0.05) 
-					* asymptoteVal(0.01 * (params[1].value*0.1 + 1), (v->position.z - -5.0)/10.0);
+				float width = 4 * 2 / PI + params[0].value * 0.04;
+				float turnLength = params[1].value * 0.03 + 1.0; 
+				float baseLength = width - turnLength * 2 / PI; 
 
-				if (radius < 1.0)
-				{
-					v->position.x = (radius - v->position.y * radius) * cos(theta); 
-					v->position.y = (radius - v->position.y * radius) * sin(theta); 
+				// augment theta for twist
+				diskTheta += diskR * params[2].value * 0.001 * TWO_PI;
+
+				float turnStart = baseLength;
+				float turnEnd = turnStart + turnLength;
+
+				if (turnStart < diskR && diskR < turnEnd) // curved part
+				{	
+					float sphereRadius = (turnLength * 2) / PI;
+					float spherePhi = ((diskR - turnStart) / turnLength) * (PI/2) - PI/2;
+
+					Point sphereCenter;
+					sphereCenter.x = turnStart * cos(diskTheta);
+					sphereCenter.y = turnStart * sin(diskTheta);
+					sphereCenter.z = sphereRadius; 
+
+					v->position.x = (sphereRadius - caneLoc) * cos(diskTheta) * cos(spherePhi) + sphereCenter.x;
+					v->position.y = (sphereRadius - caneLoc) * sin(diskTheta) * cos(spherePhi) + sphereCenter.y;
+					v->position.z = (sphereRadius - caneLoc) * sin(spherePhi) + sphereCenter.z;
 				}
-				else
+				else if (turnEnd - 0.1 < diskR) // vertical lip part
 				{
-					v->position.x = (radius - v->position.y / radius) * cos(theta); 
-					v->position.y = (radius - v->position.y / radius) * sin(theta); 
+					float sphereRadius = (turnLength * 2) / PI;
+
+					v->position.x = (turnStart + sphereRadius - caneLoc) * cos(diskTheta);	
+					v->position.y = (turnStart + sphereRadius - caneLoc)  * sin(diskTheta);
+					v->position.z = (v->position.z - turnEnd) + sphereRadius + 5.0;	
 				}
+				else if (diskR < turnStart + 0.1) // base
+				{
+					v->position.x = diskR * cos(diskTheta);
+					v->position.y = diskR * sin(diskTheta);
+					v->position.z = caneLoc;
+				}
+				v->position.z -= (10.0 - turnEnd)/2;
 				break;
 			}
 			case PieceTemplate::BOWL:
@@ -130,7 +156,7 @@ void Mesher :: applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type
 				int twist = params[2].value;
 
 				float theta = PI * v->position.x / 5.0 + PI * v->position.z * twist / 500.0;
-				float totalR = 4.0 + radius * 0.1;
+				float totalR = 10 / PI + radius * 0.1;
 				float totalPhi = 10.0 / totalR;
 				float r = totalR*size - v->position.y/size;
 				float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
@@ -171,9 +197,10 @@ void Mesher :: applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type
 				float theta = PI * v->position.x / 5.0;
 
 				// Deform into a spline-based vase
-				float body_radius = params[0].value * 0.03 + 1.0;
-				float lip_radius = params[1].value * 0.03 + 0.1;
-				float radius = 2.0 * splineVal(lip_radius, body_radius, lip_radius, (v->position.z - -5.0)/10.0);
+				float top_lip_radius = params[0].value * 0.03 + 0.4;
+				float body_radius = params[1].value * 0.03 + 1.0;
+				float bottom_radius = params[2].value * 0.03 + 0.4;
+				float radius = 2.0 * splineVal(bottom_radius, body_radius, top_lip_radius, (v->position.z - -5.0)/10.0);
 
 				if (radius < 1.0)
 				{
@@ -202,7 +229,7 @@ void Mesher :: applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type
 				float r = totalR - v->position.y;
 				float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
 
-				int waveCount = params[0].value / 10;
+				int waveCount = params[0].value / 10 + 3;
 				float waveSize = params[1].value / 30.0;
 
 				float waveAdjust = cos(waveCount * theta) * waveSize * (phi + PI/2);
