@@ -24,7 +24,7 @@ ColorEditorWidget :: ColorEditorWidget(GlassColor* _glassColor, QWidget* parent)
 	setupConnections();
 
 	// fake selecting the first list for initialization
-	sourceComboBox->setCurrentIndex(0);
+	collectionComboBox->setCurrentIndex(0);
 }
 
 
@@ -39,9 +39,9 @@ void ColorEditorWidget :: setGlassColor(GlassColor* _gc) {
 }
 
 
-void ColorEditorWidget :: sourceComboBoxChanged(int _index)
+void ColorEditorWidget :: collectionComboBoxChanged(int _index)
 {
-	if (_index < sourceComboBox->count() - 1) // if it's not the ``Add collection...'' one
+	if (_index < collectionComboBox->count() - 1) // if it's not the ``Add collection...'' one
 	{
 		prevCollection = _index;
 		collectionStack->setCurrentIndex(_index);
@@ -51,14 +51,14 @@ void ColorEditorWidget :: sourceComboBoxChanged(int _index)
 		// immediately reset back to previously selected collection, 
 		// faking the fact that ``Add collection...'' should not be 
 		// a selectable option like the real collections.
-		sourceComboBox->setCurrentIndex(prevCollection);
+		collectionComboBox->setCurrentIndex(prevCollection);
 		QString fileName = QFileDialog::getOpenFileName(this, "Load Color Library", "", 
 			"VirtualGlass Color Libraries (*.vgc)");
 
 		if (!fileName.isNull())
 		{
-			loadColors(fileName);
-			sourceComboBox->setCurrentIndex(sourceComboBox->count()-2);
+			loadCollection(fileName);
+			collectionComboBox->setCurrentIndex(collectionComboBox->count()-2);
 		}
 	}
 }
@@ -73,21 +73,21 @@ void ColorEditorWidget :: setupLayout()
 	QHBoxLayout* sourceLayout = new QHBoxLayout(this);
 	editorLayout->addLayout(sourceLayout);
 	sourceLayout->addWidget(new QLabel("Collection:", this), 0);
-	sourceComboBox = new QComboBox(this);
-	sourceComboBox->setDuplicatesEnabled(true);
-	sourceLayout->addWidget(sourceComboBox, 1);
+	collectionComboBox = new QComboBox(this);
+	collectionComboBox->setDuplicatesEnabled(true);
+	sourceLayout->addWidget(collectionComboBox, 1);
 
-	sourceComboBox->addItem("Add collection...");
+	collectionComboBox->addItem("Add collection...");
 
 	collectionStack = new QStackedWidget(this);
 	editorLayout->addWidget(collectionStack);
 
-	loadColors(":/reichenbach-opaque-colors.vgc");
-	loadColors(":/reichenbach-transparent-colors.vgc");
-	loadColors(":/kugler-opaque-colors.vgc");
-	loadColors(":/kugler-transparent-colors.vgc");
-	loadColors(":/gaffer-opaque-colors.vgc");
-	loadColors(":/gaffer-transparent-colors.vgc");
+	loadCollection(":/reichenbach-opaque-colors.vgc");
+	loadCollection(":/reichenbach-transparent-colors.vgc");
+	loadCollection(":/kugler-opaque-colors.vgc");
+	loadCollection(":/kugler-transparent-colors.vgc");
+	loadCollection(":/gaffer-opaque-colors.vgc");
+	loadCollection(":/gaffer-transparent-colors.vgc");
 
 	QHBoxLayout* alphaLayout = new QHBoxLayout(this);
 	editorLayout->addLayout(alphaLayout);
@@ -111,11 +111,11 @@ void ColorEditorWidget :: setupLayout()
 void ColorEditorWidget :: setupConnections()
 {
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
-	connect(sourceComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(sourceComboBoxChanged(int)));
+	connect(collectionComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(collectionComboBoxChanged(int)));
 	connect(alphaSlider, SIGNAL(valueChanged(int)), this, SLOT(alphaSliderPositionChanged(int)));
 }
 
-void ColorEditorWidget :: loadColors(QString fileName)
+void ColorEditorWidget :: loadCollection(QString fileName)
 {
 	QFile file(fileName);
 	file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -128,7 +128,7 @@ void ColorEditorWidget :: loadColors(QString fileName)
 	else
 	{
 		// First line of file is collection name
-		sourceComboBox->insertItem(sourceComboBox->count()-1, file.readLine().trimmed());
+		collectionComboBox->insertItem(collectionComboBox->count()-1, file.readLine().trimmed());
 	}
 
 	// This part sets up the necessary GUI parts 

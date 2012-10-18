@@ -39,13 +39,13 @@ class ColorEditorWidget : public QWidget
 	public slots:
 		void updateEverything();
                 void alphaSliderPositionChanged(int);
-		void sourceComboBoxChanged(int);		
+		void collectionComboBoxChanged(int);		
 
 	private:
 		Geometry* geometry;
 		Mesher* mesher;
 		GlassColor* glassColor;	
-		QComboBox* sourceComboBox;
+		QComboBox* collectionComboBox;
 		NiceViewWidget* niceViewWidget;
 		QVBoxLayout* editorLayout;
                 QSlider* alphaSlider;
@@ -56,7 +56,7 @@ class ColorEditorWidget : public QWidget
 
 		void setupLayout();
 		void setupConnections();
-		void loadColors(QString fileName);
+		void loadCollection(QString fileName);
 };
 
 
