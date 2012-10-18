@@ -1,0 +1,227 @@
+Reichenbach Transparents
+
+[R-100 Lead Crystal (Clear)] 	
+- 255,255,255,0
+[R-2 Gold Ruby]
+- 183,14,13,126
+[R-3 Dark Gold Pink]
+- 220,112,140,126
+[R-5 Gold Ruby Extra]
+- 224,129,156,126
+[R-6 Salmon Pink] 	
+- 233,166,96,126
+[R-8 Yellowish Aurora] 	
+- 243,213,110,126
+[R-9 Fuchsia]
+- 163,30,68,126
+[R-10 Violet Blue] 	
+- 149,77,155,126
+[R-11 Heliotrope] 	
+- 197,92,159,126
+[R-12 Reddish Amethyst] 	
+- 168,73,128,126
+[R-13 Amethyst] 	
+- 117,63,140,126
+[R-14 Hyacinth Violet] 	
+- 98,67,162,126
+[R-16 Saffron] 	
+- 252,101,29,126
+[R-17 Honey Yellow] 	
+- 253,220,3,126
+[R-18 Pale Old Gold] 	
+- 254,205,1,126
+[R-19 Gold Topaz] 	
+- 222,134,34,126
+[R-20 Brilliant Yellow] 	
+- 251,223,1,126
+[R-21 Lime Yellow] 	
+- 242,230,84,126
+[R-22 Lemon Yellow Light]
+- 166,197,5,126
+[R-23 Olive]
+- 170,208,2,126
+[R-24 Reseda Green] 	
+- 174,187,49,126
+[R-25 Beryl Green] 	
+- 48,164,80,126
+[R-26 Emerald Green] 	
+- 21,130,151,126
+[R-27 Anna Green] 	
+- 29,160,91,126
+[R-28 New Green] 	
+- 86,169,20,126
+[R-29 New Emerald Green] 	
+- 1,148,117,126
+[R-30 Tourmaline] 	
+- 130,136,99,126
+[R-32 Bristol Green] 	
+- 133,199,137,126
+[R-33 Dark Green] 	
+- 44,172,146,126
+[R-34 Dark Lagoon] 	
+- 1,72,76,126
+[R-35 Pine Tree Green] 	
+- 33,126,75,126
+[R-36 Moss Green] 	
+- 23,172,138,126
+[R-37 Sargasso Green] 	
+- 154,104,36,126
+[R-39 Brilliant Copper Blue] 	
+- 45,183,235,126
+[R-40 Aqua Blue] 	
+- 52,135,175,126
+[R-41 Dark Blue] 	
+- 24,40,209,126
+[R-42 Copper Ruby (reduces)] 	
+- 57,44,43,126
+[R-43 Steel Blue] 	
+- 73,112,154,126
+[R-44 Neutral Gray] 	
+- 118,110,99,126
+[R-45 Marine Blue] 	
+- 19,74,223,126
+[R-46 Aquamarine]
+- 18,89,164,126
+[R-47 Aquamarine Blue] 	
+- 66,164,203,126
+[R-48 Copper Blue]
+- 23,129,150,126
+[R-49 Turquoise]
+- 83,162,185,126
+[R-50 Reddish Dark Violet] 	
+- 124,78,87,126
+[R-51 Brown] 	
+- 133,75,51,126
+[R-52 Olive Brown] 	
+- 226,180,100,126
+[R-53 Olive Green] 	
+- 177,127,19,126
+[R-54 Black]
+- 65,49,51,126
+[R-54-SP Special Dense Black] 	
+- 6,7,6,126
+[R-55 Bluish Dark Violet] 	
+- 80,59,93,126
+[R-57 Aubergine] 	
+- 130,68,66,126
+[R-58 Aventurine Old Gold] 	
+- 89,65,61,126
+[R-59 Aventurine Green] 	
+- 75,80,53,126
+[R-60 Opaline] 	
+- 247,239,220,126
+[R-102 Silver Crystal (reduces)]
+- 220,209,179,126
+[R-118 Smoky Topaz] 	
+- 169,129,68,126
+[R-128 Iris Violet (reduces)]
+- 127,56,68,126
+[R-129 Bronze] 	
+- 83,67,37,126
+[R-135 Lagoon] 	
+- 31,146,164,126
+[R-136 Iris Green (reduces)] 	
+- 172,221,189,126
+[R-138 Cherry Red Extra]
+- 100,7,7,126
+[R-139 Strawberry] 	
+- 224,44,57,126
+[R-140 Orange] 	
+- 230,122,34,126
+[R-141 Roma Red (strikes)] 	
+- 207,15,26,126
+[R-142 Cherry Red (strikes)] 	
+- 207,24,30,126
+[R-143 Garnet] 	
+- 160,8,47,126
+[R-144 Iris Dark Blue (reduces)] 	
+- 63,63,98,126
+[R-145 Iris Blue (reduces)] 	
+- 121,185,221,126
+[R-146 Iris Black (reduces)] 	
+- 7,6,4,126
+[R-190 Iris Light Yellow (reduces)] 	
+- 232,172,12,126
+[R-199 Iris Amber] 	
+- 170,51,1,126
+[R-200 Copper Ruby X-LT]
+- 81,4,4,126
+[R-210 Sari Blue] 	
+- 108,167,222,126
+[R-211 Iris Light Blue (reduces)] 	
+- 117,157,201,126
+[R-212 Brilliant Gold] 	
+- 249,192,11,126
+[R-215 Gold Brown (reduces)] 	
+- 143,43,40,126
+[R-217 Light Iris Gold (reduces)] 	
+- 192,112,67,126
+[R-218 Iris Yellow (reduces)] 	
+- 177,115,63,126
+[R-219 Gold Green] 	
+- 241,224,18,126
+[R-220 Old Gold] 	
+- 189,125,47,126
+[R-221 Light Blue] 	
+- 145,187,229,126
+[R-225 Alabaster] 	
+- 255,255,255,126
+[R-228 Dark Heliotrope] 	
+- 141,72,107,126
+[R-229 Amber]
+- 179,83,47,126
+[R-231 Brilliant Ruby] 	
+- 215,91,85,126
+[R-232 Cranberry Pink] 	
+- 199,68,92,126
+[R-233 Smoky Gray] 	
+- 135,131,98,126
+[R-234 Dark Amber] 	
+- 149,70,34,126
+[R-235 Smoky Blue] 	
+- 90,99,80,126
+[R-236 Darkest Lagoon]
+- 1,108,125,126	
+[R-240 Medium Amber] 	
+- 225,138,24,126
+[R-244 Copper Ruby Light]
+- 109,6,14,126
+[R-250 Pale Gold Ruby] 	
+- 192,54,69,126
+[R-252 Pale Reddish Aurora]
+- 196,85,0,126
+[R-254 Pale Fuchsia] 	
+- 138,3,59,126
+[R-255 Pale Violet Blue] 	
+- 85,0,83,126
+[R-256 Pale Aqua Blue]
+- 89,133,169,126
+[R-257 Pale Green]
+- 133,188,130,126
+[R-259 Pale Aubergine]
+- 80,28,39,126
+[R-260 Pale Steel Blue]
+- 72,101,156,126
+[R-309 Alabaster Light]
+- 178,189,190,126
+[R-312 Whiskey]
+- 233,175,50,126
+[R-420 Mountain Blue] 	
+- 91,137,207,126
+[R-701 Emerald Green Metallic]
+- 7,169,32,126
+[R-711 Dark Blue Grey (reduces)]
+- 2,0,153,126
+[R-713 Aqua Metallic]
+- 1,108,173,126
+[R-719 Aqua Silver Blue (reduces)]
+- 0,100,145,126
+[R-730 Pale Copper Ruby]
+- 125,4,35,126
+[R-740 Dark Brown Amber (reduces)]
+- 136,42,24,126
+[R-770 Smoked Silver (reduces)]
+- 89,82,47,126
+[R-8904 Sea Green (reduces)] 	
+- 55,78,116,126
+

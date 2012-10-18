@@ -450,7 +450,6 @@ void MainWindow :: seedEverything()
 {
 	// Load color stuff
 	setViewMode(COLORBAR_VIEW_MODE);
-	colorEditorWidget->seedColors();
 	emit someDataChanged();
 
 	// Load pull template types

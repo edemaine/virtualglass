@@ -22,7 +22,9 @@ ColorEditorWidget :: ColorEditorWidget(GlassColor* _glassColor, QWidget* parent)
 	setupLayout();
 	setupConnections();
 
-	colorLibraryScrollAreas[0]->show(); 
+	// fake selecting the first list just to show *some* list 
+	// (rather than seeing the default hidden state of them all)
+	sourceComboBoxChanged(0);
 }
 
 
@@ -50,7 +52,7 @@ void ColorEditorWidget :: setupLayout()
 {
 	QHBoxLayout* pageLayout = new QHBoxLayout(this);
 	this->setLayout(pageLayout);
-	QVBoxLayout* editorLayout = new QVBoxLayout(this);
+	editorLayout = new QVBoxLayout(this);
 	pageLayout->addLayout(editorLayout);
 
 	QHBoxLayout* sourceLayout = new QHBoxLayout(this);
@@ -58,29 +60,15 @@ void ColorEditorWidget :: setupLayout()
 	sourceLayout->addWidget(new QLabel("Collection:", this), 0);
 	sourceComboBox = new QComboBox(this);
 	sourceLayout->addWidget(sourceComboBox, 1);
-	sourceComboBox->addItem("Reichenbach - Transparents");
-	sourceComboBox->addItem("Reichenbach - Opaques");
-	sourceComboBox->addItem("Gaffer - Transparents");
-	sourceComboBox->addItem("Gaffer - Opals");
-	sourceComboBox->addItem("Kugler - Transparents");
-	sourceComboBox->addItem("Kugler - Opaques");
 
-	for (int i = 0; i < 6; ++i)
-	{
-		colorLibraryScrollAreas.push_back(new QScrollArea(this));
-		editorLayout->addWidget(colorLibraryScrollAreas[i]);
-		colorLibraryScrollAreas[i]->setBackgroundRole(QPalette::Dark);
-		colorLibraryScrollAreas[i]->setWidgetResizable(true);
-		colorLibraryScrollAreas[i]->setMinimumWidth(320);
-		colorLibraryScrollAreas[i]->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-		colorLibraryScrollAreas[i]->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-		QWidget* colorLibraryWidget = new QWidget(colorLibraryScrollAreas[i]);
-		colorLibraryScrollAreas[i]->setWidget(colorLibraryWidget);
-		colorLibraryLayouts.push_back(new QVBoxLayout(colorLibraryWidget));
-		colorLibraryLayouts[i]->setSpacing(10);
-		colorLibraryWidget->setLayout(colorLibraryLayouts[i]);
-		colorLibraryScrollAreas[i]->hide();
-	}
+	// for each file containing colors
+	// read it, make [scroll area, widget, qvboxlayout], add title to combo box	
+	loadColors(":/reichenbach-opaque-colors.txt");
+	loadColors(":/reichenbach-transparent-colors.txt");
+	loadColors(":/kugler-opaque-colors.txt");
+	loadColors(":/kugler-transparent-colors.txt");
+	loadColors(":/gaffer-opaque-colors.txt");
+	loadColors(":/gaffer-transparent-colors.txt");
 
 	QHBoxLayout* alphaLayout = new QHBoxLayout(this);
 	editorLayout->addLayout(alphaLayout);
@@ -108,13 +96,38 @@ void ColorEditorWidget :: setupConnections()
 	connect(alphaSlider, SIGNAL(valueChanged(int)), this, SLOT(alphaSliderPositionChanged(int)));
 }
 
-void ColorEditorWidget :: seedColors()
-{ 
+void ColorEditorWidget :: loadColors(QString fileName)
+{
+	// This part sets up the necessary GUI parts 
+	// related to the color list.
+	QScrollArea* listScrollArea = new QScrollArea(this);
+	colorLibraryScrollAreas.push_back(listScrollArea); // push the new scroll area
+	editorLayout->addWidget(listScrollArea); // add this to the layout
+	listScrollArea->setBackgroundRole(QPalette::Dark);
+	listScrollArea->setWidgetResizable(true);
+	listScrollArea->setMinimumWidth(320);
+	listScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	listScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
+	QWidget* colorLibraryWidget = new QWidget(listScrollArea);
+	listScrollArea->setWidget(colorLibraryWidget);
+
+	QVBoxLayout* listLayout = new QVBoxLayout(colorLibraryWidget);
+	colorLibraryLayouts.push_back(listLayout);
+	listLayout->setSpacing(10);
+	colorLibraryWidget->setLayout(listLayout);
+        listScrollArea->hide();
+
+	// Here we now actually read the list from the file and
+	// create a list of GUI labels for the colors
+	QFile file(fileName);
+	file.open(QIODevice::ReadOnly | QIODevice::Text);
+	// Add the list name to the dropdown menu of lists
+	sourceComboBox->addItem(file.readLine().trimmed());
+
+	// Create each library item and add it to the listLayout
 	Color caneColor;
 	QString caneName;
-
-	QFile file(":/Colors1.txt");
-	file.open(QIODevice::ReadOnly | QIODevice::Text);
 	while (!file.atEnd())
 	{
 		QByteArray line = file.readLine();
@@ -140,24 +153,7 @@ void ColorEditorWidget :: seedColors()
 			caneColor.a = colorData[3].toInt() / 255.0;
 
 			PureColorLibraryWidget* pclw = new PureColorLibraryWidget(caneColor, caneName, this);
-			if (colorData[3].toInt() != 255) // if a transparent
-			{
-				if (caneName[0] ==  'R')
-					colorLibraryLayouts[0]->addWidget(pclw);
-				else if (caneName[0] == 'G')
-					colorLibraryLayouts[2]->addWidget(pclw);
-				else if (caneName[0] == 'K')
-					colorLibraryLayouts[4]->addWidget(pclw);
-			}
-			else
-			{
-				if (caneName[0] ==  'R')
-					colorLibraryLayouts[1]->addWidget(pclw);
-				else if (caneName[0] == 'G')
-					colorLibraryLayouts[3]->addWidget(pclw);
-				else if (caneName[0] == 'K')
-					colorLibraryLayouts[5]->addWidget(pclw);
-			}
+			listLayout->addWidget(pclw);
 		}
 	}
 	file.close();

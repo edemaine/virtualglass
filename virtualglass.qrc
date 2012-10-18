@@ -24,7 +24,12 @@
 	<file>images/pulltemplate8.png</file>
 	<file>images/pulltemplate9.png</file>
 	<file>images/pulltemplate10.png</file>
-	<file>Colors1.txt</file>
+	<file>reichenbach-opaque-colors.txt</file>
+	<file>reichenbach-transparent-colors.txt</file>
+	<file>gaffer-opaque-colors.txt</file>
+	<file>gaffer-transparent-colors.txt</file>
+	<file>kugler-opaque-colors.txt</file>
+	<file>kugler-transparent-colors.txt</file>
 	<file>COPYRIGHT.txt</file>
 	<file>version.txt</file>
 </qresource>

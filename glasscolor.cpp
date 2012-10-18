@@ -6,9 +6,9 @@ GlassColor :: GlassColor()
 {
 	Color c;
 	c.r = c.g = c.b = 1.0;
-	c.a = 0.001;
+	c.a = 0.0;
 	color = c;
-	name = "Clear";	
+	name = "R-100";	
 }
 
 GlassColor :: GlassColor(Color _color, QString _name)

@@ -1,0 +1,133 @@
+Gaffer Opals
+
+[G100 Enamel white]
+- 254,254,254,255
+[G101 Opal White]
+- 252,252,252,255
+[G102 Ivory]
+- 252,247,236,255
+[G103 Latte]
+- 250,242,230,255
+[G104 Light Tabacco]
+- 167,120,51,255
+[G105 Duck Egg White]
+- 245,246,241,255
+[G106 Cream]
+- 250,250,249,255
+[G107 Weimaraner Brown]
+- 208,196,192,255
+[G108 Pigeon Grey]
+- 174,181,187,255
+[G109 Chalcedony]
+- 200,210,183,255
+[G1095 Blue Chalcedony]
+- 128,189,187,255
+[G110 Gold Pink Extra]
+- 196,116,147,255
+[G111 Salmon]
+- 252,150,119,255
+[G112 Pale Rose]
+- 229,197,210,255
+[G113 Heliotrope]
+- 195,153,199,255
+[G114 Purpur]
+- 146,119,183,255
+[G115 Violet]
+- 107,94,150,255
+[G116 Lavender]
+- 203,175,198,255
+[G120 Lapis Blue Extra]
+- 94,79,222,255
+[G121 Pale Blue]
+- 150,156,203,255
+[G122 Turquoise]
+- 18,181,185,255
+[G123 Steel Blue]
+- 14,77,130,255
+[G124 Robin’s Egg Blue]
+- 159,222,201,255
+[G125 Denim Blue]
+- 47,145,183,255
+[G126 Stratus Blue]
+- 106,139,191,255
+[G127 Pale Turquoise]
+- 155,200,199,255
+[G128 Azure]
+- 107,194,189,255
+[G129 Navy Blue]
+- 23,27,66,255
+[G130 Jade Green]
+- 55,162,133,255
+[G131 Olive Green]
+- 144,161,76,255
+[G132 Granny Smith Green]
+- 117,178,78,255
+[G133 Lime Green]
+- 181,196,77,255
+[G134 Forest Green]
+- 59,110,47,255
+[G135 Celadon]
+- 177,216,193,255
+[G136 Chartreuse]
+- 227,228,94,255
+[G137 Light Apple Green]
+- 200,226,148,255
+[G138 Chameleon]
+- 190,213,204,255
+[G139 British Racing Green]
+- 38,61,30,255
+[G140 Pistachio Green]
+- 110,127,50,255
+[G150 Opalo Duro (Stiff White)]
+- 252,252,252,255
+[G151 Blue Duro]
+- 92,76,221,255
+[G152 Verde Duro]
+- 117,178,78,255
+[G153 Oro Duro]
+- 245,180,19,255
+[G170 Carmine]
+- 208,23,24,255
+[G171 Russet]
+- 89,36,19,255
+[G172 Mushroom]
+- 238,200,165,255
+[G173 Chocolate]
+- 43,30,17,255
+[G174 Mustard]
+- 245,181,24,255
+[G175 Cinnamon]
+- 117,64,25,255
+[G176 Vermillion]
+- 224,49,29,255
+[G177 Burnt Sienna]
+- 171,42,41,255
+[G178 Crimson]
+- 200,50,46,255
+[G179 Diablo Red]
+- 246,71,70,255
+[G180 Ferrari Red]
+- 239,59,86,255
+[G181 Chilli Red]
+- 251,74,59,255
+[G182 Orange]
+- 252,102,63,255
+[G183 Taxi Cab Yellow]
+- 253,197,92,255
+[G184 Canary Yellow]
+- 253,218,90,255
+[G185 Corn Yellow]
+- 253,202,87,255
+[G186 Tangerine]
+- 252,149,77,255
+[G187 Lemon Yellow]
+- 253,238,95,255
+[G188 Pale Primrose]
+- 254,243,152,255
+[G189 French Vanilla]
+- 251,241,129,255
+[G190 Alabaster]
+- 253,253,253,255
+[G194 Phil's Grey]
+- 206,206,202,255
+

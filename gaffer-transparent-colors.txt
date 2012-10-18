@@ -1,0 +1,107 @@
+Gaffer Transparents
+
+[G000 Clear Lead Crystal]
+- 255,255,255,126
+[G010 Gold Ruby Extra]
+- 152,20,57,126
+[G011 Gold Amethyst]
+- 152,32,91,126
+[G012 Brilliant Gold]
+- 253,146,65,126
+[G013 Apricot]
+- 232,58,59,126
+[G014 Gold Ruby]
+- 202,69,119,126
+[G015 Hyacinth]
+- 140,62,139,126
+[G016 Wine Red]
+- 175,40,79,126
+[G019 Gold Topaz]
+- 240,143,30,126
+[G020 Cobalt Blue Extra]
+- 1,58,186,126
+[G021 Midnight Blue]
+- 40,45,83,126
+[G022 Aquamarine Blue]
+- 1,147,180,126
+[G023 Copper Blue]
+- 3,185,187,126
+[G024 Steel Blue]
+- 2,87,145,126
+[G025 Steel Grey]
+- 7,70,99,126
+[G026 Cerulean Blue]
+- 2,72,207,126
+[G030 Jade Green]
+- 1,71,68,126
+[G031 Olive Green]
+- 84,113,40,126
+[G032 Emerald Green]
+- 2,101,35,126
+[G033 Teal Green]
+- 2,119,140,126
+[G034 Fluoro Green]
+- 146,203,70,126
+[G035 Forest Green]
+- 1,86,62,126
+[G036 Lime Green]
+- 217,214,77,126
+[G037 Sargasso Green]
+- 135,131,48,126
+[G038 Uranium Green]
+- 206,251,69,126
+[G040 Purple]
+- 147,37,109,126
+[G045 Indigo]
+- 40,40,73,126
+[G049 Nero Duro (Stiff Black)]
+- 0,0,0,126
+[G050 Black]
+- 0,0,0,126
+[G051 Aubergine]
+- 137,25,56,126
+[G052 Tea]
+- 133,13,13,126
+[G054 Bronze]
+- 112,87,45,126
+[G055 Grey]
+- 74,71,65,126
+[G059 Eel Green]
+- 99,114,54,126
+[G060 Silver Blue Lustre]
+- 1,63,184,126
+[G061 Gold Lustre]
+- 153,38,25,126
+[G062 Black Lustre]
+- 2,2,2,126
+[G063 Iris Yellow Lustre]
+- 182,47,33,126
+[G065 Purple Lustre]
+- 189,89,173,126
+[G066 Red Lustre Extra]
+- 119,17,6,126
+[G067 Green Lustre]
+- 2,181,178,126
+[G068 Clear Lustre]
+- 255,255,255,126
+[G070 Saffron]
+- 253,122,56,126
+[G071 Orange]
+- 254,95,50,126
+[G072 Scarlet]
+- 169,2,23,126
+[G073 Citron]
+- 254,224,86,126
+[G074 Cherry Red]
+- 238,10,42,126
+[G075 Copper Ruby]
+- 146,7,21,126
+[G076 Yellow]
+- 254,191,83,126
+[G077 Daffodil]
+- 253,199,75,126
+[G080 Photosensitive Ruby]
+- 245,245,245,126
+[G090 Lime Aventurine]
+- 102,161,72,126
+
