@@ -45,10 +45,6 @@ class MainWindow : public QMainWindow
 		void keyPressEvent(QKeyEvent* e);
 		QString windowTitle();
 
-        void setM(int);
-        char* getMchar();
-        int getM();
-
     protected:
         void contextMenuEvent(QContextMenuEvent *event);
 
@@ -127,7 +123,6 @@ class MainWindow : public QMainWindow
         QAction *saveSelectedAsAct;
 		QMenu *perfMenu;
 		QAction *depthPeelAction;
-        int m;
 
 	private slots:
 		void updateEverything();
