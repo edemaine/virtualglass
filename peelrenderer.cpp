@@ -66,7 +66,7 @@ void gl_errors(std::string const &where) {
 
 namespace {
 	//convenience function: grab the error log of a shader:
-	std::string shader_log(GLhandleARB shader, GLEWContext *glewContext) {
+    std::string shader_log(GLhandleARB shader, GLEWContext *glewContext) {
 		assert(glewContext);
 		GLint len = 0;
 		glGetObjectParameterivARB(shader, GL_OBJECT_INFO_LOG_LENGTH_ARB, &len);

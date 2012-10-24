@@ -11,6 +11,7 @@ TEMPLATE = app
 TARGET =
 DEPENDPATH += .
 INCLUDEPATH += . glew/
+INCLUDEPATH += . jsoncpp/include
 QT += opengl
 RESOURCES = virtualglass.qrc
 DEFINES += GLEW_MX
@@ -21,8 +22,9 @@ unix:!macx {
 }
 macx {
   QMAKE_CC = clang
+  QMAKE_CFLAGS += -Qunused-arguments
   QMAKE_CXX = clang
-  QMAKE_CXXFLAGS += -DUNORDERED_MAP_WORKAROUND
+  QMAKE_CXXFLAGS += -DUNORDERED_MAP_WORKAROUND -I src/jsoncpp/include
   ICON = virtualglass.icns
 }
 
@@ -39,15 +41,26 @@ macx {
 !*-msvc* {
 	QMAKE_CFLAGS_DEBUG += -Wall -Werror -g
 	QMAKE_CFLAGS_RELEASE += -Wall -Werror -g
-	QMAKE_CXXFLAGS += -Wall -Werror -Wno-deprecated -g
-	win32 {
+        QMAKE_CXXFLAGS += -Wall -Werror -Wno-unused-parameter -Wno-deprecated -g
+        win32 {
 		QMAKE_CXXFLAGS += -std=gnu++0x
 	}
 	LIBS += -lexpat
 }
 
 HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
-	primitives.h constants.h Vector.hpp \ 
+
+HEADERS += jsoncpp/include/json/autolink.h \
+        jsoncpp/include/json/config.h \
+        jsoncpp/include/json/features.h \
+        jsoncpp/include/json/forwards.h \
+        jsoncpp/include/json/json.h \
+        jsoncpp/include/json/reader.h \
+        jsoncpp/include/json/value.h \
+        jsoncpp/include/json/writer.h \
+        primitives.h \
+        constants.h \
+        Vector.hpp \
 	colorreader.h \
 	globalglass.h \
 	exampleglass.h \
@@ -76,7 +89,7 @@ HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
 	asyncpiecelibrarywidget.h \
 	pullplancustomizeviewwidget.h \
 	glassmime.h \
-	glasscolor.h \
+        glasscolor.h \
 
 SOURCES += main.cpp \ 
 	glew/glew.c \
@@ -110,4 +123,7 @@ SOURCES += main.cpp \
 	asyncpiecelibrarywidget.cpp \
 	glassmime.cpp \
 	glasscolor.cpp \
+        jsoncpp/src/lib_json/json_reader.cpp \
+        jsoncpp/src/lib_json/json_value.cpp \
+        jsoncpp/src/lib_json/json_writer.cpp
 

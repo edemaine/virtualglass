@@ -208,58 +208,58 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
             <File
-				RelativePath=".\Source\JSONAllocator.cpp"
+				RelativePath=".\_internal\Source\JSONAllocator.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\internalJSONNode.cpp"
+				RelativePath=".\_internal\Source\internalJSONNode.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONChildren.cpp"
+				RelativePath=".\_internal\Source\JSONChildren.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONDebug.cpp"
+				RelativePath=".\_internal\Source\JSONDebug.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONIterators.cpp"
+				RelativePath=".\_internal\Source\JSONIterators.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONMemory.cpp"
+				RelativePath=".\_internal\Source\JSONMemory.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONNode.cpp"
+				RelativePath=".\_internal\Source\JSONNode.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONNode_Mutex.cpp"
-				>
+				RelativePath=".\_internal\Source\JSONNode_Mutex.cpp"
+			</File>
 			<File
-				RelativePath=".\Source\JSONPreparse.cpp"
+				RelativePath=".\_internal\Source\JSONPreparse.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONStream.cpp"
+				RelativePath=".\_internal\Source\JSONStream.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONValidator.cpp"
+				RelativePath=".\_internal\Source\JSONValidator.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONWorker.cpp"
+				RelativePath=".\_internal\Source\JSONWorker.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONWriter.cpp"
+				RelativePath=".\_internal\Source\JSONWriter.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\libjson.cpp"
+				RelativePath=".\_internal\Source\libjson.cpp"
 				>
 			</File>
 		</Filter>
@@ -269,79 +269,79 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
             <File
-				RelativePath=".\Source\JSONAllocator.h"
+				RelativePath=".\_internal\Source\JSONAllocator.h"
 				>
 			</File>
              <File
-				RelativePath=".\Source\JSONMemoryPool.h"
+				RelativePath=".\_internal\Source\JSONMemoryPool.h"
 				>
 			</File>
             <File
-				RelativePath=".\Dependencies\mempool++\mempool.h"
+				RelativePath=".\_internal\Dependencies\mempool++\mempool.h"
 				>
 			</File>
             <File
-				RelativePath=".\Dependencies\libbase64++\libbase64.h"
+				RelativePath=".\_internal\Dependencies\libbase64++\libbase64.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\internalJSONNode.h"
+				RelativePath=".\_internal\Source\internalJSONNode.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSON_Base64.h"
+				RelativePath=".\_internal\Source\JSON_Base64.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONChildren.h"
+				RelativePath=".\_internal\Source\JSONChildren.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONDebug.h"
+				RelativePath=".\_internal\Source\JSONDebug.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONDefs.h"
+				RelativePath=".\_internal\Source\JSONDefs.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONDefs\GNU_C.h"
+				RelativePath=".\_internal\Source\JSONDefs\GNU_C.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONDefs\String_Defs.h"
+				RelativePath=".\_internal\Source\JSONDefs\String_Defs.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONDefs\Unknown.h"
+				RelativePath=".\_internal\Source\JSONDefs\Unknown.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONDefs\Visual_C.h"
+				RelativePath=".\_internal\Source\JSONDefs\Visual_C.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONGlobals.h"
+				RelativePath=".\_internal\Source\JSONGlobals.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONMemory.h"
+				RelativePath=".\_internal\Source\JSONMemory.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONNode.h"
+				RelativePath=".\_internal\Source\JSONNode.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONPreparse.h"
+				RelativePath=".\_internal\Source\JSONPreparse.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONSharedString.h"
+				RelativePath=".\_internal\Source\JSONSharedString.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONSingleton.h"
+				RelativePath=".\_internal\Source\JSONSingleton.h"
 				>
 			</File>
 			<File
@@ -349,15 +349,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONStream.h"
+				RelativePath=".\_internal\Source\JSONStream.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONValidator.h"
+				RelativePath=".\_internal\Source\JSONValidator.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\JSONWorker.h"
+				RelativePath=".\_internal\Source\JSONWorker.h"
 				>
 			</File>
 			<File
@@ -365,7 +365,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\NumberToString.h"
+				RelativePath=".\_internal\Source\NumberToString.h"
 				>
 			</File>
 		</Filter>

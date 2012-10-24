@@ -6,7 +6,7 @@ SubpullTemplate :: SubpullTemplate(PullPlan* plan, enum GeometricShape _s, Point
 {
 	this->plan = plan;
 	this->shape = _s;
-	this->location = location;
+    this->location = location;
 	this->diameter = diameter;
 }
 

@@ -1,5 +1,12 @@
-
 #include <QtGui>
+#include <map>
+#include <json/json.h>
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <QTextStream>
+#include <iostream.h>
+
 #include "constants.h"
 #include "dependancy.h"
 #include "niceviewwidget.h"
@@ -27,387 +34,20 @@ MainWindow :: MainWindow()
 	centralLayout = new QHBoxLayout(centralWidget);
 	setupLibrary();
 	setupEditors();
-	setupMenus();
-	setupConnections();
+    setupMenus();
+    //createActions();
+    setupConnections();
 
 	seedEverything();
 	setViewMode(EMPTY_VIEW_MODE);
 	show();
+
+	emit someDataChanged();
+	whatToDoLabel->setText("Click a library item at left to edit/view.");
+
+    //setupMenus();
+    createMenus();
 }
-
-//markus
-#ifdef UNDEF 
-void MainWindow::contextMenuEvent(QContextMenuEvent *event)
-{
-	QMenu menu(this);
-	menu.exec(event->globalPos());
-}
-
-int MainWindow::getM(){
-	return m;
-}
-
-void MainWindow::setM(int _m){
-	m = _m;
-}
-
-void MainWindow::prepareJson(PullPlan* plan, Json::Value* root1, string nestedValue) {
-	//prepare json
-	Json::Value *nested_value1 = new Json::Value;
-	//check dependency from piece to plan to save only dependent canes
-	Json::Value *value9 = new Json::Value;
-	*value9 = (plan->getTemplateType());
-	Json::Value *value10 = new Json::Value;
-	*value10 = (plan->hasSquareCasing());
-	Json::Value *value11 = new Json::Value;
-	*value11 = (plan->getCasingCount());
-	Json::Value *value23 = new Json::Value;
-	*value23 = (plan->getTwist());
-
-	Json::Value *nested_value = new Json::Value;
-
-	std::stringstream *templateTypeSstr = new std::stringstream;
-	*templateTypeSstr << "templatetype" << getM();
-	string templateType = (*templateTypeSstr).str();
-
-	std::stringstream *hasSquareCasingSstr = new std::stringstream;
-	*hasSquareCasingSstr << "hasSquareCasing" <<getM();
-	string hasSquareCasing = (*hasSquareCasingSstr).str();
-
-	std::stringstream *casingcountSstr = new std::stringstream;
-	*casingcountSstr << "casingcount" <<getM();
-	string casingCount = (*casingcountSstr).str();
-
-	std::stringstream *twistsSstr = new std::stringstream;
-	*twistsSstr << "twists" <<getM();
-	string twists = (*twistsSstr).str();
-
-	(*nested_value)[templateType] = *value9;
-	(*nested_value)[hasSquareCasing] = *value10;
-	(*nested_value)[casingCount] = *value11;
-	(*nested_value)[twists] = *value23;
-
-	std::stringstream *pullplannrSstr = new std::stringstream;
-	*pullplannrSstr << "pullplannr" <<getM();
-	string pullPlanNr = (*pullplannrSstr).str();
-
-	(*nested_value1)[pullPlanNr] = *nested_value;
-
-	//for (unsigned int j=0; j< plan->subs.size() ;j++){
-	//    SubpullTemplate* sub = &(plan->subs[j]);
-	//    cout << sub->group;
-	//}
-
-	for (unsigned int i=0; i<(plan->getCasingCount()); i++){
-		Json::Value *value13 = new Json::Value;
-		*value13 = (plan->getCasingThickness(i));
-		Json::Value *value14 = new Json::Value;
-		*value14 = (plan->getCasingShape(i));
-		Json::Value *value15 = new Json::Value;
-		*value15 = (plan->getCasingColor(i)->getName());
-		Json::Value *value16 = new Json::Value;
-		*value16 = ((plan->getCasingColor(i)->getColor())->operator [](0));
-		Json::Value *value17 = new Json::Value;
-		*value17 = ((plan->getCasingColor(i)->getColor())->operator [](1));
-		Json::Value *value18 = new Json::Value;
-		*value18 = ((plan->getCasingColor(i)->getColor())->operator [](2));
-		Json::Value *value19 = new Json::Value;
-		*value19 = ((plan->getCasingColor(i)->getColor())->operator [](3));
-		//Json::Value value12(plan->subs.size());
-
-		Json::Value *nested_value = new Json::Value;
-		(*nested_value)["CasingThickness"] = *value13;
-		(*nested_value)["CasingShape"] = *value14;
-		(*nested_value)["getCasingColor"] = *value15;
-		(*nested_value)["R"] = *value16;
-		(*nested_value)["G"] = *value17;
-		(*nested_value)["B"] = *value18;
-		(*nested_value)["alpha"] = *value19;
-		//nested_value["subsSize"] = value12;
-
-		std::stringstream *casingcountSstr = new std::stringstream;
-		*casingcountSstr << "casingcount" <<i;
-		string casingCount = (*casingcountSstr).str();
-		(*nested_value1)[casingCount] = *nested_value;
-	}
-
-	Json::Value *value20 = new Json::Value;
-	*value20 =(plan->getParameterCount());
-
-	std::stringstream *parametercountSstr = new std::stringstream;
-	*parametercountSstr << "Pullparametercount" <<getM();
-	string parameterCount = (*parametercountSstr).str();
-
-	(*nested_value1)[parameterCount] = *value20;
-
-	for(unsigned int i=0; i<(plan->getParameterCount()); i++){
-		Json::Value *value21 = new Json::Value;
-		Json::Value *value22 = new Json::Value;
-		*value21 = (plan->getParameterName(i));
-		*value22 = (plan->getParameter(i));
-		Json::Value *nested_value = new Json::Value;
-
-		std::stringstream *parameternameSstr = new std::stringstream;
-		*parameternameSstr << "parametername" <<i;
-		string parameterName = (*parameternameSstr).str();
-
-		std::stringstream *parameterValueSstr = new std::stringstream;
-		*parameterValueSstr << "parametervalue" <<i;
-		string parameterValue = (*parameterValueSstr).str();
-
-		std::stringstream *parameterSstr = new std::stringstream;
-		*parameterSstr << "parameter" <<i;
-		string parameter = (*parameterSstr).str();
-
-		(*nested_value)[parameterName] = *value21;
-		(*nested_value)[parameterValue] = *value22;
-		(*nested_value1)[parameter] = *nested_value;
-	}
-	std::stringstream *Sstr = new std::stringstream;
-	*Sstr << nestedValue <<getM();
-	string name = (*Sstr).str();
-
-	(*root1)[name] = *nested_value1;
-}
-
-void MainWindow::buildCaneTree(PullPlan* plan, PullPlan* planPrev, map<PullPlan*,int> cane, Json::Value* root1) {
-	if(cane.find(plan)->first) {
-		setM((getM())+1);
-		std::stringstream *Sstr = new std::stringstream;
-		*Sstr << "subcane" <<getM();
-		string name = (*Sstr).str();
-
-		(*root1)[name] = cane.find(plan)->second;
-		//setM((getM())+1);
-	}
-	else {
-		if((plan->subs.size())==0){
-			//if case: no canes in library
-			if (planPrev!=NULL)
-				vector< PullPlan* > caneVec;
-				//cane identifier
-				caneVec.push_back(plan);
-				//prevPointer
-				caneVec.push_back(planPrev);
-				////special case: buildCaneMap calls buildCaneTree
-				caneVec.push_back(NULL);
-				setM((getM())+1);
-				prepareJson(plan, root1, "subcane");
-			}
-		}
-		else{
-			vector< PullPlan > caneVec;
-			//cane pointer (identifier)
-			caneVec.push_back(*plan);
-			if (planPrev==NULL){
-				caneVec.push_back(NULL);
-				}
-			else{
-				//prevPointer
-				caneVec.push_back(*planPrev);
-			}
-			for(int i=0; i<int(plan->subs.size()); i++){
-				SubpullTemplate subplan = plan->subs[i];
-				//pointer next
-				caneVec.push_back(*subplan.plan);
-				//add subcane to ma
-				setM(1+getM());
-				cane.insert(pair<PullPlan*, int>(subplan.plan,getM()));
-				//go down and build tree
-				buildCaneTree(subplan.plan, plan, cane, root1);
-				prepareJson(plan, root1, "subcane");
-            		}
-		}
-	}
-}
-
-void MainWindow::buildCaneMap(PullPlan* plan, Json::Value* root1, map<PullPlan*,int> cane){
-	if(cane.find(plan)->first){
-		setM((getM())+1);
-		std::stringstream *Sstr = new std::stringstream;
-		*Sstr << "cane" <<getM();
-		string name = (*Sstr).str();
-
-		(*root1)[name] = cane.find(plan)->second;
-		//setM((getM())+1);
-	}
-	else{
-		//add first cane (pickup->sub)
-		setM(1+getM());
-		cane.insert(pair<PullPlan*, int>(plan,getM()));
-		buildCaneTree(plan, NULL, cane, root1);
-		prepareJson(plan, root1, "cane");
-	}
-}
-
-QString MainWindow::writeJson(Json::Value root){
-	Json::StyledWriter writer;
-	std::string outputConfig = writer.write( root );
-	QString output = QString::fromStdString(outputConfig);
-	return output;
-}
-
-#endif 
-
-void MainWindow::open()
-{
-#ifdef UNDEF
-	//open file dialog
-	QString filename = QFileDialog::getOpenFileName(this, tr("Open Document"), 
-		QDir::currentPath(), tr("VirtualGlass file (*.glass);;All files (*.*)") );
-#endif
-}
-
-void MainWindow::save(){
-    //open
-}
-
-void MainWindow::saveAs(){
-
-#ifdef UNDEF
-	//save file dialog
-	QString filename = QFileDialog::getSaveFileName(this, tr("Save your glass piece"), QDir::currentPath(), tr("VirtualGlass (*.glass)") );
-	//improve: prevent character set error in filename
-	//improve: empty file name -> "no savefile choosen"
-
-	QFile saveFile(filename);
-	saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
-	QTextStream fileOutput(&saveFile);
-
-
-	//read version and date from version.txt; write this into json file (root0)
-	//first line; versionNo and date
-	ifstream readHdl;
-	//date has always 12 characters
-	char date[11];
-	char versionNo[4];
-
-	readHdl.open(":/version.txt");
-	readHdl.getline(versionNo,4,'\n');
-	string versionStr;
-	versionStr.assign(versionNo, 4);
-	readHdl.getline(date,11,'\n');
-	string dateStr = date;
-	readHdl.close();
-	//write json file (root0)
-	Json::Value root0;
-	Json::Value value1(versionStr);
-	Json::Value value2(dateStr);
-
-	root0["date"] = value1;
-	root0["version"] = value2;
-	fileOutput << writeJson(root0);
-
-	//write pickuptemplate into json file (root1)
-	Json::Value root1;
-	Json::Value value3((pieceEditorWidget->getPiece())->pickup->getTemplateType());
-	Json::Value value4((pieceEditorWidget->getPiece())->pickup->getParameterCount());
-	// Json::Value value5((pieceEditorWidget->getPiece())->pickup->getParameterName(i));
-	//Json::Value value6((pieceEditorWidget->getPiece())->pickup->getParameter(i));
-	Json::Value value7(((pieceEditorWidget->getPiece())->pickup->overlayGlassColor->getName()));
-	Json::Value value8(((pieceEditorWidget->getPiece())->pickup->underlayGlassColor->getName()));
-
-	root1["PickupTemplateType"] = value3;
-	root1["PickupParameterCount"] = value4;
-	//root1["PickupParameterName"] = value5;
-	//root1["PickupParameterValue"] = value6;
-	root1["PickupoverlayGlassColor"] = value7;
-	root1["PickupunderlayGlassColor"] = value8;
-
-	//##pointer
-	//fileOutput << "getPiece " << pieceEditorWidget->getPiece() << "\n";
-	//fileOutput << "getTemplate " << (pieceEditorWidget->getPiece())->getTemplate()<< "\n";
-	//fileOutput << "getPlan/pull" << pullPlanEditorWidget->getPlan()<< "\n";
-
-	//pullupplan
-	//loop over all canes
-	setM(0);
-	map<PullPlan*,int> cane;
-	AsyncPullPlanLibraryWidget* pplw;
-	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i){
-		pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
-			dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
-		PullPlan* plan = pplw->getPullPlan();
-		//        setM(0);
-		buildCaneMap(plan, &root1, cane);
-	}
-	fileOutput << writeJson(root1);
-	fileOutput << "eof";
-
-	saveFile.close();
-#endif 
-}
-
-void MainWindow::setupMenus()
-{
-	//file:open
-	openAction = new QAction("&Open", this);
-	openAction->setShortcuts(QKeySequence::Open);
-	openAction->setStatusTip("Open an existing file");
-
-	//file:save
-	saveAction = new QAction("&Save", this);
-	saveAction->setShortcuts(QKeySequence::Save);
-	saveAction->setStatusTip("Save the document to disk");
-
-	//file:saveAs
-	saveAsAction = new QAction("&SaveAs", this);
-	saveAsAction->setShortcuts(QKeySequence::SaveAs);
-	saveAsAction->setStatusTip("Save the document to disk");
-
-	//File menu
-	fileMenu = menuBar()->addMenu("&File"); //create File menu
-	fileMenu->addAction(openAction); //add openButton
-	fileMenu->addAction(saveAction); //add saveButton
-	fileMenu->addAction(saveAsAction); //add saveAsButton
-
-	//examples:webtutorial1
-	web1PieceAction = new QAction("Tutorial 1", this);
-	web1PieceAction->setStatusTip("The first tutorial found on virtualglass.org");
-
-	//examples:webtutorial2
-	web2PieceAction = new QAction("Tutorial 2", this);
-	web2PieceAction->setStatusTip("The second tutorial found on virtualglass.org");
-
-	//examples:random:simple cane
-	randomSimpleCaneAction = new QAction("&Simple Cane", this);
-	randomSimpleCaneAction->setStatusTip("Randomly generate a simple example cane.");
-
-	//examples:random:simple piece
-	randomSimplePieceAction = new QAction("&Simple Piece", this);
-	randomSimplePieceAction->setStatusTip("Randomly generate a simple example piece.");
-
-	//examples:random:complex cane
-	randomComplexCaneAction = new QAction("&Complex Cane", this);
-	randomComplexCaneAction->setStatusTip("Ranomly generate a complex example cane.");
-
-	//examples:random:complex piece
-	randomComplexPieceAction = new QAction("&Complex Piece", this);
-	randomComplexPieceAction->setStatusTip("Randomly generate a complex example piece.");
-
-	// Examples menu and Examples:Random menu
-	examplesMenu = menuBar()->addMenu("&Examples"); //create menu for cane/piece examples
-	webExamplesMenu = examplesMenu->addMenu("&Web");
-	webExamplesMenu->addAction(web1PieceAction); 
-	webExamplesMenu->addAction(web2PieceAction); 
-	randomExamplesMenu = examplesMenu->addMenu("&Random");
-	randomExamplesMenu->addAction(randomSimpleCaneAction);
-	randomExamplesMenu->addAction(randomComplexCaneAction);
-	randomExamplesMenu->addSeparator();
-	randomExamplesMenu->addAction(randomSimplePieceAction);
-	randomExamplesMenu->addAction(randomComplexPieceAction);
-
-	// toggle depth peeling
-	depthPeelAction = new QAction(tr("&Depth peeling"), this);
-	depthPeelAction->setCheckable(true);
-	depthPeelAction->setChecked(NiceViewWidget::peelEnable);
-	depthPeelAction->setStatusTip(tr("Toggle high-quality transparency rendering in 3D views"));
-
-	// Performance menu
-	perfMenu = menuBar()->addMenu(tr("Performance"));
-	perfMenu->addAction(depthPeelAction);	
-}
-
 
 void MainWindow :: setViewMode(enum ViewMode _mode)
 {
@@ -689,20 +329,20 @@ void MainWindow :: setupConnections()
 	connect(copyPieceButton, SIGNAL(pressed()), this, SLOT(copyPiece()));
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 
-	connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
-	connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
-	connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveAs()));
+    //connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
+    //connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
+    //connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveAs()));
 
-	connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
-	connect(randomSimplePieceAction, SIGNAL(triggered()), this, SLOT(randomSimplePieceExampleActionTriggered()));
+    connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
+    connect(randomSimplePieceAction, SIGNAL(triggered()), this, SLOT(randomSimplePieceExampleActionTriggered()));
 
-	connect(randomComplexCaneAction, SIGNAL(triggered()), this, SLOT(randomComplexCaneExampleActionTriggered()));
-	connect(randomComplexPieceAction, SIGNAL(triggered()), this, SLOT(randomComplexPieceExampleActionTriggered()));
+    connect(randomComplexCaneAction, SIGNAL(triggered()), this, SLOT(randomComplexCaneExampleActionTriggered()));
+    connect(randomComplexPieceAction, SIGNAL(triggered()), this, SLOT(randomComplexPieceExampleActionTriggered()));
 
-	connect(web1PieceAction, SIGNAL(triggered()), this, SLOT(web1PieceExampleActionTriggered()));
-	connect(web2PieceAction, SIGNAL(triggered()), this, SLOT(web2PieceExampleActionTriggered()));
+    connect(web1PieceAction, SIGNAL(triggered()), this, SLOT(web1PieceExampleActionTriggered()));
+    connect(web2PieceAction, SIGNAL(triggered()), this, SLOT(web2PieceExampleActionTriggered()));
 
-	connect(depthPeelAction, SIGNAL(triggered()), this, SLOT(depthPeelActionTriggered()));
+    connect(depthPeelAction, SIGNAL(triggered()), this, SLOT(depthPeelActionTriggered()));
 }
 
 void MainWindow :: depthPeelActionTriggered()
@@ -1036,8 +676,7 @@ void MainWindow :: updateEverything()
 			pieceEditorWidget->updateEverything();
 			break;
 	}
-
-	updateLibrary();
+		updateLibrary();
 }
 
 // returns whether the pull plan is a dependancy of something in the library
@@ -1240,3 +879,656 @@ void MainWindow :: updateLibrary()
 }
 
 
+void MainWindow::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu(this);
+    menu.exec(event->globalPos());
+}
+
+int MainWindow::getM(){
+    return m;
+}
+
+char* MainWindow::getMchar(){
+
+    if(m<10){
+        char *mChar = new char[2];
+        mChar[0] = '0';
+        mChar[1] = m+48;
+        return mChar;
+    }
+    else{
+        char *mChar = new char[2];
+        if(m<100){
+            mChar[0] = (m/10)+48;
+            mChar[1] = (m-((mChar[0]-48)*10))+48;
+            return mChar;
+        }
+        else{
+            if(m<1000){  //max pieces 999
+                char *mChar = new char[3];
+                mChar[0] = (m/100)+48;
+                mChar[1] = (m-((mChar[0]-48)*100))+48;
+                mChar[2] = (m-((((mChar[1]-48)*10)+48)+(((mChar[0]-48)*100))+48));
+                return mChar;
+            }
+        }
+        *mChar = '0';
+        return mChar;
+    }
+}
+
+void MainWindow::setM(int newM){
+    m = newM;
+}
+
+
+
+void MainWindow::buildCaneTree(PullPlan* plan, vector<PullPlan*>* caneVec, vector<GlassColor*>* colorVec){
+    if(std::find((*caneVec).begin(), (*caneVec).end(),plan) != (*caneVec).end()){
+        setM(getM()+1);
+    }
+    else{
+        if(int (plan->subs.size())==0){
+            setM(getM()+1);
+            for(int i =0; i<int (plan->getCasingCount());i++){
+                if (std::find(colorVec->begin(), colorVec->end(), plan->getCasingColor(i)) != colorVec->end());
+                else colorVec->push_back(plan->getCasingColor(i));
+            }
+            if (std::find(caneVec->begin(), caneVec->end(), plan) != caneVec->end());
+            else(*caneVec).push_back(plan);
+        }
+        else{
+            for(int i =0; i<int (plan->getCasingCount());i++){
+                if (std::find(colorVec->begin(), colorVec->end(), plan->getCasingColor(i)) != colorVec->end());
+                else colorVec->push_back(plan->getCasingColor(i));
+            }
+            for(int i=0; i<int(plan->subs.size()); i++){
+                SubpullTemplate subplan = (*plan).subs.at(i);
+                setM(1+getM());
+                //go down and build tree
+                buildCaneTree(subplan.plan, caneVec, colorVec);
+                if (std::find(caneVec->begin(), caneVec->end(), subplan.plan) != caneVec->end());
+                else(*caneVec).push_back(subplan.plan);
+            }
+        }
+    }
+}
+
+void MainWindow::buildCaneMap(vector<PullPlan*>* caneVec, vector<GlassColor*>* colorVec){
+    AsyncPieceLibraryWidget *plw;
+    for (int j = 0; j < pieceLibraryLayout->count(); ++j){
+        plw = dynamic_cast<AsyncPieceLibraryWidget*>(dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(j))->widget());
+
+        Piece* piece = plw->getPiece();
+
+        for(int i =0; i<(int(((*piece).pickup->subs.size()))); i++){
+            SubpickupTemplate pick = (*piece).pickup->subs.at(i);
+            PullPlan* plan = pick.plan;
+            setM(getM()+1);
+
+            if (std::find(caneVec->begin(), caneVec->end(), plan) != caneVec->end()){
+                setM(getM()+1);
+            }
+            else{
+                if (std::find(colorVec->begin(), colorVec->end(), ((*piece).pickup->overlayGlassColor)) != colorVec->end());
+                else{
+                    colorVec->push_back(((*piece).pickup->overlayGlassColor));
+                }
+                if (std::find(colorVec->begin(), colorVec->end(), (*piece).pickup->casingGlassColor) != colorVec->end());
+                else colorVec->push_back((*piece).pickup->casingGlassColor);
+
+                if (std::find(colorVec->begin(), colorVec->end(), (*piece).pickup->underlayGlassColor) != colorVec->end());
+                else colorVec->push_back((*piece).pickup->underlayGlassColor);
+
+                buildCaneTree(plan, caneVec, colorVec);
+                if (std::find(caneVec->begin(), caneVec->end(), plan) != caneVec->end());
+                else(*caneVec).push_back(plan);
+            }
+        }
+    }
+}
+
+QString MainWindow::writeJson(Json::Value root){
+    Json::StyledWriter writer;
+    std::string outputConfig = writer.write( root );
+    QString output = QString::fromStdString(outputConfig);
+    return output;
+}
+
+void MainWindow::writeCane(Json::Value *root, map<PullPlan*, int>* caneMap, map<GlassColor*, int> colorMap, vector<PullPlan*> caneVec){
+    AsyncPullPlanLibraryWidget* pplw;
+    for (int i = 0; i < pullPlanLibraryLayout->count(); ++i){
+        pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
+            dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
+        PullPlan* plan=pplw->getPullPlan();
+
+        if((std::find(caneVec.begin(), caneVec.end(), plan)) != caneVec.end()){
+            (*caneMap)[plan] = i;
+        }
+
+    }
+
+
+    //AsyncPullPlanLibraryWidget* pplw;
+    Json::Value *pullplan_nested = new Json::Value;
+    /*for (int i = 0; i < pullPlanLibraryLayout->count(); ++i){
+        pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
+            dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
+        PullPlan* plan=pplw->getPullPlan();
+
+        if((std::find(caneVec.begin(), caneVec.end(), plan)) != caneVec.end()){
+            (*caneMap)[plan] = i;*/
+    map<PullPlan*, int>::iterator position;
+    for(position=(*caneMap).begin(); position != (*caneMap).end();++position){
+        PullPlan* plan = position->first;
+        int i = position->second;
+        //check dependency from piece to plan to save only dependent canes
+        Json::Value *value5 = new Json::Value;
+        *value5 = (plan->getTemplateType());
+        Json::Value *value6 = new Json::Value;
+        *value6 = (plan->hasSquareCasing());
+        Json::Value *value7 = new Json::Value;
+        *value7 = (plan->getCasingCount());
+        Json::Value *value8 = new Json::Value;
+         *value8 = (plan->getTwist());
+
+        Json::Value *nested_value = new Json::Value;
+
+        std::stringstream *templateTypeSstr = new std::stringstream;
+        *templateTypeSstr << "templatetype";
+        string templateType = (*templateTypeSstr).str();
+
+        std::stringstream *hasSquareCasingSstr = new std::stringstream;
+        *hasSquareCasingSstr << "hasSquareCasing";
+        string hasSquareCasing = (*hasSquareCasingSstr).str();
+
+        std::stringstream *casingcountSstr = new std::stringstream;
+        *casingcountSstr << "casingcount";
+        string casingCount = (*casingcountSstr).str();
+
+
+        for (int k=0;k<int (plan->getCasingCount());k++){
+            Json::Value *nested_value2 = new Json::Value;
+            if((colorMap.find(plan->getCasingColor(k))->second)>(int (colorMap.size())))
+                (*nested_value2)["CasingColor"] = "global_clear";
+            else
+                (*nested_value2)["CasingColor"] = colorMap.find(plan->getCasingColor(k))->second;
+
+            (*nested_value2)["CasingShape"] = plan->getCasingShape(k);
+            (*nested_value2)["CasingThickness"] = plan->getCasingThickness(k);
+            std::stringstream *casingSstr = new std::stringstream;
+            *casingSstr << k<<"Casing";
+            string casing = (*casingSstr).str();
+            (*nested_value)[casing]=(*nested_value2);
+        }
+
+        std::stringstream *twistsSstr = new std::stringstream;
+        *twistsSstr << "twists";
+        string twists = (*twistsSstr).str();
+
+        (*nested_value)[templateType] = *value5;
+        (*nested_value)[hasSquareCasing] = *value6;
+        (*nested_value)[casingCount] = *value7;
+        (*nested_value)[twists] = *value8;
+
+        std::stringstream *pullplannrSstr = new std::stringstream;
+        *pullplannrSstr  <<i<< "canes";
+        string pullPlanNr = (*pullplannrSstr).str();
+
+        if(plan->subs.size()==0);
+        else{
+            //Json::Value& subsArray = ((*nested_value)["subs"] = Json::Value());
+            Json::Value *nested_value3 = new Json::Value;
+            for(int j=0; j<(int (plan->subs.size())); j++){
+                //subsArray.append((*caneMap).find((plan->subs.at(j)).plan)->second);
+                Json::Value *nested_value2 = new Json::Value;
+                SubpullTemplate templ = plan->subs.at(j);
+
+                //(*nested_value2)["group"] = templ.group;
+                (*nested_value2)["shape"] = templ.shape;
+                (*nested_value2)["diameter"] = templ.diameter;
+                (*nested_value2)["cane"] = (*caneMap).find(templ.plan)->second;
+
+                (*nested_value2)["x"] = templ.location.operator [](0);
+                (*nested_value2)["y"] = templ.location.operator [](1);
+                (*nested_value2)["z"] = templ.location.operator [](2);
+
+                std::stringstream *Sstr = new std::stringstream;
+                if(j<10)
+                    *Sstr <<"0" <<j << "cane";
+                else
+                    *Sstr <<j << "cane";
+                string name = (*Sstr).str();
+
+                (*nested_value3)[name] = (*nested_value2);
+
+            }
+            (*nested_value)["SubpullplanTemplate"] = (*nested_value3);
+        }
+        (*pullplan_nested)[pullPlanNr] = *nested_value;
+        i++;
+    }
+    (*root)["canes"] = (*pullplan_nested);
+}
+
+void MainWindow::writeColor(Json::Value* root, map<GlassColor*, int>* colorMap, vector<GlassColor*> colorVec){
+    AsyncColorBarLibraryWidget* cblw;
+    Json::Value *color_nested = new Json::Value;
+    for (int i = 0; i < colorBarLibraryLayout->count(); ++i){
+        cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
+            dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
+        GlassColor* color = (cblw->getGlassColor());
+
+        if((std::find(colorVec.begin(), colorVec.end(), color)) != colorVec.end()){
+
+            (*colorMap)[color] = i;
+
+            Json::Value *nested_value = new Json::Value;
+
+            (*nested_value)["R"] = cblw->getGlassColor()->getColor()->operator [](0);
+            (*nested_value)["G"] = cblw->getGlassColor()->getColor()->operator [](1);
+            (*nested_value)["B"] = cblw->getGlassColor()->getColor()->operator [](2);
+            (*nested_value)["alpha"] = cblw->getGlassColor()->getColor()->operator [](3);
+
+            std::stringstream *colorSstr = new std::stringstream;
+            *colorSstr  <<i<<"_" << (cblw->getGlassColor()->getName())->toStdString();
+            string colorName = (*colorSstr).str();
+
+            (*color_nested)[colorName] = (*nested_value);
+        }
+    }
+    (*root)["colors"] = (*color_nested);
+}
+
+void MainWindow::writePiece(Json::Value* root, map<Piece*, int>* pieceMap, map<PullPlan*, int>* caneMap, map<GlassColor*, int> colorMap){
+    AsyncPieceLibraryWidget *plw;
+    Json::Value *piece_nested = new Json::Value;
+
+    for (int i = 0; i < pieceLibraryLayout->count(); ++i){
+        plw = dynamic_cast<AsyncPieceLibraryWidget*>(
+                    dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
+
+        Piece* piece = plw->getPiece();
+        (*pieceMap)[piece] = i;
+    }
+
+    map<Piece*, int>::iterator position;
+    for(position = (*pieceMap).begin(); position != (*pieceMap).end(); ++position){
+        Json::Value *nested_value = new Json::Value; 
+        Piece* piece = position->first;
+        int i = position->second;
+
+        (*nested_value)["templateType"] =((*piece).pickup->getTemplateType());
+        if((colorMap.find((*piece).pickup->overlayGlassColor)->second)>(int (colorMap.size())))
+            (*nested_value)["overlayGlassColor"] = "global_clear";
+        else
+            (*nested_value)["overlayGlassColor"] = colorMap.find((*piece).pickup->overlayGlassColor)->second;
+
+        if((colorMap.find((*piece).pickup->underlayGlassColor)->second)>(int (colorMap.size())))
+            (*nested_value)["underlayGlassColor"] = "global_clear";
+        else
+            (*nested_value)["underlayGlassColor"] = colorMap.find((*piece).pickup->underlayGlassColor)->second;
+
+        if((colorMap.find((*piece).pickup->casingGlassColor)->second)>(int (colorMap.size())))
+            (*nested_value)["casingGlassColor"] = "global_clear";
+        else
+            (*nested_value)["casingGlassColor"] = colorMap.find((*piece).pickup->casingGlassColor)->second;
+
+        TemplateParameter pickTemplPara;
+        (*piece).pickup->getParameter(0, &pickTemplPara);
+        for(int i = 0;i<int (pickTemplPara.name.size());i++){
+            (*nested_value)[(pickTemplPara.name)] = pickTemplPara.value;
+        }
+
+
+        //for(int i = 0;i<(int((*piece).pieceTemplate->parameterNames.size()));i++){
+        //    (*nested_value)[((*piece).pieceTemplate->parameterNames.operator [](i))] = ((*piece).pieceTemplate->parameterValues.operator [](i));
+        //}
+
+        Json::Value *nested_value3 = new Json::Value;
+
+        for(int j=0; j<(int ((*piece).pickup->subs.size())); j++){
+            Json::Value *nested_value2 = new Json::Value;
+            SubpickupTemplate templ = (*piece).pickup->subs.at(j);
+
+            //(*nested_value2)["group"] = templ.group;
+            (*nested_value2)["length"] = templ.length;
+            (*nested_value2)["orientation"] = templ.orientation;
+            (*nested_value2)["shape"] = templ.shape;
+            (*nested_value2)["width"] = templ.width;
+            (*nested_value2)["cane"] = (*caneMap).find(templ.plan)->second;
+
+            (*nested_value2)["x"] = templ.location.operator [](0);
+            (*nested_value2)["y"] = templ.location.operator [](1);
+            (*nested_value2)["z"] = templ.location.operator [](2);
+
+            std::stringstream *Sstr = new std::stringstream;
+            if(j<10)
+                *Sstr <<"0" <<j << "cane";
+            else
+                *Sstr <<j << "cane";
+            string name = (*Sstr).str();
+
+            (*nested_value3)[name] = (*nested_value2);
+        }
+        (*nested_value)["SubpickupTemplate"] = (*nested_value3);
+        std::stringstream *Sstr = new std::stringstream;
+        *Sstr << i<<"_piece";
+        string name = (*Sstr).str();
+        (*piece_nested)[name]=(*nested_value);
+    }
+    (*root)["pieces"] = (*piece_nested);
+}
+
+void MainWindow::openPiece(Json::Value* root, int index){
+    std::vector<std::string> rootObjectList = (*root).getMemberNames();
+    enum piece{
+        PickupParameterCount,
+        PickupTemplateType,
+        PickupoverlayGlassColor,
+        PickupunderlayGlassColor
+    };
+    static std::map<std::string, int> mapEnum;
+    mapEnum["PickupParameterCount"] = 100;
+    mapEnum["PickupTemplateType"] = 101;
+    mapEnum["PickupoverlayGlassColor"] = 102;
+    mapEnum["PickupunderlayGlassColor"] = 103;
+
+    switch(mapEnum[rootObjectList.operator [](index)]){
+        case 100 : cout << (*root)["PickupParameterCount"]; break;
+        case 101 : cout << (*root)["PickupTemplateType"]; break;
+        case 102 : cout << (*root)["PickupoverlayGlassColor"]; break;
+        case 103 : cout << (*root)["PickupunderlayGlassColor"]; break;
+        default: cout << "error " << rootObjectList.operator [](index) << endl;
+        //im default nach cane, samecane teilen
+    }
+    Json::Value *root1 = new Json::Value;
+    *root1 = (rootObjectList.operator [](index));
+    for(int i=0; i<(int (rootObjectList.operator [](index).size()));i++){
+        cout << (rootObjectList.operator [](index));//getmembers wie oben!! ["cane1"]["subcane_depth1_"]["CasingThickness"];
+        cout << endl;
+    }
+}
+
+void MainWindow::openColors(Json::Value rootColor, map<GlassColor*, int>* colorMap){
+    //rootXXX variables are Json::Values; getMemberNames available
+    //vecXXX variables are vectors; operator [] available
+    vector<std::string> vecColorMembers = rootColor.getMemberNames(); //vector for colornames
+    (*colorMap).end();
+    enum colors{
+        R,
+        G,
+        B,
+        alpha
+    };
+
+    static std::map<std::string, int> colorMapEnum;
+    colorMapEnum["R"] = R;
+    colorMapEnum["G"] = G;
+    colorMapEnum["B"] = B;
+    colorMapEnum["alpha"] = alpha;
+
+
+    for(int j=0;j<(int (vecColorMembers.size()));j++){
+        Json::Value rootColorValue = rootColor[vecColorMembers.at(j)];
+        vector<std::string> vecColorValueMembers = rootColorValue.getMemberNames(); //vector for RGBalpha
+
+        Color *color = new Color;
+        GlassColor *glasscolor = new GlassColor;
+
+        if(vecColorMembers.operator [](j).operator [](2)=='_'){
+            if(vecColorValueMembers.size()==4){
+                for(int k=0; k<4; k++){
+                    switch(colorMapEnum[vecColorValueMembers.at(k)]){
+                    case R : ((*color).c)[0] = rootColorValue["R"].asFloat(); break;
+                    case G : ((*color).c)[1] = rootColorValue["G"].asFloat(); break;
+                    case B : ((*color).c)[2] = rootColorValue["B"].asFloat(); break;
+                    case alpha : ((*color).c)[3] = rootColorValue["alpha"].asFloat(); break;
+                    }
+                    (*glasscolor).setColor(*color);
+                }
+                string colorName = (vecColorMembers.at(j)).substr ((vecColorMembers.at(j)).find("_")+1);
+                (*glasscolor).setName(QString::fromStdString(colorName));
+                unhighlightAllLibraryWidgets();
+                AsyncColorBarLibraryWidget *w =new AsyncColorBarLibraryWidget(glasscolor, this);
+                colorBarLibraryLayout->addWidget(w);
+                colorEditorWidget->setGlassColor(glasscolor);
+                colorBarLibraryLayout->update();
+                // Trigger GUI updates
+                show();
+                w->updatePixmaps();
+                emit someDataChanged();
+            }
+            else{
+                cout << "error in color " << vecColorValueMembers.operator [](j);
+            }
+
+            int ten = (vecColorMembers.operator [](j).operator [](0))-48;
+            int one = (vecColorMembers.operator [](j).operator [](1))-48;
+            //colorMap[//pointer] = ten*10+one;
+            cout << ten*10+one;
+        }
+        else{
+            if(vecColorMembers.operator [](j).operator [](3)=='_'){
+                int hundred = (vecColorMembers.operator [](j).operator [](0))-48;
+                int ten = (vecColorMembers.operator [](j).operator [](1))-48;
+                int one = (vecColorMembers.operator [](j).operator [](2))-48;
+                //colorMap[//pointer] = hundred*100+ten*10+one;
+                cout << hundred*100+ten*10+one;
+            }
+            else{
+                cout << "too much colors :(";
+                cout << endl;
+            }
+
+        }
+
+    }
+}
+
+//void MainWindow::openCanes(Json::Value root, map<PullPlan*, int>* caneMap, map<GlassColor*, int>* colorMap){
+//    ;
+//}
+
+//void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<PullPlan*, int>* caneMap, map<GlassColor*, int>* colorMap){
+//    ;
+//}
+
+void MainWindow::open(){
+    //open file dialog
+        QString filename = QFileDialog::getOpenFileName(this, tr("Open Document"), QDir::currentPath(), tr("VirtualGlass file (*.glass);;All files (*.*)") );
+    QFile openFile(filename);
+    openFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QTextStream fileInput(&openFile);
+    QString QStr = fileInput.readAll();
+    std::string str = QStr.toStdString();
+    Json::Value root;
+    Json::Reader reader;
+    ifstream readHdl;
+    char versionNo[16]; //date has always 12 characters
+
+    readHdl.open(filename.toAscii());
+    readHdl.getline(versionNo,16,'\n');
+    readHdl.close();
+
+    //check version No
+    if((int(versionNo[2]))>55);//ascii: char 7 == int 55
+    else{
+        //lower version than 7xx
+    }
+    if((int(versionNo[3])<53)&&((int(versionNo[2]))>55)){
+            //lower version than (firstIf)5x
+    }
+    if((int(versionNo[4])<56)&&(int(versionNo[3])>53)&&((int(versionNo[2]))>55)){
+        //lower version than (firstIf)(secondIf)8
+    }
+
+    bool parsedSuccess = reader.parse(str,root,false);
+    map<GlassColor*, int> colorMap;
+    map<PullPlan*, int> caneMap;
+    map<Piece*, int> pieceMap;
+
+    if(!parsedSuccess){
+        cout<<"Failed to parse JSON"<<endl<<reader.getFormatedErrorMessages()<<endl; //debugging
+    }
+
+    if(int(root.size()!=3)){
+        cout << "error in file";
+    }
+    else{
+        vector<std::string> rootMembers = root.getMemberNames();
+        for(int i=0;i<3;i++){
+            if(rootMembers.operator [](i)=="colors") openColors(root["colors"], &colorMap);
+            //if(rootMembers.operator [](i)=="canes") openCanes(root["canes"], &caneMap, &colorMap);
+            //if(rootMembers.operator [](i)=="pieces") openPieces(root["pieces"], &pieceMap, &caneMap, &colorMap);
+        }
+    }
+}
+
+void MainWindow::saveAll(){
+    ;//open
+}
+
+void MainWindow::saveSelected(){
+    ;
+}
+
+void MainWindow::saveSelectedAs(){
+    ;
+}
+
+void MainWindow::saveAllAs(){
+    //save file dialog
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save your glass piece"), QDir::currentPath(), tr("VirtualGlass (*.glass)") );
+    //improve: prevent character set error in filename
+    //improve: empty file name -> "no savefile choosen"
+
+    QFile saveFile(filename);
+    saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream fileOutput(&saveFile);
+
+    //read version and date from version.txt; write this into json file (root0)
+    //first line; versionNo and date
+    ifstream readHdl;
+    //date has always 12 characters
+    char date[11];
+    char versionNo[4];
+
+    readHdl.open("/Volumes/HDD/virtualglass/svn/trunk/src/version.txt");
+    readHdl.getline(versionNo,4,'\n');
+    string versionStr;
+    versionStr.assign(versionNo, 4);
+    readHdl.getline(date,11,'\n');
+    string dateStr = date;
+    readHdl.close();
+
+    QString versionQstr(versionStr.c_str());
+    QString dateQstr(dateStr.c_str());
+    fileOutput << "//"<<versionQstr <<"_"<< dateQstr << "\n";
+
+    Json::Value root;
+    map<Piece*,int> pieceMap;
+    map<PullPlan*,int> caneMap;
+    map<GlassColor*, int> colorMap;
+    vector<PullPlan*> caneVec;
+    vector<GlassColor*> colorVec;
+
+    setM(0);
+    buildCaneMap(&caneVec, &colorVec);
+    writeColor(&root, &colorMap, colorVec);
+    writeCane(&root, &caneMap, colorMap, caneVec);
+    writePiece(&root, &pieceMap, &caneMap, colorMap);
+
+    fileOutput << writeJson(root);
+    saveFile.close();
+}
+
+void MainWindow::setupMenus()
+{
+    //open
+    openAct = new QAction(tr("&Open"), this);
+    openAct->setShortcuts(QKeySequence::Open);
+    openAct->setStatusTip(tr("Open an existing file"));
+    connect(openAct, SIGNAL(triggered()), this, SLOT(open()));
+
+    //save
+    saveAllAct = new QAction(tr("&SaveAll"), this);
+    saveAllAct->setShortcuts(QKeySequence::Save);
+    saveAllAct->setStatusTip(tr("Save all glass to disk"));
+    connect(saveAllAct, SIGNAL(triggered()), this, SLOT(saveAll()));
+
+    //saveSelected; no shortcut
+    saveSelectedAct = new QAction(tr("&SaveSelected"), this);
+    saveSelectedAct->setStatusTip(tr("Save selected glass to disk"));
+    connect(saveSelectedAct, SIGNAL(triggered()), this, SLOT(saveSelected()));
+
+    //saveAllAs
+    saveAllAsAct = new QAction(tr("&SaveAllAs"), this);
+    saveAllAsAct->setShortcuts(QKeySequence::SaveAs);
+    saveAllAsAct->setStatusTip(tr("Save all glass to disk"));
+    connect(saveAllAsAct, SIGNAL(triggered()), this, SLOT(saveAllAs()));
+
+    //saveSelectedAs
+    saveSelectedAsAct = new QAction(tr("&SaveSelectedAs"), this);
+    saveSelectedAsAct->setStatusTip(tr("Save selected glass to disk"));
+    connect(saveSelectedAsAct, SIGNAL(triggered()), this, SLOT(saveSelectedAs()));
+
+
+    //examples:webtutorial1
+    web1PieceAction = new QAction("Tutorial 1", this);
+    web1PieceAction->setStatusTip("The first tutorial found on virtualglass.org");
+
+    //examples:webtutorial2
+    web2PieceAction = new QAction("Tutorial 2", this);
+    web2PieceAction->setStatusTip("The second tutorial found on virtualglass.org");
+
+    //examples:random:simple cane
+    randomSimpleCaneAction = new QAction("&Simple Cane", this);
+    randomSimpleCaneAction->setStatusTip("Randomly generate a simple example cane.");
+
+    //examples:random:simple piece
+    randomSimplePieceAction = new QAction("&Simple Piece", this);
+    randomSimplePieceAction->setStatusTip("Randomly generate a simple example piece.");
+
+    //examples:random:complex cane
+    randomComplexCaneAction = new QAction("&Complex Cane", this);
+    randomComplexCaneAction->setStatusTip("Ranomly generate a complex example cane.");
+
+    //examples:random:complex piece
+    randomComplexPieceAction = new QAction("&Complex Piece", this);
+    randomComplexPieceAction->setStatusTip("Randomly generate a complex example piece.");
+
+    // Examples menu and Examples:Random menu
+    examplesMenu = menuBar()->addMenu("&Examples"); //create menu for cane/piece examples
+    webExamplesMenu = examplesMenu->addMenu("&Web");
+    webExamplesMenu->addAction(web1PieceAction);
+    webExamplesMenu->addAction(web2PieceAction);
+    randomExamplesMenu = examplesMenu->addMenu("&Random");
+    randomExamplesMenu->addAction(randomSimpleCaneAction);
+    randomExamplesMenu->addAction(randomComplexCaneAction);
+    randomExamplesMenu->addSeparator();
+    randomExamplesMenu->addAction(randomSimplePieceAction);
+    randomExamplesMenu->addAction(randomComplexPieceAction);
+
+    // toggle depth peeling
+    depthPeelAction = new QAction(tr("&Depth peeling"), this);
+    depthPeelAction->setCheckable(true);
+    depthPeelAction->setChecked(NiceViewWidget::peelEnable);
+    depthPeelAction->setStatusTip(tr("Toggle high-quality transparency rendering in 3D views"));
+
+    // Performance menu
+    perfMenu = menuBar()->addMenu(tr("Performance"));
+    perfMenu->addAction(depthPeelAction);
+
+}
+
+void MainWindow::createMenus()
+{
+    fileMenu = menuBar()->addMenu(tr("&File")); //create File menu
+    fileMenu->addAction(openAct); //add openButton
+    fileMenu->addAction(saveAllAct); //add saveButton
+    fileMenu->addAction(saveSelectedAct); //add saveButton
+    fileMenu->addAction(saveAllAsAct); //add saveButton
+    fileMenu->addAction(saveSelectedAsAct); //add saveAsButton
+}

@@ -4,7 +4,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-// <json/json.h>
+#include <QtGui>
+#include <QObject>
+#include <json/json.h>
 
 class GlassColor;
 class PullPlan;
@@ -43,8 +45,12 @@ class MainWindow : public QMainWindow
 		void keyPressEvent(QKeyEvent* e);
 		QString windowTitle();
 
-	//protected:
-		//void contextMenuEvent(QContextMenuEvent *event);
+        void setM(int);
+        char* getMchar();
+        int getM();
+
+    protected:
+        void contextMenuEvent(QContextMenuEvent *event);
 
 	signals:
 		void someDataChanged();
@@ -72,19 +78,18 @@ class MainWindow : public QMainWindow
 		void initializeRandomPiece();
 		void deleteCurrentEditingObject();
 		void setViewMode(enum ViewMode m);
-		//QString writeJson(Json::Value);
-		//void prepareJson(PullPlan*, Json::Value*, string nestedValue);
-		//void buildCaneTree(PullPlan* , PullPlan* , map<PullPlan*,int>, Json::Value*);
-		//void buildCaneMap(PullPlan*, Json::Value*, map<PullPlan*,int>);
-		//int getM();
-		//void setM(int m);
+        QString writeJson(Json::Value);
+        void prepareJson(PullPlan*, Json::Value*, std::string nestedValue);
+        void buildCaneTree(PullPlan* , PullPlan* , std::map<PullPlan*,int>, Json::Value*);
+        void buildCaneMap(PullPlan*, Json::Value*, std::map<PullPlan*,int>);
+        void createActions();
+        void createMenus();
 
 		void unhighlightAllLibraryWidgets();
 		bool glassColorIsDependancy(GlassColor* color);
 		bool pullPlanIsDependancy(PullPlan* plan);
 
 		// Variables
-		//int m;
 		QLabel* whatToDoLabel;
 		NiceViewWidget* colorBarNiceViewWidget;
 		QVBoxLayout* colorBarLibraryLayout;
@@ -115,11 +120,14 @@ class MainWindow : public QMainWindow
 		QAction *web1PieceAction;
 		QAction *web2PieceAction;
 		QMenu *fileMenu;
-		QAction *openAction;
-		QAction *saveAction;
-		QAction *saveAsAction;
+        QAction *openAct;
+        QAction *saveAllAct;
+        QAction *saveSelectedAct;
+        QAction *saveAllAsAct;
+        QAction *saveSelectedAsAct;
 		QMenu *perfMenu;
 		QAction *depthPeelAction;
+        int m;
 
 	private slots:
 		void updateEverything();
@@ -130,9 +138,11 @@ class MainWindow : public QMainWindow
 		void copyColorBar();
 		void copyPullPlan();
 		void copyPiece();
-		void open();
-		void save();
-		void saveAs();
+        void open();
+        void saveAll();
+        void saveSelected();
+        void saveAllAs();
+        void saveSelectedAs();
 		void randomSimpleCaneExampleActionTriggered();
 		void randomSimplePieceExampleActionTriggered();
 		void randomComplexCaneExampleActionTriggered();
@@ -140,8 +150,16 @@ class MainWindow : public QMainWindow
 		void web1PieceExampleActionTriggered();
 		void web2PieceExampleActionTriggered();
 		void depthPeelActionTriggered();
+        void buildCaneTree(PullPlan* , std::vector<PullPlan*>*, std::vector<GlassColor*>*);
+        void buildCaneMap(std::vector<PullPlan *>*, std::vector<GlassColor*>*);
+        void writeCane(Json::Value*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>, std::vector<PullPlan*>);
+        void writeColor(Json::Value*, std::map<GlassColor*, int>*, std::vector<GlassColor*>);
+        void writePiece(Json::Value*, std::map<Piece*, int>*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>);
+        void openColors(Json::Value, std::map<GlassColor*, int>*);
+        //void openCanes(Json::Value, std::map<PullPlan*, int>*, std::map<GlassColor*, int>* colorMap);
+        void openPiece(Json::Value*, int index);
+        //void openPieces(Json::Value, std::map<Piece*, int>*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>*);
 };
-
 
 #endif
 
