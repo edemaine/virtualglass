@@ -176,7 +176,7 @@ int PullPlan :: getTwist() {
 	return this->twist;
 }
 
-int PullPlan :: getTemplateType() {
+enum PullTemplate::Type PullPlan :: getTemplateType() {
 
 	return this->templateType;
 }
