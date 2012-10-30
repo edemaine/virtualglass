@@ -5,7 +5,7 @@
 #include <sstream>
 #include <fstream>
 #include <QTextStream>
-#include <iostream.h>
+#include <iostream>
 
 #include "constants.h"
 #include "dependancy.h"
