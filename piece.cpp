@@ -77,7 +77,7 @@ void Piece :: getParameter(unsigned int _index, TemplateParameter* dest)
 void Piece :: setParameter(unsigned int _index, int _value)
 {
 	assert(_index < parameters.size());
-	assert(parameters[_index].lowerLimit <= _value <= parameters[_index].upperLimit);
+    assert(parameters[_index].lowerLimit <= _value && _value <= parameters[_index].upperLimit);
 	parameters[_index].value = _value;
 }
 
