@@ -1716,6 +1716,8 @@ Path::addPathInArg( const std::string &path,
                     InArgs::const_iterator &itInArg, 
                     PathArgument::Kind kind )
 {
+   //VirtualGlass fix:
+   (void) path;
    if ( itInArg == in.end() )
    {
        // Error: missing argument %d
@@ -1736,6 +1738,9 @@ Path::invalidPath( const std::string &path,
                    int location )
 {
    // Error: invalid path.
+   //VirtualGlass fix:
+   (void) path;
+   (void) location;
 }
 
 
