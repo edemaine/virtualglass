@@ -46,6 +46,7 @@ class MainWindow : public QMainWindow
 		QString windowTitle();
 
     protected:
+        void closeEvent(QCloseEvent *event);
         void contextMenuEvent(QContextMenuEvent *event);
 
 	signals:
@@ -116,6 +117,7 @@ class MainWindow : public QMainWindow
 		QAction *web1PieceAction;
 		QAction *web2PieceAction;
 		QMenu *fileMenu;
+        QAction *newAct;
         QAction *openAct;
         QAction *saveAllAct;
         QAction *saveSelectedAct;
@@ -134,6 +136,7 @@ class MainWindow : public QMainWindow
 		void copyPullPlan();
 		void copyPiece();
         void open();
+        void New();
         void saveAll();
         void saveSelected();
         void saveAllAs();

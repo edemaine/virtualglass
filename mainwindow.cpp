@@ -879,6 +879,14 @@ void MainWindow :: updateLibrary()
     }
 }
 
+void MainWindow::closeEvent(QCloseEvent *event){
+    //maybe save settings to open the programm with closed settings?
+    //if not saved:
+    //////MainWindow::saveAllAs();
+    //Else: nothing
+    event->accept();
+}
+
 
 void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 {
@@ -1670,8 +1678,40 @@ void MainWindow::open(){
     }
 }
 
+void MainWindow::New(){
+    AsyncColorBarLibraryWidget* cblw;
+    for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
+    {
+            cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
+                    dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
+            if (colorEditorWidget->getGlassColor() == cblw->getGlassColor())
+            {
+                cblw->close();
+                cblw->updatePixmaps();
+            }
+    }
+
+    AsyncPullPlanLibraryWidget* pplw;
+    for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
+    {
+        pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
+            dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
+        pplw->close();
+        pplw->updatePixmaps();
+    }
+
+    AsyncPieceLibraryWidget* plw;
+    for (int i = 0; i < pieceLibraryLayout->count(); ++i)
+    {
+        plw = dynamic_cast<AsyncPieceLibraryWidget*>(
+            dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
+        plw->close();
+        plw->updatePixmap();
+    }
+}
+
 void MainWindow::saveAll(){
-    ;//open
+    ;
 }
 
 void MainWindow::saveSelected(){
@@ -1679,7 +1719,9 @@ void MainWindow::saveSelected(){
 }
 
 void MainWindow::saveSelectedAs(){
-    ;
+
+
+    //(pieceEditorWidget->getPiece())
 }
 
 void MainWindow::saveAllAs(){
@@ -1736,6 +1778,13 @@ void MainWindow::setupMenus()
     openAct->setShortcuts(QKeySequence::Open);
     openAct->setStatusTip(tr("Open an existing file"));
     connect(openAct, SIGNAL(triggered()), this, SLOT(open()));
+
+    //new
+
+    newAct = new QAction(tr("&New"), this);
+    newAct->setShortcuts(QKeySequence::New);
+    newAct->setStatusTip(tr("Open a new VirtualGlass session"));
+    connect(newAct, SIGNAL(triggered()), this, SLOT(New()));
 
     //save
     saveAllAct = new QAction(tr("&SaveAll"), this);
@@ -1812,6 +1861,7 @@ void MainWindow::createMenus()
 {
     fileMenu = menuBar()->addMenu(tr("&File")); //create File menu
     fileMenu->addAction(openAct); //add openButton
+    fileMenu->addAction(newAct); //add newButton
     fileMenu->addAction(saveAllAct); //add saveButton
     fileMenu->addAction(saveSelectedAct); //add saveButton
     fileMenu->addAction(saveAllAsAct); //add saveButton

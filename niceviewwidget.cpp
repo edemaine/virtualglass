@@ -61,7 +61,7 @@ NiceViewWidget :: NiceViewWidget(enum CameraMode cameraMode, QWidget *parent)
 		case PIECE_CAMERA_MODE:
 			theta = -PI/2.0;
 			phi = PI/2;
-			rho = 16.0; 
+            rho = 16.0;
 			lookAtLoc[0] = 0.0;
 			lookAtLoc[1] = 0.0;
 			lookAtLoc[2] = 0.0;
@@ -353,13 +353,25 @@ void NiceViewWidget :: mouseMoveEvent (QMouseEvent* e)
 
 void NiceViewWidget :: wheelEvent(QWheelEvent *e)
 {
-	if (cameraMode == PICKUPPLAN_CAMERA_MODE || cameraMode == PULLPLAN_CAMERA_MODE)
-		return;
-
-	if (e->delta() > 0)
-		rho *= 0.8;
-	else if (e->delta() < 0)
-		rho *= 1.2;	
+    if (cameraMode == PICKUPPLAN_CAMERA_MODE)
+        return;
+    if(cameraMode == PULLPLAN_CAMERA_MODE){
+        if (e->delta() > 0)
+            rho *= 0.8;
+        else{ if (e->delta() < 0){
+                if((rho*1.2)>(11.0))
+                    rho=11.0;
+                else
+                    rho *= 1.2;
+                }
+            }
+    }
+    else{
+        if (e->delta() > 0)
+            rho *= 0.8;
+        else if (e->delta() < 0)
+            rho *= 1.2;
+    }
 	update();	
 }
 
