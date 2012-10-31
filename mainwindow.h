@@ -151,9 +151,8 @@ class MainWindow : public QMainWindow
         void writeColor(Json::Value*, std::map<GlassColor*, int>*, std::vector<GlassColor*>);
         void writePiece(Json::Value*, std::map<Piece*, int>*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>);
         void openColors(Json::Value, std::map<GlassColor*, int>*);
-        //void openCanes(Json::Value, std::map<PullPlan*, int>*, std::map<GlassColor*, int>* colorMap);
-        void openPiece(Json::Value*, int index);
-        //void openPieces(Json::Value, std::map<Piece*, int>*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>*);
+        void openCanes(Json::Value, std::map<PullPlan*, int>*, std::map<GlassColor*, int>* colorMap);
+        void openPieces(Json::Value, std::map<Piece*, int>*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>*);
 };
 
 #endif
