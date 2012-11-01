@@ -1477,15 +1477,7 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 		Json::Value rootPieceValues = root[vecPieceMembers.operator [](i)];
 		std::vector<std::string> vecPieceValues = rootPieceValues.getMemberNames(); //vec with piece values
 		map<GlassColor*,int>::iterator iterGlass;
-		//Color global = *(GlobalGlass::color())->getColor();
-		//cout << global;
-		//cout << endl;
 		Piece *piece = new Piece(PieceTemplate::BOWL);
-		//cout << global;
-		//cout << endl;
-		//piece->pickup->overlayGlassColor->setColor(global);
-		//piece->pickup->underlayGlassColor->setColor(global);
-		//piece->pickup->casingGlassColor->setColor(global);
 		Json::Value rootPieceTempl;
 		for(int i = 0;i<(int (vecPieceValues.size()));i++){
 			string name = vecPieceValues.operator [](i);
