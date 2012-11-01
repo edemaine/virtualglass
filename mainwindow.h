@@ -149,10 +149,10 @@ class MainWindow : public QMainWindow
 		void web2PieceExampleActionTriggered();
 		void depthPeelActionTriggered();
         void buildCaneTree(PullPlan* , std::vector<PullPlan*>*, std::vector<GlassColor*>*);
-        void buildCaneMap(std::vector<PullPlan *>*, std::vector<GlassColor*>*);
+        void buildCaneMap(std::vector<PullPlan *>*, std::vector<GlassColor*>*, int);
         void writeCane(Json::Value*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>, std::vector<PullPlan*>);
         void writeColor(Json::Value*, std::map<GlassColor*, int>*, std::vector<GlassColor*>);
-        void writePiece(Json::Value*, std::map<Piece*, int>*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>);
+        void writePiece(Json::Value*, std::map<Piece*, int>*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>, int);
         void openColors(Json::Value, std::map<GlassColor*, int>*);
         void openCanes(Json::Value, std::map<PullPlan*, int>*, std::map<GlassColor*, int>* colorMap);
         void openPieces(Json::Value, std::map<Piece*, int>*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>*);

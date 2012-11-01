@@ -922,12 +922,17 @@ void MainWindow::buildCaneTree(PullPlan* plan, vector<PullPlan*>* caneVec, vecto
     }
 }
 
-void MainWindow::buildCaneMap(vector<PullPlan*>* caneVec, vector<GlassColor*>* colorVec){
+void MainWindow::buildCaneMap(vector<PullPlan*>* caneVec, vector<GlassColor*>* colorVec, int selected){
     AsyncPieceLibraryWidget *plw;
     for (int j = 0; j < pieceLibraryLayout->count(); ++j){
         plw = dynamic_cast<AsyncPieceLibraryWidget*>(dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(j))->widget());
 
         Piece* piece = plw->getPiece();
+        //build map the selected piece only
+        if(selected==1){
+            j=(pieceLibraryLayout->count())+1;
+            piece = (pieceEditorWidget->getPiece());
+        }
 
         for(int i =0; i<(int(((*piece).pickup->subs.size()))); i++){
             SubpickupTemplate pick = (*piece).pickup->subs.at(i);
@@ -1093,17 +1098,24 @@ void MainWindow::writeColor(Json::Value* root, map<GlassColor*, int>* colorMap, 
     (*root)["colors"] = (*color_nested);
 }
 
-void MainWindow::writePiece(Json::Value* root, map<Piece*, int>* pieceMap, map<PullPlan*, int>* caneMap, map<GlassColor*, int> colorMap){
+void MainWindow::writePiece(Json::Value* root, map<Piece*, int>* pieceMap, map<PullPlan*, int>* caneMap, map<GlassColor*, int> colorMap, int selected){
     AsyncPieceLibraryWidget *plw;
     Json::Value *piece_nested = new Json::Value;
 
-    for (int i = 0; i < pieceLibraryLayout->count(); ++i){
-        plw = dynamic_cast<AsyncPieceLibraryWidget*>(
-                    dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 
-        Piece* piece = plw->getPiece();
-        (*pieceMap)[piece] = i;
+    if(selected==0){
+        for (int i = 0; i < pieceLibraryLayout->count(); ++i){
+            plw = dynamic_cast<AsyncPieceLibraryWidget*>(
+                        dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
+
+            Piece* piece = plw->getPiece();
+            (*pieceMap)[piece] = i;
+        }
     }
+    else{
+        (*pieceMap)[pieceEditorWidget->getPiece()] = 0; //build map with selected piece only
+    }
+
 
     map<Piece*, int>::iterator position;
     for(position = (*pieceMap).begin(); position != (*pieceMap).end(); ++position){
@@ -1719,9 +1731,51 @@ void MainWindow::saveSelected(){
 }
 
 void MainWindow::saveSelectedAs(){
+    //save file dialog
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save your glass piece"), QDir::currentPath(), tr("VirtualGlass (*.glass)") );
+    //improve: prevent character set error in filename
+    //improve: empty file name -> "no savefile choosen"
 
+    QFile saveFile(filename);
+    saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream fileOutput(&saveFile);
 
-    //(pieceEditorWidget->getPiece())
+    //read version and date from version.txt; write this into json file (root0)
+    //first line; versionNo and date
+    ifstream readHdl;
+    //date has always 12 characters
+    char date[11];
+    char versionNo[4];
+
+    readHdl.open(":/version.txt");
+    readHdl.getline(versionNo,4,'\n');
+    string versionStr;
+    versionStr.assign(versionNo, 4);
+    readHdl.getline(date,11,'\n');
+    string dateStr = date;
+    readHdl.close();
+
+    QString versionQstr(versionStr.c_str());
+    QString dateQstr(dateStr.c_str());
+    fileOutput << "//"<<versionQstr <<"_"<< dateQstr << "\n";
+
+    Json::Value root;
+    map<Piece*,int> pieceMap;
+    map<PullPlan*,int> caneMap;
+    map<GlassColor*, int> colorMap;
+    vector<PullPlan*> caneVec;
+    vector<GlassColor*> colorVec;
+
+    colorMap[GlobalGlass::color()] = 0;
+
+    buildCaneMap(&caneVec, &colorVec, 1);
+
+    writeColor(&root, &colorMap, colorVec);
+    writeCane(&root, &caneMap, colorMap, caneVec);
+    writePiece(&root, &pieceMap, &caneMap, colorMap, 1);
+
+    fileOutput << writeJson(root);
+    saveFile.close();
 }
 
 void MainWindow::saveAllAs(){
@@ -1762,10 +1816,10 @@ void MainWindow::saveAllAs(){
 
     colorMap[GlobalGlass::color()] = 0;
 
-    buildCaneMap(&caneVec, &colorVec);
+    buildCaneMap(&caneVec, &colorVec, 0);
     writeColor(&root, &colorMap, colorVec);
     writeCane(&root, &caneMap, colorMap, caneVec);
-    writePiece(&root, &pieceMap, &caneMap, colorMap);
+    writePiece(&root, &pieceMap, &caneMap, colorMap, 0);
 
     fileOutput << writeJson(root);
     saveFile.close();
