@@ -1715,12 +1715,16 @@ void MainWindow::New(){
     {
             cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
                     dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
-            if (colorEditorWidget->getGlassColor() == cblw->getGlassColor())
-            {
                 cblw->close();
                 cblw->updatePixmaps();
-            }
     }
+
+    AsyncColorBarLibraryWidget *cb =new AsyncColorBarLibraryWidget(new GlassColor(), this);
+    colorBarLibraryLayout->addWidget(cb);
+    colorBarLibraryLayout->update();
+    show();
+    cb->updatePixmaps();
+    emit someDataChanged();
 
     AsyncPullPlanLibraryWidget* pplw;
     for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
@@ -1730,6 +1734,12 @@ void MainWindow::New(){
         pplw->close();
         pplw->updatePixmaps();
     }
+    AsyncPullPlanLibraryWidget *ppl = new AsyncPullPlanLibraryWidget(new PullPlan(PullTemplate::BASE_CIRCLE));
+    pullPlanLibraryLayout->addWidget(ppl);
+    pullPlanLibraryLayout->update();
+    show();
+    ppl->updatePixmaps();
+    emit someDataChanged();
 
     AsyncPieceLibraryWidget* plw;
     for (int i = 0; i < pieceLibraryLayout->count(); ++i)
@@ -1739,6 +1749,12 @@ void MainWindow::New(){
         plw->close();
         plw->updatePixmap();
     }
+    AsyncPieceLibraryWidget *pl = new AsyncPieceLibraryWidget(new Piece(PieceTemplate::TUMBLER));
+    pieceLibraryLayout->addWidget(pl);
+    pieceLibraryLayout->update();
+    show();
+    pl->updatePixmap();
+    emit someDataChanged();
 }
 
 void MainWindow::saveAll(){
