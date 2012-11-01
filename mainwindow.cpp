@@ -1331,8 +1331,7 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
                     if(templType.find(" ") != std::string::npos)
                         templType.replace(templType.find(" "),1, "");
                 }
-                cout << templType;
-                cout << endl;
+
                 switch(caneMapEnum[(templType)]){
                                        case BaseCircle : (*plan).setTemplateType(PullTemplate::BASE_CIRCLE); break;
                                        case BaseSquare : (*plan).setTemplateType(PullTemplate::BASE_SQUARE); break;
@@ -1372,18 +1371,12 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
     int j=0;
     for(pullIter = caneMap->begin();pullIter != caneMap->end();pullIter++){
         PullPlan *plan = new PullPlan(PullTemplate::BASE_CIRCLE);
-        cout << "bla";
-        cout << endl;
         plan = pullIter->first;
         Json::Value rootCaneValue = rootCane[vecCaneMembers.at(j)];
-        cout << "vecCaneMembers.at(j) " << vecCaneMembers.at(j);
-        cout << endl;
         Json::Value rootCaneSubpull = rootCaneValue["SubpullplanTemplate"];
         vector<std::string>vecCaneSubpullMembers = rootCaneSubpull.getMemberNames();
         for (int i = 0; i<(int (vecCaneSubpullMembers.size())); i++){
             Json::Value rootSubcane = rootCaneSubpull[vecCaneSubpullMembers.at(i)];
-            cout << "i " << i << " vecCaneSubpullMembers.at(i)  " << vecCaneSubpullMembers.at(i);
-            cout << endl;
             int k = 0;
             for(SubpullIter = caneMap->begin();SubpullIter != caneMap->end();SubpullIter++){
                 if(SubpullIter->second==rootSubcane["cane"].asInt()){
@@ -1399,14 +1392,9 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
                     location->operator [](1) = rootSubcane["y"].asFloat();
                     location->operator [](2) = rootSubcane["z"].asFloat();
                     SubpullTemplate *Sub = new SubpullTemplate(Subplan, *shape, *location, rootSubcane["diameter"].asFloat());
-                    cout << Sub;
-                    cout << endl;
                     plan->subs.insert(plan->subs.begin()+k,*Sub);
                     //plan->subs.push_back(*Sub);
                     k++;
-                    cout << plan->subs.size();
-                    cout << endl;
-
                 }
 
             }
@@ -1447,8 +1435,10 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
         z,
         row,
         thickness,
-        column
-
+        column,
+        lipwidth,
+        bodywidth,
+        twist
     };
     static std::map<std::string, int> mapEnum;
     mapEnum["overlayGlassColor"] = overlayGlassColor;
@@ -1479,14 +1469,29 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
     mapEnum["Row/Column count"] = row;
     mapEnum["Thickness"] = thickness;
     mapEnum["Column count"] = column;
+    mapEnum["Lip width"] = lipwidth;
+    mapEnum["Body width"] = bodywidth;
+    mapEnum["Twist"] = twist;
     for(int i = 0; i<(int (vecPieceMembers.size())); i++){
         Json::Value rootPieceValues = root[vecPieceMembers.operator [](i)];
         std::vector<std::string> vecPieceValues = rootPieceValues.getMemberNames(); //vec with piece values
         map<GlassColor*,int>::iterator iterGlass;
+        //Color global = *(GlobalGlass::color())->getColor();
+        //cout << global;
+        //cout << endl;
         Piece *piece = new Piece(PieceTemplate::BOWL);
+        //cout << global;
+        //cout << endl;
+        //piece->pickup->overlayGlassColor->setColor(global);
+        //piece->pickup->underlayGlassColor->setColor(global);
+        //piece->pickup->casingGlassColor->setColor(global);
         Json::Value rootPieceTempl;
         for(int i = 0;i<(int (vecPieceValues.size()));i++){
-            switch(mapEnum[vecPieceValues.operator [](i)]){
+            string name = vecPieceValues.operator [](i);
+            if((vecPieceValues.operator [](i)).find("_") != std::string::npos){
+                name = (vecPieceValues.operator [](i)).substr ((vecPieceValues.operator [](i)).find("_")+1);
+            }
+            switch(mapEnum[name]){
             case Vase : case Tumbler : case Bowl : case Pot :{
                 rootPieceTempl = rootPieceValues[vecPieceValues.operator [](i)];
                 if(int(piece->getParameterCount())==3){
@@ -1543,22 +1548,29 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
                 break;
             case overlayGlassColor : { if(rootPieceValues["overlayGlassColor"]!=rootPieceValues["NULL"]){
                     if((rootPieceValues["overlayGlassColor"].asInt())==0){
-                        piece->pickup->overlayGlassColor->setColor(*GlobalGlass::color()->getColor());
+                        iterGlass = colorMap->begin();
+                        piece->pickup->overlayGlassColor->setColor(*(GlobalGlass::color())->getColor());
+                        cout << "gg " <<(*(iterGlass->first)->getColor());
+                        cout << endl;
                     }
                     else{
                         for(iterGlass = colorMap->begin();iterGlass != colorMap->end();iterGlass++){
                             if(iterGlass->second==rootPieceValues["overlayGlassColor"].asInt()){
                                 piece->pickup->overlayGlassColor->setColor(*(iterGlass->first)->getColor());
-                                cout << rootPieceValues["overlayGlassColor"];
+                                cout << (*(iterGlass->first)->getColor()) << " " << (*GlobalGlass::color()->getColor());
+                                cout << endl;
                             }
                         }
                     }
                 }
-                        break;
+            break;
             }
             case underlayGlassColor : { if(rootPieceValues["underlayGlassColor"]!=rootPieceValues["NULL"]){
                    if((rootPieceValues["underlayGlassColor"].asInt())==0){
-                       piece->pickup->overlayGlassColor->setColor(*GlobalGlass::color()->getColor());
+                       iterGlass = colorMap->begin();
+                       piece->pickup->underlayGlassColor->setColor(*(GlobalGlass::color())->getColor());
+                       cout << "gg " <<(*(iterGlass->first)->getColor());
+                       cout << endl;
                    }
                    else{
                         for(iterGlass = colorMap->begin();iterGlass != colorMap->end();iterGlass++){
@@ -1572,7 +1584,11 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
             break;
             case casingGlassColor : { if(rootPieceValues["casingGlassColor"]!=rootPieceValues["NULL"]){
                         if((rootPieceValues["casingGlassColor"].asInt())==0){
-                                piece->pickup->overlayGlassColor->setColor(*GlobalGlass::color()->getColor());
+                                iterGlass = colorMap->begin();
+                                //piece->pickup->casingGlassColor->setColor(*(iterGlass->first)->getColor());
+                                piece->pickup->casingGlassColor->setColor(*(GlobalGlass::color())->getColor());
+                                cout << "gg " <<(*(iterGlass->first)->getColor());
+                                cout << endl;
                         }
                         else{
                             for(iterGlass = colorMap->begin();iterGlass != colorMap->end();iterGlass++){
@@ -1583,11 +1599,9 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
                 }
             }
             break;
-            default: if((vecPieceValues.operator [](i)).find("_") != std::string::npos){
-                int position = (vecPieceValues.operator [](i)).find("_")-1;
-                int paramNumb = (vecPieceValues.operator [](i)).operator [] (position);
+            default: int position = (vecPieceValues.operator [](i)).find("_")-1;
+                int paramNumb = ((vecPieceValues.operator [](i)).operator [] (position))-48;
                 piece->setParameter(paramNumb, rootPieceValues[(vecPieceValues.operator [](i))].asInt());
-                }
             }
         }
         vector<string> vecPieceTempl = rootPieceTempl.getMemberNames();
@@ -1619,9 +1633,6 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
                     shape = SQUARE_SHAPE;
                 }
                 SubpickupTemplate *pick = new SubpickupTemplate(plan, location, rootPieceTemplMember["orientation"].asInt(), rootPieceTemplMember["length"].asFloat(), rootPieceTemplMember["width"].asFloat(), shape);
-                cout << "subs.size " <<piece->pickup->subs.size();
-                cout << endl;
-                cout << pick->length;
                 piece->pickup->subs.push_back(*pick);
                 emit someDataChanged();
                 this->updateEverything();
@@ -1674,7 +1685,7 @@ void MainWindow::open(){
     map<PullPlan*, int> caneMap;
     map<Piece*, int> pieceMap;
 
-    colorMap[GlobalGlass::color()] = 0;
+    colorMap[(GlobalGlass::color())] = 0;
 
     if(!parsedSuccess){
         cout<<"Failed to parse JSON"<<endl<<reader.getFormatedErrorMessages()<<endl; //debugging
@@ -1684,9 +1695,17 @@ void MainWindow::open(){
         cout << "error in file";
     }
     else{
+        cout << *(GlobalGlass::color()->getColor());
+        cout << endl;
         openColors(root["colors"], &colorMap);
+        cout << *(GlobalGlass::color()->getColor());
+        cout << endl;
         openCanes(root["canes"], &caneMap, &colorMap);
+        cout << *(GlobalGlass::color()->getColor());
+        cout << endl;
         openPieces(root["pieces"], &pieceMap, &caneMap, &colorMap);
+        cout << *(GlobalGlass::color()->getColor());
+        cout << endl;
     }
 }
 
