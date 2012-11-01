@@ -46,8 +46,6 @@ MainWindow :: MainWindow()
 
     emit someDataChanged();
     whatToDoLabel->setText("Click a library item at left to edit/view.");
-
-    createMenus();
 }
 
 void MainWindow :: setViewMode(enum ViewMode _mode)
@@ -76,15 +74,15 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 
 QString MainWindow :: windowTitle()
 {
-    QString title = tr("VirtualGlass");
-    QFile inFile(":/version.txt");
-    if (inFile.open(QIODevice::ReadOnly)) {
-        QTextStream in(&inFile);
-        QString revision = in.readLine();
-        QString date = in.readLine();
-        title += " - r" + revision + " built on " + date;
-    }
-    return title;
+	QString title = tr("VirtualGlass");
+	QFile inFile(":/version.txt");
+	if (inFile.open(QIODevice::ReadOnly)) {
+		QTextStream in(&inFile);
+		QString revision = in.readLine();
+		QString date = in.readLine();
+		title += " - r" + revision + " built on " + date;
+	}
+	return title;
 }
 
 void MainWindow :: seedEverything()
@@ -330,9 +328,12 @@ void MainWindow :: setupConnections()
     connect(copyPieceButton, SIGNAL(pressed()), this, SLOT(copyPiece()));
     connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 
-    //connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
-    //connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
-    //connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveAs()));
+    connect(openAct, SIGNAL(triggered()), this, SLOT(openFile()));
+    connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
+    connect(saveAllAct, SIGNAL(triggered()), this, SLOT(saveAllFile()));
+    connect(saveSelectedAct, SIGNAL(triggered()), this, SLOT(saveSelectedFile()));
+    connect(saveAllAsAct, SIGNAL(triggered()), this, SLOT(saveAllAsFile()));
+    connect(saveSelectedAsAct, SIGNAL(triggered()), this, SLOT(saveSelectedAsFile()));
 
     connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
     connect(randomSimplePieceAction, SIGNAL(triggered()), this, SLOT(randomSimplePieceExampleActionTriggered()));
@@ -1651,7 +1652,7 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
     }
 }
 
-void MainWindow::open(){
+void MainWindow::openFile(){
     //open file dialog
         QString filename = QFileDialog::getOpenFileName(this, tr("Open Document"), QDir::currentPath(), tr("VirtualGlass file (*.glass);;All files (*.*)") );
     QFile openFile(filename);
@@ -1709,7 +1710,7 @@ void MainWindow::open(){
     }
 }
 
-void MainWindow::New(){
+void MainWindow::newFile(){
     AsyncColorBarLibraryWidget* cblw;
     for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
     {
@@ -1757,15 +1758,15 @@ void MainWindow::New(){
     emit someDataChanged();
 }
 
-void MainWindow::saveAll(){
+void MainWindow::saveAllFile(){
     ;
 }
 
-void MainWindow::saveSelected(){
+void MainWindow::saveSelectedFile(){
     ;
 }
 
-void MainWindow::saveSelectedAs(){
+void MainWindow::saveSelectedAsFile(){
     //save file dialog
     QString filename = QFileDialog::getSaveFileName(this, tr("Save your glass piece"), QDir::currentPath(), tr("VirtualGlass (*.glass)") );
     //improve: prevent character set error in filename
@@ -1813,7 +1814,7 @@ void MainWindow::saveSelectedAs(){
     saveFile.close();
 }
 
-void MainWindow::saveAllAs(){
+void MainWindow::saveAllAsFile(){
     //save file dialog
     QString filename = QFileDialog::getSaveFileName(this, tr("Save your glass piece"), QDir::currentPath(), tr("VirtualGlass (*.glass)") );
     //improve: prevent character set error in filename
@@ -1866,37 +1867,38 @@ void MainWindow::setupMenus()
     openAct = new QAction(tr("&Open"), this);
     openAct->setShortcuts(QKeySequence::Open);
     openAct->setStatusTip(tr("Open an existing file"));
-    connect(openAct, SIGNAL(triggered()), this, SLOT(open()));
 
     //new
-
     newAct = new QAction(tr("&New"), this);
     newAct->setShortcuts(QKeySequence::New);
     newAct->setStatusTip(tr("Open a new VirtualGlass session"));
-    connect(newAct, SIGNAL(triggered()), this, SLOT(New()));
 
     //save
     saveAllAct = new QAction(tr("&SaveAll"), this);
     saveAllAct->setShortcuts(QKeySequence::Save);
     saveAllAct->setStatusTip(tr("Save all glass to disk"));
-    connect(saveAllAct, SIGNAL(triggered()), this, SLOT(saveAll()));
 
     //saveSelected; no shortcut
     saveSelectedAct = new QAction(tr("&SaveSelected"), this);
     saveSelectedAct->setStatusTip(tr("Save selected glass to disk"));
-    connect(saveSelectedAct, SIGNAL(triggered()), this, SLOT(saveSelected()));
 
     //saveAllAs
     saveAllAsAct = new QAction(tr("&SaveAllAs"), this);
     saveAllAsAct->setShortcuts(QKeySequence::SaveAs);
     saveAllAsAct->setStatusTip(tr("Save all glass to disk"));
-    connect(saveAllAsAct, SIGNAL(triggered()), this, SLOT(saveAllAs()));
 
     //saveSelectedAs
     saveSelectedAsAct = new QAction(tr("&SaveSelectedAs"), this);
     saveSelectedAsAct->setStatusTip(tr("Save selected glass to disk"));
-    connect(saveSelectedAsAct, SIGNAL(triggered()), this, SLOT(saveSelectedAs()));
 
+    //File menu
+    fileMenu = menuBar()->addMenu(tr("&File")); //create File menu
+    fileMenu->addAction(openAct); //add openButton
+    fileMenu->addAction(newAct); //add newButton
+    fileMenu->addAction(saveAllAct); //add saveButton
+    fileMenu->addAction(saveSelectedAct); //add saveButton
+    fileMenu->addAction(saveAllAsAct); //add saveButton
+    fileMenu->addAction(saveSelectedAsAct); //add saveAsButton
 
     //examples:webtutorial1
     web1PieceAction = new QAction("Tutorial 1", this);
@@ -1946,13 +1948,3 @@ void MainWindow::setupMenus()
 
 }
 
-void MainWindow::createMenus()
-{
-    fileMenu = menuBar()->addMenu(tr("&File")); //create File menu
-    fileMenu->addAction(openAct); //add openButton
-    fileMenu->addAction(newAct); //add newButton
-    fileMenu->addAction(saveAllAct); //add saveButton
-    fileMenu->addAction(saveSelectedAct); //add saveButton
-    fileMenu->addAction(saveAllAsAct); //add saveButton
-    fileMenu->addAction(saveSelectedAsAct); //add saveAsButton
-}

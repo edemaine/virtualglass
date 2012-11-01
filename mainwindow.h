@@ -45,9 +45,9 @@ class MainWindow : public QMainWindow
 		void keyPressEvent(QKeyEvent* e);
 		QString windowTitle();
 
-    protected:
-        void closeEvent(QCloseEvent *event);
-        void contextMenuEvent(QContextMenuEvent *event);
+	protected:
+		void closeEvent(QCloseEvent *event);
+		void contextMenuEvent(QContextMenuEvent *event);
 
 	signals:
 		void someDataChanged();
@@ -75,12 +75,11 @@ class MainWindow : public QMainWindow
 		void initializeRandomPiece();
 		void deleteCurrentEditingObject();
 		void setViewMode(enum ViewMode m);
-        QString writeJson(Json::Value);
-        void prepareJson(PullPlan*, Json::Value*, std::string nestedValue);
-        void buildCaneTree(PullPlan* , PullPlan* , std::map<PullPlan*,int>, Json::Value*);
-        void buildCaneMap(PullPlan*, Json::Value*, std::map<PullPlan*,int>);
-        void createActions();
-        void createMenus();
+		QString writeJson(Json::Value);
+		void prepareJson(PullPlan*, Json::Value*, std::string nestedValue);
+		void buildCaneTree(PullPlan* , PullPlan* , std::map<PullPlan*,int>, Json::Value*);
+		void buildCaneMap(PullPlan*, Json::Value*, std::map<PullPlan*,int>);
+		void createActions();
 
 		void unhighlightAllLibraryWidgets();
 		bool glassColorIsDependancy(GlassColor* color);
@@ -117,12 +116,12 @@ class MainWindow : public QMainWindow
 		QAction *web1PieceAction;
 		QAction *web2PieceAction;
 		QMenu *fileMenu;
-        QAction *newAct;
-        QAction *openAct;
-        QAction *saveAllAct;
-        QAction *saveSelectedAct;
-        QAction *saveAllAsAct;
-        QAction *saveSelectedAsAct;
+		QAction *newAct;
+		QAction *openAct;
+		QAction *saveAllAct;
+		QAction *saveSelectedAct;
+		QAction *saveAllAsAct;
+		QAction *saveSelectedAsAct;
 		QMenu *perfMenu;
 		QAction *depthPeelAction;
 
@@ -135,12 +134,12 @@ class MainWindow : public QMainWindow
 		void copyColorBar();
 		void copyPullPlan();
 		void copyPiece();
-        void open();
-        void New();
-        void saveAll();
-        void saveSelected();
-        void saveAllAs();
-        void saveSelectedAs();
+		void openFile();
+		void newFile();
+		void saveAllFile();
+		void saveSelectedFile();
+		void saveAllAsFile();
+		void saveSelectedAsFile();
 		void randomSimpleCaneExampleActionTriggered();
 		void randomSimplePieceExampleActionTriggered();
 		void randomComplexCaneExampleActionTriggered();
@@ -148,14 +147,14 @@ class MainWindow : public QMainWindow
 		void web1PieceExampleActionTriggered();
 		void web2PieceExampleActionTriggered();
 		void depthPeelActionTriggered();
-        void buildCaneTree(PullPlan* , std::vector<PullPlan*>*, std::vector<GlassColor*>*);
-        void buildCaneMap(std::vector<PullPlan *>*, std::vector<GlassColor*>*, int);
-        void writeCane(Json::Value*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>, std::vector<PullPlan*>);
-        void writeColor(Json::Value*, std::map<GlassColor*, int>*, std::vector<GlassColor*>);
-        void writePiece(Json::Value*, std::map<Piece*, int>*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>, int);
-        void openColors(Json::Value, std::map<GlassColor*, int>*);
-        void openCanes(Json::Value, std::map<PullPlan*, int>*, std::map<GlassColor*, int>* colorMap);
-        void openPieces(Json::Value, std::map<Piece*, int>*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>*);
+		void buildCaneTree(PullPlan* , std::vector<PullPlan*>*, std::vector<GlassColor*>*);
+		void buildCaneMap(std::vector<PullPlan *>*, std::vector<GlassColor*>*, int);
+		void writeCane(Json::Value*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>, std::vector<PullPlan*>);
+		void writeColor(Json::Value*, std::map<GlassColor*, int>*, std::vector<GlassColor*>);
+		void writePiece(Json::Value*, std::map<Piece*, int>*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>, int);
+		void openColors(Json::Value, std::map<GlassColor*, int>*);
+		void openCanes(Json::Value, std::map<PullPlan*, int>*, std::map<GlassColor*, int>* colorMap);
+		void openPieces(Json::Value, std::map<Piece*, int>*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>*);
 };
 
 #endif
