@@ -328,11 +328,11 @@ void MainWindow :: setupConnections()
 	connect(copyPieceButton, SIGNAL(pressed()), this, SLOT(copyPiece()));
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 
-	connect(openAct, SIGNAL(triggered()), this, SLOT(openFile()));
-	connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
-	connect(saveAllAct, SIGNAL(triggered()), this, SLOT(saveAllFile()));
-	connect(saveSelectedAct, SIGNAL(triggered()), this, SLOT(saveSelectedFile()));
-	connect(saveAllAsAct, SIGNAL(triggered()), this, SLOT(saveAllAsFile()));
+    connect(openAct, SIGNAL(triggered()), this, SLOT(openFile()));
+    connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
+    connect(saveAllAct, SIGNAL(triggered()), this, SLOT(saveAllFile()));
+    connect(saveSelectedAct, SIGNAL(triggered()), this, SLOT(saveSelectedFile()));
+    connect(saveAllAsAct, SIGNAL(triggered()), this, SLOT(saveAllAsFile()));
 	connect(saveSelectedAsAct, SIGNAL(triggered()), this, SLOT(saveSelectedAsFile()));
 
 	connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
@@ -1136,7 +1136,6 @@ void MainWindow::writePiece(Json::Value* root, map<Piece*, int>* pieceMap, map<P
 			(*nested_value3)[(pickTemplPara.name)] = pickTemplPara.value;
 		}
 
-
 		for(int i = 0;i<(int((*piece).getParameterCount()));i++){
 			TemplateParameter pieceTemplPara;
 			(*piece).getParameter(i,&pieceTemplPara);
@@ -1364,6 +1363,7 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(plan));
 		pullPlanLibraryLayout->update();
 		emit someDataChanged();
+		plan->subs.clear();
 		(*caneMap)[plan] = caneNumberInt;	
 	}
 	//fill subs
@@ -1536,6 +1536,7 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 						case murrine : piece->pickup->setTemplateType(PickupTemplate::MURRINE);
 							piece->pickup->subs.clear();
 							break;
+                    default : ;
 					}
 				}
 				break;
@@ -1655,8 +1656,16 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 
 void MainWindow::openFile(){
 	//open file dialog
-	QString filename = QFileDialog::getOpenFileName(this, tr("Open Document"), 
+	QString filename = QFileDialog::getOpenFileName(this, tr("Open Document"),
 		QDir::currentPath(), tr("VirtualGlass file (*.glass);;All files (*.*)") );
+	if((filename.toStdString())!=""){
+		QFile savePath("/Volumes/HDD/code/markuswebert-virtualglass-4e5a3278ac999be871a5b0d4a8e437b8d707d863/svn/trunk/src/save");
+		savePath.open(QIODevice::WriteOnly | QIODevice::Text);
+		QTextStream savePathOutput(&savePath);
+		savePathOutput << filename << "\n";
+		savePath.close();
+	}
+
 	QFile openFile(filename);
 	openFile.open(QIODevice::ReadOnly | QIODevice::Text);
 	QTextStream fileInput(&openFile);
@@ -1698,21 +1707,20 @@ void MainWindow::openFile(){
 		cout << "error in file";
 	}
 	else{
-		cout << *(GlobalGlass::color()->getColor());
-		cout << endl;
 		openColors(root["colors"], &colorMap);
-		cout << *(GlobalGlass::color()->getColor());
-		cout << endl;
 		openCanes(root["canes"], &caneMap, &colorMap);
-		cout << *(GlobalGlass::color()->getColor());
-		cout << endl;
 		openPieces(root["pieces"], &pieceMap, &caneMap, &colorMap);
-		cout << *(GlobalGlass::color()->getColor());
-		cout << endl;
 	}
 }
 
 void MainWindow::newFile(){
+
+	QFile savePath("/Volumes/HDD/code/markuswebert-virtualglass-4e5a3278ac999be871a5b0d4a8e437b8d707d863/svn/trunk/src/save");
+	savePath.open(QIODevice::WriteOnly | QIODevice::Text);
+	QTextStream savePathOutput(&savePath);
+	savePathOutput << "\n";
+	savePath.close();
+
 	AsyncColorBarLibraryWidget* cblw;
 	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 	{
@@ -1757,71 +1765,11 @@ void MainWindow::newFile(){
 	pieceLibraryLayout->update();
 	show();
 	pl->updatePixmap();
+	unhighlightAllLibraryWidgets();
 	emit someDataChanged();
 }
 
-void MainWindow::saveAllFile(){
-
-}
-
-void MainWindow::saveSelectedFile(){
-	
-}
-
-void MainWindow::saveSelectedAsFile(){
-	//save file dialog
-	QString filename = QFileDialog::getSaveFileName(this, tr("Save your glass piece"), QDir::currentPath(), tr("VirtualGlass (*.glass)") );
-	//improve: prevent character set error in filename
-	//improve: empty file name -> "no savefile choosen"
-
-	QFile saveFile(filename);
-	saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
-	QTextStream fileOutput(&saveFile);
-
-	//read version and date from version.txt; write this into json file (root0)
-	//first line; versionNo and date
-	ifstream readHdl;
-	//date has always 12 characters
-	char date[11];
-	char versionNo[4];
-
-	readHdl.open(":/version.txt");
-	readHdl.getline(versionNo,4,'\n');
-	string versionStr;
-	versionStr.assign(versionNo, 4);
-	readHdl.getline(date,11,'\n');
-	string dateStr = date;
-	readHdl.close();
-
-	QString versionQstr(versionStr.c_str());
-	QString dateQstr(dateStr.c_str());
-	fileOutput << "//"<<versionQstr <<"_"<< dateQstr << "\n";
-
-	Json::Value root;
-	map<Piece*,int> pieceMap;
-	map<PullPlan*,int> caneMap;
-	map<GlassColor*, int> colorMap;
-	vector<PullPlan*> caneVec;
-	vector<GlassColor*> colorVec;
-
-	colorMap[GlobalGlass::color()] = 0;
-
-	buildCaneMap(&caneVec, &colorVec, 1);
-
-	writeColor(&root, &colorMap, colorVec);
-	writeCane(&root, &caneMap, colorMap, caneVec);
-	writePiece(&root, &pieceMap, &caneMap, colorMap, 1);
-
-	fileOutput << writeJson(root);
-	saveFile.close();
-}
-
-void MainWindow::saveAllAsFile(){
-	//save file dialog
-	QString filename = QFileDialog::getSaveFileName(this, tr("Save your glass piece"), QDir::currentPath(), tr("VirtualGlass (*.glass)") );
-	//improve: prevent character set error in filename
-	//improve: empty file name -> "no savefile choosen"
-
+void MainWindow::save(QString filename){
 	QFile saveFile(filename);
 	saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
 	QTextStream fileOutput(&saveFile);
@@ -1861,6 +1809,126 @@ void MainWindow::saveAllAsFile(){
 
 	fileOutput << writeJson(root);
 	saveFile.close();
+}
+
+void MainWindow::saveAs(QString filename){
+	QFile saveFile(filename);
+	saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
+	QTextStream fileOutput(&saveFile);
+
+	//read version and date from version.txt; write this into json file (root0)
+	//first line; versionNo and date
+	ifstream readHdl;
+	//date has always 12 characters
+	char date[11];
+	char versionNo[4];
+
+	readHdl.open(":/version.txt");
+	readHdl.getline(versionNo,4,'\n');
+	string versionStr;
+	versionStr.assign(versionNo, 4);
+	readHdl.getline(date,11,'\n');
+	string dateStr = date;
+	readHdl.close();
+
+	QString versionQstr(versionStr.c_str());
+	QString dateQstr(dateStr.c_str());
+	fileOutput << "//"<<versionQstr <<"_"<< dateQstr << "\n";
+
+	Json::Value root;
+	map<Piece*,int> pieceMap;
+	map<PullPlan*,int> caneMap;
+	map<GlassColor*, int> colorMap;
+	vector<PullPlan*> caneVec;
+	vector<GlassColor*> colorVec;
+
+	colorMap[GlobalGlass::color()] = 0;
+
+	buildCaneMap(&caneVec, &colorVec, 1);
+	writeColor(&root, &colorMap, colorVec);
+	writeCane(&root, &caneMap, colorMap, caneVec);
+	writePiece(&root, &pieceMap, &caneMap, colorMap, 1);
+
+	fileOutput << writeJson(root);
+	saveFile.close();
+}
+
+void MainWindow::saveAllFile(){
+	char path[509]; //MS max path 248 chars, max filename 260 chars, plus 1 forterminator
+	//read version and date from version.txt; write this into json file (root0)
+	//first line; versionNo and date
+
+	ifstream readHdl;
+
+	readHdl.open("/Volumes/HDD/code/markuswebert-virtualglass-4e5a3278ac999be871a5b0d4a8e437b8d707d863/svn/trunk/src/save");
+	readHdl.getline(path,509, '\n');
+	string strPath;
+	strPath.assign(path, strlen(path));
+	readHdl.close();
+	QString filename;
+	if(strPath==""){
+		filename = QFileDialog::getSaveFileName(this, tr("Save your glass piece"), QDir::currentPath(), tr("VirtualGlass (*.glass)") );
+				//improve: prevent character set error in filename
+				//improve: empty file name -> "no savefile choosen"
+		if((filename.toStdString())!=""){
+			QFile savePath("/Volumes/HDD/code/markuswebert-virtualglass-4e5a3278ac999be871a5b0d4a8e437b8d707d863/svn/trunk/src/save");
+			savePath.open(QIODevice::WriteOnly | QIODevice::Text);
+			QTextStream savePathOutput(&savePath);
+			savePathOutput << filename << "\n";
+			savePath.close();
+		}
+	}
+	else{
+		filename = strPath.c_str();
+	}
+	saveAs(filename);
+}
+
+void MainWindow::saveSelectedFile(){
+
+	char path[509]; //MS max path 248 chars, max filename 260 chars, plus 1 forterminator
+	//read version and date from version.txt; write this into json file (root0)
+	//first line; versionNo and date
+
+	ifstream readHdl;
+
+	readHdl.open("/Volumes/HDD/code/markuswebert-virtualglass-4e5a3278ac999be871a5b0d4a8e437b8d707d863/svn/trunk/src/save");
+	readHdl.getline(path,509, '\n');
+	string strPath;
+	strPath.assign(path, strlen(path));
+	readHdl.close();
+	QString filename;
+	if(strPath==""){
+		filename = QFileDialog::getSaveFileName(this, tr("Save your glass piece"), QDir::currentPath(), tr("VirtualGlass (*.glass)") );
+				//improve: prevent character set error in filename
+				//improve: empty file name -> "no savefile choosen"
+		if((filename.toStdString())!=""){
+			QFile savePath("/Volumes/HDD/code/markuswebert-virtualglass-4e5a3278ac999be871a5b0d4a8e437b8d707d863/svn/trunk/src/save");
+			savePath.open(QIODevice::WriteOnly | QIODevice::Text);
+			QTextStream savePathOutput(&savePath);
+			savePathOutput << filename << "\n";
+			savePath.close();
+		}
+	}
+	else{
+		filename = strPath.c_str();
+	}
+	saveAs(filename);
+}
+
+void MainWindow::saveSelectedAsFile(){
+	QString filename = QFileDialog::getSaveFileName(this, tr("Save your glass piece"), QDir::currentPath(), tr("VirtualGlass (*.glass)") );
+	if(filename.toStdString()!="")
+		saveAs(filename);
+}
+
+void MainWindow::saveAllAsFile(){
+	//save file dialog
+	QString filename = QFileDialog::getSaveFileName(this, tr("Save your glass piece"), QDir::currentPath(), tr("VirtualGlass (*.glass)") );
+	//improve: prevent character set error in filename
+	//improve: empty file name -> "no savefile choosen"
+	if(filename.toStdString()!="")
+		save(filename);
 }
 
 void MainWindow::setupMenus()

@@ -80,6 +80,8 @@ class MainWindow : public QMainWindow
 		void buildCaneTree(PullPlan* , PullPlan* , std::map<PullPlan*,int>, Json::Value*);
 		void buildCaneMap(PullPlan*, Json::Value*, std::map<PullPlan*,int>);
 		void createActions();
+		void save(QString);
+		void saveAs(QString);
 
 		void unhighlightAllLibraryWidgets();
 		bool glassColorIsDependancy(GlassColor* color);
