@@ -882,9 +882,16 @@ void MainWindow :: updateLibrary()
 
 void MainWindow::closeEvent(QCloseEvent *event){
 	//maybe save settings to open the programm with closed settings?
-	//if not saved:
-	//////MainWindow::saveAllAs();
-	//Else: nothing
+	char path[509]; //MS max path 248 chars, max filename 260 chars, plus 1 forterminator
+	ifstream readHdl;
+	readHdl.open(":/save");
+	readHdl.getline(path,509, '\n');
+	string strPath;
+	strPath.assign(path, strlen(path));
+	readHdl.close();
+	//if(strPath==""){
+	//	saveAllAs();
+	//}
 	event->accept();
 }
 
@@ -1659,7 +1666,7 @@ void MainWindow::openFile(){
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open Document"),
 		QDir::currentPath(), tr("VirtualGlass file (*.glass);;All files (*.*)") );
 	if((filename.toStdString())!=""){
-		QFile savePath("/Volumes/HDD/code/markuswebert-virtualglass-4e5a3278ac999be871a5b0d4a8e437b8d707d863/svn/trunk/src/save");
+		QFile savePath(":/save");
 		savePath.open(QIODevice::WriteOnly | QIODevice::Text);
 		QTextStream savePathOutput(&savePath);
 		savePathOutput << filename << "\n";
@@ -1715,7 +1722,7 @@ void MainWindow::openFile(){
 
 void MainWindow::newFile(){
 
-	QFile savePath("/Volumes/HDD/code/markuswebert-virtualglass-4e5a3278ac999be871a5b0d4a8e437b8d707d863/svn/trunk/src/save");
+	QFile savePath(":/save");
 	savePath.open(QIODevice::WriteOnly | QIODevice::Text);
 	QTextStream savePathOutput(&savePath);
 	savePathOutput << "\n";
@@ -1860,7 +1867,7 @@ void MainWindow::saveAllFile(){
 
 	ifstream readHdl;
 
-	readHdl.open("/Volumes/HDD/code/markuswebert-virtualglass-4e5a3278ac999be871a5b0d4a8e437b8d707d863/svn/trunk/src/save");
+	readHdl.open(":/save");
 	readHdl.getline(path,509, '\n');
 	string strPath;
 	strPath.assign(path, strlen(path));
@@ -1871,7 +1878,7 @@ void MainWindow::saveAllFile(){
 				//improve: prevent character set error in filename
 				//improve: empty file name -> "no savefile choosen"
 		if((filename.toStdString())!=""){
-			QFile savePath("/Volumes/HDD/code/markuswebert-virtualglass-4e5a3278ac999be871a5b0d4a8e437b8d707d863/svn/trunk/src/save");
+			QFile savePath(":/save");
 			savePath.open(QIODevice::WriteOnly | QIODevice::Text);
 			QTextStream savePathOutput(&savePath);
 			savePathOutput << filename << "\n";
@@ -1892,7 +1899,7 @@ void MainWindow::saveSelectedFile(){
 
 	ifstream readHdl;
 
-	readHdl.open("/Volumes/HDD/code/markuswebert-virtualglass-4e5a3278ac999be871a5b0d4a8e437b8d707d863/svn/trunk/src/save");
+	readHdl.open(":/save");
 	readHdl.getline(path,509, '\n');
 	string strPath;
 	strPath.assign(path, strlen(path));
@@ -1903,7 +1910,7 @@ void MainWindow::saveSelectedFile(){
 				//improve: prevent character set error in filename
 				//improve: empty file name -> "no savefile choosen"
 		if((filename.toStdString())!=""){
-			QFile savePath("/Volumes/HDD/code/markuswebert-virtualglass-4e5a3278ac999be871a5b0d4a8e437b8d707d863/svn/trunk/src/save");
+			QFile savePath(":/save");
 			savePath.open(QIODevice::WriteOnly | QIODevice::Text);
 			QTextStream savePathOutput(&savePath);
 			savePathOutput << filename << "\n";
