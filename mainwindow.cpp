@@ -1329,7 +1329,6 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 					}
 					(*plan).setCasingThickness(rootCaneCasing["CasingThickness"].asDouble(),i);
 				}
-			//}
 				break;
 			}
 			case templatetype : {
@@ -1353,8 +1352,6 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 					   case CustomCircle : (*plan).setTemplateType(PullTemplate::CUSTOM_CIRCLE); break;
 					   case CustomSquare : (*plan).setTemplateType(PullTemplate::CUSTOM_SQUARE); break;
 					   default :;
-				//}
-				//break;
 				}
 				break;
 			}
@@ -1366,7 +1363,6 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 			default : ;
 			}
 		}
-		//newPullPlan(plan);
 		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(plan));
 		pullPlanLibraryLayout->update();
 		emit someDataChanged();
@@ -1401,7 +1397,6 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 					location->operator [](2) = rootSubcane["z"].asFloat();
 					SubpullTemplate *Sub = new SubpullTemplate(Subplan, *shape, *location, rootSubcane["diameter"].asFloat());
 					plan->subs.insert(plan->subs.begin()+k,*Sub);
-					//plan->subs.push_back(*Sub);
 					k++;
 				}
 
@@ -1552,16 +1547,12 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 				if(rootPieceValues["overlayGlassColor"]!=rootPieceValues["NULL"]){
 					if((rootPieceValues["overlayGlassColor"].asInt())==0){
 						iterGlass = colorMap->begin();
-						piece->pickup->overlayGlassColor->setColor(*(GlobalGlass::color())->getColor());
-						cout << "gg " <<(*(iterGlass->first)->getColor());
-						cout << endl;
+						piece->pickup->overlayGlassColor = GlobalGlass::color();
 					}
 					else{
 						for(iterGlass = colorMap->begin();iterGlass != colorMap->end();iterGlass++){
 							if(iterGlass->second==rootPieceValues["overlayGlassColor"].asInt()){
-								piece->pickup->overlayGlassColor->setColor(*(iterGlass->first)->getColor());
-								cout << (*(iterGlass->first)->getColor()) << " " << (*GlobalGlass::color()->getColor());
-								cout << endl;
+								piece->pickup->overlayGlassColor = iterGlass->first;
 								}
 						}
 					}
@@ -1573,14 +1564,12 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 				if(rootPieceValues["underlayGlassColor"]!=rootPieceValues["NULL"]){
 					if((rootPieceValues["underlayGlassColor"].asInt())==0){
 						iterGlass = colorMap->begin();
-						piece->pickup->underlayGlassColor->setColor(*(GlobalGlass::color())->getColor());
-						cout << "gg " <<(*(iterGlass->first)->getColor());
-						cout << endl;
+						piece->pickup->underlayGlassColor = GlobalGlass::color();
 					}
 					else {
 						for(iterGlass = colorMap->begin();iterGlass != colorMap->end();iterGlass++){
 							if(iterGlass->second==rootPieceValues["underlayGlassColor"].asInt())
-								piece->pickup->underlayGlassColor->setColor(*((iterGlass->first)->getColor()));
+								piece->pickup->underlayGlassColor = iterGlass->first;
 						}
 					}
 				}
@@ -1591,15 +1580,12 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 				if(rootPieceValues["casingGlassColor"]!=rootPieceValues["NULL"]){
 					if((rootPieceValues["casingGlassColor"].asInt())==0){
 						iterGlass = colorMap->begin();
-						//piece->pickup->casingGlassColor->setColor(*(iterGlass->first)->getColor());
-						piece->pickup->casingGlassColor->setColor(*(GlobalGlass::color())->getColor());
-						cout << "gg " <<(*(iterGlass->first)->getColor());
-						cout << endl;
+						piece->pickup->casingGlassColor = GlobalGlass::color();
 					}
 					else{
 						for(iterGlass = colorMap->begin();iterGlass != colorMap->end();iterGlass++){
 							if(iterGlass->second==rootPieceValues["casingGlassColor"].asInt())
-								piece->pickup->casingGlassColor->setColor(*((iterGlass->first)->getColor()));
+								piece->pickup->casingGlassColor = iterGlass->first;
 						}
 					}
 				}
@@ -1623,7 +1609,7 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 				case column : 
 					piece->pickup->setParameter(0,rootPieceTempl[vecPieceTempl.at(i)].asInt());
 					break;
-			default : //vector<string> vecPieceTemplMember = rootPieceTemplMember.getMemberNames();
+			default :
 				map<PullPlan*, int>::iterator iter;
 				PullPlan* plan;
 				for(iter = caneMap->begin();iter != caneMap->end();iter++){
@@ -1652,12 +1638,8 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 		AsyncPieceLibraryWidget *w = new AsyncPieceLibraryWidget(piece, this);
 		pieceLibraryLayout->addWidget(w);
 		pieceLibraryLayout->update();
-		//pullPlanLibraryLayout->update();
-		//colorBarLibraryLayout->update();
 		w->updatePixmap();
 		emit someDataChanged();
-		w->updateGeometry();
-		//w->repaint();
 	}
 }
 
@@ -1734,7 +1716,6 @@ void MainWindow::newFile(){
 		cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 		cblw->close();
-		cblw->updatePixmaps();
 	}
 
 	AsyncColorBarLibraryWidget *cb =new AsyncColorBarLibraryWidget(new GlassColor(), this);
@@ -1744,13 +1725,13 @@ void MainWindow::newFile(){
 	cb->updatePixmaps();
 	emit someDataChanged();
 
+
 	AsyncPullPlanLibraryWidget* pplw;
 	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 	{
 		pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 		pplw->close();
-		pplw->updatePixmaps();
 	}
 	AsyncPullPlanLibraryWidget *ppl = new AsyncPullPlanLibraryWidget(new PullPlan(PullTemplate::BASE_CIRCLE));
 	pullPlanLibraryLayout->addWidget(ppl);
@@ -1765,7 +1746,6 @@ void MainWindow::newFile(){
 		plw = dynamic_cast<AsyncPieceLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 		plw->close();
-		plw->updatePixmap();
 	}
 	AsyncPieceLibraryWidget *pl = new AsyncPieceLibraryWidget(new Piece(PieceTemplate::TUMBLER));
 	pieceLibraryLayout->addWidget(pl);
@@ -1773,6 +1753,7 @@ void MainWindow::newFile(){
 	show();
 	pl->updatePixmap();
 	unhighlightAllLibraryWidgets();
+	setViewMode(EMPTY_VIEW_MODE);
 	emit someDataChanged();
 }
 
@@ -1780,7 +1761,6 @@ void MainWindow::save(QString filename){
 	QFile saveFile(filename);
 	saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
 	QTextStream fileOutput(&saveFile);
-
 	//read version and date from version.txt; write this into json file (root0)
 	//first line; versionNo and date
 	ifstream readHdl;
@@ -1822,7 +1802,6 @@ void MainWindow::saveAs(QString filename){
 	QFile saveFile(filename);
 	saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
 	QTextStream fileOutput(&saveFile);
-
 	//read version and date from version.txt; write this into json file (root0)
 	//first line; versionNo and date
 	ifstream readHdl;
@@ -1862,8 +1841,6 @@ void MainWindow::saveAs(QString filename){
 
 void MainWindow::saveAllFile(){
 	char path[509]; //MS max path 248 chars, max filename 260 chars, plus 1 forterminator
-	//read version and date from version.txt; write this into json file (root0)
-	//first line; versionNo and date
 
 	ifstream readHdl;
 
@@ -1894,8 +1871,6 @@ void MainWindow::saveAllFile(){
 void MainWindow::saveSelectedFile(){
 
 	char path[509]; //MS max path 248 chars, max filename 260 chars, plus 1 forterminator
-	//read version and date from version.txt; write this into json file (root0)
-	//first line; versionNo and date
 
 	ifstream readHdl;
 
