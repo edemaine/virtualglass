@@ -24,7 +24,7 @@ namespace PickupTemplate
 	enum Type firstSeedTemplate();
 	enum Type lastSeedTemplate();
 
-        const char* enumToString(enum Type t);
+	const char* enumToString(enum Type t);
 }
 
 #endif

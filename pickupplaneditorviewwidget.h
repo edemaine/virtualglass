@@ -25,22 +25,22 @@ class PickupPlanEditorViewWidget : public QWidget
 		void someDataChanged();
 
 	protected:
-                void mousePressEvent(QMouseEvent* event);
+		void mousePressEvent(QMouseEvent* event);
 		void dragEnterEvent(QDragEnterEvent* dee);
 		void dropEvent(QDropEvent* de);
-                void resizeEvent(QResizeEvent* event);
+		void resizeEvent(QResizeEvent* event);
 
 	private:
 		Mesher mesher;
 		Geometry geometry;
 		NiceViewWidget* niceViewWidget;
 		PickupPlan* pickup;
-                float ulX, ulY, squareSize;
+		float ulX, ulY, squareSize;
 
-                float adjustedX(float rawX);
-                float adjustedY(float rawX);
-                float rawX(float adjustedX);
-                float rawY(float adjustedY);
+		float adjustedX(float rawX);
+		float adjustedY(float rawX);
+		float rawX(float adjustedX);
+		float rawY(float adjustedY);
 		void getSubplanAt(float x, float y, PullPlan** plan, int* subplanIndex);
 };
 

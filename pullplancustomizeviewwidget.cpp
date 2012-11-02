@@ -28,46 +28,46 @@ PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget
 
 void PullPlanCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
 {
-        int width, height;
+	int width, height;
 
-        width = event->size().width();
-        height = event->size().height();
+	width = event->size().width();
+	height = event->size().height();
 
-        if (width > height) // wider than tall 
-        {
-                ulX = (width - height)/2.0;
-                ulY = 0;
-                squareSize = height;
-        }
-        else
-        {
-                ulX = 0;
-                ulY = (height - width)/2.0;
-                squareSize = width;
-        }
+	if (width > height) // wider than tall 
+	{
+		ulX = (width - height)/2.0;
+		ulY = 0;
+		squareSize = height;
+	}
+	else
+	{
+		ulX = 0;
+		ulY = (height - width)/2.0;
+		squareSize = width;
+	}
 
 	BOUNDING_BOX_SPACE = MAX(squareSize / 100, 1);
-        this->update();
+	this->update();
 }
 
 float PullPlanCustomizeViewWidget :: adjustedX(float rawX)
 {
-        return rawX - ulX;
+	return rawX - ulX;
 }
 
 float PullPlanCustomizeViewWidget :: adjustedY(float rawY)
 {
-        return rawY - ulY;
+	return rawY - ulY;
 }
 
 float PullPlanCustomizeViewWidget :: rawX(float adjustedX)
 {
-        return adjustedX + ulX;
+	return adjustedX + ulX;
 }
 
 float PullPlanCustomizeViewWidget :: rawY(float adjustedY)
 {
-        return adjustedY + ulY;
+	return adjustedY + ulY;
 }
 
 void PullPlanCustomizeViewWidget :: dropEvent(QDropEvent* event)
@@ -339,7 +339,7 @@ void PullPlanCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 			}
 		}
 		if (!isIn && hoveringIndex != -1)
-        	{
+		{
 			if (event->modifiers() != Qt::ControlModifier && event->modifiers() != Qt::ShiftModifier)
 			{
 				subplansSelected.clear();
@@ -387,7 +387,7 @@ void PullPlanCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent* event)
 					break;
 				}
 			}
-        	}
+		}
 	}
 	
 	mouseStartingLoc.x = (adjustedX(event->pos().x()));
@@ -418,10 +418,10 @@ void PullPlanCustomizeViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 
 void PullPlanCustomizeViewWidget :: keyPressEvent(QKeyEvent* event)
 {
-    if (event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Delete)
-    {
-        deleteSelectionPressed();
-    }
+	if (event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Delete)
+	{
+		deleteSelectionPressed();
+	}
 }
 
 void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* _plan)
@@ -524,7 +524,7 @@ void PullPlanCustomizeViewWidget :: paintShape(float x, float y, float size, enu
 	
 	roundedX = floor(rawX(x) + 0.5);
 	roundedY = floor(rawY(y) + 0.5);
- 
+
 	switch (shape)
 	{
 		case CIRCLE_SHAPE:

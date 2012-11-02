@@ -3,8 +3,8 @@
 
 #include <json/json.h>
 class writeJson{
-public:
-    void writejson(Json::Value, QTextStream);
+	public:
+		void writejson(Json::Value, QTextStream);
 }
 
 #endif // WRITEJSON_H

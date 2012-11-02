@@ -63,9 +63,9 @@ void PullPlanEditorWidget :: updateEverything()
 		TemplateParameter tp;
 		plan->getParameter(i, &tp);
 		paramLabels[i]->setText(tp.name.c_str());
-                disconnect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
+		disconnect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
 		paramSpins[i]->setRange(tp.lowerLimit, tp.upperLimit);
-                connect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
+		connect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
 		paramSpins[i]->setValue(tp.value);
 		if (i != 0)
 		{
@@ -170,7 +170,7 @@ void PullPlanEditorWidget :: setupLayout()
 	paramStack->addWidget(paramWidget);
 	QHBoxLayout* paramLayout = new QHBoxLayout(paramWidget);
 	paramWidget->setLayout(paramLayout);
-        paramLayout->setContentsMargins(0, 0, 0, 0);
+	paramLayout->setContentsMargins(0, 0, 0, 0);
 	paramLabels.push_back(new QLabel("Param 1:", paramWidget));
 	paramLabels.push_back(new QLabel("Param 2:", paramWidget));
 	paramLabels.push_back(new QLabel("Param 3:", paramWidget));
@@ -255,14 +255,10 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 void PullPlanEditorWidget :: tabChanged(int i)
 {
-    if (i == 0)
-    {
-        descriptionLabel->setText("Cane editor - drag color or other canes in.");
-    }
-    else
-    {
-        descriptionLabel->setText("Cane customizer - select and drag shapes around to customize cane layout.");
-    }
+	if (i == 0)
+		descriptionLabel->setText("Cane editor - drag color or other canes in.");
+	else
+		descriptionLabel->setText("Cane customizer - select and drag shapes around to customize cane layout.");
 }
 
 void PullPlanEditorWidget :: circleCasingButtonPressed()
@@ -291,22 +287,22 @@ void PullPlanEditorWidget :: addCasingButtonPressed()
 
 void PullPlanEditorWidget :: copySelectedButtonPressed()
 {
-    customizeViewWidget->copySelectionPressed();
+	customizeViewWidget->copySelectionPressed();
 }
 
 void PullPlanEditorWidget :: deleteSelectedButtonPressed()
 {
-    customizeViewWidget->deleteSelectionPressed();
+	customizeViewWidget->deleteSelectionPressed();
 }
 
 void PullPlanEditorWidget :: addCircleButtonPressed()
 {
-    customizeViewWidget->addCirclePressed();
+	customizeViewWidget->addCirclePressed();
 }
 
 void PullPlanEditorWidget :: addSquareButtonPressed()
 {
-    customizeViewWidget->addSquarePressed();
+	customizeViewWidget->addSquarePressed();
 }
 
 void PullPlanEditorWidget :: setupConnections()

@@ -5,8 +5,8 @@
 // Pull template types
 namespace PullTemplate
 {
-        // When adding a new template, be sure to update the names[] array below
-        // and the first/last template functions in pulltemplate.cpp
+	// When adding a new template, be sure to update the names[] array below
+	// and the first/last template functions in pulltemplate.cpp
 	enum Type
 	{
 		BASE_CIRCLE=1,

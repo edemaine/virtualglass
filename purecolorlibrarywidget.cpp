@@ -5,7 +5,7 @@ PureColorLibraryWidget :: PureColorLibraryWidget(Color color, QString colorName,
 {
 	setFixedSize(300, 40);
 	setScaledContents(true);
-        setAttribute(Qt::WA_LayoutUsesWidgetRect);
+	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
 	isSelected = false;
 	this->colorName = colorName;
@@ -25,12 +25,12 @@ void PureColorLibraryWidget :: setSelected(bool s)
 
 void PureColorLibraryWidget :: renderPixmap()
 {
-        QPixmap pixmap(300, 40);
-        QPainter painter(&pixmap);
-        painter.fillRect(pixmap.rect(), QBrush(Qt::white));
-        painter.fillRect(QRect(10, 10, 20, 20), QBrush(QColor(255*color.r, 255*color.g, 255*color.b, 255*color.a)));
-        painter.drawRect(QRect(10, 10, 20, 20));
-        painter.drawText(QPointF(40, 25), colorName);
+	QPixmap pixmap(300, 40);
+	QPainter painter(&pixmap);
+	painter.fillRect(pixmap.rect(), QBrush(Qt::white));
+	painter.fillRect(QRect(10, 10, 20, 20), QBrush(QColor(255*color.r, 255*color.g, 255*color.b, 255*color.a)));
+	painter.drawRect(QRect(10, 10, 20, 20));
+	painter.drawText(QPointF(40, 25), colorName);
 
 	// do highlighting if selected
 	if (isSelected)
@@ -43,9 +43,9 @@ void PureColorLibraryWidget :: renderPixmap()
 	}
 	
 
-        painter.end();
+	painter.end();
 
-        setPixmap(pixmap);
+	setPixmap(pixmap);
 }
 
 void PureColorLibraryWidget :: setAlpha(float a)

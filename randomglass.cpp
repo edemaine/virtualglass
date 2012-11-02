@@ -17,7 +17,7 @@
 GlassColor* randomGlassColor()
 {
 	// Sample from reichenbach transparents
-        QFile file(":/reichenbach-transparent-colors.vgc");
+	QFile file(":/reichenbach-transparent-colors.vgc");
 
 	// First see how many colors are in there
 	file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -114,8 +114,8 @@ PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimp
 
 PickupPlan* randomPickup(PullPlan* pullPlan1, PullPlan* pullPlan2)
 {
-        int randomTemplateNumber = qrand() % (PickupTemplate::lastSeedTemplate() - PickupTemplate::firstSeedTemplate())
-                + PickupTemplate::firstSeedTemplate();
+	int randomTemplateNumber = qrand() % (PickupTemplate::lastSeedTemplate() - PickupTemplate::firstSeedTemplate())
+		+ PickupTemplate::firstSeedTemplate();
 	PickupPlan* pickup = new PickupPlan(static_cast<PickupTemplate::Type>(randomTemplateNumber));
 
 	// set parameters
@@ -147,8 +147,8 @@ PickupPlan* randomPickup(PullPlan* pullPlan1, PullPlan* pullPlan2)
 
 Piece* randomPiece(PickupPlan* pickup)
 {
-        int randomTemplateNumber = qrand() % (PieceTemplate::lastSeedTemplate() - PieceTemplate::firstSeedTemplate())
-                + PieceTemplate::firstSeedTemplate();
+	int randomTemplateNumber = qrand() % (PieceTemplate::lastSeedTemplate() - PieceTemplate::firstSeedTemplate())
+		+ PieceTemplate::firstSeedTemplate();
 	Piece* piece = new Piece(static_cast<PieceTemplate::Type>(randomTemplateNumber));
 
 	// set piece parameters

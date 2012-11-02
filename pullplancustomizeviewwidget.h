@@ -52,7 +52,7 @@ private:
 	float rawX(float adjustedX);
 	float rawY(float adjustedY);
 	void drawSubplan(float x, float y, float drawWidth, float drawHeight,
-        	PullPlan* plan, bool outermostLevel, QPainter* painter);
+		PullPlan* plan, bool outermostLevel, QPainter* painter);
 	void paintShape(float x, float y, float size, enum GeometricShape s, QPainter* painter);
 	void setBoundaryPainter(QPainter* painter, bool outermostLevel, bool greyedOut);
 	void drawActionControls(QPainter* painter);

@@ -10,18 +10,18 @@ Piece :: Piece(enum PieceTemplate::Type _type)
 
 bool Piece :: hasDependencyOn(PullPlan* plan)
 {
-        bool pickupPlansDependOn = false;
+	bool pickupPlansDependOn = false;
 
-        for (unsigned int i = 0; i < this->pickup->subs.size(); ++i)
-        {
-                if (this->pickup->subs[i].plan->hasDependencyOn(plan))
-                {
-                        pickupPlansDependOn = true;
-                        break;
-                }
-        }
+	for (unsigned int i = 0; i < this->pickup->subs.size(); ++i)
+	{
+		if (this->pickup->subs[i].plan->hasDependencyOn(plan))
+		{
+			pickupPlansDependOn = true;
+			break;
+		}
+	}
 
-        return pickupPlansDependOn;
+	return pickupPlansDependOn;
 }
 
 
@@ -53,10 +53,10 @@ Piece* Piece :: copy() const
 {
 	Piece* c = new Piece(type);
 
-        for (unsigned int i = 0; i < parameters.size(); ++i)
-        {
-                c->parameters[i] = parameters[i];
-        }
+	for (unsigned int i = 0; i < parameters.size(); ++i)
+	{
+		c->parameters[i] = parameters[i];
+	}
 
 	c->pickup = this->pickup->copy();
 	
@@ -77,49 +77,49 @@ void Piece :: getParameter(unsigned int _index, TemplateParameter* dest)
 void Piece :: setParameter(unsigned int _index, int _value)
 {
 	assert(_index < parameters.size());
-    assert(parameters[_index].lowerLimit <= _value && _value <= parameters[_index].upperLimit);
+	assert(parameters[_index].lowerLimit <= _value && _value <= parameters[_index].upperLimit);
 	parameters[_index].value = _value;
 }
 
 void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
 {
-        if (!force && this->type == _type)
-                return;
+	if (!force && this->type == _type)
+		return;
 
 	this->type = _type;
 
 	parameters.clear();
-        switch (type)
-        {
+	switch (type)
+	{
 		// Is it possible to just make a string const and hope it's 
 		// kept around as long as the TemplateParameter is?
-                case PieceTemplate::VASE:
+		case PieceTemplate::VASE:
 			parameters.push_back(TemplateParameter(0, string("Lip width"), 0, 100));
 			parameters.push_back(TemplateParameter(0, string("Body width"), 0, 100));
 			parameters.push_back(TemplateParameter(0, string("Twist"), 0, 100));
-                        break;
-                case PieceTemplate::TUMBLER:
+			break;
+		case PieceTemplate::TUMBLER:
 			parameters.push_back(TemplateParameter(30, string("Width"), 0, 100));
 			parameters.push_back(TemplateParameter(50, string("Roundedness"), 0, 100));
 			parameters.push_back(TemplateParameter(0, string("Twist"), 0, 100));
-                        break;
-                case PieceTemplate::BOWL:
+			break;
+		case PieceTemplate::BOWL:
 			parameters.push_back(TemplateParameter(10, string("Openness"), 0, 100));
 			parameters.push_back(TemplateParameter(0, string("Size"), 0, 100));
 			parameters.push_back(TemplateParameter(0, string("Twist"), 0, 100));
-                        break;
-                case PieceTemplate::POT:
+			break;
+		case PieceTemplate::POT:
 			parameters.push_back(TemplateParameter(50, string("Lip width"), 0, 100));
 			parameters.push_back(TemplateParameter(50, string("Body width"), 0, 100));
 			parameters.push_back(TemplateParameter(50, string("Bottom width"), 0, 100));
-                        break;
-                case PieceTemplate::WAVY_PLATE:
+			break;
+		case PieceTemplate::WAVY_PLATE:
 			parameters.push_back(TemplateParameter(30, string("Wave count"), 0, 100));
 			parameters.push_back(TemplateParameter(50, string("Wave depth"), 0, 100));
-                        break;
-                case PieceTemplate::PICKUP:
 			break;
-        }
+		case PieceTemplate::PICKUP:
+			break;
+	}
 
 }
 

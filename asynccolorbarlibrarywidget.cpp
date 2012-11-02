@@ -6,9 +6,9 @@
 
 AsyncColorBarLibraryWidget :: AsyncColorBarLibraryWidget(GlassColor* _glassColor, QWidget* _parent): AsyncRenderWidget(_parent) 
 {
-        setFixedSize(100, 100);
+	setFixedSize(100, 100);
 	glassColor = _glassColor;
-        updatePixmaps();
+	updatePixmaps();
 }
 
 GlassColor* AsyncColorBarLibraryWidget :: getGlassColor()
@@ -28,14 +28,14 @@ void AsyncColorBarLibraryWidget :: updateDragPixmap()
 {
 	// update the drag pixmap in the main thread, since it's fast
 	Color c = *(glassColor->getColor());
-        QPixmap _dragPixmap(100, 100);
-        _dragPixmap.fill(QColor(255*c.r, 255*c.g, 255*c.b, 255*MAX(0.1, c.a)));
+	QPixmap _dragPixmap(100, 100);
+	_dragPixmap.fill(QColor(255*c.r, 255*c.g, 255*c.b, 255*MAX(0.1, c.a)));
 	dragPixmap = _dragPixmap;
 }
 
 const QPixmap* AsyncColorBarLibraryWidget :: getDragPixmap()
 {
-        return &(this->dragPixmap);
+	return &(this->dragPixmap);
 }
 
 void AsyncColorBarLibraryWidget :: updatePixmaps()
@@ -44,7 +44,7 @@ void AsyncColorBarLibraryWidget :: updatePixmaps()
 
 	// indicate to the user that the image is being updated
 	// busy-ness is turned off inherited AsyncRenderWidget::renderFinished()
-        setBusy(true);
+	setBusy(true);
 
 	//queue up an async update (though as of 9/12 the rendering
 	//is real-time anyway):

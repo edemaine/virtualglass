@@ -35,7 +35,7 @@ class PieceEditorWidget : public QWidget
 		void updateEverything();
 
 	private slots:
-                void pickupViewWidgetDataChanged();
+		void pickupViewWidgetDataChanged();
 		void pieceParameterSliderChanged(int);
 		void pickupParameterSpinBoxChanged(int);
 		void pickupParameterSliderChanged(int);

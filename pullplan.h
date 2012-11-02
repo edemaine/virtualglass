@@ -25,8 +25,8 @@ class PullPlan
 		enum PullTemplate::Type getTemplateType();
 
 		unsigned int getParameterCount();
-                void getParameter(unsigned int index, TemplateParameter* dest);
-                void setParameter(unsigned int index, int value);
+		void getParameter(unsigned int index, TemplateParameter* dest);
+		void setParameter(unsigned int index, int value);
 
 		void setCasingThickness(float t, unsigned int index);
 		void setOutermostCasingShape(enum GeometricShape s);

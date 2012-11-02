@@ -124,10 +124,10 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 
 PullPlan* PullPlanEditorViewWidget :: getSubplanAt(float x, float y)
 {
-        // Recursively call drawing on subplans
-        for (unsigned int i = 0; i < plan->subs.size(); ++i)
-        {
-                SubpullTemplate* sub = &(plan->subs[i]);
+	// Recursively call drawing on subplans
+	for (unsigned int i = 0; i < plan->subs.size(); ++i)
+	{
+		SubpullTemplate* sub = &(plan->subs[i]);
 		if (getShapeRadius(sub->shape, x - sub->location.x, y - sub->location.y) < sub->diameter/2.0)
 			return sub->plan;
 	}			
@@ -162,7 +162,7 @@ void PullPlanEditorViewWidget :: setMinMaxCasingRadii(float* min, float* max)
 	
 		cti_minus_1 = 0.0;
 		cti_plus_1 = plan->getCasingThickness(1);	
-        }
+	}
 	else 
 	{
 		csi = plan->getCasingShape(draggedCasingIndex);
@@ -170,7 +170,7 @@ void PullPlanEditorViewWidget :: setMinMaxCasingRadii(float* min, float* max)
 		csi_plus_1 = plan->getCasingShape(draggedCasingIndex+1);
 		cti_minus_1 = plan->getCasingThickness(draggedCasingIndex-1);
 		cti_plus_1 = plan->getCasingThickness(draggedCasingIndex+1);
-        }
+	}
 		
 	if (csi == CIRCLE_SHAPE && csi_minus_1 == SQUARE_SHAPE)
 		*min = cti_minus_1 * sqrt(2.0) + 0.01;
@@ -216,7 +216,7 @@ void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 	event->acceptProposedAction();
 	void* ptr;
 	enum GlassMime::Type type;
-        GlassMime::decode(event->mimeData()->text().toAscii().constData(), &ptr, &type);
+	GlassMime::decode(event->mimeData()->text().toAscii().constData(), &ptr, &type);
 	switch (type)
 	{
 		case GlassMime::colorbar:
@@ -244,21 +244,21 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDropEvent*
 	int x = adjustedX(mouse.x());
 	int y = adjustedY(mouse.y());
 
-        subplansHighlighted.clear();
-        casingsHighlighted.clear();
+	subplansHighlighted.clear();
+	casingsHighlighted.clear();
 
-        populateHighlightedSubplans(x, y, event);
-        if (subplansHighlighted.size() > 0) 
-        {
+	populateHighlightedSubplans(x, y, event);
+	if (subplansHighlighted.size() > 0) 
+	{
 		highlightColor.r = highlightColor.g = highlightColor.b = highlightColor.a = 1.0;
 		return;
-        }
+	}
 	populateHighlightedCasings(x, y);
-        if (casingsHighlighted.size() > 0) 
-        {
+	if (casingsHighlighted.size() > 0) 
+	{
 		highlightColor = *(draggedColor->getColor());
 		return;
-        }
+	}
 }
 
 void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
@@ -392,10 +392,10 @@ void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, bool oute
 
 void PullPlanEditorViewWidget :: paintShape(float x, float y, float size, enum GeometricShape shape, QPainter* painter)
 {
-        int roundedX, roundedY;
+	int roundedX, roundedY;
 
-        roundedX = floor(rawX(x) + 0.5);
-        roundedY = floor(rawY(y) + 0.5);
+	roundedX = floor(rawX(x) + 0.5);
+	roundedY = floor(rawY(y) + 0.5);
 
 	switch (shape)
 	{
@@ -418,14 +418,14 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	painter->setPen(Qt::NoPen);
 	paintShape(x, y, drawWidth, plan->getOutermostCasingShape(), painter);
 
-        if (highlightThis)
-        {
-                painter->setBrush(QColor(255*highlightColor.r, 255*highlightColor.g, 255*highlightColor.b,
-                        255*highlightColor.a));
-                painter->setPen(Qt::NoPen);
-                paintShape(x, y, drawWidth, plan->getOutermostCasingShape(), painter);
-                return;
-        }
+	if (highlightThis)
+	{
+		painter->setBrush(QColor(255*highlightColor.r, 255*highlightColor.g, 255*highlightColor.b,
+			255*highlightColor.a));
+		painter->setPen(Qt::NoPen);
+		paintShape(x, y, drawWidth, plan->getOutermostCasingShape(), painter);
+		return;
+	}
 
 	// Do casing colors outermost to innermost to get concentric rings of each casing's color
 	for (unsigned int i = plan->getCasingCount() - 1; i < plan->getCasingCount(); --i) 

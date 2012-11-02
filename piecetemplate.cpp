@@ -3,16 +3,16 @@
 
 namespace PieceTemplate
 {
-        const char* names[] =
-        {
-                "Undefined",
-                "Tumbler",
-                "Bowl",
-                "Vase",
-                "Pot",
-                "Wavy Plate",
+	const char* names[] =
+	{
+		"Undefined",
+		"Tumbler",
+		"Bowl",
+		"Vase",
+		"Pot",
+		"Wavy Plate",
 		"Pickup"
-        };
+	};
 
 	enum Type firstSeedTemplate()
 	{

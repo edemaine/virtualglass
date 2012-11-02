@@ -118,11 +118,11 @@ void PieceEditorWidget :: pickupParameterSpinBoxChanged(int)
 	{
 		TemplateParameter tp;
 		piece->pickup->getParameter(i, &tp);
-                if (tp.value != pickupParamSpinboxes[i]->value())
-                {
-                        piece->pickup->setParameter(i, pickupParamSpinboxes[i]->value());
-                        emit someDataChanged();
-                }
+		if (tp.value != pickupParamSpinboxes[i]->value())
+		{
+			piece->pickup->setParameter(i, pickupParamSpinboxes[i]->value());
+			emit someDataChanged();
+		}
 	}
 }
 
@@ -132,11 +132,11 @@ void PieceEditorWidget :: pickupParameterSliderChanged(int)
 	{
 		TemplateParameter tp;
 		piece->pickup->getParameter(i, &tp);
-                if (tp.value != pickupParamSliders[i]->value())
-                {
-                        piece->pickup->setParameter(i, pickupParamSliders[i]->value());
-                        emit someDataChanged();
-                }
+		if (tp.value != pickupParamSliders[i]->value())
+		{
+			piece->pickup->setParameter(i, pickupParamSliders[i]->value());
+			emit someDataChanged();
+		}
 	}
 }
 
