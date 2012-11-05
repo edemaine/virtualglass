@@ -334,6 +334,7 @@ void MainWindow :: setupConnections()
 	connect(saveSelectedAct, SIGNAL(triggered()), this, SLOT(saveSelectedFile()));
 	connect(saveAllAsAct, SIGNAL(triggered()), this, SLOT(saveAllAsFile()));
 	connect(saveSelectedAsAct, SIGNAL(triggered()), this, SLOT(saveSelectedAsFile()));
+	connect(exitAct, SIGNAL(triggered()), qApp, SLOT(quit()));
 
 	connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
 	connect(randomSimplePieceAction, SIGNAL(triggered()), this, SLOT(randomSimplePieceExampleActionTriggered()));
@@ -1516,6 +1517,8 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 			string name = vecPieceValues[i];
 			if(vecPieceValues[i].find("_") != std::string::npos){
 				name = vecPieceValues[i].substr(vecPieceValues[i].find("_") + 1);
+				//help.resize((vecPieceValues.at(i)).find("_")); //extracts number from string
+				//number = atoi(help.c_str());
 			}
 
 			switch(mapEnum[name]){
@@ -1556,35 +1559,27 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 						switch(mapEnum[rootPieceValues["subPickupTemplateType"].asString()]){
 							case vertical: 
 								piece->pickup->setTemplateType(PickupTemplate::VERTICAL);
-								piece->pickup->subs.clear();
 								break;
 							case reticello: 
 								piece->pickup->setTemplateType(PickupTemplate::RETICELLO_VERTICAL_HORIZONTAL);
-								piece->pickup->subs.clear();
 								break;
 							case murrinecolumn:
 								piece->pickup->setTemplateType(PickupTemplate::MURRINE_COLUMN);
-								piece->pickup->subs.clear();
 								break;
 							case verticalsandhorizontals: 
 								piece->pickup->setTemplateType(PickupTemplate::VERTICALS_AND_HORIZONTALS);
-								piece->pickup->subs.clear();
 								break;
 							case verthorizontalvert: 
 								piece->pickup->setTemplateType(PickupTemplate::VERTICAL_HORIZONTAL_VERTICAL);
-								piece->pickup->subs.clear();
 								break;
 							case verticalwithlipwrap: 
 								piece->pickup->setTemplateType(PickupTemplate::VERTICAL_WITH_LIP_WRAP);
-								piece->pickup->subs.clear();
 								break;
 							case murrinerow: 
 								piece->pickup->setTemplateType(PickupTemplate::MURRINE_ROW);
-								piece->pickup->subs.clear();
 								break;
 							case murrine: 
 								piece->pickup->setTemplateType(PickupTemplate::MURRINE);
-								piece->pickup->subs.clear();
 								break;
 						}
 					}
@@ -1644,6 +1639,13 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 					piece->setParameter(paramNumb, rootPieceValues[vecPieceValues[i]].asInt());
 			}
 		}
+		//resize subs vector
+		if(rootPieceTempl["Column count"]!=rootPieceTempl["NULL"]){
+			piece->pickup->setParameter(0,rootPieceTempl["Column count"].asInt());
+		}
+		if(rootPieceTempl["Row/Column count"]!=rootPieceTempl["NULL"]){
+			piece->pickup->setParameter(0,rootPieceTempl["Row/Column count"].asInt());
+		}
 		vector<string> vecPieceTempl = rootPieceTempl.getMemberNames();
 		for(unsigned int i =0; i < vecPieceTempl.size(); i++){
 			Json::Value rootPieceTemplMember = rootPieceTempl[vecPieceTempl.at(i)];
@@ -1651,35 +1653,44 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 				case thickness: 
 					piece->pickup->setParameter(1, rootPieceTempl[vecPieceTempl.at(i)].asInt());
 					break;
-				case row: 
-					piece->pickup->setParameter(0, rootPieceTempl[vecPieceTempl.at(i)].asInt());
+				case row : 
+					;//done piece->pickup->setParameter(0,rootPieceTempl[vecPieceTempl.at(i)].asInt());
 					break;
-				case column: 
-					piece->pickup->setParameter(0, rootPieceTempl[vecPieceTempl.at(i)].asInt());
+				case column : ;
+				//done
 					break;
-				default:
-					map<PullPlan*, int>::iterator iter;
-					PullPlan* plan;
-					for(iter = caneMap->begin();iter != caneMap->end();iter++){
-						if(iter->second==(rootPieceTemplMember["cane"].asInt()))
-						plan = iter->first;
+			default :{
+					if(vecPieceTempl.operator [](i)!="NULL"){
+						map<PullPlan*, int>::iterator iter;
+						PullPlan* plan;
+						for(iter = caneMap->begin();iter != caneMap->end();iter++){
+							if(iter->second==(rootPieceTemplMember["cane"].asInt()))
+							plan = iter->first;
+						}
+						Point location;
+						location[0] = rootPieceTemplMember["x"].asFloat();
+						location[1] = rootPieceTemplMember["y"].asFloat();
+						location[2] = rootPieceTemplMember["z"].asFloat();
+						GeometricShape shape;
+						if(rootPieceTemplMember["shape"].asInt()==0){
+							shape = CIRCLE_SHAPE;
+						}
+						else{
+							shape = SQUARE_SHAPE;
+						}
+						int number = 0;
+						string help = vecPieceTempl.operator [](i);
+						if(help.find("c") != std::string::npos){
+							help.resize(vecPieceTempl.at(i).find("c")); //extracts number from string
+							number = atoi(help.c_str());
+						}
+						SubpickupTemplate *pick = new SubpickupTemplate(plan, location, rootPieceTemplMember["orientation"].asInt(),
+							rootPieceTemplMember["length"].asFloat(), rootPieceTemplMember["width"].asFloat(), shape);
+						piece->pickup->subs.at(number) = *pick;
+						emit someDataChanged();
+						this->updateEverything();
 					}
-					Point location;
-					location[0] = rootPieceTemplMember["x"].asFloat();
-					location[1] = rootPieceTemplMember["y"].asFloat();
-					location[2] = rootPieceTemplMember["z"].asFloat();
-					GeometricShape shape;
-					if(rootPieceTemplMember["shape"].asInt()==0){
-						shape = CIRCLE_SHAPE;
-					}
-					else{
-						shape = SQUARE_SHAPE;
-					}
-					SubpickupTemplate *pick = new SubpickupTemplate(plan, location, rootPieceTemplMember["orientation"].asInt(), 
-						rootPieceTemplMember["length"].asFloat(), rootPieceTemplMember["width"].asFloat(), shape);
-					piece->pickup->subs.push_back(*pick);
-					emit someDataChanged();
-					this->updateEverything();
+				}
 			}
 		}
 		pieceMap->end();
@@ -1991,14 +2002,22 @@ void MainWindow::setupMenus()
 	saveSelectedAsAct = new QAction(tr("&SaveSelectedAs"), this);
 	saveSelectedAsAct->setStatusTip(tr("Save selected glass to disk"));
 
+	//exit
+	exitAct = new QAction(tr("E&xit"), this);
+	exitAct->setShortcuts(QKeySequence::Quit);
+	exitAct->setStatusTip(tr("Exit"));
+
 	//File menu
 	fileMenu = menuBar()->addMenu(tr("&File")); //create File menu
 	fileMenu->addAction(openAct); //add openButton
 	fileMenu->addAction(newAct); //add newButton
+	fileMenu->addSeparator();
 	fileMenu->addAction(saveAllAct); //add saveButton
 	fileMenu->addAction(saveSelectedAct); //add saveButton
 	fileMenu->addAction(saveAllAsAct); //add saveButton
 	fileMenu->addAction(saveSelectedAsAct); //add saveAsButton
+	fileMenu->addSeparator();
+	fileMenu->addAction(exitAct);
 
 	//examples:webtutorial1
 	web1PieceAction = new QAction("Tutorial 1", this);

@@ -124,6 +124,7 @@ class MainWindow : public QMainWindow
 		QAction *saveSelectedAct;
 		QAction *saveAllAsAct;
 		QAction *saveSelectedAsAct;
+		QAction *exitAct;
 		QMenu *perfMenu;
 		QAction *depthPeelAction;
 
