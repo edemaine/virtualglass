@@ -61,7 +61,7 @@ NiceViewWidget :: NiceViewWidget(enum CameraMode cameraMode, QWidget *parent)
 		case PIECE_CAMERA_MODE:
 			theta = -PI/2.0;
 			phi = PI/2;
-            rho = 16.0;
+			rho = 16.0;
 			lookAtLoc[0] = 0.0;
 			lookAtLoc[1] = 0.0;
 			lookAtLoc[2] = 0.0;
@@ -91,25 +91,25 @@ NiceViewWidget :: ~NiceViewWidget()
 
 void NiceViewWidget :: initializePeel()
 {
-        assert(!peelRenderer);
-        // set up glew:
-        GLEWContext *glewContext = new GLEWContext;
+	assert(!peelRenderer);
+	// set up glew:
+	GLEWContext *glewContext = new GLEWContext;
 #define glewGetContext() glewContext
-        GLenum err = glewInit();
+	GLenum err = glewInit();
 #undef glewGetContext
-        if (err != GLEW_OK) {
-                std::cerr << "WARNING: Failure initializing glew: " << glewGetErrorString(err) << std::endl;
-                std::cerr << " ... we will continue, but code that uses extensions will cause a crash" << std::endl;
-                delete glewContext;
-        } else {
-                try {
-                        peelRenderer = new PeelRenderer(glewContext);
-                } catch (...) {
-                        std::cerr << "Caught exception constructing peelRenderer, will fall back to regular rendering." << std::endl;
-                        peelRenderer = NULL;
-                        delete glewContext;
-                }
-        }
+	if (err != GLEW_OK) {
+		std::cerr << "WARNING: Failure initializing glew: " << glewGetErrorString(err) << std::endl;
+		std::cerr << " ... we will continue, but code that uses extensions will cause a crash" << std::endl;
+		delete glewContext;
+	} else {
+		try {
+			peelRenderer = new PeelRenderer(glewContext);
+		} catch (...) {
+			std::cerr << "Caught exception constructing peelRenderer, will fall back to regular rendering." << std::endl;
+			peelRenderer = NULL;
+			delete glewContext;
+		}
+	}
 } 
 
 void NiceViewWidget :: initializeGL()
@@ -169,12 +169,12 @@ void NiceViewWidget :: paintWithoutDepthPeeling()
 	this->qglClearColor(bgColor);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glEnable(GL_LIGHTING);
-        glEnable(GL_LIGHT0);
-        glEnable(GL_CULL_FACE);
-        glDisable(GL_DEPTH_TEST);
-        glEnable (GL_BLEND);
-        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//Check that Vertex and Triangle have proper size:
 	assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3));
@@ -353,25 +353,33 @@ void NiceViewWidget :: mouseMoveEvent (QMouseEvent* e)
 
 void NiceViewWidget :: wheelEvent(QWheelEvent *e)
 {
-    if (cameraMode == PICKUPPLAN_CAMERA_MODE)
-        return;
-    if(cameraMode == PULLPLAN_CAMERA_MODE){
-        if (e->delta() > 0)
-            rho *= 0.8;
-        else{ if (e->delta() < 0){
-                if((rho*1.2)>(11.0))
-                    rho=11.0;
-                else
-                    rho *= 1.2;
-                }
-            }
-    }
-    else{
-        if (e->delta() > 0)
-            rho *= 0.8;
-        else if (e->delta() < 0)
-            rho *= 1.2;
-    }
+	if (cameraMode == PICKUPPLAN_CAMERA_MODE)
+		return;
+	if(cameraMode == PULLPLAN_CAMERA_MODE)
+	{
+		if (e->delta() > 0)
+			rho *= 0.8;
+		else
+		{ 
+			if (e->delta() < 0)
+			{
+				if (rho*1.2 > 11.0)
+					rho=11.0;
+				else
+					rho *= 1.2;
+			}
+		}
+	}
+	else
+	{
+		if (e->delta() > 0)
+			rho *= 0.8;
+		else if (e->delta() < 0)
+			rho *= 1.2;
+	}
 	update();	
 }
+
+
+
 

@@ -49,7 +49,7 @@ void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** sub
 		}	
 
 		// Need to invert event location, since upper left/lower left origins exist	
-                if (ll.x < x && x < ur.x && ll.y < -y && -y < ur.y)
+		if (ll.x < x && x < ur.x && ll.y < -y && -y < ur.y)
 		{
 			if (hitIndex == -1)
 			{
@@ -78,70 +78,70 @@ void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** sub
 
 void PickupPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 {
-        // Check for convenience subplan-to-subplan drag
-        float x = (adjustedX(event->pos().x()) - squareSize/2) / float(squareSize/2-10);
-        float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
+	// Check for convenience subplan-to-subplan drag
+	float x = (adjustedX(event->pos().x()) - squareSize/2) / float(squareSize/2-10);
+	float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
 
 	int subplanIndex;
-        PullPlan* subplan;
+	PullPlan* subplan;
 	getSubplanAt(x, y, &subplan, &subplanIndex);
-        if (subplan != NULL)
-        {
+	if (subplan != NULL)
+	{
 		AsyncPullPlanLibraryWidget plplw(subplan);
 
-                char buf[500];
-                sprintf(buf, "%p %d", subplan, GlassMime::pullplan);
-                QByteArray pointerData(buf);
-                QMimeData* mimeData = new QMimeData;
-                mimeData->setText(pointerData);
+		char buf[500];
+		sprintf(buf, "%p %d", subplan, GlassMime::pullplan);
+		QByteArray pointerData(buf);
+		QMimeData* mimeData = new QMimeData;
+		mimeData->setText(pointerData);
 
-                QDrag *drag = new QDrag(this);
-                drag->setMimeData(mimeData);
-                drag->setPixmap(*(plplw.getDragPixmap()));
+		QDrag *drag = new QDrag(this);
+		drag->setMimeData(mimeData);
+		drag->setPixmap(*(plplw.getDragPixmap()));
 
-                drag->exec(Qt::CopyAction);
-        }
+		drag->exec(Qt::CopyAction);
+	}
 }
 
 void PickupPlanEditorViewWidget :: resizeEvent(QResizeEvent* event)
 {
-        int width, height;
+	int width, height;
 
-        width = event->size().width();
-        height = event->size().height();
+	width = event->size().width();
+	height = event->size().height();
 
-        if (width > height) // wider than tall 
-        {
-                ulX = (width - height)/2.0;
-                ulY = 0;
-                squareSize = height;
-        }
-        else
-        {
-                ulX = 0;
-                ulY = (height - width)/2.0;
-                squareSize = width;
-        }
+	if (width > height) // wider than tall 
+	{
+		ulX = (width - height)/2.0;
+		ulY = 0;
+		squareSize = height;
+	}
+	else
+	{
+		ulX = 0;
+		ulY = (height - width)/2.0;
+		squareSize = width;
+	}
 }
 
 float PickupPlanEditorViewWidget :: adjustedX(float rawX)
 {
-        return rawX - ulX;
+	return rawX - ulX;
 }
 
 float PickupPlanEditorViewWidget :: adjustedY(float rawY)
 {
-        return rawY - ulY;
+	return rawY - ulY;
 }
 
 float PickupPlanEditorViewWidget :: rawX(float adjustedX)
 {
-        return adjustedX + ulX;
+	return adjustedX + ulX;
 }
 
 float PickupPlanEditorViewWidget :: rawY(float adjustedY)
 {
-        return adjustedY + ulY;
+	return adjustedY + ulY;
 }
 
 QPixmap PickupPlanEditorViewWidget :: getPixmap()
@@ -157,11 +157,11 @@ void PickupPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
 	void* droppedObject;
-        GlassColor* droppedColor;
-        PullPlan* droppedPlan;
+	GlassColor* droppedColor;
+	PullPlan* droppedPlan;
 	enum GlassMime::Type type;
 
-        GlassMime::decode(event->mimeData()->text().toAscii().constData(), &droppedObject, &type);
+	GlassMime::decode(event->mimeData()->text().toAscii().constData(), &droppedObject, &type);
 	switch (type)
 	{
 		case GlassMime::colorbar:
@@ -184,8 +184,8 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	}
 
 	// otherwise it's a pull plan, and we do some complicated things now
-        float x = (adjustedX(event->pos().x()) - squareSize/2) / float(squareSize/2-10);
-        float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
+	float x = (adjustedX(event->pos().x()) - squareSize/2) / float(squareSize/2-10);
+	float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
 
 	int subplanIndex;
 	PullPlan* subplan;	

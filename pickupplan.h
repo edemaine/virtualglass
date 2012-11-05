@@ -22,9 +22,9 @@ class PickupPlan
 		void setTemplateType(enum PickupTemplate::Type t, bool force=false);
 		enum PickupTemplate::Type getTemplateType();
 
-                unsigned int getParameterCount();
-                void getParameter(unsigned int index, TemplateParameter* dest);
-                void setParameter(unsigned int index, int value);
+		unsigned int getParameterCount();
+		void getParameter(unsigned int index, TemplateParameter* dest);
+		void setParameter(unsigned int index, int value);
 
 		PickupPlan* copy() const;
 

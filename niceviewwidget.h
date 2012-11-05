@@ -19,12 +19,12 @@ class NiceViewWidget : public QGLWidget
 	Q_OBJECT
 
 public:
-        enum CameraMode
-        {
-                PULLPLAN_CAMERA_MODE,
+	enum CameraMode
+	{
+		PULLPLAN_CAMERA_MODE,
 		PICKUPPLAN_CAMERA_MODE,
-               	PIECE_CAMERA_MODE 
-        };
+		PIECE_CAMERA_MODE 
+	};
 	
 	static bool peelEnable;
 

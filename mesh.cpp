@@ -401,42 +401,42 @@ void Mesher :: getTemplatePoints(vector<Vector2f>* points, unsigned int angularR
 	// this consistency is necessary for meshBaseCasing() which stitches the tops
 	// of them together	
 	switch (shape)
-        {
-                case CIRCLE_SHAPE:
-                        for (unsigned int i = 0; i < angularResolution; ++i)
-                        {
-                                p.x = cos(TWO_PI * i / angularResolution - PI/4);
-                                p.y = sin(TWO_PI * i / angularResolution - PI/4);
-                                points->push_back(p);
-                        }
-                        break;
-                case SQUARE_SHAPE:
-                        for (unsigned int i = 0; i < angularResolution / 4; ++i)
-                        {
-                                p.x = 1.0;
-                                p.y = -1.0 + 8.0 * i / angularResolution;
-                                points->push_back(p);
-                        }
-                        for (unsigned int i = 0; i < angularResolution / 4; ++i)
-                        {
-                                p.x = 1.0 - 8.0 * i / angularResolution;
-                                p.y = 1.0;
-                                points->push_back(p);
-                        }
-                        for (unsigned int i = 0; i < angularResolution / 4; ++i)
-                        {
-                                p.x = -1.0;
-                                p.y = 1.0 - 8.0 * i / angularResolution;
-                                points->push_back(p);
-                        }
-                        for (unsigned int i = 0; i < angularResolution / 4; ++i)
-                        {
-                                p.x = -1.0 + 8.0 * i / angularResolution;
-                                p.y = -1.0;
-                                points->push_back(p);
-                        }
-                        break;
-        }
+	{
+		case CIRCLE_SHAPE:
+			for (unsigned int i = 0; i < angularResolution; ++i)
+			{
+				p.x = cos(TWO_PI * i / angularResolution - PI/4);
+				p.y = sin(TWO_PI * i / angularResolution - PI/4);
+				points->push_back(p);
+			}
+			break;
+		case SQUARE_SHAPE:
+			for (unsigned int i = 0; i < angularResolution / 4; ++i)
+			{
+				p.x = 1.0;
+				p.y = -1.0 + 8.0 * i / angularResolution;
+				points->push_back(p);
+			}
+			for (unsigned int i = 0; i < angularResolution / 4; ++i)
+			{
+				p.x = 1.0 - 8.0 * i / angularResolution;
+				p.y = 1.0;
+				points->push_back(p);
+			}
+			for (unsigned int i = 0; i < angularResolution / 4; ++i)
+			{
+				p.x = -1.0;
+				p.y = 1.0 - 8.0 * i / angularResolution;
+				points->push_back(p);
+			}
+			for (unsigned int i = 0; i < angularResolution / 4; ++i)
+			{
+				p.x = -1.0 + 8.0 * i / angularResolution;
+				p.y = -1.0;
+				points->push_back(p);
+			}
+			break;
+	}
 
 	// scale for radius 
 	for (unsigned int i = 0; i < points->size(); ++i) {
@@ -502,10 +502,10 @@ void Mesher :: meshBaseCasing(Geometry* geometry, vector<ancestor>* ancestors, C
 	enum GeometricShape outerShape, enum GeometricShape innerShape, float length, float outerRadius, 
 	float innerRadius, bool ensureVisible)
 {
-        float finalDiameter = totalShrink(ancestors);
-        unsigned int angularResolution = MIN(MAX(finalDiameter*10, 4), 12);
+	float finalDiameter = totalShrink(ancestors);
+	unsigned int angularResolution = MIN(MAX(finalDiameter*10, 4), 12);
 	angularResolution = ((angularResolution + 2) / 4) * 4; // round to nearest multiple of 4
-        unsigned int axialResolution = MIN(MAX(length * 40, 5), 80);
+	unsigned int axialResolution = MIN(MAX(length * 40, 5), 80);
 	
 	uint32_t first_vert = geometry->vertices.size();
 	uint32_t first_triangle = geometry->triangles.size();
@@ -550,11 +550,11 @@ float Mesher :: totalShrink(vector<ancestor>* ancestors)
 {
 	float shrink = 1.0;	
 
-        for (unsigned int i = ancestors->size() - 2; i < ancestors->size(); --i)
-        {
+	for (unsigned int i = ancestors->size() - 2; i < ancestors->size(); --i)
+	{
 		ancestor a = (*ancestors)[i];
 		shrink *= a.parent->subs[a.child].diameter; // is this off by a factor of 2?
-        }
+	}
 
 	return shrink;
 }
@@ -715,7 +715,7 @@ void Mesher :: recurseMesh(PickupPlan* pickup, Geometry *geometry, vector<ancest
 		thickness = pickup->subs[0].length*2.5;	
 	else
 		thickness = pickup->subs[0].width*2.5;
- 
+
 	// top level means that you want a pickup (and not a piece formed from a pickup)
 	// in this case, the slab is not ensureVisible'd, but the canes are, as the pickup
 	// serves as a guide for where to put subcanes, which must be visible

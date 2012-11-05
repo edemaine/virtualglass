@@ -37,7 +37,7 @@ PickupPlan* PickupPlan :: copy() const {
 
 
 void PickupPlan :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
-    Point location, enum PickupCaneOrientation ori, float length, float width, enum GeometricShape shape) {
+	Point location, enum PickupCaneOrientation ori, float length, float width, enum GeometricShape shape) {
 
 	if (newSubs->size() < subs.size())
 	{
@@ -59,7 +59,7 @@ void PickupPlan :: updateSubs() {
 	float width, length;
 	switch (this->type) {
 		case PickupTemplate::MURRINE:
-                        width = 2.0 / MAX(parameters[0].value, 1);
+			width = 2.0 / MAX(parameters[0].value, 1);
 			length = parameters[1].value*0.005 + 0.005;
 			for (int r = 0; r < parameters[0].value; ++r)
 			{
@@ -72,7 +72,7 @@ void PickupPlan :: updateSubs() {
 						length, width-0.0001, SQUARE_SHAPE);
 				}
 			}
-                        break;
+			break;
 		case PickupTemplate::MURRINE_COLUMN:
 			width = 2.0 / MAX(parameters[0].value, 1);
 			for (int i = 0; i < parameters[0].value-1; ++i) {
