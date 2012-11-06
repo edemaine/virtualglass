@@ -1293,6 +1293,7 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 		vector<std::string> vecCaneValueMembers = rootCaneValue.getMemberNames(); //vector for CaneValues
 		string caneMapEnumStr = vecCaneValueMembers.at(i);
 		PullPlan *plan = new PullPlan(PullTemplate::BASE_CIRCLE);
+		AsyncPullPlanLibraryWidget *p = new AsyncPullPlanLibraryWidget(plan);
 		if((vecCaneValueMembers.at(i)).find(" ") != string::npos){
 			caneMapEnumStr.resize((vecCaneValueMembers.at(i)).find(" ")); //resize string to fit with caneMapEnum
 		}
@@ -1390,9 +1391,10 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 				break;
 			}
 		}
-		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(plan));
+		pullPlanLibraryLayout->addWidget(p);
 		pullPlanLibraryLayout->update();
 		emit someDataChanged();
+		p->updatePixmaps();
 		plan->subs.clear();
 		(*caneMap)[plan] = caneNumberInt;	
 	}
@@ -1402,6 +1404,7 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 	unsigned int j = 0;
 	for(pullIter = caneMap->begin(); pullIter != caneMap->end(); pullIter++){
 		PullPlan *plan = new PullPlan(PullTemplate::BASE_CIRCLE);
+		AsyncPullPlanLibraryWidget *p = new AsyncPullPlanLibraryWidget(plan);
 		plan = pullIter->first;
 		Json::Value rootCaneValue = rootCane[vecCaneMembers.at(j)];
 		Json::Value rootCaneSubpull = rootCaneValue["SubpullplanTemplate"];
@@ -1430,6 +1433,7 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 			}
 		}
 		j++;
+		p->updatePixmaps();
 	}
 	pullPlanLibraryLayout->update();
 	emit someDataChanged();
@@ -1688,6 +1692,7 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 						SubpickupTemplate *pick = new SubpickupTemplate(plan, location, rootPieceTemplMember["orientation"].asInt(),
 							rootPieceTemplMember["length"].asFloat(), rootPieceTemplMember["width"].asFloat(), shape);
 						piece->pickup->subs.at(number) = *pick;
+						pullPlanLibraryLayout->update();
 						emit someDataChanged();
 						this->updateEverything();
 					}
@@ -1701,6 +1706,15 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 		w->updatePixmap();
 		emit someDataChanged();
 	}
+	//repaint pullplan library
+	AsyncPullPlanLibraryWidget* pplw;
+	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
+	{
+		pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
+			dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
+		pplw->updatePixmaps();
+	}
+
 }
 
 void MainWindow::openFile(){
@@ -1776,8 +1790,10 @@ void MainWindow::newFile(){
 		cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 		cblw->close();
+		cblw->deleteLater();
+		cblw->update();
 	}
-
+	cblw->update();
 	AsyncColorBarLibraryWidget *cb =new AsyncColorBarLibraryWidget(new GlassColor(), this);
 	colorBarLibraryLayout->addWidget(cb);
 	colorBarLibraryLayout->update();
@@ -1792,6 +1808,8 @@ void MainWindow::newFile(){
 		pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 		pplw->close();
+		pplw->deleteLater();
+		pplw->update();
 	}
 	AsyncPullPlanLibraryWidget *ppl = new AsyncPullPlanLibraryWidget(new PullPlan(PullTemplate::BASE_CIRCLE));
 	pullPlanLibraryLayout->addWidget(ppl);
@@ -1806,6 +1824,8 @@ void MainWindow::newFile(){
 		plw = dynamic_cast<AsyncPieceLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 		plw->close();
+		plw->deleteLater();
+		plw->update();
 	}
 	AsyncPieceLibraryWidget *pl = new AsyncPieceLibraryWidget(new Piece(PieceTemplate::TUMBLER));
 	pieceLibraryLayout->addWidget(pl);
