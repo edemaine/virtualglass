@@ -157,8 +157,8 @@ void PickupPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
 	void* droppedObject;
-	GlassColor* droppedColor;
-	PullPlan* droppedPlan;
+	GlassColor* droppedColor = 0;
+	PullPlan* droppedPlan = 0;
 	enum GlassMime::Type type;
 
 	GlassMime::decode(event->mimeData()->text().toAscii().constData(), &droppedObject, &type);

@@ -1659,10 +1659,11 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 				case column : ;
 				//done
 					break;
-			default :{
+				default:
+				{
 					if(vecPieceTempl.operator [](i)!="NULL"){
 						map<PullPlan*, int>::iterator iter;
-						PullPlan* plan;
+						PullPlan* plan = 0;
 						for(iter = caneMap->begin();iter != caneMap->end();iter++){
 							if(iter->second==(rootPieceTemplMember["cane"].asInt()))
 							plan = iter->first;

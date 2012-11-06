@@ -322,7 +322,7 @@ enum GeometricShape PullPlan :: getCasingShape(unsigned int index) {
 void PullPlan :: pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs,
 	enum GeometricShape _shape, Point p, float diameter) 
 {
-	PullPlan* plan;
+	PullPlan* plan = 0;
 
 	// if it's not a hard reset and there are still old subplans to use and the next one matches shape
 	// with the shape we want to have, then use it
