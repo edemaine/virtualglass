@@ -29,12 +29,12 @@ Color* GlassColor :: getColor()
 
 void GlassColor :: setName(QString _name)
 {
-        name = _name;
+	name = _name;
 }
 
 QString* GlassColor :: getName()
 {
-        return &name;
+	return &name;
 }
 
 GlassColor* GlassColor :: copy() const

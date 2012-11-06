@@ -19,10 +19,10 @@ class AsyncPullPlanLibraryWidget : public AsyncRenderWidget
 		QPixmap dragPixmap;
 
 		void updateDragPixmap();
-                static void paintShape(float x, float y, float size, enum GeometricShape shape, QPainter* painter);
-                static void setBoundaryPainter(QPainter* painter, bool outermostLevel);
-                static void drawSubplan(float x, float y, float drawWidth, float drawHeight,
-                        PullPlan* plan, bool outermostLevel, QPainter* painter);
+		static void paintShape(float x, float y, float size, enum GeometricShape shape, QPainter* painter);
+		static void setBoundaryPainter(QPainter* painter, bool outermostLevel);
+		static void drawSubplan(float x, float y, float drawWidth, float drawHeight,
+			PullPlan* plan, bool outermostLevel, QPainter* painter);
 };
 
 #endif //ASYNCPULLPLANLIBRARYWIDGET_H

@@ -20,7 +20,7 @@ class QSlider;
 class QStackedWidget;
 
 using std::vector;
-             
+
 class ColorEditorWidget : public QWidget
 {
 	Q_OBJECT
@@ -38,7 +38,7 @@ class ColorEditorWidget : public QWidget
 
 	public slots:
 		void updateEverything();
-                void alphaSliderPositionChanged(int);
+		void alphaSliderPositionChanged(int);
 		void collectionComboBoxChanged(int);		
 
 	private:
@@ -48,7 +48,7 @@ class ColorEditorWidget : public QWidget
 		QComboBox* collectionComboBox;
 		NiceViewWidget* niceViewWidget;
 		QVBoxLayout* editorLayout;
-                QSlider* alphaSlider;
+		QSlider* alphaSlider;
 		vector<QScrollArea*> colorLibraryScrollAreas;
 		vector<QVBoxLayout*> colorLibraryLayouts;
 		QStackedWidget* collectionStack;
