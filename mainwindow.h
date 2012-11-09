@@ -82,6 +82,9 @@ class MainWindow : public QMainWindow
 		void createActions();
 		void save(QString);
 		void saveAs(QString);
+		void setMerge(bool);
+		bool getMerge();
+		void deleteStandardLibraryElements();
 
 		void unhighlightAllLibraryWidgets();
 		bool glassColorIsDependancy(GlassColor* color);
@@ -108,6 +111,7 @@ class MainWindow : public QMainWindow
 		QPushButton* copyColorBarButton;
 		QPushButton* copyPullPlanButton;
 		QPushButton* copyPieceButton;
+		QPushButton* mergeButton;
 		QMenu *webExamplesMenu;
 		QMenu *randomExamplesMenu;
 		QMenu *examplesMenu;
@@ -127,6 +131,9 @@ class MainWindow : public QMainWindow
 		QAction *exitAct;
 		QMenu *perfMenu;
 		QAction *depthPeelAction;
+		QFileDialog openFileDialog;
+		QSignalMapper *signalMapper;
+		bool merge;
 
 	private slots:
 		void updateEverything();
@@ -138,6 +145,8 @@ class MainWindow : public QMainWindow
 		void copyPullPlan();
 		void copyPiece();
 		void openFile();
+		void open(QStringList);
+		void castMergeButton(QWidget*);
 		void newFile();
 		void saveAllFile();
 		void saveSelectedFile();
