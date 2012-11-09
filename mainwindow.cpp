@@ -1906,15 +1906,18 @@ void MainWindow::openFile(){
 	connect(mergeButton, SIGNAL(clicked()), signalMapper, SLOT(map()));
 	signalMapper->setMapping(mergeButton, &openFileDialog);
 	connect(signalMapper, SIGNAL(mapped(QWidget*)),SLOT(castMergeButton(QWidget*)));
-	openFileDialog.exec(); //run open window
-	QStringList list = openFileDialog.selectedFiles(); //get the selected files after pressing open
-	if(getMerge()==false){
-		newFile();
-		open(list);
-		deleteStandardLibraryElements();
+	QStringList list;
+	//detects a click on the cancel button
+	if (openFileDialog.exec()){
+		list = openFileDialog.selectedFiles(); //get the selected files after pressing open
+		if(getMerge()==false){
+			newFile();
+			open(list);
+			deleteStandardLibraryElements();
+		}
+		setViewMode(EMPTY_VIEW_MODE);
+		setMerge(false);
 	}
-	setViewMode(EMPTY_VIEW_MODE);
-	setMerge(false);
 }
 
 void MainWindow::newFile(){
