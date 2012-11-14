@@ -17,8 +17,7 @@ namespace PullTemplate
 		"Square of Squares",
 		"Surrounding Circle",
 		"Surrounding Square",
-		"Custom Circle",
-		"Custom Square"
+		"Custom",
 	};
 
 	enum Type firstSeedTemplate()
@@ -38,7 +37,7 @@ namespace PullTemplate
 
 	enum Type lastTemplate()
 	{
-		return CUSTOM_SQUARE;
+		return CUSTOM;
 	}
 
 	const char* enumToString(enum Type t)

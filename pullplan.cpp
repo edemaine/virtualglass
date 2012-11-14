@@ -32,7 +32,17 @@ PullPlan :: PullPlan(PullTemplate::Type _templateType)
 
 	// setup template (subplans and parameters) `forcefully', i.e.
 	// occuring regardless of what current template type is
-	setTemplateType(_templateType, true);
+	// if an attempt is made to initialize to custom, first
+	// initialize with default real template, then set to custom.
+	// remember: custom isn't a real template, it's just the lack
+	// of conformance to a real template, i.e. an admission of failure 
+	if (_templateType == PullTemplate::CUSTOM)
+	{
+		setTemplateType(PullTemplate::BASE_CIRCLE, true);
+		setTemplateType(PullTemplate::CUSTOM, false);
+	}
+	else
+		setTemplateType(_templateType, true);
 }
 
 
@@ -124,13 +134,8 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) {
 			casings[0].thickness = 1 / SQRT_TWO * casings[1].thickness;
 			parameters.push_back(TemplateParameter(2, string("Column count"), 2, 10));
 			break;
-		case PullTemplate::CUSTOM_CIRCLE:
-			casings[0].shape  = CIRCLE_SHAPE;
-			casings[0].thickness = 0.9 * casings[1].thickness;
-			break;
-		case PullTemplate::CUSTOM_SQUARE:
-			this->casings[0].shape = SQUARE_SHAPE;
-			casings[0].thickness = 1 / SQRT_TWO * casings[1].thickness;
+		case PullTemplate::CUSTOM:
+			// we don't touch anything, because a plan 
 			break;
 	}
 
@@ -539,8 +544,7 @@ void PullPlan :: resetSubs(bool hardReset)
 			}
 			break;
 		}
-		case PullTemplate::CUSTOM_CIRCLE:
-		case PullTemplate::CUSTOM_SQUARE:
+		case PullTemplate::CUSTOM:
 		{
 			for (unsigned int i = 0; i < subs.size(); i++)
 			{

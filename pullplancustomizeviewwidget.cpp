@@ -176,6 +176,8 @@ void PullPlanCustomizeViewWidget :: updateIndexes(QPoint pos)
 			break;
 		}
 	}
+
+	update();
 }
 
 void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
@@ -184,11 +186,9 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 	if (event->buttons() == Qt::NoButton)
 	{
 		updateIndexes(event->pos());
-		emit someDataChanged();
-		this->update();
 		return;
 	}
-
+	
 	switch (mode)
 	{
 		case MOVE_MODE:
@@ -429,24 +429,15 @@ void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* _plan)
 	plan = _plan;
 	if (isVisible())
 	{
-		if (plan->getTemplateType() != PullTemplate::CUSTOM_CIRCLE 
-			&& plan->getTemplateType() != PullTemplate::CUSTOM_SQUARE)
+		if (plan->getTemplateType() != PullTemplate::CUSTOM)
 		{
 			subplansSelected.clear();
 			activeControlPoint = -1;
 			hoveringIndex = -1;
 			activeBoxIndex = -1;
 		}
-		
-		switch (plan->getCasingShape(0))
-		{
-			case CIRCLE_SHAPE:
-				plan->setTemplateType(PullTemplate::CUSTOM_CIRCLE);
-				break;
-			case SQUARE_SHAPE:
-				plan->setTemplateType(PullTemplate::CUSTOM_SQUARE);
-				break;
-		}
+	
+		plan->setTemplateType(PullTemplate::CUSTOM);	
 	}
 	else
 	{

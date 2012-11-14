@@ -19,8 +19,7 @@ namespace PullTemplate
 		SQUARE_OF_SQUARES,
 		SURROUNDING_CIRCLE,
 		SURROUNDING_SQUARE,
-		CUSTOM_CIRCLE,
-		CUSTOM_SQUARE
+		CUSTOM,
 	};
 
 	enum Type firstTemplate();

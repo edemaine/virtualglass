@@ -1268,8 +1268,7 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 		SquareofSquares,
 		SurroundingCircle,
 		SurroundingSquare,
-		CustomCircle,
-		CustomSquare
+		Custom
 	};
 
 	static std::map<std::string, int> caneMapEnum;
@@ -1296,8 +1295,7 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 	caneMapEnum["Square of Squares"] = SquareofSquares;
 	caneMapEnum["Surrounding Circle"] = SurroundingCircle;
 	caneMapEnum["Surrounding Square"] = SurroundingSquare;
-	caneMapEnum["Custom Circle"] = CustomCircle;
-	caneMapEnum["Custom Square"] = CustomSquare;
+	caneMapEnum["Custom"] = Custom;
 	int k=0;
 	for(int i = 0; i < int(vecCaneMembers.size()); i++){
 		string member = vecCaneMembers[i];
@@ -1401,11 +1399,8 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 					case SurroundingSquare: 
 						plan->setTemplateType(PullTemplate::SURROUNDING_SQUARE); 
 						break;
-					case CustomCircle: 
-						plan->setTemplateType(PullTemplate::CUSTOM_CIRCLE); 
-						break;
-					case CustomSquare: 
-						plan->setTemplateType(PullTemplate::CUSTOM_SQUARE); 
+					case Custom: 
+						plan->setTemplateType(PullTemplate::CUSTOM); 
 						break;
 				}
 				break;
