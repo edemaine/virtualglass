@@ -212,7 +212,17 @@ void PullPlan :: removeCasing() {
 	float diff = casings[count-1].thickness - casings[count-2].thickness;
 	casings.pop_back();
 	for (unsigned int i = 0; i < casings.size(); ++i) 
-		casings[i].thickness += diff;
+	{
+		switch (casings[i].shape)
+		{
+			case CIRCLE_SHAPE:
+				casings[i].thickness += diff;
+				break;
+			case SQUARE_SHAPE: 
+				casings[i].thickness += diff/SQRT_TWO;
+				break;
+		}
+	}
 
 	// rescale subcanes
 	for (unsigned int i = 0; i < subs.size(); ++i)
@@ -233,10 +243,20 @@ bool PullPlan :: hasSquareCasing() {
 
 void PullPlan :: addCasing(enum GeometricShape _shape) {
 
-	// rescale all but innermost casing
+	// rescale casings
 	float oldInnermostCasingThickness = casings[0].thickness;
 	for (unsigned int i = 0; i < casings.size(); ++i) 
-		casings[i].thickness -= MIN(0.1, casings[i].thickness/2);
+	{
+                switch (casings[i].shape)
+                {
+                        case CIRCLE_SHAPE:
+				casings[i].thickness -= MIN(0.1, casings[i].thickness/2);
+                                break;
+                        case SQUARE_SHAPE:
+				casings[i].thickness -= MIN(0.1 / SQRT_TWO, casings[i].thickness/2);
+                                break;
+                }
+	}
 	
 	// if casing addition is circle around a square, rescale everything down a bit more
 	if (_shape == CIRCLE_SHAPE && getOutermostCasingShape() == SQUARE_SHAPE) {		
