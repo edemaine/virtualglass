@@ -1010,10 +1010,18 @@ void MainWindow::writeCane(Json::Value *root, map<PullPlan*, int>* caneMap, map<
 		*casingcountSstr << "casingcount";
 		string casingCount = casingcountSstr->str();
 
-
+		map<GlassColor*, int>::iterator iter;
 		for (unsigned int k = 0; k< plan->getCasingCount(); k++){
 			Json::Value *nested_value2 = new Json::Value;
-			(*nested_value2)["CasingColor"] = colorMap.find(plan->getCasingColor(k))->second;
+
+			bool color = false;
+			for(iter=colorMap.begin(); iter != colorMap.end(); iter++){
+				(*nested_value2)["CasingColor"] = colorMap.find(plan->getCasingColor(k))->second;
+				color = true;
+			}
+			if(color==false)
+				(*nested_value2)["CasingColor"] = 0;
+
 			(*nested_value2)["CasingShape"] = plan->getCasingShape(k);
 			(*nested_value2)["CasingThickness"] = plan->getCasingThickness(k);
 			std::stringstream *casingSstr = new std::stringstream;
@@ -1366,37 +1374,48 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 		}
 
 		for(unsigned int l = 0; l < vecCaneValueMembers.size(); l++){
+			Json::Value rootCaneCasing;
 			switch(caneMapEnum[vecCaneValueMembers.at(l)]){
 			case casingcount: 
 			{
-				for(unsigned int i = 0; i < rootCaneValue["casingcount"].asUInt(); i++){
+				rootCaneCasing = rootCaneValue["0_Casing"];
+				if(rootCaneCasing["CasingShape"].asBool())
+					plan->setTemplateType(PullTemplate::BASE_SQUARE);
+				else
+					plan->setTemplateType(PullTemplate::BASE_CIRCLE);
+
+				for(unsigned int i = 0; i < rootCaneValue["casingcount"].asUInt()-2; i++){
+					std::stringstream *sstr = new std::stringstream;
+					*sstr << i+2<<"_Casing";
+					string casing = sstr->str();
+					Json::Value rootCaneCasing = rootCaneValue[casing];
+					//if(i==plan->getCasingCount()-1){
+						if(rootCaneCasing["CasingShape"].asBool())
+							plan->addCasing(SQUARE_SHAPE);
+						else
+							plan->addCasing(CIRCLE_SHAPE);
+					//}
+				}
+				for(int i = 0; i < rootCaneValue["casingcount"].asInt(); i++){
 					std::stringstream *sstr = new std::stringstream;
 					*sstr << i<<"_Casing";
 					string casing = sstr->str();
-					cout << casing;
-					Json::Value rootCaneCasing = rootCaneValue[casing];
-					cout << "casingcount" << plan->getCasingCount();
-					cout << endl;
-					if (plan->getCasingCount() < rootCaneValue["casingcount"].asUInt())
-					{
-						if (rootCaneValue["hasSquareCasing"].asBool())
-						{
-							plan->addCasing(SQUARE_SHAPE);
-						}
-						else
-						{
-							plan->addCasing(CIRCLE_SHAPE);
-						}
-					}
-					plan->setCasingThickness(rootCaneCasing["CasingThickness"].asFloat(),i);
 					for(iter = colorMap->begin(); iter != colorMap->end(); iter++){
-						if(iter->second == rootCaneCasing["CasingColor"].asInt()){
+						if(iter->second == rootCaneValue[casing]["CasingColor"].asInt())
 							plan->setCasingColor(iter->first,i);
-						}
 					}
 				}
-				break;
+				int i=plan->getCasingCount();
+				while(i>0){
+					std::stringstream *sstr = new std::stringstream;
+					*sstr << i-1<<"_Casing";
+					string casing = sstr->str();
+					Json::Value rootCaneCasing = rootCaneValue[casing];
+					plan->setCasingThickness(rootCaneCasing["CasingThickness"].asFloat(),i-1);
+					i--;
+				}
 			}
+			break;
 			case templatetype: ;
 			case twists: 
 				plan->setTwist(rootCaneValue["twists"].asInt()); 
@@ -1715,11 +1734,7 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 					if(vecPieceTempl.operator [](i)!="NULL"){
 						map<PullPlan*, int>::iterator iter;
 						PullPlan* plan = new PullPlan(PullTemplate::BASE_CIRCLE);
-						cout << "size" << caneMap->size();
-						cout << endl;
 						for(iter = caneMap->begin();iter != caneMap->end();iter++){
-							cout << "iter " << iter->second;
-							cout << endl;
 							if(iter->second==(rootPieceTemplMember["cane"].asInt()))
 							{
 								plan = iter->first;
@@ -1915,9 +1930,7 @@ void MainWindow::openFile(){
 	if (openFileDialog.exec()){
 		list = openFileDialog.selectedFiles(); //get the selected files after pressing open
 		if(getMerge()==false){
-			newFile();
 			open(list, false);
-			deleteStandardLibraryElements();
 		}
 		setViewMode(EMPTY_VIEW_MODE);
 		setMerge(false);
