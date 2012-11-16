@@ -145,7 +145,7 @@ class MainWindow : public QMainWindow
 		void copyPullPlan();
 		void copyPiece();
 		void openFile();
-		void open(QStringList);
+		void open(QStringList, bool);
 		void castMergeButton(QWidget*);
 		void newFile();
 		void saveAllFile();

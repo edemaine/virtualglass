@@ -973,10 +973,6 @@ void MainWindow::writeCane(Json::Value *root, map<PullPlan*, int>* caneMap, map<
 		pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 		PullPlan* plan=pplw->getPullPlan();
-		//cout << GlobalGlass::squarePlan() << endl;
-		//cout << GlobalGlass::circlePlan() << endl;
-		//cout << plan;
-		//cout << endl;
 		if(((std::find(caneVec.begin(), caneVec.end(), plan)) != caneVec.end())|(plan==GlobalGlass::circlePlan())|(plan==GlobalGlass::squarePlan())){
 			if((plan==GlobalGlass::circlePlan())|(plan==GlobalGlass::squarePlan()))
 				(*caneMap)[plan] = 0;
@@ -1231,7 +1227,6 @@ void MainWindow::openColors(Json::Value rootColor, map<GlassColor*, int>* colorM
 			colorEditorWidget->setGlassColor(glasscolor);
 			colorBarLibraryLayout->update();
 			// Trigger GUI updates
-			show();
 			w->updatePixmaps();
 			emit someDataChanged();
 		}
@@ -1328,6 +1323,48 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 		caneNumberSt.resize((vecCaneMembers.at(k)).find("_")); //extracts number from string
 		int caneNumberInt = atoi(caneNumberSt.c_str());
 
+		string templType = (rootCaneValue["templatetype"].asString());
+		for (unsigned int i = 0; i < templType.size(); i++){
+			if (templType.find(" ") != std::string::npos)
+				templType.replace(templType.find(" "), 1, "");
+		}
+
+		switch(caneMapEnum[(templType)]){
+			case BaseCircle:
+				plan->setTemplateType(PullTemplate::BASE_CIRCLE);
+				break;
+			case BaseSquare:
+				plan->setTemplateType(PullTemplate::BASE_SQUARE);
+				break;
+			case HorizontalLineCircle:
+				plan->setTemplateType(PullTemplate::HORIZONTAL_LINE_CIRCLE);
+				break;
+			case HorizontalLineSquare:
+				plan->setTemplateType(PullTemplate::HORIZONTAL_LINE_SQUARE);
+				break;
+			case Tripod:
+				plan->setTemplateType(PullTemplate::TRIPOD);
+				break;
+			case Cross:
+				plan->setTemplateType(PullTemplate::CROSS);
+				break;
+			case SquareofCircles:
+				plan->setTemplateType(PullTemplate::SQUARE_OF_CIRCLES);
+				break;
+			case SquareofSquares:
+				plan->setTemplateType(PullTemplate::SQUARE_OF_SQUARES);
+				break;
+			case SurroundingCircle:
+				plan->setTemplateType(PullTemplate::SURROUNDING_CIRCLE);
+				break;
+			case SurroundingSquare:
+				plan->setTemplateType(PullTemplate::SURROUNDING_SQUARE);
+				break;
+			case Custom: 
+				plan->setTemplateType(PullTemplate::CUSTOM); 
+				break;
+		}
+
 		for(unsigned int l = 0; l < vecCaneValueMembers.size(); l++){
 			switch(caneMapEnum[vecCaneValueMembers.at(l)]){
 			case casingcount: 
@@ -1338,7 +1375,9 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 					string casing = sstr->str();
 					cout << casing;
 					Json::Value rootCaneCasing = rootCaneValue[casing];
-					if (plan->getCasingCount()+i-1 < rootCaneValue["casingcount"].asUInt())
+					cout << "casingcount" << plan->getCasingCount();
+					cout << endl;
+					if (plan->getCasingCount() < rootCaneValue["casingcount"].asUInt())
 					{
 						if (rootCaneValue["hasSquareCasing"].asBool())
 						{
@@ -1349,9 +1388,7 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 							plan->addCasing(CIRCLE_SHAPE);
 						}
 					}
-					plan->setCasingThickness(rootCaneCasing["CasingThickness"].asDouble(),i);
-					cout << "; Thickness " << rootCaneCasing["CasingThickness"].asDouble();
-					cout << endl;
+					plan->setCasingThickness(rootCaneCasing["CasingThickness"].asFloat(),i);
 					for(iter = colorMap->begin(); iter != colorMap->end(); iter++){
 						if(iter->second == rootCaneCasing["CasingColor"].asInt()){
 							plan->setCasingColor(iter->first,i);
@@ -1360,51 +1397,7 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 				}
 				break;
 			}
-			case templatetype: 
-			{
-				string templType = (rootCaneValue["templatetype"].asString());
-				for (unsigned int i = 0; i < templType.size(); i++){
-					if (templType.find(" ") != std::string::npos)
-						templType.replace(templType.find(" "), 1, "");
-				}
-
-				switch(caneMapEnum[(templType)]){
-					case BaseCircle: 
-						plan->setTemplateType(PullTemplate::BASE_CIRCLE); 
-						break;
-					case BaseSquare: 
-						plan->setTemplateType(PullTemplate::BASE_SQUARE); 
-						break;
-					case HorizontalLineCircle: 
-						plan->setTemplateType(PullTemplate::HORIZONTAL_LINE_CIRCLE); 
-						break;
-					case HorizontalLineSquare: 
-						plan->setTemplateType(PullTemplate::HORIZONTAL_LINE_SQUARE); 
-						break;
-					case Tripod: 
-						plan->setTemplateType(PullTemplate::TRIPOD); 
-						break;
-					case Cross: 
-						plan->setTemplateType(PullTemplate::CROSS); 
-						break;
-					case SquareofCircles: 
-						plan->setTemplateType(PullTemplate::SQUARE_OF_CIRCLES); 
-						break;
-					case SquareofSquares: 
-						plan->setTemplateType(PullTemplate::SQUARE_OF_SQUARES); 
-						break;
-					case SurroundingCircle: 
-						plan->setTemplateType(PullTemplate::SURROUNDING_CIRCLE); 
-						break;
-					case SurroundingSquare: 
-						plan->setTemplateType(PullTemplate::SURROUNDING_SQUARE); 
-						break;
-					case Custom: 
-						plan->setTemplateType(PullTemplate::CUSTOM); 
-						break;
-				}
-				break;
-			}
+			case templatetype: ;
 			case twists: 
 				plan->setTwist(rootCaneValue["twists"].asInt()); 
 				break;
@@ -1439,9 +1432,6 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 		plan = pullIter->first;
 		if(plan->subs.size()>1){
 			AsyncPullPlanLibraryWidget *p = new AsyncPullPlanLibraryWidget(plan);
-			cout << plan->getTemplateType();
-			cout << "pulliter " << pullIter->second;
-			cout << endl;
 			for(unsigned int j = 0; j<vecCaneMembers.size(); j++){
 				string numberSt = vecCaneMembers.at(j);
 				int numberInt = 0;
@@ -1452,16 +1442,12 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 				if(numberInt==pullIter->second){
 					Json::Value rootCaneValue = rootCane[vecCaneMembers.at(j)];
 					if(rootCaneValue["SubpullplanTemplate"] != rootCaneValue["NULL"]){
-						//cout << rootCaneValue["SubpullplanTemplate"];
-						//cout << endl;
 						Json::Value rootCaneSubpull = rootCaneValue["SubpullplanTemplate"];
 						vector<std::string> vecCaneSubpullMembers = rootCaneSubpull.getMemberNames();
 
 						for (unsigned int i = 0; i < vecCaneSubpullMembers.size(); i++){
 							Json::Value rootSubcane = rootCaneSubpull[vecCaneSubpullMembers.at(i)];
 							string member = vecCaneSubpullMembers.at(i);
-							cout << "member" << member;
-							cout << endl;
 							int number =0;
 							if(member.find("_") != std::string::npos){
 								member.resize((vecCaneSubpullMembers.at(i)).find("_"));
@@ -1510,6 +1496,7 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 		Vase,
 		Bowl,
 		Pot,
+		Pickup,
 		Wavy_Plate,
 		vertical,
 		reticello,
@@ -1544,14 +1531,15 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 	mapEnum["Vase"] = Vase;
 	mapEnum["Bowl"] = Bowl;
 	mapEnum["Pot"] = Pot;
-	mapEnum["Wavy_Plate"] = Wavy_Plate;
+	mapEnum["Pickup"] = Pickup;
+	mapEnum["Wavy Plate"] = Wavy_Plate;
 	mapEnum["Vertical"] = vertical;
 	mapEnum["Reticello Vertical Horizontal"] = reticello;
 	mapEnum["Murrine Column"] = murrinecolumn;
 	mapEnum["Verticals and Horizontals"] = verticalsandhorizontals;
 	mapEnum["Vertical Horizontal Vertical"] = verthorizontalvert;
 	mapEnum["Vertical With Lip Wrap"] = verticalwithlipwrap;
-	mapEnum["Murrine row"] = murrinerow;
+	mapEnum["Murrine Row"] = murrinerow;
 	mapEnum["Murrine"] = murrine;
 	mapEnum["cane"] = cane;
 	mapEnum["length"] = length;
@@ -1567,7 +1555,7 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 	mapEnum["Lip width"] = lipwidth;
 	mapEnum["Body width"] = bodywidth;
 	mapEnum["Twist"] = twist;
-
+	
 	for (unsigned int i = 0; i < vecPieceMembers.size(); i++)
 	{
 		Json::Value rootPieceValues = root[vecPieceMembers[i]];
@@ -1585,69 +1573,69 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 			}
 
 			switch(mapEnum[name]){
-				case Vase: 
-				case Tumbler: 
-				case Bowl: 
+				case Vase:
+				case Tumbler:
+				case Bowl:
 				case Pot:
+				case Pickup:
 				{
 					rootPieceTempl = rootPieceValues[vecPieceValues[i]];
 					if(piece->getParameterCount() == 3){
 						switch(vecPieceValues[i][0]) {
-							case 'V': 
+							case 'V':
 								piece->setTemplateType(PieceTemplate::VASE);
 								break;
-							case 'T': 
+							case 'T':
 								piece->setTemplateType(PieceTemplate::TUMBLER);
 								break;
-							case 'B': 
+							case 'B':
 								piece->setTemplateType(PieceTemplate::BOWL);
 								break;
-							case 'P': 
-								piece->setTemplateType(PieceTemplate::POT);
-								break;
-							default: 
+							case 'P':
+							if(vecPieceValues[i][1]=='o')
+									piece->setTemplateType(PieceTemplate::POT);
+							if(vecPieceValues[i][1]=='i')
 								piece->setTemplateType(PieceTemplate::PICKUP);
+								break;
 						}
 					}
 					break;
 				}
 				case Wavy_Plate:
-					if(piece->getParameterCount() == 2){
-						rootPieceTempl = rootPieceValues[mapEnum[vecPieceValues[i]]];
+						rootPieceTempl = rootPieceValues[vecPieceValues[i]];
 						piece->setTemplateType(PieceTemplate::WAVY_PLATE);
-					}
 					break;
-				case subPickupTemplateType: 
+				case subPickupTemplateType:
 					if(rootPieceValues["subPickupTemplateType"]!=rootPieceValues["NULL"]){
 						switch(mapEnum[rootPieceValues["subPickupTemplateType"].asString()]){
-							case vertical: 
-								piece->pickup->setTemplateType(PickupTemplate::VERTICAL);
+							case vertical:
+							piece->pickup->setTemplateType(PickupTemplate::VERTICAL);
 								break;
-							case reticello: 
+							case reticello:
 								piece->pickup->setTemplateType(PickupTemplate::RETICELLO_VERTICAL_HORIZONTAL);
 								break;
 							case murrinecolumn:
 								piece->pickup->setTemplateType(PickupTemplate::MURRINE_COLUMN);
 								break;
-							case verticalsandhorizontals: 
+							case verticalsandhorizontals:
 								piece->pickup->setTemplateType(PickupTemplate::VERTICALS_AND_HORIZONTALS);
 								break;
-							case verthorizontalvert: 
+							case verthorizontalvert:
 								piece->pickup->setTemplateType(PickupTemplate::VERTICAL_HORIZONTAL_VERTICAL);
 								break;
-							case verticalwithlipwrap: 
+							case verticalwithlipwrap:
 								piece->pickup->setTemplateType(PickupTemplate::VERTICAL_WITH_LIP_WRAP);
 								break;
-							case murrinerow: 
+							case murrinerow:
 								piece->pickup->setTemplateType(PickupTemplate::MURRINE_ROW);
 								break;
-							case murrine: 
+							case murrine:
 								piece->pickup->setTemplateType(PickupTemplate::MURRINE);
 								break;
 						}
-					}
+				}
 					break;
-				case overlayGlassColor: 
+				case overlayGlassColor:
 				{
 					if(rootPieceValues["overlayGlassColor"]!=rootPieceValues["NULL"]){
 						if ((rootPieceValues["overlayGlassColor"].asInt()) == 0){
@@ -1664,7 +1652,7 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 					}
 					break;
 				}
-				case underlayGlassColor: 
+				case underlayGlassColor:
 				{
 					if(rootPieceValues["underlayGlassColor"]!=rootPieceValues["NULL"]){
 						if((rootPieceValues["underlayGlassColor"].asInt()) == 0){
@@ -1680,8 +1668,8 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 					}
 					break;
 				}
-				case casingGlassColor: 
-				{ 
+				case casingGlassColor:
+				{
 					if(rootPieceValues["casingGlassColor"]!=rootPieceValues["NULL"]){
 						if((rootPieceValues["casingGlassColor"].asInt()) == 0){
 							iterGlass = colorMap->begin();
@@ -1696,7 +1684,7 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 					}
 					break;
 				}
-				default: 
+				default:
 					int position = vecPieceValues[i].find("_") - 1;
 					int paramNumb = vecPieceValues[i][position] - 48;
 					piece->setParameter(paramNumb, rootPieceValues[vecPieceValues[i]].asInt());
@@ -1713,10 +1701,10 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 		for(unsigned int i =0; i < vecPieceTempl.size(); i++){
 			Json::Value rootPieceTemplMember = rootPieceTempl[vecPieceTempl.at(i)];
 			switch(mapEnum[vecPieceTempl.at(i)]){
-				case thickness: 
+				case thickness:
 					piece->pickup->setParameter(1, rootPieceTempl[vecPieceTempl.at(i)].asInt());
 					break;
-				case row : 
+				case row :
 					;//done piece->pickup->setParameter(0,rootPieceTempl[vecPieceTempl.at(i)].asInt());
 					break;
 				case column : ;
@@ -1727,10 +1715,15 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 					if(vecPieceTempl.operator [](i)!="NULL"){
 						map<PullPlan*, int>::iterator iter;
 						PullPlan* plan = new PullPlan(PullTemplate::BASE_CIRCLE);
+						cout << "size" << caneMap->size();
+						cout << endl;
 						for(iter = caneMap->begin();iter != caneMap->end();iter++){
+							cout << "iter " << iter->second;
+							cout << endl;
 							if(iter->second==(rootPieceTemplMember["cane"].asInt()))
-							plan = iter->first;
-							break;
+							{
+								plan = iter->first;
+							}
 						}
 						Point location;
 						location[0] = rootPieceTemplMember["x"].asFloat();
@@ -1777,31 +1770,32 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 }
 
 void MainWindow::deleteStandardLibraryElements(){
-	//colors
-	AsyncColorBarLibraryWidget* cblw;
-	cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
-	dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(1))->widget());
-	cblw->close();
-	cblw->deleteLater();
-	cblw->update();
+	QLayoutItem* w;
+		//colors
+	if(colorBarLibraryLayout->count()>=1)
+	{
+		w = colorBarLibraryLayout->takeAt(0);
+		delete w->widget();
+		delete w;
+	}
 
 	//canes
-	AsyncPullPlanLibraryWidget* pplw;
-	pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
-	dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(1))->widget());
-	pplw->close();
-	pplw->deleteLater();
-	pplw->update();
+	if(pullPlanLibraryLayout->count()>=1)
+	{
+		w = pullPlanLibraryLayout->takeAt(0);
+		delete w->widget();
+		delete w;
+	}
 
 	//pieces
-	AsyncPieceLibraryWidget* plw;
-	plw = dynamic_cast<AsyncPieceLibraryWidget*>(
-	dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(1))->widget());
-	plw->close();
-	plw->deleteLater();
-	plw->update();
-	emit someDataChanged();
+	if(pieceLibraryLayout->count()>=1)
+	{
+		w = pieceLibraryLayout->takeAt(0);
+		delete w->widget();
+		delete w;
+	}
 
+	emit someDataChanged();
 }
 
 void MainWindow::setMerge(bool var){
@@ -1815,63 +1809,78 @@ bool MainWindow::getMerge(){
 	return merge;
 }
 
-void MainWindow::open(QStringList list){
+void MainWindow::open(QStringList list, bool merge){
 	for(int i = 0; i < list.size(); i++){
-	QString filename = list.at(i);
-	if((filename.toStdString())!=""){
-		QFile savePath(":/save");
-		savePath.open(QIODevice::WriteOnly | QIODevice::Text);
-		QTextStream savePathOutput(&savePath);
-		savePathOutput << filename << "\n";
-		savePath.close();
-	}
+		QString filename = list.at(i);
+		if((filename.toStdString())!=""&&list.size()>1){
+			QFile savePath(":/save");
+			savePath.open(QIODevice::WriteOnly | QIODevice::Text);
+			QTextStream savePathOutput(&savePath);
+			savePathOutput << filename << "\n";
+			savePath.close();
+		}
 
-	QFile openFile(filename);
-	openFile.open(QIODevice::ReadOnly | QIODevice::Text);
-	QTextStream fileInput(&openFile);
-	QString QStr = fileInput.readAll();
-	std::string str = QStr.toStdString();
-	Json::Value root;
-	Json::Reader reader;
-	ifstream readHdl;
-	char versionNo[16]; //date has always 12 characters
+		QFile openFile(filename);
+		openFile.open(QIODevice::ReadOnly | QIODevice::Text);
+		QTextStream fileInput(&openFile);
+		QString QStr = fileInput.readAll();
+		std::string str = QStr.toStdString();
+		Json::Value root;
+		Json::Reader reader;
+		ifstream readHdl;
+		char versionNo[16]; //date has always 12 characters
 
-	readHdl.open(filename.toAscii());
-	readHdl.getline(versionNo,16,'\n');
-	readHdl.close();
+		readHdl.open(filename.toAscii());
+		readHdl.getline(versionNo,16,'\n');
+		readHdl.close();
 
-	//check version No
-	if((int(versionNo[2]))>55);//ascii: char 7 == int 55
-	else{
-		//lower version than 7xx
-	}
-	if((int(versionNo[3])<53)&&((int(versionNo[2]))>55)){
-			//lower version than (firstIf)5x
-	}
-	if((int(versionNo[4])<56)&&(int(versionNo[3])>53)&&((int(versionNo[2]))>55)){
-		//lower version than (firstIf)(secondIf)8
-	}
+		//check version No
+		if((int(versionNo[2]))>55);//ascii: char 7 == int 55
+		else{
+			//lower version than 7xx
+		}
+		if((int(versionNo[3])<53)&&((int(versionNo[2]))>55)){
+				//lower version than (firstIf)5x
+		}
+		if((int(versionNo[4])<56)&&(int(versionNo[3])>53)&&((int(versionNo[2]))>55)){
+			//lower version than (firstIf)(secondIf)8
+		}
 
-	bool parsedSuccess = reader.parse(str,root,false);
-	map<GlassColor*, int> colorMap;
-	map<PullPlan*, int> caneMap;
-	map<Piece*, int> pieceMap;
+		bool parsedSuccess = reader.parse(str,root,false);
+		map<GlassColor*, int> colorMap;
+		map<PullPlan*, int> caneMap;
+		map<Piece*, int> pieceMap;
 
-	colorMap[(GlobalGlass::color())] = 0;
+		colorMap[new GlassColor] = 0;
+		caneMap[new PullPlan(PullTemplate::BASE_CIRCLE)] = 0;
 
-	if(!parsedSuccess){
-		cout<<"Failed to parse JSON"<<endl<<reader.getFormatedErrorMessages()<<endl; //debugging
-	}
+		if(!parsedSuccess){
+			cout<<"Failed to parse JSON"<<endl<<reader.getFormatedErrorMessages()<<endl; //debugging
+		}
 
-	if( root.size() != 3){
-		cout << "error in file";
+		if( root.size() != 3){
+			cout << "error in file";
+		}
+		else{
+			if(merge==false&&root["pieces"].size()!=0)
+			{
+				newFile();
+				openColors(root["colors"], &colorMap);
+				openCanes(root["canes"], &caneMap, &colorMap);
+				openPieces(root["pieces"], &pieceMap, &caneMap, &colorMap);
+				deleteStandardLibraryElements();
+			}
+			else
+			{
+				if(merge==true&&root["pieces"].size()!=0)
+				{
+					openColors(root["colors"], &colorMap);
+					openCanes(root["canes"], &caneMap, &colorMap);
+					openPieces(root["pieces"], &pieceMap, &caneMap, &colorMap);
+				}
+			}
+		}
 	}
-	else{
-		openColors(root["colors"], &colorMap);
-		openCanes(root["canes"], &caneMap, &colorMap);
-		openPieces(root["pieces"], &pieceMap, &caneMap, &colorMap);
-	}
-}
 }
 
 void MainWindow::castMergeButton(QWidget* w)
@@ -1880,7 +1889,7 @@ void MainWindow::castMergeButton(QWidget* w)
 	Q_ASSERT( openFileDialog );
 	QStringList list = openFileDialog->selectedFiles();
 	setMerge(true);
-	open(list);
+	open(list, true);
 	openFileDialog->close();
 }
 
@@ -1907,7 +1916,7 @@ void MainWindow::openFile(){
 		list = openFileDialog.selectedFiles(); //get the selected files after pressing open
 		if(getMerge()==false){
 			newFile();
-			open(list);
+			open(list, false);
 			deleteStandardLibraryElements();
 		}
 		setViewMode(EMPTY_VIEW_MODE);
@@ -1922,54 +1931,60 @@ void MainWindow::newFile(){
 	QTextStream savePathOutput(&savePath);
 	savePathOutput << "\n";
 	savePath.close();
+	QLayoutItem* w;
 
-	AsyncColorBarLibraryWidget* cblw;
-	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
-	{
-		cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
-			dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
-		cblw->close();
-		cblw->deleteLater();
-		cblw->update();
-	}
-	cblw->update();
-	AsyncColorBarLibraryWidget *cb =new AsyncColorBarLibraryWidget(new GlassColor, this);
-	colorBarLibraryLayout->addWidget(cb);
+	//colors
+
+	//AsyncColorBarLibraryWidget *cb =new AsyncColorBarLibraryWidget(new GlassColor, this);
+	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(new GlassColor, this));
 	colorBarLibraryLayout->update();
-	cb->updatePixmaps();
+
+	int i;
+	for (i=0; i < colorBarLibraryLayout->count();)
+	{
+		w = colorBarLibraryLayout->takeAt(i);
+		delete w->widget();
+		delete w;
+		if(colorBarLibraryLayout->count()<=1)
+			i++;
+	}
+	colorBarLibraryLayout->update();
 	emit someDataChanged();
 
+	//pullplan
 
-	AsyncPullPlanLibraryWidget* pplw;
-	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
-	{
-		pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
-			dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
-		pplw->close();
-		pplw->deleteLater();
-		pplw->update();
-	}
-	AsyncPullPlanLibraryWidget *ppl = new AsyncPullPlanLibraryWidget(new PullPlan(PullTemplate::BASE_CIRCLE));
-	pullPlanLibraryLayout->addWidget(ppl);
+	AsyncPullPlanLibraryWidget *pplw =new AsyncPullPlanLibraryWidget(new PullPlan(PullTemplate::BASE_CIRCLE),this);
+	pullPlanLibraryLayout->addWidget(pplw);
 	pullPlanLibraryLayout->update();
-	show();
-	ppl->updatePixmaps();
+
+	for (i=0; i< pullPlanLibraryLayout->count();)
+	{
+		w=pullPlanLibraryLayout->takeAt(i);
+		delete w->widget();
+		delete w;
+		if(pullPlanLibraryLayout->count()<=1)
+			i++;
+	}
+	pullPlanLibraryLayout->update();
 	emit someDataChanged();
 
-	AsyncPieceLibraryWidget* plw;
-	for (int i = 0; i < pieceLibraryLayout->count(); ++i)
-	{
-		plw = dynamic_cast<AsyncPieceLibraryWidget*>(
-			dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
-		plw->close();
-		plw->deleteLater();
-		plw->update();
-	}
-	AsyncPieceLibraryWidget *pl = new AsyncPieceLibraryWidget(new Piece(PieceTemplate::TUMBLER));
-	pieceLibraryLayout->addWidget(pl);
+
+	//pieces
+
+	AsyncPieceLibraryWidget *plw = new AsyncPieceLibraryWidget(new Piece(PieceTemplate::TUMBLER));
+	pieceLibraryLayout->addWidget(plw);
 	pieceLibraryLayout->update();
-	show();
-	pl->updatePixmap();
+
+	for (i=0; i < pieceLibraryLayout->count();)
+	{
+		w=pieceLibraryLayout->takeAt(i);
+		delete w->widget();
+		delete w;
+		if(pieceLibraryLayout->count()<=1)
+			i++;
+	}
+	pieceLibraryLayout->update();
+	plw->updatePixmap();
 	unhighlightAllLibraryWidgets();
 	setViewMode(EMPTY_VIEW_MODE);
 	emit someDataChanged();
