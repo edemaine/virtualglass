@@ -76,9 +76,9 @@ class MainWindow : public QMainWindow
 		void deleteCurrentEditingObject();
 		void setViewMode(enum ViewMode m);
 		QString writeJson(Json::Value);
-		void prepareJson(PullPlan*, Json::Value*, std::string nestedValue);
-		void buildCaneTree(PullPlan* , PullPlan* , std::map<PullPlan*,int>, Json::Value*);
-		void buildCaneMap(PullPlan*, Json::Value*, std::map<PullPlan*,int>);
+		//void prepareJson(PullPlan*, Json::Value*, std::string nestedValue);
+		//void buildCaneTree(PullPlan* , PullPlan* , std::map<PullPlan*,int>, Json::Value*);
+		//void buildCaneMap(PullPlan*, Json::Value*, std::map<PullPlan*,int>);
 		void createActions();
 		void save(QString);
 		void saveAs(QString);
@@ -166,7 +166,7 @@ class MainWindow : public QMainWindow
 		void writePiece(Json::Value*, std::map<Piece*, int>*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>, int);
 		void openColors(Json::Value, std::map<GlassColor*, int>*);
 		void openCanes(Json::Value, std::map<PullPlan*, int>*, std::map<GlassColor*, int>* colorMap);
-		void openPieces(Json::Value, std::map<Piece*, int>*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>*);
+		void openPieces(Json::Value, std::map<PullPlan *, int> *caneMap, std::map<GlassColor *, int> *colorMap);
 };
 
 #endif

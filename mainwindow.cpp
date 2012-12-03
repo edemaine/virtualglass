@@ -897,7 +897,6 @@ void MainWindow::closeEvent(QCloseEvent *event){
 	event->accept();
 }
 
-
 void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 {
 	QMenu menu(this);
@@ -944,7 +943,7 @@ void MainWindow::buildCaneMap(vector<PullPlan*>* caneVec, vector<GlassColor*>* c
 			PullPlan* plan = piece->pickup->subs.at(i).plan;
 
 			if (std::find(caneVec->begin(), caneVec->end(), plan) == caneVec->end())
-			{	
+			{
 				if (std::find(colorVec->begin(), colorVec->end(), piece->pickup->overlayGlassColor) == colorVec->end())
 					colorVec->push_back(piece->pickup->overlayGlassColor);
 				if (std::find(colorVec->begin(), colorVec->end(), piece->pickup->casingGlassColor) == colorVec->end())
@@ -960,16 +959,10 @@ void MainWindow::buildCaneMap(vector<PullPlan*>* caneVec, vector<GlassColor*>* c
 	}
 }
 
-QString MainWindow::writeJson(Json::Value root){
-	Json::StyledWriter writer;
-	std::string outputConfig = writer.write( root );
-	QString output = QString::fromStdString(outputConfig);
-	return output;
-}
-
 void MainWindow::writeCane(Json::Value *root, map<PullPlan*, int>* caneMap, map<GlassColor*, int> colorMap, vector<PullPlan*> caneVec){
 	AsyncPullPlanLibraryWidget* pplw;
-	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i){
+	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
+	{
 		pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 		PullPlan* plan=pplw->getPullPlan();
@@ -989,26 +982,12 @@ void MainWindow::writeCane(Json::Value *root, map<PullPlan*, int>* caneMap, map<
 		//check dependency from piece to plan to save only dependent canes
 		Json::Value *value5 = new Json::Value;
 		*value5 = PullTemplate::enumToString(plan->getTemplateType());
-		Json::Value *value6 = new Json::Value;
-		*value6 = (plan->hasSquareCasing());
 		Json::Value *value7 = new Json::Value;
 		*value7 = (plan->getCasingCount());
 		Json::Value *value8 = new Json::Value;
-		 *value8 = (plan->getTwist());
+		*value8 = (plan->getTwist());
 
 		Json::Value *nested_value = new Json::Value;
-
-		std::stringstream *templateTypeSstr = new std::stringstream;
-		*templateTypeSstr << "templatetype";
-		string templateType = templateTypeSstr->str();
-
-		std::stringstream *hasSquareCasingSstr = new std::stringstream;
-		*hasSquareCasingSstr << "hasSquareCasing";
-		string hasSquareCasing = hasSquareCasingSstr->str();
-
-		std::stringstream *casingcountSstr = new std::stringstream;
-		*casingcountSstr << "casingcount";
-		string casingCount = casingcountSstr->str();
 
 		map<GlassColor*, int>::iterator iter;
 		for (unsigned int k = 0; k< plan->getCasingCount(); k++){
@@ -1024,29 +1003,26 @@ void MainWindow::writeCane(Json::Value *root, map<PullPlan*, int>* caneMap, map<
 
 			(*nested_value2)["CasingShape"] = plan->getCasingShape(k);
 			(*nested_value2)["CasingThickness"] = plan->getCasingThickness(k);
-			std::stringstream *casingSstr = new std::stringstream;
-			*casingSstr << k<<"_Casing";
-			string casing = casingSstr->str();
+			std::stringstream casingSstr;
+			casingSstr << k<<"_Casing";
+			string casing = casingSstr.str();
 			(*nested_value)[casing] = (*nested_value2);
 		}
-
+		Json::Value *nested_value2 = new Json::Value;
 		for(unsigned int i = 0; i < plan->getParameterCount(); i++){
 			TemplateParameter pullTemplPara;
 			plan->getParameter(i, &pullTemplPara);
-			(*nested_value)[(pullTemplPara.name)] = pullTemplPara.value;
+			(*nested_value2)[(pullTemplPara.name)] = pullTemplPara.value;
 		}
+		if(plan->getParameterCount() != 0)
+			(*nested_value)["PullTemplateParameters"] = *nested_value2;
 
-		std::stringstream *twistsSstr = new std::stringstream;
-		*twistsSstr << "twists";
-		string twists = twistsSstr->str();
-
-		(*nested_value)[templateType] = *value5;
-		(*nested_value)[hasSquareCasing] = *value6;
-		(*nested_value)[casingCount] = *value7;
-		(*nested_value)[twists] = *value8;
+		(*nested_value)["PullTemplate"] = *value5;
+		(*nested_value)["Casing count"] = *value7;
+		(*nested_value)["Twists"] = *value8;
 
 		std::stringstream *pullplannrSstr = new std::stringstream;
-		*pullplannrSstr  <<i<< "_canes";
+		*pullplannrSstr  <<i<< "_Cane";
 		string pullPlanNr = (*pullplannrSstr).str();
 
 		if(plan->subs.size() !=0)
@@ -1056,27 +1032,26 @@ void MainWindow::writeCane(Json::Value *root, map<PullPlan*, int>* caneMap, map<
 				Json::Value *nested_value2 = new Json::Value;
 				SubpullTemplate templ = plan->subs.at(j);
 
-				//(*nested_value2)["group"] = templ.group;
-				(*nested_value2)["shape"] = templ.shape;
-				(*nested_value2)["diameter"] = templ.diameter;
-				(*nested_value2)["cane"] = caneMap->find(templ.plan)->second;
+				(*nested_value2)["Shape"] = templ.shape;
+				(*nested_value2)["Diameter"] = templ.diameter;
+				(*nested_value2)["Cane"] = caneMap->find(templ.plan)->second;
 
-				(*nested_value2)["x"] = templ.location[0];
-				(*nested_value2)["y"] = templ.location[1];
-				(*nested_value2)["z"] = templ.location[2];
+				(*nested_value2)["X"] = templ.location[0];
+				(*nested_value2)["Y"] = templ.location[1];
+				(*nested_value2)["Z"] = templ.location[2];
 
 				std::stringstream *Sstr = new std::stringstream;
-					*Sstr <<j << "_cane";
+					*Sstr <<j << "_Cane";
 				string name = Sstr->str();
 
 				(*nested_value3)[name] = (*nested_value2);
 			}
-			(*nested_value)["SubpullplanTemplate"] = (*nested_value3);
+			(*nested_value)["SubPullPlans"] = (*nested_value3);
 		}
 		(*pullplan_nested)[pullPlanNr] = *nested_value;
 		i++;
 	}
-	(*root)["canes"] = (*pullplan_nested);
+	(*root)["Canes"] = (*pullplan_nested);
 }
 
 void MainWindow::writeColor(Json::Value* root, map<GlassColor*, int>* colorMap, vector<GlassColor*> colorVec){
@@ -1089,14 +1064,14 @@ void MainWindow::writeColor(Json::Value* root, map<GlassColor*, int>* colorMap, 
 
 		if((std::find(colorVec.begin(), colorVec.end(), color)) != colorVec.end()){
 
-			(*colorMap)[color] = i+1; //global_clear ==0
+			(*colorMap)[color] = i+1; //clear ==0
 
 			Json::Value *nested_value = new Json::Value;
 
-			(*nested_value)["R"] = cblw->getGlassColor()->getColor()->r; 
+			(*nested_value)["R"] = cblw->getGlassColor()->getColor()->r;
 			(*nested_value)["G"] = cblw->getGlassColor()->getColor()->g;
 			(*nested_value)["B"] = cblw->getGlassColor()->getColor()->b;
-			(*nested_value)["alpha"] = cblw->getGlassColor()->getColor()->a;
+			(*nested_value)["Alpha"] = cblw->getGlassColor()->getColor()->a;
 
 			std::stringstream *colorSstr = new std::stringstream;
 			*colorSstr  <<i+1<<"_" << (cblw->getGlassColor()->getName())->toStdString();
@@ -1105,15 +1080,14 @@ void MainWindow::writeColor(Json::Value* root, map<GlassColor*, int>* colorMap, 
 			(*color_nested)[colorName] = (*nested_value);
 		}
 	}
-	(*root)["colors"] = (*color_nested);
+	(*root)["Colors"] = (*color_nested);
 }
 
 void MainWindow::writePiece(Json::Value* root, map<Piece*, int>* pieceMap, map<PullPlan*, int>* caneMap, map<GlassColor*, int> colorMap, int selected){
-	AsyncPieceLibraryWidget *plw;
 	Json::Value *piece_nested = new Json::Value;
 
-
 	if(selected==0){
+		AsyncPieceLibraryWidget *plw;
 		for (int i = 0; i < pieceLibraryLayout->count(); ++i){
 			plw = dynamic_cast<AsyncPieceLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
@@ -1126,65 +1100,70 @@ void MainWindow::writePiece(Json::Value* root, map<Piece*, int>* pieceMap, map<P
 		(*pieceMap)[pieceEditorWidget->getPiece()] = 0; //build map with selected piece only
 	}
 
-
 	map<Piece*, int>::iterator position;
 	for(position = (*pieceMap).begin(); position != (*pieceMap).end(); ++position){
 		Json::Value *nested_value = new Json::Value;
 		Piece* piece = position->first;
 		int i = position->second;
 
-		(*nested_value)["subPickupTemplateType"] =(PickupTemplate::enumToString(piece->pickup->getTemplateType()));
-		(*nested_value)["overlayGlassColor"] = colorMap.find((*piece).pickup->overlayGlassColor)->second;
-		(*nested_value)["underlayGlassColor"] = colorMap.find((*piece).pickup->underlayGlassColor)->second;
-		(*nested_value)["casingGlassColor"] = colorMap.find((*piece).pickup->casingGlassColor)->second;
+		(*nested_value)["OverlayGlassColor"] = colorMap.find((*piece).pickup->overlayGlassColor)->second;
+		(*nested_value)["UnderlayGlassColor"] = colorMap.find((*piece).pickup->underlayGlassColor)->second;
+		(*nested_value)["CasingGlassColor"] = colorMap.find((*piece).pickup->casingGlassColor)->second;
 
 		Json::Value *nested_value3 = new Json::Value;
+		Json::Value *nested_value5 = new Json::Value;
 		for(unsigned int i = 0; i< piece->pickup->getParameterCount(); i++){
 			TemplateParameter pickTemplPara;
 			piece->pickup->getParameter(i, &pickTemplPara);
-			(*nested_value3)[(pickTemplPara.name)] = pickTemplPara.value;
+			(*nested_value5)[(pickTemplPara.name)] = pickTemplPara.value;
 		}
+		(*nested_value3)["SubPickupTemplateParameters"] =  (*nested_value5);
 
+		Json::Value *nested_value4 = new Json::Value;
 		for(unsigned int i = 0; i < piece->getParameterCount(); i++){
 			TemplateParameter pieceTemplPara;
 			piece->getParameter(i,&pieceTemplPara);
 			std::stringstream *Sstr = new std::stringstream;
 			*Sstr <<i << "_" <<pieceTemplPara.name;
 			string name = Sstr->str();
-			(*nested_value)[name] = pieceTemplPara.value;
+			(*nested_value4)[name] = pieceTemplPara.value;
 		}
+		(*nested_value)["PieceTemplateParameters"] = (*nested_value4);
 
 		for(unsigned int j = 0; j < piece->pickup->subs.size(); j++){
 			Json::Value *nested_value2 = new Json::Value;
 			SubpickupTemplate templ = (*piece).pickup->subs.at(j);
 			map<PullPlan*, int>::iterator iter;
-			(*nested_value2)["cane"] = 0;
+			(*nested_value2)["Cane"] = 0;
 			for(iter = caneMap->begin(); iter != caneMap->end(); iter++){
 				if(iter->first==templ.plan)
-					(*nested_value2)["cane"] = iter->second;
+					(*nested_value2)["Cane"] = iter->second;
 			}
 
-			(*nested_value2)["length"] = templ.length;
-			(*nested_value2)["orientation"] = templ.orientation;
-			(*nested_value2)["shape"] = templ.shape;
-			(*nested_value2)["width"] = templ.width;
-			(*nested_value2)["x"] = templ.location[0];
-			(*nested_value2)["y"] = templ.location[1];
-			(*nested_value2)["z"] = templ.location[2];
+			(*nested_value2)["Length"] = templ.length;
+			(*nested_value2)["Orientation"] = templ.orientation;
+			(*nested_value2)["Shape"] = templ.shape;
+			(*nested_value2)["Width"] = templ.width;
+			(*nested_value2)["X"] = templ.location[0];
+			(*nested_value2)["Y"] = templ.location[1];
+			(*nested_value2)["Z"] = templ.location[2];
 
 			std::stringstream *Sstr = new std::stringstream;
-			*Sstr <<j << "cane";
+			*Sstr <<j << "_Cane";
 			string name = Sstr->str();
 
 			(*nested_value3)[name] = (*nested_value2);
+
+			(*nested_value3)["SubPickupTemplate"] =(PickupTemplate::enumToString(piece->pickup->getTemplateType()));
 		}
-		(*nested_value)[PieceTemplate::enumToString(piece->getTemplateType())] = (*nested_value3);
+		(*nested_value)["SubPickups"] = (*nested_value3);
+		(*nested_value)["PieceTemplate"] = PieceTemplate::enumToString(piece->getTemplateType());
 		std::stringstream *Sstr = new std::stringstream;
-		*Sstr << i<<"_piece";
+		*Sstr << i<<"_Piece";
 		string name = Sstr->str();
 		(*piece_nested)[name]=(*nested_value);
 	}
-	(*root)["pieces"] = (*piece_nested);
+	(*root)["Pieces"] = (*piece_nested);
 }
 
 void MainWindow::openColors(Json::Value rootColor, map<GlassColor*, int>* colorMap){
@@ -1202,10 +1181,43 @@ void MainWindow::openColors(Json::Value rootColor, map<GlassColor*, int>* colorM
 	colorMapEnum["R"] = R;
 	colorMapEnum["G"] = G;
 	colorMapEnum["B"] = B;
-	colorMapEnum["alpha"] = alpha;
+	colorMapEnum["Alpha"] = alpha;
 
+	unsigned int index[vecColorMembers.size()];
+	unsigned j = 0;
+	for (unsigned int i = 0; i < vecColorMembers.size(); i++) //loop over all canes
+	{
+		string member = vecColorMembers[i];
+		unsigned int number =0;
+		//fixes "wrong" order (0, 10, 11..., 1, 2 ,.., 9)
+		if(member.find("_")!=std::string::npos){
+			member.resize(vecColorMembers[i].find("_"));
+			number = atoi(member.c_str());
+		}
 
-	for(int j=0;j<(int (vecColorMembers.size()));j++){
+		if(i+1==number)
+			index[i]=number-1;
+		else
+		{
+			for (unsigned int l = 0; l < vecColorMembers.size(); l++) //loop over all canes
+			{
+				string member = vecColorMembers[l];
+				if(member.find("_")!=std::string::npos){
+					member.resize(vecColorMembers[l].find("_"));
+					number = atoi(member.c_str());
+				}
+				if(i+1==number)
+				{
+					index[i]=l;
+					l=vecColorMembers.size();
+				}
+			}
+		}
+	}
+
+	for (unsigned int i = 0; i< vecColorMembers.size(); i++) //loop over all pieces; adds pieces in correct order
+	{
+		j=index[i];
 		Json::Value rootColorValue = rootColor[vecColorMembers.at(j)];
 		vector<std::string> vecColorValueMembers = rootColorValue.getMemberNames(); //vector for RGBalpha
 
@@ -1218,7 +1230,7 @@ void MainWindow::openColors(Json::Value rootColor, map<GlassColor*, int>* colorM
 				case R : ((*color).c)[0] = rootColorValue["R"].asFloat(); break;
 				case G : ((*color).c)[1] = rootColorValue["G"].asFloat(); break;
 				case B : ((*color).c)[2] = rootColorValue["B"].asFloat(); break;
-				case alpha : ((*color).c)[3] = rootColorValue["alpha"].asFloat(); break;
+				case alpha : ((*color).c)[3] = rootColorValue["Alpha"].asFloat(); break;
 				}
 				(*glasscolor).setColor(*color);
 			}
@@ -1229,7 +1241,6 @@ void MainWindow::openColors(Json::Value rootColor, map<GlassColor*, int>* colorM
 
 			string colorName = (vecColorMembers.at(j)).substr ((vecColorMembers.at(j)).find("_")+1);
 			(*glasscolor).setName(QString::fromStdString(colorName));
-			unhighlightAllLibraryWidgets();
 			AsyncColorBarLibraryWidget *w =new AsyncColorBarLibraryWidget(glasscolor, this);
 			colorBarLibraryLayout->addWidget(w);
 			colorEditorWidget->setGlassColor(glasscolor);
@@ -1248,10 +1259,10 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 	map<GlassColor*, int>::iterator iter;
 
 	enum caneKeywords{
-		SubpullplanTemplate,
+		Subpullplans,
 		casingcount,
-		hasSquareCasing,
-		templatetype,
+		PullTemplate,
+		PullTemplateParameters,
 		twists,
 		Column,
 		Count, //Column count
@@ -1275,11 +1286,11 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 	};
 
 	static std::map<std::string, int> caneMapEnum;
-	caneMapEnum["SubpullplanTemplate"] = SubpullplanTemplate;
-	caneMapEnum["casingcount"] = casingcount;
-	caneMapEnum["hasSquareCasing"] = hasSquareCasing;
-	caneMapEnum["templatetype"] = templatetype;
-	caneMapEnum["twists"] = twists;
+	caneMapEnum["SubPullPlans"] = Subpullplans;
+	caneMapEnum["PullTemplate"] = PullTemplate;
+	caneMapEnum["PullTemplateParameters"] = PullTemplateParameters;
+	caneMapEnum["Casing count"] = casingcount;
+	caneMapEnum["Twists"] = twists;
 	caneMapEnum["Column"] = Column;
 	caneMapEnum["Count"] = Count;
 	caneMapEnum["Row"] = Row;
@@ -1288,10 +1299,10 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 	caneMapEnum["CasingShape"] = CasingShape;
 	caneMapEnum["CasingThickness"] = CasingThickness;
 	caneMapEnum["Undefined"] = Undefined;
-	caneMapEnum["BaseCircle"] = BaseCircle;
-	caneMapEnum["BaseSquare"] = BaseSquare;
-	caneMapEnum["HorizontalLineCircle"] = HorizontalLineCircle;
-	caneMapEnum["HorizontalLineSquare"] = HorizontalLineSquare;
+	caneMapEnum["Base Circle"] = BaseCircle;
+	caneMapEnum["Base Square"] = BaseSquare;
+	caneMapEnum["Horizontal Line Circle"] = HorizontalLineCircle;
+	caneMapEnum["Horizontal Line Square"] = HorizontalLineSquare;
 	caneMapEnum["Tripod"] = Tripod;
 	caneMapEnum["Cross"] = Cross;
 	caneMapEnum["Square of Circles"] = SquareofCircles;
@@ -1299,45 +1310,98 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 	caneMapEnum["Surrounding Circle"] = SurroundingCircle;
 	caneMapEnum["Surrounding Square"] = SurroundingSquare;
 	caneMapEnum["Custom"] = Custom;
-	int k=0;
-	for(int i = 0; i < int(vecCaneMembers.size()); i++){
+
+	unsigned int index[vecCaneMembers.size()];
+	unsigned k = 0;
+	for (unsigned int i = 0; i < vecCaneMembers.size(); i++) //loop over all canes
+	{
 		string member = vecCaneMembers[i];
-		int number =0;
-		//fixes that cane 0 will be opened first and not 10; see json file with (more than) 11 canes
+		unsigned int number =0;
+		//fixes "wrong" order (0, 10, 11..., 1, 2 ,.., 9)
 		if(member.find("_")!=std::string::npos){
 			member.resize(vecCaneMembers[i].find("_"));
 			number = atoi(member.c_str());
 		}
-		if(i==number){
-			k=i;
-		}
-		else{
-			for(int m=0;m<int(vecCaneMembers.size());m++){
-				if(m==number)
-					k=m;
-					break;
+
+		if(i+1==number)
+			index[i]=number-1;
+		else
+		{
+			for (unsigned int l = 0; l < vecCaneMembers.size(); l++) //loop over all canes
+			{
+				string member = vecCaneMembers[l];
+				if(member.find("_")!=std::string::npos){
+					member.resize(vecCaneMembers[l].find("_"));
+					number = atoi(member.c_str());
+				}
+				if(i+1==number)
+				{
+					index[i]=l;
+					l=vecCaneMembers.size();
+				}
 			}
 		}
+	}
+
+	for (unsigned int i = 0; i < vecCaneMembers.size(); i++) //loop over all pieces; adds pieces in correct order
+	{
+		k=index[i];
+		cout << "k " << vecCaneMembers.at(k);
+		cout << endl;
 
 		Json::Value rootCaneValue = rootCane[vecCaneMembers.at(k)];
 		vector<std::string> vecCaneValueMembers = rootCaneValue.getMemberNames(); //vector for CaneValues
-		string caneMapEnumStr = vecCaneValueMembers.at(k);
 		PullPlan *plan = new PullPlan(PullTemplate::BASE_CIRCLE);
 		AsyncPullPlanLibraryWidget *p = new AsyncPullPlanLibraryWidget(plan);
-		if((vecCaneValueMembers.at(k)).find(" ") != string::npos){
-			caneMapEnumStr.resize((vecCaneValueMembers.at(k)).find(" ")); //resize string to fit with caneMapEnum
-		}
 		string caneNumberSt = (vecCaneMembers.at(k));
 		caneNumberSt.resize((vecCaneMembers.at(k)).find("_")); //extracts number from string
 		int caneNumberInt = atoi(caneNumberSt.c_str());
+		for(unsigned int l = 0; l < vecCaneValueMembers.size(); l++){
+			Json::Value rootCaneCasing;
+			switch(caneMapEnum[vecCaneValueMembers.at(l)]){
+			case casingcount:
+			{
+				rootCaneCasing = rootCaneValue["0_Casing"];
+				if(rootCaneCasing["CasingShape"].asBool())
+					plan->setTemplateType(PullTemplate::BASE_SQUARE);
+				else
+					plan->setTemplateType(PullTemplate::BASE_CIRCLE);
 
-		string templType = (rootCaneValue["templatetype"].asString());
-		for (unsigned int i = 0; i < templType.size(); i++){
-			if (templType.find(" ") != std::string::npos)
-				templType.replace(templType.find(" "), 1, "");
-		}
-
-		switch(caneMapEnum[(templType)]){
+				for(unsigned int i = 0; i < rootCaneValue["Casing count"].asUInt()-2; i++){
+					std::stringstream *sstr = new std::stringstream;
+					*sstr << i+2<<"_Casing";
+					string casing = sstr->str();
+					Json::Value rootCaneCasing = rootCaneValue[casing];
+					//if(i==plan->getCasingCount()-1){
+						if(rootCaneCasing["CasingShape"].asBool())
+							plan->addCasing(SQUARE_SHAPE);
+						else
+							plan->addCasing(CIRCLE_SHAPE);
+					//}
+				}
+				for(int i = 0; i < rootCaneValue["Casing count"].asInt(); i++){
+					std::stringstream *sstr = new std::stringstream;
+					*sstr << i<<"_Casing";
+					string casing = sstr->str();
+					for(iter = colorMap->begin(); iter != colorMap->end(); iter++){
+						if(iter->second == rootCaneValue[casing]["CasingColor"].asInt())
+							plan->setCasingColor(iter->first,i);
+					}
+				}
+				int i=plan->getCasingCount();
+				while(i>0){
+					std::stringstream *sstr = new std::stringstream;
+					*sstr << i-1<<"_Casing";
+					string casing = sstr->str();
+					Json::Value rootCaneCasing = rootCaneValue[casing];
+					plan->setCasingThickness(rootCaneCasing["CasingThickness"].asFloat(),i-1);
+					i--;
+				}
+			}
+			break;
+			case PullTemplate:
+			{
+			switch(caneMapEnum[rootCaneValue["PullTemplate"].asString()]){
 			case BaseCircle:
 				plan->setTemplateType(PullTemplate::BASE_CIRCLE);
 				break;
@@ -1368,79 +1432,28 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 			case SurroundingSquare:
 				plan->setTemplateType(PullTemplate::SURROUNDING_SQUARE);
 				break;
-			case Custom: 
-				plan->setTemplateType(PullTemplate::CUSTOM); 
+			case Custom:
+				plan->setTemplateType(PullTemplate::CUSTOM);
 				break;
 		}
-
-		for(unsigned int l = 0; l < vecCaneValueMembers.size(); l++){
-			Json::Value rootCaneCasing;
-			switch(caneMapEnum[vecCaneValueMembers.at(l)]){
-			case casingcount: 
-			{
-				rootCaneCasing = rootCaneValue["0_Casing"];
-				if(rootCaneCasing["CasingShape"].asBool())
-					plan->setTemplateType(PullTemplate::BASE_SQUARE);
-				else
-					plan->setTemplateType(PullTemplate::BASE_CIRCLE);
-
-				for(unsigned int i = 0; i < rootCaneValue["casingcount"].asUInt()-2; i++){
-					std::stringstream *sstr = new std::stringstream;
-					*sstr << i+2<<"_Casing";
-					string casing = sstr->str();
-					Json::Value rootCaneCasing = rootCaneValue[casing];
-					//if(i==plan->getCasingCount()-1){
-						if(rootCaneCasing["CasingShape"].asBool())
-							plan->addCasing(SQUARE_SHAPE);
-						else
-							plan->addCasing(CIRCLE_SHAPE);
-					//}
-				}
-				for(int i = 0; i < rootCaneValue["casingcount"].asInt(); i++){
-					std::stringstream *sstr = new std::stringstream;
-					*sstr << i<<"_Casing";
-					string casing = sstr->str();
-					for(iter = colorMap->begin(); iter != colorMap->end(); iter++){
-						if(iter->second == rootCaneValue[casing]["CasingColor"].asInt())
-							plan->setCasingColor(iter->first,i);
-					}
-				}
-				int i=plan->getCasingCount();
-				while(i>0){
-					std::stringstream *sstr = new std::stringstream;
-					*sstr << i-1<<"_Casing";
-					string casing = sstr->str();
-					Json::Value rootCaneCasing = rootCaneValue[casing];
-					plan->setCasingThickness(rootCaneCasing["CasingThickness"].asFloat(),i-1);
-					i--;
-				}
+		break;
 			}
-			break;
-			case templatetype: ;
-			case twists: 
-				plan->setTwist(rootCaneValue["twists"].asInt()); 
+			case twists:
+				plan->setTwist(rootCaneValue["Twists"].asInt());
 				break;
-			case Column: 
-				plan->setParameter(0,rootCaneValue["Column"].asInt()); //first parameter!
-				break;
-			case Count: 
-				plan->setParameter(0,rootCaneValue["Count"].asInt()); //first parameter!
-				break;
-			case Row: 
-				plan->setParameter(0,rootCaneValue["Row"].asInt()); //first parameter!
-				break;
-			case Radial: 
-				plan->setParameter(0,rootCaneValue["Radial"].asInt()); //first parameter!
-				break;
+			case PullTemplateParameters:
+				if(rootCaneValue.isMember("PullTemplateParameters"))
+				{
+					vector<std::string> pullTemplateParameterValues = rootCaneValue["PullTemplateParameters"].getMemberNames();
+					plan->setParameter(0,rootCaneValue["PullTemplateParameters"][pullTemplateParameterValues[0]].asInt()); //first parameter!
+					break;
+				}
 			}
 		}
 		pullPlanLibraryLayout->addWidget(p);
 		pullPlanLibraryLayout->update();
 		emit someDataChanged();
-		//p->updatePixmaps();
-		//plan->subs.clear();
 		(*caneMap)[plan] = caneNumberInt;
-		k++;
 	}
 	//fill subs
 	map<PullPlan*, int>::iterator pullIter;
@@ -1460,8 +1473,8 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 				}
 				if(numberInt==pullIter->second){
 					Json::Value rootCaneValue = rootCane[vecCaneMembers.at(j)];
-					if(rootCaneValue["SubpullplanTemplate"] != rootCaneValue["NULL"]){
-						Json::Value rootCaneSubpull = rootCaneValue["SubpullplanTemplate"];
+					if(rootCaneValue["SubPullPlans"] != rootCaneValue["NULL"]){
+						Json::Value rootCaneSubpull = rootCaneValue["SubPullPlans"];
 						vector<std::string> vecCaneSubpullMembers = rootCaneSubpull.getMemberNames();
 
 						for (unsigned int i = 0; i < vecCaneSubpullMembers.size(); i++){
@@ -1474,21 +1487,21 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 							}
 
 							for(subpullIter = caneMap->begin(); subpullIter != caneMap->end(); subpullIter++) {
-								if (subpullIter->second == rootSubcane["cane"].asInt())
+								if (subpullIter->second == rootSubcane["Cane"].asInt())
 								{
 									PullPlan *subplan = new PullPlan(PullTemplate::BASE_CIRCLE);
 									subplan = subpullIter->first;
 									GeometricShape shape;
-									if (rootSubcane["shape"].asInt() == 0)
+									if (rootSubcane["Shape"].asInt() == 0)
 										shape = CIRCLE_SHAPE;
 									else
 										shape = SQUARE_SHAPE;
 									Point location;
-									location.x = rootSubcane["x"].asFloat();
-									location.y = rootSubcane["y"].asFloat();
-									location.z = rootSubcane["z"].asFloat();
+									location.x = rootSubcane["X"].asFloat();
+									location.y = rootSubcane["Y"].asFloat();
+									location.z = rootSubcane["Z"].asFloat();
 
-									SubpullTemplate *sub = new SubpullTemplate(subplan, shape, location, rootSubcane["diameter"].asFloat());
+									SubpullTemplate *sub = new SubpullTemplate(subplan, shape, location, rootSubcane["Diameter"].asFloat());
 									plan->subs[number] =  *sub;
 								}
 							}
@@ -1503,11 +1516,14 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 	emit someDataChanged();
 }
 
-void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<PullPlan*, int>* caneMap, map<GlassColor*, int>* colorMap){
+void MainWindow::openPieces(Json::Value root, map<PullPlan*, int>* caneMap, map<GlassColor*, int>* colorMap)
+{
 	std::vector<std::string> vecPieceMembers = root.getMemberNames(); //vec with pieces
 
 	enum piece{
-		subPickupTemplateType,
+		subPickupTemplateParameters,
+		subPickupTemplate,
+		subPickups,
 		overlayGlassColor,
 		underlayGlassColor,
 		casingGlassColor,
@@ -1538,14 +1554,16 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 		column,
 		lipwidth,
 		bodywidth,
-		twist
+		twists
 	};
 
 	static std::map<std::string, int> mapEnum;
-	mapEnum["overlayGlassColor"] = overlayGlassColor;
-	mapEnum["underlayGlassColor"] = underlayGlassColor;
-	mapEnum["casingGlassColor"] = casingGlassColor;
-	mapEnum["subPickupTemplateType"] = subPickupTemplateType;
+	mapEnum["OverlayGlassColor"] = overlayGlassColor;
+	mapEnum["UnderlayGlassColor"] = underlayGlassColor;
+	mapEnum["CasingGlassColor"] = casingGlassColor;
+	mapEnum["SubPickupTemplate"] = subPickupTemplate;
+	mapEnum["SubPickupTemplateParameters"] = subPickupTemplateParameters;
+	mapEnum["SubPickups"] = subPickups;
 	mapEnum["Tumbler"] = Tumbler;
 	mapEnum["Vase"] = Vase;
 	mapEnum["Bowl"] = Bowl;
@@ -1560,219 +1578,212 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 	mapEnum["Vertical With Lip Wrap"] = verticalwithlipwrap;
 	mapEnum["Murrine Row"] = murrinerow;
 	mapEnum["Murrine"] = murrine;
-	mapEnum["cane"] = cane;
-	mapEnum["length"] = length;
-	mapEnum["orientation"] = orientation;
-	mapEnum["shape"] = shape;
-	mapEnum["width"] = width;
-	mapEnum["x"] = x;
-	mapEnum["y"] = y;
-	mapEnum["z"] = z;
+	mapEnum["Cane"] = cane;
+	mapEnum["Length"] = length;
+	mapEnum["Orientation"] = orientation;
+	mapEnum["Shape"] = shape;
+	mapEnum["Width"] = width;
+	mapEnum["X"] = x;
+	mapEnum["Y"] = y;
+	mapEnum["Z"] = z;
 	mapEnum["Row/Column count"] = row;
 	mapEnum["Thickness"] = thickness;
 	mapEnum["Column count"] = column;
 	mapEnum["Lip width"] = lipwidth;
 	mapEnum["Body width"] = bodywidth;
-	mapEnum["Twist"] = twist;
-	
-	for (unsigned int i = 0; i < vecPieceMembers.size(); i++)
+	mapEnum["Twists"] = twists;
+
+	unsigned int index[vecPieceMembers.size()];
+	unsigned k = 0;
+	for (unsigned int i = 0; i < vecPieceMembers.size(); i++) //loop over all pieces
 	{
-		Json::Value rootPieceValues = root[vecPieceMembers[i]];
-		std::vector<std::string> vecPieceValues = rootPieceValues.getMemberNames(); //vec with piece values
-		map<GlassColor*,int>::iterator iterGlass;
-		Piece *piece = new Piece(PieceTemplate::BOWL);
-		Json::Value rootPieceTempl;
-		for(unsigned int i = 0; i < vecPieceValues.size(); i++)
+		string member = vecPieceMembers[i];
+		unsigned int number =0;
+		//fixes "wrong" order (0, 10, 11..., 1, 2 ,.., 9)
+		if(member.find("_")!=std::string::npos){
+			member.resize(vecPieceMembers[i].find("_"));
+			number = atoi(member.c_str());
+		}
+
+		if(i==number)
 		{
-			string name = vecPieceValues[i];
-			if(vecPieceValues[i].find("_") != std::string::npos){
-				name = vecPieceValues[i].substr(vecPieceValues[i].find("_") + 1);
-				//help.resize((vecPieceValues.at(i)).find("_")); //extracts number from string
-				//number = atoi(help.c_str());
+			index[i]=number;
+			cout << "bla";
+			cout << endl;
+		}
+		else
+		{
+			for (unsigned int l = 0; l < vecPieceMembers.size(); l++) //loop over all pieces
+			{
+				string member = vecPieceMembers[l];
+				if(member.find("_")!=std::string::npos){
+					member.resize(vecPieceMembers[l].find("_"));
+					number = atoi(member.c_str());
+				}
+				if(i==number)
+				{
+					index[i]=l;
+					l=vecPieceMembers.size();
+				}
+			}
+		}
+	}
+
+	for (unsigned int i = 0; i < vecPieceMembers.size(); i++) //loop over all pieces; adds pieces in correct order
+	{
+		k=index[i];
+
+		Json::Value rootPieceValues = root[vecPieceMembers[k]];
+		PieceTemplate::Type ptt;
+		switch(mapEnum[rootPieceValues["PieceTemplate"].asString()])
+		{
+			case 	Tumbler :
+				ptt = PieceTemplate::TUMBLER;
+				break;
+			case Vase :
+				ptt = PieceTemplate::VASE;
+				break;
+			case Bowl :
+				ptt = PieceTemplate::BOWL;
+				break;
+			case Pot :
+				ptt = PieceTemplate::POT;
+				break;
+			case Pickup :
+				ptt = PieceTemplate::PICKUP;
+				break;
+			case Wavy_Plate :
+				ptt = PieceTemplate::WAVY_PLATE;
+				break;
+		}
+
+		Piece *piece = new Piece(ptt);
+		map<GlassColor*,int>::iterator iter;
+		for(iter = colorMap->begin(); iter != colorMap->end(); iter++){
+			if(rootPieceValues["CasingGlassColor"].asInt()==iter->second)
+				piece->pickup->casingGlassColor = iter->first;
+			if(rootPieceValues["OverlayGlassColor"].asInt()==iter->second)
+				piece->pickup->overlayGlassColor = iter->first;
+			if(rootPieceValues["UnderlayGlassColor"].asInt()==iter->second)
+				piece->pickup->underlayGlassColor = iter->first;
+		}
+		if(rootPieceValues.isMember("PieceTemplateParameters"))
+		{
+			std::vector<std::string> vecPieceTemplParameters = rootPieceValues["PieceTemplateParameters"].getMemberNames();
+			for(unsigned int i=0; i< vecPieceTemplParameters.size(); i++){
+				if((vecPieceTemplParameters[i].find("_") != std::string::npos)&&(rootPieceValues["PieceTemplateParameters"].isMember(vecPieceTemplParameters[i])))
+						piece->setParameter(i, rootPieceValues["PieceTemplateParameters"][vecPieceTemplParameters[i]].asInt());
+			}
+		}
+
+		if(rootPieceValues["SubPickups"]["SubPickupTemplate"]!=rootPieceValues["NULL"])
+		{
+			switch(mapEnum[rootPieceValues["SubPickups"]["SubPickupTemplate"].asString()])
+			{
+				case vertical:
+				piece->pickup->setTemplateType(PickupTemplate::VERTICAL);
+					break;
+				case reticello:
+					piece->pickup->setTemplateType(PickupTemplate::RETICELLO_VERTICAL_HORIZONTAL);
+					break;
+				case murrinecolumn:
+					piece->pickup->setTemplateType(PickupTemplate::MURRINE_COLUMN);
+					break;
+				case verticalsandhorizontals:
+					piece->pickup->setTemplateType(PickupTemplate::VERTICALS_AND_HORIZONTALS);
+					break;
+				case verthorizontalvert:
+					piece->pickup->setTemplateType(PickupTemplate::VERTICAL_HORIZONTAL_VERTICAL);
+					break;
+				case verticalwithlipwrap:
+					piece->pickup->setTemplateType(PickupTemplate::VERTICAL_WITH_LIP_WRAP);
+					break;
+				case murrinerow:
+					piece->pickup->setTemplateType(PickupTemplate::MURRINE_ROW);
+					break;
+				case murrine:
+					piece->pickup->setTemplateType(PickupTemplate::MURRINE);
+					break;
+				}
+		}
+		if(rootPieceValues["SubPickups"].isMember("SubPickupTemplateParameters"))  //in the moment not necessary. safety first!
+		{
+			std::vector<std::string> vecSubPickupPara = rootPieceValues["SubPickups"]["SubPickupTemplateParameters"].getMemberNames();
+			if(vecSubPickupPara.size()<3)
+			{
+				if((rootPieceValues["SubPickups"]["SubPickupTemplateParameters"].isMember("Column count"))&&(rootPieceValues["SubPickups"]["SubPickupTemplateParameters"]["Column count"]!=rootPieceValues["NULL"]))
+					piece->pickup->setParameter(0, rootPieceValues["SubPickups"]["SubPickupTemplateParameters"]["Column count"].asInt());
+
+				if((rootPieceValues["SubPickups"]["SubPickupTemplateParameters"].isMember("Row/Column count"))&&(rootPieceValues["SubPickups"]["SubPickupTemplateParameters"]["Row/Column count"]!=rootPieceValues["NULL"]))
+					piece->pickup->setParameter(0, rootPieceValues["SubPickups"]["SubPickupTemplateParameters"]["Row/Column count"].asInt());
+
+				if(rootPieceValues["SubPickups"]["SubPickupTemplateParameters"].isMember("Thickness")&&(rootPieceValues["SubPickups"]["SubPickupTemplateParameters"]["Thickness"]!=rootPieceValues["NULL"]))
+					piece->pickup->setParameter(1, rootPieceValues["SubPickups"]["SubPickupTemplateParameters"]["Thickness"].asInt());
+			}
+		}
+
+		std::vector<std::string> vecSubPickups = rootPieceValues["SubPickups"].getMemberNames();
+
+		for(unsigned int j = 0; j < vecSubPickups.size()-2; j++)
+		{
+
+			string member = vecSubPickups[j];
+			int number =0;
+			//fixes "wrong" order (0, 10, 11..., 1, 2 ,.., 9)
+			if(member.find("_")!=std::string::npos){
+				member.resize(vecSubPickups[j].find("_"));
+				number = atoi(member.c_str());
 			}
 
-			switch(mapEnum[name]){
-				case Vase:
-				case Tumbler:
-				case Bowl:
-				case Pot:
-				case Pickup:
+			std::ostringstream help;
+			help << number << "_Cane";
+			std::string var = help.str();
+
+			if(rootPieceValues["SubPickups"].isMember(var))
+			{
+				std::vector<std::string> vecSubPickupCanes = rootPieceValues["SubPickups"][vecSubPickups[number]].getMemberNames();
+				Json::Value rootSubPickupCanes = rootPieceValues["SubPickups"][vecSubPickups[number]];
+
+				if(vecSubPickupCanes.size()==8)
 				{
-					rootPieceTempl = rootPieceValues[vecPieceValues[i]];
-					if(piece->getParameterCount() == 3){
-						switch(vecPieceValues[i][0]) {
-							case 'V':
-								piece->setTemplateType(PieceTemplate::VASE);
-								break;
-							case 'T':
-								piece->setTemplateType(PieceTemplate::TUMBLER);
-								break;
-							case 'B':
-								piece->setTemplateType(PieceTemplate::BOWL);
-								break;
-							case 'P':
-							if(vecPieceValues[i][1]=='o')
-									piece->setTemplateType(PieceTemplate::POT);
-							if(vecPieceValues[i][1]=='i')
-								piece->setTemplateType(PieceTemplate::PICKUP);
-								break;
+					map<PullPlan*, int>::iterator iter;
+					PullPlan* plan = new PullPlan(PullTemplate::BASE_CIRCLE);
+					for(iter = caneMap->begin();iter != caneMap->end();iter++){
+						if(iter->second==(rootSubPickupCanes["Cane"].asInt()))
+						{
+							plan = iter->first;
 						}
 					}
-					break;
-				}
-				case Wavy_Plate:
-						rootPieceTempl = rootPieceValues[vecPieceValues[i]];
-						piece->setTemplateType(PieceTemplate::WAVY_PLATE);
-					break;
-				case subPickupTemplateType:
-					if(rootPieceValues["subPickupTemplateType"]!=rootPieceValues["NULL"]){
-						switch(mapEnum[rootPieceValues["subPickupTemplateType"].asString()]){
-							case vertical:
-							piece->pickup->setTemplateType(PickupTemplate::VERTICAL);
-								break;
-							case reticello:
-								piece->pickup->setTemplateType(PickupTemplate::RETICELLO_VERTICAL_HORIZONTAL);
-								break;
-							case murrinecolumn:
-								piece->pickup->setTemplateType(PickupTemplate::MURRINE_COLUMN);
-								break;
-							case verticalsandhorizontals:
-								piece->pickup->setTemplateType(PickupTemplate::VERTICALS_AND_HORIZONTALS);
-								break;
-							case verthorizontalvert:
-								piece->pickup->setTemplateType(PickupTemplate::VERTICAL_HORIZONTAL_VERTICAL);
-								break;
-							case verticalwithlipwrap:
-								piece->pickup->setTemplateType(PickupTemplate::VERTICAL_WITH_LIP_WRAP);
-								break;
-							case murrinerow:
-								piece->pickup->setTemplateType(PickupTemplate::MURRINE_ROW);
-								break;
-							case murrine:
-								piece->pickup->setTemplateType(PickupTemplate::MURRINE);
-								break;
-						}
-				}
-					break;
-				case overlayGlassColor:
-				{
-					if(rootPieceValues["overlayGlassColor"]!=rootPieceValues["NULL"]){
-						if ((rootPieceValues["overlayGlassColor"].asInt()) == 0){
-							iterGlass = colorMap->begin();
-							piece->pickup->overlayGlassColor = GlobalGlass::color();
-						}
-						else{
-							for(iterGlass = colorMap->begin();iterGlass != colorMap->end(); iterGlass++){
-								if(iterGlass->second==rootPieceValues["overlayGlassColor"].asInt()){
-									piece->pickup->overlayGlassColor = iterGlass->first;
-								}
-							}
-						}
+					Point location;
+					location[0] = rootSubPickupCanes["X"].asFloat();
+					location[1] = rootSubPickupCanes["Y"].asFloat();
+					location[2] = rootSubPickupCanes["Z"].asFloat();
+					GeometricShape shape;
+					if(rootSubPickupCanes["Shape"].asInt()==0){
+						shape = CIRCLE_SHAPE;
+					} else
+					{
+						shape = SQUARE_SHAPE;
 					}
-					break;
+
+					SubpickupTemplate *pick = new SubpickupTemplate(plan, location, rootSubPickupCanes["Orientation"].asInt(),
+						rootSubPickupCanes["Length"].asFloat(), rootSubPickupCanes["Width"].asFloat(), shape);
+					piece->pickup->subs.at(number) = *pick;
+					pullPlanLibraryLayout->update();
+					emit someDataChanged();
+					this->updateEverything();
 				}
-				case underlayGlassColor:
-				{
-					if(rootPieceValues["underlayGlassColor"]!=rootPieceValues["NULL"]){
-						if((rootPieceValues["underlayGlassColor"].asInt()) == 0){
-							iterGlass = colorMap->begin();
-							piece->pickup->underlayGlassColor = GlobalGlass::color();
-						}
-						else {
-							for(iterGlass = colorMap->begin();iterGlass != colorMap->end();iterGlass++){
-								if(iterGlass->second==rootPieceValues["underlayGlassColor"].asInt())
-									piece->pickup->underlayGlassColor = iterGlass->first;
-							}
-						}
-					}
-					break;
-				}
-				case casingGlassColor:
-				{
-					if(rootPieceValues["casingGlassColor"]!=rootPieceValues["NULL"]){
-						if((rootPieceValues["casingGlassColor"].asInt()) == 0){
-							iterGlass = colorMap->begin();
-							piece->pickup->casingGlassColor = GlobalGlass::color();
-						}
-						else{
-							for(iterGlass = colorMap->begin();iterGlass != colorMap->end();iterGlass++){
-								if(iterGlass->second==rootPieceValues["casingGlassColor"].asInt())
-									piece->pickup->casingGlassColor = iterGlass->first;
-							}
-						}
-					}
-					break;
-				}
-				default:
-					int position = vecPieceValues[i].find("_") - 1;
-					int paramNumb = vecPieceValues[i][position] - 48;
-					piece->setParameter(paramNumb, rootPieceValues[vecPieceValues[i]].asInt());
+			} else
+			{
+				cout << "Not enough SubPickups available!" << endl;
 			}
 		}
-		//resize subs vector
-		if(rootPieceTempl["Column count"]!=rootPieceTempl["NULL"]){
-			piece->pickup->setParameter(0,rootPieceTempl["Column count"].asInt());
-		}
-		if(rootPieceTempl["Row/Column count"]!=rootPieceTempl["NULL"]){
-			piece->pickup->setParameter(0,rootPieceTempl["Row/Column count"].asInt());
-		}
-		vector<string> vecPieceTempl = rootPieceTempl.getMemberNames();
-		for(unsigned int i =0; i < vecPieceTempl.size(); i++){
-			Json::Value rootPieceTemplMember = rootPieceTempl[vecPieceTempl.at(i)];
-			switch(mapEnum[vecPieceTempl.at(i)]){
-				case thickness:
-					piece->pickup->setParameter(1, rootPieceTempl[vecPieceTempl.at(i)].asInt());
-					break;
-				case row :
-					;//done piece->pickup->setParameter(0,rootPieceTempl[vecPieceTempl.at(i)].asInt());
-					break;
-				case column : ;
-				//done
-					break;
-				default:
-				{
-					if(vecPieceTempl.operator [](i)!="NULL"){
-						map<PullPlan*, int>::iterator iter;
-						PullPlan* plan = new PullPlan(PullTemplate::BASE_CIRCLE);
-						for(iter = caneMap->begin();iter != caneMap->end();iter++){
-							if(iter->second==(rootPieceTemplMember["cane"].asInt()))
-							{
-								plan = iter->first;
-							}
-						}
-						Point location;
-						location[0] = rootPieceTemplMember["x"].asFloat();
-						location[1] = rootPieceTemplMember["y"].asFloat();
-						location[2] = rootPieceTemplMember["z"].asFloat();
-						GeometricShape shape;
-						if(rootPieceTemplMember["shape"].asInt()==0){
-							shape = CIRCLE_SHAPE;
-						}
-						else{
-							shape = SQUARE_SHAPE;
-						}
-						int number = 0;
-						string help = vecPieceTempl.operator [](i);
-						if(help.find("c") != std::string::npos){
-							help.resize(vecPieceTempl.at(i).find("c")); //extracts number from string
-							number = atoi(help.c_str());
-						}
-						SubpickupTemplate *pick = new SubpickupTemplate(plan, location, rootPieceTemplMember["orientation"].asInt(),
-							rootPieceTemplMember["length"].asFloat(), rootPieceTemplMember["width"].asFloat(), shape);
-						piece->pickup->subs.at(number) = *pick;
-						pullPlanLibraryLayout->update();
-						emit someDataChanged();
-						this->updateEverything();
-					}
-				}
-			}
-		}
-		pieceMap->end();
-		AsyncPieceLibraryWidget *w = new AsyncPieceLibraryWidget(piece, this);
-		pieceLibraryLayout->addWidget(w);
-		pieceLibraryLayout->update();
-		w->updatePixmap();
-		emit someDataChanged();
+
+			AsyncPieceLibraryWidget *w = new AsyncPieceLibraryWidget(piece, this);
+			pieceLibraryLayout->addWidget(w);
+			pieceLibraryLayout->update();
+			w->updatePixmap();
+			emit someDataChanged();
 	}
 	//repaint pullplan library
 	AsyncPullPlanLibraryWidget* pplw;
@@ -1781,6 +1792,66 @@ void MainWindow::openPieces(Json::Value root, map<Piece*, int>* pieceMap,map<Pul
 		pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 		pplw->updatePixmaps();
+	}
+}
+
+void MainWindow::open(QStringList list, bool merge){
+	for(int i = 0; i < list.size(); i++){
+		QString filename = list.at(i);
+		if((filename.toStdString())!=""&&list.size()>1){
+			QFile savePath(":/save");
+			savePath.open(QIODevice::WriteOnly | QIODevice::Text);
+			QTextStream savePathOutput(&savePath);
+			savePathOutput << filename << "\n";
+			savePath.close();
+		}
+
+		QFile openFile(filename);
+		openFile.open(QIODevice::ReadOnly | QIODevice::Text);
+		QTextStream fileInput(&openFile);
+		QString QStr = fileInput.readAll();
+		std::string str = QStr.toStdString();
+		Json::Value root;
+		Json::Reader reader;
+
+		bool parsedSuccess = reader.parse(str,root,false);
+		map<GlassColor*, int> colorMap;
+		map<PullPlan*, int> caneMap;
+
+		colorMap[new GlassColor] = 0;
+
+		//ready to use if necessary
+		//if(((root["Build information"]["Number"]).asString())<"700")
+		//	cout << "we do not support your build number " << (root["Build information"]["Number"]).asString() << " any more!" << endl;
+
+		if(!parsedSuccess){
+			cout<<"Failed to parse JSON"<<endl<<reader.getFormatedErrorMessages()<<endl; //debugging
+		}
+
+		if( root.size() != 4){
+			cout << "error in file";
+		}
+		else{
+			if(merge==false&&root["Pieces"].size()!=0)
+			{
+				if(i==0)
+					newFile();
+				openColors(root["Colors"], &colorMap);
+				openCanes(root["Canes"], &caneMap, &colorMap);
+				openPieces(root["Pieces"], &caneMap, &colorMap);
+				if(i==0)
+					deleteStandardLibraryElements();
+			}
+			else
+			{
+				if(merge==true&&root["Pieces"].size()!=0)
+				{
+					openColors(root["Colors"], &colorMap);
+					openCanes(root["Canes"], &caneMap, &colorMap);
+					openPieces(root["Pieces"], &caneMap, &colorMap);
+				}
+			}
+		}
 	}
 }
 
@@ -1813,130 +1884,6 @@ void MainWindow::deleteStandardLibraryElements(){
 	emit someDataChanged();
 }
 
-void MainWindow::setMerge(bool var){
-	if(var==true)
-		merge =true;
-	else
-		merge=false;
-}
-
-bool MainWindow::getMerge(){
-	return merge;
-}
-
-void MainWindow::open(QStringList list, bool merge){
-	for(int i = 0; i < list.size(); i++){
-		QString filename = list.at(i);
-		if((filename.toStdString())!=""&&list.size()>1){
-			QFile savePath(":/save");
-			savePath.open(QIODevice::WriteOnly | QIODevice::Text);
-			QTextStream savePathOutput(&savePath);
-			savePathOutput << filename << "\n";
-			savePath.close();
-		}
-
-		QFile openFile(filename);
-		openFile.open(QIODevice::ReadOnly | QIODevice::Text);
-		QTextStream fileInput(&openFile);
-		QString QStr = fileInput.readAll();
-		std::string str = QStr.toStdString();
-		Json::Value root;
-		Json::Reader reader;
-		ifstream readHdl;
-		char versionNo[16]; //date has always 12 characters
-
-		readHdl.open(filename.toAscii());
-		readHdl.getline(versionNo,16,'\n');
-		readHdl.close();
-
-		//check version No
-		if((int(versionNo[2]))>55);//ascii: char 7 == int 55
-		else{
-			//lower version than 7xx
-		}
-		if((int(versionNo[3])<53)&&((int(versionNo[2]))>55)){
-				//lower version than (firstIf)5x
-		}
-		if((int(versionNo[4])<56)&&(int(versionNo[3])>53)&&((int(versionNo[2]))>55)){
-			//lower version than (firstIf)(secondIf)8
-		}
-
-		bool parsedSuccess = reader.parse(str,root,false);
-		map<GlassColor*, int> colorMap;
-		map<PullPlan*, int> caneMap;
-		map<Piece*, int> pieceMap;
-
-		colorMap[new GlassColor] = 0;
-		caneMap[new PullPlan(PullTemplate::BASE_CIRCLE)] = 0;
-
-		if(!parsedSuccess){
-			cout<<"Failed to parse JSON"<<endl<<reader.getFormatedErrorMessages()<<endl; //debugging
-		}
-
-		if( root.size() != 3){
-			cout << "error in file";
-		}
-		else{
-			if(merge==false&&root["pieces"].size()!=0)
-			{
-				newFile();
-				openColors(root["colors"], &colorMap);
-				openCanes(root["canes"], &caneMap, &colorMap);
-				openPieces(root["pieces"], &pieceMap, &caneMap, &colorMap);
-				deleteStandardLibraryElements();
-			}
-			else
-			{
-				if(merge==true&&root["pieces"].size()!=0)
-				{
-					openColors(root["colors"], &colorMap);
-					openCanes(root["canes"], &caneMap, &colorMap);
-					openPieces(root["pieces"], &pieceMap, &caneMap, &colorMap);
-				}
-			}
-		}
-	}
-}
-
-void MainWindow::castMergeButton(QWidget* w)
-{
-	QFileDialog *openFileDialog = qobject_cast<QFileDialog *>(w);
-	Q_ASSERT( openFileDialog );
-	QStringList list = openFileDialog->selectedFiles();
-	setMerge(true);
-	open(list, true);
-	openFileDialog->close();
-}
-
-void MainWindow::openFile(){
-
-	setMerge(false);
-	QFileDialog openFileDialog(this);
-	openFileDialog.setOption(QFileDialog::DontUseNativeDialog);
-	openFileDialog.setWindowTitle(tr("Open your VirtualGlass file"));
-	openFileDialog.setNameFilter(tr("VirtualGlass file (*.glass)")); //avoid open non .glass files
-	openFileDialog.setFileMode(QFileDialog::ExistingFiles);
-
-	QPushButton *mergeButton = new QPushButton(&openFileDialog);
-	mergeButton->setText("Merge"); //set button text
-	QGridLayout *layout = (QGridLayout*)openFileDialog.layout();
-	layout->addWidget(mergeButton, 4, 2); //set position
-	signalMapper = new QSignalMapper();
-	connect(mergeButton, SIGNAL(clicked()), signalMapper, SLOT(map()));
-	signalMapper->setMapping(mergeButton, &openFileDialog);
-	connect(signalMapper, SIGNAL(mapped(QWidget*)),SLOT(castMergeButton(QWidget*)));
-	QStringList list;
-	//detects a click on the cancel button
-	if (openFileDialog.exec()){
-		list = openFileDialog.selectedFiles(); //get the selected files after pressing open
-		if(getMerge()==false){
-			open(list, false);
-		}
-		setViewMode(EMPTY_VIEW_MODE);
-		setMerge(false);
-	}
-}
-
 void MainWindow::newFile(){
 
 	QFile savePath(":/save");
@@ -1953,14 +1900,19 @@ void MainWindow::newFile(){
 	colorBarLibraryLayout->update();
 
 	int i;
-	for (i=0; i < colorBarLibraryLayout->count();)
+
+	if(colorBarLibraryLayout->count()>1) //do not delete an empty library (except of your new element)
 	{
-		w = colorBarLibraryLayout->takeAt(i);
-		delete w->widget();
-		delete w;
-		if(colorBarLibraryLayout->count()<=1)
-			i++;
+		for (i=0; i < colorBarLibraryLayout->count();)
+		{
+			w = colorBarLibraryLayout->takeAt(i);
+			delete w->widget();
+			delete w;
+			if(colorBarLibraryLayout->count()<=1) //deleting library except of your new element
+				i++;
+		}
 	}
+
 	colorBarLibraryLayout->update();
 	emit someDataChanged();
 
@@ -1970,13 +1922,16 @@ void MainWindow::newFile(){
 	pullPlanLibraryLayout->addWidget(pplw);
 	pullPlanLibraryLayout->update();
 
-	for (i=0; i< pullPlanLibraryLayout->count();)
+	if(pullPlanLibraryLayout->count()>1) //do not delete an empty library (except of your new element)
 	{
-		w=pullPlanLibraryLayout->takeAt(i);
-		delete w->widget();
-		delete w;
-		if(pullPlanLibraryLayout->count()<=1)
-			i++;
+		for (i=0; i< pullPlanLibraryLayout->count();)
+		{
+			w=pullPlanLibraryLayout->takeAt(i);
+			delete w->widget();
+			delete w;
+			if(pullPlanLibraryLayout->count()<=1) //clears library except of your new element
+				i++;
+		}
 	}
 	pullPlanLibraryLayout->update();
 	emit someDataChanged();
@@ -1993,7 +1948,7 @@ void MainWindow::newFile(){
 		w=pieceLibraryLayout->takeAt(i);
 		delete w->widget();
 		delete w;
-		if(pieceLibraryLayout->count()<=1)
+		if(pieceLibraryLayout->count()<=1) //clears library except of your new element
 			i++;
 	}
 	pieceLibraryLayout->update();
@@ -2016,17 +1971,14 @@ void MainWindow::save(QString filename){
 
 	readHdl.open(":/version.txt");
 	readHdl.getline(versionNo,4,'\n');
-	string versionStr;
-	versionStr.assign(versionNo, 4);
 	readHdl.getline(date,11,'\n');
-	string dateStr = date;
 	readHdl.close();
 
-	QString versionQstr(versionStr.c_str());
-	QString dateQstr(dateStr.c_str());
-	fileOutput << "//"<<versionQstr <<"_"<< dateQstr << "\n";
-
 	Json::Value root;
+	Json::Value nested_value;
+	nested_value["Number"] = versionNo;
+	nested_value["Date"] = date;
+	root["Build information"] = nested_value;
 	map<Piece*,int> pieceMap;
 	map<PullPlan*,int> caneMap;
 	map<GlassColor*, int> colorMap;
@@ -2057,17 +2009,15 @@ void MainWindow::saveAs(QString filename){
 
 	readHdl.open(":/version.txt");
 	readHdl.getline(versionNo,4,'\n');
-	string versionStr;
-	versionStr.assign(versionNo, 4);
 	readHdl.getline(date,11,'\n');
-	string dateStr = date;
 	readHdl.close();
 
-	QString versionQstr(versionStr.c_str());
-	QString dateQstr(dateStr.c_str());
-	fileOutput << "//"<<versionQstr <<"_"<< dateQstr << "\n";
-
 	Json::Value root;
+	Json::Value nested_value;
+	nested_value["Number"] = versionNo;
+	nested_value["Date"] = date;
+	root["Build information"] = nested_value;
+
 	map<Piece*,int> pieceMap;
 	map<PullPlan*,int> caneMap;
 	map<GlassColor*, int> colorMap;
@@ -2117,7 +2067,6 @@ void MainWindow::saveAllFile(){
 void MainWindow::saveSelectedFile(){
 
 	char path[509]; //MS max path 248 chars, max filename 260 chars, plus 1 forterminator
-
 	ifstream readHdl;
 
 	readHdl.open(":/save");
@@ -2157,6 +2106,63 @@ void MainWindow::saveAllAsFile(){
 	//improve: empty file name -> "no savefile choosen"
 	if(filename.toStdString()!="")
 		save(filename);
+}
+
+void MainWindow::setMerge(bool var){
+	if(var==true)
+		merge =true;
+	else
+		merge=false;
+}
+
+bool MainWindow::getMerge(){
+	return merge;
+}
+
+void MainWindow::castMergeButton(QWidget* w)
+{
+	QFileDialog *openFileDialog = qobject_cast<QFileDialog *>(w);
+	Q_ASSERT( openFileDialog );
+	QStringList list = openFileDialog->selectedFiles();
+	setMerge(true);
+	open(list, true);
+	openFileDialog->close();
+}
+
+void MainWindow::openFile(){
+
+	setMerge(false);
+	QFileDialog openFileDialog(this);
+	openFileDialog.setOption(QFileDialog::DontUseNativeDialog);
+	openFileDialog.setWindowTitle(tr("Open your VirtualGlass file"));
+	openFileDialog.setNameFilter(tr("VirtualGlass file (*.glass)")); //avoid open non .glass files
+	openFileDialog.setFileMode(QFileDialog::ExistingFiles);
+
+	QPushButton *mergeButton = new QPushButton(&openFileDialog);
+	mergeButton->setText("Merge"); //set button text
+	QGridLayout *layout = (QGridLayout*)openFileDialog.layout();
+	layout->addWidget(mergeButton, 4, 2); //set position
+	signalMapper = new QSignalMapper();
+	connect(mergeButton, SIGNAL(clicked()), signalMapper, SLOT(map()));
+	signalMapper->setMapping(mergeButton, &openFileDialog);
+	connect(signalMapper, SIGNAL(mapped(QWidget*)),SLOT(castMergeButton(QWidget*)));
+	QStringList list;
+	//detects a click on the cancel button
+	if (openFileDialog.exec()){
+		list = openFileDialog.selectedFiles(); //get the selected files after click open
+		if(getMerge()==false){
+			open(list, false);
+		}
+		setViewMode(EMPTY_VIEW_MODE);
+		setMerge(false);
+	}
+}
+
+QString MainWindow::writeJson(Json::Value root){
+	Json::StyledWriter writer;
+	std::string outputConfig = writer.write( root );
+	QString output = QString::fromStdString(outputConfig);
+	return output;
 }
 
 void MainWindow::setupMenus()
