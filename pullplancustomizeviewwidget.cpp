@@ -21,7 +21,7 @@ PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget
 	activeBoxIndex = -1;
 	activeControlPoint = -1;
 	mode = MOVE_MODE;
-	BOUNDING_BOX_SPACE = MAX(squareSize / 100, 1);
+    BOUNDING_BOX_SPACE = 1; //squareSize isn't set yet, so can't do MAX(squareSize / 100, 1);
 	boundActiveBox();
 	this->setMouseTracking(true);
 }

@@ -1183,7 +1183,7 @@ void MainWindow::openColors(Json::Value rootColor, map<GlassColor*, int>* colorM
 	colorMapEnum["B"] = B;
 	colorMapEnum["Alpha"] = alpha;
 
-	unsigned int index[vecColorMembers.size()];
+    unsigned int *index = new unsigned int[vecColorMembers.size()];
 	unsigned j = 0;
 	for (unsigned int i = 0; i < vecColorMembers.size(); i++) //loop over all canes
 	{
@@ -1252,6 +1252,8 @@ void MainWindow::openColors(Json::Value rootColor, map<GlassColor*, int>* colorM
 		else
 			cout << "error in color " << vecColorValueMembers[j];
 	}
+
+    delete index;
 }
 
 void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, map<GlassColor*, int>* colorMap){
@@ -1311,7 +1313,7 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 	caneMapEnum["Surrounding Square"] = SurroundingSquare;
 	caneMapEnum["Custom"] = Custom;
 
-	unsigned int index[vecCaneMembers.size()];
+    unsigned int *index = new unsigned int[vecCaneMembers.size()];
 	unsigned k = 0;
 	for (unsigned int i = 0; i < vecCaneMembers.size(); i++) //loop over all canes
 	{
@@ -1514,6 +1516,7 @@ void MainWindow::openCanes(Json::Value rootCane, map<PullPlan*, int>* caneMap, m
 	}
 	pullPlanLibraryLayout->update();
 	emit someDataChanged();
+    delete index;
 }
 
 void MainWindow::openPieces(Json::Value root, map<PullPlan*, int>* caneMap, map<GlassColor*, int>* colorMap)
@@ -1593,7 +1596,7 @@ void MainWindow::openPieces(Json::Value root, map<PullPlan*, int>* caneMap, map<
 	mapEnum["Body width"] = bodywidth;
 	mapEnum["Twists"] = twists;
 
-	unsigned int index[vecPieceMembers.size()];
+    unsigned int *index = new unsigned int[vecPieceMembers.size()];
 	unsigned k = 0;
 	for (unsigned int i = 0; i < vecPieceMembers.size(); i++) //loop over all pieces
 	{
@@ -1793,6 +1796,8 @@ void MainWindow::openPieces(Json::Value root, map<PullPlan*, int>* caneMap, map<
 			dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 		pplw->updatePixmaps();
 	}
+
+    delete index;
 }
 
 void MainWindow::open(QStringList list, bool merge){
@@ -2121,7 +2126,7 @@ bool MainWindow::getMerge(){
 
 void MainWindow::castMergeButton(QWidget* w)
 {
-	QFileDialog *openFileDialog = qobject_cast<QFileDialog *>(w);
+    QFileDialog *openFileDialog = dynamic_cast<QFileDialog *>(w);
 	Q_ASSERT( openFileDialog );
 	QStringList list = openFileDialog->selectedFiles();
 	setMerge(true);

@@ -3,7 +3,7 @@
 
 Piece :: Piece(enum PieceTemplate::Type _type)
 {
-	setTemplateType(_type);
+    setTemplateType(_type, true);
 	// initialize the piece's pickup to be something boring and base
 	this->pickup = new PickupPlan(PickupTemplate::VERTICAL);
 }
