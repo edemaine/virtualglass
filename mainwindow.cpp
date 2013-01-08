@@ -2183,21 +2183,21 @@ void MainWindow::setupMenus()
 	newAct->setStatusTip(tr("Open a new VirtualGlass session"));
 
 	//save
-	saveAllAct = new QAction(tr("&SaveAll"), this);
+	saveAllAct = new QAction(tr("&Save"), this);
 	saveAllAct->setShortcuts(QKeySequence::Save);
 	saveAllAct->setStatusTip(tr("Save all glass to disk"));
 
-	//saveSelected; no shortcut
-	saveSelectedAct = new QAction(tr("&SaveSelected"), this);
-	saveSelectedAct->setStatusTip(tr("Save selected glass to disk"));
-
 	//saveAllAs
-	saveAllAsAct = new QAction(tr("&SaveAllAs"), this);
+	saveAllAsAct = new QAction(tr("Save &As"), this);
 	saveAllAsAct->setShortcuts(QKeySequence::SaveAs);
 	saveAllAsAct->setStatusTip(tr("Save all glass to disk"));
 
+	//saveSelected; no shortcut
+	saveSelectedAct = new QAction(tr("Save S&elected"), this);
+	saveSelectedAct->setStatusTip(tr("Save selected glass to disk"));
+
 	//saveSelectedAs
-	saveSelectedAsAct = new QAction(tr("&SaveSelectedAs"), this);
+	saveSelectedAsAct = new QAction(tr("Save Selected As"), this);
 	saveSelectedAsAct->setStatusTip(tr("Save selected glass to disk"));
 
 	//exit
@@ -2211,8 +2211,8 @@ void MainWindow::setupMenus()
 	fileMenu->addAction(newAct); //add newButton
 	fileMenu->addSeparator();
 	fileMenu->addAction(saveAllAct); //add saveButton
-	fileMenu->addAction(saveSelectedAct); //add saveButton
 	fileMenu->addAction(saveAllAsAct); //add saveButton
+	fileMenu->addAction(saveSelectedAct); //add saveButton
 	fileMenu->addAction(saveSelectedAsAct); //add saveAsButton
 	fileMenu->addSeparator();
 	fileMenu->addAction(exitAct);
