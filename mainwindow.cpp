@@ -1637,7 +1637,7 @@ void MainWindow::openPieces(Json::Value root, map<PullPlan*, int>* caneMap, map<
 		k=index[i];
 
 		Json::Value rootPieceValues = root[vecPieceMembers[k]];
-		PieceTemplate::Type ptt;
+        PieceTemplate::Type ptt = PieceTemplate::TUMBLER;
 		switch(mapEnum[rootPieceValues["PieceTemplate"].asString()])
 		{
 			case 	Tumbler :
