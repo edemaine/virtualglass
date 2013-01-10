@@ -331,6 +331,7 @@ void MainWindow :: setupConnections()
 
 	connect(openAct, SIGNAL(triggered()), this, SLOT(openFile()));
 	connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
+	connect(importAct, SIGNAL(triggered()), this, SLOT(import()));
 	connect(saveAllAct, SIGNAL(triggered()), this, SLOT(saveAllFile()));
 	connect(saveSelectedAct, SIGNAL(triggered()), this, SLOT(saveSelectedFile()));
 	connect(saveAllAsAct, SIGNAL(triggered()), this, SLOT(saveAllAsFile()));
@@ -1963,6 +1964,26 @@ void MainWindow::newFile(){
 	emit someDataChanged();
 }
 
+void MainWindow::import(){
+	QFileDialog importFileDialog(this);
+	importFileDialog.setOption(QFileDialog::DontUseNativeDialog);
+	importFileDialog.setWindowTitle(tr("Open your SCG cane crosssection file"));
+	importFileDialog.setNameFilter(tr("Scalable Vector Graphics (*.svg)")); //avoid open non .svg files
+	importFileDialog.setFileMode(QFileDialog::ExistingFiles);
+	QStringList list;
+
+
+    if (importFileDialog.exec()){
+		list = importFileDialog.selectedFiles(); //get the selected files after click open
+		for(int i = 0; i < list.size(); i++){
+
+            // For now just create blank square canes. Will actually import later
+			PullPlan *newEditorPlan = new PullPlan(PullTemplate::BASE_SQUARE);
+			emit newPullPlan(newEditorPlan);
+		}
+	}
+}
+
 void MainWindow::save(QString filename){
 	QFile saveFile(filename);
 	saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -2182,6 +2203,10 @@ void MainWindow::setupMenus()
 	newAct->setShortcuts(QKeySequence::New);
 	newAct->setStatusTip(tr("Open a new VirtualGlass session"));
 
+	//import svg cane
+	importAct = new QAction(tr("&Import SVG Cane"), this);
+	importAct->setStatusTip(tr("Import cane cross section from file."));
+
 	//save
 	saveAllAct = new QAction(tr("&Save"), this);
 	saveAllAct->setShortcuts(QKeySequence::Save);
@@ -2209,6 +2234,8 @@ void MainWindow::setupMenus()
 	fileMenu = menuBar()->addMenu(tr("&File")); //create File menu
 	fileMenu->addAction(openAct); //add openButton
 	fileMenu->addAction(newAct); //add newButton
+	fileMenu->addSeparator();
+	fileMenu->addAction(importAct); //add importButton
 	fileMenu->addSeparator();
 	fileMenu->addAction(saveAllAct); //add saveButton
 	fileMenu->addAction(saveAllAsAct); //add saveButton

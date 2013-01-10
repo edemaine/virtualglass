@@ -394,11 +394,6 @@ inline Vector< NUM, SIZE > normalize( Vector< NUM, SIZE > a) {
 	return a;
 }
 
-template< typename NUM, int SIZE >
-inline Vector< NUM, SIZE > perpendicular( Vector< NUM, SIZE > const & a) {
-	return make_vector(-a.c[1], a.c[0]);
-}
-
 
 //this does a 3d cross product -- may not perform well on other types.
 //will do very bad things on size==2
@@ -624,6 +619,11 @@ inline Vector< NUM, SIZE > make_vector_p( NUM const *in ) { //hack!
 		ret.c[i] = in[i];
 	}
 	return ret;
+}
+
+template< typename NUM, int SIZE >
+inline Vector< NUM, SIZE > perpendicular( Vector< NUM, SIZE > const & a) {
+    return make_vector(-a.c[1], a.c[0]);
 }
 
 template< typename NUM, int SIZE >

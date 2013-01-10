@@ -124,6 +124,7 @@ class MainWindow : public QMainWindow
 		QMenu *fileMenu;
 		QAction *newAct;
 		QAction *openAct;
+		QAction *importAct;
 		QAction *saveAllAct;
 		QAction *saveSelectedAct;
 		QAction *saveAllAsAct;
@@ -132,6 +133,7 @@ class MainWindow : public QMainWindow
 		QMenu *perfMenu;
 		QAction *depthPeelAction;
 		QFileDialog openFileDialog;
+		QFileDialog importFileDialog;
 		QSignalMapper *signalMapper;
 		bool merge;
 
@@ -148,6 +150,7 @@ class MainWindow : public QMainWindow
 		void open(QStringList, bool);
 		void castMergeButton(QWidget*);
 		void newFile();
+		void import();
 		void saveAllFile();
 		void saveSelectedFile();
 		void saveAllAsFile();

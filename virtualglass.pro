@@ -90,6 +90,9 @@ HEADERS += jsoncpp/include/json/autolink.h \
 	pullplancustomizeviewwidget.h \
 	glassmime.h \
         glasscolor.h \
+	SVG.hpp \
+	Box.hpp \
+	Matrix.hpp \
 
 SOURCES += main.cpp \ 
 	glew/glew.c \
@@ -125,5 +128,6 @@ SOURCES += main.cpp \
 	glasscolor.cpp \
         jsoncpp/src/lib_json/json_reader.cpp \
         jsoncpp/src/lib_json/json_value.cpp \
-        jsoncpp/src/lib_json/json_writer.cpp
+	jsoncpp/src/lib_json/json_writer.cpp \
+	SVG.cpp
 
