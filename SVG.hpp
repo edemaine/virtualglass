@@ -4,6 +4,8 @@
 #include "Vector.hpp"
 #include "Box.hpp"
 #include "Matrix.hpp"
+#include "pullplan.h"
+#include "globalglass.h"
 
 #include <list>
 #include <string>
@@ -120,7 +122,7 @@ public:
 	Node root;
 };
 
-bool load_svg(std::string const &filename, SVG &into);
+bool load_svg(std::string const &filename, SVG &into, PullPlan *pullPlan);
 
 };
 

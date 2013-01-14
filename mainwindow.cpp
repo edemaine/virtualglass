@@ -28,6 +28,7 @@
 #include "pulltemplate.h"
 #include "mainwindow.h"
 #include "globalglass.h"
+#include "SVG.hpp"
 
 MainWindow :: MainWindow()
 {
@@ -661,7 +662,7 @@ void MainWindow :: newPullPlan(PullPlan* newPlan)
 	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(newPlan));
 
 	// Give the new plan to the editor
-	pullPlanEditorWidget->setPlan(newPlan);
+    pullPlanEditorWidget->setPlan(newPlan);
 
 	// Load up the right editor
 	setViewMode(PULLPLAN_VIEW_MODE);
@@ -671,7 +672,7 @@ void MainWindow :: updateEverything()
 {
 	switch (editorStack->currentIndex())
 	{
-		case COLORBAR_VIEW_MODE:
+        case COLORBAR_VIEW_MODE:
 			colorEditorWidget->updateEverything();
 			break;
 		case PULLPLAN_VIEW_MODE:
@@ -1831,7 +1832,7 @@ void MainWindow::open(QStringList list, bool merge){
 		//	cout << "we do not support your build number " << (root["Build information"]["Number"]).asString() << " any more!" << endl;
 
 		if(!parsedSuccess){
-			cout<<"Failed to parse JSON"<<endl<<reader.getFormatedErrorMessages()<<endl; //debugging
+            cout<<"Failed to parse JSON"<<endl<<reader.getFormatedErrorMessages()<<endl; //debugging
 		}
 
 		if( root.size() != 4){
@@ -1965,21 +1966,37 @@ void MainWindow::newFile(){
 }
 
 void MainWindow::import(){
-	QFileDialog importFileDialog(this);
+    QFileDialog importFileDialog(this);
 	importFileDialog.setOption(QFileDialog::DontUseNativeDialog);
 	importFileDialog.setWindowTitle(tr("Open your SCG cane crosssection file"));
 	importFileDialog.setNameFilter(tr("Scalable Vector Graphics (*.svg)")); //avoid open non .svg files
 	importFileDialog.setFileMode(QFileDialog::ExistingFiles);
 	QStringList list;
 
-
     if (importFileDialog.exec()){
 		list = importFileDialog.selectedFiles(); //get the selected files after click open
+
+        // Loop through all files
 		for(int i = 0; i < list.size(); i++){
 
-            // For now just create blank square canes. Will actually import later
-			PullPlan *newEditorPlan = new PullPlan(PullTemplate::BASE_SQUARE);
-			emit newPullPlan(newEditorPlan);
+            // Attempt to import the SVG into pullplan
+            SVG::SVG svg;
+            PullPlan *newEditorPlan = new PullPlan(PullTemplate::BASE_SQUARE);
+            if (SVG::load_svg(list.at(i).toUtf8().constData(), svg, newEditorPlan) ) {
+
+                // Test if it is square
+                if (svg.page.c[0]==svg.page.c[1]) {
+
+                    emit newPullPlan(newEditorPlan);
+                    pullPlanEditorWidget->update();
+                } else {
+                    // If its not square, give a little error message
+                    QMessageBox::warning ( this, tr("Invalid File"), tr("The SVG file appears to not be square :-("));
+                }
+            } else {
+                // If import fails, give an error message
+                QMessageBox::warning ( this, tr("Import Failed"), tr("Failed to import SVG file :-("));
+            }
 		}
 	}
 }
@@ -2266,7 +2283,7 @@ void MainWindow::setupMenus()
 
 	//examples:random:complex piece
 	randomComplexPieceAction = new QAction("&Complex Piece", this);
-	randomComplexPieceAction->setStatusTip("Randomly generate a complex example piece.");
+    randomComplexPieceAction->setStatusTip("Randomly generate a complex example piece.");
 
 	// Examples menu and Examples:Random menu
 	examplesMenu = menuBar()->addMenu("&Examples"); //create menu for cane/piece examples

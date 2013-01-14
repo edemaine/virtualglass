@@ -32,7 +32,8 @@ public:
 
 class Parse {
 public:
-Parse(std::istream &in, SVG &_into) : into(_into) {
+Parse(std::istream &in, SVG &_into, PullPlan* myPullPlan) : into(_into) {
+    pullPlan = myPullPlan;
 	parser = XML_ParserCreate(NULL);
 	XML_SetUserData(parser, this);
 	XML_SetElementHandler(parser, &wrap_start_element, &wrap_end_element);
@@ -64,6 +65,7 @@ vector< Node * > stack;
 vector< string > errors;
 XML_Parser parser;
 SVG &into;
+PullPlan *pullPlan;
 
 bool svg_length(string const &from, double &into) {
 	std::istringstream str(from);
@@ -449,9 +451,30 @@ void start_element(string const &name, map< string, string > &atts) {
 		} else {
 			Error(this) << "rect without x,y,width, or height.";
 		}
-	}
-	//TODO: generate command list if it's a circle element
-	{ //translate command list
+    } else if (name == "circle") {
+        //TODO: make sure this is actually using the right coordinate transformation (it looks almost right...)
+        double cx, cy, r;
+        if (svg_length(atts, "cx", cx) && svg_length(atts, "cy", cy) && svg_length(atts, "r", r)) {
+
+            // Grab page size (right now we assume its square).
+            float pageSize = (float) into.page.c[0];
+
+            // Convert coordinates from 0, 0 in upper left to 0,0 in center and scale
+            Point p = make_vector(((float) cx-pageSize/2)/ pageSize, ((float) cy - pageSize/2)/ pageSize, 0.0f);
+
+            // Scale radius
+            float diameter = 2*r/ pageSize;
+
+            // Add circle to pullPlan
+            pullPlan->subs.insert(pullPlan->subs.begin(),
+                SubpullTemplate(new PullPlan(PullTemplate::BASE_CIRCLE), CIRCLE_SHAPE, p, diameter));
+
+        } else {
+            Error(this) << "circle without cx, cy, or r.";
+        }
+    }
+
+    { //translate command list
 		Vector2d subpath_start = make_vector(0.0, 0.0);
 		Vector2d prev = make_vector(0.0, 0.0);
 		while (!commands.empty()) {
@@ -820,9 +843,9 @@ void Node::execute(Matrix const &xform, double tol, vector< vector< Vector2d > >
 	}
 }
 
-bool load_svg(std::string const &filename, SVG &into) {
-	std::ifstream file(filename.c_str());
-	Parse parse(file, into);
+bool load_svg(std::string const &filename, SVG &into, PullPlan *pullPlan) {
+    std::ifstream file(filename.c_str());
+    Parse parse(file, into, pullPlan);
 	return parse.errors.empty();
 }
 
