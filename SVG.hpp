@@ -5,7 +5,6 @@
 #include "Box.hpp"
 #include "Matrix.hpp"
 #include "pullplan.h"
-#include "globalglass.h"
 
 #include <list>
 #include <string>

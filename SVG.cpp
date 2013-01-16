@@ -443,27 +443,43 @@ void start_element(string const &name, map< string, string > &atts) {
 	} else if (name == "rect") {
 		double x,y,width,height;
 		if (svg_length(atts, "x", x) && svg_length(atts, "y", y) && svg_length(atts, "width", width) && svg_length(atts, "height", height)) {
-			node.moveto(make_vector(x,y));
-			node.lineto(make_vector(x+width,y));
-			node.lineto(make_vector(x+width,y+height));
-			node.lineto(make_vector(x,y+height));
-			node.closepath();
+            if (width == height) {
+
+                // Grab page size (right now we assume it's square because it will error later otherwise).
+                float pageSize = (float) into.page.c[0];
+
+                // Convert coordinates from 0, 0 in upper left to 0,0 in center and scale
+                Point p = make_vector((float) ((x +width/2-pageSize/2)/ pageSize* sqrt(2.0)),
+                                      (float) (( y +width/2 - pageSize/2)/ pageSize*sqrt(2.0)), 0.0f);
+                // Scale radius
+                float diameter = width/ pageSize * sqrt(2);
+
+                // Add square to pullPlan
+                pullPlan->subs.insert(pullPlan->subs.begin(),
+                    SubpullTemplate(new PullPlan(PullTemplate::BASE_SQUARE), SQUARE_SHAPE, p, diameter));
+            } else {
+                node.moveto(make_vector(x,y));
+                node.lineto(make_vector(x+width,y));
+                node.lineto(make_vector(x+width,y+height));
+                node.lineto(make_vector(x,y+height));
+                node.closepath();
+            }
 		} else {
 			Error(this) << "rect without x,y,width, or height.";
 		}
     } else if (name == "circle") {
-        //TODO: make sure this is actually using the right coordinate transformation (it looks almost right...)
+
         double cx, cy, r;
         if (svg_length(atts, "cx", cx) && svg_length(atts, "cy", cy) && svg_length(atts, "r", r)) {
 
-            // Grab page size (right now we assume its square).
+            // Grab page size (right now we assume it's square because it will error later otherwise).
             float pageSize = (float) into.page.c[0];
 
             // Convert coordinates from 0, 0 in upper left to 0,0 in center and scale
-            Point p = make_vector(((float) cx-pageSize/2)/ pageSize, ((float) cy - pageSize/2)/ pageSize, 0.0f);
-
+            Point p = make_vector((float) ((cx -pageSize/2)/ pageSize* sqrt(2.0)),
+                                  (float) (( cy - pageSize/2)/ pageSize*sqrt(2.0)), 0.0f);
             // Scale radius
-            float diameter = 2*r/ pageSize;
+            float diameter = 2*r/ pageSize * sqrt(2);
 
             // Add circle to pullPlan
             pullPlan->subs.insert(pullPlan->subs.begin(),
