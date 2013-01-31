@@ -724,10 +724,17 @@ void Mesher :: recurseMesh(Piece* piece, Geometry* geometry, vector<ancestor>* a
 	{
 		geometry->clear();
 		//change twist parameter if onePieceView is choosen
-		vecLayerTwist->clear();
-		TemplateParameter templ;
-		piece->getParameter(2, &templ);
-		vecLayerTwist->push_back(templ.value);
+		int pt = piece->getTemplateType();
+		if(pt != 5) //if((pt != 5) || (pt != 6)) don't worked..?
+		{
+			if(pt != 6)
+			{
+				vecLayerTwist->clear();
+				TemplateParameter templ;
+				piece->getParameter(2, &templ);
+				vecLayerTwist->push_back(templ.value);
+			}
+		}
 	}
 	else
 		thicknessAllLayers = fabs(piece->getOuterZ())*2.5 + fabs(piece->getInnerZ())*2.5;
