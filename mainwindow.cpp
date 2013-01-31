@@ -336,7 +336,6 @@ void MainWindow :: setupConnections()
 	connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
 	connect(importAct, SIGNAL(triggered()), this, SLOT(import()));
 	connect(saveAllAct, SIGNAL(triggered()), this, SLOT(saveAllFile()));
-	connect(saveSelectedAct, SIGNAL(triggered()), this, SLOT(saveSelectedFile()));
 	connect(saveAllAsAct, SIGNAL(triggered()), this, SLOT(saveAllAsFile()));
 	connect(saveSelectedAsAct, SIGNAL(triggered()), this, SLOT(saveSelectedAsFile()));
 	connect(exitAct, SIGNAL(triggered()), qApp, SLOT(quit()));
@@ -2248,7 +2247,7 @@ void MainWindow::saveAllFile(){
 	save(filename);
 }
 
-void MainWindow::saveSelectedFile(){
+/*void MainWindow::saveSelectedFile(){
 
 	char path[509]; //MS max path 248 chars, max filename 260 chars, plus 1 forterminator
 	ifstream readHdl;
@@ -2275,7 +2274,7 @@ void MainWindow::saveSelectedFile(){
 		filename = strPath.c_str();
 	}
 	saveAs(filename);
-}
+}*/
 
 void MainWindow::saveSelectedAsFile(){
 	QString filename = QFileDialog::getSaveFileName(this, tr("Save your glass piece"), QDir::currentPath(), tr("VirtualGlass (*.glass)") );
@@ -2375,10 +2374,6 @@ void MainWindow::setupMenus()
 	saveAllAsAct->setShortcuts(QKeySequence::SaveAs);
 	saveAllAsAct->setStatusTip(tr("Save all glass to disk"));
 
-	//saveSelected; no shortcut
-	saveSelectedAct = new QAction(tr("Save S&elected"), this);
-	saveSelectedAct->setStatusTip(tr("Save selected glass to disk"));
-
 	//saveSelectedAs
 	saveSelectedAsAct = new QAction(tr("Save Selected As"), this);
 	saveSelectedAsAct->setStatusTip(tr("Save selected glass to disk"));
@@ -2397,7 +2392,6 @@ void MainWindow::setupMenus()
 	fileMenu->addSeparator();
 	fileMenu->addAction(saveAllAct); //add saveButton
 	fileMenu->addAction(saveAllAsAct); //add saveButton
-	fileMenu->addAction(saveSelectedAct); //add saveButton
 	fileMenu->addAction(saveSelectedAsAct); //add saveAsButton
 	fileMenu->addSeparator();
 	fileMenu->addAction(exitAct);

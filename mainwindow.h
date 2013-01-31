@@ -155,7 +155,7 @@ class MainWindow : public QMainWindow
 		void newFile();
 		void import();
 		void saveAllFile();
-		void saveSelectedFile();
+		//void saveSelectedFile();
 		void saveAllAsFile();
 		void saveSelectedAsFile();
 		void randomSimpleCaneExampleActionTriggered();
