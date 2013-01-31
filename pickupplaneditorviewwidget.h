@@ -18,8 +18,11 @@ class PickupPlanEditorViewWidget : public QWidget
 
 	public:
 		PickupPlanEditorViewWidget(PickupPlan* pickup, QWidget* parent=0);
-		void setPickup(PickupPlan* p);
+		void setPickup(PickupPlan* p, bool viewAll = false);
 		QPixmap getPixmap();
+		void resetPickupEditorView();
+		void setViewAllPickupEditorView();
+		void setViewAll(bool);
 	
 	signals:
 		void someDataChanged();
@@ -36,6 +39,7 @@ class PickupPlanEditorViewWidget : public QWidget
 		NiceViewWidget* niceViewWidget;
 		PickupPlan* pickup;
 		float ulX, ulY, squareSize;
+		vector<std::string> vecLayer;
 
 		float adjustedX(float rawX);
 		float adjustedY(float rawX);

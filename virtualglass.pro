@@ -12,6 +12,9 @@ TARGET =
 DEPENDPATH += .
 INCLUDEPATH += . glew/
 INCLUDEPATH += . jsoncpp/include
+#INCLUDEPATH += . freeglut/include
+#INCLUDEPATH += . freeglut/include/GL
+#INCLUDEPATH += . freeglut/src
 QT += opengl
 RESOURCES = virtualglass.qrc
 DEFINES += GLEW_MX
@@ -19,13 +22,15 @@ DEFINES += GLEW_MX
 unix:!macx {
   QMAKE_CXXFLAGS += -std=gnu++0x
   LIBS += -lGLU
+ #LIBS += -lGLUT
 }
 macx {
   QMAKE_CC = clang
   QMAKE_CFLAGS += -Qunused-arguments
   QMAKE_CXX = clang
-  QMAKE_CXXFLAGS += -DUNORDERED_MAP_WORKAROUND -I src/jsoncpp/include
+  QMAKE_CXXFLAGS += -DUNORDERED_MAP_WORKAROUND -I src/jsoncpp/include #-I src/freeglut/include -I src/freeglut/include/GL -I src/freeglut/src
   ICON = virtualglass.icns
+LIBS += -framework GLUT
 }
 
 *-msvc* {
@@ -36,6 +41,7 @@ macx {
 	QMAKE_CFLAGS_DEBUG += $${MYFLAGS}
 	QMAKE_CFLAGS_RELEASE += $${MYFLAGS}
 	QMAKE_CXXFLAGS += $${MYFLAGS}
+ #LIBS += -lGLUT
 }
 #one hopes this catches mingw:
 !*-msvc* {
@@ -46,9 +52,11 @@ macx {
 		QMAKE_CXXFLAGS += -std=gnu++0x
 	}
 	LIBS += -lexpat
+# LIBS += -lGLUT
 }
 
 HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
+    bubble.h
 
 HEADERS += jsoncpp/include/json/autolink.h \
         jsoncpp/include/json/config.h \
@@ -58,6 +66,11 @@ HEADERS += jsoncpp/include/json/autolink.h \
         jsoncpp/include/json/reader.h \
         jsoncpp/include/json/value.h \
         jsoncpp/include/json/writer.h \
+        #freeglut/include/GL/glut.h \
+        #freeglut/include/GL/freeglut.h \
+        #freeglut/include/GL/freeglut_std.h \
+        #freeglut/include/GL/freeglut_ext.h \
+        #freeglut/src/freeglut_internal.h \
         primitives.h \
         constants.h \
         Vector.hpp \
@@ -90,9 +103,9 @@ HEADERS += jsoncpp/include/json/autolink.h \
 	pullplancustomizeviewwidget.h \
 	glassmime.h \
         glasscolor.h \
-	SVG.hpp \
-	Box.hpp \
-	Matrix.hpp \
+        #SVG.hpp \
+        #Box.hpp \
+        #Matrix.hpp \
 
 SOURCES += main.cpp \ 
 	glew/glew.c \
@@ -129,5 +142,5 @@ SOURCES += main.cpp \
         jsoncpp/src/lib_json/json_reader.cpp \
         jsoncpp/src/lib_json/json_value.cpp \
 	jsoncpp/src/lib_json/json_writer.cpp \
-	SVG.cpp
-
+        SVG.cpp
+    bubble.cpp

@@ -47,8 +47,10 @@ MainWindow :: MainWindow()
 	show();
 
 	emit someDataChanged();
+	resetDirtyBits();
 	whatToDoLabel->setText("Click a library item at left to edit/view.");
 }
+
 
 void MainWindow :: setViewMode(enum ViewMode _mode)
 {
@@ -560,6 +562,7 @@ void MainWindow :: setupPieceEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
 	pieceEditorWidget = new PieceEditorWidget(editorStack);
+	pieceEditorWidget->setMainWindow(this);
 	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(pieceEditorWidget->getPiece()));
 }
 
@@ -589,6 +592,7 @@ void MainWindow :: setupPullPlanEditor()
 	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pullPlanEditorWidget->getPlan()));
 }
 
+
 void MainWindow :: newPiece()
 {
 	// Create the new piece
@@ -613,6 +617,11 @@ void MainWindow :: copyPiece()
 	pieceEditorWidget->setPiece(newEditorPiece);
 
 	emit someDataChanged();
+}
+
+PickupPlan* MainWindow :: newPickupPlan()
+{
+	return new PickupPlan(PickupTemplate::VERTICAL);
 }
 
 void MainWindow :: newColorBar()
@@ -884,18 +893,146 @@ void MainWindow :: updateLibrary()
 	}
 }
 
+void MainWindow :: resetDirtyBits()
+{
+	AsyncColorBarLibraryWidget* cblw;
+	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
+	{
+		cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
+			dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
+		cblw->getGlassColor()->setDirtyBitColor(false);
+	}
+
+	AsyncPullPlanLibraryWidget* pplw;
+	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
+	{
+		pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
+			dynamic_cast<QWidgetItem*>(pullPlanLibraryLayout->itemAt(i))->widget());
+		pplw->getPullPlan()->setDirtyBitBool(false);
+	}
+
+	AsyncPieceLibraryWidget* plw;
+	for (int i = 0; i < pieceLibraryLayout->count(); ++i)
+	{
+		plw = dynamic_cast<AsyncPieceLibraryWidget*>(
+				dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
+		plw->getPiece()->setDirtyBitPiece(false);
+		plw->getPiece()->pickup->setDirtyBitPick(false);
+	}
+}
+
+bool MainWindow :: getDirtyBits()
+{
+	bool dirtyBits = false;
+
+	AsyncPieceLibraryWidget* plw;
+	for (int i = 0; i < pieceLibraryLayout->count(); ++i)
+	{
+		plw = dynamic_cast<AsyncPieceLibraryWidget*>(
+				dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
+		cout << "dirtyBits piece " << i << " " << dirtyBits;
+		cout << endl;
+		if(plw->getPiece()->pickup->getDirtyBitPick())
+			dirtyBits = true;
+		if(plw->getPiece()->getDirtyBitPiece() | dirtyBits)
+		{
+			dirtyBits = true;
+			i = pieceLibraryLayout->count(); //exit loop
+		}
+
+		AsyncPullPlanLibraryWidget* pplw;
+		for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
+		{
+			pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
+				dynamic_cast<QWidgetItem*>(pullPlanLibraryLayout->itemAt(i))->widget());
+					if (plw->getPiece()->hasDependencyOn(pplw->getPullPlan()))
+					{
+						cout << "dirtyBits pullplan " << i << " " << dirtyBits;
+						cout << endl;
+						if(pplw->getPullPlan()->getDirtyBitPull() | dirtyBits)
+						{
+							dirtyBits= true;
+							i = pullPlanLibraryLayout->count();
+						}
+						AsyncColorBarLibraryWidget* cblw;
+						for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
+						{
+							cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
+								dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
+							if (pplw->getPullPlan()->hasDependencyOn(cblw->getGlassColor())| plw->getPiece()->hasDependencyOn(cblw->getGlassColor()))
+							{
+								cout << "dirtyBits color " << i << " " << dirtyBits;
+								cout << endl;
+								if(cblw->getGlassColor()->getDirtyBitColor())
+								{
+									dirtyBits = true;
+									i = colorBarLibraryLayout->count();
+								}
+								cout << "dirtyBits color after " << i << " " << dirtyBits;
+								cout << endl;
+							}
+						}
+					}
+		}
+	}
+	cout << "dirtyBits end " << dirtyBits;
+	cout << endl;
+	return dirtyBits;
+}
+
 void MainWindow::closeEvent(QCloseEvent *event){
 	//maybe save settings to open the programm with closed settings?
-	char path[509]; //MS max path 248 chars, max filename 260 chars, plus 1 forterminator
+	char path[509]; //MS max path 248 chars, max filename 260 chars, plus 1 for terminator
 	ifstream readHdl;
-	readHdl.open(":/save");
-	readHdl.getline(path,509, '\n');
+	readHdl.open("save");
+	readHdl.getline(path,509);
 	string strPath;
 	strPath.assign(path, strlen(path));
 	readHdl.close();
-	//if(strPath==""){
-	//	saveAllAs();
-	//}
+
+	if(getDirtyBits())
+	{
+		string message;
+		QMessageBox saveMsgBox;
+		saveMsgBox.setIconPixmap(QPixmap("virtualglass.png"));
+		saveMsgBox.addButton(tr("Don't save"), QMessageBox::YesRole);
+		QPushButton *cancelButton = saveMsgBox.addButton(tr("Cancel"), QMessageBox::ActionRole);
+		QPushButton *saveAsButton = saveMsgBox.addButton(tr("Save As"), QMessageBox::ActionRole);
+		QPushButton	*saveButton = saveMsgBox.addButton(tr("Save"), QMessageBox::ActionRole);
+
+		if(strPath.empty())
+		{
+			saveAsButton->setText("Save");
+			message = "Do you want to save the changes you made?";
+			saveButton->hide();
+		}
+		else
+			message = "Do you want to save the changes you made to " + strPath;
+
+		saveMsgBox.setText(message.c_str());
+		saveMsgBox.exec();
+
+		if (saveMsgBox.clickedButton() == saveButton)
+			save(strPath.c_str());
+
+		if (saveMsgBox.clickedButton() == saveAsButton)
+			saveAllAsFile();
+
+		if (saveMsgBox.clickedButton() == cancelButton)
+		{
+			//ignore close event
+			event->ignore();
+			return;
+		}
+	}
+
+	//clear save file
+	QFile savePath("save");
+	savePath.open(QIODevice::WriteOnly | QIODevice::Text);
+	QTextStream savePathOutput(&savePath);
+	savePathOutput << "";
+	savePath.close();
+
 	event->accept();
 }
 
@@ -1806,7 +1943,7 @@ void MainWindow::open(QStringList list, bool merge){
 	for(int i = 0; i < list.size(); i++){
 		QString filename = list.at(i);
 		if((filename.toStdString())!=""&&list.size()>1){
-			QFile savePath(":/save");
+			QFile savePath("save");
 			savePath.open(QIODevice::WriteOnly | QIODevice::Text);
 			QTextStream savePathOutput(&savePath);
 			savePathOutput << filename << "\n";
@@ -1893,7 +2030,7 @@ void MainWindow::deleteStandardLibraryElements(){
 
 void MainWindow::newFile(){
 
-	QFile savePath(":/save");
+	QFile savePath("save");
 	savePath.open(QIODevice::WriteOnly | QIODevice::Text);
 	QTextStream savePathOutput(&savePath);
 	savePathOutput << "\n";
@@ -2002,6 +2139,8 @@ void MainWindow::import(){
 }
 
 void MainWindow::save(QString filename){
+	if(!filename.isEmpty())
+		resetDirtyBits();
 	QFile saveFile(filename);
 	saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
 	QTextStream fileOutput(&saveFile);
@@ -2040,6 +2179,8 @@ void MainWindow::save(QString filename){
 }
 
 void MainWindow::saveAs(QString filename){
+	if(!filename.isEmpty())
+		resetDirtyBits();
 	QFile saveFile(filename);
 	saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
 	QTextStream fileOutput(&saveFile);
@@ -2083,18 +2224,18 @@ void MainWindow::saveAllFile(){
 
 	ifstream readHdl;
 
-	readHdl.open(":/save");
-	readHdl.getline(path,509, '\n');
+	readHdl.open("save");
+	readHdl.getline(path,509);
 	string strPath;
 	strPath.assign(path, strlen(path));
 	readHdl.close();
 	QString filename;
-	if(strPath==""){
+	if(strPath.empty()){
 		filename = QFileDialog::getSaveFileName(this, tr("Save your glass piece"), QDir::currentPath(), tr("VirtualGlass (*.glass)") );
 				//improve: prevent character set error in filename
 				//improve: empty file name -> "no savefile choosen"
-		if((filename.toStdString())!=""){
-			QFile savePath(":/save");
+		if(!(filename.toStdString().empty())){
+			QFile savePath("save");
 			savePath.open(QIODevice::WriteOnly | QIODevice::Text);
 			QTextStream savePathOutput(&savePath);
 			savePathOutput << filename << "\n";
@@ -2112,7 +2253,7 @@ void MainWindow::saveSelectedFile(){
 	char path[509]; //MS max path 248 chars, max filename 260 chars, plus 1 forterminator
 	ifstream readHdl;
 
-	readHdl.open(":/save");
+	readHdl.open("save");
 	readHdl.getline(path,509, '\n');
 	string strPath;
 	strPath.assign(path, strlen(path));
@@ -2123,7 +2264,7 @@ void MainWindow::saveSelectedFile(){
 				//improve: prevent character set error in filename
 				//improve: empty file name -> "no savefile choosen"
 		if((filename.toStdString())!=""){
-			QFile savePath(":/save");
+			QFile savePath("save");
 			savePath.open(QIODevice::WriteOnly | QIODevice::Text);
 			QTextStream savePathOutput(&savePath);
 			savePathOutput << filename << "\n";
@@ -2181,7 +2322,7 @@ void MainWindow::openFile(){
 	openFileDialog.setNameFilter(tr("VirtualGlass file (*.glass)")); //avoid open non .glass files
 	openFileDialog.setFileMode(QFileDialog::ExistingFiles);
 
-	QPushButton *mergeButton = new QPushButton(&openFileDialog);
+	QPushButton *mergeButton =  new QPushButton(&openFileDialog);
 	mergeButton->setText("Merge"); //set button text
 	QGridLayout *layout = (QGridLayout*)openFileDialog.layout();
 	layout->addWidget(mergeButton, 4, 2); //set position
@@ -2308,4 +2449,3 @@ void MainWindow::setupMenus()
 	perfMenu->addAction(depthPeelAction);
 
 }
-

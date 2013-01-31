@@ -7,7 +7,7 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWi
 	setMinimumSize(200, 200);
 	this->pickup = pickup;
 	this->niceViewWidget = new NiceViewWidget(NiceViewWidget::PICKUPPLAN_CAMERA_MODE, this);
-	mesher.generateMesh(pickup, &geometry);
+	mesher.generateMesh(pickup, &geometry, false);
 	this->niceViewWidget->setGeometry(&geometry);
 	this->niceViewWidget->repaint();
 
@@ -154,8 +154,30 @@ void PickupPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 	event->acceptProposedAction();
 }
 
+void PickupPlanEditorViewWidget :: resetPickupEditorView()
+{
+	this->niceViewWidget->resetPickupEditorView();
+}
+
+void PickupPlanEditorViewWidget :: setViewAllPickupEditorView()
+{
+	this->niceViewWidget->setViewAllPickupEditorView();
+}
+
+void PickupPlanEditorViewWidget :: setViewAll(bool value)
+{
+	this->niceViewWidget->setViewAll(value);
+}
+
 void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
+	if(pickup->getViewAll())
+	{
+		event->ignore();
+		return;
+	}
+	resetPickupEditorView();
+
 	void* droppedObject;
 	GlassColor* droppedColor = 0;
 	PullPlan* droppedPlan = 0;
@@ -211,10 +233,10 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	}
 }
 
-void PickupPlanEditorViewWidget :: setPickup(PickupPlan* pickup)
+void PickupPlanEditorViewWidget :: setPickup(PickupPlan* pickup, bool viewAll)
 {
 	this->pickup = pickup;
-	mesher.generateMesh(pickup, &geometry);
+	mesher.generateMesh(pickup, &geometry, viewAll);
 	this->niceViewWidget->repaint();
+	this->pickup->setDirtyBitPick();
 }
-

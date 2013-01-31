@@ -1,4 +1,5 @@
 
+
 #include "pullplan.h"
 #include "geometry.h"
 #include "pullplaneditorwidget.h"
@@ -388,6 +389,7 @@ void PullPlanEditorWidget :: seedTemplates()
 void PullPlanEditorWidget :: setPlan(PullPlan* p)
 {
 	plan = p;
+	plan->setDirtyBitBool();
 	emit someDataChanged();	
 }
 
@@ -395,7 +397,3 @@ PullPlan* PullPlanEditorWidget :: getPlan()
 {
 	return plan;
 }
-
-
-
-

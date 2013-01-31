@@ -29,6 +29,7 @@ PullPlan :: PullPlan(PullTemplate::Type _templateType)
 
 	// setup default twist
 	twist = 0;
+	this->setDirtyBitBool();
 
 	// setup template (subplans and parameters) `forcefully', i.e.
 	// occuring regardless of what current template type is
@@ -45,6 +46,15 @@ PullPlan :: PullPlan(PullTemplate::Type _templateType)
 		setTemplateType(_templateType, true);
 }
 
+bool PullPlan :: getDirtyBitPull()
+{
+	return dirtyBit;
+}
+
+void PullPlan :: setDirtyBitBool(bool value)
+{
+	dirtyBit = value;
+}
 
 bool PullPlan :: hasDependencyOn(PullPlan* plan) {
 
@@ -85,6 +95,7 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) {
 	if (!force && templateType == this->templateType)
 		return;
 
+	setDirtyBitBool();
 	this->templateType = templateType;
 
 	// setup starter casings (casing 0 may be changed depending upon template)
@@ -143,15 +154,15 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) {
 }
 
 void PullPlan :: setCasingColor(GlassColor* gc, unsigned int index) {
-
 	if (index >= this->casings.size())
 		return;
 	this->casings[index].glassColor = gc;
+	setDirtyBitBool();
 }
 
 void PullPlan :: setOutermostCasingColor(GlassColor* gc) {
-
 	this->casings[casings.size()-1].glassColor = gc;
+	setDirtyBitBool();
 }
 
 GlassColor* PullPlan :: getOutermostCasingColor() {
@@ -172,8 +183,8 @@ unsigned int PullPlan :: getCasingCount() {
 }
 
 void PullPlan :: setTwist(int t) {
-
 	this->twist = t;
+	setDirtyBitBool();
 }
 
 int PullPlan :: getTwist() {
@@ -202,6 +213,7 @@ void PullPlan :: setParameter(unsigned int _index, int value)
 	assert(_index < parameters.size());
 	parameters[_index].value = value;
 	resetSubs(false);
+	setDirtyBitBool();
 }
 
 void PullPlan :: removeCasing() {
@@ -209,6 +221,8 @@ void PullPlan :: removeCasing() {
 	int count = casings.size();
 	if (count < 3)
 		return;
+
+	setDirtyBitBool();
 
 	float oldInnermostCasingThickness = casings[0].thickness;
 
@@ -248,6 +262,7 @@ bool PullPlan :: hasSquareCasing() {
 
 void PullPlan :: addCasing(enum GeometricShape _shape) {
 
+	setDirtyBitBool();
 	// rescale casings
 	float oldInnermostCasingThickness = casings[0].thickness;
 	for (unsigned int i = 0; i < casings.size(); ++i) 
@@ -286,6 +301,7 @@ void PullPlan :: setCasingThickness(float t, unsigned int index) {
 	// to valid relative sizes.
 	if (index >= casings.size()-1)
 		return;
+	setDirtyBitBool();
 	// if innermost casing, scale subcanes with changing casing thickness
 	if (index == 0) {
 		float scaleRatio = t / casings[0].thickness;
@@ -301,8 +317,9 @@ void PullPlan :: setCasingThickness(float t, unsigned int index) {
 void PullPlan :: setOutermostCasingShape(enum GeometricShape _shape) {
 
 	if (_shape == getOutermostCasingShape()) 
-		return; 
+		return;
 
+	setDirtyBitBool();
 	float oldInnermostCasingThickness = casings[0].thickness;
 
 	// simple case of only 1 casing
@@ -367,6 +384,7 @@ void PullPlan :: pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs
 				break;
 		}
 	}
+	setDirtyBitBool();
 
 	newSubs->push_back(SubpullTemplate(plan, _shape, p, diameter));
 }
@@ -384,6 +402,7 @@ of subplans, as well as increasing or decreasing the number of subplans.
 */
 void PullPlan :: resetSubs(bool hardReset)
 {
+	setDirtyBitBool();
 	Point p = make_vector(0.0f, 0.0f, 0.0f);
 	assert(!casings.empty());
 	float radius = casings[0].thickness;
@@ -566,6 +585,7 @@ void PullPlan :: resetSubs(bool hardReset)
 PullPlan* PullPlan :: copy() const {
 
 	PullPlan* c = new PullPlan(templateType);
+	c->setDirtyBitBool();
 
 	c->casings = casings;
 	c->twist = twist;

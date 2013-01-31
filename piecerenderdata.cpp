@@ -17,6 +17,6 @@ Geometry *PieceRenderData::getGeometry()
 {
 	Geometry *geometry = new Geometry;
 	Mesher mesher;
-	mesher.generateMesh(piece, geometry);
+	mesher.generateMesh(piece, geometry, false);
 	return geometry;
 }

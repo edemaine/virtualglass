@@ -1,36 +1,38 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-	<file>images/piecetemplate1.png</file>
-	<file>images/piecetemplate2.png</file>
-	<file>images/piecetemplate3.png</file>
-	<file>images/piecetemplate4.png</file>
-	<file>images/piecetemplate5.png</file>
-	<file>images/piecetemplate6.png</file>
-	<file>images/pickuptemplate1.png</file>
-	<file>images/pickuptemplate2.png</file>
-	<file>images/pickuptemplate3.png</file>
-	<file>images/pickuptemplate4.png</file>
-	<file>images/pickuptemplate5.png</file>
-	<file>images/pickuptemplate6.png</file>
-	<file>images/pickuptemplate7.png</file>
-	<file>images/pickuptemplate8.png</file>
-	<file>images/pulltemplate1.png</file>
-	<file>images/pulltemplate2.png</file>
-	<file>images/pulltemplate3.png</file>
-	<file>images/pulltemplate4.png</file>
-	<file>images/pulltemplate5.png</file>
-	<file>images/pulltemplate6.png</file>
-	<file>images/pulltemplate7.png</file>
-	<file>images/pulltemplate8.png</file>
-	<file>images/pulltemplate9.png</file>
-	<file>images/pulltemplate10.png</file>
-	<file>reichenbach-opaque-colors.vgc</file>
-	<file>reichenbach-transparent-colors.vgc</file>
-	<file>gaffer-opaque-colors.vgc</file>
-	<file>gaffer-transparent-colors.vgc</file>
-	<file>kugler-opaque-colors.vgc</file>
-	<file>kugler-transparent-colors.vgc</file>
-	<file>COPYRIGHT.txt</file>
-	<file>version.txt</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file>images/piecetemplate1.png</file>
+        <file>images/piecetemplate2.png</file>
+        <file>images/piecetemplate3.png</file>
+        <file>images/piecetemplate4.png</file>
+        <file>images/piecetemplate5.png</file>
+        <file>images/piecetemplate6.png</file>
+        <file>images/pickuptemplate1.png</file>
+        <file>images/pickuptemplate2.png</file>
+        <file>images/pickuptemplate3.png</file>
+        <file>images/pickuptemplate4.png</file>
+        <file>images/pickuptemplate5.png</file>
+        <file>images/pickuptemplate6.png</file>
+        <file>images/pickuptemplate7.png</file>
+        <file>images/pickuptemplate8.png</file>
+        <file>images/pulltemplate1.png</file>
+        <file>images/pulltemplate2.png</file>
+        <file>images/pulltemplate3.png</file>
+        <file>images/pulltemplate4.png</file>
+        <file>images/pulltemplate5.png</file>
+        <file>images/pulltemplate6.png</file>
+        <file>images/pulltemplate7.png</file>
+        <file>images/pulltemplate8.png</file>
+        <file>images/pulltemplate9.png</file>
+        <file>images/pulltemplate10.png</file>
+        <file>reichenbach-opaque-colors.vgc</file>
+        <file>reichenbach-transparent-colors.vgc</file>
+        <file>gaffer-opaque-colors.vgc</file>
+        <file>gaffer-transparent-colors.vgc</file>
+        <file>kugler-opaque-colors.vgc</file>
+        <file>kugler-transparent-colors.vgc</file>
+        <file>COPYRIGHT.txt</file>
+        <file>version.txt</file>
+        <file>save</file>
+        <file>virtualglass.png</file>
+    </qresource>
 </RCC>

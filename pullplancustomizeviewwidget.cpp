@@ -21,7 +21,7 @@ PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget
 	activeBoxIndex = -1;
 	activeControlPoint = -1;
 	mode = MOVE_MODE;
-    BOUNDING_BOX_SPACE = 1; //squareSize isn't set yet, so can't do MAX(squareSize / 100, 1);
+	BOUNDING_BOX_SPACE = 1; //squareSize isn't set yet, so can't do MAX(squareSize / 100, 1);
 	boundActiveBox();
 	this->setMouseTracking(true);
 }
@@ -239,6 +239,8 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 				for (unsigned int i = 0; i < subplansSelected.size(); i++)
 				{
 					plan->subs[subplansSelected[i]].diameter *= proportion;
+					std::cout << "subplan diameter " << plan->subs[subplansSelected[i]].diameter;
+					std::cout << std::endl;
 				}
 			}
 			else
@@ -468,6 +470,7 @@ bool PullPlanCustomizeViewWidget :: isValidMovePosition(QMouseEvent*)
 	/* This should check if the subcane can be moved to the given position
 	  (i.e. not intersecting with another subcane or leaving the casing).
 	  For now it doesn't prevent anything. */
+	//if valid -> plan->dirtyBit=true;
 	return true;
 }
 
@@ -683,6 +686,7 @@ void PullPlanCustomizeViewWidget :: copySelectionPressed()
 {
 	if (subplansSelected.size() == 0)
 		return;
+	//plan->dirtyBit=true;
 	vector<SubpullTemplate*> newSubplans;
 	newSubplans.clear();
 	for (unsigned int i = 0; i < subplansSelected.size(); i++)
@@ -711,6 +715,7 @@ void PullPlanCustomizeViewWidget :: copySelectionPressed()
 
 void PullPlanCustomizeViewWidget :: deleteSelectionPressed()
 {
+	//plan->dirtyBit=true;
 	for (unsigned int i = 0; i < subplansSelected.size(); i++)
 	{
 		unsigned int n = subplansSelected[i];
@@ -732,6 +737,7 @@ void PullPlanCustomizeViewWidget :: deleteSelectionPressed()
 
 void PullPlanCustomizeViewWidget :: addCirclePressed()
 {
+	//plan->dirtyBit=true;
 	Point p = make_vector(0.0f, 0.0f, 0.0f);
 	float diameter = 0;
 	for (unsigned int i = 0; i < plan->subs.size(); i++)
@@ -753,6 +759,7 @@ void PullPlanCustomizeViewWidget :: addCirclePressed()
 
 void PullPlanCustomizeViewWidget :: addSquarePressed()
 {
+	//plan->dirtyBit=true;
 	Point p = make_vector(0.0f, 0.0f, 0.0f);
 	float diameter = 0;
 	for (unsigned int i = 0; i < plan->subs.size(); i++)

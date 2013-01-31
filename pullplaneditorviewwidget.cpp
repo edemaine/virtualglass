@@ -369,7 +369,6 @@ void PullPlanEditorViewWidget :: populateHighlightedCasings(int x, int y)
 }
 
 void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan) {
-
 	this->plan = plan;
 	updateHighlightedSubplansAndCasings(NULL);
 }
@@ -504,6 +503,3 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 
 	painter.end();
 }
-
-
-

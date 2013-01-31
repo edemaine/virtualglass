@@ -1,5 +1,9 @@
 
+#include	"pickupplaneditorviewwidget.h"
 #include "pieceeditorwidget.h"
+#include "mainwindow.h"
+#include <sstream>
+#include "bubble.h"
 
 PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -11,7 +15,9 @@ PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 
 	setupLayout();
 	setupConnections();
+	updateEverything();
 }
+
 
 void PieceEditorWidget :: updateEverything()
 {
@@ -26,9 +32,10 @@ void PieceEditorWidget :: updateEverything()
 		else
 			pktlw->setDependancy(false);
 	}
-
-	pickupViewWidget->setPickup(piece->pickup);
-
+	if(viewCheckBox->isChecked())
+		pickupViewWidget->setPickup(piece->pickup, true);
+	else
+		pickupViewWidget->setPickup(piece->pickup, false);
 	unsigned int i = 0;
 	for (; i < piece->pickup->getParameterCount(); ++i)
 	{
@@ -59,29 +66,33 @@ void PieceEditorWidget :: updateEverything()
 		pickupParamStacks[i]->setCurrentIndex(1); // hide
 	}
 
-	// update piece stuff
-	PieceTemplateLibraryWidget* ptlw;
-	for (int i = 0; i < pieceTemplateLibraryLayout->count(); ++i)
-	{
-		ptlw = dynamic_cast<PieceTemplateLibraryWidget*>(
-			dynamic_cast<QWidgetItem *>(pieceTemplateLibraryLayout->itemAt(i))->widget());
-		if (ptlw->type == piece->getTemplateType())
-			ptlw->setDependancy(true, IS_DEPENDANCY);
+		// update piece stuff
+		PieceTemplateLibraryWidget* ptlw;
+		for (int i = 0; i < pieceTemplateLibraryLayout->count(); ++i)
+		{
+			ptlw = dynamic_cast<PieceTemplateLibraryWidget*>(
+				dynamic_cast<QWidgetItem *>(pieceTemplateLibraryLayout->itemAt(i))->widget());
+			if (ptlw->type == piece->getTemplateType())
+				ptlw->setDependancy(true, IS_DEPENDANCY);
+			else
+				ptlw->setDependancy(false);
+			}
+
+		if(viewCheckBox->isChecked())
+			mesher.generateMesh(piece, &geometry, true);
 		else
-			ptlw->setDependancy(false);
-	}
-
-	geometry.clear();
-	mesher.generateMesh(piece, &geometry);
-	niceViewWidget->repaint();
-
+		{
+			geometry.clear();
+			mesher.generateMesh(piece, &geometry, false);
+		}
+		niceViewWidget->repaint();
 	i = 0;
 	for (; i < piece->getParameterCount(); ++i)
 	{
 		TemplateParameter tp;
 		piece->getParameter(i, &tp);
 		pieceParamLabels[i]->setText(tp.name.c_str());
-		// temporarily disconnect the signals because 
+		// temporarily disconnect the signals because
 		// it appears that (bugged?) setRange() calls valueChanged()
 		disconnect(pieceParamSliders[i], SIGNAL(valueChanged(int)),
 			this, SLOT(pieceParameterSliderChanged(int)));
@@ -98,6 +109,138 @@ void PieceEditorWidget :: updateEverything()
 	}
 }
 
+void PieceEditorWidget :: viewAllPieces()
+{
+	/*for(unsigned long i = 0; i < vecLayerComboBox.size(); i++)
+	{
+		getPiece()->pickup = &(vecLayerComboBox[i]);
+		if(i==0)
+			allGeometry = geometry;
+		else
+		{
+			allGeometry.groups.insert(allGeometry.groups.end(),geometry.groups.begin(),geometry.groups.end());
+			allGeometry.triangles.insert(allGeometry.triangles.end(), geometry.triangles.begin(), geometry.triangles.end());
+			allGeometry.vertices.insert(allGeometry.vertices.end(), geometry.vertices.begin(), geometry.vertices.end());
+		}
+	}*/
+	allLayersPiece = getPiece()->copy();
+	allLayersPiece->pickup = (&(vecLayerComboBox[0]))->copy();
+	//allLayersPiece->vecLayerVerticesPushBack(vecLayerComboBox[0].getVertices());
+	mesher.generateMesh(allLayersPiece, &geometry, true);
+
+
+	//todo instead loop i = 0
+	if(viewCheckBox->isChecked())
+	{
+		if (vecLayerComboBox[0].subs[0].orientation == MURRINE_PICKUP_CANE_ORIENTATION)
+		{
+			if(allLayersPiece->getInnerZ() > (vecLayerComboBox[0].subs[0].location[2] - vecLayerComboBox[0].subs[0].length/2))
+				allLayersPiece->setInnerZ(vecLayerComboBox[0].subs[0].location[2] - vecLayerComboBox[0].subs[0].length/2);
+			if(allLayersPiece->getOuterZ() < (vecLayerComboBox[0].subs[0].location[2] + vecLayerComboBox[0].subs[0].length/2))
+				allLayersPiece->setOuterZ(vecLayerComboBox[0].subs[0].location[2] + vecLayerComboBox[0].subs[0].length/2);
+		}
+		else
+		{
+			if(allLayersPiece->getInnerZ() > (vecLayerComboBox[0].subs[0].location[2] - vecLayerComboBox[0].subs[0].width/2))
+				allLayersPiece->setInnerZ(vecLayerComboBox[0].subs[0].location[2] - vecLayerComboBox[0].subs[0].width/2);
+			if(allLayersPiece->getOuterZ() < (vecLayerComboBox[0].subs[0].location[2] + vecLayerComboBox[0].subs[0].width/2))
+				allLayersPiece->setOuterZ(vecLayerComboBox[0].subs[0].location[2] + vecLayerComboBox[0].subs[0].width/2);
+		}
+
+		allLayersPiece->vecLayerVerticesSetValue(vecLayerComboBox[0].getVertices(),0);
+
+		for(unsigned long i = 1; i < vecLayerComboBox.size(); i++)
+		{
+			allLayersPiece->pickup->subs.insert(allLayersPiece->pickup->subs.end(),vecLayerComboBox[i].subs.begin(),vecLayerComboBox[i].subs.end());
+			allLayersPiece->vecLayerVerticesSetValue(vecLayerComboBox[i].getVertices(),i);
+
+			if (vecLayerComboBox[i].subs[0].orientation == MURRINE_PICKUP_CANE_ORIENTATION)
+			{
+				if(allLayersPiece->getInnerZ() > (vecLayerComboBox[i].subs[0].location[2] - vecLayerComboBox[i].subs[0].length/2))
+					allLayersPiece->setInnerZ(vecLayerComboBox[i].subs[0].location[2] - vecLayerComboBox[i].subs[0].length/2);
+				if(allLayersPiece->getOuterZ() < (vecLayerComboBox[i].subs[0].location[2] + vecLayerComboBox[i].subs[0].length/2))
+					allLayersPiece->setOuterZ(vecLayerComboBox[i].subs[0].location[2] + vecLayerComboBox[i].subs[0].length/2);
+			}
+			else
+			{
+				if(allLayersPiece->getInnerZ() > (vecLayerComboBox[i].subs[0].location[2] - vecLayerComboBox[i].subs[0].width/2))
+					allLayersPiece->setInnerZ(vecLayerComboBox[i].subs[0].location[2] - vecLayerComboBox[i].subs[0].width/2);
+				if(allLayersPiece->getOuterZ() < (vecLayerComboBox[i].subs[0].location[2] + vecLayerComboBox[i].subs[0].width/2))
+					allLayersPiece->setOuterZ(vecLayerComboBox[i].subs[0].location[2] + vecLayerComboBox[i].subs[0].width/2);
+			}
+		}
+		//std::cout << "innerZ " << allLayersPiece->getInnerZ()*2.5 << " outerZ " << allLayersPiece->getOuterZ()*2.5;
+		//std::cout << std::endl;
+		mesher.generateMesh(allLayersPiece, &geometry, true);
+	}
+}
+
+//calculates the number of vertices from a cane with the length 2
+/*int PieceEditorWidget :: calculatePullVertices(PullPlan* plan, int vertices)
+{
+	if(plan->getCasingCount()>2)
+		vertices= vertices+((plan->getCasingCount()-2)*1920); //add casing = 1920 vertices (cane with length 2)
+
+	for(unsigned long i = 0; i < plan->subs.size(); i++) //check diameter
+	{
+		if(plan->subs[i].diameter<0.6)
+			vertices = vertices+974; //small diameter
+		else
+		{
+			if(plan->subs[i].diameter>=1.0)
+				vertices = vertices+2918;//large diameter
+			else
+				vertices = vertices+1946;//middle diameter
+		}
+	}
+*/
+	/*switch(plan->getTemplateType())
+	{
+	case PullTemplate::BASE_CIRCLE : vertices = vertices+2918; break;
+	case PullTemplate::BASE_SQUARE : vertices = vertices+2918; break;
+	case PullTemplate::HORIZONTAL_LINE_CIRCLE : ; break;
+	case PullTemplate::HORIZONTAL_LINE_SQUARE : ; break;
+	case PullTemplate::TRIPOD : ; break;
+	case PullTemplate::CROSS : ; break;
+	case PullTemplate::SQUARE_OF_CIRCLES : ; break;
+	case PullTemplate::SQUARE_OF_SQUARES : ; break;
+	case PullTemplate::SURROUNDING_CIRCLE : ; break;
+	case PullTemplate::CUSTOM : ; break;
+	default : std::cout << "wrong PullPlan Template Type? (PieceEditorWidget::recurseCanes)" << endl;
+	}*/
+/*
+	for(unsigned long i = 0; i< plan->subs.size();i++)
+		calculatePullVertices(plan->subs[i].plan, vertices);
+
+
+	return vertices;
+}*/
+
+/*void PieceEditorWidget :: recurseLayers(vector<PickupPlan*> vecLayers, vector<int> vecLayerTwist, int vertices)
+{
+	for(unsigned long i = 0; i < vecLayers.size(); i++) //in this case: column count == subs.size
+	{
+		for(unsigned long j = 0; j < vecLayers[i]->subs.size(); j++)
+		{
+			//calculatePullVertices(vecLayers[i]->subs[j].plan, vertices);
+
+			switch(vecLayers[i]->getTemplateType())
+			{
+				case PickupTemplate::VERTICAL : vertices = vertices+calculatePullVertices(vecLayers[i]->subs[j].plan, vertices); break;
+				case PickupTemplate::RETICELLO_VERTICAL_HORIZONTAL : ;break;
+				case PickupTemplate::MURRINE_COLUMN : ;break;
+				case PickupTemplate::VERTICALS_AND_HORIZONTALS : ;break;
+				case PickupTemplate::VERTICAL_HORIZONTAL_VERTICAL : ;break;
+				case PickupTemplate::VERTICAL_WITH_LIP_WRAP : ;break;
+				case PickupTemplate::MURRINE_ROW : ;break;
+				case PickupTemplate::MURRINE : ;break;
+				default: cout << "Error in recursePickup. Wrong PickupTemplateType?";
+			}
+		}
+		vecLayerTwist.push_back(vertices);
+	}
+}*/
+
 void PieceEditorWidget :: pieceParameterSliderChanged(int)
 {
 	for (unsigned int i = 0; i < piece->getParameterCount(); ++i)
@@ -106,7 +249,9 @@ void PieceEditorWidget :: pieceParameterSliderChanged(int)
 		piece->getParameter(i, &tp);
 		if (tp.value != pieceParamSliders[i]->value())
 		{
-			piece->setParameter(i, pieceParamSliders[i]->value());
+			this->getPiece()->setParameter(i, pieceParamSliders[i]->value());
+			if(i==2)
+				this->getPiece()->vecLayerTwistSetValue(pieceParamSliders[2]->value(), layerComboBox->currentIndex());
 			emit someDataChanged();
 		}
 	}
@@ -138,6 +283,9 @@ void PieceEditorWidget :: pickupParameterSliderChanged(int)
 			emit someDataChanged();
 		}
 	}
+	//Bubble sphere(10, 12, 24);
+	//this->niceViewWidget->displayBubble(sphere);
+	//this->niceViewWidget->drawBubble();
 }
 
 void PieceEditorWidget :: setupLayout()
@@ -145,10 +293,31 @@ void PieceEditorWidget :: setupLayout()
 	QGridLayout* editorLayout = new QGridLayout(this);
 	this->setLayout(editorLayout);
 
-	// two 3D views in the first row (and stretched to take up all the slack space 
-	editorLayout->addWidget(pickupViewWidget, 0, 0); 
-	editorLayout->addWidget(niceViewWidget, 0, 1); 
-	editorLayout->setRowStretch(0, 10);
+	// two 3D views in the first row (and stretched to take up all the slack space
+	editorLayout->addWidget(pickupViewWidget, 0, 0);
+	editorLayout->addWidget(niceViewWidget, 0, 1);
+	editorLayout->setRowStretch (0, 10);
+
+
+	QWidget* editorWidget = new QWidget(this);
+	QVBoxLayout* qvBoxEditorLayout = new QVBoxLayout(editorWidget);
+	editorWidget->setLayout(qvBoxEditorLayout);
+
+	pickupLayerViewLayout = new QHBoxLayout(editorWidget);
+	layerLabel = new QLabel("Layers:");
+	addLayerButton = new QPushButton("&+");
+	removeLayerButton = new QPushButton("&-");
+	viewCheckBox = new QCheckBox("View &all", this); //shortcut ALT and 'a'
+	layerComboBox = new QComboBox(this);
+	layerComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	layerComboBox->setInsertPolicy(QComboBox::InsertAtBottom);
+	layerComboBox->addItem("Layer 1");
+	pickupLayerViewLayout->addWidget(layerLabel, 1, 0);
+	pickupLayerViewLayout->addWidget(addLayerButton, 1, 0);
+	pickupLayerViewLayout->addWidget(removeLayerButton, 1, 0);
+	pickupLayerViewLayout->addWidget(viewCheckBox, 1, 0);
+	pickupLayerViewLayout->addWidget(layerComboBox, 1, 0);
+	editorLayout->addLayout(pickupLayerViewLayout, 1, 0);
 
 	// pickup template and piece template selectors in the second row
 	QWidget* pickupTemplateLibraryWidget = new QWidget(this);
@@ -163,7 +332,7 @@ void PieceEditorWidget :: setupLayout()
 	pickupTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	pickupTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pickupTemplateLibraryScrollArea->setFixedHeight(130);
-	editorLayout->addWidget(pickupTemplateLibraryScrollArea, 1, 0);
+	editorLayout->addWidget(pickupTemplateLibraryScrollArea, 3, 0);
 
 	QWidget* pieceTemplateLibraryWidget = new QWidget(this);
 	pieceTemplateLibraryLayout = new QHBoxLayout(pieceTemplateLibraryWidget);
@@ -177,13 +346,13 @@ void PieceEditorWidget :: setupLayout()
 	pieceTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	pieceTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pieceTemplateLibraryScrollArea->setFixedHeight(130);
-	editorLayout->addWidget(pieceTemplateLibraryScrollArea, 1, 1);
+	editorLayout->addWidget(pieceTemplateLibraryScrollArea, 3, 1);
 
 	// layouts containing pickup and piece template parameters in the third row
 
 	// Pickup parameter layout
 	QVBoxLayout* pickupParamLayout = new QVBoxLayout(this);
-	editorLayout->addLayout(pickupParamLayout, 2, 0);
+	editorLayout->addLayout(pickupParamLayout, 4, 0);
 
 	pickupParamStacks.push_back(new QStackedWidget(this));
 	QWidget* pickupParameter1Widget = new QWidget(pickupParamStacks[0]);
@@ -227,7 +396,7 @@ void PieceEditorWidget :: setupLayout()
 
 	// Piece parameter layout 
 	QVBoxLayout* pieceParamLayout = new QVBoxLayout(this);
-	editorLayout->addLayout(pieceParamLayout, 2, 1);
+	editorLayout->addLayout(pieceParamLayout, 4, 1);
 
 	pieceParamStacks.push_back(new QStackedWidget(this));
 	QWidget* pieceParameter1Widget = new QWidget(pieceParamStacks[0]);
@@ -279,9 +448,129 @@ void PieceEditorWidget :: setupLayout()
 	pieceParamLayout->addWidget(niceViewDescriptionLabel);
 }
 
+void PieceEditorWidget :: setMainWindow(MainWindow* MW)
+{
+	MainWin = MW;
+}
+
+void PieceEditorWidget :: addLayer()
+{
+	this->getPiece()->setDirtyBitPiece();
+	TemplateParameter templPara;
+
+	if((layerComboBox->count()==1)&&(layerComboBox->currentIndex()==0))
+	{
+		vecLayerComboBox.push_back(*(getPiece()->pickup->copy()));
+		getPiece()->getParameter(2, &templPara);
+	}
+	this->getPiece()->vecLayerTwistPushBack(0);
+	this->getPiece()->vecLayerVerticesPushBack(0);
+	PickupPlan* pp = MainWin->newPickupPlan();
+	vecLayerComboBox.push_back(*pp);
+	getPiece()->pickup = pp;
+	std::stringstream layerName;
+	layerName << "Layer " << (layerComboBox->count())+1;
+	layerComboBox->addItem(QString::fromStdString(layerName.str()));
+	layerComboBox->setCurrentIndex(layerComboBox->count()-1);
+
+	someDataChanged();
+}
+
+void PieceEditorWidget :: changeLayer()
+{
+	emit this->someDataChanged();
+	cout << "index " << getPiece()->vecLayerTwistGetValue(layerComboBox->currentIndex());
+	cout << endl;
+	getPiece()->pickup = &(vecLayerComboBox[layerComboBox->currentIndex()]);
+	getPiece()->setParameter(2, getPiece()->vecLayerTwistGetValue(layerComboBox->currentIndex()));
+	this->pickupViewWidgetDataChanged();
+	emit this->someDataChanged();
+}
+
+void PieceEditorWidget :: removeLayer()
+{
+	this->getPiece()->setDirtyBitPiece();
+	if(layerComboBox->count()>1)
+	{
+		if(layerComboBox->currentIndex()==layerComboBox->count()-1)
+		{
+			layerComboBox->removeItem(layerComboBox->currentIndex());
+			vecLayerComboBox.erase(vecLayerComboBox.begin()+layerComboBox->currentIndex());
+		}
+		else
+		{
+			;
+		}
+		getPiece()->pickup = &(vecLayerComboBox[layerComboBox->currentIndex()]);
+		someDataChanged();
+	}
+}
+
+void PieceEditorWidget :: combineLayers()
+{
+	if(vecLayerComboBox.size()>1)
+	{
+		if(viewCheckBox->isChecked())
+		{
+			this->pickupViewWidget->setViewAll(true);
+			this->pickupViewWidget->setViewAllPickupEditorView();
+			addLayerButton->setEnabled(false);
+			removeLayerButton->setEnabled(false);
+			layerComboBox->setEnabled(false);
+			for (unsigned int i = 0; i < pickupParamSpinboxes.size(); ++i)
+				pickupParamSpinboxes[i]->setEnabled(false);
+			for (unsigned int i = 0; i < pickupParamSliders.size(); ++i)
+				pickupParamSliders[i]->setEnabled(false);
+			for (unsigned int i = 0; i < pieceParamSliders.size(); ++i)
+				pieceParamSliders[i]->setEnabled(false);
+
+			viewCheckBox->setChecked(false);
+			getPiece()->pickup = (&(vecLayerComboBox[0]))->copy();
+			someDataChanged();
+			viewCheckBox->setChecked(true);
+
+			if(vecLayerComboBox.size()>1)
+			{
+				for(unsigned long i = 0; i < vecLayerComboBox.size(); i++)
+				{
+					getPiece()->pickup = (&(vecLayerComboBox[i]));//->copy();
+					getPiece()->pickup->setViewAll(true);
+					someDataChanged();
+					getPiece()->pickup->viewLayer(i);
+					someDataChanged();
+				}
+				viewAllPieces();
+			}
+		}
+		else
+		{
+			for(unsigned long i = 0; i < vecLayerComboBox.size(); i++)
+				(&(vecLayerComboBox[i]))->setViewAll(false);//->copy();
+
+			this->pickupViewWidget->setViewAll(false);
+			addLayerButton->setEnabled(true);
+			removeLayerButton->setEnabled(true);
+			layerComboBox->setEnabled(true);
+			for (unsigned int i = 0; i < pickupParamSpinboxes.size(); ++i)
+				pickupParamSpinboxes[i]->setEnabled(true);
+			for (unsigned int i = 0; i < pickupParamSliders.size(); ++i)
+				pickupParamSliders[i]->setEnabled(true);
+			for (unsigned int i = 0; i < pieceParamSliders.size(); ++i)
+				pieceParamSliders[i]->setEnabled(true);
+			layerComboBox->setCurrentIndex(layerComboBox->count()-1);
+			this->pickupViewWidget->resetPickupEditorView();
+			changeLayer();
+		}
+	}
+}
 
 void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
 {
+	if(piece->pickup->getViewAll())
+	{
+		event->ignore();
+		return;
+	}
 	PickupTemplateLibraryWidget* pktlw = dynamic_cast<PickupTemplateLibraryWidget*>(childAt(event->pos()));
 	PieceTemplateLibraryWidget* ptlw = dynamic_cast<PieceTemplateLibraryWidget*>(childAt(event->pos()));
 
@@ -321,8 +610,12 @@ void PieceEditorWidget :: setupConnections()
 			this, SLOT(pieceParameterSliderChanged(int)));
 	}
 
+	connect(layerComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(changeLayer()));
 	connect(pickupViewWidget, SIGNAL(someDataChanged()), this, SLOT(pickupViewWidgetDataChanged()));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+	connect(addLayerButton, SIGNAL(pressed()), this, SLOT(addLayer()));
+	connect(removeLayerButton, SIGNAL(pressed()), this, SLOT(removeLayer()));
+	connect(viewCheckBox, SIGNAL(stateChanged(int)), this, SLOT(combineLayers()));
 }
 
 void PieceEditorWidget :: pickupViewWidgetDataChanged()
@@ -353,7 +646,6 @@ void PieceEditorWidget :: seedTemplates()
 
 void PieceEditorWidget :: updateLibraryWidgetPixmaps(AsyncPieceLibraryWidget* w)
 {
-	//w->updateEyePosition(niceViewWidget->eyePosition());
 	w->updatePixmap();
 }
 
@@ -378,6 +670,7 @@ void PieceEditorWidget :: setPickupTemplateType(enum PickupTemplate::Type _type)
 void PieceEditorWidget :: setPiece(Piece* p)
 {
 	piece = p;
+	p->setDirtyBitPiece();
 	emit someDataChanged();	
 }
 
@@ -385,7 +678,3 @@ Piece* PieceEditorWidget :: getPiece()
 {
 	return piece;
 }
-
-
-
-

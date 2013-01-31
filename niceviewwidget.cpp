@@ -16,6 +16,7 @@ it is involved in modifying the cane.
 #include <stdexcept>
 #include "constants.h"
 #include "niceviewwidget.h"
+#include "bubble.h"
 
 using namespace std;
 
@@ -35,6 +36,7 @@ bool NiceViewWidget::peelEnable = true;
 NiceViewWidget :: NiceViewWidget(enum CameraMode cameraMode, QWidget *parent) 
 	: QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent), peelRenderer(NULL)
 {
+	viewAll = false;
 	leftMouseDown = false;
 	bgColor = QColor(200, 200, 200);
 	geometry = NULL;
@@ -89,6 +91,11 @@ NiceViewWidget :: ~NiceViewWidget()
 	}
 }
 
+void NiceViewWidget :: setViewAll(bool value)
+{
+	this->viewAll = value;
+}
+
 void NiceViewWidget :: initializePeel()
 {
 	assert(!peelRenderer);
@@ -111,6 +118,24 @@ void NiceViewWidget :: initializePeel()
 		}
 	}
 } 
+
+void NiceViewWidget :: resetPickupEditorView()
+{
+	theta = -PI/2.0;
+	phi = PI/2;
+	// rho set in resizeGL() b/c it depends on window size
+	lookAtLoc[0] = 0.0;
+	lookAtLoc[1] = 0.0;
+	lookAtLoc[2] = 0.0;
+	mouseLocX = 0;
+	mouseLocY = 0;
+	resizeGL(this->width(), this->height());
+}
+
+void NiceViewWidget :: setViewAllPickupEditorView()
+{
+	phi = PI/4;
+}
 
 void NiceViewWidget :: initializeGL()
 {
@@ -145,6 +170,66 @@ QImage NiceViewWidget :: renderImage() {
 	return fb.toImage();
 }
 
+/*void NiceViewWidget :: Bubble(void)
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				glColor3d(1,0,0);
+
+				glPushMatrix();
+								glTranslated(0.0,1.2,-6);
+								glutSolidSphere(1,50,50);
+				glPopMatrix();
+
+				glPushMatrix();
+								glTranslated(0.0,-1.2,-6);
+								glutWireSphere(1,16,16);
+				glPopMatrix();
+
+				glutSwapBuffers();
+}*/
+
+void NiceViewWidget :: displayBubble(Bubble sphere)
+{
+	int const win_width  = 300; // retrieve window dimensions from
+					int const win_height = 300; // framework of choice here
+					float const win_aspect = (float)win_width / (float)win_height;
+
+					glViewport(0, 0, win_width, win_height);
+
+					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+					glMatrixMode(GL_PROJECTION);
+					glLoadIdentity();
+					gluPerspective(45, win_aspect, 1, 10);
+
+					glMatrixMode(GL_MODELVIEW);
+					glLoadIdentity();
+
+	#ifdef DRAW_WIREFRAME
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	#endif
+					this->drawBubble(0, 0, -5, sphere);
+
+					swapBuffers();
+}
+
+void NiceViewWidget :: drawBubble(GLfloat x, GLfloat y, GLfloat z, Bubble sphere)
+{
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glTranslatef(x,y,z);
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	glVertexPointer(3, GL_FLOAT, 0, &(sphere.vertices)[0]);
+	glNormalPointer(GL_FLOAT, 0, &(sphere.normals)[0]);
+	glTexCoordPointer(2, GL_FLOAT, 0, &(sphere.texcoords)[0]);
+	glDrawElements(GL_QUADS, sphere.indices.size(), GL_UNSIGNED_SHORT, &(sphere.indices)[0]);
+	glPopMatrix();
+	this->paintGL();
+}
 
 /*
 Handles the drawing of a triangle mesh.
@@ -212,7 +297,7 @@ void NiceViewWidget :: resizeGL(int width, int height)
 {
 	if (this->cameraMode == PICKUPPLAN_CAMERA_MODE)
 	{
-		rho = 11.5;	
+		rho = 11.5;
 		if (width < height)
 		{
 			rho *= height;
@@ -274,7 +359,7 @@ void NiceViewWidget :: mousePressEvent (QMouseEvent* e)
 	// In pickup plan mode, user does not move camera location, zoom, etc.
 	// The widget is a passive `display' widget only, with an interactive layer
 	// on top of it (PickupPlanEditorViewWidget), which we pass the event up to.
-	if (cameraMode == PICKUPPLAN_CAMERA_MODE)
+	if ((cameraMode == PICKUPPLAN_CAMERA_MODE)&&(!viewAll))
 	{
 		e->ignore(); 
 		return;
@@ -338,13 +423,13 @@ void NiceViewWidget :: mouseMoveEvent (QMouseEvent* e)
 	mouseLocY = e->y();
 	relY = (mouseLocY - oldMouseLocY) / windowHeight;
 
-	if (cameraMode == PICKUPPLAN_CAMERA_MODE)
+	if ((cameraMode == PICKUPPLAN_CAMERA_MODE)&&(!viewAll))
 		return;
 
 	if (leftMouseDown)
 	{
 		theta -= (relX * 100.0 * PI / 180.0);
-		if (cameraMode == PIECE_CAMERA_MODE)
+		if (cameraMode == PIECE_CAMERA_MODE | cameraMode == PICKUPPLAN_CAMERA_MODE)
 			phi = MIN(PI-0.0001, MAX(0.0001, phi - (relY * 100.0 * PI / 180.0)));
 		update();
 	}
@@ -353,7 +438,7 @@ void NiceViewWidget :: mouseMoveEvent (QMouseEvent* e)
 
 void NiceViewWidget :: wheelEvent(QWheelEvent *e)
 {
-	if (cameraMode == PICKUPPLAN_CAMERA_MODE)
+	if ((cameraMode == PICKUPPLAN_CAMERA_MODE)&&(!viewAll))
 		return;
 	if(cameraMode == PULLPLAN_CAMERA_MODE)
 	{
@@ -379,7 +464,3 @@ void NiceViewWidget :: wheelEvent(QWheelEvent *e)
 	}
 	update();	
 }
-
-
-
-

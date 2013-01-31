@@ -57,3 +57,4 @@ void AsyncColorBarLibraryWidget :: updatePixmaps()
 	setScene(camera, new GlassColorRenderData(glassColor));
 }
 
+

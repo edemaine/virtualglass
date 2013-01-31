@@ -44,6 +44,7 @@ class MainWindow : public QMainWindow
 		void seedEverything();
 		void keyPressEvent(QKeyEvent* e);
 		QString windowTitle();
+		PickupPlan* newPickupPlan();
 
 	protected:
 		void closeEvent(QCloseEvent *event);
@@ -85,6 +86,8 @@ class MainWindow : public QMainWindow
 		void setMerge(bool);
 		bool getMerge();
 		void deleteStandardLibraryElements();
+		bool getDirtyBits();
+		void resetDirtyBits();
 
 		void unhighlightAllLibraryWidgets();
 		bool glassColorIsDependancy(GlassColor* color);

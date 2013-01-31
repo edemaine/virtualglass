@@ -11,6 +11,7 @@
 #include "primitives.h"
 #include "geometry.h"
 #include "peelrenderer.h"
+#include "bubble.h"
 
 using namespace std;
 
@@ -31,8 +32,13 @@ public:
 	NiceViewWidget(enum CameraMode cameraMode, QWidget* parent=0);
 	virtual ~NiceViewWidget();
 	void setGeometry(Geometry* g);
+	void displayBubble(Bubble);
+	void drawBubble(GLfloat, GLfloat, GLfloat, Bubble);
 	Vector3f eyePosition();
 	QImage renderImage();
+	void resetPickupEditorView();
+	void setViewAllPickupEditorView();
+	void setViewAll(bool);
 
 protected:
 	void initializeGL();
@@ -57,6 +63,7 @@ private:
 	QGLFramebufferObject *selectBuffer;
 	bool initializeGLCalled;
 	PeelRenderer *peelRenderer;
+	bool viewAll;
 
 	void setGLMatrices();
 };

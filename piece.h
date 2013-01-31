@@ -24,15 +24,34 @@ class Piece
 		PickupPlan* pickup;
 		bool hasDependencyOn(GlassColor* c);
 		bool hasDependencyOn(PullPlan* p);
+		void setDirtyBitPiece(bool value = true);
+		bool getDirtyBitPiece();
+		float getOuterZ();
+		void setOuterZ(float);
+		float getInnerZ();
+		void setInnerZ(float);
 
 		unsigned int getParameterCount();
 		void getParameter(unsigned int index, TemplateParameter* dest);
 		void setParameter(unsigned int index, int value);
+		void vecLayerVerticesPushBack(unsigned int);
+		unsigned int vecLayerVerticesGetValue(int);
+		unsigned long vecLayerVerticesGetSize();
+		void vecLayerVerticesSetValue(int, unsigned long);
+		void vecLayerTwistSetValue(int, unsigned long);
+		int vecLayerTwistGetValue(unsigned long);
+		unsigned long vecLayerTwistGetSize();
+		void vecLayerTwistPushBack(int);
 	
 	private:
 		// Variables
 		enum PieceTemplate::Type type;
 		vector<TemplateParameter> parameters;
+		bool dirtyBit;
+		float innerZ;
+		float outerZ;
+		vector<unsigned int>* vecLayerVertices;
+		vector<int>* vecLayerTwist;
 };
 
 Piece *deep_copy(const Piece *);

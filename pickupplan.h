@@ -20,11 +20,14 @@ class PickupPlan
 		PickupPlan();
 
 		void setTemplateType(enum PickupTemplate::Type t, bool force=false);
+		void viewLayer(int);
 		enum PickupTemplate::Type getTemplateType();
 
 		unsigned int getParameterCount();
 		void getParameter(unsigned int index, TemplateParameter* dest);
 		void setParameter(unsigned int index, int value);
+		void setVertices(unsigned int);
+		unsigned int getVertices();
 
 		PickupPlan* copy() const;
 
@@ -32,6 +35,11 @@ class PickupPlan
 		GlassColor* overlayGlassColor;
 		GlassColor* underlayGlassColor;
 		GlassColor* casingGlassColor;
+		int layer;
+		bool getDirtyBitPick();
+		void setDirtyBitPick(bool value = true);
+		bool getViewAll();
+		void setViewAll(bool);
 
 	private:
 		void updateSubs();
@@ -39,6 +47,9 @@ class PickupPlan
 			enum PickupCaneOrientation ori, float length, float width, enum GeometricShape s); 
 		enum PickupTemplate::Type type;
 		vector<TemplateParameter> parameters;
+		bool dirtyBit;
+		unsigned int vertices;
+		bool viewAll;
 };
 
 PickupPlan *deep_copy(const PickupPlan *);

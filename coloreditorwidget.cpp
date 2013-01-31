@@ -34,8 +34,8 @@ GlassColor* ColorEditorWidget :: getGlassColor() {
 }
 
 void ColorEditorWidget :: setGlassColor(GlassColor* _gc) {
-
 	glassColor = _gc;
+	glassColor->setDirtyBitColor();
 }
 
 

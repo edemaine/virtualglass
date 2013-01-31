@@ -7,9 +7,13 @@
 #include "pullplan.h"
 #include "glasscolor.h"
 #include "pickupplan.h"
+#include "pieceeditorwidget.h"
 
 PickupPlan :: PickupPlan(enum PickupTemplate::Type _type) {
-
+	vertices = 0;
+	layer = 1;
+	viewAll = 0;
+	this->setDirtyBitPick();
 	casingGlassColor = underlayGlassColor = overlayGlassColor = GlobalGlass::color();
 	setTemplateType(_type, true);
 }
@@ -17,6 +21,8 @@ PickupPlan :: PickupPlan(enum PickupTemplate::Type _type) {
 PickupPlan* PickupPlan :: copy() const {
 	
 	PickupPlan* c = new PickupPlan(type);
+
+	c->setDirtyBitPick();
 
 	for (unsigned int i = 0; i < parameters.size(); ++i)
 	{
@@ -35,10 +41,20 @@ PickupPlan* PickupPlan :: copy() const {
 	return c;
 }
 
+void PickupPlan :: setVertices(unsigned int verts)
+{
+	this->vertices = verts;
+}
+
+unsigned int PickupPlan :: getVertices()
+{
+	return this->vertices;
+}
 
 void PickupPlan :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
 	Point location, enum PickupCaneOrientation ori, float length, float width, enum GeometricShape shape) {
 
+	this->setDirtyBitPick();
 	if (newSubs->size() < subs.size())
 	{
 		newSubs->push_back(SubpickupTemplate(subs[newSubs->size()].plan,
@@ -49,6 +65,52 @@ void PickupPlan :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
 		newSubs->push_back(SubpickupTemplate(GlobalGlass::circlePlan(),
 			location, ori, length, width, shape));
 	}
+}
+
+bool PickupPlan :: getViewAll()
+{
+	return this->viewAll;
+}
+
+void PickupPlan :: setViewAll(bool value)
+{
+	viewAll = value;
+}
+
+void PickupPlan :: setDirtyBitPick(bool value)
+{
+	dirtyBit = value;
+}
+
+bool PickupPlan :: getDirtyBitPick()
+{
+	return dirtyBit;
+}
+
+void PickupPlan :: viewLayer(int layer)
+{
+	vector<SubpickupTemplate>* newSubs = new vector<SubpickupTemplate>;
+	float caneDiameter;
+	Point location;
+
+
+	if (this->subs[0].orientation == MURRINE_PICKUP_CANE_ORIENTATION)
+		caneDiameter = this->subs[0].length;
+	else
+		caneDiameter = this->subs[0].width;
+
+	location.x = location.y = 0.0;
+	float width = 2.0 / MAX(this->parameters[0].value, 1);
+	location.y = -1.0;
+	location.z = layer*caneDiameter*-1;
+	std::cout << "diameter " << caneDiameter << std::endl;
+	std::cout << "location " << location.z;
+	std::cout << std::endl;
+	for (int i = 0; i < this->parameters[0].value; ++i) {
+		location.x = -1.0 + width / 2 + width * i;
+		pushNewSubplan(newSubs, location, VERTICAL_PICKUP_CANE_ORIENTATION, 2.0, width-0.0001, CIRCLE_SHAPE);
+	}
+	subs = *newSubs;
 }
 
 void PickupPlan :: updateSubs() {
@@ -135,6 +197,7 @@ void PickupPlan :: updateSubs() {
 			for (int i = 0; i < parameters[0].value; ++i) {
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = -1.0;
+							//p.z = 2.0;
 				pushNewSubplan(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 2.0, width-0.0001, SQUARE_SHAPE);
 			}
 			break;
@@ -207,6 +270,8 @@ void PickupPlan :: setTemplateType(enum PickupTemplate::Type _type, bool force) 
 	if (!force && type == _type)
 		return;
 
+	this->setDirtyBitPick();
+
 	this->type = _type;
 
 	parameters.clear();
@@ -260,6 +325,7 @@ void PickupPlan :: getParameter(unsigned int _index, TemplateParameter* dest)
 
 void PickupPlan :: setParameter(unsigned int _index, int _value)
 {
+	setDirtyBitPick();
 	assert(_index < parameters.size());
 	parameters[_index].value = _value;
 	updateSubs();
@@ -275,7 +341,8 @@ PickupPlan *deep_copy(const PickupPlan *_pickup) {
 	return pickup;
 }
 
-void deep_delete(PickupPlan *pickup) {
+void deep_delete(PickupPlan *pickup)
+{
 	assert(pickup);
 	for (vector< SubpickupTemplate >::iterator s = pickup->subs.begin(); s != pickup->subs.end(); ++s) {
 		delete s->plan;
