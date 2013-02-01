@@ -23,8 +23,6 @@ using std::make_pair;
 
 PullPlan :: PullPlan(PullTemplate::Type _templateType)
 {
-	// setup default casings
-	casings.push_back(Casing(0.9, CIRCLE_SHAPE, GlobalGlass::color()));
 	casings.push_back(Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
 
 	// setup default twist
@@ -90,27 +88,53 @@ bool PullPlan :: hasDependencyOn(GlassColor* glassColor) {
 	return childrenAreDependent;
 }
 
-void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) {
+void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) 
+{
+	// the parameter "force" really means "is this the first time?", as if so
+	// we do a hard reset of some values that we don't do otherwise for continuity's sake
 
 	if (!force && templateType == this->templateType)
 		return;
 
 	setDirtyBitBool();
+
+	// adjust number of casing if you switched between types that have subcanes or not
+	// note that this doesn't handle resizing or shape changing of the newly added casing...
+	// that is done in the switch statement, as it's specific to the new template
+	if (force) // you're being initialized
+	{
+		if (!(templateType == PullTemplate::BASE_CIRCLE || templateType == PullTemplate::BASE_SQUARE))
+			casings.push_back(Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
+	}
+	else // you're having your existing tempalte type changed
+	{
+		bool curIsOneCasingType;
+		bool newIsOneCasingType;
+		
+		curIsOneCasingType = (this->templateType == PullTemplate::BASE_CIRCLE || 
+			this->templateType == PullTemplate::BASE_SQUARE);
+		newIsOneCasingType = (templateType == PullTemplate::BASE_CIRCLE || 
+			templateType == PullTemplate::BASE_SQUARE);
+
+		if (curIsOneCasingType && !newIsOneCasingType)
+			casings.insert(casings.begin(), Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
+		else if (!curIsOneCasingType && newIsOneCasingType)
+			casings.erase(casings.begin());
+	}
 	this->templateType = templateType;
 
 	// setup starter casings (casing 0 may be changed depending upon template)
 	parameters.clear();
 	switch (templateType) {
 		case PullTemplate::BASE_CIRCLE:
-			casings[0].shape  = CIRCLE_SHAPE;
-			casings[0].thickness = 0.9 * casings[1].thickness;
+			casings[0].shape = CIRCLE_SHAPE;
 			break;
 		case PullTemplate::BASE_SQUARE:
-			casings[0].shape  = SQUARE_SHAPE;
+			casings[0].shape = SQUARE_SHAPE;
 			casings[0].thickness = 1 / SQRT_TWO * casings[1].thickness;
 			break;
 		case PullTemplate::HORIZONTAL_LINE_CIRCLE:
-			casings[0].shape  = CIRCLE_SHAPE;
+			casings[0].shape = CIRCLE_SHAPE;
 			casings[0].thickness = 0.9 * casings[1].thickness;
 			parameters.push_back(TemplateParameter(3, string("Row count"), 2, 30));
 			break;
@@ -146,7 +170,7 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) {
 			parameters.push_back(TemplateParameter(2, string("Column count"), 2, 10));
 			break;
 		case PullTemplate::CUSTOM:
-			// we don't touch anything, because a plan 
+			// we don't touch anything, who knows what's going on in there
 			break;
 	}
 
@@ -219,14 +243,16 @@ void PullPlan :: setParameter(unsigned int _index, int value)
 void PullPlan :: removeCasing() {
 
 	int count = casings.size();
-	if (count < 3)
-		return;
+	if (templateType == PullTemplate::BASE_CIRCLE || templateType == PullTemplate::BASE_SQUARE)
+		if (count < 2) return;
+	else 
+		if (count < 3) return;	
 
 	setDirtyBitBool();
 
 	float oldInnermostCasingThickness = casings[0].thickness;
 
-	// `puff out' the casing thicknesses so second outermost now has radius of 
+	// "puff out" the casing thicknesses so second outermost now has radius of 
 	// previous outermost one
 	float diff = casings[count-1].thickness - casings[count-2].thickness;
 	casings.pop_back();

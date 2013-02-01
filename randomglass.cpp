@@ -69,9 +69,9 @@ PullPlan* randomSimplePullPlan(enum GeometricShape outermostCasingShape, GlassCo
 	else
 		plan = new PullPlan(PullTemplate::BASE_SQUARE);
 
+	plan->addCasing(outermostCasingShape);
 	plan->setCasingColor(color, 0);
 	plan->setCasingThickness((qrand() % 25) * 0.01 + 0.25, 0);
-	plan->setOutermostCasingShape(outermostCasingShape);
 
 	return plan;
 }

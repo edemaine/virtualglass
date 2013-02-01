@@ -14,7 +14,7 @@
 
 PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 {
-	plan = new PullPlan(PullTemplate::BASE_CIRCLE);
+	plan = new PullPlan(PullTemplate::HORIZONTAL_LINE_CIRCLE);
 
 	viewWidget = new PullPlanEditorViewWidget(plan, this);	
 	customizeViewWidget = new PullPlanCustomizeViewWidget(plan, this);

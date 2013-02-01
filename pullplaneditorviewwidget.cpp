@@ -248,9 +248,12 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDropEvent*
 	casingsHighlighted.clear();
 
 	populateHighlightedSubplans(x, y, event);
-	if (subplansHighlighted.size() > 0) 
+	if (subplansHighlighted.size() > 0)  // if you hit something, set highlight color and get out
 	{
-		highlightColor.r = highlightColor.g = highlightColor.b = highlightColor.a = 1.0;
+		if (isDraggingColor)
+			highlightColor = *(draggedColor->getColor());
+		else
+			highlightColor.r = highlightColor.g = highlightColor.b = highlightColor.a = 1.0;
 		return;
 	}
 	populateHighlightedCasings(x, y);
@@ -269,14 +272,30 @@ void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 
 void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
+	// subplans highlighted can mean you're dragging color or plan
 	if (subplansHighlighted.size() > 0)
 	{
 		event->accept();
 		for (unsigned int i = 0; i < subplansHighlighted.size(); ++i)
 		{
-			plan->subs[subplansHighlighted[i]].plan = draggedPlan;
+			if (isDraggingColor)
+			{
+				// this is a memory leak as of Jan 31, 2013.
+				// need to either:
+				// 1. make user responsible for it by adding to the library
+				// 2. do primitive reference counting 
+				// 3. give it a special "this is just a dropped color plan" mark
+				// 4. accept that the memory is lost forever 
+				PullPlan* newColorBarPlan = new PullPlan(PullTemplate::BASE_CIRCLE);
+				newColorBarPlan->setCasingColor(draggedColor, 0);
+				newColorBarPlan->setOutermostCasingShape(plan->subs[subplansHighlighted[i]].shape);
+				plan->subs[subplansHighlighted[i]].plan = newColorBarPlan;
+			}
+			else // isDraggingPlan == true
+				plan->subs[subplansHighlighted[i]].plan = draggedPlan;
 		}
 	}
+	// casings highlighted is definitely a dragged plan
 	else if (casingsHighlighted.size() > 0)
 	{
 		event->accept();
@@ -291,16 +310,20 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 
 void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, QDropEvent* event)
 {
+	// the goal is to populate the list of subplans hit by the drag
+	// if the drag is color, then we hit no matter what due to the amorphous shape of color
+	// if the drag is a plan, then we have to do type-checking for correct shape
 	subplansHighlighted.clear();
 
-	if (!isDraggingPlan)
+	// if you ain't draggin, get out
+	if (!isDraggingColor && !isDraggingPlan)
 		return;
 
-	if (draggedPlan->hasDependencyOn(plan)) // don't allow circular DAGs
+	// can't drag into yourself
+	if (isDraggingPlan && draggedPlan->hasDependencyOn(plan)) 
 		return;
 
 	int drawSize = squareSize - 20;
-	// check to see if the drop was in a subpull
 	for (unsigned int i = 0; i < plan->subs.size(); ++i)
 	{
 		SubpullTemplate* subpull = &(plan->subs[i]);
@@ -313,12 +336,20 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, QDrop
 		if (!hit)
 			continue;
 
-		if (subpull->shape != draggedPlan->getOutermostCasingShape())
-			continue;
+		// if you're dragging color, you win
+		if (isDraggingColor)
+		{
+			subplansHighlighted.push_back(i);
+		}
+		// else have to do shape type-checking
+		else if (/* isDraggingPlan && */ subpull->shape == draggedPlan->getOutermostCasingShape())
+		{
+			subplansHighlighted.push_back(i);
+		}
 
-		// If the shift button is down, fill in the entire group
-		subplansHighlighted.push_back(i);
 	}
+	
+	// the remainder of the code is to handle the "fill-all" behavior when the shift key is being held down
 	
 	// if user is hovering over a subplan and the shift key is currently held down, fill in all subplans
 	// Note that this needs to wait until another event (say, a drag move) occurs to catch the shift button being down.
@@ -327,11 +358,14 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, QDrop
 	// lets you notice that the shift key is down earlier, i.e. during the drag, which is the only time you care anyway.
 	if (subplansHighlighted.size() > 0 && event && (event->keyboardModifiers() & Qt::ShiftModifier))
 	{
+		// fill er up
 		subplansHighlighted.clear();	
 		for (unsigned int i = 0; i < plan->subs.size(); ++i)
 		{
 			SubpullTemplate* subpull = &(plan->subs[i]);
-			if (subpull->shape == draggedPlan->getOutermostCasingShape())
+			if (isDraggingColor)
+				subplansHighlighted.push_back(i);
+			else if (/* isDraggingPlan && */ subpull->shape == draggedPlan->getOutermostCasingShape())
 				subplansHighlighted.push_back(i);
 		}
 	}

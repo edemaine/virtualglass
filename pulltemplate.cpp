@@ -22,7 +22,7 @@ namespace PullTemplate
 
 	enum Type firstSeedTemplate()
 	{
-		return BASE_CIRCLE;
+                return BASE_CIRCLE;
 	}
 
 	enum Type lastSeedTemplate()

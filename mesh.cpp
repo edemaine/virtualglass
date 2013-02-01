@@ -603,7 +603,7 @@ float Mesher :: totalShrink(vector<ancestor>* ancestors)
 The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
 */
 void Mesher :: meshBaseCane(Geometry* geometry, vector<ancestor>* ancestors, 
-	Color* color, enum GeometricShape shape, float length, float radius)
+	Color* color, enum GeometricShape shape, float length, float radius, bool ensureVisible)
 {
 	float finalDiameter = totalShrink(ancestors);
 	unsigned int angularResolution = MIN(MAX(finalDiameter*10, 4), 10); 
@@ -708,7 +708,7 @@ void Mesher :: meshBaseCane(Geometry* geometry, vector<ancestor>* ancestors,
 		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors);
 	}
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, color));
+		first_vert, geometry->vertices.size() - first_vert, color, ensureVisible));
 }
 
 void Mesher :: recurseMesh(Piece* piece, Geometry* geometry, vector<ancestor>* ancestors, bool viewAll)
@@ -874,7 +874,7 @@ void Mesher :: recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>*
 	// punting on actually doing this geometry right and just making it a cylinder
 	// (that intersects its subcanes)
 	meshBaseCane(geometry, ancestors, plan->getCasingColor(0)->getColor(), 
-		plan->getCasingShape(0), length-0.001, plan->getCasingThickness(0));
+		plan->getCasingShape(0), length-0.001, plan->getCasingThickness(0), ensureVisible);
 	ancestors->pop_back();
 
 	// Make recursive calls depending on the type of the current node

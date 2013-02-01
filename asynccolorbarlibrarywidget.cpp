@@ -4,10 +4,9 @@
 #include "pullplanrenderdata.h"
 #include "asynccolorbarlibrarywidget.h"
 
-AsyncColorBarLibraryWidget :: AsyncColorBarLibraryWidget(GlassColor* _glassColor, QWidget* _parent): AsyncRenderWidget(_parent) 
+AsyncColorBarLibraryWidget :: AsyncColorBarLibraryWidget(GlassColor* _glassColor, QWidget* _parent): AsyncRenderWidget(_parent), glassColor(_glassColor) 
 {
 	setFixedSize(100, 100);
-	glassColor = _glassColor;
 	updatePixmaps();
 }
 
@@ -26,11 +25,29 @@ void AsyncColorBarLibraryWidget :: paintEvent(QPaintEvent *event)
 
 void AsyncColorBarLibraryWidget :: updateDragPixmap()
 {
-	// update the drag pixmap in the main thread, since it's fast
-	Color c = *(glassColor->getColor());
-	QPixmap _dragPixmap(100, 100);
-	_dragPixmap.fill(QColor(255*c.r, 255*c.g, 255*c.b, 255*MAX(0.1, c.a)));
-	dragPixmap = _dragPixmap;
+        QPixmap _pixmap(200, 200);
+        _pixmap.fill(Qt::transparent);
+        QPainter painter(&_pixmap);
+	
+	// Fill in with color
+	Color* c = glassColor->getColor();
+	QColor qc(255*c->r, 255*c->g, 255*c->b, 255*c->a);
+	painter.setBrush(qc);
+        painter.setPen(Qt::NoPen);
+	painter.drawEllipse(10, 10, 180, 180);
+
+	/*
+	// Draw the little outer boundary line
+	QPen pen;
+	pen.setWidth(3);
+	pen.setColor(Qt::black);
+	painter.setPen(pen);
+	painter.drawEllipse(10, 10, 180, 180);
+	*/
+
+        painter.end();
+
+        dragPixmap = _pixmap.scaled(100, 100);
 }
 
 const QPixmap* AsyncColorBarLibraryWidget :: getDragPixmap()

@@ -46,7 +46,7 @@ class Mesher
 			Color* c, enum GeometricShape outerShape, enum GeometricShape innerShape, 
 			float length, float outerRadius, float innerRadius, bool ensureVisible=false);
 		void meshBaseCane(Geometry* g, vector<ancestor>* ancestors, Color* c, 
-			enum GeometricShape s, float length, float radius);
+			enum GeometricShape s, float length, float radius, bool ensureVisible=false);
 		void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float length, float radius, 
 			unsigned int angularResolution, unsigned int axialResolution, bool flipOrientation=false);
 		void getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution, 

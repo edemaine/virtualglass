@@ -194,15 +194,16 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			break;
 	}
 
+	// right now, if you drop color bar, we're going to immediately turn it into a simple pull plan
+	// to put in the pickup, no overlay or underlay colors allowed. 
+	// but we're keeping around the color/plan distinction in the case of using
+	// Markus's pickup layers to have special "color layers" which only accept a color and for which
+	// the color/plan distinction really matters
 	if (type == GlassMime::colorbar)
 	{
-		event->accept();
-		if ((event->keyboardModifiers() & Qt::ShiftModifier))
-			pickup->overlayGlassColor = droppedColor;
-		else
-			pickup->underlayGlassColor = droppedColor;
-		emit someDataChanged();
-		return;
+		// oh yeah, this is def a memory leak
+		droppedPlan = new PullPlan(PullTemplate::BASE_CIRCLE); // why circle? idk
+		droppedPlan->setOutermostCasingColor(droppedColor);
 	}
 
 	// otherwise it's a pull plan, and we do some complicated things now

@@ -137,7 +137,6 @@ void AsyncPullPlanLibraryWidget :: paintShape(float x, float y, float size, enum
 			painter->drawRect(x, y, size, size);
 			break;
 	}
-
 }
 
 
