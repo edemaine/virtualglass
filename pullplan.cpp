@@ -131,7 +131,9 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force)
 			break;
 		case PullTemplate::BASE_SQUARE:
 			casings[0].shape = SQUARE_SHAPE;
-			casings[0].thickness = 1 / SQRT_TWO * casings[1].thickness;
+			if (casings.size() > 1) // if you're in a multiple casing world, size off next largest
+				casings[0].thickness = 0.9 * 1 / SQRT_TWO * casings[1].thickness;
+			// else, the old template had one casing of radius 1.0, and you'll keep it that way
 			break;
 		case PullTemplate::HORIZONTAL_LINE_CIRCLE:
 			casings[0].shape = CIRCLE_SHAPE;
@@ -156,7 +158,7 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force)
 		case PullTemplate::SQUARE_OF_SQUARES:
 		case PullTemplate::SQUARE_OF_CIRCLES:
 			casings[0].shape = SQUARE_SHAPE;
-			casings[0].thickness = 1 / SQRT_TWO * casings[1].thickness;
+			casings[0].thickness = 0.9 * 1 / SQRT_TWO * casings[1].thickness;
 			parameters.push_back(TemplateParameter(4, string("Row count"), 2, 8));
 			break;
 		case PullTemplate::TRIPOD:
@@ -166,7 +168,7 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force)
 			break;
 		case PullTemplate::SURROUNDING_SQUARE:
 			casings[0].shape = SQUARE_SHAPE;
-			casings[0].thickness = 1 / SQRT_TWO * casings[1].thickness;
+			casings[0].thickness = 0.9 * 1 / SQRT_TWO * casings[1].thickness;
 			parameters.push_back(TemplateParameter(2, string("Column count"), 2, 10));
 			break;
 		case PullTemplate::CUSTOM:
@@ -244,9 +246,15 @@ void PullPlan :: removeCasing() {
 
 	int count = casings.size();
 	if (templateType == PullTemplate::BASE_CIRCLE || templateType == PullTemplate::BASE_SQUARE)
-		if (count < 2) return;
-	else 
-		if (count < 3) return;	
+	{
+		if (count < 2) 
+			return;
+	}
+	else
+	{ 
+		if (count < 3) 
+			return;	
+	}
 
 	setDirtyBitBool();
 
@@ -254,19 +262,15 @@ void PullPlan :: removeCasing() {
 
 	// "puff out" the casing thicknesses so second outermost now has radius of 
 	// previous outermost one
-	float diff = casings[count-1].thickness - casings[count-2].thickness;
+	float diff = 1.0 - casings[count-2].thickness;
 	casings.pop_back();
-	for (unsigned int i = 0; i < casings.size(); ++i) 
+	casings[count-2].thickness = 1.0;
+	for (unsigned int i = 0; i < casings.size()-1; ++i) 
 	{
-		switch (casings[i].shape)
-		{
-			case CIRCLE_SHAPE:
-				casings[i].thickness += diff;
-				break;
-			case SQUARE_SHAPE: 
-				casings[i].thickness += diff/SQRT_TWO;
-				break;
-		}
+		if (casings[i].shape == casings[i+1].shape || casings[i].shape == CIRCLE_SHAPE)
+			casings[i].thickness += diff;
+		else
+			casings[i].thickness += diff/SQRT_TWO;
 	}
 
 	// rescale subcanes
