@@ -14,7 +14,7 @@
 
 PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 {
-	plan = new PullPlan(PullTemplate::HORIZONTAL_LINE_CIRCLE);
+	resetPlan();
 
 	viewWidget = new PullPlanEditorViewWidget(plan, this);	
 	customizeViewWidget = new PullPlanCustomizeViewWidget(plan, this);
@@ -23,6 +23,11 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 
 	setupLayout();
 	setupConnections();
+}
+
+void PullPlanEditorWidget :: resetPlan()
+{
+	plan = new PullPlan(PullTemplate::HORIZONTAL_LINE_CIRCLE);
 }
 
 void PullPlanEditorWidget :: updateEverything()
@@ -389,7 +394,6 @@ void PullPlanEditorWidget :: seedTemplates()
 void PullPlanEditorWidget :: setPlan(PullPlan* p)
 {
 	plan = p;
-	plan->setDirtyBitBool();
 	emit someDataChanged();	
 }
 

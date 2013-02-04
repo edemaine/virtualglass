@@ -36,8 +36,6 @@ class PickupPlan
 		GlassColor* underlayGlassColor;
 		GlassColor* casingGlassColor;
 		int layer;
-		bool getDirtyBitPick();
-		void setDirtyBitPick(bool value = true);
 		bool getViewAll();
 		void setViewAll(bool);
 
@@ -47,7 +45,6 @@ class PickupPlan
 			enum PickupCaneOrientation ori, float length, float width, enum GeometricShape s); 
 		enum PickupTemplate::Type type;
 		vector<TemplateParameter> parameters;
-		bool dirtyBit;
 		unsigned int vertices;
 		bool viewAll;
 };

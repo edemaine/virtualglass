@@ -26,7 +26,8 @@ class ColorEditorWidget : public QWidget
 	Q_OBJECT
 
 	public:
-		ColorEditorWidget(GlassColor* _color, QWidget* parent=0);
+		ColorEditorWidget(QWidget* parent=0);
+		void resetGlassColor();
 		void setGlassColor(GlassColor* _color);
 		GlassColor* getGlassColor();
 

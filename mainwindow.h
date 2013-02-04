@@ -32,6 +32,8 @@ class QPushButton;
 class QMenu;
 class QAction;
 
+using std::vector;
+
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -72,28 +74,23 @@ class MainWindow : public QMainWindow
 		void setupPieceEditor();
 		void setupConnections();
 		void setupMenus();
+		void setupSaveFile();
 		void updateLibrary();
 		void initializeRandomPiece();
 		void deleteCurrentEditingObject();
 		void setViewMode(enum ViewMode m);
-		QString writeJson(Json::Value);
-		//void prepareJson(PullPlan*, Json::Value*, std::string nestedValue);
-		//void buildCaneTree(PullPlan* , PullPlan* , std::map<PullPlan*,int>, Json::Value*);
-		//void buildCaneMap(PullPlan*, Json::Value*, std::map<PullPlan*,int>);
-		void createActions();
-		void save(QString);
-		void saveAs(QString);
-		void setMerge(bool);
-		bool getMerge();
-		void deleteStandardLibraryElements();
-		bool getDirtyBits();
-		void resetDirtyBits();
-
+		void clearLibrary();
 		void unhighlightAllLibraryWidgets();
 		bool glassColorIsDependancy(GlassColor* color);
 		bool pullPlanIsDependancy(PullPlan* plan);
+		void updateWindowTitle();
+		void setDirtyBit(bool v);
+		void setSaveFilename(QString filename);
+		void getLibraryContents(vector<GlassColor*>* colors, vector<PullPlan*>* plans, vector<Piece*>* pieces);
 
 		// Variables
+		bool dirtyBit;
+		QString saveFilename;
 		QLabel* whatToDoLabel;
 		NiceViewWidget* colorBarNiceViewWidget;
 		QVBoxLayout* colorBarLibraryLayout;
@@ -138,9 +135,14 @@ class MainWindow : public QMainWindow
 		QFileDialog openFileDialog;
 		QFileDialog importFileDialog;
 		QSignalMapper *signalMapper;
-		bool merge;
 
 	private slots:
+		void openFile();
+		void newFile();
+		void saveAllFile();
+		void saveAllAsFile();
+		void saveSelectedAsFile();
+		void importSVG();
 		void updateEverything();
 		void newColorBar();
 		void newPullPlan();
@@ -149,15 +151,6 @@ class MainWindow : public QMainWindow
 		void copyColorBar();
 		void copyPullPlan();
 		void copyPiece();
-		void openFile();
-		void open(QStringList, bool);
-		void castMergeButton(QWidget*);
-		void newFile();
-		void import();
-		void saveAllFile();
-		//void saveSelectedFile();
-		void saveAllAsFile();
-		void saveSelectedAsFile();
 		void randomSimpleCaneExampleActionTriggered();
 		void randomSimplePieceExampleActionTriggered();
 		void randomComplexCaneExampleActionTriggered();
@@ -165,14 +158,6 @@ class MainWindow : public QMainWindow
 		void web1PieceExampleActionTriggered();
 		void web2PieceExampleActionTriggered();
 		void depthPeelActionTriggered();
-		void buildCaneTree(PullPlan* , std::vector<PullPlan*>*, std::vector<GlassColor*>*);
-		void buildCaneMap(std::vector<PullPlan *>*, std::vector<GlassColor*>*, int);
-		void writeCane(Json::Value*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>, std::vector<PullPlan*>);
-		void writeColor(Json::Value*, std::map<GlassColor*, int>*, std::vector<GlassColor*>);
-		void writePiece(Json::Value*, std::map<Piece*, int>*, std::map<PullPlan*, int>*, std::map<GlassColor*, int>, int);
-		void openColors(Json::Value, std::map<GlassColor*, int>*);
-		void openCanes(Json::Value, std::map<PullPlan*, int>*, std::map<GlassColor*, int>* colorMap);
-		void openPieces(Json::Value, std::map<PullPlan *, int> *caneMap, std::map<GlassColor *, int> *colorMap);
 };
 
 #endif

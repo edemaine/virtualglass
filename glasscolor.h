@@ -14,15 +14,12 @@ class GlassColor
 
 		QString* getName();
 		void setName(QString _name);
-		void setDirtyBitColor(bool value = true);
-		bool getDirtyBitColor();
 
 		GlassColor* copy() const;
 
 	private:
 		Color color;
 		QString name;	
-		bool dirtyBit;
 };
 
 GlassColor* deep_copy(const GlassColor* _gc);

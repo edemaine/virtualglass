@@ -82,14 +82,26 @@ HEADERS += jsoncpp/include/json/autolink.h \
 	dependancy.h \
 	shape.h \
 	templateparameter.h \
-	pullplan.h pulltemplate.h subpulltemplate.h pickupplan.h \
-	piece.h piecetemplate.h \
-	pickuptemplate.h subpickuptemplate.h pickupplaneditorviewwidget.h \ 
-	purecolorlibrarywidget.h casing.h \
-	mainwindow.h niceviewwidget.h \
-	pulltemplatelibrarywidget.h pickuptemplatelibrarywidget.h piecetemplatelibrarywidget.h \
-	pullplaneditorviewwidget.h pullplaneditorwidget.h \
-	pieceeditorwidget.h coloreditorwidget.h \
+	pullplan.h \
+	pulltemplate.h \
+	subpulltemplate.h \
+	pickupplan.h \
+	piece.h \
+	piecetemplate.h \
+	pickuptemplate.h \
+	subpickuptemplate.h \
+	pickupplaneditorviewwidget.h \ 
+	purecolorlibrarywidget.h \
+	casing.h \
+	mainwindow.h \
+	niceviewwidget.h \
+	pulltemplatelibrarywidget.h \
+	pickuptemplatelibrarywidget.h \
+	piecetemplatelibrarywidget.h \
+	pullplaneditorviewwidget.h \
+	pullplaneditorwidget.h \
+	pieceeditorwidget.h \
+	coloreditorwidget.h \
 	geometry.h mesh.h \ 
 	peelrenderer.h \
 	asyncrenderwidget.h \
@@ -106,6 +118,7 @@ HEADERS += jsoncpp/include/json/autolink.h \
         SVG.hpp \
         Box.hpp \
         Matrix.hpp \
+	glassfileio.h \
 
 SOURCES += main.cpp \ 
 	glew/glew.c \
@@ -115,19 +128,29 @@ SOURCES += main.cpp \
 	randomglass.cpp \
 	templateparameter.cpp \
 	pullplancustomizeviewwidget.cpp \
-	pullplan.cpp subpulltemplate.cpp \
+	pullplan.cpp \
+	subpulltemplate.cpp \
 	globalglass.cpp \
 	piece.cpp \
 	piecetemplate.cpp \
 	pulltemplate.cpp \
 	pickuptemplate.cpp \
-	pickupplan.cpp subpickuptemplate.cpp pickupplaneditorviewwidget.cpp \
-	purecolorlibrarywidget.cpp casing.cpp \
-	geometry.cpp mesh.cpp \
-	mainwindow.cpp niceviewwidget.cpp \
-	pulltemplatelibrarywidget.cpp pickuptemplatelibrarywidget.cpp piecetemplatelibrarywidget.cpp \
-	pullplaneditorviewwidget.cpp pullplaneditorwidget.cpp \ 
-	pieceeditorwidget.cpp coloreditorwidget.cpp \
+	pickupplan.cpp \
+	subpickuptemplate.cpp \
+	pickupplaneditorviewwidget.cpp \
+	purecolorlibrarywidget.cpp \
+	casing.cpp \
+	geometry.cpp \
+	mesh.cpp \
+	mainwindow.cpp \
+	niceviewwidget.cpp \
+	pulltemplatelibrarywidget.cpp \
+	pickuptemplatelibrarywidget.cpp \
+	piecetemplatelibrarywidget.cpp \
+	pullplaneditorviewwidget.cpp \
+	pullplaneditorwidget.cpp \ 
+	pieceeditorwidget.cpp \
+	coloreditorwidget.cpp \
 	peelrenderer.cpp \
 	asyncrenderwidget.cpp \
 	asyncrenderinternal.cpp \
@@ -143,4 +166,7 @@ SOURCES += main.cpp \
         jsoncpp/src/lib_json/json_value.cpp \
 	jsoncpp/src/lib_json/json_writer.cpp \
         SVG.cpp \
-        bubble.cpp
+        bubble.cpp \
+	glassfileio.cpp \
+
+

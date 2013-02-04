@@ -10,13 +10,14 @@
 #include "colorreader.h"
 #include "coloreditorwidget.h"
 
-ColorEditorWidget :: ColorEditorWidget(GlassColor* _glassColor, QWidget* parent) : QWidget(parent)
+ColorEditorWidget :: ColorEditorWidget(QWidget* parent) : QWidget(parent)
 {
+	resetGlassColor();
+
 	geometry = new Geometry();
 	mesher = new Mesher();
 
 	niceViewWidget = new NiceViewWidget(NiceViewWidget::PULLPLAN_CAMERA_MODE, this);
-	glassColor = _glassColor;
 	mesher->generateColorMesh(glassColor, geometry);
 	niceViewWidget->setGeometry(geometry);
 
@@ -27,6 +28,10 @@ ColorEditorWidget :: ColorEditorWidget(GlassColor* _glassColor, QWidget* parent)
 	collectionComboBox->setCurrentIndex(0);
 }
 
+void ColorEditorWidget :: resetGlassColor()
+{
+	glassColor = new GlassColor();
+}
 
 GlassColor* ColorEditorWidget :: getGlassColor() {
 
@@ -35,7 +40,6 @@ GlassColor* ColorEditorWidget :: getGlassColor() {
 
 void ColorEditorWidget :: setGlassColor(GlassColor* _gc) {
 	glassColor = _gc;
-	glassColor->setDirtyBitColor();
 }
 
 

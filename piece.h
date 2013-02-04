@@ -24,8 +24,6 @@ class Piece
 		PickupPlan* pickup;
 		bool hasDependencyOn(GlassColor* c);
 		bool hasDependencyOn(PullPlan* p);
-		void setDirtyBitPiece(bool value = true);
-		bool getDirtyBitPiece();
 		float getOuterZ();
 		void setOuterZ(float);
 		float getInnerZ();
@@ -47,7 +45,6 @@ class Piece
 		// Variables
 		enum PieceTemplate::Type type;
 		vector<TemplateParameter> parameters;
-		bool dirtyBit;
 		float innerZ;
 		float outerZ;
 		vector<unsigned int>* vecLayerVertices;

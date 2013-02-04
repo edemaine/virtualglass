@@ -41,8 +41,6 @@ class PullPlan
 		GlassColor* getCasingColor(unsigned int index);
 		unsigned int getCasingCount(); 
 		bool hasSquareCasing();
-		bool getDirtyBitPull();
-		void setDirtyBitBool(bool value = true);
 
 		void setTwist(int t);
 		int getTwist();
@@ -59,7 +57,6 @@ class PullPlan
 		vector<Casing> casings;
 		float twist;
 		vector<TemplateParameter> parameters;
-		bool dirtyBit;
 
 		// Methods
 		void initializeTemplate();

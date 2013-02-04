@@ -33,16 +33,6 @@ void Piece :: setInnerZ(float value)
 	this->innerZ = value;
 }
 
-bool Piece :: getDirtyBitPiece()
-{
-	return dirtyBit;
-}
-
-void Piece :: setDirtyBitPiece(bool value)
-{
-	dirtyBit = value;
-}
-
 unsigned int Piece :: vecLayerVerticesGetValue(int index)
 {
 	return this->vecLayerVertices->at(index);
@@ -138,7 +128,6 @@ but does not include the pull plans used.
 Piece* Piece :: copy() const
 {
 	Piece* c = new Piece(type);
-	c->setDirtyBitPiece();
 
 	for (unsigned int i = 0; i < parameters.size(); ++i)
 	{
@@ -165,7 +154,6 @@ void Piece :: getParameter(unsigned int _index, TemplateParameter* dest)
 
 void Piece :: setParameter(unsigned int _index, int _value)
 {
-	setDirtyBitPiece();
 	assert(_index < parameters.size());
 	assert(parameters[_index].lowerLimit <= _value && _value <= parameters[_index].upperLimit);
 	parameters[_index].value = _value;
@@ -176,7 +164,6 @@ void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
 	if (!force && this->type == _type)
 		return;
 
-	setDirtyBitPiece();
 	this->type = _type;
 
 	parameters.clear();

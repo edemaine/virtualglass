@@ -20,6 +20,7 @@ class PieceEditorWidget : public QWidget
 
 	public:
 		PieceEditorWidget(QWidget* parent=0);
+		void resetPiece();
 		Piece* getPiece();
 		void updateLibraryWidgetPixmaps(AsyncPieceLibraryWidget* w);
 		void seedTemplates();

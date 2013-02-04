@@ -9,7 +9,6 @@ GlassColor :: GlassColor()
 	c.a = 0.0;
 	color = c;
 	name = "R-100";
-	setDirtyBitColor();
 }
 
 GlassColor :: GlassColor(Color _color, QString _name)
@@ -18,20 +17,9 @@ GlassColor :: GlassColor(Color _color, QString _name)
 	setName(_name);
 }
 
-bool GlassColor :: getDirtyBitColor()
-{
-	return dirtyBit;
-}
-
-void GlassColor :: setDirtyBitColor(bool value)
-{
-	dirtyBit = value;
-}
-
 void GlassColor :: setColor(Color _color) 
 {
 	color = _color;
-	this->setDirtyBitColor();
 }
 
 Color* GlassColor :: getColor()
@@ -54,7 +42,6 @@ GlassColor* GlassColor :: copy() const
 	GlassColor* newGlassColor = new GlassColor();
 	newGlassColor->color = color;
 	newGlassColor->name = name;
-	newGlassColor->setDirtyBitColor();
 	return newGlassColor;
 }
 

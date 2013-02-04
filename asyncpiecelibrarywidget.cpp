@@ -8,6 +8,7 @@ AsyncPieceLibraryWidget :: AsyncPieceLibraryWidget(Piece* _piece, QWidget* _pare
 	eyePosition.x = -16.0;
 	eyePosition.y = 0.0;
 	eyePosition.z = 0.0;
+	updatePixmap();
 }
 
 Piece* AsyncPieceLibraryWidget :: getPiece()

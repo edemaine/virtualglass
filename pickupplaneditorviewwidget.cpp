@@ -239,5 +239,4 @@ void PickupPlanEditorViewWidget :: setPickup(PickupPlan* pickup, bool viewAll)
 	this->pickup = pickup;
 	mesher.generateMesh(pickup, &geometry, viewAll);
 	this->niceViewWidget->repaint();
-	this->pickup->setDirtyBitPick();
 }

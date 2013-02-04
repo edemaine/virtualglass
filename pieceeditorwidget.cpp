@@ -1,5 +1,5 @@
 
-#include	"pickupplaneditorviewwidget.h"
+#include "pickupplaneditorviewwidget.h"
 #include "pieceeditorwidget.h"
 #include "mainwindow.h"
 #include <sstream>
@@ -7,7 +7,7 @@
 
 PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 {
-	this->piece = new Piece(PieceTemplate::TUMBLER);
+	resetPiece();
 
 	this->pickupViewWidget = new PickupPlanEditorViewWidget(piece->pickup, this);	
 	this->niceViewWidget = new NiceViewWidget(NiceViewWidget::PIECE_CAMERA_MODE, this);
@@ -18,6 +18,10 @@ PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 	updateEverything();
 }
 
+void PieceEditorWidget :: resetPiece()
+{
+	piece = new Piece(PieceTemplate::TUMBLER);
+}
 
 void PieceEditorWidget :: updateEverything()
 {
@@ -455,7 +459,6 @@ void PieceEditorWidget :: setMainWindow(MainWindow* MW)
 
 void PieceEditorWidget :: addLayer()
 {
-	this->getPiece()->setDirtyBitPiece();
 	TemplateParameter templPara;
 
 	if((layerComboBox->count()==1)&&(layerComboBox->currentIndex()==0))
@@ -489,7 +492,6 @@ void PieceEditorWidget :: changeLayer()
 
 void PieceEditorWidget :: removeLayer()
 {
-	this->getPiece()->setDirtyBitPiece();
 	if(layerComboBox->count()>1)
 	{
 		if(layerComboBox->currentIndex()==layerComboBox->count()-1)
@@ -670,7 +672,6 @@ void PieceEditorWidget :: setPickupTemplateType(enum PickupTemplate::Type _type)
 void PieceEditorWidget :: setPiece(Piece* p)
 {
 	piece = p;
-	p->setDirtyBitPiece();
 	emit someDataChanged();	
 }
 

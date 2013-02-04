@@ -13,7 +13,6 @@ PickupPlan :: PickupPlan(enum PickupTemplate::Type _type) {
 	vertices = 0;
 	layer = 1;
 	viewAll = 0;
-	this->setDirtyBitPick();
 	casingGlassColor = underlayGlassColor = overlayGlassColor = GlobalGlass::color();
 	setTemplateType(_type, true);
 }
@@ -21,8 +20,6 @@ PickupPlan :: PickupPlan(enum PickupTemplate::Type _type) {
 PickupPlan* PickupPlan :: copy() const {
 	
 	PickupPlan* c = new PickupPlan(type);
-
-	c->setDirtyBitPick();
 
 	for (unsigned int i = 0; i < parameters.size(); ++i)
 	{
@@ -54,7 +51,6 @@ unsigned int PickupPlan :: getVertices()
 void PickupPlan :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
 	Point location, enum PickupCaneOrientation ori, float length, float width, enum GeometricShape shape) {
 
-	this->setDirtyBitPick();
 	if (newSubs->size() < subs.size())
 	{
 		newSubs->push_back(SubpickupTemplate(subs[newSubs->size()].plan,
@@ -75,16 +71,6 @@ bool PickupPlan :: getViewAll()
 void PickupPlan :: setViewAll(bool value)
 {
 	viewAll = value;
-}
-
-void PickupPlan :: setDirtyBitPick(bool value)
-{
-	dirtyBit = value;
-}
-
-bool PickupPlan :: getDirtyBitPick()
-{
-	return dirtyBit;
 }
 
 void PickupPlan :: viewLayer(int layer)
@@ -270,8 +256,6 @@ void PickupPlan :: setTemplateType(enum PickupTemplate::Type _type, bool force) 
 	if (!force && type == _type)
 		return;
 
-	this->setDirtyBitPick();
-
 	this->type = _type;
 
 	parameters.clear();
@@ -325,7 +309,6 @@ void PickupPlan :: getParameter(unsigned int _index, TemplateParameter* dest)
 
 void PickupPlan :: setParameter(unsigned int _index, int _value)
 {
-	setDirtyBitPick();
 	assert(_index < parameters.size());
 	parameters[_index].value = _value;
 	updateSubs();
