@@ -11,6 +11,7 @@ void web1Piece(GlassColor** gc, PullPlan** pp, Piece** p)
 	*gc = new GlassColor(c, "R-27");
 
 	*pp = new PullPlan(PullTemplate::BASE_CIRCLE);	
+	(*pp)->addCasing(CIRCLE_SHAPE);
 	(*pp)->setCasingColor(*gc, 0);
 	(*pp)->setCasingThickness(0.4, 0);
 
@@ -34,11 +35,12 @@ void web2Piece(GlassColor** gc, PullPlan** pp1, PullPlan** pp2, Piece** p)
 	*gc = new GlassColor(c, "R-45");
 
 	*pp1 = new PullPlan(PullTemplate::BASE_SQUARE);	
-	(*pp1)->setOutermostCasingShape(SQUARE_SHAPE);
+	(*pp1)->addCasing(CIRCLE_SHAPE);	
 	(*pp1)->setCasingColor(*gc, 0);
 	(*pp1)->setCasingThickness(0.5, 0);
 
 	*pp2 = new PullPlan(PullTemplate::BASE_SQUARE);	
+	(*pp2)->addCasing(SQUARE_SHAPE);
 	(*pp2)->setOutermostCasingShape(SQUARE_SHAPE);
 	(*pp2)->setCasingColor(*gc, 1);
 	(*pp2)->setCasingThickness(0.5, 0);

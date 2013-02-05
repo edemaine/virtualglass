@@ -86,7 +86,8 @@ PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimp
 	PullPlan* plan = new PullPlan(static_cast<PullTemplate::Type>(randomTemplateNumber));
 	
 	// set parameters
-	plan->setTwist(qrand() % 50 - 25);
+	int direction = (qrand() % 3) - 1;
+	plan->setTwist(direction * (qrand() % 35 + 15));
 	TemplateParameter p;
 	for (unsigned int i = 0; i < plan->getParameterCount(); ++i)
 	{

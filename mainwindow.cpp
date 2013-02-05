@@ -1331,7 +1331,8 @@ void MainWindow::saveAllFile()
 void MainWindow::saveAllAsFile()
 {
 	// do the dialog thing to set saveFilename
-	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."), QDir::currentPath(), tr("VirtualGlass (*.glass)"));
+	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."), 
+		QDir::currentPath(), tr("VirtualGlass (*.glass)"));
 	if (!userSpecifiedFilename.isNull())
 		setSaveFilename(userSpecifiedFilename);
 	else
