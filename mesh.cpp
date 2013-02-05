@@ -95,194 +95,155 @@ float Mesher :: asymptoteVal(float s, float t)
 	return 1 - (s / (t + s)); 
 }
 
-void Mesher :: applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type, vector<TemplateParameter> params, vector <int>* vecLayerTwist, vector <unsigned int>* vecLayerVertices)
+void Mesher :: applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type, vector<TemplateParameter> params)
 {
-	unsigned int start = 0;
-	unsigned int end = 0;
-	unsigned int endAll = 1;
-	if(vecLayerVertices->empty()) //same as viewAll = false
+	for (uint32_t i = 0; i < geom->vertices.size(); ++i)
 	{
-		end = geom->vertices.size();
-	}
-	else
-	{
-		end = vecLayerVertices->at(0);
-		endAll = vecLayerTwist->size();
-	}
-
-
-	for(unsigned long j = 0; j < endAll; j++)
-	{
-		if((!vecLayerVertices->empty())&&j!=0)
+		Vertex* v = &(geom->vertices[i]);
+		switch (type)
 		{
-			start = end+1; //calculate new start point
-			if((j+1)==endAll)
-				end = geom->vertices.size();
-			else
+			case PieceTemplate::TUMBLER:
 			{
-				end = start + (vecLayerVertices->at(j)) - 1; //calculation new end point
+				float diskTheta = PI * v->position.x / 5.0;
+				float diskR = v->position.z + 5.0;
+				float caneLoc = v->position.y;
+
+				float width = 4 * 2 / PI + params[0].value * 0.04;
+				float turnLength = params[1].value * 0.03 + 1.0; 
+				float baseLength = width - turnLength * 2 / PI; 
+
+				// augment theta for twist
+				diskTheta += diskR * params[2].value * 0.001 * TWO_PI;
+
+				float turnStart = baseLength;
+				float turnEnd = turnStart + turnLength;
+
+				if (turnStart < diskR && diskR < turnEnd) // curved part
+				{	
+					float sphereRadius = (turnLength * 2) / PI;
+					float spherePhi = ((diskR - turnStart) / turnLength) * (PI/2) - PI/2;
+
+					Point sphereCenter;
+					sphereCenter.x = turnStart * cos(diskTheta);
+					sphereCenter.y = turnStart * sin(diskTheta);
+					sphereCenter.z = sphereRadius; 
+
+					v->position.x = (sphereRadius - caneLoc) * cos(diskTheta) * cos(spherePhi) + sphereCenter.x;
+					v->position.y = (sphereRadius - caneLoc) * sin(diskTheta) * cos(spherePhi) + sphereCenter.y;
+					v->position.z = (sphereRadius - caneLoc) * sin(spherePhi) + sphereCenter.z;
+				}
+				else if (turnEnd - 0.1 < diskR) // vertical lip part
+				{
+					float sphereRadius = (turnLength * 2) / PI;
+
+					v->position.x = (turnStart + sphereRadius - caneLoc) * cos(diskTheta);	
+					v->position.y = (turnStart + sphereRadius - caneLoc)  * sin(diskTheta);
+					v->position.z = (v->position.z - turnEnd) + sphereRadius + 5.0;	
+				}
+				else if (diskR < turnStart + 0.1) // base
+				{
+					v->position.x = diskR * cos(diskTheta);
+					v->position.y = diskR * sin(diskTheta);
+					v->position.z = caneLoc;
+				}
+				v->position.z -= (10.0 - turnEnd)/2;
+				break;
 			}
-		}
-
-		for (uint32_t i = start; i <= end; ++i)
-		{
-			Vertex* v = &(geom->vertices[i]);
-			switch (type)
+			case PieceTemplate::BOWL:
 			{
-				case PieceTemplate::TUMBLER:
+				int radius = params[0].value;
+				float size = 1.0 + 0.01 * params[1].value;
+				int twist = params[2].value;
+
+				float theta = PI * v->position.x / 5.0 + PI * v->position.z * twist / 500.0;
+				float totalR = 10 / PI + radius * 0.1;
+				float totalPhi = 10.0 / totalR;
+				float r = totalR*size - v->position.y/size;
+				float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
+
+				v->position.x = r * cos(theta) * cos(phi);
+				v->position.y = r * sin(theta) * cos(phi);
+				v->position.z = r * sin(phi) + (totalR - totalR * sin(totalPhi - PI / 2))/2.0;
+
+				break;
+			}		
+			case PieceTemplate::VASE:
+			{
+				// compute theta within a rollup, starting with pickup geometry
+				float theta = PI * v->position.x / 5.0;
+
+				// Deform into a spline-based vase
+				float lip_radius = params[0].value * 0.03 + 0.5; 
+				float body_radius = params[1].value * 0.03 + 1.0; 
+				float twist_theta = PI * v->position.z * params[2].value / 500.0; 
+				float radius = 2.0 * splineVal(0.1, body_radius, 0.5, lip_radius, (v->position.z - -5.0)/10.0);
+
+				if (radius < 1.0)
 				{
-					float diskTheta = PI * v->position.x / 5.0;
-					float diskR = v->position.z + 5.0;
-					float caneLoc = v->position.y;
-
-					float width = 4 * 2 / PI + params[0].value * 0.04;
-					float turnLength = params[1].value * 0.03 + 1.0;
-					float baseLength = width - turnLength * 2 / PI;
-
-					int twist = params[2].value;
-
-					if(!vecLayerTwist->empty())
-							twist=vecLayerTwist->at(j);
-
-					// augment theta for twist
-					diskTheta += diskR * twist * 0.001 * TWO_PI;
-
-					float turnStart = baseLength;
-					float turnEnd = turnStart + turnLength;
-
-					if (turnStart < diskR && diskR < turnEnd) // curved part
-					{
-						float sphereRadius = (turnLength * 2) / PI;
-						float spherePhi = ((diskR - turnStart) / turnLength) * (PI/2) - PI/2;
-
-						Point sphereCenter;
-						sphereCenter.x = turnStart * cos(diskTheta);
-						sphereCenter.y = turnStart * sin(diskTheta);
-						sphereCenter.z = sphereRadius;
-
-						v->position.x = (sphereRadius - caneLoc) * cos(diskTheta) * cos(spherePhi) + sphereCenter.x;
-						v->position.y = (sphereRadius - caneLoc) * sin(diskTheta) * cos(spherePhi) + sphereCenter.y;
-						v->position.z = (sphereRadius - caneLoc) * sin(spherePhi) + sphereCenter.z;
-					}
-					else if (turnEnd - 0.1 < diskR) // vertical lip part
-					{
-						float sphereRadius = (turnLength * 2) / PI;
-						v->position.x = (turnStart + sphereRadius - caneLoc) * cos(diskTheta);
-						v->position.y = (turnStart + sphereRadius - caneLoc)  * sin(diskTheta);
-						v->position.z = (v->position.z - turnEnd) + sphereRadius + 5.0;
-					}
-					else if (diskR < turnStart + 0.1) // base
-					{
-						v->position.x = diskR * cos(diskTheta);
-						v->position.y = diskR * sin(diskTheta);
-						v->position.z = caneLoc;
-					}
-					v->position.z -= (10.0 - turnEnd)/2;
-					break;
+					v->position.x = (radius - v->position.y * radius) * cos(theta + twist_theta); 
+					v->position.y = (radius - v->position.y * radius) * sin(theta + twist_theta); 
 				}
-				case PieceTemplate::BOWL:
+				else
 				{
-					int radius = params[0].value;
-					float size = 1.0 + 0.01 * params[1].value;
-					int twist = params[2].value;
-
-					if(!vecLayerTwist->empty())
-							twist=(*vecLayerTwist)[j];
-
-					float theta = PI * v->position.x / 5.0 + PI * v->position.z * twist / 500.0;
-					float totalR = 10 / PI + radius * 0.1;
-					float totalPhi = 10.0 / totalR;
-					float r = totalR*size - v->position.y/size;
-					float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
-					v->position.x = r * cos(theta) * cos(phi);
-					v->position.y = r * sin(theta) * cos(phi);
-					v->position.z = r * sin(phi) + (totalR - totalR * sin(totalPhi - PI / 2))/2.0;
-
-					break;
+					v->position.x = (radius - v->position.y / radius) * cos(theta + twist_theta); 
+					v->position.y = (radius - v->position.y / radius) * sin(theta + twist_theta); 
 				}
-				case PieceTemplate::VASE:
+
+				break;
+			}		
+			case PieceTemplate::POT:
+			{
+				// compute theta within a rollup, starting with pickup geometry
+				float theta = PI * v->position.x / 5.0;
+
+				// Deform into a spline-based vase
+				float top_lip_radius = params[0].value * 0.03 + 0.4;
+				float body_radius = params[1].value * 0.03 + 1.0;
+				float bottom_radius = params[2].value * 0.03 + 0.4;
+				float radius = 2.0 * splineVal(bottom_radius, body_radius, top_lip_radius, (v->position.z - -5.0)/10.0);
+
+				if (radius < 1.0)
 				{
-					// compute theta within a rollup, starting with pickup geometry
-					float theta = PI * v->position.x / 5.0;
-
-					// Deform into a spline-based vase
-					float lip_radius = params[0].value * 0.03 + 0.5;
-					float body_radius = params[1].value * 0.03 + 1.0;
-					int twist = params[2].value;
-
-					if(!vecLayerTwist->empty())
-							twist=(*vecLayerTwist)[j];
-
-					float twist_theta = PI * v->position.z * twist / 500.0;
-					float radius = 2.0 * splineVal(0.1, body_radius, 0.5, lip_radius, (v->position.z - -5.0)/10.0);
-
-					if (radius < 1.0)
-					{
-						v->position.x = (radius - v->position.y * radius) * cos(theta + twist_theta);
-						v->position.y = (radius - v->position.y * radius) * sin(theta + twist_theta);
-					}
-					else
-					{
-						v->position.x = (radius - v->position.y / radius) * cos(theta + twist_theta);
-						v->position.y = (radius - v->position.y / radius) * sin(theta + twist_theta);
-					}
-
-					break;
+					v->position.x = (radius - v->position.y * radius) * cos(theta);
+					v->position.y = (radius - v->position.y * radius) * sin(theta);
 				}
-				case PieceTemplate::POT:
+				else
 				{
-					// compute theta within a rollup, starting with pickup geometry
-					float theta = PI * v->position.x / 5.0;
-
-					// Deform into a spline-based vase
-					float top_lip_radius = params[0].value * 0.03 + 0.4;
-					float body_radius = params[1].value * 0.03 + 1.0;
-					float bottom_radius = params[2].value * 0.03 + 0.4;
-					float radius = 2.0 * splineVal(bottom_radius, body_radius, top_lip_radius, (v->position.z - -5.0)/10.0);
-
-					if (radius < 1.0)
-					{
-						v->position.x = (radius - v->position.y * radius) * cos(theta);
-						v->position.y = (radius - v->position.y * radius) * sin(theta);
-					}
-					else
-					{
-						v->position.x = (radius - v->position.y / radius) * cos(theta);
-						v->position.y = (radius - v->position.y / radius) * sin(theta);
-					}
-
-					break;
+					v->position.x = (radius - v->position.y / radius) * cos(theta);
+					v->position.y = (radius - v->position.y / radius) * sin(theta);
 				}
-				case PieceTemplate::WAVY_PLATE:
-				{
-					// Do a rollup
-					// send x value to theta value
-					// -5.0 goes to -PI, 5.0 goes to PI
-					// everything gets a base radius of 5.0
-					float theta = PI * v->position.x / 5.0;
 
-					float totalR = 4.0 + 100 * 0.1;
-					float totalPhi = 10.0 / totalR;
+				break;
+			}		
+			case PieceTemplate::WAVY_PLATE:
+			{
+				// Do a rollup
+				// send x value to theta value 
+				// -5.0 goes to -PI, 5.0 goes to PI
+				// everything gets a base radius of 5.0
+				float theta = PI * v->position.x / 5.0;
 
-					float r = totalR - v->position.y;
-					float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
+				float totalR = 4.0 + 100 * 0.1;
+				float totalPhi = 10.0 / totalR;
 
-					int waveCount = params[0].value / 10 + 3;
-					float waveSize = params[1].value / 30.0;
+				float r = totalR - v->position.y;
+				float phi = ((v->position.z - -5.0) / 10.0) * totalPhi - PI/2;
 
-					float waveAdjust = cos(waveCount * theta) * waveSize * (phi + PI/2);
+				int waveCount = params[0].value / 10 + 3;
+				float waveSize = params[1].value / 30.0;
 
-					v->position.x = (r + waveAdjust) * cos(theta) * cos(phi);
-					v->position.y = (r + waveAdjust) * sin(theta) * cos(phi);
-					v->position.z = (r + waveAdjust) * sin(phi) + (totalR - totalR * sin(totalPhi - PI / 2))/2.0;
+				float waveAdjust = cos(waveCount * theta) * waveSize * (phi + PI/2);
 
-					break;
-				}
-				case PieceTemplate::PICKUP:
-					break;
-			} // end switch
-		} // end loop over vertices
-	}
+				v->position.x = (r + waveAdjust) * cos(theta) * cos(phi);
+				v->position.y = (r + waveAdjust) * sin(theta) * cos(phi);
+				v->position.z = (r + waveAdjust) * sin(phi) + (totalR - totalR * sin(totalPhi - PI / 2))/2.0;
+
+				break;
+			}
+			case PieceTemplate::PICKUP:
+				break; 
+		} // end switch
+	} // end loop over vertices
 }
 
 Vertex Mesher :: applyTransforms(Vertex v, vector<ancestor>* ancestors)
@@ -292,7 +253,7 @@ Vertex Mesher :: applyTransforms(Vertex v, vector<ancestor>* ancestors)
 	return v;
 }
 
-void Mesher :: meshPickupCasingSlab(Geometry* geometry, Color* color, float y, float thickness, float slabShift, bool ensureVisible)
+void Mesher :: meshPickupCasingSlab(Geometry* geometry, Color* color, float y, float thickness, bool ensureVisible)
 {
 	unsigned int slabResolution = 100;
 
@@ -305,13 +266,13 @@ void Mesher :: meshPickupCasingSlab(Geometry* geometry, Color* color, float y, f
 	for (unsigned int i = 0; i < slabResolution; ++i)
 	{
 		p.x = 4.999 - 9.998* i / (slabResolution-1);
-		p.y = y + thickness-(slabShift/1.5) + 0.01;
+		p.y = y + thickness + 0.01;
 		points.push_back(p);
 	}
 	for (unsigned int i = 0; i < slabResolution; ++i)
 	{
 		p.x = -4.999 + 9.998 * i / (slabResolution-1);
-		p.y = y + -thickness-(slabShift/1.5) - 0.01;
+		p.y = y + -thickness - 0.01;
 		points.push_back(p);
 	}
 
@@ -537,7 +498,7 @@ void Mesher :: meshCylinderWall(Geometry* geometry, enum GeometricShape shape, f
 	}
 } 
 
-void Mesher :: meshBaseCasing(Geometry* geometry, vector<ancestor>* ancestors, Color* color,
+void Mesher :: meshBaseCasing(Geometry* geometry, vector<ancestor>* ancestors, Color* color, 
 	enum GeometricShape outerShape, enum GeometricShape innerShape, float length, float outerRadius, 
 	float innerRadius, bool ensureVisible)
 {
@@ -711,35 +672,13 @@ void Mesher :: meshBaseCane(Geometry* geometry, vector<ancestor>* ancestors,
 		first_vert, geometry->vertices.size() - first_vert, color, ensureVisible));
 }
 
-void Mesher :: recurseMesh(Piece* piece, Geometry* geometry, vector<ancestor>* ancestors, bool viewAll)
+void Mesher :: recurseMesh(Piece* piece, Geometry* geometry, vector<ancestor>* ancestors)
 {
 	if (piece == NULL)
 		return;
 
-	float thicknessAllLayers = 0;
-	vector<unsigned int>* vecLayerVertices = new vector<unsigned int>;
-	vector <int>* vecLayerTwist = new vector <int>;
-
-	if(viewAll==false)
-	{
-		geometry->clear();
-		//change twist parameter if onePieceView is choosen
-		int pt = piece->getTemplateType();
-		if(pt != 5) //if((pt != 5) || (pt != 6)) don't worked..?
-		{
-			if(pt != 6)
-			{
-				vecLayerTwist->clear();
-				TemplateParameter templ;
-				piece->getParameter(2, &templ);
-				vecLayerTwist->push_back(templ.value);
-			}
-		}
-	}
-	else
-		thicknessAllLayers = fabs(piece->getOuterZ())*2.5 + fabs(piece->getInnerZ())*2.5;
-
-	recurseMesh(piece->pickup, geometry, ancestors, false, false, thicknessAllLayers, fabs(piece->getInnerZ())*2.5);
+	geometry->clear();
+	recurseMesh(piece->pickup, geometry, ancestors);
 	vector<TemplateParameter> params;
 	for (unsigned int i = 0; i < piece->getParameterCount(); ++i)
 	{
@@ -747,43 +686,22 @@ void Mesher :: recurseMesh(Piece* piece, Geometry* geometry, vector<ancestor>* a
 		piece->getParameter(i, &tp);
 		params.push_back(tp);
 	}
-
-	for(unsigned long i = 0; i < piece->vecLayerVerticesGetSize(); i++)
-	{
-		vecLayerVertices->push_back(piece->vecLayerVerticesGetValue(i));
-	}
-
-	if(piece->vecLayerTwistGetSize()!=10000&&viewAll)
-	{
-		for(unsigned long i = 0; i < piece->vecLayerTwistGetSize();i++)
-			vecLayerTwist->push_back(piece->vecLayerTwistGetValue(i));
-	}
-
-	if(!viewAll)
-		vecLayerVertices->clear();
-
-	applyPieceTransform(geometry, piece->getTemplateType(), params, vecLayerTwist, vecLayerVertices);
+	applyPieceTransform(geometry, piece->getTemplateType(), params);
 }
 
-void Mesher :: recurseMesh(PickupPlan* pickup, Geometry *geometry, vector<ancestor>* ancestors, bool isTopLevel, bool viewAll, float thickness, float slabShift)
+void Mesher :: recurseMesh(PickupPlan* pickup, Geometry *geometry, vector<ancestor>* ancestors, bool isTopLevel)
 {
 	if (pickup == NULL)
 		return;
-	if(!viewAll)
-	{
-		geometry->clear();
-	}
+
+	geometry->clear();
 	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
 	{
 		ancestors->clear();
 		uint32_t startPlanVerts = geometry->vertices.size();
-		recurseMesh(pickup->subs[i].plan, geometry,
-			ancestors, pickup->subs[i].length, isTopLevel);
+		recurseMesh(pickup->subs[i].plan, geometry, 
+			ancestors, pickup->subs[i].length, isTopLevel); 
 		uint32_t endPlanVerts = geometry->vertices.size();
-		if((i+1 == pickup->subs.size())&&(!viewAll))
-		{
-			pickup->setVertices(geometry->vertices.size());
-		}
 		
 		for (uint32_t v = startPlanVerts; v < endPlanVerts; ++v)
 		{
@@ -791,39 +709,34 @@ void Mesher :: recurseMesh(PickupPlan* pickup, Geometry *geometry, vector<ancest
 		}
 	}
 
+	float thickness;
 	// base thickness of casing off of representative (first) cane in pickup
-	if(thickness==0)
-	{
-		if (pickup->subs[0].orientation == MURRINE_PICKUP_CANE_ORIENTATION)
-			thickness = pickup->subs[0].length*2.5;
-		else
-			thickness = pickup->subs[0].width*2.5;
-	} 
+	if (pickup->subs[0].orientation == MURRINE_PICKUP_CANE_ORIENTATION)
+		thickness = pickup->subs[0].length*2.5;	
+	else
+		thickness = pickup->subs[0].width*2.5;
 
 	// top level means that you want a pickup (and not a piece formed from a pickup)
 	// in this case, the slab is not ensureVisible'd, but the canes are, as the pickup
 	// serves as a guide for where to put subcanes, which must be visible
+	meshPickupCasingSlab(geometry, pickup->casingGlassColor->getColor(), 0.0, thickness, !isTopLevel);
 
-	if(!viewAll)
-		slabShift = 0;
-
-	meshPickupCasingSlab(geometry, pickup->casingGlassColor->getColor(), 0.0, thickness, slabShift, !isTopLevel);
 	// overlay/underlays
 	meshPickupCasingSlab(geometry, pickup->underlayGlassColor->getColor(), thickness + 0.1, 0.05);
 	meshPickupCasingSlab(geometry, pickup->overlayGlassColor->getColor(), -(thickness + 0.1), 0.05);
 }
 
-void Mesher :: generateMesh(Piece* piece, Geometry* geometry, bool viewAll)
+void Mesher :: generateMesh(Piece* piece, Geometry* geometry)
 {
 	vector<ancestor> ancestors;
-	recurseMesh(piece, geometry, &ancestors, viewAll);
+	recurseMesh(piece, geometry, &ancestors);
 	geometry->compute_normals_from_triangles();
 }
 
-void Mesher :: generateMesh(PickupPlan* pickup, Geometry* geometry, bool viewAll)
+void Mesher :: generateMesh(PickupPlan* pickup, Geometry* geometry)
 {
 	vector<ancestor> ancestors;
-	recurseMesh(pickup, geometry, &ancestors, true, viewAll);
+	recurseMesh(pickup, geometry, &ancestors, true);
 	geometry->compute_normals_from_triangles();
 }
 
@@ -860,25 +773,36 @@ void Mesher :: recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>*
 {
 	if (plan == NULL)
 		return;
+
 	ancestor me = {plan, 0};
 	ancestors->push_back(me); 
 	// if you're the root node of the cane, mark yourself as `needing to be visible'
 	// to fake incidence of refraction
 	bool ensureVisible = (ancestors->size() == 1) && isTopLevel; 
-	for (unsigned int i = 1; i < plan->getCasingCount(); ++i) {
-		meshBaseCasing(geometry, ancestors, plan->getCasingColor(i)->getColor(), 
-			plan->getCasingShape(i), plan->getCasingShape(i-1), length,
-			plan->getCasingThickness(i), plan->getCasingThickness(i-1)+0.05, 
-			ensureVisible);
+	for (unsigned int i = 0; i < plan->getCasingCount(); ++i) 
+	{
+		bool outermostLayer = (i == plan->getCasingCount()-1);
+
+		if (i == 0)
+		{
+			// punting on actually doing this geometry right and just making it a cylinder
+			// (that intersects its subcanes)
+			meshBaseCane(geometry, ancestors, plan->getCasingColor(0)->getColor(), 
+				plan->getCasingShape(0), length-0.001, plan->getCasingThickness(0), ensureVisible && outermostLayer);
+		}
+		else
+		{
+			meshBaseCasing(geometry, ancestors, plan->getCasingColor(i)->getColor(), 
+				plan->getCasingShape(i), plan->getCasingShape(i-1), length,
+				plan->getCasingThickness(i), plan->getCasingThickness(i-1)+0.05, 
+				ensureVisible && outermostLayer);
+		}
+
 	}
-	// punting on actually doing this geometry right and just making it a cylinder
-	// (that intersects its subcanes)
-	meshBaseCane(geometry, ancestors, plan->getCasingColor(0)->getColor(), 
-		plan->getCasingShape(0), length-0.001, plan->getCasingThickness(0), ensureVisible);
 	ancestors->pop_back();
 
 	// Make recursive calls depending on the type of the current node
-	for (unsigned int i = 0; i < plan->subs.size()/**2*/; ++i)
+	for (unsigned int i = 0; i < plan->subs.size(); ++i)
 	{
 		me.child = i;
 		ancestors->push_back(me);
@@ -886,3 +810,6 @@ void Mesher :: recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>*
 		ancestors->pop_back();
 	}
 }
+
+
+

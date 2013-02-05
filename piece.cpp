@@ -1,87 +1,11 @@
+
 #include "piece.h"
 
 Piece :: Piece(enum PieceTemplate::Type _type)
 {
-	setTemplateType(_type, true);
+    setTemplateType(_type, true);
 	// initialize the piece's pickup to be something boring and base
 	this->pickup = new PickupPlan(PickupTemplate::VERTICAL);
-	this->vecLayerVertices = new vector <unsigned int>;
-	this->vecLayerVertices->push_back(0);
-	this->vecLayerTwist = new vector <int>;
-	this->vecLayerTwist->push_back(0);
-	this->innerZ = 100;
-	this->outerZ = -100;
-}
-
-float Piece :: getOuterZ()
-{
-	return this->outerZ;
-}
-
-void Piece :: setOuterZ(float value)
-{
-	this->outerZ = value;
-}
-
-float Piece :: getInnerZ()
-{
-	return this->innerZ;
-}
-
-void Piece :: setInnerZ(float value)
-{
-	this->innerZ = value;
-}
-
-unsigned int Piece :: vecLayerVerticesGetValue(int index)
-{
-	return this->vecLayerVertices->at(index);
-}
-
-unsigned long Piece :: vecLayerVerticesGetSize()
-{
-	return this->vecLayerVertices->size();
-}
-
-void Piece :: vecLayerVerticesSetValue(int value, unsigned long index)
-{
-	if(!(index>=this->vecLayerVertices->size()))
-		this->vecLayerVertices->at(index) = value;
-	else
-		std::cout << "ERROR! vecLayerVerticesSetValue: index not available in vecLayerTwist";
-}
-
-void Piece :: vecLayerTwistSetValue(int value, unsigned long index)
-{
-	if(!(index>=this->vecLayerTwist->size()))
-	{
-		this->vecLayerTwist->at(index) = value;
-	}
-	else
-		std::cout << "ERROR! vecLayerTwistSetValue: index not available in vecLayerTwist";
-}
-
-int Piece :: vecLayerTwistGetValue(unsigned long index)
-{
-	if(!(index>=this->vecLayerTwist->size()))
-		return this->vecLayerTwist->at(index);
-	std::cout << "ERROR! vecLayerTwistGetValue: index not available in vecLayerTwist";
-	return 10000; //no twist with 10k available -> error
-}
-
-unsigned long Piece :: vecLayerTwistGetSize()
-{
-	return this->vecLayerTwist->size();
-}
-
-void Piece :: vecLayerVerticesPushBack(unsigned int value)
-{
-	this->vecLayerVertices->push_back(value);
-}
-
-void Piece :: vecLayerTwistPushBack(int value)
-{
-	this->vecLayerTwist->push_back(value);
 }
 
 bool Piece :: hasDependencyOn(PullPlan* plan)
@@ -135,8 +59,6 @@ Piece* Piece :: copy() const
 	}
 
 	c->pickup = this->pickup->copy();
-	c->vecLayerTwist = this->vecLayerTwist;
-	c->vecLayerVertices = this->vecLayerVertices;
 	
 	return c;
 }
@@ -174,17 +96,17 @@ void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
 		case PieceTemplate::VASE:
 			parameters.push_back(TemplateParameter(0, string("Lip width"), 0, 100));
 			parameters.push_back(TemplateParameter(0, string("Body width"), 0, 100));
-			parameters.push_back(TemplateParameter(0, string("Twist"), -100, 100));
+			parameters.push_back(TemplateParameter(0, string("Twist"), 0, 100));
 			break;
 		case PieceTemplate::TUMBLER:
 			parameters.push_back(TemplateParameter(30, string("Width"), 0, 100));
 			parameters.push_back(TemplateParameter(50, string("Roundedness"), 0, 100));
-			parameters.push_back(TemplateParameter(0, string("Twist"), -100, 100));
+			parameters.push_back(TemplateParameter(0, string("Twist"), 0, 100));
 			break;
 		case PieceTemplate::BOWL:
 			parameters.push_back(TemplateParameter(10, string("Openness"), 0, 100));
 			parameters.push_back(TemplateParameter(0, string("Size"), 0, 100));
-			parameters.push_back(TemplateParameter(0, string("Twist"), -100, 100));
+			parameters.push_back(TemplateParameter(0, string("Twist"), 0, 100));
 			break;
 		case PieceTemplate::POT:
 			parameters.push_back(TemplateParameter(50, string("Lip width"), 0, 100));

@@ -632,7 +632,6 @@ void MainWindow :: setupPieceEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
 	pieceEditorWidget = new PieceEditorWidget(editorStack);
-	pieceEditorWidget->setMainWindow(this);
 	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(pieceEditorWidget->getPiece()));
 }
 

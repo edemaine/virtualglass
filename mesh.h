@@ -22,8 +22,8 @@ class Mesher
 		Mesher();
 		void generatePullMesh(PullPlan* plan, Geometry* geometry);
 		void generateColorMesh(GlassColor* glassColor, Geometry* geometry);
-		void generateMesh(PickupPlan* plan, Geometry* geometry, bool viewAll = false);
-		void	generateMesh(Piece* piece, Geometry* geometry, bool);
+		void generateMesh(PickupPlan* plan, Geometry* geometry);
+		void generateMesh(Piece* piece, Geometry* geometry);
 
 	private:
 
@@ -34,8 +34,8 @@ class Mesher
 		};
 
 		// Methods
-		void recurseMesh(PickupPlan* plan, Geometry *geometry, vector<ancestor>* ancestors, bool isTopLevel=false, bool viewAll = false, float thickness = 0, float slabShift = 0);
-		void recurseMesh(Piece* piece, Geometry *geometry, vector<ancestor>* ancestors, bool viewAll = false);
+		void recurseMesh(PickupPlan* plan, Geometry *geometry, vector<ancestor>* ancestors, bool isTopLevel=false);
+		void recurseMesh(Piece* piece, Geometry *geometry, vector<ancestor>* ancestors);
 		void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>* ancestors, 
 			float length, bool isTopLevel=false);
 
@@ -46,19 +46,19 @@ class Mesher
 			Color* c, enum GeometricShape outerShape, enum GeometricShape innerShape, 
 			float length, float outerRadius, float innerRadius, bool ensureVisible=false);
 		void meshBaseCane(Geometry* g, vector<ancestor>* ancestors, Color* c, 
-			enum GeometricShape s, float length, float radius, bool ensureVisible=false);
+			enum GeometricShape s, float length, float radius, bool ensureVisible);
 		void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float length, float radius, 
 			unsigned int angularResolution, unsigned int axialResolution, bool flipOrientation=false);
 		void getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution, 
 			enum GeometricShape shape, float radius);
-		void meshPickupCasingSlab(Geometry* g, Color* c, float y, float thickness, float slabShift = 0, bool ensureVisible=false);
+		void meshPickupCasingSlab(Geometry* g, Color* c, float y, float thickness, bool ensureVisible=false);
 		void applyResizeTransform(Vertex* v, float scale);
 		void applySubplanTransform(Vertex* v, ancestor a);
 		void applySubplanTransform(Geometry* geometry, ancestor a);
 		void applyCasingResizeTransform(Vertex* v, ancestor a);
 		Vertex applyTransforms(Vertex p, vector<ancestor>* ancestors);
 		void applyPickupTransform(Vertex* p, SubpickupTemplate* spt);
-		void applyPieceTransform(Geometry* geometry, enum PieceTemplate::Type type, vector<TemplateParameter> params, vector <int>* vecLayerTwist, vector<unsigned int>* vecLayerVertices = new vector <unsigned int>());
+		void applyPieceTransform(Geometry* geometry, enum PieceTemplate::Type type, vector<TemplateParameter> params);
 		float totalShrink(vector<ancestor>* ancestors);
 };
 #endif

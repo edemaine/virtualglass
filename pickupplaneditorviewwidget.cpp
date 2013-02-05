@@ -7,7 +7,7 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWi
 	setMinimumSize(200, 200);
 	this->pickup = pickup;
 	this->niceViewWidget = new NiceViewWidget(NiceViewWidget::PICKUPPLAN_CAMERA_MODE, this);
-	mesher.generateMesh(pickup, &geometry, false);
+	mesher.generateMesh(pickup, &geometry);
 	this->niceViewWidget->setGeometry(&geometry);
 	this->niceViewWidget->repaint();
 
@@ -154,30 +154,8 @@ void PickupPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 	event->acceptProposedAction();
 }
 
-void PickupPlanEditorViewWidget :: resetPickupEditorView()
-{
-	this->niceViewWidget->resetPickupEditorView();
-}
-
-void PickupPlanEditorViewWidget :: setViewAllPickupEditorView()
-{
-	this->niceViewWidget->setViewAllPickupEditorView();
-}
-
-void PickupPlanEditorViewWidget :: setViewAll(bool value)
-{
-	this->niceViewWidget->setViewAll(value);
-}
-
 void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
-	if(pickup->getViewAll())
-	{
-		event->ignore();
-		return;
-	}
-	resetPickupEditorView();
-
 	void* droppedObject;
 	GlassColor* droppedColor = 0;
 	PullPlan* droppedPlan = 0;
@@ -194,16 +172,15 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			break;
 	}
 
-	// right now, if you drop color bar, we're going to immediately turn it into a simple pull plan
-	// to put in the pickup, no overlay or underlay colors allowed. 
-	// but we're keeping around the color/plan distinction in the case of using
-	// Markus's pickup layers to have special "color layers" which only accept a color and for which
-	// the color/plan distinction really matters
 	if (type == GlassMime::colorbar)
 	{
-		// oh yeah, this is def a memory leak
-		droppedPlan = new PullPlan(PullTemplate::BASE_CIRCLE); // why circle? idk
-		droppedPlan->setOutermostCasingColor(droppedColor);
+		event->accept();
+		if ((event->keyboardModifiers() & Qt::ShiftModifier))
+			pickup->overlayGlassColor = droppedColor;
+		else
+			pickup->underlayGlassColor = droppedColor;
+		emit someDataChanged();
+		return;
 	}
 
 	// otherwise it's a pull plan, and we do some complicated things now
@@ -234,9 +211,10 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	}
 }
 
-void PickupPlanEditorViewWidget :: setPickup(PickupPlan* pickup, bool viewAll)
+void PickupPlanEditorViewWidget :: setPickup(PickupPlan* pickup)
 {
 	this->pickup = pickup;
-	mesher.generateMesh(pickup, &geometry, viewAll);
+	mesher.generateMesh(pickup, &geometry);
 	this->niceViewWidget->repaint();
 }
+
