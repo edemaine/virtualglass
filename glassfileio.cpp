@@ -19,7 +19,7 @@
 QString GlassFileIO :: writeJson(Json::Value root)
 {
         Json::StyledWriter writer;
-        std::string outputConfig = writer.write( root );
+        std::string outputConfig = writer.write(root);
         QString output = QString::fromStdString(outputConfig);
         return output;
 }
@@ -325,7 +325,8 @@ void GlassFileIO::writePieces(Json::Value* root, map<Piece*, int>* pieceMap, map
 }
 
 #ifdef UNDEF
-void GlassFileIO::openColors(Json::Value rootColor, map<GlassColor*, int>* colorMap){
+void GlassFileIO::openColors(Json::Value rootColor, map<GlassColor*, int>* colorMap)
+{
         //rootXXX variables are Json::Values; getMemberNames available
         //vecXXX variables are vectors; operator [] available
         vector<std::string> vecColorMembers = rootColor.getMemberNames(); //vector for colornames
@@ -958,6 +959,8 @@ void GlassFileIO::openPieces(Json::Value root, map<PullPlan*, int>* caneMap, map
 
     delete index;
 }
+#endif
+
 
 void GlassFileIO::open(QStringList list, bool merge){
 	for(int i = 0; i < list.size(); i++){
@@ -1019,112 +1022,6 @@ void GlassFileIO::open(QStringList list, bool merge){
 	}
 }
 
-void GlassFileIO::newFile(){
-
-	QFile savePath("save");
-	savePath.open(QIODevice::WriteOnly | QIODevice::Text);
-	QTextStream savePathOutput(&savePath);
-	savePathOutput << "\n";
-	savePath.close();
-	QLayoutItem* w;
-
-	//colors
-
-	//AsyncColorBarLibraryWidget *cb =new AsyncColorBarLibraryWidget(new GlassColor, this);
-	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(new GlassColor, this));
-	colorBarLibraryLayout->update();
-
-	int i;
-
-	if(colorBarLibraryLayout->count()>1) //do not delete an empty library (except of your new element)
-	{
-		for (i=0; i < colorBarLibraryLayout->count();)
-		{
-			w = colorBarLibraryLayout->takeAt(i);
-			delete w->widget();
-			delete w;
-			if(colorBarLibraryLayout->count()<=1) //deleting library except of your new element
-				i++;
-		}
-	}
-
-	colorBarLibraryLayout->update();
-	emit someDataChanged();
-
-	//pullplan
-
-	AsyncPullPlanLibraryWidget *pplw =new AsyncPullPlanLibraryWidget(new PullPlan(PullTemplate::BASE_CIRCLE),this);
-	pullPlanLibraryLayout->addWidget(pplw);
-	pullPlanLibraryLayout->update();
-
-	if(pullPlanLibraryLayout->count()>1) //do not delete an empty library (except of your new element)
-	{
-		for (i=0; i< pullPlanLibraryLayout->count();)
-		{
-			w=pullPlanLibraryLayout->takeAt(i);
-			delete w->widget();
-			delete w;
-			if(pullPlanLibraryLayout->count()<=1) //clears library except of your new element
-				i++;
-		}
-	}
-	pullPlanLibraryLayout->update();
-	emit someDataChanged();
-
-
-	//pieces
-
-	AsyncPieceLibraryWidget *plw = new AsyncPieceLibraryWidget(new Piece(PieceTemplate::TUMBLER));
-	pieceLibraryLayout->addWidget(plw);
-	pieceLibraryLayout->update();
-
-	for (i=0; i < pieceLibraryLayout->count();)
-	{
-		w=pieceLibraryLayout->takeAt(i);
-		delete w->widget();
-		delete w;
-		if(pieceLibraryLayout->count()<=1) //clears library except of your new element
-			i++;
-	}
-	pieceLibraryLayout->update();
-	plw->updatePixmap();
-	unhighlightAllLibraryWidgets();
-	setViewMode(EMPTY_VIEW_MODE);
-	emit someDataChanged();
-}
-#endif
-
-#ifdef UNDEF
-void GlassFileIO::saveAllFile()
-{
-	char path[509]; //MS max path 248 chars, max filename 260 chars, plus 1 forterminator
-
-	ifstream readHdl;
-
-	readHdl.open("save");
-	readHdl.getline(path,509);
-	string strPath;
-	strPath.assign(path, strlen(path));
-	readHdl.close();
-	QString filename;
-	if(strPath.empty()){
-		filename = QFileDialog::getSaveFileName(this, tr("Save your glass piece"), QDir::currentPath(), tr("VirtualGlass (*.glass)") );
-				//improve: prevent character set error in filename
-				//improve: empty file name -> "no savefile choosen"
-		if(!(filename.toStdString().empty())){
-			QFile savePath("save");
-			savePath.open(QIODevice::WriteOnly | QIODevice::Text);
-			QTextStream savePathOutput(&savePath);
-			savePathOutput << filename << "\n";
-			savePath.close();
-		}
-	}
-	else{
-		filename = strPath.c_str();
-	}
-	save(filename);
-}
-#endif
 
 #ifdef UNDEF
 void GlassFileIO::saveSelectedFile(){

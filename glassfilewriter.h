@@ -1,6 +1,6 @@
 
-#ifndef GLASSFILEIO_H
-#define GLASSFILEIO_H
+#ifndef GLASSFILEWRITER_H
+#define GLASSFILEWRITER_H
 
 #include <json/json.h>
 
@@ -16,11 +16,10 @@ using std::map;
 using std::vector;
 using std::ifstream;
 
-class GlassFileIO
+class GlassFileWriter
 {
 	public:
                 static void save(QString filename, vector<GlassColor*> colors, vector<PullPlan*> plans, vector<Piece*> pieces);
-                static void load(QString filename, vector<GlassColor*>* colors, vector<PullPlan*>* plans, vector<Piece*>* pieces);
 
 	private:
 		static QString writeJson(Json::Value);
@@ -32,12 +31,6 @@ class GlassFileIO
 			vector<PullPlan*>* plans);
                 static void writePieces(Json::Value*, map<Piece*, int>*, map<PullPlan*, int>*, map<GlassColor*, int>,
 			vector<Piece*>* pieces);
-
-#ifdef UNDEF
-                static void openColors(Json::Value, std::map<GlassColor*, int>*);
-                static void openCanes(Json::Value, std::map<PullPlan*, int>*, std::map<GlassColor*, int>* colorMap);
-                static void openPieces(Json::Value, std::map<PullPlan *, int> *caneMap, std::map<GlassColor *, int> *colorMap);
-#endif
 };
 
 

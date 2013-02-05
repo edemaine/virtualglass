@@ -118,7 +118,8 @@ HEADERS += jsoncpp/include/json/autolink.h \
         SVG.hpp \
         Box.hpp \
         Matrix.hpp \
-	glassfileio.h \
+	glassfilewriter.h \
+	glassfilereader.h \
 
 SOURCES += main.cpp \ 
 	glew/glew.c \
@@ -167,6 +168,7 @@ SOURCES += main.cpp \
 	jsoncpp/src/lib_json/json_writer.cpp \
         SVG.cpp \
         bubble.cpp \
-	glassfileio.cpp \
+	glassfilewriter.cpp \
+	glassfilereader.cpp \
 
 

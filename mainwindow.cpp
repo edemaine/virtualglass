@@ -22,7 +22,8 @@
 #include "mainwindow.h"
 #include "globalglass.h"
 #include "SVG.hpp"
-#include "glassfileio.h"
+#include "glassfilewriter.h"
+#include "glassfilereader.h"
 
 MainWindow :: MainWindow()
 {
@@ -36,13 +37,13 @@ MainWindow :: MainWindow()
 	setupSaveFile();
 	setupConnections();
 	setWindowTitle(windowTitle());
-
 	seedEverything();
+
 	setViewMode(EMPTY_VIEW_MODE);
 	show();
+	setDirtyBit(false);
 
-	emit someDataChanged();
-	whatToDoLabel->setText("Click a library item at left to edit/view.");
+	//emit someDataChanged();
 }
 
 
@@ -330,9 +331,10 @@ void MainWindow :: setupConnections()
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 
 	// the file IO menu stuff
-	connect(openAct, SIGNAL(triggered()), this, SLOT(openFile()));
 	connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
-	connect(importAct, SIGNAL(triggered()), this, SLOT(importSVG()));
+	connect(openAct, SIGNAL(triggered()), this, SLOT(openFile()));
+	connect(addAct, SIGNAL(triggered()), this, SLOT(addFile()));
+	connect(importSVGAct, SIGNAL(triggered()), this, SLOT(importSVG()));
 	connect(saveAllAct, SIGNAL(triggered()), this, SLOT(saveAllFile()));
 	connect(saveAllAsAct, SIGNAL(triggered()), this, SLOT(saveAllAsFile()));
 	connect(saveSelectedAsAct, SIGNAL(triggered()), this, SLOT(saveSelectedAsFile()));
@@ -556,6 +558,9 @@ void MainWindow :: setupLibrary()
 
 void MainWindow :: clearLibrary()
 {
+	// kind of a memory leak here, as we delete
+	// all of the library objects but none of the glass objects they represent
+	// the non-trivial part is just the editors and their "current editing object"
 	QLayoutItem* w;
 	
 	while (colorBarLibraryLayout->count() > 0)
@@ -983,9 +988,13 @@ void MainWindow::setupMenus()
 	openAct->setShortcuts(QKeySequence::Open);
 	openAct->setStatusTip(tr("Open an existing file."));
 
+	//add
+	addAct = new QAction(tr("&Add"), this);
+	addAct->setStatusTip(tr("Add an existing file."));
+
 	//import svg cane
-	importAct = new QAction(tr("&Import SVG Cane"), this);
-	importAct->setStatusTip(tr("Import cane cross section from .svg file."));
+	importSVGAct = new QAction(tr("&Import SVG Cane"), this);
+	importSVGAct->setStatusTip(tr("Import cane cross section from .svg file."));
 
 	//save
 	saveAllAct = new QAction(tr("&Save"), this);
@@ -1010,8 +1019,9 @@ void MainWindow::setupMenus()
 	fileMenu = menuBar()->addMenu(tr("&File")); //create File menu
 	fileMenu->addAction(newAct); //add newButton
 	fileMenu->addAction(openAct); //add openButton
+	fileMenu->addAction(addAct); //add addButton
 	fileMenu->addSeparator();
-	fileMenu->addAction(importAct); //add importButton
+	fileMenu->addAction(importSVGAct); //add importButton
 	fileMenu->addSeparator();
 	fileMenu->addAction(saveAllAct); //add saveButton
 	fileMenu->addAction(saveAllAsAct); //add saveButton
@@ -1137,11 +1147,6 @@ void MainWindow::getLibraryContents(vector<GlassColor*>* colors, vector<PullPlan
 	}
 }
 
-void MainWindow::openFile()
-{
-	// do the dialog
-	// load the file and set saveFilename to its name
-}
 
 void MainWindow::newFile()
 {
@@ -1190,18 +1195,135 @@ void MainWindow::newFile()
 	setDirtyBit(false);
 }
 
+
+void MainWindow::openFile()
+{
+	// first, if user's current file is dirty, confirm that they are ok to throw away their current changes
+	// notice that if the open file dialog fails, then their changes won't actually be thrown away.
+	if (dirtyBit)
+	{
+		QMessageBox msgBox;
+		msgBox.setText("The glass library has been modified.");
+		msgBox.setInformativeText("Do you want to discard your changes?");
+		msgBox.setStandardButtons(QMessageBox::Discard | QMessageBox::Cancel);
+		msgBox.setDefaultButton(QMessageBox::Cancel);
+		int returnValue = msgBox.exec();
+
+		switch (returnValue)
+		{
+			case QMessageBox::Cancel:
+				return;
+			case QMessageBox::Discard:
+				break;
+		}
+	}
+	
+	// do the dialog
+	QString userSpecifiedFilename = QFileDialog::getOpenFileName(this, tr("Open file..."), QDir::currentPath(), 
+		tr("VirtualGlass (*.glass)"));
+	if (userSpecifiedFilename.isNull())
+		return;
+
+	// try to read in the file
+	vector<GlassColor*> colors;
+	vector<PullPlan*> plans;
+	vector<Piece*> pieces;
+	bool success = GlassFileReader::load(userSpecifiedFilename, &colors, &plans, &pieces);
+
+	// if it failed, pop a sad little message box 
+	if (!success) 
+	{
+		QMessageBox msgBox;
+		msgBox.setText("The file " + userSpecifiedFilename + " cannot be read.");
+		msgBox.setStandardButtons(QMessageBox::Ok);
+		msgBox.exec();
+		return;
+	}		
+
+	// put the read objects into the library	
+	clearLibrary();	
+	for (unsigned int i = 0; i < colors.size(); ++i)
+		colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(colors[i]));
+	for (unsigned int i = 0; i < plans.size(); ++i)
+		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(plans[i]));
+	for (unsigned int i = 0; i < pieces.size(); ++i)
+		pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(pieces[i]));
+
+	// go back to empty mode
+	setViewMode(EMPTY_VIEW_MODE);
+	
+	// set the save file info
+	setSaveFilename(userSpecifiedFilename);
+	setDirtyBit(false);
+}
+
+void MainWindow::addFile()
+{
+	// do the dialog
+	QStringList userSpecifiedFilenames = QFileDialog::getOpenFileNames(this, tr("Open file..."), QDir::currentPath(), 
+		tr("VirtualGlass (*.glass)"));
+	if (userSpecifiedFilenames.size() == 0) // emptiness iff empty list (hopefully?)
+		return;
+
+	// try to read in the files....ALL OF THEM
+	vector<GlassColor*> colors;
+	vector<PullPlan*> plans;
+	vector<Piece*> pieces;
+	vector<GlassColor*> partialColors;
+	vector<PullPlan*> partialPlans;
+	vector<Piece*> partialPieces;
+	for (int i = 0; i < userSpecifiedFilenames.size(); ++i)
+	{
+		partialColors.clear();
+		partialPlans.clear();
+		partialPieces.clear();
+		if (GlassFileReader::load(userSpecifiedFilenames[i], &partialColors, &partialPlans, &partialPieces))
+		{
+			for (unsigned int j = 0; j < partialColors.size(); ++j)
+				colors.push_back(partialColors[i]);
+			for (unsigned int j = 0; j < partialPlans.size(); ++j)
+				plans.push_back(partialPlans[i]);
+			for (unsigned int j = 0; j < partialPieces.size(); ++j)
+				pieces.push_back(partialPieces[i]);
+		}
+		else // yes, we're popping up a dialog for every file that can't be read...don't try 1000 at a time
+		{
+			QMessageBox msgBox;
+			msgBox.setText("The file " + userSpecifiedFilenames[i] + " cannot be read.");
+			msgBox.setStandardButtons(QMessageBox::Ok);
+			msgBox.exec();
+			return;
+
+		}	
+	}
+
+	// put the read objects into the library	
+	for (unsigned int i = 0; i < colors.size(); ++i)
+		colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(colors[i]));
+	for (unsigned int i = 0; i < plans.size(); ++i)
+		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(plans[i]));
+	for (unsigned int i = 0; i < pieces.size(); ++i)
+		pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(pieces[i]));
+
+	// go back to empty mode
+	setViewMode(EMPTY_VIEW_MODE);
+
+	// turn *on* dirty bit, because we just added stuff
+	setDirtyBit(true);
+}
+
 void MainWindow::saveAllFile()
 {
 	if (saveFilename == "[unsaved]")
 		saveAllAsFile();
 	else
 	{
-		// call the actual file-saving code in GlassFileIO
+		// call the actual file-saving code in GlassFileWriter
 		vector<GlassColor*> colors;
 		vector<PullPlan*> plans;
 		vector<Piece*> pieces;
 		getLibraryContents(&colors, &plans, &pieces);
-		GlassFileIO::save(saveFilename, colors, plans, pieces);	
+		GlassFileWriter::save(saveFilename, colors, plans, pieces);	
 		setDirtyBit(false);
 	}
 }
@@ -1210,7 +1332,7 @@ void MainWindow::saveAllAsFile()
 {
 	// do the dialog thing to set saveFilename
 	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."), QDir::currentPath(), tr("VirtualGlass (*.glass)"));
-	if (!userSpecifiedFilename.toStdString().empty()) // emptiness iff no save file selected (hopefully?)
+	if (!userSpecifiedFilename.isNull())
 		setSaveFilename(userSpecifiedFilename);
 	else
 		return;
@@ -1219,7 +1341,7 @@ void MainWindow::saveAllAsFile()
 	vector<PullPlan*> plans;
 	vector<Piece*> pieces;
 	getLibraryContents(&colors, &plans, &pieces);
-	GlassFileIO::save(saveFilename, colors, plans, pieces);	
+	GlassFileWriter::save(saveFilename, colors, plans, pieces);	
 	setDirtyBit(false);
 }
 
@@ -1247,11 +1369,11 @@ void MainWindow::saveSelectedAsFile()
 	
 	// do the dialog thing to get a one-time filename that you save to
 	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."), QDir::currentPath(), tr("VirtualGlass (*.glass)"));
-	if (userSpecifiedFilename.toStdString().empty()) // emptiness iff no save file selected (hopefully?)
+	if (userSpecifiedFilename.isNull())
 		return;
 
 	// pretend library has one thing in it		
-	GlassFileIO::save(userSpecifiedFilename, colors, plans, pieces);	
+	GlassFileWriter::save(userSpecifiedFilename, colors, plans, pieces);	
 
 	// this doesn't impact dirty bit or saveFilename at all: it's a special operation that 
 	// virtualglass has that lives outside of the usual file-editor relationship, e.g. of a text editor. 

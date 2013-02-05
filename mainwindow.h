@@ -124,7 +124,8 @@ class MainWindow : public QMainWindow
 		QMenu *fileMenu;
 		QAction *newAct;
 		QAction *openAct;
-		QAction *importAct;
+		QAction *addAct;
+		QAction *importSVGAct;
 		QAction *saveAllAct;
 		QAction *saveSelectedAct;
 		QAction *saveAllAsAct;
@@ -132,13 +133,11 @@ class MainWindow : public QMainWindow
 		QAction *exitAct;
 		QMenu *perfMenu;
 		QAction *depthPeelAction;
-		QFileDialog openFileDialog;
-		QFileDialog importFileDialog;
-		QSignalMapper *signalMapper;
 
 	private slots:
-		void openFile();
 		void newFile();
+		void openFile();
+		void addFile();
 		void saveAllFile();
 		void saveAllAsFile();
 		void saveSelectedAsFile();
