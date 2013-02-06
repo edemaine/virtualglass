@@ -17,6 +17,6 @@ PieceRenderData::~PieceRenderData()
 Geometry *PieceRenderData::getGeometry()
 {
 	Geometry *geometry = new Geometry;
-	generateMesh(piece, geometry, UINT_MAX);
+	generateMesh(piece, geometry, 2);
 	return geometry;
 }

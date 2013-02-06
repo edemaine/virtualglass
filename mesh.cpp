@@ -10,6 +10,7 @@
 
 void generateMesh(Piece* piece, Geometry* geometry, unsigned int quality)
 {
+	quality = MIN(4, quality);
 	geometry->clear();
 	vector<MeshInternal::ancestor> ancestors;
 	MeshInternal::recurseMesh(piece, geometry, &ancestors, quality);
@@ -18,6 +19,7 @@ void generateMesh(Piece* piece, Geometry* geometry, unsigned int quality)
 
 void generateMesh(PickupPlan* pickup, Geometry* geometry, unsigned int quality)
 {
+	quality = MIN(4, quality);
 	geometry->clear();
 	vector<MeshInternal::ancestor> ancestors;
 	MeshInternal::recurseMesh(pickup, geometry, &ancestors, quality, true);
@@ -26,6 +28,7 @@ void generateMesh(PickupPlan* pickup, Geometry* geometry, unsigned int quality)
 
 void generatePullMesh(PullPlan* plan, Geometry* geometry, unsigned int quality)
 {
+	quality = MIN(4, quality);
 	geometry->clear();
 	vector<MeshInternal::ancestor> ancestors;
 	MeshInternal::recurseMesh(plan, geometry, &ancestors, 2.0, quality, true);
@@ -38,7 +41,7 @@ void generatePullMesh(PullPlan* plan, Geometry* geometry, unsigned int quality)
 	geometry->compute_normals_from_triangles();
 }
 
-void generateColorMesh(GlassColor* gc, Geometry* geometry)
+void generateColorMesh(GlassColor* gc, Geometry* geometry, unsigned int quality)
 {
 	PullPlan dummyPlan(PullTemplate::BASE_CIRCLE);
 	dummyPlan.setOutermostCasingColor(gc);
@@ -46,7 +49,7 @@ void generateColorMesh(GlassColor* gc, Geometry* geometry)
 	geometry->clear();
 	vector<MeshInternal::ancestor> ancestors;
 	MeshInternal::recurseMesh(&dummyPlan, geometry, &ancestors, 2.0, 
-		10 /* anything more than 2 or 3 are equivalent */, true);
+		quality, true);
 	geometry->compute_normals_from_triangles();
 }
 
@@ -542,12 +545,12 @@ void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float lengt
 
 void meshBaseCasing(Geometry* geometry, vector<ancestor>* ancestors, Color color, 
 	enum GeometricShape outerShape, enum GeometricShape innerShape, float length, float outerRadius, 
-	float innerRadius, bool ensureVisible)
+	float innerRadius, unsigned int quality, bool ensureVisible)
 {
 	float finalDiameter = totalShrink(ancestors);
-	unsigned int angularResolution = MIN(MAX(finalDiameter*10, 4), 12);
-	angularResolution = ((angularResolution + 2) / 4) * 4; // round to nearest multiple of 4
-	unsigned int axialResolution = MIN(MAX(length * 40, 5), 80);
+	unsigned int angularResolution = quality / 4.0 * MIN(MAX(finalDiameter*10, 4), 10); 
+	angularResolution = ((angularResolution + 2) / 4) * 4;
+	unsigned int axialResolution = quality / 4.0 * MIN(MAX(length * 40, 5), 80);
 	
 	uint32_t first_vert = geometry->vertices.size();
 	uint32_t first_triangle = geometry->triangles.size();
@@ -606,13 +609,13 @@ float totalShrink(vector<ancestor>* ancestors)
 The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
 */
 void meshBaseCane(Geometry* geometry, vector<ancestor>* ancestors, 
-	Color color, enum GeometricShape shape, float length, float radius, bool ensureVisible)
+	Color color, enum GeometricShape shape, float length, float radius, unsigned int quality, bool ensureVisible)
 {
 	float finalDiameter = totalShrink(ancestors);
-	unsigned int angularResolution = MIN(MAX(finalDiameter*10, 4), 10); 
+	unsigned int angularResolution = quality / 4.0 * MIN(MAX(finalDiameter*10, 4), 10); 
 	angularResolution = ((angularResolution + 2) / 4) * 4;
-	unsigned int axialResolution = MIN(MAX(length * 40, 5), 80);
-	
+	unsigned int axialResolution = quality / 4.0 * MIN(MAX(length * 40, 5), 80);
+
 	uint32_t first_vert = geometry->vertices.size();
 	uint32_t first_triangle = geometry->triangles.size();
 
@@ -781,7 +784,7 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>* ancestors
 	if (plan == NULL)
 		return;
 
-	if (ancestors->size() > quality)
+	if (quality == 0 && ancestors->size() > 0)
 		return;
 
 	ancestor me = {plan, 0};
@@ -798,14 +801,14 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>* ancestors
 			// punting on actually doing this geometry right and just making it a cylinder
 			// (that intersects its subcanes)
 			meshBaseCane(geometry, ancestors, *(plan->getCasingColor(0)->getColor()), 
-				plan->getCasingShape(0), length-0.001, plan->getCasingThickness(0), 
+				plan->getCasingShape(0), length-0.001, plan->getCasingThickness(0), quality, 
 				ensureVisible && outermostLayer);
 		}
 		else
 		{
 			meshBaseCasing(geometry, ancestors, *(plan->getCasingColor(i)->getColor()), 
 				plan->getCasingShape(i), plan->getCasingShape(i-1), length,
-				plan->getCasingThickness(i), plan->getCasingThickness(i-1)+0.05, 
+				plan->getCasingThickness(i), plan->getCasingThickness(i-1)+0.05, quality,
 				ensureVisible && outermostLayer);
 		}
 
