@@ -31,7 +31,6 @@ public:
 
 	NiceViewWidget(enum CameraMode cameraMode, QWidget* parent=0);
 	virtual ~NiceViewWidget();
-	void setGeometry(Geometry* g);
 	void displayBubble(Bubble);
 	void drawBubble(GLfloat, GLfloat, GLfloat, Bubble);
 	Vector3f eyePosition();
@@ -39,6 +38,7 @@ public:
 	void resetPickupEditorView();
 	void setViewAllPickupEditorView();
 	void setViewAll(bool);
+	void setGeometry(Geometry* g);
 
 protected:
 	void initializeGL();

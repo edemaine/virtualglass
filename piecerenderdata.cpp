@@ -5,6 +5,7 @@
 
 PieceRenderData::PieceRenderData(Piece const *_piece) : piece(deep_copy(_piece))
 {
+
 }
 
 
@@ -16,7 +17,6 @@ PieceRenderData::~PieceRenderData()
 Geometry *PieceRenderData::getGeometry()
 {
 	Geometry *geometry = new Geometry;
-	Mesher mesher;
-	mesher.generateMesh(piece, geometry);
+	generateMesh(piece, geometry, UINT_MAX);
 	return geometry;
 }

@@ -31,8 +31,7 @@ PullPlanRenderData::~PullPlanRenderData() {
 
 Geometry *PullPlanRenderData::getGeometry() {
 	Geometry *geom = new Geometry();
-	Mesher mesher;
-	mesher.generatePullMesh(plan, geom);
+	generatePullMesh(plan, geom, UINT_MAX);
 	return geom;
 }
 
@@ -44,8 +43,7 @@ GlassColorRenderData::~GlassColorRenderData() {
 
 Geometry *GlassColorRenderData::getGeometry() {
 	Geometry *geom = new Geometry();
-	Mesher mesher;
-	mesher.generateColorMesh(glassColor, geom);
+	generateColorMesh(glassColor, geom);
 	return geom;
 
 }

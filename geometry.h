@@ -37,7 +37,7 @@ class Group
 {
 public:
 	Group(uint32_t _triangle_begin, uint32_t _triangle_size, uint32_t _vertex_begin, uint32_t _vertex_size, 
-		Color *_color, bool _ensureVisible=false)
+		Color _color, bool _ensureVisible=false)
 		: triangle_begin(_triangle_begin), triangle_size(_triangle_size), vertex_begin(_vertex_begin), 
 		vertex_size(_vertex_size), color(_color), ensureVisible(_ensureVisible) {
 	}
@@ -45,7 +45,7 @@ public:
 	uint32_t triangle_size;
 	uint32_t vertex_begin;
 	uint32_t vertex_size;
-	Color* color;
+	Color color;
 	bool ensureVisible;
 };
 

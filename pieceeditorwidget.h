@@ -13,9 +13,13 @@
 #include "geometry.h"
 #include "mesh.h"
 
+class PieceGeometryThread;
+		
 class PieceEditorWidget : public QWidget
 {
 	Q_OBJECT
+
+	friend class PieceGeometryThread;
 
 	public:
 		PieceEditorWidget(QWidget* parent=0);
@@ -29,6 +33,7 @@ class PieceEditorWidget : public QWidget
 		void setPickupParameter(int param, int value);
 		void mousePressEvent(QMouseEvent*);
 
+
 	signals:
 		void someDataChanged();
 
@@ -40,13 +45,28 @@ class PieceEditorWidget : public QWidget
 		void pieceParameterSliderChanged(int);
 		void pickupParameterSpinBoxChanged(int);
 		void pickupParameterSliderChanged(int);
+		void geometryThreadFinishedMesh();
 
 	private:
+		QMutex tempPieceMutex;
+		Piece* tempPiece;
+		bool tempPieceDirty;
+
+		QWaitCondition wakeWait;
+		QMutex wakeMutex;
+
+		PieceGeometryThread* geometryThread;
+
+		QMutex tempGeometry1Mutex;
+		QMutex tempGeometry2Mutex;
+		Geometry tempGeometry1;
+		Geometry tempGeometry2;
+
 		Geometry geometry;
-		Mesher mesher;
+
 		Piece* piece;
-		PickupPlanEditorViewWidget* pickupViewWidget;	
 		NiceViewWidget* niceViewWidget;
+		PickupPlanEditorViewWidget* pickupViewWidget;	
 
 		vector<QLabel*> pickupParamLabels;
 		vector<QSpinBox*> pickupParamSpinboxes;
@@ -64,9 +84,29 @@ class PieceEditorWidget : public QWidget
 		QPushButton* addCasingButton;
 
 		void setupLayout();
+		void setupThreading();
 		void setupConnections();
+
 };
 
+class PieceEditorWidget;
+
+class PieceGeometryThread : public QThread
+{
+	Q_OBJECT
+
+	public:
+		PieceGeometryThread(PieceEditorWidget* pew);
+		void run();
+		PieceEditorWidget* pew;
+		PieceEditorWidget* ppew;
+
+	signals:
+		void finishedMesh();
+};
 
 #endif
+
+
+
 

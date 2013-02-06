@@ -31,7 +31,6 @@ class PickupPlanEditorViewWidget : public QWidget
 		void resizeEvent(QResizeEvent* event);
 
 	private:
-		Mesher mesher;
 		Geometry geometry;
 		NiceViewWidget* niceViewWidget;
 		PickupPlan* pickup;

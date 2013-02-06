@@ -10,6 +10,7 @@ PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 	niceViewWidget->setGeometry(&geometry);
 
 	setupLayout();
+	setupThreading();
 	setupConnections();
 }
 
@@ -32,7 +33,7 @@ void PieceEditorWidget :: updateEverything()
 			pktlw->setDependancy(false);
 	}
 
-	pickupViewWidget->setPickup(piece->pickup);
+	//pickupViewWidget->setPickup(piece->pickup);
 
 	unsigned int i = 0;
 	for (; i < piece->pickup->getParameterCount(); ++i)
@@ -75,10 +76,13 @@ void PieceEditorWidget :: updateEverything()
 		else
 			ptlw->setDependancy(false);
 	}
-
-	geometry.clear();
-	mesher.generateMesh(piece, &geometry);
-	niceViewWidget->repaint();
+	
+	tempPieceMutex.lock();
+	deep_delete(tempPiece);
+	tempPiece = deep_copy(piece);
+	tempPieceDirty = true;
+	tempPieceMutex.unlock();
+	wakeWait.wakeOne(); // wake up the thread if it's sleeping
 
 	i = 0;
 	for (; i < piece->getParameterCount(); ++i)
@@ -101,6 +105,26 @@ void PieceEditorWidget :: updateEverything()
 	{
 		pieceParamStacks[i]->setCurrentIndex(1); // hide
 	}
+}
+
+void PieceEditorWidget :: geometryThreadFinishedMesh()
+{
+	if (tempGeometry1Mutex.tryLock())
+	{
+		geometry.vertices = tempGeometry1.vertices;
+		geometry.triangles = tempGeometry1.triangles;
+		geometry.groups = tempGeometry1.groups;
+		tempGeometry1Mutex.unlock();
+	}
+	else if (tempGeometry2Mutex.tryLock())
+	{
+		geometry.vertices = tempGeometry2.vertices;
+		geometry.triangles = tempGeometry2.triangles;
+		geometry.groups = tempGeometry2.groups;
+		tempGeometry2Mutex.unlock();
+	}
+	
+	niceViewWidget->repaint();
 }
 
 void PieceEditorWidget :: pieceParameterSliderChanged(int)
@@ -284,7 +308,6 @@ void PieceEditorWidget :: setupLayout()
 	pieceParamLayout->addWidget(niceViewDescriptionLabel);
 }
 
-
 void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
 {
 	PickupTemplateLibraryWidget* pktlw = dynamic_cast<PickupTemplateLibraryWidget*>(childAt(event->pos()));
@@ -308,6 +331,15 @@ void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
 	}
 }
 
+
+void PieceEditorWidget :: setupThreading()
+{
+	tempPiece = deep_copy(piece);
+	tempPieceDirty = true;
+	geometryThread = new PieceGeometryThread(this);
+	geometryThread->start();	
+}
+
 void PieceEditorWidget :: setupConnections()
 {
 	for (unsigned int i = 0; i < pickupParamSpinboxes.size(); ++i)
@@ -326,6 +358,7 @@ void PieceEditorWidget :: setupConnections()
 			this, SLOT(pieceParameterSliderChanged(int)));
 	}
 
+	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
 	connect(pickupViewWidget, SIGNAL(someDataChanged()), this, SLOT(pickupViewWidgetDataChanged()));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }
@@ -391,6 +424,53 @@ Piece* PieceEditorWidget :: getPiece()
 	return piece;
 }
 
+PieceGeometryThread::PieceGeometryThread(PieceEditorWidget* _pew) : pew(_pew)
+{
+	
+}
+
+void PieceGeometryThread::run()
+{
+	while (1)
+	{
+		pew->wakeWait.wait(&(pew->wakeMutex));
+
+		start:
+	
+		// get lock for pew's tempPiece 
+		// and make a copy to get out of his way as fast as possible	
+		pew->tempPieceMutex.lock();
+		Piece* myTempPiece = deep_copy(pew->tempPiece);
+		pew->tempPieceDirty = false;
+		pew->tempPieceMutex.unlock();	
+	
+		// now lock the geometry
+		pew->tempGeometry1Mutex.lock();
+		generateMesh(myTempPiece, &(pew->tempGeometry1), 0);
+		pew->tempGeometry1Mutex.unlock();	
+		pew->tempGeometry2Mutex.lock();
+		generateMesh(myTempPiece, &(pew->tempGeometry2), 0);
+		pew->tempGeometry2Mutex.unlock();	
+		emit finishedMesh();
+
+		pew->tempPieceMutex.lock();
+		bool startOver = pew->tempPieceDirty;
+		pew->tempPieceMutex.unlock();
+		if (startOver)
+		{
+			deep_delete(myTempPiece);
+			goto start;
+		}
+
+		pew->tempGeometry1Mutex.lock();
+		generateMesh(myTempPiece, &(pew->tempGeometry1), UINT_MAX);
+		pew->tempGeometry1Mutex.unlock();	
+		pew->tempGeometry2Mutex.lock();
+		generateMesh(myTempPiece, &(pew->tempGeometry2), UINT_MAX);
+		pew->tempGeometry2Mutex.unlock();	
+		emit finishedMesh();
+	}
+}
 
 
 

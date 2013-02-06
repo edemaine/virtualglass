@@ -163,10 +163,10 @@ void RenderThread::simpleRender(Geometry const &geometry) {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 
-	for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g) {
-		assert(g->color);
-		Color* c = g->color;
-		glColor4f(c->r, c->g, c->b, c->a);
+	for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g) 
+	{
+		Color c = g->color;
+		glColor4f(c.r, c.g, c.b, c.a);
 		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 			GL_UNSIGNED_INT, &(geometry.triangles[g->triangle_begin].v1));
 	}

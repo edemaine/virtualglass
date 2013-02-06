@@ -7,12 +7,54 @@
 #include "subpulltemplate.h"
 #include "mesh.h"
 
-Mesher :: Mesher() 
+
+void generateMesh(Piece* piece, Geometry* geometry, unsigned int quality)
 {
-	// yeah, um..
+	geometry->clear();
+	vector<MeshInternal::ancestor> ancestors;
+	MeshInternal::recurseMesh(piece, geometry, &ancestors, quality);
+	geometry->compute_normals_from_triangles();
 }
 
-void Mesher :: applySubplanTransform(Geometry* geometry, ancestor a)
+void generateMesh(PickupPlan* pickup, Geometry* geometry, unsigned int quality)
+{
+	geometry->clear();
+	vector<MeshInternal::ancestor> ancestors;
+	MeshInternal::recurseMesh(pickup, geometry, &ancestors, quality, true);
+	geometry->compute_normals_from_triangles();
+}
+
+void generatePullMesh(PullPlan* plan, Geometry* geometry, unsigned int quality)
+{
+	geometry->clear();
+	vector<MeshInternal::ancestor> ancestors;
+	MeshInternal::recurseMesh(plan, geometry, &ancestors, 2.0, quality, true);
+
+	// Make skinnier to more closely mimic the canes found in pickups
+	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
+	{
+		MeshInternal::applyResizeTransform(&(geometry->vertices[v]), 0.5);
+	}
+	geometry->compute_normals_from_triangles();
+}
+
+void generateColorMesh(GlassColor* gc, Geometry* geometry)
+{
+	PullPlan dummyPlan(PullTemplate::BASE_CIRCLE);
+	dummyPlan.setOutermostCasingColor(gc);
+
+	geometry->clear();
+	vector<MeshInternal::ancestor> ancestors;
+	MeshInternal::recurseMesh(&dummyPlan, geometry, &ancestors, 2.0, 
+		10 /* anything more than 2 or 3 are equivalent */, true);
+	geometry->compute_normals_from_triangles();
+}
+
+
+namespace MeshInternal
+{
+
+void applySubplanTransform(Geometry* geometry, ancestor a)
 {
 	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
 	{
@@ -20,7 +62,7 @@ void Mesher :: applySubplanTransform(Geometry* geometry, ancestor a)
 	}
 }
 
-void Mesher :: applyResizeTransform(Vertex* v, float scale)
+void applyResizeTransform(Vertex* v, float scale)
 {
 	// Adjust diameter
 	v->position.x *= scale; 
@@ -28,7 +70,7 @@ void Mesher :: applyResizeTransform(Vertex* v, float scale)
 }
 
 // Does move, resize, and twist
-void Mesher :: applySubplanTransform(Vertex* v, ancestor a)
+void applySubplanTransform(Vertex* v, ancestor a)
 {
 	SubpullTemplate* subTemp = &(a.parent->subs[a.child]);
 	Point locationInParent = subTemp->location;
@@ -50,7 +92,7 @@ void Mesher :: applySubplanTransform(Vertex* v, ancestor a)
 	v->position.y += (r * sin(postTheta) - r * sin(preTheta));
 }
 
-void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
+void applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 {
 	// Shrink width to correct width
 	v->position.x *= spt->width * 2.5; 
@@ -80,22 +122,22 @@ void Mesher :: applyPickupTransform(Vertex* v, SubpickupTemplate* spt)
 	v->position.y = v->position.y + spt->location.z * 5.0;
 }
 
-float Mesher :: splineVal(float r1, float r2, float r3, float r4, float t)
-{
-	return pow((1.0 - t), 3) * r1 + 3 * pow(1.0 - t, 2) * t * r2 + 3 * pow(1.0 - t, 2) * t * r3 + pow(t, 3) * r4;
-}
-
-float Mesher :: splineVal(float r1, float r2, float r3, float t)
+float splineVal(float r1, float r2, float r3, float t)
 {
 	return pow((1.0 - t), 2) * r1 + 2 * (1.0 - t) * t * r2 + pow(t, 2) * r3;
 }
 
-float Mesher :: asymptoteVal(float s, float t)
+float splineVal(float r1, float r2, float r3, float r4, float t)
+{
+	return pow((1.0 - t), 3) * r1 + 3 * pow(1.0 - t, 2) * t * r2 + 3 * pow(1.0 - t, 2) * t * r3 + pow(t, 3) * r4;
+}
+
+float asymptoteVal(float s, float t)
 {
 	return 1 - (s / (t + s)); 
 }
 
-void Mesher :: applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type, vector<TemplateParameter> params)
+void applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type, vector<TemplateParameter> params)
 {
 	for (uint32_t i = 0; i < geom->vertices.size(); ++i)
 	{
@@ -246,14 +288,14 @@ void Mesher :: applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type
 	} // end loop over vertices
 }
 
-Vertex Mesher :: applyTransforms(Vertex v, vector<ancestor>* ancestors)
+Vertex applyTransforms(Vertex v, vector<ancestor>* ancestors)
 {
 	for (int i = ancestors->size() - 2; i >= 0; --i)
 		applySubplanTransform(&v, (*ancestors)[i]);
 	return v;
 }
 
-void Mesher :: meshPickupCasingSlab(Geometry* geometry, Color* color, float y, float thickness, bool ensureVisible)
+void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickness, bool ensureVisible)
 {
 	unsigned int slabResolution = 100;
 
@@ -387,7 +429,7 @@ void Mesher :: meshPickupCasingSlab(Geometry* geometry, Color* color, float y, f
 		first_vert, geometry->vertices.size() - first_vert, color, ensureVisible));
 }
 
-void Mesher :: getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution, 
+void getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution, 
 	enum GeometricShape shape, float radius)
 {
 	Vector2f p;
@@ -446,7 +488,7 @@ void Mesher :: getTemplatePoints(vector<Vector2f>* points, unsigned int angularR
 
 } 
 
-void Mesher :: meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float length, float radius, 
+void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float length, float radius, 
 	unsigned int angularResolution, unsigned int axialResolution, bool flipOrientation)
 {
 	vector< Vector2f > points;
@@ -498,7 +540,7 @@ void Mesher :: meshCylinderWall(Geometry* geometry, enum GeometricShape shape, f
 	}
 } 
 
-void Mesher :: meshBaseCasing(Geometry* geometry, vector<ancestor>* ancestors, Color* color, 
+void meshBaseCasing(Geometry* geometry, vector<ancestor>* ancestors, Color color, 
 	enum GeometricShape outerShape, enum GeometricShape innerShape, float length, float outerRadius, 
 	float innerRadius, bool ensureVisible)
 {
@@ -546,7 +588,7 @@ void Mesher :: meshBaseCasing(Geometry* geometry, vector<ancestor>* ancestors, C
 		first_vert, geometry->vertices.size() - first_vert, color, ensureVisible));
 }
 
-float Mesher :: totalShrink(vector<ancestor>* ancestors)
+float totalShrink(vector<ancestor>* ancestors)
 {
 	float shrink = 1.0;	
 
@@ -563,8 +605,8 @@ float Mesher :: totalShrink(vector<ancestor>* ancestors)
 /*
 The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
 */
-void Mesher :: meshBaseCane(Geometry* geometry, vector<ancestor>* ancestors, 
-	Color* color, enum GeometricShape shape, float length, float radius, bool ensureVisible)
+void meshBaseCane(Geometry* geometry, vector<ancestor>* ancestors, 
+	Color color, enum GeometricShape shape, float length, float radius, bool ensureVisible)
 {
 	float finalDiameter = totalShrink(ancestors);
 	unsigned int angularResolution = MIN(MAX(finalDiameter*10, 4), 10); 
@@ -672,13 +714,13 @@ void Mesher :: meshBaseCane(Geometry* geometry, vector<ancestor>* ancestors,
 		first_vert, geometry->vertices.size() - first_vert, color, ensureVisible));
 }
 
-void Mesher :: recurseMesh(Piece* piece, Geometry* geometry, vector<ancestor>* ancestors)
+void recurseMesh(Piece* piece, Geometry* geometry, vector<ancestor>* ancestors, unsigned int quality)
 {
 	if (piece == NULL)
 		return;
 
 	geometry->clear();
-	recurseMesh(piece->pickup, geometry, ancestors);
+	recurseMesh(piece->pickup, geometry, ancestors, quality);
 	vector<TemplateParameter> params;
 	for (unsigned int i = 0; i < piece->getParameterCount(); ++i)
 	{
@@ -689,7 +731,7 @@ void Mesher :: recurseMesh(Piece* piece, Geometry* geometry, vector<ancestor>* a
 	applyPieceTransform(geometry, piece->getTemplateType(), params);
 }
 
-void Mesher :: recurseMesh(PickupPlan* pickup, Geometry *geometry, vector<ancestor>* ancestors, bool isTopLevel)
+void recurseMesh(PickupPlan* pickup, Geometry *geometry, vector<ancestor>* ancestors, unsigned int quality, bool isTopLevel)
 {
 	if (pickup == NULL)
 		return;
@@ -700,7 +742,7 @@ void Mesher :: recurseMesh(PickupPlan* pickup, Geometry *geometry, vector<ancest
 		ancestors->clear();
 		uint32_t startPlanVerts = geometry->vertices.size();
 		recurseMesh(pickup->subs[i].plan, geometry, 
-			ancestors, pickup->subs[i].length, isTopLevel); 
+			ancestors, pickup->subs[i].length, quality, isTopLevel); 
 		uint32_t endPlanVerts = geometry->vertices.size();
 		
 		for (uint32_t v = startPlanVerts; v < endPlanVerts; ++v)
@@ -719,47 +761,11 @@ void Mesher :: recurseMesh(PickupPlan* pickup, Geometry *geometry, vector<ancest
 	// top level means that you want a pickup (and not a piece formed from a pickup)
 	// in this case, the slab is not ensureVisible'd, but the canes are, as the pickup
 	// serves as a guide for where to put subcanes, which must be visible
-	meshPickupCasingSlab(geometry, pickup->casingGlassColor->getColor(), 0.0, thickness, !isTopLevel);
+	meshPickupCasingSlab(geometry, *(pickup->casingGlassColor->getColor()), 0.0, thickness, !isTopLevel);
 
 	// overlay/underlays
-	meshPickupCasingSlab(geometry, pickup->underlayGlassColor->getColor(), thickness + 0.1, 0.05);
-	meshPickupCasingSlab(geometry, pickup->overlayGlassColor->getColor(), -(thickness + 0.1), 0.05);
-}
-
-void Mesher :: generateMesh(Piece* piece, Geometry* geometry)
-{
-	vector<ancestor> ancestors;
-	recurseMesh(piece, geometry, &ancestors);
-	geometry->compute_normals_from_triangles();
-}
-
-void Mesher :: generateMesh(PickupPlan* pickup, Geometry* geometry)
-{
-	vector<ancestor> ancestors;
-	recurseMesh(pickup, geometry, &ancestors, true);
-	geometry->compute_normals_from_triangles();
-}
-
-void Mesher :: generatePullMesh(PullPlan* plan, Geometry* geometry)
-{
-	vector<ancestor> ancestors;
-	recurseMesh(plan, geometry, &ancestors, 2.0, true);
-
-	// Make skinnier to more closely mimic the canes found in pickups
-	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
-	{
-		applyResizeTransform(&(geometry->vertices[v]), 0.5);
-	}
-	geometry->compute_normals_from_triangles();
-}
-
-void Mesher :: generateColorMesh(GlassColor* gc, Geometry* geometry)
-{
-	PullPlan dummyPlan(PullTemplate::BASE_CIRCLE);
-	dummyPlan.setOutermostCasingColor(gc);
-	vector<ancestor> ancestors;
-	recurseMesh(&dummyPlan, geometry, &ancestors, 2.0, true);
-	geometry->compute_normals_from_triangles();
+	meshPickupCasingSlab(geometry, *(pickup->underlayGlassColor->getColor()), thickness + 0.1, 0.05);
+	meshPickupCasingSlab(geometry, *(pickup->overlayGlassColor->getColor()), -(thickness + 0.1), 0.05);
 }
 
 /*
@@ -769,9 +775,13 @@ the transforms array is filled with with the transformations encountered at each
 leaf is reached, these transformations are used to generate a complete mesh
 for the leaf node.
 */
-void Mesher :: recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>* ancestors, float length, bool isTopLevel)
+void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>* ancestors, float length, 
+	unsigned int quality, bool isTopLevel)
 {
 	if (plan == NULL)
+		return;
+
+	if (ancestors->size() > quality)
 		return;
 
 	ancestor me = {plan, 0};
@@ -787,12 +797,13 @@ void Mesher :: recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>*
 		{
 			// punting on actually doing this geometry right and just making it a cylinder
 			// (that intersects its subcanes)
-			meshBaseCane(geometry, ancestors, plan->getCasingColor(0)->getColor(), 
-				plan->getCasingShape(0), length-0.001, plan->getCasingThickness(0), ensureVisible && outermostLayer);
+			meshBaseCane(geometry, ancestors, *(plan->getCasingColor(0)->getColor()), 
+				plan->getCasingShape(0), length-0.001, plan->getCasingThickness(0), 
+				ensureVisible && outermostLayer);
 		}
 		else
 		{
-			meshBaseCasing(geometry, ancestors, plan->getCasingColor(i)->getColor(), 
+			meshBaseCasing(geometry, ancestors, *(plan->getCasingColor(i)->getColor()), 
 				plan->getCasingShape(i), plan->getCasingShape(i-1), length,
 				plan->getCasingThickness(i), plan->getCasingThickness(i-1)+0.05, 
 				ensureVisible && outermostLayer);
@@ -806,10 +817,13 @@ void Mesher :: recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>*
 	{
 		me.child = i;
 		ancestors->push_back(me);
-		recurseMesh(plan->subs[i].plan, geometry, ancestors, length);
+		recurseMesh(plan->subs[i].plan, geometry, ancestors, length, quality);
 		ancestors->pop_back();
 	}
 }
+
+}
+
 
 
 

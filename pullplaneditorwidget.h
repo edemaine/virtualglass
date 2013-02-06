@@ -53,7 +53,6 @@ class PullPlanEditorWidget : public QWidget
 
 	private:
 		Geometry geometry;
-		Mesher mesher;
 		PullPlan* plan;
 		PullPlanEditorViewWidget* viewWidget;	
 		PullPlanCustomizeViewWidget* customizeViewWidget;	

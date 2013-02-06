@@ -278,15 +278,15 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const & geometry) {
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glEnableClientState(GL_NORMAL_ARRAY);
 
-			for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g) {
-				assert(g->color);
-				Color* c = g->color;
-				if (!g->ensureVisible && c->a < 0.01) // don't even draw it if it's not going to be visible
+			for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g) 
+			{
+				Color c = g->color;
+				if (!g->ensureVisible && c.a < 0.01) // don't even draw it if it's not going to be visible
 					continue;
 				if (g->ensureVisible) 
-					glColor4f(c->r, c->g, c->b, MAX(c->a, 0.1));
+					glColor4f(c.r, c.g, c.b, MAX(c.a, 0.1));
 				else
-					glColor4f(c->r, c->g, c->b, c->a);
+					glColor4f(c.r, c.g, c.b, c.a);
 				glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 							   GL_UNSIGNED_INT, &(geometry.triangles[g->triangle_begin].v1));
 			}

@@ -10,7 +10,6 @@
 
 class GlassColor;
 class PullPlan;
-class Mesher;
 class Geometry;
 class PureColorLibraryWidget;
 class NiceViewWidget;
@@ -44,7 +43,6 @@ class ColorEditorWidget : public QWidget
 
 	private:
 		Geometry* geometry;
-		Mesher* mesher;
 		GlassColor* glassColor;	
 		QComboBox* collectionComboBox;
 		NiceViewWidget* niceViewWidget;

@@ -89,7 +89,7 @@ void PullPlanEditorWidget :: updateEverything()
 	}
 
 	geometry.clear();
-	mesher.generatePullMesh(plan, &geometry);
+	generatePullMesh(plan, &geometry, UINT_MAX);
 	emit geometryChanged(geometry);
 
 	// Highlight correct pull template

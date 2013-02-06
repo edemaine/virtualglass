@@ -179,3 +179,5 @@ void ComputeThread::run() {
 	controller->computeQueueLock.unlock();
 	std::cout << "Quitting a compute thread." << std::endl;
 }
+
+

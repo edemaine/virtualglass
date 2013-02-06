@@ -7,7 +7,7 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWi
 	setMinimumSize(200, 200);
 	this->pickup = pickup;
 	this->niceViewWidget = new NiceViewWidget(NiceViewWidget::PICKUPPLAN_CAMERA_MODE, this);
-	mesher.generateMesh(pickup, &geometry);
+	generateMesh(pickup, &geometry, UINT_MAX);
 	this->niceViewWidget->setGeometry(&geometry);
 	this->niceViewWidget->repaint();
 
@@ -214,7 +214,7 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 void PickupPlanEditorViewWidget :: setPickup(PickupPlan* pickup)
 {
 	this->pickup = pickup;
-	mesher.generateMesh(pickup, &geometry);
+	generateMesh(pickup, &geometry, UINT_MAX);
 	this->niceViewWidget->repaint();
 }
 
