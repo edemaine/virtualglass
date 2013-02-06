@@ -12,9 +12,13 @@
 #include "glassmime.h"
 #include "glasscolor.h"
 
+class PickupGeometryThread;
+
 class PickupPlanEditorViewWidget : public QWidget
 {
 	Q_OBJECT
+
+	friend class PickupGeometryThread;
 
 	public:
 		PickupPlanEditorViewWidget(PickupPlan* pickup, QWidget* parent=0);
@@ -30,12 +34,31 @@ class PickupPlanEditorViewWidget : public QWidget
 		void dropEvent(QDropEvent* de);
 		void resizeEvent(QResizeEvent* event);
 
+	private slots:
+                void geometryThreadFinishedMesh();
+
 	private:
+		QMutex tempPickupMutex;
+		PickupPlan* tempPickup;
+		bool tempPickupDirty;
+
+		QWaitCondition wakeWait;
+		QMutex wakeMutex;
+
+		PickupGeometryThread* geometryThread;
+
+		QMutex tempGeometry1Mutex;
+		QMutex tempGeometry2Mutex;
+		Geometry tempGeometry1;
+		Geometry tempGeometry2;
+
 		Geometry geometry;
 		NiceViewWidget* niceViewWidget;
 		PickupPlan* pickup;
 		float ulX, ulY, squareSize;
 
+		void setupThreading();
+		void setupConnections();
 		float adjustedX(float rawX);
 		float adjustedY(float rawX);
 		float rawX(float adjustedX);

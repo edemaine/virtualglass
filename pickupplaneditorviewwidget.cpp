@@ -1,5 +1,6 @@
 
 #include "pickupplaneditorviewwidget.h"
+#include "pickupgeometrythread.h"
 
 PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWidget* parent) : QWidget(parent)
 {
@@ -7,14 +8,28 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWi
 	setMinimumSize(200, 200);
 	this->pickup = pickup;
 	this->niceViewWidget = new NiceViewWidget(NiceViewWidget::PICKUPPLAN_CAMERA_MODE, this);
-	generateMesh(pickup, &geometry, UINT_MAX);
 	this->niceViewWidget->setGeometry(&geometry);
-	this->niceViewWidget->repaint();
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	this->setLayout(layout);
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addWidget(niceViewWidget, 1);
+
+	setupThreading();
+	setupConnections();
+}
+
+void PickupPlanEditorViewWidget :: setupThreading()
+{
+	tempPickup = deep_copy(pickup);
+	tempPickupDirty = true;
+	geometryThread = new PickupGeometryThread(this);
+	geometryThread->start();
+}
+
+void PickupPlanEditorViewWidget :: setupConnections()
+{
+	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
 }
 
 void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** subplan, int* subplanIndex)
@@ -211,10 +226,36 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	}
 }
 
-void PickupPlanEditorViewWidget :: setPickup(PickupPlan* pickup)
+void PickupPlanEditorViewWidget :: setPickup(PickupPlan* _pickup)
 {
-	this->pickup = pickup;
-	generateMesh(pickup, &geometry, UINT_MAX);
-	this->niceViewWidget->repaint();
+	pickup = _pickup;
+
+        tempPickupMutex.lock();
+        deep_delete(tempPickup);
+        tempPickup = deep_copy(pickup);
+        tempPickupDirty = true;
+        tempPickupMutex.unlock();
+        wakeWait.wakeOne(); // wake up the thread if it's sleeping
 }
+
+void PickupPlanEditorViewWidget :: geometryThreadFinishedMesh()
+{
+        if (tempGeometry1Mutex.tryLock())
+        {
+                geometry.vertices = tempGeometry1.vertices;
+                geometry.triangles = tempGeometry1.triangles;
+                geometry.groups = tempGeometry1.groups;
+                tempGeometry1Mutex.unlock();
+        }
+        else if (tempGeometry2Mutex.tryLock())
+        {
+                geometry.vertices = tempGeometry2.vertices;
+                geometry.triangles = tempGeometry2.triangles;
+                geometry.groups = tempGeometry2.groups;
+                tempGeometry2Mutex.unlock();
+        }
+
+        niceViewWidget->repaint();
+}
+
 

@@ -120,6 +120,8 @@ HEADERS += jsoncpp/include/json/autolink.h \
         Matrix.hpp \
 	glassfilewriter.h \
 	glassfilereader.h \
+	piecegeometrythread.h \
+	pickupgeometrythread.h \
 
 SOURCES += main.cpp \ 
 	glew/glew.c \
@@ -170,5 +172,7 @@ SOURCES += main.cpp \
         bubble.cpp \
 	glassfilewriter.cpp \
 	glassfilereader.cpp \
+	piecegeometrythread.cpp \
+	pickupgeometrythread.cpp \
 
 

@@ -33,7 +33,6 @@ class PieceEditorWidget : public QWidget
 		void setPickupParameter(int param, int value);
 		void mousePressEvent(QMouseEvent*);
 
-
 	signals:
 		void someDataChanged();
 
@@ -87,22 +86,6 @@ class PieceEditorWidget : public QWidget
 		void setupThreading();
 		void setupConnections();
 
-};
-
-class PieceEditorWidget;
-
-class PieceGeometryThread : public QThread
-{
-	Q_OBJECT
-
-	public:
-		PieceGeometryThread(PieceEditorWidget* pew);
-		void run();
-		PieceEditorWidget* pew;
-		PieceEditorWidget* ppew;
-
-	signals:
-		void finishedMesh();
 };
 
 #endif
