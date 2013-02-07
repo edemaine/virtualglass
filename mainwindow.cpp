@@ -42,8 +42,6 @@ MainWindow :: MainWindow()
 	setViewMode(EMPTY_VIEW_MODE);
 	show();
 	setDirtyBit(false);
-
-	//emit someDataChanged();
 }
 
 
@@ -338,7 +336,7 @@ void MainWindow :: setupConnections()
 	connect(saveAllAct, SIGNAL(triggered()), this, SLOT(saveAllFile()));
 	connect(saveAllAsAct, SIGNAL(triggered()), this, SLOT(saveAllAsFile()));
 	connect(saveSelectedAsAct, SIGNAL(triggered()), this, SLOT(saveSelectedAsFile()));
-	connect(exitAct, SIGNAL(triggered()), qApp, SLOT(quit()));
+	connect(exitAct, SIGNAL(triggered()), this, SLOT(attemptToQuit()));
 
 	connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
 	connect(randomSimplePieceAction, SIGNAL(triggered()), this, SLOT(randomSimplePieceExampleActionTriggered()));
@@ -936,13 +934,15 @@ void MainWindow :: updateLibrary()
 	}
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)
+void MainWindow::closeEvent(QCloseEvent * /*event*/)
+{
+	attemptToQuit();	
+}
+
+void MainWindow::attemptToQuit()
 {
 	if (!dirtyBit)
-	{
-		event->accept();
-		return;
-	}	
+		QCoreApplication::exit();
 
 	// setup and launch the warning dialog
 	// using http://qt-project.org/doc/qt-4.8/qmessagebox.html#the-property-based-api
@@ -958,7 +958,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	switch (returnValue)
 	{
 		case QMessageBox::Cancel:
-			event->ignore();
 			return;
 		case QMessageBox::Save:
 			saveAllFile();
@@ -966,7 +965,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 		case QMessageBox::Discard:
 			break;
 	}
-	event->accept();
+
+	QCoreApplication::exit();
 }
 
 void MainWindow::contextMenuEvent(QContextMenuEvent *event)

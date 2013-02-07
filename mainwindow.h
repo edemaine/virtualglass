@@ -157,6 +157,7 @@ class MainWindow : public QMainWindow
 		void web1PieceExampleActionTriggered();
 		void web2PieceExampleActionTriggered();
 		void depthPeelActionTriggered();
+		void attemptToQuit();
 };
 
 #endif
