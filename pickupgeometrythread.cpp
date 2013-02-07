@@ -15,7 +15,6 @@ void PickupGeometryThread::run()
 	{
 		ppew->wakeWait.wait(&(ppew->wakeMutex));
 
-		start:
 
 		for (unsigned int quality = 1; quality < 5; ++quality)
 		{	
@@ -41,7 +40,7 @@ void PickupGeometryThread::run()
 			if (startOver)
 			{
 				deep_delete(myTempPickup);
-				goto start;
+				quality = 0;	
 			}
 		}
 	}

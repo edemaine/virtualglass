@@ -10,7 +10,6 @@
 
 void generateMesh(Piece* piece, Geometry* geometry, unsigned int quality)
 {
-	quality = MIN(4, quality);
 	geometry->clear();
 	vector<MeshInternal::ancestor> ancestors;
 	MeshInternal::recurseMesh(piece, geometry, &ancestors, quality);
@@ -19,7 +18,6 @@ void generateMesh(Piece* piece, Geometry* geometry, unsigned int quality)
 
 void generateMesh(PickupPlan* pickup, Geometry* geometry, unsigned int quality)
 {
-	quality = MIN(4, quality);
 	geometry->clear();
 	vector<MeshInternal::ancestor> ancestors;
 	MeshInternal::recurseMesh(pickup, geometry, &ancestors, quality, true);
@@ -28,7 +26,6 @@ void generateMesh(PickupPlan* pickup, Geometry* geometry, unsigned int quality)
 
 void generatePullMesh(PullPlan* plan, Geometry* geometry, unsigned int quality)
 {
-	quality = MIN(4, quality);
 	geometry->clear();
 	vector<MeshInternal::ancestor> ancestors;
 	MeshInternal::recurseMesh(plan, geometry, &ancestors, 2.0, quality, true);
@@ -549,8 +546,12 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>* ancestors, Color color
 {
 	float finalDiameter = totalShrink(ancestors);
 	unsigned int angularResolution = quality / 4.0 * MIN(MAX(finalDiameter*10, 4), 10); 
+	if (angularResolution < 4)
+		return;
 	angularResolution = ((angularResolution + 2) / 4) * 4;
 	unsigned int axialResolution = quality / 4.0 * MIN(MAX(length * 40, 5), 80);
+	if (axialResolution < 5)
+		return;
 	
 	uint32_t first_vert = geometry->vertices.size();
 	uint32_t first_triangle = geometry->triangles.size();
@@ -613,8 +614,12 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>* ancestors,
 {
 	float finalDiameter = totalShrink(ancestors);
 	unsigned int angularResolution = quality / 4.0 * MIN(MAX(finalDiameter*10, 4), 10); 
+	if (angularResolution < 4)
+		return;
 	angularResolution = ((angularResolution + 2) / 4) * 4;
 	unsigned int axialResolution = quality / 4.0 * MIN(MAX(length * 40, 5), 80);
+	if (axialResolution < 5)
+		return;
 
 	uint32_t first_vert = geometry->vertices.size();
 	uint32_t first_triangle = geometry->triangles.size();

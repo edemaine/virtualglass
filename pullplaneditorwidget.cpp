@@ -1,5 +1,4 @@
 
-
 #include "pullplan.h"
 #include "geometry.h"
 #include "pullplaneditorwidget.h"
@@ -11,6 +10,7 @@
 #include "mesh.h"
 #include "dependancy.h"
 #include "templateparameter.h"
+#include "pullplangeometrythread.h"
 
 PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -22,12 +22,21 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 	niceViewWidget->setGeometry(&geometry);
 
 	setupLayout();
+	setupThreading();
 	setupConnections();
 }
 
 void PullPlanEditorWidget :: resetPlan()
 {
 	plan = new PullPlan(PullTemplate::HORIZONTAL_LINE_CIRCLE);
+}
+
+void PullPlanEditorWidget :: setupThreading()
+{
+	tempPullPlan = deep_copy(plan);
+	tempPullPlanDirty = true;
+	geometryThread = new PullPlanGeometryThread(this);
+	geometryThread->start();
 }
 
 void PullPlanEditorWidget :: updateEverything()
@@ -51,8 +60,6 @@ void PullPlanEditorWidget :: updateEverything()
 	twistSpin->setEnabled(!plan->hasSquareCasing());
 
 	viewWidget->setPullPlan(plan);
-	viewWidget->repaint();
-
 	customizeViewWidget->setPullPlan(plan);
 
 	// we always keep the first parameter shown so that the stack widget
@@ -88,9 +95,12 @@ void PullPlanEditorWidget :: updateEverything()
 		}
 	}
 
-	geometry.clear();
-	generatePullMesh(plan, &geometry, 4);
-	emit geometryChanged(geometry);
+	tempPullPlanMutex.lock();
+	deep_delete(tempPullPlan);
+	tempPullPlan = deep_copy(plan);
+	tempPullPlanDirty = true;
+	tempPullPlanMutex.unlock();
+	wakeWait.wakeOne(); // wake up the thread if it's sleeping
 
 	// Highlight correct pull template
 	PullTemplateLibraryWidget* ptlw; 
@@ -104,6 +114,27 @@ void PullPlanEditorWidget :: updateEverything()
 		        ptlw->setDependancy(false);
 	}
 }
+
+void PullPlanEditorWidget :: geometryThreadFinishedMesh()
+{
+	if (tempGeometry1Mutex.tryLock())
+	{
+		geometry.vertices = tempGeometry1.vertices;
+		geometry.triangles = tempGeometry1.triangles;
+		geometry.groups = tempGeometry1.groups;
+		tempGeometry1Mutex.unlock();
+	}
+	else if (tempGeometry2Mutex.tryLock())
+	{
+		geometry.vertices = tempGeometry2.vertices;
+		geometry.triangles = tempGeometry2.triangles;
+		geometry.groups = tempGeometry2.groups;
+		tempGeometry2Mutex.unlock();
+	}
+
+	niceViewWidget->repaint();
+}
+
 
 void PullPlanEditorWidget :: setupLayout()
 {
@@ -326,10 +357,10 @@ void PullPlanEditorWidget :: setupConnections()
 	for (unsigned int i = 0; i < paramSpins.size(); ++i)
 		connect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
 
+	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(viewWidgetDataChanged()));
 	connect(customizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(customizeViewWidgetDataChanged()));
-	connect(this, SIGNAL(geometryChanged(Geometry)), niceViewWidget, SLOT(repaint()));
 	connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 }
 

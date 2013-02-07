@@ -15,8 +15,6 @@ void PieceGeometryThread::run()
 	{
 		pew->wakeWait.wait(&(pew->wakeMutex));
 
-		start:
-
 		for (unsigned int quality = 1; quality < 5; ++quality)
 		{	
 			// get lock for pew's tempPiece 
@@ -41,7 +39,7 @@ void PieceGeometryThread::run()
 			if (startOver)
 			{
 				deep_delete(myTempPiece);
-				goto start;
+				quality = 0;	
 			}
 		}
 	}

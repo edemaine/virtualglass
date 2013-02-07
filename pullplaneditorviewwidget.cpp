@@ -402,9 +402,11 @@ void PullPlanEditorViewWidget :: populateHighlightedCasings(int x, int y)
 	}
 }
 
-void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan) {
+void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan) 
+{
 	this->plan = plan;
 	updateHighlightedSubplansAndCasings(NULL);
+	this->repaint();	
 }
 
 

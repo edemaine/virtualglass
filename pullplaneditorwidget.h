@@ -14,10 +14,13 @@ class PullPlanCustomizeViewWidget;
 class NiceViewWidget;
 class AsyncPullPlanLibraryWidget;
 class PullTemplateLibraryWidget;
+class PullPlanGeometryThread;
 
 class PullPlanEditorWidget : public QWidget
 {
 	Q_OBJECT
+
+	friend class PullPlanGeometryThread;
 
 	public:
 		PullPlanEditorWidget(QWidget* parent=0);
@@ -30,7 +33,6 @@ class PullPlanEditorWidget : public QWidget
 	signals:
 		void someDataChanged();
 		void newPullPlan(PullPlan* p);
-		void geometryChanged(Geometry g);
 
 	public slots:
 		void updateEverything();
@@ -50,8 +52,23 @@ class PullPlanEditorWidget : public QWidget
 		void twistSliderChanged(int);
 		void paramSpinChanged(int);
 		void tabChanged(int);
+		void geometryThreadFinishedMesh();
 
 	private:
+                QMutex tempPullPlanMutex;
+                PullPlan* tempPullPlan;
+                bool tempPullPlanDirty;
+
+                QWaitCondition wakeWait;
+                QMutex wakeMutex;
+
+                PullPlanGeometryThread* geometryThread;
+
+                QMutex tempGeometry1Mutex;
+                QMutex tempGeometry2Mutex;
+                Geometry tempGeometry1;
+                Geometry tempGeometry2;
+
 		Geometry geometry;
 		PullPlan* plan;
 		PullPlanEditorViewWidget* viewWidget;	
@@ -78,6 +95,7 @@ class PullPlanEditorWidget : public QWidget
 		NiceViewWidget* niceViewWidget;
 
 		void setupLayout();
+		void setupThreading();
 		void setupConnections();
 };
 
