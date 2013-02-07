@@ -21,6 +21,7 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWi
 
 void PickupPlanEditorViewWidget :: setupThreading()
 {
+	geometryDirty = false;
 	tempPickup = deep_copy(pickup);
 	tempPickupDirty = true;
 	geometryThread = new PickupGeometryThread(this);
@@ -240,6 +241,12 @@ void PickupPlanEditorViewWidget :: setPickup(PickupPlan* _pickup)
 
 void PickupPlanEditorViewWidget :: geometryThreadFinishedMesh()
 {
+	geometryDirtyMutex.lock();
+	bool dirty = geometryDirty;
+	geometryDirtyMutex.unlock();
+	if (!dirty)
+		return;
+
         if (tempGeometry1Mutex.tryLock())
         {
                 geometry.vertices = tempGeometry1.vertices;

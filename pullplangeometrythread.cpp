@@ -15,7 +15,7 @@ void PullPlanGeometryThread::run()
 	{
 		ppew->wakeWait.wait(&(ppew->wakeMutex));
 
-		for (unsigned int quality = 3; quality < 13; quality+=3)
+		for (unsigned int quality = 4; quality < 17; quality+=4)
 		{	
 			// get lock for ppew's tempPullPlan 
 			// and make a copy to get out of his way as fast as possible	
@@ -31,6 +31,9 @@ void PullPlanGeometryThread::run()
 			ppew->tempGeometry2Mutex.lock();
 			generatePullMesh(myTempPullPlan, &(ppew->tempGeometry2), quality);
 			ppew->tempGeometry2Mutex.unlock();	
+                        ppew->geometryDirtyMutex.lock();
+                        ppew->geometryDirty = true;
+                        ppew->geometryDirtyMutex.unlock();
 			emit finishedMesh();
 
 			ppew->tempPullPlanMutex.lock();

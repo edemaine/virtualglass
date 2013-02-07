@@ -63,7 +63,9 @@ class PullPlanEditorWidget : public QWidget
                 QMutex wakeMutex;
 
                 PullPlanGeometryThread* geometryThread;
-
+	
+		QMutex geometryDirtyMutex;
+		bool geometryDirty;
                 QMutex tempGeometry1Mutex;
                 QMutex tempGeometry2Mutex;
                 Geometry tempGeometry1;

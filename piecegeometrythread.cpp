@@ -31,6 +31,9 @@ void PieceGeometryThread::run()
 			pew->tempGeometry2Mutex.lock();
 			generateMesh(myTempPiece, &(pew->tempGeometry2), quality);
 			pew->tempGeometry2Mutex.unlock();	
+			pew->geometryDirtyMutex.lock();
+			pew->geometryDirty = true;
+			pew->geometryDirtyMutex.unlock();
 			emit finishedMesh();
 
 			pew->tempPieceMutex.lock();

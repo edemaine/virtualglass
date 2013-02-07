@@ -33,6 +33,7 @@ void PullPlanEditorWidget :: resetPlan()
 
 void PullPlanEditorWidget :: setupThreading()
 {
+	geometryDirty = false;
 	tempPullPlan = deep_copy(plan);
 	tempPullPlanDirty = true;
 	geometryThread = new PullPlanGeometryThread(this);
@@ -117,8 +118,17 @@ void PullPlanEditorWidget :: updateEverything()
 
 void PullPlanEditorWidget :: geometryThreadFinishedMesh()
 {
+	geometryDirtyMutex.lock();
+	bool dirty = geometryDirty;
+	geometryDirtyMutex.unlock();
+	if (!dirty)
+		return;
+
 	if (tempGeometry1Mutex.tryLock())
 	{
+		geometryDirtyMutex.lock();
+		geometryDirty = false;
+		geometryDirtyMutex.unlock();
 		geometry.vertices = tempGeometry1.vertices;
 		geometry.triangles = tempGeometry1.triangles;
 		geometry.groups = tempGeometry1.groups;
@@ -126,10 +136,14 @@ void PullPlanEditorWidget :: geometryThreadFinishedMesh()
 	}
 	else if (tempGeometry2Mutex.tryLock())
 	{
+		geometryDirtyMutex.lock();
+		geometryDirty = false;
+		geometryDirtyMutex.unlock();
 		geometry.vertices = tempGeometry2.vertices;
 		geometry.triangles = tempGeometry2.triangles;
 		geometry.groups = tempGeometry2.groups;
 		tempGeometry2Mutex.unlock();
+
 	}
 
 	niceViewWidget->repaint();

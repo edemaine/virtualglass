@@ -111,8 +111,17 @@ void PieceEditorWidget :: updateEverything()
 
 void PieceEditorWidget :: geometryThreadFinishedMesh()
 {
+	geometryDirtyMutex.lock();
+	bool dirty = geometryDirty;
+	geometryDirtyMutex.unlock();
+	if (!dirty)
+		return;
+
 	if (tempGeometry1Mutex.tryLock())
 	{
+		geometryDirtyMutex.lock();
+		geometryDirty = false;
+		geometryDirtyMutex.unlock();
 		geometry.vertices = tempGeometry1.vertices;
 		geometry.triangles = tempGeometry1.triangles;
 		geometry.groups = tempGeometry1.groups;
@@ -120,11 +129,29 @@ void PieceEditorWidget :: geometryThreadFinishedMesh()
 	}
 	else if (tempGeometry2Mutex.tryLock())
 	{
+		geometryDirtyMutex.lock();
+		geometryDirty = false;
+		geometryDirtyMutex.unlock();
 		geometry.vertices = tempGeometry2.vertices;
 		geometry.triangles = tempGeometry2.triangles;
 		geometry.groups = tempGeometry2.groups;
 		tempGeometry2Mutex.unlock();
 	}
+	// else: this might happen if we get incredibly unlucky:
+	// We try lock 1 while the geometry thread has it, 
+	// and before we can try lock 2, the geometry thread unlocks 1
+	// and takes lock 2.
+	// 
+	// Because the goal is to have a non-blocking GUI thread *and* geometry
+	// thread that continously writes new geometry regardless of whether the
+	// GUI thread read the last geometry, we can never *ensure* that we can read.
+	//
+	// However, since every piece change causes the geometry thread to emit multiple
+	// signals (dependent on number of mesh qualities created), this would 
+	// have to happen a number of times *in a row* to result in not getting
+	// any updated geometry for a new piece. Probability is p^quality, where
+	// p is probability of the scenario each time. If it's a linear function
+	// of running time, then it's probably < 1%. 
 	
 	niceViewWidget->repaint();
 }
@@ -336,6 +363,7 @@ void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 void PieceEditorWidget :: setupThreading()
 {
+	geometryDirty = false;
 	tempPiece = deep_copy(piece);
 	tempPieceDirty = true;
 	geometryThread = new PieceGeometryThread(this);

@@ -15,7 +15,6 @@ void PickupGeometryThread::run()
 	{
 		ppew->wakeWait.wait(&(ppew->wakeMutex));
 
-
 		for (unsigned int quality = 1; quality < 5; ++quality)
 		{	
 			// get lock for ppew's tempPiece 
@@ -32,6 +31,9 @@ void PickupGeometryThread::run()
 			ppew->tempGeometry2Mutex.lock();
 			generateMesh(myTempPickup, &(ppew->tempGeometry2), quality);
 			ppew->tempGeometry2Mutex.unlock();	
+			ppew->geometryDirtyMutex.lock();
+			ppew->geometryDirty = true;
+			ppew->geometryDirtyMutex.unlock();
 			emit finishedMesh();
 
 			ppew->tempPickupMutex.lock();
