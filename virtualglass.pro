@@ -118,8 +118,7 @@ HEADERS += jsoncpp/include/json/autolink.h \
         SVG.hpp \
         Box.hpp \
         Matrix.hpp \
-	glassfilewriter.h \
-	glassfilereader.h \
+	glassfileio.h \
 	piecegeometrythread.h \
 	pickupgeometrythread.h \
 	pullplangeometrythread.h \
@@ -171,8 +170,7 @@ SOURCES += main.cpp \
 	jsoncpp/src/lib_json/json_writer.cpp \
         SVG.cpp \
         bubble.cpp \
-	glassfilewriter.cpp \
-	glassfilereader.cpp \
+	glassfileio.cpp \
 	piecegeometrythread.cpp \
 	pickupgeometrythread.cpp \
 	pullplangeometrythread.cpp \
