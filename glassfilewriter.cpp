@@ -1,12 +1,12 @@
 
 #include "glassfilewriter.h"
 
+#include <algorithm>
 #include <string>
 #include <sstream>
 #include <fstream>
 #include <iostream>
 #include <stdio.h>
-
 #include <QTextStream>
 #include <QFile>
 
@@ -15,10 +15,25 @@
 #include "piece.h"
 #include "globalglass.h"
 
+using std::find;
+using std::stringstream;
+
+string GlassFileWriter::geometricShapeToString(enum GeometricShape shape)
+{
+	switch (shape)
+	{
+		case SQUARE_SHAPE:
+			return "Square";
+		case CIRCLE_SHAPE:
+		default:
+			return "Circle";
+	}
+}
+
 QString GlassFileWriter :: writeJson(Json::Value root)
 {
         Json::StyledWriter writer;
-        std::string outputConfig = writer.write(root);
+        string outputConfig = writer.write(root);
         QString output = QString::fromStdString(outputConfig);
         return output;
 }
@@ -28,22 +43,22 @@ void GlassFileWriter :: save(QString filename, vector<GlassColor*> colors, vecto
         QFile saveFile(filename);
         saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream fileOutput(&saveFile);
-        //read version and date from version.txt; write this into json file (root0)
-        //first line; versionNo and date
-        ifstream readHdl;
-        //date has always 12 characters
-        char date[11];
-        char versionNo[4];
 
-        readHdl.open(":/version.txt");
-        readHdl.getline(versionNo,4,'\n');
-        readHdl.getline(date,11,'\n');
-        readHdl.close();
+        //read version and date from version.txt; write this into json file (root0)
+        QFile inFile(":/version.txt");
+	QString revision;
+	QString date;
+        if (inFile.open(QIODevice::ReadOnly)) 
+	{
+                QTextStream in(&inFile);
+                revision = in.readLine();
+                date = in.readLine();
+        }
 
         Json::Value root;
         Json::Value nested_value;
-        nested_value["Number"] = versionNo;
-        nested_value["Date"] = date;
+        nested_value["Revision"] = revision.toStdString();
+        nested_value["Date"] = date.toStdString();
         root["Build information"] = nested_value;
         map<Piece*,int> pieceMap;
         map<PullPlan*,int> caneMap;
@@ -64,16 +79,16 @@ void GlassFileWriter :: save(QString filename, vector<GlassColor*> colors, vecto
 
 void GlassFileWriter::buildCaneTree(PullPlan* plan, vector<PullPlan*>* caneVec, vector<GlassColor*>* colorVec)
 {
-        if(std::find(caneVec->begin(), caneVec->end(), plan) != caneVec->end())
+        if(find(caneVec->begin(), caneVec->end(), plan) != caneVec->end())
                 return;
 
         for(unsigned int i = 0; i < plan->getCasingCount(); i++){
-                if (std::find(colorVec->begin(), colorVec->end(), plan->getCasingColor(i)) == colorVec->end())
+                if (find(colorVec->begin(), colorVec->end(), plan->getCasingColor(i)) == colorVec->end())
                         colorVec->push_back(plan->getCasingColor(i));
         }
         if(plan->subs.size() == 0)
 	{
-                if (std::find(caneVec->begin(), caneVec->end(), plan) == caneVec->end())
+                if (find(caneVec->begin(), caneVec->end(), plan) == caneVec->end())
                         caneVec->push_back(plan);
         }
         else
@@ -83,7 +98,7 @@ void GlassFileWriter::buildCaneTree(PullPlan* plan, vector<PullPlan*>* caneVec, 
                         SubpullTemplate subplan = plan->subs.at(i);
                         //go down and build tree
                         buildCaneTree(subplan.plan, caneVec, colorVec);
-                        if (std::find(caneVec->begin(), caneVec->end(), subplan.plan) == caneVec->end())
+                        if (find(caneVec->begin(), caneVec->end(), subplan.plan) == caneVec->end())
                                 caneVec->push_back(subplan.plan);
                 }
         }
@@ -98,17 +113,17 @@ void GlassFileWriter::buildCaneMap(vector<PullPlan*>* caneVec, vector<GlassColor
                 for(unsigned int i = 0; i < piece->pickup->subs.size(); i++){
                         PullPlan* plan = piece->pickup->subs.at(i).plan;
 
-                        if (std::find(caneVec->begin(), caneVec->end(), plan) == caneVec->end())
+                        if (find(caneVec->begin(), caneVec->end(), plan) == caneVec->end())
                         {
-                                if (std::find(colorVec->begin(), colorVec->end(), piece->pickup->overlayGlassColor) == colorVec->end())
+                                if (find(colorVec->begin(), colorVec->end(), piece->pickup->overlayGlassColor) == colorVec->end())
                                         colorVec->push_back(piece->pickup->overlayGlassColor);
-                                if (std::find(colorVec->begin(), colorVec->end(), piece->pickup->casingGlassColor) == colorVec->end())
+                                if (find(colorVec->begin(), colorVec->end(), piece->pickup->casingGlassColor) == colorVec->end())
                                         colorVec->push_back(piece->pickup->casingGlassColor);
-                                if (std::find(colorVec->begin(), colorVec->end(), piece->pickup->underlayGlassColor) == colorVec->end())
+                                if (find(colorVec->begin(), colorVec->end(), piece->pickup->underlayGlassColor) == colorVec->end())
                                         colorVec->push_back(piece->pickup->underlayGlassColor);
 
                                 buildCaneTree(plan, caneVec, colorVec);
-                                if (std::find(caneVec->begin(), caneVec->end(), plan) == caneVec->end())
+                                if (find(caneVec->begin(), caneVec->end(), plan) == caneVec->end())
                                         caneVec->push_back(plan);
                         }
                 }
@@ -124,7 +139,7 @@ void GlassFileWriter::writeCanes(Json::Value *root, map<PullPlan*, int>* caneMap
                 PullPlan* plan = (*plans)[i];
 
 		// if plan is in caneVec, or is a global glass 
-                if(((std::find(caneVec.begin(), caneVec.end(), plan)) != caneVec.end()) 
+                if(((find(caneVec.begin(), caneVec.end(), plan)) != caneVec.end()) 
 			|| (plan == GlobalGlass::circlePlan()) || (plan==GlobalGlass::squarePlan()))
 		{
                         if((plan == GlobalGlass::circlePlan()) || (plan==GlobalGlass::squarePlan()))
@@ -161,9 +176,9 @@ void GlassFileWriter::writeCanes(Json::Value *root, map<PullPlan*, int>* caneMap
                         if(color==false)
                                 (*nested_value2)["CasingColor"] = 0;
 
-                        (*nested_value2)["CasingShape"] = plan->getCasingShape(k);
+                        (*nested_value2)["CasingShape"] = geometricShapeToString(plan->getCasingShape(k));
                         (*nested_value2)["CasingThickness"] = plan->getCasingThickness(k);
-                        std::stringstream casingSstr;
+                        stringstream casingSstr;
                         casingSstr << k<<"_Casing";
                         string casing = casingSstr.str();
                         (*nested_value)[casing] = (*nested_value2);
@@ -179,9 +194,9 @@ void GlassFileWriter::writeCanes(Json::Value *root, map<PullPlan*, int>* caneMap
 
                 (*nested_value)["PullTemplate"] = *value5;
                 (*nested_value)["Casing count"] = *value7;
-                (*nested_value)["Twists"] = *value8;
+                (*nested_value)["Twist"] = *value8;
 
-                std::stringstream *pullplannrSstr = new std::stringstream;
+                stringstream *pullplannrSstr = new stringstream;
                 *pullplannrSstr  <<i<< "_Cane";
                 string pullPlanNr = (*pullplannrSstr).str();
 
@@ -200,13 +215,13 @@ void GlassFileWriter::writeCanes(Json::Value *root, map<PullPlan*, int>* caneMap
                                 (*nested_value2)["Y"] = templ.location[1];
                                 (*nested_value2)["Z"] = templ.location[2];
 
-                                std::stringstream *Sstr = new std::stringstream;
+                                stringstream *Sstr = new stringstream;
                                         *Sstr <<j << "_Cane";
                                 string name = Sstr->str();
 
                                 (*nested_value3)[name] = (*nested_value2);
                         }
-                        (*nested_value)["SubPullPlans"] = (*nested_value3);
+                        (*nested_value)["Subpulls"] = (*nested_value3);
                 }
                 (*pullplan_nested)[pullPlanNr] = *nested_value;
                 i++;
@@ -222,7 +237,7 @@ void GlassFileWriter::writeColors(Json::Value* root, map<GlassColor*, int>* colo
 	{
                 GlassColor* color = (*colors)[i];
 
-                if((std::find(colorVec.begin(), colorVec.end(), color)) != colorVec.end()){
+                if((find(colorVec.begin(), colorVec.end(), color)) != colorVec.end()){
 
                         (*colorMap)[color] = i+1; //clear ==0
 
@@ -236,7 +251,7 @@ void GlassFileWriter::writeColors(Json::Value* root, map<GlassColor*, int>* colo
                         (*nested_value)["B"] = color->getColor()->b; 
                         (*nested_value)["Alpha"] = color->getColor()->a;
 
-                        std::stringstream *colorSstr = new std::stringstream;
+                        stringstream *colorSstr = new stringstream;
                         *colorSstr  <<i+1<<"_" << (color->getName())->toStdString();
                         string colorName = colorSstr->str();
 
@@ -280,7 +295,7 @@ void GlassFileWriter::writePieces(Json::Value* root, map<Piece*, int>* pieceMap,
                 for(unsigned int i = 0; i < piece->getParameterCount(); i++){
                         TemplateParameter pieceTemplPara;
                         piece->getParameter(i,&pieceTemplPara);
-                        std::stringstream *Sstr = new std::stringstream;
+                        stringstream *Sstr = new stringstream;
                         *Sstr <<i << "_" <<pieceTemplPara.name;
                         string name = Sstr->str();
                         (*nested_value4)[name] = pieceTemplPara.value;
@@ -305,7 +320,7 @@ void GlassFileWriter::writePieces(Json::Value* root, map<Piece*, int>* pieceMap,
                         (*nested_value2)["Y"] = templ.location[1];
                         (*nested_value2)["Z"] = templ.location[2];
 
-                        std::stringstream *Sstr = new std::stringstream;
+                        stringstream *Sstr = new stringstream;
                         *Sstr <<j << "_Cane";
                         string name = Sstr->str();
 
@@ -315,7 +330,7 @@ void GlassFileWriter::writePieces(Json::Value* root, map<Piece*, int>* pieceMap,
                 }
                 (*nested_value)["SubPickups"] = (*nested_value3);
                 (*nested_value)["PieceTemplate"] = PieceTemplate::enumToString(piece->getTemplateType());
-                std::stringstream *Sstr = new std::stringstream;
+                stringstream *Sstr = new stringstream;
                 *Sstr << i<<"_Piece";
                 string name = Sstr->str();
                 (*piece_nested)[name]=(*nested_value);

@@ -29,18 +29,21 @@ class PullPlan
 		void setParameter(unsigned int index, int value);
 
 		void setCasingThickness(float t, unsigned int index);
-		void setOutermostCasingShape(enum GeometricShape s);
-		void setCasingColor(GlassColor* gc, unsigned int index);
-		void addCasing(enum GeometricShape s);
-		void removeCasing();
 		float getCasingThickness(unsigned int index);
+
+		void setOutermostCasingShape(enum GeometricShape s);
 		enum GeometricShape getCasingShape(unsigned int index);
 		enum GeometricShape getOutermostCasingShape();
-		void setOutermostCasingColor(GlassColor* gc);
-		GlassColor* getOutermostCasingColor();
-		GlassColor* getCasingColor(unsigned int index);
-		unsigned int getCasingCount(); 
 		bool hasSquareCasing();
+
+		void setCasingColor(GlassColor* gc, unsigned int index);
+		void setOutermostCasingColor(GlassColor* gc);
+		GlassColor* getCasingColor(unsigned int index);
+		GlassColor* getOutermostCasingColor();
+
+		void addCasing(enum GeometricShape s);
+		void removeCasing();
+		unsigned int getCasingCount(); 
 
 		void setTwist(int t);
 		int getTwist();

@@ -934,9 +934,10 @@ void MainWindow :: updateLibrary()
 	}
 }
 
-void MainWindow::closeEvent(QCloseEvent * /*event*/)
+void MainWindow::closeEvent(QCloseEvent * event)
 {
 	attemptToQuit();	
+	event->ignore(); // if you didn't quit, don't
 }
 
 void MainWindow::attemptToQuit()
@@ -1227,7 +1228,7 @@ void MainWindow::openFile()
 	vector<GlassColor*> colors;
 	vector<PullPlan*> plans;
 	vector<Piece*> pieces;
-	bool success = GlassFileReader::load(userSpecifiedFilename, &colors, &plans, &pieces);
+	bool success = GlassFileIO::read(userSpecifiedFilename, colors, plans, pieces);
 
 	// if it failed, pop a sad little message box 
 	if (!success) 
@@ -1273,17 +1274,14 @@ void MainWindow::addFile()
 	vector<Piece*> partialPieces;
 	for (int i = 0; i < userSpecifiedFilenames.size(); ++i)
 	{
-		partialColors.clear();
-		partialPlans.clear();
-		partialPieces.clear();
-		if (GlassFileReader::load(userSpecifiedFilenames[i], &partialColors, &partialPlans, &partialPieces))
+		if (GlassFileIO::read(userSpecifiedFilenames[i], partialColors, partialPlans, partialPieces))
 		{
 			for (unsigned int j = 0; j < partialColors.size(); ++j)
-				colors.push_back(partialColors[i]);
+				colors.push_back(partialColors[j]);
 			for (unsigned int j = 0; j < partialPlans.size(); ++j)
-				plans.push_back(partialPlans[i]);
+				plans.push_back(partialPlans[j]);
 			for (unsigned int j = 0; j < partialPieces.size(); ++j)
-				pieces.push_back(partialPieces[i]);
+				pieces.push_back(partialPieces[j]);
 		}
 		else // yes, we're popping up a dialog for every file that can't be read...don't try 1000 at a time
 		{
@@ -1292,7 +1290,6 @@ void MainWindow::addFile()
 			msgBox.setStandardButtons(QMessageBox::Ok);
 			msgBox.exec();
 			return;
-
 		}	
 	}
 
@@ -1322,7 +1319,7 @@ void MainWindow::saveAllFile()
 		vector<PullPlan*> plans;
 		vector<Piece*> pieces;
 		getLibraryContents(&colors, &plans, &pieces);
-		GlassFileWriter::save(saveFilename, colors, plans, pieces);	
+		GlassFileIO::write(saveFilename, colors, plans, pieces);	
 		setDirtyBit(false);
 	}
 }
@@ -1341,7 +1338,7 @@ void MainWindow::saveAllAsFile()
 	vector<PullPlan*> plans;
 	vector<Piece*> pieces;
 	getLibraryContents(&colors, &plans, &pieces);
-	GlassFileWriter::save(saveFilename, colors, plans, pieces);	
+	GlassFileIO::write(saveFilename, colors, plans, pieces);	
 	setDirtyBit(false);
 }
 
@@ -1373,7 +1370,7 @@ void MainWindow::saveSelectedAsFile()
 		return;
 
 	// pretend library has one thing in it		
-	GlassFileWriter::save(userSpecifiedFilename, colors, plans, pieces);	
+	GlassFileIO::write(userSpecifiedFilename, colors, plans, pieces);	
 
 	// this doesn't impact dirty bit or saveFilename at all: it's a special operation that 
 	// virtualglass has that lives outside of the usual file-editor relationship, e.g. of a text editor. 

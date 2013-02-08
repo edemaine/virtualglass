@@ -25,9 +25,9 @@ unix:!macx {
  #LIBS += -lGLUT
 }
 macx {
-  QMAKE_CC = clang
+  QMAKE_CC = g++
   QMAKE_CFLAGS += -Qunused-arguments
-  QMAKE_CXX = clang
+  QMAKE_CXX = g++
   QMAKE_CXXFLAGS += -DUNORDERED_MAP_WORKAROUND -I src/jsoncpp/include #-I src/freeglut/include -I src/freeglut/include/GL -I src/freeglut/src
   ICON = virtualglass.icns
 LIBS += -framework GLUT
