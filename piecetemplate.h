@@ -20,8 +20,6 @@ namespace PieceTemplate
 	enum Type lastSeedTemplate();
 	enum Type firstTemplate();
 	enum Type lastTemplate();
-
-	const char* enumToString(enum Type t);
 }
 
 #endif

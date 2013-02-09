@@ -17,11 +17,11 @@ enum PickupCaneOrientation
 class SubpickupTemplate
 {
 	public:
-		SubpickupTemplate(PullPlan* plan, Point location, int orientation, 
+		SubpickupTemplate(PullPlan* plan, Point location, enum PickupCaneOrientation orientation, 
 			float length, float width, enum GeometricShape shape);
 		PullPlan* plan;
 		Point location;
-		int orientation;
+		enum PickupCaneOrientation orientation;
 		float length;
 		float width;
 		enum GeometricShape shape;

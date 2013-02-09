@@ -3,17 +3,6 @@
 
 namespace PieceTemplate
 {
-	const char* names[] =
-	{
-		"Undefined",
-		"Tumbler",
-		"Bowl",
-		"Vase",
-		"Pot",
-		"Wavy Plate",
-		"Pickup"
-	};
-
 	enum Type firstSeedTemplate()
 	{
 		return TUMBLER;
@@ -32,11 +21,6 @@ namespace PieceTemplate
 	enum Type lastTemplate()
 	{
 		return PICKUP;
-	}
-
-	const char* enumToString(enum Type t)
-	{
-		return names[t];
 	}
 }
 

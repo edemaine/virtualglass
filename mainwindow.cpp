@@ -22,8 +22,7 @@
 #include "mainwindow.h"
 #include "globalglass.h"
 #include "SVG.hpp"
-#include "glassfilewriter.h"
-#include "glassfilereader.h"
+#include "glassfileio.h"
 
 MainWindow :: MainWindow()
 {
