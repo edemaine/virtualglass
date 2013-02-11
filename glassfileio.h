@@ -30,6 +30,9 @@ class GlassFileIO
 
 	private:
 		static void writeDocumentation(Json::Value& root);
+
+		static GlassColor* safeColorMap(map<unsigned int, GlassColor*>& colorMap, unsigned int index);
+		static PullPlan* safeCaneMap(map<unsigned int, PullPlan*>& caneMap, unsigned int index);
 			
 		static void writeBuildInformation(Json::Value& root);
 		static void readBuildInformation(Json::Value& root, unsigned int& revision, string& date);

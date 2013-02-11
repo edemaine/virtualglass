@@ -12,6 +12,7 @@
 #include "pullplan.h"
 #include "piece.h"
 #include "globalglass.h"
+#include "constants.h" // for MAX
 
 using std::string;
 using std::vector;
@@ -37,6 +38,22 @@ void GlassFileIO::writeDocumentation(Json::Value& root)
 	docFile.close();
 
 	root.setComment(docComment, Json::commentBefore);
+}
+
+// read
+GlassColor* GlassFileIO::safeColorMap(map<unsigned int, GlassColor*>& colorMap, unsigned int index)
+{
+	if (colorMap.find(index) == colorMap.end())
+		return GlobalGlass::color();
+	return colorMap[index];
+}
+
+PullPlan* GlassFileIO::safeCaneMap(map<unsigned int, PullPlan*>& caneMap, unsigned int index)
+{
+	if (caneMap.find(index) == caneMap.end())
+		// not quite right in some cases, should depend on expected shape
+		return GlobalGlass::circlePlan(); 
+	return caneMap[index];
 }
 
 // write
@@ -102,6 +119,11 @@ string GlassFileIO::idAndNameToString(unsigned int id, string name)
 // read
 unsigned int GlassFileIO::stringToId(string id)
 {
+	// if string doesn't contain a valid id, return a dummy ID that 
+	// does its best to avoid collision with any real ID
+	if (id.find("_") == string::npos)
+		return UINT_MAX; 
+	// otherwise return the best interpretation according to atoi()
 	return atoi(id.substr(id.find("_") + 1).c_str()); 
 }
 
@@ -399,9 +421,10 @@ void GlassFileIO::writeCane(Json::Value& root, PullPlan* cane, unsigned int cane
 	for (unsigned int i = 0; i < cane->getCasingCount(); ++i)
 	{
 		string casingName = idAndNameToString(i, "Casing");
-		root[canename]["Casings"][casingName]["Casing shape"] = geometricShapeToString(cane->getCasingShape(i));
-		root[canename]["Casings"][casingName]["Casing thickness"] = cane->getCasingThickness(i);
-		root[canename]["Casings"][casingName]["Casing color pointer"] = colorMap[cane->getCasingColor(i)];
+		root[canename]["Casings"][casingName]["Index"] = i;
+		root[canename]["Casings"][casingName]["Shape"] = geometricShapeToString(cane->getCasingShape(i));
+		root[canename]["Casings"][casingName]["Thickness"] = cane->getCasingThickness(i);
+		root[canename]["Casings"][casingName]["Color pointer"] = colorMap[cane->getCasingColor(i)];
 	}
 
 	// write pull template parameters
@@ -411,7 +434,7 @@ void GlassFileIO::writeCane(Json::Value& root, PullPlan* cane, unsigned int cane
 		TemplateParameter tmpParam;
 		cane->getParameter(i, &tmpParam);
 
-		string paramName = tmpParam.name;
+		string paramName = idAndNameToString(i, "PullTemplateParam");
 		root[canename]["Pull template parameters"][paramName]["Index"] = i;
 		root[canename]["Pull template parameters"][paramName]["Name"] = tmpParam.name;
 		root[canename]["Pull template parameters"][paramName]["Value"] = tmpParam.value;
@@ -445,27 +468,30 @@ PullPlan* GlassFileIO::readCane(string canename, Json::Value& root, unsigned int
 	PullPlan* cane = new PullPlan(stringToPullTemplate(root[canename]["Pull template"].asString()));
 	cane->setTwist(root[canename]["Twist"].asInt());
 
-	// loop over casings
+	// make a temporary list of casings that can be modified freely, unlike those stashed inside
+	// a cane, which have constraints due to collision, etc.
+	// make sure you get at least once casing, even if the file doesn't contain any
 	vector<Casing> tempCasings;
-	for (unsigned int i = 0; i < root[canename]["Casings"].getMemberNames().size(); ++i) // initialize temporary list
-		tempCasings.push_back(Casing(1.0, CIRCLE_SHAPE, NULL));
+	for (unsigned int i = 0; i < MAX(root[canename]["Casings"].getMemberNames().size(), 1); ++i) // initialize temporary list
+		tempCasings.push_back(Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
+	// now set this temporary list to the values of casings in the file
 	for (unsigned int i = 0; i < root[canename]["Casings"].getMemberNames().size(); ++i) // read in json to list
 	{
 		string casingname = root[canename]["Casings"].getMemberNames()[i];
-		int casingIndex = stringToId(casingname);
+		unsigned int casingIndex = root[canename]["Casings"][casingname]["Index"].asUInt();
 
 		GeometricShape casingShape = stringToGeometricShape(
-			root[canename]["Casings"][casingname]["Casing shape"].asString());
-		float casingThickness = root[canename]["Casings"][casingname]["Casing thickness"].asFloat();
-		unsigned int casingColorIndex = root[canename]["Casings"][casingname]["Casing color pointer"].asUInt();
+			root[canename]["Casings"][casingname]["Shape"].asString());
+		float casingThickness = root[canename]["Casings"][casingname]["Thickness"].asFloat();
+		unsigned int casingColorIndex = root[canename]["Casings"][casingname]["Color pointer"].asUInt();
 
 		tempCasings[casingIndex].shape = casingShape;
 		tempCasings[casingIndex].thickness = casingThickness;
-		tempCasings[casingIndex].glassColor = colorMap[casingColorIndex];
+		tempCasings[casingIndex].glassColor = safeColorMap(colorMap, casingColorIndex);
 	}
 	// make an initial pass to get casings with the right shapes piled on
-	// note: innermost casing is determined by pull template
-	for (unsigned int i = 1; i < root[canename]["Casings"].getMemberNames().size(); ++i) 
+	// note: innermost casing shape is determined by pull template
+	for (unsigned int i = 1; i < tempCasings.size(); ++i)
 	{
 		if (i == 1 && cane->getCasingCount() == 2) // you already got your casing
 			cane->setOutermostCasingShape(tempCasings[i].shape);
@@ -473,7 +499,7 @@ PullPlan* GlassFileIO::readCane(string canename, Json::Value& root, unsigned int
 			cane->addCasing(tempCasings[i].shape);
 	}
 	// make a second pass to set thickness and color
-	for (unsigned int i = 0; i < root[canename]["Casings"].getMemberNames().size(); ++i) 
+	for (unsigned int i = 0; i < tempCasings.size(); ++i) 
 	{
 		cane->setCasingThickness(tempCasings[i].thickness, i);
 		cane->setCasingColor(tempCasings[i].glassColor, i);
@@ -483,6 +509,7 @@ PullPlan* GlassFileIO::readCane(string canename, Json::Value& root, unsigned int
 	for (unsigned int i = 0; i < root[canename]["Pull template parameters"].getMemberNames().size(); ++i)
 	{
 		string paramname = root[canename]["Pull template parameters"].getMemberNames()[i];
+		
 		unsigned int paramIndex = root[canename]["Pull template parameters"][paramname]["Index"].asUInt();
 		cane->setParameter(paramIndex, root[canename]["Pull template parameters"][paramname]["Value"].asInt());
 		// don't bother to read name or lower/upper limits
@@ -499,7 +526,7 @@ void GlassFileIO::readCaneSubcanes(Json::Value& root, PullPlan* cane, map<unsign
 		string subpullname = root["Subcanes"].getMemberNames()[i];
 		unsigned int subpullIndex = root["Subcanes"][subpullname]["Index"].asUInt();
 
-		cane->subs[subpullIndex].plan = caneMap[root["Subcanes"][subpullname]["Cane pointer"].asUInt()];
+		cane->subs[subpullIndex].plan = safeCaneMap(caneMap, root["Subcanes"][subpullname]["Cane pointer"].asUInt());
 		cane->subs[subpullIndex].diameter = root["Subcanes"][subpullname]["Diameter"].asFloat();
 		cane->subs[subpullIndex].shape = stringToGeometricShape(root["Subcanes"][subpullname]["Shape"].asString());
 		cane->subs[subpullIndex].location.x = root["Subcanes"][subpullname]["X"].asFloat();
@@ -647,9 +674,9 @@ PickupPlan* GlassFileIO::readPickup(string pickupname, Json::Value& root,
 {
 	// read singletons: casing color, overlay color, underlay color, pickup template
 	PickupPlan* pickup = new PickupPlan(stringToPickupTemplate(root[pickupname]["Pickup template"].asString()));
-	pickup->casingGlassColor = colorMap[root[pickupname]["Casing color pointer"].asUInt()];
-	pickup->overlayGlassColor = colorMap[root[pickupname]["Overlay color pointer"].asUInt()];
-	pickup->underlayGlassColor = colorMap[root[pickupname]["Underlay color pointer"].asUInt()];
+	pickup->casingGlassColor = safeColorMap(colorMap, root[pickupname]["Casing color pointer"].asUInt());
+	pickup->overlayGlassColor = safeColorMap(colorMap, root[pickupname]["Overlay color pointer"].asUInt());
+	pickup->underlayGlassColor = safeColorMap(colorMap, root[pickupname]["Underlay color pointer"].asUInt());
 
 	// read pickup template parameters
 	for (unsigned int i = 0; i < root[pickupname]["Pickup template parameters"].getMemberNames().size(); ++i)
@@ -668,7 +695,8 @@ PickupPlan* GlassFileIO::readPickup(string pickupname, Json::Value& root,
 		string subpullname = root[pickupname]["Subcanes"].getMemberNames()[i];
 		unsigned int subIndex = root[pickupname]["Subcanes"][subpullname]["Index"].asUInt();
 	
-		pickup->subs[subIndex].plan = caneMap[root[pickupname]["Subcanes"][subpullname]["Cane pointer"].asUInt()];
+		pickup->subs[subIndex].plan = safeCaneMap(caneMap,
+			root[pickupname]["Subcanes"][subpullname]["Cane pointer"].asUInt());
 		pickup->subs[subIndex].length = root[pickupname]["Subcanes"][subpullname]["Length"].asFloat();
 		pickup->subs[subIndex].width = root[pickupname]["Subcanes"][subpullname]["Width"].asFloat();
 		pickup->subs[subIndex].orientation 
