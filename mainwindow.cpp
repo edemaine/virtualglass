@@ -942,7 +942,10 @@ void MainWindow::closeEvent(QCloseEvent * event)
 void MainWindow::attemptToQuit()
 {
 	if (!dirtyBit)
+	{
 		QCoreApplication::exit();
+		return;
+	}
 
 	// setup and launch the warning dialog
 	// using http://qt-project.org/doc/qt-4.8/qmessagebox.html#the-property-based-api

@@ -24,13 +24,13 @@ using std::string;
 class GlassFileIO
 {
 	public:
-		// returns whether load occured (true) or ran into issues (false) 
+		// returns whether the read or write succeeded (true) or ran into issues (false) 
                 static bool read(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, vector<Piece*>& pieces);
                 static bool write(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, vector<Piece*>& pieces);
 
 	private:
-		static QString writeJson(Json::Value& root);
-
+		static void writeDocumentation(Json::Value& root);
+			
 		static void writeBuildInformation(Json::Value& root);
 		static void readBuildInformation(Json::Value& root, unsigned int& revision, string& date);
 
@@ -41,8 +41,7 @@ class GlassFileIO
 		static enum GeometricShape stringToGeometricShape(string id);
 
 		static string idAndNameToString(unsigned int id, string name);
-		static int stringToId(string s);
-		static string stringToName(string s);
+		static unsigned int stringToId(string s);
 
 		static string pullTemplateToString(enum PullTemplate::Type type); 
 		static enum PullTemplate::Type stringToPullTemplate(string s);
@@ -65,7 +64,7 @@ class GlassFileIO
 			map<unsigned int, GlassColor*>& colorMap);
 
 		static void writeCanes(Json::Value& root, vector<PullPlan*>& canes, vector<GlassColor*>& colors);
-		static void readCaneSubpulls(Json::Value& caneRoot, PullPlan* cane, map<unsigned int, PullPlan*>& caneMap);
+		static void readCaneSubcanes(Json::Value& caneRoot, PullPlan* cane, map<unsigned int, PullPlan*>& caneMap);
                 static void readCanes(Json::Value& root, map<unsigned int, PullPlan*>& caneMap, map<unsigned int, GlassColor*>& colorMap, 
 			vector<PullPlan*>& readPlans);
 
