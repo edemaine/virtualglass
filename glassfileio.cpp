@@ -727,7 +727,7 @@ Piece* GlassFileIO::readPiece(string piecename, Json::Value& root, map<unsigned 
 		string paramname = root[piecename]["Piece template parameters"].getMemberNames()[i];
 		unsigned int paramIndex = root[piecename]["Piece template parameters"][paramname]["Index"].asUInt();
 
-		int paramValue = root[piecename]["Pickup template parameters"][paramname]["Value"].asInt();	
+		int paramValue = root[piecename]["Piece template parameters"][paramname]["Value"].asInt();	
 		piece->setParameter(paramIndex, paramValue); 
 	}
 
