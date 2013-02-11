@@ -310,7 +310,7 @@ void GlassFileIO::writeColors(Json::Value& root, vector<GlassColor*>& colors)
 
 void GlassFileIO::readColors(Json::Value& colorRoot, map<unsigned int, GlassColor*>& colorMap, vector<GlassColor*>& readColors)
 {
-	// clear out readColors for consistency with readPlans()
+	// clear out readColors for consistency with readCanes()
 	readColors.clear();
 
 	// add global color for map completeness
@@ -376,31 +376,31 @@ caneRoot
 */
 
 // write
-void GlassFileIO::writeCane(Json::Value& root, PullPlan* plan, unsigned int planIndex, map<PullPlan*, unsigned int>& planMap, 
+void GlassFileIO::writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<PullPlan*, unsigned int>& caneMap, 
 	map<GlassColor*, unsigned int>& colorMap)
 {
-	string canename = idAndNameToString(planIndex, "Cane");
+	string canename = idAndNameToString(caneIndex, "Cane");
 	
 	// write singletons: pull template, twist
-	root[canename]["Pull template"] = pullTemplateToString(plan->getTemplateType());
-	root[canename]["Twist"] = plan->getTwist();
+	root[canename]["Pull template"] = pullTemplateToString(cane->getTemplateType());
+	root[canename]["Twist"] = cane->getTwist();
 
 	// write casings	
 	root[canename]["Casings"];
-	for (unsigned int i = 0; i < plan->getCasingCount(); ++i)
+	for (unsigned int i = 0; i < cane->getCasingCount(); ++i)
 	{
 		string casingName = idAndNameToString(i, "Casing");
-		root[canename]["Casings"][casingName]["Casing shape"] = geometricShapeToString(plan->getCasingShape(i));
-		root[canename]["Casings"][casingName]["Casing thickness"] = plan->getCasingThickness(i);
-		root[canename]["Casings"][casingName]["Casing color"] = colorMap[plan->getCasingColor(i)];
+		root[canename]["Casings"][casingName]["Casing shape"] = geometricShapeToString(cane->getCasingShape(i));
+		root[canename]["Casings"][casingName]["Casing thickness"] = cane->getCasingThickness(i);
+		root[canename]["Casings"][casingName]["Casing color"] = colorMap[cane->getCasingColor(i)];
 	}
 
 	// write pull template parameters
 	root[canename]["Pull template parameters"];
-	for (unsigned int i = 0; i < plan->getParameterCount(); ++i)
+	for (unsigned int i = 0; i < cane->getParameterCount(); ++i)
 	{
 		TemplateParameter tmpParam;
-		plan->getParameter(i, &tmpParam);
+		cane->getParameter(i, &tmpParam);
 
 		string paramName = tmpParam.name;
 		root[canename]["Pull template parameters"][paramName]["Index"] = i;
@@ -412,29 +412,29 @@ void GlassFileIO::writeCane(Json::Value& root, PullPlan* plan, unsigned int plan
 
 	// loop over subpulls
 	root[canename]["Subpulls"];
-	for (unsigned int i = 0; i < plan->subs.size(); ++i)
+	for (unsigned int i = 0; i < cane->subs.size(); ++i)
 	{
 		string subpullName = idAndNameToString(i, "Subpull");
 		root[canename]["Subpulls"][subpullName]["Index"] = i;
-		root[canename]["Subpulls"][subpullName]["Cane"] = planMap[plan->subs[i].plan];
-		root[canename]["Subpulls"][subpullName]["Diameter"] = plan->subs[i].diameter;
-		root[canename]["Subpulls"][subpullName]["Shape"] = geometricShapeToString(plan->subs[i].shape);
-		root[canename]["Subpulls"][subpullName]["X"] = plan->subs[i].location.x;
-		root[canename]["Subpulls"][subpullName]["Y"] = plan->subs[i].location.y;
-		root[canename]["Subpulls"][subpullName]["Z"] = plan->subs[i].location.z;
+		root[canename]["Subpulls"][subpullName]["Cane"] = caneMap[cane->subs[i].plan];
+		root[canename]["Subpulls"][subpullName]["Diameter"] = cane->subs[i].diameter;
+		root[canename]["Subpulls"][subpullName]["Shape"] = geometricShapeToString(cane->subs[i].shape);
+		root[canename]["Subpulls"][subpullName]["X"] = cane->subs[i].location.x;
+		root[canename]["Subpulls"][subpullName]["Y"] = cane->subs[i].location.y;
+		root[canename]["Subpulls"][subpullName]["Z"] = cane->subs[i].location.z;
 	}
 }
 
 
 // read
-PullPlan* GlassFileIO::readCane(string canename, Json::Value& root, unsigned int& planIndex, 
+PullPlan* GlassFileIO::readCane(string canename, Json::Value& root, unsigned int& caneIndex, 
 	map<unsigned int, GlassColor*>& colorMap)
 {
-        planIndex = stringToId(canename);
+        caneIndex = stringToId(canename);
 
 	// read singletons: pull template, twist
-	PullPlan* plan = new PullPlan(stringToPullTemplate(root[canename]["Pull template"].asString()));
-	plan->setTwist(root[canename]["Twist"].asInt());
+	PullPlan* cane = new PullPlan(stringToPullTemplate(root[canename]["Pull template"].asString()));
+	cane->setTwist(root[canename]["Twist"].asInt());
 
 	// loop over casings
 	vector<Casing> tempCasings;
@@ -458,16 +458,16 @@ PullPlan* GlassFileIO::readCane(string canename, Json::Value& root, unsigned int
 	// note: innermost casing is determined by pull template
 	for (unsigned int i = 1; i < root[canename]["Casings"].getMemberNames().size(); ++i) 
 	{
-		if (i == 1 && plan->getCasingCount() == 2) // you already got your casing
-			plan->setOutermostCasingShape(tempCasings[i].shape);
+		if (i == 1 && cane->getCasingCount() == 2) // you already got your casing
+			cane->setOutermostCasingShape(tempCasings[i].shape);
 		else 
-			plan->addCasing(tempCasings[i].shape);
+			cane->addCasing(tempCasings[i].shape);
 	}
 	// make a second pass to set thickness and color
 	for (unsigned int i = 0; i < root[canename]["Casings"].getMemberNames().size(); ++i) 
 	{
-		plan->setCasingThickness(tempCasings[i].thickness, i);
-		plan->setCasingColor(tempCasings[i].glassColor, i);
+		cane->setCasingThickness(tempCasings[i].thickness, i);
+		cane->setCasingColor(tempCasings[i].glassColor, i);
 	}
 
 	// loop over pull template parameters
@@ -475,14 +475,14 @@ PullPlan* GlassFileIO::readCane(string canename, Json::Value& root, unsigned int
 	{
 		string paramname = root[canename]["Pull template parameters"].getMemberNames()[i];
 		unsigned int paramIndex = root[canename]["Pull template parameters"][paramname]["Index"].asUInt();
-		plan->setParameter(paramIndex, root[canename]["Pull template parameters"][paramname]["Value"].asInt());
+		cane->setParameter(paramIndex, root[canename]["Pull template parameters"][paramname]["Value"].asInt());
 		// don't bother to read name or lower/upper limits
 	}
 
-	return plan;
+	return cane;
 }
 
-void GlassFileIO::readCaneSubpulls(Json::Value& root, PullPlan* plan, map<unsigned int, PullPlan*>& caneMap)
+void GlassFileIO::readCaneSubpulls(Json::Value& root, PullPlan* cane, map<unsigned int, PullPlan*>& caneMap)
 {
 	// loop over subpulls
 	for (unsigned int i = 0; i < root["Subpulls"].getMemberNames().size(); ++i)
@@ -490,17 +490,17 @@ void GlassFileIO::readCaneSubpulls(Json::Value& root, PullPlan* plan, map<unsign
 		string subpullname = root["Subpulls"].getMemberNames()[i];
 		unsigned int subpullIndex = root["Subpulls"][subpullname]["Index"].asUInt();
 
-		plan->subs[subpullIndex].plan = caneMap[root["Subpulls"][subpullname]["Cane"].asUInt()];
-		plan->subs[subpullIndex].diameter = root["Subpulls"][subpullname]["Diameter"].asFloat();
-		plan->subs[subpullIndex].shape = stringToGeometricShape(root["Subpulls"][subpullname]["Shape"].asString());
-		plan->subs[subpullIndex].location.x = root["Subpulls"][subpullname]["X"].asFloat();
-		plan->subs[subpullIndex].location.y = root["Subpulls"][subpullname]["Y"].asFloat();
-		plan->subs[subpullIndex].location.z = root["Subpulls"][subpullname]["Z"].asFloat();
+		cane->subs[subpullIndex].plan = caneMap[root["Subpulls"][subpullname]["Cane"].asUInt()];
+		cane->subs[subpullIndex].diameter = root["Subpulls"][subpullname]["Diameter"].asFloat();
+		cane->subs[subpullIndex].shape = stringToGeometricShape(root["Subpulls"][subpullname]["Shape"].asString());
+		cane->subs[subpullIndex].location.x = root["Subpulls"][subpullname]["X"].asFloat();
+		cane->subs[subpullIndex].location.y = root["Subpulls"][subpullname]["Y"].asFloat();
+		cane->subs[subpullIndex].location.z = root["Subpulls"][subpullname]["Z"].asFloat();
 	}
 }
 
 // write 
-void GlassFileIO::writeCanes(Json::Value& root, vector<PullPlan*>& plans, vector<GlassColor*>& colors)
+void GlassFileIO::writeCanes(Json::Value& root, vector<PullPlan*>& canes, vector<GlassColor*>& colors)
 {
 	// generate color map
 	map<GlassColor*, unsigned int> colorMap;
@@ -509,26 +509,26 @@ void GlassFileIO::writeCanes(Json::Value& root, vector<PullPlan*>& plans, vector
 		colorMap[colors[i]] = i+1;
 
 	// generate pull plan map
-	map<PullPlan*, unsigned int> planMap;
-	planMap[GlobalGlass::circlePlan()] = 0;
-	planMap[GlobalGlass::squarePlan()] = 1;
-	for (unsigned int i = 0; i < plans.size(); ++i)
-		planMap[plans[i]] = i+2;
+	map<PullPlan*, unsigned int> caneMap;
+	caneMap[GlobalGlass::circlePlan()] = 0;
+	caneMap[GlobalGlass::squarePlan()] = 1;
+	for (unsigned int i = 0; i < canes.size(); ++i)
+		caneMap[canes[i]] = i+2;
 
 	// call writeCane() on each cane
-	for (unsigned int i = 0; i < plans.size(); ++i)
+	for (unsigned int i = 0; i < canes.size(); ++i)
 	{
-		writeCane(root, plans[i], i+2, planMap, colorMap);
+		writeCane(root, canes[i], i+2, caneMap, colorMap);
 	}
 }
 
 // read
 void GlassFileIO::readCanes(Json::Value& canesRoot, map<unsigned int, PullPlan*>& caneMap, 
-	map<unsigned int, GlassColor*>& colorMap, vector<PullPlan*>& readPlans)
+	map<unsigned int, GlassColor*>& colorMap, vector<PullPlan*>& readCanes)
 {
-	// clear out readPlans, since the correspondence between 
-	// readPlans[i] and canesRoot.getMemberNames()[i] is used
-	readPlans.clear();
+	// clear out readCanes, since the correspondence between 
+	// readCanes[i] and canesRoot.getMemberNames()[i] is used
+	readCanes.clear();
 
 	// add global plan to map for completeness
 	caneMap[0] = GlobalGlass::circlePlan();
@@ -537,13 +537,13 @@ void GlassFileIO::readCanes(Json::Value& canesRoot, map<unsigned int, PullPlan*>
 	// loop over canes
 	for (unsigned int i = 0; i < canesRoot.getMemberNames().size(); ++i)
 	{
-		unsigned int planIndex;
+		unsigned int caneIndex;
 		string canename = canesRoot.getMemberNames()[i];
-		PullPlan* plan = readCane(canename, canesRoot, planIndex, colorMap);
-		if (plan != NULL)
+		PullPlan* cane = readCane(canename, canesRoot, caneIndex, colorMap);
+		if (cane != NULL)
 		{
-			readPlans.push_back(plan);
-			caneMap[planIndex] = plan;
+			readCanes.push_back(cane);
+			caneMap[caneIndex] = cane;
 		}	
 	}
 
@@ -551,7 +551,7 @@ void GlassFileIO::readCanes(Json::Value& canesRoot, map<unsigned int, PullPlan*>
 	for (unsigned int i = 0; i < canesRoot.getMemberNames().size(); ++i)
 	{
 		Json::Value caneRoot = canesRoot[canesRoot.getMemberNames()[i]];	
-		readCaneSubpulls(caneRoot, readPlans[i], caneMap);
+		readCaneSubpulls(caneRoot, readCanes[i], caneMap);
 	}
 }
 
@@ -587,7 +587,7 @@ pickup
 		...
 */
 void GlassFileIO::writePickup(Json::Value& root, PickupPlan* pickup, unsigned int pickupIndex,
-	map<PullPlan*, unsigned int>& planMap, map<GlassColor*, unsigned int>& colorMap)
+	map<PullPlan*, unsigned int>& caneMap, map<GlassColor*, unsigned int>& colorMap)
 {
 	string pickupname = idAndNameToString(pickupIndex, "Pickup");
 
@@ -618,7 +618,7 @@ void GlassFileIO::writePickup(Json::Value& root, PickupPlan* pickup, unsigned in
 	{
 		string subpullName = idAndNameToString(i, "Subpull");
 		root[pickupname]["Subpulls"][subpullName]["Index"] = i;
-		root[pickupname]["Subpulls"][subpullName]["Cane"] = planMap[pickup->subs[i].plan];
+		root[pickupname]["Subpulls"][subpullName]["Cane"] = caneMap[pickup->subs[i].plan];
 		root[pickupname]["Subpulls"][subpullName]["Length"] = pickup->subs[i].length;
 		root[pickupname]["Subpulls"][subpullName]["Width"] = pickup->subs[i].width;
 		root[pickupname]["Subpulls"][subpullName]["Orientation"] = orientationToString(pickup->subs[i].orientation);
@@ -630,7 +630,7 @@ void GlassFileIO::writePickup(Json::Value& root, PickupPlan* pickup, unsigned in
 }
 
 PickupPlan* GlassFileIO::readPickup(string pickupname, Json::Value& root,
-	map<unsigned int, PullPlan*>& planMap, map<unsigned int, GlassColor*>& colorMap)
+	map<unsigned int, PullPlan*>& caneMap, map<unsigned int, GlassColor*>& colorMap)
 {
 	// read singletons: casing color, overlay color, underlay color, pickup template
 	PickupPlan* pickup = new PickupPlan(stringToPickupTemplate(root[pickupname]["Pickup template"].asString()));
@@ -655,7 +655,7 @@ PickupPlan* GlassFileIO::readPickup(string pickupname, Json::Value& root,
 		string subpullname = root[pickupname]["Subpulls"].getMemberNames()[i];
 		unsigned int subIndex = root[pickupname]["Subpulls"][subpullname]["Index"].asUInt();
 	
-		pickup->subs[subIndex].plan = planMap[root[pickupname]["Subpulls"][subpullname]["Cane"].asUInt()];
+		pickup->subs[subIndex].plan = caneMap[root[pickupname]["Subpulls"][subpullname]["Cane"].asUInt()];
 		pickup->subs[subIndex].length = root[pickupname]["Subpulls"][subpullname]["Length"].asFloat();
 		pickup->subs[subIndex].width = root[pickupname]["Subpulls"][subpullname]["Width"].asFloat();
 		pickup->subs[subIndex].orientation 
@@ -683,7 +683,7 @@ piece
 		...
 	pickups (done separately)
 */
-void GlassFileIO::writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<PullPlan*, unsigned int>& planMap,
+void GlassFileIO::writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<PullPlan*, unsigned int>& caneMap,
 	map<GlassColor*, unsigned int>& colorMap)
 {
 	string piecename = idAndNameToString(pieceIndex, "Piece");
@@ -707,10 +707,10 @@ void GlassFileIO::writePiece(Json::Value& root, Piece* piece, unsigned int piece
 	}
 
 	// write pickups (currently only one)
-	writePickup(root[piecename]["Pickups"], piece->pickup, 0, planMap, colorMap);
+	writePickup(root[piecename]["Pickups"], piece->pickup, 0, caneMap, colorMap);
 }
 
-Piece* GlassFileIO::readPiece(string piecename, Json::Value& root, map<unsigned int, PullPlan*>& planMap, 
+Piece* GlassFileIO::readPiece(string piecename, Json::Value& root, map<unsigned int, PullPlan*>& caneMap, 
 	map<unsigned int, GlassColor*>& colorMap)
 {
 	// read singletons: piece template
@@ -730,13 +730,13 @@ Piece* GlassFileIO::readPiece(string piecename, Json::Value& root, map<unsigned 
 	for (unsigned int i = 0; i < root[piecename]["Pickups"].getMemberNames().size(); ++i)
 	{
 		string pickupname = root[piecename]["Pickups"].getMemberNames()[i];
-		piece->pickup/*s[i]*/ = readPickup(pickupname, root[piecename]["Pickups"], planMap, colorMap);
+		piece->pickup/*s[i]*/ = readPickup(pickupname, root[piecename]["Pickups"], caneMap, colorMap);
 	}
 
 	return piece;
 }
 
-void GlassFileIO::writePieces(Json::Value& root, vector<Piece*>& pieces, vector<PullPlan*>& plans, 
+void GlassFileIO::writePieces(Json::Value& root, vector<Piece*>& pieces, vector<PullPlan*>& canes, 
 	vector<GlassColor*>& colors)
 {
         // generate color map
@@ -746,28 +746,28 @@ void GlassFileIO::writePieces(Json::Value& root, vector<Piece*>& pieces, vector<
                 colorMap[colors[i]] = i+1;
 
         // generate pull plan map
-        map<PullPlan*, unsigned int> planMap;
-        planMap[GlobalGlass::circlePlan()] = 0;
-        planMap[GlobalGlass::squarePlan()] = 1;
-        for (unsigned int i = 0; i < plans.size(); ++i)
-                planMap[plans[i]] = i+2;
+        map<PullPlan*, unsigned int> caneMap;
+        caneMap[GlobalGlass::circlePlan()] = 0;
+        caneMap[GlobalGlass::squarePlan()] = 1;
+        for (unsigned int i = 0; i < canes.size(); ++i)
+                caneMap[canes[i]] = i+2;
 
         // call writeCane() on each cane
         for (unsigned int i = 0; i < pieces.size(); ++i)
-                writePiece(root, pieces[i], i, planMap, colorMap);
+                writePiece(root, pieces[i], i, caneMap, colorMap);
 }
 
-void GlassFileIO::readPieces(Json::Value& piecesRoot, map<unsigned int, PullPlan*>& planMap, map<unsigned int, 
+void GlassFileIO::readPieces(Json::Value& piecesRoot, map<unsigned int, PullPlan*>& caneMap, map<unsigned int, 
 	GlassColor*>& colorMap, vector<Piece*>& readPieces)
 {
-        // clear out readPlans, since the correspondence between 
-        // readPlans[i] and canesRoot.getMemberNames()[i] is used
+        // clear out readPieces, since the correspondence between 
+        // readPieces[i] and piecesRoot.getMemberNames()[i] is used
         readPieces.clear();
 
         // loop over pieces
         for (unsigned int i = 0; i < piecesRoot.getMemberNames().size(); ++i)
         {
-                Piece* piece = readPiece(piecesRoot.getMemberNames()[i], piecesRoot, planMap, colorMap);
+                Piece* piece = readPiece(piecesRoot.getMemberNames()[i], piecesRoot, caneMap, colorMap);
                 if (piece != NULL)
                 {
                         readPieces.push_back(piece);
@@ -776,14 +776,14 @@ void GlassFileIO::readPieces(Json::Value& piecesRoot, map<unsigned int, PullPlan
 }
 
 // write
-bool GlassFileIO::write(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& plans, 
+bool GlassFileIO::write(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, 
 	vector<Piece*>& pieces)
 {
 	Json::Value root;
 	writeBuildInformation(root); 
 	writeColors(root["Colors"], colors);
-	writeCanes(root["Canes"], plans, colors);
-	writePieces(root["Pieces"], pieces, plans, colors);
+	writeCanes(root["Canes"], canes, colors);
+	writePieces(root["Pieces"], pieces, canes, colors);
 
 	QFile saveFile(filename);
 	saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -795,7 +795,7 @@ bool GlassFileIO::write(QString filename, vector<GlassColor*>& colors, vector<Pu
 }
 
 // read
-bool GlassFileIO::read(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& plans, 
+bool GlassFileIO::read(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, 
 	vector<Piece*>& pieces)
 {
 	// TODO:fail when error is encountered, rather than charging blindly into the chars
@@ -821,12 +821,12 @@ bool GlassFileIO::read(QString filename, vector<GlassColor*>& colors, vector<Pul
 	if (root.isMember("Colors"))
 		readColors(root["Colors"], colorMap, colors);
 
-	map<unsigned int, PullPlan*> planMap;
+	map<unsigned int, PullPlan*> caneMap;
 	if (root.isMember("Canes"))
-		readCanes(root["Canes"], planMap, colorMap, plans);
+		readCanes(root["Canes"], caneMap, colorMap, canes);
 
 	if (root.isMember("Pieces"))
-		readPieces(root["Pieces"], planMap, colorMap, pieces);
+		readPieces(root["Pieces"], caneMap, colorMap, pieces);
 
 	return true;
 }

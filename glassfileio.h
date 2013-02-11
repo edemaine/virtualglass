@@ -25,8 +25,8 @@ class GlassFileIO
 {
 	public:
 		// returns whether load occured (true) or ran into issues (false) 
-                static bool read(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces);
-                static bool write(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces);
+                static bool read(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, vector<Piece*>& pieces);
+                static bool write(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, vector<Piece*>& pieces);
 
 	private:
 		static QString writeJson(Json::Value& root);
@@ -59,27 +59,27 @@ class GlassFileIO
 		static void writeColors(Json::Value& root, vector<GlassColor*>& colors);
                 static void readColors(Json::Value& root, map<unsigned int, GlassColor*>& colorMap, vector<GlassColor*>& readColors);
 
-		static void writeCane(Json::Value& root, PullPlan* plan, unsigned int planIndex, map<PullPlan*, unsigned int>& caneMap, 
+		static void writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<PullPlan*, unsigned int>& caneMap, 
 			map<GlassColor*, unsigned int>& colorMap);
-		static PullPlan* readCane(string canename, Json::Value& root, unsigned int& planIndex, 
+		static PullPlan* readCane(string canename, Json::Value& root, unsigned int& caneIndex, 
 			map<unsigned int, GlassColor*>& colorMap);
 
-		static void writeCanes(Json::Value& root, vector<PullPlan*>& plans, vector<GlassColor*>& colors);
-		static void readCaneSubpulls(Json::Value& caneRoot, PullPlan* plan, map<unsigned int, PullPlan*>& caneMap);
+		static void writeCanes(Json::Value& root, vector<PullPlan*>& canes, vector<GlassColor*>& colors);
+		static void readCaneSubpulls(Json::Value& caneRoot, PullPlan* cane, map<unsigned int, PullPlan*>& caneMap);
                 static void readCanes(Json::Value& root, map<unsigned int, PullPlan*>& caneMap, map<unsigned int, GlassColor*>& colorMap, 
 			vector<PullPlan*>& readPlans);
 
 		static void writePickup(Json::Value& root, PickupPlan* pickup, unsigned int pickupIndex, 
-			map<PullPlan*, unsigned int>& planMap, map<GlassColor*, unsigned int>& colorMap);
+			map<PullPlan*, unsigned int>& caneMap, map<GlassColor*, unsigned int>& colorMap);
 		static PickupPlan* readPickup(string pickupname, Json::Value& root, 
-			map<unsigned int, PullPlan*>& planMap, map<unsigned int, GlassColor*>& colorMap);
+			map<unsigned int, PullPlan*>& caneMap, map<unsigned int, GlassColor*>& colorMap);
 
 		static void writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<PullPlan*, unsigned int>& caneMap,
 			map<GlassColor*, unsigned int>& colorMap);
-		static Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, PullPlan*>& planMap, 
+		static Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, PullPlan*>& caneMap, 
 			map<unsigned int, GlassColor*>& colorMap);
 			
-		static void writePieces(Json::Value& root, vector<Piece*>& pieces, vector<PullPlan*>& plans, 
+		static void writePieces(Json::Value& root, vector<Piece*>& pieces, vector<PullPlan*>& canes, 
 			vector<GlassColor*>& colors);
                 static void readPieces(Json::Value& root, map<unsigned int, PullPlan*>& caneMap, map<unsigned int, GlassColor*>& colorMap,
 			vector<Piece*>& readPieces);
