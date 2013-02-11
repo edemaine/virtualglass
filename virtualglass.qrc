@@ -32,6 +32,7 @@
         <file>kugler-transparent-colors.vgc</file>
         <file>COPYRIGHT.txt</file>
         <file>version.txt</file>
+	<file>glassfile_inline_doc.txt</file>
         <file>save</file>
         <file>virtualglass.png</file>
     </qresource>

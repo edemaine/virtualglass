@@ -20,14 +20,22 @@ using std::map;
 // write
 void GlassFileIO::writeDocumentation(Json::Value& root)
 {
-	// give a brief 
+	QFile docFile(":/glassfile_inline_doc.txt");
+
+	if (!docFile.open(QIODevice::ReadOnly))
+		return;
+
+	QTextStream docStream(&docFile);
 	string docComment;
-	docComment += "// This is a VirtualGlass file containing a saved set of colors, canes, and pieces.\n//\n";
-	docComment += "// Editing attributes by hand is possible, and reading/editing these files\n";
-	docComment += "// programmatically is possible using a Json library, e.g. JsonCpp.\n//\n";
-	docComment += "// The dependancies among objects (e.g. a cane using a color) are described by\n";
-	docComment += "// a set of pointer fields in canes, pickups, pieces and numeric object IDs found in\n";
-	docComment += "// object names.";
+
+	QString line = docStream.readLine();
+	while (!line.isNull())
+	{
+		docComment += "// " + line.toStdString() + "\n"; 
+		line = docStream.readLine();
+	}
+	docFile.close();
+
 	root.setComment(docComment, Json::commentBefore);
 }
 

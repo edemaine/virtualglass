@@ -1,0 +1,9 @@
+This is a VirtualGlass file containing a saved set of colors, canes, and pieces.
+
+Editing attributes by hand is possible, and reading/editing these files 
+programmatically is possible using a Json library, e.g. JsonCpp.
+
+The dependancies among objects (e.g. a cane using a color) are described by
+a set of pointer fields in canes, pickups, pieces (e.g. ''Color pointer'',
+''Cane pointer'') and numeric object IDs (e.g. 9 in ''Color_9'', 
+5 in ''Cane_5'') in object names.
