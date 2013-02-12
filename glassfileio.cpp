@@ -858,8 +858,8 @@ bool GlassFileIO::read(QString filename, vector<GlassColor*>& colors, vector<Pul
 	QFile openFile(filename);
 	openFile.open(QIODevice::ReadOnly | QIODevice::Text);
 	QTextStream fileInput(&openFile);
-	QString QStr = fileInput.readAll();
-	string str = QStr.toStdString();
+	QString qStr = fileInput.readAll();
+	string str = qStr.toStdString();
 	Json::Value root;
 	Json::Reader reader;
 
@@ -870,7 +870,7 @@ bool GlassFileIO::read(QString filename, vector<GlassColor*>& colors, vector<Pul
 	unsigned int revision;
 	string date;
 	readBuildInformation(root, revision, date);
-	if (0 < revision && revision < 865) // if you got a valid number and it's not current
+	if (0 < revision && revision < 875) // if you got a valid number and it's not current
 		return false;
 
 	map<unsigned int, GlassColor*> colorMap;

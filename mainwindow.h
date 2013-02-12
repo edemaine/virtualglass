@@ -43,7 +43,7 @@ class MainWindow : public QMainWindow
 		void mousePressEvent(QMouseEvent* event);
 		void mouseReleaseEvent(QMouseEvent* event);
 		void mouseMoveEvent(QMouseEvent* event);
-		void seedEverything();
+		void setupViews();
 		void keyPressEvent(QKeyEvent* e);
 		QString windowTitle();
 		PickupPlan* newPickupPlan();
@@ -86,7 +86,10 @@ class MainWindow : public QMainWindow
 		void updateWindowTitle();
 		void setDirtyBit(bool v);
 		void setSaveFilename(QString filename);
-		void getLibraryContents(vector<GlassColor*>* colors, vector<PullPlan*>* plans, vector<Piece*>* pieces);
+		void getLibraryContents(vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces);
+		void getDependantLibraryContents(PullPlan* plan, vector<GlassColor*>& colors, vector<PullPlan*>& plans);
+		void getDependantLibraryContents(Piece* piece, vector<GlassColor*>& colors, vector<PullPlan*>& plans,
+			vector<Piece*>& pieces);
 
 		// Variables
 		bool dirtyBit;

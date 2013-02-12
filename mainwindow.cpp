@@ -36,7 +36,7 @@ MainWindow :: MainWindow()
 	setupSaveFile();
 	setupConnections();
 	setWindowTitle(windowTitle());
-	seedEverything();
+	setupViews();
 
 	setViewMode(EMPTY_VIEW_MODE);
 	show();
@@ -84,7 +84,7 @@ QString MainWindow :: windowTitle()
 	return title;
 }
 
-void MainWindow :: seedEverything()
+void MainWindow :: setupViews()
 {
 	// Load color stuff
 	setViewMode(COLORBAR_VIEW_MODE);
@@ -1121,15 +1121,55 @@ void MainWindow::importSVG()
 	}
 }
 
+void MainWindow::getDependantLibraryContents(Piece* piece, vector<GlassColor*>& colors, vector<PullPlan*>& plans, 
+	vector<Piece*>& pieces)
+{
+	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
+	{
+		GlassColor* color = dynamic_cast<AsyncColorBarLibraryWidget*>(
+				dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget())->getGlassColor();
+		if (piece->hasDependencyOn(color))
+			colors.push_back(color);
+	}
 
-void MainWindow::getLibraryContents(vector<GlassColor*>* colors, vector<PullPlan*>* plans, vector<Piece*>* pieces)
+	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
+	{
+		PullPlan* plan = dynamic_cast<AsyncPullPlanLibraryWidget*>(
+			dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget())->getPullPlan();
+		if (piece->hasDependencyOn(plan))
+			plans.push_back(plan);
+	}
+	
+	pieces.push_back(piece);	
+}
+
+void MainWindow::getDependantLibraryContents(PullPlan* plan, vector<GlassColor*>& colors, vector<PullPlan*>& plans)
+{
+	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
+	{
+		GlassColor* color = dynamic_cast<AsyncColorBarLibraryWidget*>(
+				dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget())->getGlassColor();
+		if (plan->hasDependencyOn(color))
+			colors.push_back(color);
+	}
+
+	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
+	{
+		PullPlan* otherPlan = dynamic_cast<AsyncPullPlanLibraryWidget*>(
+			dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget())->getPullPlan();
+		if (plan->hasDependencyOn(otherPlan))
+			plans.push_back(otherPlan);
+	}
+}
+
+void MainWindow::getLibraryContents(vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces)
 {
 	AsyncColorBarLibraryWidget* cblw;
 	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 	{
 		cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
-		colors->push_back(cblw->getGlassColor());
+		colors.push_back(cblw->getGlassColor());
 	}
 
 	AsyncPullPlanLibraryWidget* pplw;
@@ -1137,7 +1177,7 @@ void MainWindow::getLibraryContents(vector<GlassColor*>* colors, vector<PullPlan
 	{
 		pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
 			dynamic_cast<QWidgetItem*>(pullPlanLibraryLayout->itemAt(i))->widget());
-		plans->push_back(pplw->getPullPlan());
+		plans.push_back(pplw->getPullPlan());
 	}
 
 	AsyncPieceLibraryWidget* plw;
@@ -1145,7 +1185,7 @@ void MainWindow::getLibraryContents(vector<GlassColor*>* colors, vector<PullPlan
 	{
 		plw = dynamic_cast<AsyncPieceLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
-		pieces->push_back(plw->getPiece());
+		pieces.push_back(plw->getPiece());
 	}
 }
 
@@ -1320,7 +1360,7 @@ void MainWindow::saveAllFile()
 		vector<GlassColor*> colors;
 		vector<PullPlan*> plans;
 		vector<Piece*> pieces;
-		getLibraryContents(&colors, &plans, &pieces);
+		getLibraryContents(colors, plans, pieces);
 		GlassFileIO::write(saveFilename, colors, plans, pieces);	
 		setDirtyBit(false);
 	}
@@ -1339,7 +1379,7 @@ void MainWindow::saveAllAsFile()
 	vector<GlassColor*> colors;
 	vector<PullPlan*> plans;
 	vector<Piece*> pieces;
-	getLibraryContents(&colors, &plans, &pieces);
+	getLibraryContents(colors, plans, pieces);
 	GlassFileIO::write(saveFilename, colors, plans, pieces);	
 	setDirtyBit(false);
 }
@@ -1359,19 +1399,21 @@ void MainWindow::saveSelectedAsFile()
 			colors.push_back(colorEditorWidget->getGlassColor());
 			break;
 		case PULLPLAN_VIEW_MODE:
-			plans.push_back(pullPlanEditorWidget->getPlan());
+			getDependantLibraryContents(pullPlanEditorWidget->getPlan(), colors, plans);
 			break;
 		case PIECE_VIEW_MODE:
-			pieces.push_back(pieceEditorWidget->getPiece());
+			getDependantLibraryContents(pieceEditorWidget->getPiece(), colors, plans, pieces);
 			break;
 	}
 	
 	// do the dialog thing to get a one-time filename that you save to
-	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."), QDir::currentPath(), tr("VirtualGlass (*.glass)"));
+	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."), 
+		QDir::currentPath(), tr("VirtualGlass (*.glass)"));
 	if (userSpecifiedFilename.isNull())
 		return;
 
-	// pretend library has one thing in it		
+	// pass off "curated" library to regular write file; 
+	// effectively pretending that the library only has your thing and its dependancies
 	GlassFileIO::write(userSpecifiedFilename, colors, plans, pieces);	
 
 	// this doesn't impact dirty bit or saveFilename at all: it's a special operation that 
