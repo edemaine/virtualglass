@@ -31,7 +31,7 @@ void AsyncColorBarLibraryWidget :: updateDragPixmap()
 	
 	// Fill in with color
 	Color* c = glassColor->getColor();
-	QColor qc(255*c->r, 255*c->g, 255*c->b, 255*c->a);
+	QColor qc(255*c->r, 255*c->g, 255*c->b, MAX(255*c->a, 20));
 	painter.setBrush(qc);
         painter.setPen(Qt::NoPen);
 	painter.drawEllipse(10, 10, 180, 180);

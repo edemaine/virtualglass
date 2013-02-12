@@ -57,9 +57,7 @@ namespace MeshInternal
 void applySubplanTransform(Geometry* geometry, ancestor a)
 {
 	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
-	{
 		applySubplanTransform(&(geometry->vertices[v]), a);
-	}
 }
 
 void applyResizeTransform(Vertex* v, float scale)
@@ -288,9 +286,9 @@ void applyPieceTransform(Geometry* geom, enum PieceTemplate::Type type, vector<T
 	} // end loop over vertices
 }
 
-Vertex applyTransforms(Vertex v, vector<ancestor>* ancestors)
+Vertex applySubplanTransforms(Vertex v, vector<ancestor>* ancestors)
 {
-	for (int i = ancestors->size() - 2; i >= 0; --i)
+	for (unsigned int i = ancestors->size() - 1; i < ancestors->size(); --i)
 		applySubplanTransform(&v, (*ancestors)[i]);
 	return v;
 }
@@ -540,18 +538,31 @@ void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float lengt
 	}
 } 
 
+// goals for resolutions with respect to quality:
+// quality ranges from 1 to 10: 1 is low, 10 is high
+// 5 gives something decent with mild artifacts
+// 1 gives something really ugly but low triangle count
+// 10 gives something with no artifacts
+unsigned int computeAngularResolution(float finalDiameter, unsigned int quality)
+{
+	// standard "full" cane diameter is 1.0 
+	unsigned int r = MAX(finalDiameter*14 + quality/1.2, 4); 
+	return (r / 4) * 4; // round down to nearest multiple of 4
+}
+
+unsigned int computeAxialResolution(float length, unsigned int quality)
+{
+	// standard "full" cane length is 2.0
+	unsigned int r = MAX(length * quality * 5, 5);
+	return r;
+}
+
 void meshBaseCasing(Geometry* geometry, vector<ancestor>* ancestors, Color color, 
 	enum GeometricShape outerShape, enum GeometricShape innerShape, float length, float outerRadius, 
 	float innerRadius, unsigned int quality, bool ensureVisible)
 {
-	float finalDiameter = totalShrink(ancestors);
-	unsigned int angularResolution = quality / 4.0 * MIN(MAX(finalDiameter*10, 4), 10); 
-	if (angularResolution < 4)
-		return;
-	angularResolution = ((angularResolution + 2) / 4) * 4;
-	unsigned int axialResolution = quality / 4.0 * MIN(MAX(length * 40, 5), 80);
-	if (axialResolution < 5)
-		return;
+	unsigned int angularResolution = computeAngularResolution(totalShrink(ancestors), quality);
+	unsigned int axialResolution = computeAxialResolution(length, quality);
 	
 	uint32_t first_vert = geometry->vertices.size();
 	uint32_t first_triangle = geometry->triangles.size();
@@ -586,7 +597,7 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>* ancestors, Color color
 	// Actually do the transformations on the basic canonical cylinder mesh
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
-		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors);
+		geometry->vertices[v] = applySubplanTransforms(geometry->vertices[v], ancestors);
 	}
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
 		first_vert, geometry->vertices.size() - first_vert, color, ensureVisible));
@@ -594,12 +605,12 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>* ancestors, Color color
 
 float totalShrink(vector<ancestor>* ancestors)
 {
-	float shrink = 1.0;	
+	float shrink = 1.0; // initial radius	
 
-	for (unsigned int i = ancestors->size() - 2; i < ancestors->size(); --i)
+	for (unsigned int i = ancestors->size() - 1; i < ancestors->size(); --i)
 	{
 		ancestor a = (*ancestors)[i];
-		shrink *= a.parent->subs[a.child].diameter; // is this off by a factor of 2?
+		shrink *= (a.parent->subs[a.child].diameter * 0.5); 
 	}
 
 	return shrink;
@@ -612,14 +623,8 @@ The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 
 void meshBaseCane(Geometry* geometry, vector<ancestor>* ancestors, 
 	Color color, enum GeometricShape shape, float length, float radius, unsigned int quality, bool ensureVisible)
 {
-	float finalDiameter = totalShrink(ancestors);
-	unsigned int angularResolution = quality / 4.0 * MIN(MAX(finalDiameter*10, 4), 10); 
-	if (angularResolution < 4)
-		return;
-	angularResolution = ((angularResolution + 2) / 4) * 4;
-	unsigned int axialResolution = quality / 4.0 * MIN(MAX(length * 40, 5), 80);
-	if (axialResolution < 5)
-		return;
+	unsigned int angularResolution = computeAngularResolution(totalShrink(ancestors), quality);
+	unsigned int axialResolution = computeAxialResolution(length, quality);
 
 	uint32_t first_vert = geometry->vertices.size();
 	uint32_t first_triangle = geometry->triangles.size();
@@ -716,7 +721,7 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>* ancestors,
 	// Actually do the transformations on the basic canonical cylinder mesh
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
-		geometry->vertices[v] = applyTransforms(geometry->vertices[v], ancestors);
+		geometry->vertices[v] = applySubplanTransforms(geometry->vertices[v], ancestors);
 	}
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
 		first_vert, geometry->vertices.size() - first_vert, color, ensureVisible));
@@ -786,17 +791,13 @@ for the leaf node.
 void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>* ancestors, float length, 
 	unsigned int quality, bool isTopLevel)
 {
-	if (plan == NULL)
+	// quality == 0 is reserved for pickups and pieces that don't want to draw any contents at all
+	if (plan == NULL || quality == 0) 
 		return;
 
-	if (quality == 0 && ancestors->size() > 0)
-		return;
-
-	ancestor me = {plan, 0};
-	ancestors->push_back(me); 
 	// if you're the root node of the cane, mark yourself as `needing to be visible'
 	// to fake incidence of refraction
-	bool ensureVisible = (ancestors->size() == 1) && isTopLevel; 
+	bool ensureVisible = (ancestors->size() == 0) && isTopLevel; 
 	for (unsigned int i = 0; i < plan->getCasingCount(); ++i) 
 	{
 		bool outermostLayer = (i == plan->getCasingCount()-1);
@@ -818,9 +819,9 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>* ancestors
 		}
 
 	}
-	ancestors->pop_back();
 
 	// Make recursive calls depending on the type of the current node
+	ancestor me = {plan, 0};
 	for (unsigned int i = 0; i < plan->subs.size(); ++i)
 	{
 		me.child = i;

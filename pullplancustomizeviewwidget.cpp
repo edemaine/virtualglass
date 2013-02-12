@@ -47,7 +47,6 @@ void PullPlanCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
 	}
 
 	BOUNDING_BOX_SPACE = MAX(squareSize / 100, 1);
-	this->update();
 }
 
 float PullPlanCustomizeViewWidget :: adjustedX(float rawX)
@@ -196,7 +195,7 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 			if (pow(double((adjustedX(event->pos().x()) - clickedLoc->x()) 
 				* (adjustedX(event->pos().x()) - clickedLoc->x()) 
 				+ (adjustedY(event->pos().y()) - clickedLoc->y())
-				*(adjustedY(event->pos().y()) - clickedLoc->y())),0.5) > BOUNDING_BOX_SPACE)
+				* (adjustedY(event->pos().y()) - clickedLoc->y())),0.5) > BOUNDING_BOX_SPACE)
 			{
 				clickMoved = true;
 			}
@@ -209,6 +208,7 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 						(adjustedX(event->pos().x()) - mouseStartingLoc.x)/(squareSize/2.0 - 10);
 					plan->subs[subplansSelected[i]].location.y += 
 						(adjustedY(event->pos().y()) - mouseStartingLoc.y)/(squareSize/2.0 - 10);
+					emit someDataChanged();
 				}
 				mouseStartingLoc.x=(adjustedX(event->pos().x()));
 				mouseStartingLoc.y=(adjustedY(event->pos().y()));
@@ -220,7 +220,7 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 			clickMoved = true;
 			if (activeBoxIndex == -1)
 			{
-				this->update();
+				update();
 				return;
 			}
 
@@ -239,9 +239,8 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 				for (unsigned int i = 0; i < subplansSelected.size(); i++)
 				{
 					plan->subs[subplansSelected[i]].diameter *= proportion;
-					std::cout << "subplan diameter " << plan->subs[subplansSelected[i]].diameter;
-					std::cout << std::endl;
 				}
+				emit someDataChanged();
 			}
 			else
 			{
@@ -265,15 +264,20 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 				for (unsigned int i = 0; i < subplansSelected.size(); i++)
 				{
 					plan->subs[subplansSelected[i]].diameter *= no_proportion;
-					plan->subs[subplansSelected[i]].location.x = (center_x - 10 - drawSize/2)/double(drawSize/2.0) + ((plan->subs[subplansSelected[i]].location.x - (center_x - 10 - drawSize/2)/double(drawSize/2.0))*no_proportion);
-					plan->subs[subplansSelected[i]].location.y = (center_y - 10 - drawSize/2)/double(drawSize/2.0) + ((plan->subs[subplansSelected[i]].location.y - (center_y - 10 - drawSize/2)/double(drawSize/2.0))*no_proportion);
+					plan->subs[subplansSelected[i]].location.x = (center_x - 10 - drawSize/2) / double(drawSize/2.0) 
+						+ ((plan->subs[subplansSelected[i]].location.x 
+							- (center_x - 10 - drawSize/2) / double(drawSize/2.0)) * no_proportion);
+					plan->subs[subplansSelected[i]].location.y = (center_y - 10 - drawSize/2) / double(drawSize/2.0) 
+						+ ((plan->subs[subplansSelected[i]].location.y 
+							- (center_y - 10 - drawSize/2)/double(drawSize/2.0))*no_proportion);
 				}
+				emit someDataChanged();
 			}
 			break;
 		}
 	}
 	boundActiveBox();
-	this->update();
+	update();
 
 	// This is to turn a control point a different color when it's being hovered over. For now it does nothing.
 	activeControlPoint = -1;
@@ -290,13 +294,13 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 	}
 	else if (activeBoxIndex == INT_MAX)
 	{
-	    if((fabs(float(adjustedX(event->pos().x()) - activeBox_xmin - 3*BOUNDING_BOX_SPACE)) < BOUNDING_BOX_SPACE ||
-		fabs(float(adjustedX(event->pos().x()) - activeBox_xmax - 3*BOUNDING_BOX_SPACE)) < BOUNDING_BOX_SPACE) &&
-		(fabs(float(adjustedY(event->pos().y()) - activeBox_ymin + 3*BOUNDING_BOX_SPACE)) < BOUNDING_BOX_SPACE ||
-		 fabs(float(adjustedY(event->pos().y()) - activeBox_ymax + 3*BOUNDING_BOX_SPACE)) < BOUNDING_BOX_SPACE))
-	    {
+		if((fabs(float(adjustedX(event->pos().x()) - activeBox_xmin - 3*BOUNDING_BOX_SPACE)) < BOUNDING_BOX_SPACE ||
+			fabs(float(adjustedX(event->pos().x()) - activeBox_xmax - 3*BOUNDING_BOX_SPACE)) < BOUNDING_BOX_SPACE) &&
+			(fabs(float(adjustedY(event->pos().y()) - activeBox_ymin + 3*BOUNDING_BOX_SPACE)) < BOUNDING_BOX_SPACE ||
+			fabs(float(adjustedY(event->pos().y()) - activeBox_ymax + 3*BOUNDING_BOX_SPACE)) < BOUNDING_BOX_SPACE))
+		{
 			// not yet implemented
-	    }
+		}
 	}
 }
 
@@ -363,7 +367,7 @@ void PullPlanCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 	mouseStartingLoc.y=(adjustedY(event->pos().y()));
 	boundActiveBox();
 	updateIndexes(event->pos());
-	this->update();
+	update();
 }
 
 void PullPlanCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent* event)
@@ -397,7 +401,7 @@ void PullPlanCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent* event)
 	emit someDataChanged();
 	boundActiveBox();
 	updateIndexes(event->pos());
-	this->update();
+	update();
 }
 
 void PullPlanCustomizeViewWidget :: dragMoveEvent(QDragMoveEvent* event)
@@ -415,7 +419,7 @@ void PullPlanCustomizeViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 	mouseStartingLoc.y=(adjustedY(event->pos().y()));
 	boundActiveBox();
 	emit someDataChanged();
-	this->update();
+	update();
 }
 
 void PullPlanCustomizeViewWidget :: keyPressEvent(QKeyEvent* event)
@@ -708,7 +712,7 @@ void PullPlanCustomizeViewWidget :: copySelectionPressed()
 	}
 	emit someDataChanged();
 	boundActiveBox();
-	this->update();
+	update();
 }
 
 void PullPlanCustomizeViewWidget :: deleteSelectionPressed()
@@ -729,7 +733,7 @@ void PullPlanCustomizeViewWidget :: deleteSelectionPressed()
 	activeControlPoint = -1;
 	emit someDataChanged();
 	boundActiveBox();
-	this->update();
+	update();
 }
 
 void PullPlanCustomizeViewWidget :: addCirclePressed()
@@ -750,7 +754,7 @@ void PullPlanCustomizeViewWidget :: addCirclePressed()
 	subplansSelected.push_back(0);
 	emit someDataChanged();
 	boundActiveBox();
-	this->update();
+	update();
 }
 
 void PullPlanCustomizeViewWidget :: addSquarePressed()
@@ -771,7 +775,7 @@ void PullPlanCustomizeViewWidget :: addSquarePressed()
 	subplansSelected.push_back(0);
 	emit someDataChanged();
 	boundActiveBox();
-	this->update();
+	update();
 }
 
 

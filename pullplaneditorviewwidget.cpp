@@ -189,7 +189,6 @@ void PullPlanEditorViewWidget :: setMinMaxCasingRadii(float* min, float* max)
 
 void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 {
-	// bug in here?
 	if (!isDraggingCasing)
 		return;
 

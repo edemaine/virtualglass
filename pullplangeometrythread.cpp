@@ -15,7 +15,7 @@ void PullPlanGeometryThread::run()
 	{
 		ppew->wakeWait.wait(&(ppew->wakeMutex));
 
-		for (unsigned int quality = 2; quality < 7; ++quality)
+		for (unsigned int quality = 1; quality < 11; ++quality)
 		{	
 			// get lock for ppew's tempPullPlan 
 			// and make a copy to get out of his way as fast as possible	
@@ -42,7 +42,7 @@ void PullPlanGeometryThread::run()
 			if (startOver)
 			{
 				deep_delete(myTempPullPlan);
-				quality = 0;	
+				quality = 1;	
 			}
 		}
 	}

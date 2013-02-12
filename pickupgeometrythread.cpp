@@ -15,7 +15,7 @@ void PickupGeometryThread::run()
 	{
 		ppew->wakeWait.wait(&(ppew->wakeMutex));
 
-		for (unsigned int quality = 1; quality < 5; ++quality)
+		for (unsigned int quality = 1; quality < 11; ++quality)
 		{	
 			// get lock for ppew's tempPiece 
 			// and make a copy to get out of his way as fast as possible	

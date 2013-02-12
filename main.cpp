@@ -2,7 +2,7 @@
 #include <QtGui>
 #include "mainwindow.h"
 
-	extern void qt_set_sequence_auto_mnemonic(bool b);
+extern void qt_set_sequence_auto_mnemonic(bool b);
 
 int main(int argc, char** argv)
 {

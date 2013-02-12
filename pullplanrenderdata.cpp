@@ -31,7 +31,7 @@ PullPlanRenderData::~PullPlanRenderData() {
 
 Geometry *PullPlanRenderData::getGeometry() {
 	Geometry *geom = new Geometry();
-	generatePullMesh(plan, geom, 4);
+	generatePullMesh(plan, geom, 5);
 	return geom;
 }
 

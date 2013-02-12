@@ -74,7 +74,6 @@ NiceViewWidget :: NiceViewWidget(enum CameraMode cameraMode, QWidget *parent)
 	mouseLocY = 0;
 
 	initializeGLCalled = false;
-
 	geometry = NULL;
 }
 

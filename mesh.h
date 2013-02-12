@@ -38,6 +38,8 @@ namespace MeshInternal
 	void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>* ancestors, 
 		float length, unsigned int quality, bool isTopLevel=false);
 
+	unsigned int computeAxialResolution(float length, unsigned int quality);
+	unsigned int computeAngularResolution(float finalDiameter, unsigned int quality);
 	float asymptoteVal(float s, float t);
 	float splineVal(float r1, float r2, float r3, float t);
 	float splineVal(float r1, float r2, float r3, float r4, float t);
@@ -55,7 +57,7 @@ namespace MeshInternal
 	void applySubplanTransform(Vertex* v, ancestor a);
 	void applySubplanTransform(Geometry* geometry, ancestor a);
 	void applyCasingResizeTransform(Vertex* v, ancestor a);
-	Vertex applyTransforms(Vertex p, vector<ancestor>* ancestors);
+	Vertex applySubplanTransforms(Vertex p, vector<ancestor>* ancestors);
 	void applyPickupTransform(Vertex* p, SubpickupTemplate* spt);
 	void applyPieceTransform(Geometry* geometry, enum PieceTemplate::Type type, vector<TemplateParameter> params);
 	float totalShrink(vector<ancestor>* ancestors);

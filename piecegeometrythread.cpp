@@ -15,7 +15,7 @@ void PieceGeometryThread::run()
 	{
 		pew->wakeWait.wait(&(pew->wakeMutex));
 
-		for (unsigned int quality = 1; quality < 5; ++quality)
+		for (unsigned int quality = 1; quality < 11; ++quality)
 		{	
 			// get lock for pew's tempPiece 
 			// and make a copy to get out of his way as fast as possible	

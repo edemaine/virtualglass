@@ -520,7 +520,15 @@ PullPlan* GlassFileIO::readCane(string canename, Json::Value& root, unsigned int
 
 void GlassFileIO::readCaneSubcanes(Json::Value& root, PullPlan* cane, map<unsigned int, PullPlan*>& caneMap)
 {
-	// loop over subpulls
+	// if the cane's template type is custom, then it is impossible to know how many subcanes it has
+	// so we make an initial pass over the subcanes just to build an initial list of the correct size
+	if (cane->getTemplateType() == PullTemplate::CUSTOM)
+	{
+		Point location;
+		for (unsigned int i = 0; i < root["Subcanes"].getMemberNames().size(); ++i)
+			cane->subs.push_back(SubpullTemplate(cane, CIRCLE_SHAPE, location, 1.0));
+	}
+
 	for (unsigned int i = 0; i < root["Subcanes"].getMemberNames().size(); ++i)
 	{
 		string subpullname = root["Subcanes"].getMemberNames()[i];
