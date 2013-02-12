@@ -330,14 +330,14 @@ void MainWindow :: setupConnections()
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 
 	// the file IO menu stuff
-	connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
-	connect(openAct, SIGNAL(triggered()), this, SLOT(openFile()));
-	connect(addAct, SIGNAL(triggered()), this, SLOT(addFile()));
-	connect(importSVGAct, SIGNAL(triggered()), this, SLOT(importSVG()));
-	connect(saveAllAct, SIGNAL(triggered()), this, SLOT(saveAllFile()));
-	connect(saveAllAsAct, SIGNAL(triggered()), this, SLOT(saveAllAsFile()));
-	connect(saveSelectedAsAct, SIGNAL(triggered()), this, SLOT(saveSelectedAsFile()));
-	connect(exitAct, SIGNAL(triggered()), this, SLOT(attemptToQuit()));
+	connect(newFileAction, SIGNAL(triggered()), this, SLOT(newFile()));
+	connect(openFileAction, SIGNAL(triggered()), this, SLOT(openFile()));
+	connect(addFileAction, SIGNAL(triggered()), this, SLOT(addFile()));
+	connect(importSVGFileAction, SIGNAL(triggered()), this, SLOT(importSVG()));
+	connect(saveAllFileAction, SIGNAL(triggered()), this, SLOT(saveAllFile()));
+	connect(saveAllAsFileAction, SIGNAL(triggered()), this, SLOT(saveAllAsFile()));
+	connect(saveSelectedAsFileAction, SIGNAL(triggered()), this, SLOT(saveSelectedAsFile()));
+	connect(exitAction, SIGNAL(triggered()), this, SLOT(attemptToQuit()));
 
 	connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
 	connect(randomSimplePieceAction, SIGNAL(triggered()), this, SLOT(randomSimplePieceExampleActionTriggered()));
@@ -1010,79 +1010,79 @@ void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 void MainWindow::setupMenus()
 {
 	//new
-	newAct = new QAction(tr("&New"), this);
-	newAct->setShortcuts(QKeySequence::New);
-	newAct->setStatusTip(tr("Open a new empty file."));
+	newFileAction = new QAction("&New", this);
+	newFileAction->setShortcuts(QKeySequence::New);
+	newFileAction->setToolTip("Open a new empty file.");
 
 	//open
-	openAct = new QAction(tr("&Open"), this);
-	openAct->setShortcuts(QKeySequence::Open);
-	openAct->setStatusTip(tr("Open an existing file."));
+	openFileAction = new QAction("&Open", this);
+	openFileAction->setShortcuts(QKeySequence::Open);
+	openFileAction->setToolTip("Open an existing file.");
 
 	//add
-	addAct = new QAction(tr("&Add"), this);
-	addAct->setStatusTip(tr("Add an existing file."));
+	addFileAction = new QAction("&Add", this);
+	addFileAction->setToolTip("Add an existing file.");
 
 	//import svg cane
-	importSVGAct = new QAction(tr("&Import SVG Cane"), this);
-	importSVGAct->setStatusTip(tr("Import cane cross section from .svg file."));
+	importSVGFileAction = new QAction("&Import SVG Cane", this);
+	importSVGFileAction->setToolTip("Import cane cross section from .svg file.");
 
 	//save
-	saveAllAct = new QAction(tr("&Save"), this);
-	saveAllAct->setShortcuts(QKeySequence::Save);
-	saveAllAct->setStatusTip(tr("Save library to file."));
+	saveAllFileAction = new QAction("&Save", this);
+	saveAllFileAction->setShortcuts(QKeySequence::Save);
+	saveAllFileAction->setToolTip("Save library to file.");
 
 	//saveAllAs
-	saveAllAsAct = new QAction(tr("Save &As"), this);
-	saveAllAsAct->setShortcuts(QKeySequence::SaveAs);
-	saveAllAsAct->setStatusTip(tr("Save library to file."));
+	saveAllAsFileAction = new QAction("Save &As", this);
+	saveAllAsFileAction->setShortcuts(QKeySequence::SaveAs);
+	saveAllAsFileAction->setToolTip("Save library to file.");
 
 	//saveSelectedAs
-	saveSelectedAsAct = new QAction(tr("Save Selected As"), this);
-	saveSelectedAsAct->setStatusTip(tr("Save selected object to file."));
+	saveSelectedAsFileAction = new QAction("Save Selected As", this);
+	saveSelectedAsFileAction->setToolTip("Save selected object to file.");
 
 	//exit
-	exitAct = new QAction(tr("Q&uit"), this);
-	exitAct->setShortcuts(QKeySequence::Quit);
-	exitAct->setStatusTip(tr("Quit"));
+	exitAction = new QAction(tr("Q&uit"), this);
+	exitAction->setShortcuts(QKeySequence::Quit);
+	exitAction->setToolTip("Quit");
 
 	//File menu
 	fileMenu = menuBar()->addMenu(tr("&File")); //create File menu
-	fileMenu->addAction(newAct); //add newButton
-	fileMenu->addAction(openAct); //add openButton
-	fileMenu->addAction(addAct); //add addButton
+	fileMenu->addAction(newFileAction); //add newButton
+	fileMenu->addAction(openFileAction); //add openButton
+	fileMenu->addAction(addFileAction); //add addButton
 	fileMenu->addSeparator();
-	fileMenu->addAction(importSVGAct); //add importButton
+	fileMenu->addAction(importSVGFileAction); //add importButton
 	fileMenu->addSeparator();
-	fileMenu->addAction(saveAllAct); //add saveButton
-	fileMenu->addAction(saveAllAsAct); //add saveButton
-	fileMenu->addAction(saveSelectedAsAct); //add saveAsButton
+	fileMenu->addAction(saveAllFileAction); //add saveButton
+	fileMenu->addAction(saveAllAsFileAction); //add saveButton
+	fileMenu->addAction(saveSelectedAsFileAction); //add saveAsButton
 	fileMenu->addSeparator();
-	fileMenu->addAction(exitAct);
+	fileMenu->addAction(exitAction);
 
 	//examples:webtutorial1
 	web1PieceAction = new QAction("Tutorial 1", this);
-	web1PieceAction->setStatusTip("The first tutorial found on virtualglass.org");
+	web1PieceAction->setToolTip("The first tutorial found on virtualglass.org");
 
 	//examples:webtutorial2
 	web2PieceAction = new QAction("Tutorial 2", this);
-	web2PieceAction->setStatusTip("The second tutorial found on virtualglass.org");
+	web2PieceAction->setToolTip("The second tutorial found on virtualglass.org");
 
 	//examples:random:simple cane
 	randomSimpleCaneAction = new QAction("&Simple Cane", this);
-	randomSimpleCaneAction->setStatusTip("Randomly generate a simple example cane.");
+	randomSimpleCaneAction->setToolTip("Randomly generate a simple example cane.");
 
 	//examples:random:simple piece
 	randomSimplePieceAction = new QAction("&Simple Piece", this);
-	randomSimplePieceAction->setStatusTip("Randomly generate a simple example piece.");
+	randomSimplePieceAction->setToolTip("Randomly generate a simple example piece.");
 
 	//examples:random:complex cane
 	randomComplexCaneAction = new QAction("&Complex Cane", this);
-	randomComplexCaneAction->setStatusTip("Ranomly generate a complex example cane.");
+	randomComplexCaneAction->setToolTip("Ranomly generate a complex example cane.");
 
 	//examples:random:complex piece
 	randomComplexPieceAction = new QAction("&Complex Piece", this);
-	randomComplexPieceAction->setStatusTip("Randomly generate a complex example piece.");
+	randomComplexPieceAction->setToolTip("Randomly generate a complex example piece.");
 
 	// Examples menu and Examples:Random menu
 	examplesMenu = menuBar()->addMenu("&Examples"); //create menu for cane/piece examples
