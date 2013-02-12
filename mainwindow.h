@@ -130,6 +130,8 @@ class MainWindow : public QMainWindow
 		QAction *openFileAction;
 		QAction *addFileAction;
 		QAction *importSVGFileAction;
+		QAction *exportPLYFileAction;
+		QAction *exportOBJFileAction;
 		QAction *saveAllFileAction;
 		QAction *saveAllAsFileAction;
 		QAction *saveSelectedAsFileAction;
@@ -150,6 +152,8 @@ class MainWindow : public QMainWindow
 		void saveAllAsFile();
 		void saveSelectedAsFile();
 		void importSVG();
+		void exportPLY();
+		void exportOBJ();
 		void updateEverything();
 		void newColorBar();
 		void newPullPlan();

@@ -21,6 +21,16 @@ void PieceEditorWidget :: resetPiece()
 	piece = new Piece(PieceTemplate::TUMBLER);
 }
 
+void PieceEditorWidget :: writePieceToOBJFile(QString& filename)
+{
+	geometry.save_obj_file(filename.toStdString());
+}
+
+void PieceEditorWidget :: writePieceToPLYFile(QString& filename)
+{
+	geometry.save_ply_file(filename.toStdString());
+}
+
 void PieceEditorWidget :: updateEverything()
 {
 	// update pickup stuff

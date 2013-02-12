@@ -3,6 +3,7 @@
 #define PULLPLANEDITORWIDGET_H
 
 #include <QtGui>
+#include <string>
 #include "shape.h"
 #include "mesh.h"
 
@@ -29,6 +30,8 @@ class PullPlanEditorWidget : public QWidget
 		void setPlan(PullPlan* p);
 		void seedTemplates();
 		void mousePressEvent(QMouseEvent*);
+		void writePlanToPLYFile(QString& filename);
+		void writePlanToOBJFile(QString& filename);
 
 	signals:
 		void someDataChanged();

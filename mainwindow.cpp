@@ -52,6 +52,8 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 	copyColorBarButton->setEnabled(false);
 	copyPullPlanButton->setEnabled(false);
 	copyPieceButton->setEnabled(false);
+	exportPLYFileAction->setEnabled(false);
+	exportOBJFileAction->setEnabled(false);
 	switch (_mode)
 	{
 		case EMPTY_VIEW_MODE:
@@ -62,9 +64,13 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			break;
 		case PULLPLAN_VIEW_MODE:
 			copyPullPlanButton->setEnabled(true);
+			exportPLYFileAction->setEnabled(true);
+			exportOBJFileAction->setEnabled(true);
 			break;
 		case PIECE_VIEW_MODE:
 			copyPieceButton->setEnabled(true);
+			exportPLYFileAction->setEnabled(true);
+			exportOBJFileAction->setEnabled(true);
 			break;
 	}
 	emit someDataChanged();
@@ -334,6 +340,8 @@ void MainWindow :: setupConnections()
 	connect(openFileAction, SIGNAL(triggered()), this, SLOT(openFile()));
 	connect(addFileAction, SIGNAL(triggered()), this, SLOT(addFile()));
 	connect(importSVGFileAction, SIGNAL(triggered()), this, SLOT(importSVG()));
+	connect(exportPLYFileAction, SIGNAL(triggered()), this, SLOT(exportPLY()));
+	connect(exportOBJFileAction, SIGNAL(triggered()), this, SLOT(exportOBJ()));
 	connect(saveAllFileAction, SIGNAL(triggered()), this, SLOT(saveAllFile()));
 	connect(saveAllAsFileAction, SIGNAL(triggered()), this, SLOT(saveAllAsFile()));
 	connect(saveSelectedAsFileAction, SIGNAL(triggered()), this, SLOT(saveSelectedAsFile()));
@@ -1024,9 +1032,17 @@ void MainWindow::setupMenus()
 	addFileAction->setToolTip("Add an existing file.");
 
 	//import svg cane
-	importSVGFileAction = new QAction("&Import SVG Cane", this);
+	importSVGFileAction = new QAction("&Import cane from SVG", this);
 	importSVGFileAction->setToolTip("Import cane cross section from .svg file.");
 
+	//export ply object
+	exportPLYFileAction = new QAction("&Export glass to PLY", this);
+	exportPLYFileAction->setToolTip("Export cane or piece");
+	
+	//export obj object
+	exportOBJFileAction = new QAction("&Export glass to OBJ", this);
+	exportOBJFileAction->setToolTip("Export cane or piece");
+	
 	//save
 	saveAllFileAction = new QAction("&Save", this);
 	saveAllFileAction->setShortcuts(QKeySequence::Save);
@@ -1047,16 +1063,18 @@ void MainWindow::setupMenus()
 	exitAction->setToolTip("Quit");
 
 	//File menu
-	fileMenu = menuBar()->addMenu(tr("&File")); //create File menu
-	fileMenu->addAction(newFileAction); //add newButton
-	fileMenu->addAction(openFileAction); //add openButton
-	fileMenu->addAction(addFileAction); //add addButton
+	fileMenu = menuBar()->addMenu(tr("&File")); 
+	fileMenu->addAction(newFileAction); 
+	fileMenu->addAction(openFileAction); 
+	fileMenu->addAction(addFileAction); 
 	fileMenu->addSeparator();
-	fileMenu->addAction(importSVGFileAction); //add importButton
+	fileMenu->addAction(importSVGFileAction); 
+	fileMenu->addAction(exportPLYFileAction); 
+	fileMenu->addAction(exportOBJFileAction); 
 	fileMenu->addSeparator();
-	fileMenu->addAction(saveAllFileAction); //add saveButton
-	fileMenu->addAction(saveAllAsFileAction); //add saveButton
-	fileMenu->addAction(saveSelectedAsFileAction); //add saveAsButton
+	fileMenu->addAction(saveAllFileAction); 
+	fileMenu->addAction(saveAllAsFileAction); 
+	fileMenu->addAction(saveSelectedAsFileAction); 
 	fileMenu->addSeparator();
 	fileMenu->addAction(exitAction);
 
@@ -1121,8 +1139,66 @@ void MainWindow::setupMenus()
 	graphicsMenu->addAction(lowGraphicsAction);
 }
 
+void MainWindow::exportOBJ()
+{
+	// should never be invoked if menu disabling is working correctly, but just in case
+	if (editorStack->currentIndex() == EMPTY_VIEW_MODE 
+		|| editorStack->currentIndex() == COLORBAR_VIEW_MODE)
+		return; 
+
+	// get filename
+        QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."),
+                QDir::currentPath(), tr("Wavefront object file (*.obj)"));
+	if (userSpecifiedFilename.isNull())
+		return; 
+
+	// call it on currently selected object
+	switch (editorStack->currentIndex())
+	{
+		case PULLPLAN_VIEW_MODE:
+			pullPlanEditorWidget->writePlanToOBJFile(userSpecifiedFilename);
+			return;	
+		case PIECE_VIEW_MODE:
+			pieceEditorWidget->writePieceToOBJFile(userSpecifiedFilename);
+			return; 
+		default: // should never get here as button should be disabled
+			return;
+	}	
+}
+
+void MainWindow::exportPLY()
+{
+	// should never be invoked if menu disabling is working correctly, but just in case
+	if (editorStack->currentIndex() == EMPTY_VIEW_MODE 
+		|| editorStack->currentIndex() == COLORBAR_VIEW_MODE)
+		return; 
+
+	// get filename
+        QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."),
+                QDir::currentPath(), tr("Polygon file (*.ply)"));
+	if (userSpecifiedFilename.isNull())
+		return; 
+
+	// call it on currently selected object
+	switch (editorStack->currentIndex())
+	{
+		case PULLPLAN_VIEW_MODE:
+			pullPlanEditorWidget->writePlanToPLYFile(userSpecifiedFilename);
+			return;	
+		case PIECE_VIEW_MODE:
+			pieceEditorWidget->writePieceToPLYFile(userSpecifiedFilename);
+			return; 
+		default: // should never get here as button should be disabled
+			return;
+	}	
+}
+
 void MainWindow::importSVG()
 {
+	// use below instead as dialog?
+        // QString userSpecifiedFilename = QFileDialog::getOpenFileName(this, "Open your SVG cane crossection file",
+	//	QDir::currentPath(), "Scalable Vector Graphics (*.svg)");
+
 	QFileDialog importFileDialog(this);
 	importFileDialog.setOption(QFileDialog::DontUseNativeDialog);
 	importFileDialog.setWindowTitle(tr("Open your SVG cane crosssection file"));

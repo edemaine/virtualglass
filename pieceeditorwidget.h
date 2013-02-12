@@ -32,6 +32,8 @@ class PieceEditorWidget : public QWidget
 		void setPickupTemplateType(enum PickupTemplate::Type t);
 		void setPickupParameter(int param, int value);
 		void mousePressEvent(QMouseEvent*);
+		void writePieceToPLYFile(QString& filename);
+		void writePieceToOBJFile(QString& filename);
 
 	signals:
 		void someDataChanged();

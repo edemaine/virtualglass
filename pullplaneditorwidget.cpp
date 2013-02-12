@@ -31,6 +31,16 @@ void PullPlanEditorWidget :: resetPlan()
 	plan = new PullPlan(PullTemplate::HORIZONTAL_LINE_CIRCLE);
 }
 
+void PullPlanEditorWidget :: writePlanToOBJFile(QString& filename)
+{
+	geometry.save_obj_file(filename.toStdString());
+}
+
+void PullPlanEditorWidget :: writePlanToPLYFile(QString& filename)
+{
+	geometry.save_ply_file(filename.toStdString());
+}
+
 void PullPlanEditorWidget :: setupThreading()
 {
 	geometryDirty = false;
