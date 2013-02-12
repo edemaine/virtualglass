@@ -122,6 +122,7 @@ HEADERS += jsoncpp/include/json/autolink.h \
 	piecegeometrythread.h \
 	pickupgeometrythread.h \
 	pullplangeometrythread.h \
+	globalgraphicssetting.h \
 
 SOURCES += main.cpp \ 
 	glew/glew.c \
@@ -174,5 +175,6 @@ SOURCES += main.cpp \
 	piecegeometrythread.cpp \
 	pickupgeometrythread.cpp \
 	pullplangeometrythread.cpp \
+	globalgraphicssetting.cpp \
 
 

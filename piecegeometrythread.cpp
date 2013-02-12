@@ -1,8 +1,8 @@
 
-
 #include "piecegeometrythread.h"
 #include "pieceeditorwidget.h"
 #include "piece.h"
+#include "globalgraphicssetting.h"
 
 PieceGeometryThread::PieceGeometryThread(PieceEditorWidget* _pew) : pew(_pew)
 {
@@ -15,7 +15,7 @@ void PieceGeometryThread::run()
 	{
 		pew->wakeWait.wait(&(pew->wakeMutex));
 
-		for (unsigned int quality = 1; quality < 11; ++quality)
+		for (unsigned int quality = 1; quality <= GlobalGraphicsSetting::getQuality(); ++quality)
 		{	
 			// get lock for pew's tempPiece 
 			// and make a copy to get out of his way as fast as possible	

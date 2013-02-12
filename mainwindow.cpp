@@ -23,6 +23,7 @@
 #include "globalglass.h"
 #include "SVG.hpp"
 #include "glassfileio.h"
+#include "globalgraphicssetting.h"
 
 MainWindow :: MainWindow()
 {
@@ -34,6 +35,7 @@ MainWindow :: MainWindow()
 	setupEditors();
 	setupMenus();
 	setupSaveFile();
+	setupGraphics();
 	setupConnections();
 	setWindowTitle(windowTitle());
 	setupViews();
@@ -347,6 +349,27 @@ void MainWindow :: setupConnections()
 	connect(web2PieceAction, SIGNAL(triggered()), this, SLOT(web2PieceExampleActionTriggered()));
 
 	connect(depthPeelAction, SIGNAL(triggered()), this, SLOT(depthPeelActionTriggered()));
+	connect(highGraphicsAction, SIGNAL(triggered()), this, SLOT(highGraphicsActionTriggered()));
+	connect(mediumGraphicsAction, SIGNAL(triggered()), this, SLOT(mediumGraphicsActionTriggered()));
+	connect(lowGraphicsAction, SIGNAL(triggered()), this, SLOT(lowGraphicsActionTriggered()));
+}
+
+void MainWindow :: highGraphicsActionTriggered()
+{
+	GlobalGraphicsSetting::set(GlobalGraphicsSetting::HIGH);
+	updateEverything();	
+}
+
+void MainWindow :: mediumGraphicsActionTriggered()
+{
+	GlobalGraphicsSetting::set(GlobalGraphicsSetting::MEDIUM);
+	updateEverything();	
+}
+
+void MainWindow :: lowGraphicsActionTriggered()
+{
+	GlobalGraphicsSetting::set(GlobalGraphicsSetting::LOW);
+	updateEverything();	
 }
 
 void MainWindow :: depthPeelActionTriggered()
@@ -463,6 +486,12 @@ void MainWindow :: randomComplexPieceExampleActionTriggered()
 
 	pieceEditorWidget->setPiece(randomP);
 	setViewMode(PIECE_VIEW_MODE);
+}
+
+void MainWindow :: setupGraphics()
+{
+	GlobalGraphicsSetting::set(GlobalGraphicsSetting::HIGH);
+	highGraphicsAction->setChecked(true);
 }
 
 void MainWindow :: setDirtyBit(bool v)
@@ -1068,15 +1097,28 @@ void MainWindow::setupMenus()
 	randomExamplesMenu->addAction(randomComplexPieceAction);
 
 	// toggle depth peeling
-	depthPeelAction = new QAction(tr("&Depth peeling"), this);
+	depthPeelAction = new QAction("Depth peeling", this);
 	depthPeelAction->setCheckable(true);
 	depthPeelAction->setChecked(NiceViewWidget::peelEnable);
-	depthPeelAction->setStatusTip(tr("Toggle high-quality transparency rendering in 3D views"));
+	depthPeelAction->setToolTip(tr("Toggle high-quality transparency rendering in 3D views"));
 
 	// Performance menu
-	perfMenu = menuBar()->addMenu(tr("Performance"));
+	perfMenu = menuBar()->addMenu("Performance");
 	perfMenu->addAction(depthPeelAction);
-
+	graphicsMenu = perfMenu->addMenu("Graphics quality");
+	graphicsActionGroup = new QActionGroup(this);
+	highGraphicsAction = new QAction("High", this);
+	highGraphicsAction->setCheckable(true);
+	graphicsActionGroup->addAction(highGraphicsAction);
+	graphicsMenu->addAction(highGraphicsAction);
+	mediumGraphicsAction = new QAction("Medium", this);
+	mediumGraphicsAction->setCheckable(true);
+	graphicsActionGroup->addAction(mediumGraphicsAction);
+	graphicsMenu->addAction(mediumGraphicsAction);
+	lowGraphicsAction = new QAction("Low", this);
+	lowGraphicsAction->setCheckable(true);
+	graphicsActionGroup->addAction(lowGraphicsAction);
+	graphicsMenu->addAction(lowGraphicsAction);
 }
 
 void MainWindow::importSVG()

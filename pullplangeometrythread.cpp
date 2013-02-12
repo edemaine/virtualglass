@@ -3,6 +3,7 @@
 #include "pullplangeometrythread.h"
 #include "pullplaneditorwidget.h"
 #include "pullplan.h"
+#include "globalgraphicssetting.h"
 
 PullPlanGeometryThread::PullPlanGeometryThread(PullPlanEditorWidget* _ppew) : ppew(_ppew)
 {
@@ -15,7 +16,7 @@ void PullPlanGeometryThread::run()
 	{
 		ppew->wakeWait.wait(&(ppew->wakeMutex));
 
-		for (unsigned int quality = 1; quality < 11; ++quality)
+		for (unsigned int quality = 1; quality <= GlobalGraphicsSetting::getQuality(); ++quality)
 		{	
 			// get lock for ppew's tempPullPlan 
 			// and make a copy to get out of his way as fast as possible	

@@ -75,6 +75,7 @@ class MainWindow : public QMainWindow
 		void setupConnections();
 		void setupMenus();
 		void setupSaveFile();
+		void setupGraphics();
 		void updateLibrary();
 		void initializeRandomPiece();
 		void deleteCurrentEditingObject();
@@ -136,6 +137,11 @@ class MainWindow : public QMainWindow
 		QAction *exitAct;
 		QMenu *perfMenu;
 		QAction *depthPeelAction;
+		QMenu *graphicsMenu;
+		QActionGroup* graphicsActionGroup;
+		QAction *highGraphicsAction;
+		QAction *mediumGraphicsAction;
+		QAction *lowGraphicsAction;
 
 	private slots:
 		void newFile();
@@ -160,6 +166,9 @@ class MainWindow : public QMainWindow
 		void web1PieceExampleActionTriggered();
 		void web2PieceExampleActionTriggered();
 		void depthPeelActionTriggered();
+		void highGraphicsActionTriggered(); 	
+		void mediumGraphicsActionTriggered(); 	
+		void lowGraphicsActionTriggered(); 	
 		void attemptToQuit();
 };
 

@@ -1,8 +1,8 @@
 
-
 #include "pickupgeometrythread.h"
 #include "pickupplaneditorviewwidget.h"
 #include "pickupplan.h"
+#include "globalgraphicssetting.h"
 
 PickupGeometryThread::PickupGeometryThread(PickupPlanEditorViewWidget* _ppew) : ppew(_ppew)
 {
@@ -15,7 +15,7 @@ void PickupGeometryThread::run()
 	{
 		ppew->wakeWait.wait(&(ppew->wakeMutex));
 
-		for (unsigned int quality = 1; quality < 11; ++quality)
+		for (unsigned int quality = 1; quality <= GlobalGraphicsSetting::getQuality(); ++quality)
 		{	
 			// get lock for ppew's tempPiece 
 			// and make a copy to get out of his way as fast as possible	
