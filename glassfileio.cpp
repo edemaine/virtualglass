@@ -19,7 +19,73 @@ using std::vector;
 using std::map;
 
 // write
-void GlassFileIO::writeDocumentation(Json::Value& root)
+bool writeGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, 
+	vector<Piece*>& pieces)
+{
+	// produce the json tree representation
+	Json::Value root;
+	GlassFileIOInternal::writeDocumentation(root);
+	GlassFileIOInternal::writeBuildInformation(root); 
+	GlassFileIOInternal::writeColors(root["Colors"], colors);
+	GlassFileIOInternal::writeCanes(root["Canes"], canes, colors);
+	GlassFileIOInternal::writePieces(root["Pieces"], pieces, canes, colors);
+
+	// convert it to text using json library
+        Json::StyledWriter writer;
+        string outputText = writer.write(root);
+
+	// open a savefile and write the string to it
+	QFile saveFile(filename);
+	saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
+	QTextStream fileOutput(&saveFile);
+	fileOutput << QString::fromStdString(outputText);
+	saveFile.close();
+
+	return true; // successlol
+}
+
+// read
+bool readGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, 
+	vector<Piece*>& pieces)
+{
+	// TODO:fail when error is encountered, rather than charging blindly into the chars
+	QFile openFile(filename);
+	openFile.open(QIODevice::ReadOnly | QIODevice::Text);
+	QTextStream fileInput(&openFile);
+	QString qStr = fileInput.readAll();
+	string str = qStr.toStdString();
+	Json::Value root;
+	Json::Reader reader;
+
+	bool parsedSuccess = reader.parse(str, root, false);
+	if (!parsedSuccess)
+		return false;
+
+	unsigned int revision;
+	string date;
+	GlassFileIOInternal::readBuildInformation(root, revision, date);
+	if (0 < revision && revision < 875) // if you got a valid number and it's not current
+		return false;
+
+	map<unsigned int, GlassColor*> colorMap;
+	if (root.isMember("Colors"))
+		GlassFileIOInternal::readColors(root["Colors"], colorMap, colors);
+
+	map<unsigned int, PullPlan*> caneMap;
+	if (root.isMember("Canes"))
+		GlassFileIOInternal::readCanes(root["Canes"], caneMap, colorMap, canes);
+
+	if (root.isMember("Pieces"))
+		GlassFileIOInternal::readPieces(root["Pieces"], caneMap, colorMap, pieces);
+
+	return true;
+}
+
+namespace GlassFileIOInternal
+{
+
+// write
+void writeDocumentation(Json::Value& root)
 {
 	QFile docFile(":/glassfile_inline_doc.txt");
 
@@ -41,14 +107,14 @@ void GlassFileIO::writeDocumentation(Json::Value& root)
 }
 
 // read
-GlassColor* GlassFileIO::safeColorMap(map<unsigned int, GlassColor*>& colorMap, unsigned int index)
+GlassColor* safeColorMap(map<unsigned int, GlassColor*>& colorMap, unsigned int index)
 {
 	if (colorMap.find(index) == colorMap.end())
 		return GlobalGlass::color();
 	return colorMap[index];
 }
 
-PullPlan* GlassFileIO::safeCaneMap(map<unsigned int, PullPlan*>& caneMap, unsigned int index)
+PullPlan* safeCaneMap(map<unsigned int, PullPlan*>& caneMap, unsigned int index)
 {
 	if (caneMap.find(index) == caneMap.end())
 		// not quite right in some cases, should depend on expected shape
@@ -57,7 +123,7 @@ PullPlan* GlassFileIO::safeCaneMap(map<unsigned int, PullPlan*>& caneMap, unsign
 }
 
 // write
-string GlassFileIO::orientationToString(enum PickupCaneOrientation ori)
+string orientationToString(enum PickupCaneOrientation ori)
 {
 	switch (ori)
 	{
@@ -73,7 +139,7 @@ string GlassFileIO::orientationToString(enum PickupCaneOrientation ori)
 }	
 
 // read
-enum PickupCaneOrientation GlassFileIO::stringToOrientation(string s)
+enum PickupCaneOrientation stringToOrientation(string s)
 {
 	if (s == "Horizontal")
 		return HORIZONTAL_PICKUP_CANE_ORIENTATION;
@@ -86,7 +152,7 @@ enum PickupCaneOrientation GlassFileIO::stringToOrientation(string s)
 }
 
 // write
-string GlassFileIO::geometricShapeToString(enum GeometricShape shape)
+string geometricShapeToString(enum GeometricShape shape)
 {
 	switch (shape)
 	{
@@ -100,7 +166,7 @@ string GlassFileIO::geometricShapeToString(enum GeometricShape shape)
 }
 
 // read
-enum GeometricShape GlassFileIO::stringToGeometricShape(string id)
+enum GeometricShape stringToGeometricShape(string id)
 {
 	if (id == "Square")
 		return SQUARE_SHAPE;
@@ -109,7 +175,7 @@ enum GeometricShape GlassFileIO::stringToGeometricShape(string id)
 }
 
 // write
-string GlassFileIO::idAndNameToString(unsigned int id, string name)
+string idAndNameToString(unsigned int id, string name)
 {
 	char tmp[200];
 	sprintf(tmp, "_%d", id);
@@ -117,7 +183,7 @@ string GlassFileIO::idAndNameToString(unsigned int id, string name)
 }
 
 // read
-unsigned int GlassFileIO::stringToId(string id)
+unsigned int stringToId(string id)
 {
 	// if string doesn't contain a valid id, return a dummy ID that 
 	// does its best to avoid collision with any real ID
@@ -128,7 +194,7 @@ unsigned int GlassFileIO::stringToId(string id)
 }
 
 // write
-string GlassFileIO::pullTemplateToString(enum PullTemplate::Type type)
+string pullTemplateToString(enum PullTemplate::Type type)
 {
 	switch (type)
 	{
@@ -160,7 +226,7 @@ string GlassFileIO::pullTemplateToString(enum PullTemplate::Type type)
 }
 
 // read
-enum PullTemplate::Type GlassFileIO::stringToPullTemplate(string s)
+enum PullTemplate::Type stringToPullTemplate(string s)
 {
 	if (s == "Base Circle")
 		return PullTemplate::BASE_CIRCLE;
@@ -189,7 +255,7 @@ enum PullTemplate::Type GlassFileIO::stringToPullTemplate(string s)
 }
 
 // write 
-string GlassFileIO::pickupTemplateToString(enum PickupTemplate::Type type)
+string pickupTemplateToString(enum PickupTemplate::Type type)
 {
 	switch (type)
 	{
@@ -215,7 +281,7 @@ string GlassFileIO::pickupTemplateToString(enum PickupTemplate::Type type)
 }
 
 // read 
-enum PickupTemplate::Type GlassFileIO::stringToPickupTemplate(string s)
+enum PickupTemplate::Type stringToPickupTemplate(string s)
 {
 	if (s == "Vertical")
 		return PickupTemplate::VERTICAL;
@@ -238,7 +304,7 @@ enum PickupTemplate::Type GlassFileIO::stringToPickupTemplate(string s)
 }
 
 // write
-string GlassFileIO::pieceTemplateToString(enum PieceTemplate::Type type)
+string pieceTemplateToString(enum PieceTemplate::Type type)
 {
 	switch (type)
 	{
@@ -260,7 +326,7 @@ string GlassFileIO::pieceTemplateToString(enum PieceTemplate::Type type)
 }
 
 // read
-enum PieceTemplate::Type GlassFileIO::stringToPieceTemplate(string s)
+enum PieceTemplate::Type stringToPieceTemplate(string s)
 {
 	if (s == "Tumbler")
 		return PieceTemplate::TUMBLER;
@@ -279,7 +345,7 @@ enum PieceTemplate::Type GlassFileIO::stringToPieceTemplate(string s)
 }
 
 // write
-void GlassFileIO::writeBuildInformation(Json::Value& root)
+void writeBuildInformation(Json::Value& root)
 {
 	QFile versionFile(":/version.txt");
 	QString revision;
@@ -299,7 +365,7 @@ void GlassFileIO::writeBuildInformation(Json::Value& root)
 }
 
 // read
-void GlassFileIO::readBuildInformation(Json::Value& root, unsigned int& revision, string& date)
+void readBuildInformation(Json::Value& root, unsigned int& revision, string& date)
 {
 	revision = 0;
 	date = "unknown";
@@ -312,7 +378,7 @@ void GlassFileIO::readBuildInformation(Json::Value& root, unsigned int& revision
 }
 
 // write
-void GlassFileIO::writeColor(Json::Value& root, GlassColor* color, unsigned int colorIndex)
+void writeColor(Json::Value& root, GlassColor* color, unsigned int colorIndex)
 {
 	string colorName = color->getName()->toStdString();
 	string colorname = idAndNameToString(colorIndex, "Color");
@@ -326,7 +392,7 @@ void GlassFileIO::writeColor(Json::Value& root, GlassColor* color, unsigned int 
 }
 
 // read
-GlassColor* GlassFileIO::readColor(Json::Value& root, string colorname, unsigned int& colorIndex)
+GlassColor* readColor(Json::Value& root, string colorname, unsigned int& colorIndex)
 {
 	string colorName = root[colorname]["Name"].asString();
 	colorIndex = stringToId(colorname);
@@ -340,7 +406,7 @@ GlassColor* GlassFileIO::readColor(Json::Value& root, string colorname, unsigned
 	return new GlassColor(color, QString::fromStdString(colorName));
 }
 
-void GlassFileIO::writeColors(Json::Value& root, vector<GlassColor*>& colors)
+void writeColors(Json::Value& root, vector<GlassColor*>& colors)
 {
 	// give helpful advice about pointer scheme
 	root.setComment("// Color_0 is the global default color and is not saved.", 
@@ -350,7 +416,7 @@ void GlassFileIO::writeColors(Json::Value& root, vector<GlassColor*>& colors)
 		writeColor(root, colors[i], i+1);
 }
 
-void GlassFileIO::readColors(Json::Value& colorRoot, map<unsigned int, GlassColor*>& colorMap, vector<GlassColor*>& readColors)
+void readColors(Json::Value& colorRoot, map<unsigned int, GlassColor*>& colorMap, vector<GlassColor*>& readColors)
 {
 	// clear out readColors for consistency with readCanes()
 	readColors.clear();
@@ -407,7 +473,7 @@ cane
 */
 
 // write
-void GlassFileIO::writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<PullPlan*, unsigned int>& caneMap, 
+void writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<PullPlan*, unsigned int>& caneMap, 
 	map<GlassColor*, unsigned int>& colorMap)
 {
 	string canename = idAndNameToString(caneIndex, "Cane");
@@ -459,7 +525,7 @@ void GlassFileIO::writeCane(Json::Value& root, PullPlan* cane, unsigned int cane
 
 
 // read
-PullPlan* GlassFileIO::readCane(string canename, Json::Value& root, unsigned int& caneIndex, 
+PullPlan* readCane(string canename, Json::Value& root, unsigned int& caneIndex, 
 	map<unsigned int, GlassColor*>& colorMap)
 {
         caneIndex = stringToId(canename);
@@ -518,7 +584,7 @@ PullPlan* GlassFileIO::readCane(string canename, Json::Value& root, unsigned int
 	return cane;
 }
 
-void GlassFileIO::readCaneSubcanes(Json::Value& root, PullPlan* cane, map<unsigned int, PullPlan*>& caneMap)
+void readCaneSubcanes(Json::Value& root, PullPlan* cane, map<unsigned int, PullPlan*>& caneMap)
 {
 	// if the cane's template type is custom, then it is impossible to know how many subcanes it has
 	// so we make an initial pass over the subcanes just to build an initial list of the correct size
@@ -544,7 +610,7 @@ void GlassFileIO::readCaneSubcanes(Json::Value& root, PullPlan* cane, map<unsign
 }
 
 // write 
-void GlassFileIO::writeCanes(Json::Value& root, vector<PullPlan*>& canes, vector<GlassColor*>& colors)
+void writeCanes(Json::Value& root, vector<PullPlan*>& canes, vector<GlassColor*>& colors)
 {
 	// give helpful advice about pointer scheme
 	root.setComment("// Cane_0 and Cane_1 are the the global default circular and square canes and are not saved.",
@@ -571,7 +637,7 @@ void GlassFileIO::writeCanes(Json::Value& root, vector<PullPlan*>& canes, vector
 }
 
 // read
-void GlassFileIO::readCanes(Json::Value& canesRoot, map<unsigned int, PullPlan*>& caneMap, 
+void readCanes(Json::Value& canesRoot, map<unsigned int, PullPlan*>& caneMap, 
 	map<unsigned int, GlassColor*>& colorMap, vector<PullPlan*>& readCanes)
 {
 	// clear out readCanes, since the correspondence between 
@@ -634,7 +700,7 @@ pickup
 		subcane_2
 		...
 */
-void GlassFileIO::writePickup(Json::Value& root, PickupPlan* pickup, unsigned int pickupIndex,
+void writePickup(Json::Value& root, PickupPlan* pickup, unsigned int pickupIndex,
 	map<PullPlan*, unsigned int>& caneMap, map<GlassColor*, unsigned int>& colorMap)
 {
 	string pickupname = idAndNameToString(pickupIndex, "Pickup");
@@ -677,7 +743,7 @@ void GlassFileIO::writePickup(Json::Value& root, PickupPlan* pickup, unsigned in
 	}
 }
 
-PickupPlan* GlassFileIO::readPickup(string pickupname, Json::Value& root,
+PickupPlan* readPickup(string pickupname, Json::Value& root,
 	map<unsigned int, PullPlan*>& caneMap, map<unsigned int, GlassColor*>& colorMap)
 {
 	// read singletons: casing color, overlay color, underlay color, pickup template
@@ -732,7 +798,7 @@ piece
 		...
 	pickups (done separately)
 */
-void GlassFileIO::writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<PullPlan*, unsigned int>& caneMap,
+void writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<PullPlan*, unsigned int>& caneMap,
 	map<GlassColor*, unsigned int>& colorMap)
 {
 	string piecename = idAndNameToString(pieceIndex, "Piece");
@@ -759,7 +825,7 @@ void GlassFileIO::writePiece(Json::Value& root, Piece* piece, unsigned int piece
 	writePickup(root[piecename]["Pickups"], piece->pickup, 0, caneMap, colorMap);
 }
 
-Piece* GlassFileIO::readPiece(string piecename, Json::Value& root, map<unsigned int, PullPlan*>& caneMap, 
+Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, PullPlan*>& caneMap, 
 	map<unsigned int, GlassColor*>& colorMap)
 {
 	// read singletons: piece template
@@ -785,7 +851,7 @@ Piece* GlassFileIO::readPiece(string piecename, Json::Value& root, map<unsigned 
 	return piece;
 }
 
-void GlassFileIO::writePieces(Json::Value& root, vector<Piece*>& pieces, vector<PullPlan*>& canes, 
+void writePieces(Json::Value& root, vector<Piece*>& pieces, vector<PullPlan*>& canes, 
 	vector<GlassColor*>& colors)
 {
         // generate color map
@@ -806,7 +872,7 @@ void GlassFileIO::writePieces(Json::Value& root, vector<Piece*>& pieces, vector<
                 writePiece(root, pieces[i], i, caneMap, colorMap);
 }
 
-void GlassFileIO::readPieces(Json::Value& piecesRoot, map<unsigned int, PullPlan*>& caneMap, map<unsigned int, 
+void readPieces(Json::Value& piecesRoot, map<unsigned int, PullPlan*>& caneMap, map<unsigned int, 
 	GlassColor*>& colorMap, vector<Piece*>& readPieces)
 {
         // clear out readPieces, since the correspondence between 
@@ -824,68 +890,5 @@ void GlassFileIO::readPieces(Json::Value& piecesRoot, map<unsigned int, PullPlan
         }
 }
 
-// write
-bool GlassFileIO::write(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, 
-	vector<Piece*>& pieces)
-{
-	// produce the json tree representation
-	Json::Value root;
-	writeDocumentation(root);
-	writeBuildInformation(root); 
-	writeColors(root["Colors"], colors);
-	writeCanes(root["Canes"], canes, colors);
-	writePieces(root["Pieces"], pieces, canes, colors);
-
-	// convert it to text using json library
-        Json::StyledWriter writer;
-        string outputText = writer.write(root);
-
-	// open a savefile and write the string to it
-	QFile saveFile(filename);
-	saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
-	QTextStream fileOutput(&saveFile);
-	fileOutput << QString::fromStdString(outputText);
-	saveFile.close();
-
-	return true; // successlol
 }
-
-// read
-bool GlassFileIO::read(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, 
-	vector<Piece*>& pieces)
-{
-	// TODO:fail when error is encountered, rather than charging blindly into the chars
-	QFile openFile(filename);
-	openFile.open(QIODevice::ReadOnly | QIODevice::Text);
-	QTextStream fileInput(&openFile);
-	QString qStr = fileInput.readAll();
-	string str = qStr.toStdString();
-	Json::Value root;
-	Json::Reader reader;
-
-	bool parsedSuccess = reader.parse(str, root, false);
-	if (!parsedSuccess)
-		return false;
-
-	unsigned int revision;
-	string date;
-	readBuildInformation(root, revision, date);
-	if (0 < revision && revision < 875) // if you got a valid number and it's not current
-		return false;
-
-	map<unsigned int, GlassColor*> colorMap;
-	if (root.isMember("Colors"))
-		readColors(root["Colors"], colorMap, colors);
-
-	map<unsigned int, PullPlan*> caneMap;
-	if (root.isMember("Canes"))
-		readCanes(root["Canes"], caneMap, colorMap, canes);
-
-	if (root.isMember("Pieces"))
-		readPieces(root["Pieces"], caneMap, colorMap, pieces);
-
-	return true;
-}
-
-
 

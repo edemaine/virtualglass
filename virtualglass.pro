@@ -12,9 +12,6 @@ TARGET =
 DEPENDPATH += .
 INCLUDEPATH += . glew/
 INCLUDEPATH += . jsoncpp/include
-#INCLUDEPATH += . freeglut/include
-#INCLUDEPATH += . freeglut/include/GL
-#INCLUDEPATH += . freeglut/src
 QT += opengl
 RESOURCES = virtualglass.qrc
 DEFINES += GLEW_MX
@@ -22,15 +19,13 @@ DEFINES += GLEW_MX
 unix:!macx {
   QMAKE_CXXFLAGS += -std=gnu++0x
   LIBS += -lGLU
- #LIBS += -lGLUT
 }
 macx {
   QMAKE_CC = g++
   QMAKE_CFLAGS += -Qunused-arguments
   QMAKE_CXX = g++
-  QMAKE_CXXFLAGS += -DUNORDERED_MAP_WORKAROUND -I src/jsoncpp/include #-I src/freeglut/include -I src/freeglut/include/GL -I src/freeglut/src
+  QMAKE_CXXFLAGS += -DUNORDERED_MAP_WORKAROUND -I src/jsoncpp/include 
   ICON = virtualglass.icns
-LIBS += -framework GLUT
 }
 
 *-msvc* {
@@ -41,7 +36,6 @@ LIBS += -framework GLUT
 	QMAKE_CFLAGS_DEBUG += $${MYFLAGS}
 	QMAKE_CFLAGS_RELEASE += $${MYFLAGS}
 	QMAKE_CXXFLAGS += $${MYFLAGS}
- #LIBS += -lGLUT
 }
 #one hopes this catches mingw:
 !*-msvc* {
@@ -52,13 +46,13 @@ LIBS += -framework GLUT
 		QMAKE_CXXFLAGS += -std=gnu++0x
 	}
 	LIBS += -lexpat
-# LIBS += -lGLUT
 }
 
-HEADERS += glew/glew.h glew/glxew.h glew/wglew.h \
-    bubble.h
-
-HEADERS += jsoncpp/include/json/autolink.h \
+HEADERS += glew/glew.h \
+	glew/glxew.h \
+	glew/wglew.h \
+	bubble.h \
+	jsoncpp/include/json/autolink.h \
         jsoncpp/include/json/config.h \
         jsoncpp/include/json/features.h \
         jsoncpp/include/json/forwards.h \
@@ -66,11 +60,6 @@ HEADERS += jsoncpp/include/json/autolink.h \
         jsoncpp/include/json/reader.h \
         jsoncpp/include/json/value.h \
         jsoncpp/include/json/writer.h \
-        #freeglut/include/GL/glut.h \
-        #freeglut/include/GL/freeglut.h \
-        #freeglut/include/GL/freeglut_std.h \
-        #freeglut/include/GL/freeglut_ext.h \
-        #freeglut/src/freeglut_internal.h \
         primitives.h \
         constants.h \
         Vector.hpp \

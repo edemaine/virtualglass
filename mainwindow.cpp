@@ -1388,7 +1388,7 @@ void MainWindow::openFile()
 	vector<GlassColor*> colors;
 	vector<PullPlan*> plans;
 	vector<Piece*> pieces;
-	bool success = GlassFileIO::read(userSpecifiedFilename, colors, plans, pieces);
+	bool success = readGlassFile(userSpecifiedFilename, colors, plans, pieces);
 
 	// if it failed, pop a sad little message box 
 	if (!success) 
@@ -1434,7 +1434,7 @@ void MainWindow::addFile()
 	vector<Piece*> partialPieces;
 	for (int i = 0; i < userSpecifiedFilenames.size(); ++i)
 	{
-		if (GlassFileIO::read(userSpecifiedFilenames[i], partialColors, partialPlans, partialPieces))
+		if (readGlassFile(userSpecifiedFilenames[i], partialColors, partialPlans, partialPieces))
 		{
 			for (unsigned int j = 0; j < partialColors.size(); ++j)
 				colors.push_back(partialColors[j]);
@@ -1479,7 +1479,7 @@ void MainWindow::saveAllFile()
 		vector<PullPlan*> plans;
 		vector<Piece*> pieces;
 		getLibraryContents(colors, plans, pieces);
-		GlassFileIO::write(saveFilename, colors, plans, pieces);	
+		writeGlassFile(saveFilename, colors, plans, pieces);	
 		setDirtyBit(false);
 	}
 }
@@ -1498,7 +1498,7 @@ void MainWindow::saveAllAsFile()
 	vector<PullPlan*> plans;
 	vector<Piece*> pieces;
 	getLibraryContents(colors, plans, pieces);
-	GlassFileIO::write(saveFilename, colors, plans, pieces);	
+	writeGlassFile(saveFilename, colors, plans, pieces);	
 	setDirtyBit(false);
 }
 
@@ -1532,7 +1532,7 @@ void MainWindow::saveSelectedAsFile()
 
 	// pass off "curated" library to regular write file; 
 	// effectively pretending that the library only has your thing and its dependancies
-	GlassFileIO::write(userSpecifiedFilename, colors, plans, pieces);	
+	writeGlassFile(userSpecifiedFilename, colors, plans, pieces);	
 
 	// this doesn't impact dirty bit or saveFilename at all: it's a special operation that 
 	// virtualglass has that lives outside of the usual file-editor relationship, e.g. of a text editor. 
