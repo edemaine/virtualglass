@@ -169,7 +169,9 @@ void ColorEditorWidget :: alphaSliderPositionChanged(int)
 {
 	if (alphaSlider->sliderPosition() != (int) (glassColor->getColor().a * 255))
 	{
-		glassColor->getColor().a = (255 - alphaSlider->sliderPosition()) / 255.0;
+		Color c = glassColor->getColor();
+		c.a = (255 - alphaSlider->sliderPosition()) / 255.0;
+		glassColor->setColor(c);
 		emit someDataChanged();
 	} 
 }

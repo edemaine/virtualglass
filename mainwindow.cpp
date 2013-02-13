@@ -297,12 +297,12 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 
 	if (cblw != NULL)
 	{
-		GlassMime::encode(buf, cblw->getGlassColor(), GlassMime::colorbar);
+		GlassMime::encode(buf, cblw->getGlassColor(), GlassMime::COLORBAR_MIME);
 		pixmap = *cblw->getDragPixmap();
 	}
 	else if (plplw != NULL)
 	{
-		GlassMime::encode(buf, plplw->getPullPlan(), GlassMime::pullplan);
+		GlassMime::encode(buf, plplw->getPullPlan(), GlassMime::PULLPLAN_MIME);
 		pixmap = *plplw->getDragPixmap();
 	}
 	else

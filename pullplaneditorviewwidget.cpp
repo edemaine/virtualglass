@@ -104,7 +104,7 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	PullPlan* selectedSubplan = getSubplanAt(x, y);
 	if (selectedSubplan != NULL)
 	{
-		enum GlassMime::Type type = GlassMime::pullplan;
+		enum GlassMime::Type type = GlassMime::PULLPLAN_MIME;
 		AsyncPullPlanLibraryWidget plplw(selectedSubplan);		
 		QPixmap pixmap = *(plplw.getDragPixmap());
 
@@ -218,11 +218,11 @@ void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 	GlassMime::decode(event->mimeData()->text().toAscii().constData(), &ptr, &type);
 	switch (type)
 	{
-		case GlassMime::colorbar:
+		case GlassMime::COLORBAR_MIME:
 			isDraggingColor = true;
 			draggedColor = reinterpret_cast<GlassColor*>(ptr);
 			break;
-		case GlassMime::pullplan:
+		case GlassMime::PULLPLAN_MIME:
 			isDraggingPlan = true;
 			draggedPlan = reinterpret_cast<PullPlan*>(ptr);
 			break;

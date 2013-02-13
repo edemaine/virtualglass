@@ -106,7 +106,7 @@ void PickupPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 		AsyncPullPlanLibraryWidget plplw(subplan);
 
 		char buf[500];
-		sprintf(buf, "%p %d", subplan, GlassMime::pullplan);
+		sprintf(buf, "%p %d", subplan, GlassMime::PULLPLAN_MIME);
 		QByteArray pointerData(buf);
 		QMimeData* mimeData = new QMimeData;
 		mimeData->setText(pointerData);
@@ -180,15 +180,15 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	GlassMime::decode(event->mimeData()->text().toAscii().constData(), &droppedObject, &type);
 	switch (type)
 	{
-		case GlassMime::colorbar:
+		case GlassMime::COLORBAR_MIME:
 			droppedColor = reinterpret_cast<GlassColor*>(droppedObject);
 			break;
-		case GlassMime::pullplan:
+		case GlassMime::PULLPLAN_MIME:
 			droppedPlan = reinterpret_cast<PullPlan*>(droppedObject);
 			break;
 	}
 
-	if (type == GlassMime::colorbar)
+	if (type == GlassMime::COLORBAR_MIME)
 	{
 		event->accept();
 		if ((event->keyboardModifiers() & Qt::ShiftModifier))
