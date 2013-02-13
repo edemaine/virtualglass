@@ -1,0 +1,4 @@
+This is a VirtualGlass file containing a color library.
+
+Editing attributes by hand is possible, and reading/editing these files 
+programmatically is possible using a Json library, e.g. JsonCpp.

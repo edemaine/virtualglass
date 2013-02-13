@@ -19,12 +19,12 @@ using std::vector;
 using std::map;
 
 
-
 // write
 bool writeColorFile(QString filename, QString collectionName, vector<GlassColor*>& colors)
 {
 	Json::Value root;
-	//GlassFileIOInternal::writeDocumentation(root);
+	string docFilename(":/colorfile_inline_doc.txt"); 
+	GlassFileIOInternal::writeDocumentation(docFilename, root);
 	GlassFileIOInternal::writeBuildInformation(root); 
 	root["Collection name"] = collectionName.toStdString();
 	GlassFileIOInternal::writeColors(root["Colors"], colors);
@@ -74,7 +74,8 @@ bool writeGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPl
 {
 	// produce the json tree representation
 	Json::Value root;
-	GlassFileIOInternal::writeDocumentation(root);
+	string docFilename(":/glassfile_inline_doc.txt"); 
+	GlassFileIOInternal::writeDocumentation(docFilename, root);
 	GlassFileIOInternal::writeBuildInformation(root); 
 	GlassFileIOInternal::writeColors(root["Colors"], colors);
 	GlassFileIOInternal::writeCanes(root["Canes"], canes, colors);
@@ -140,9 +141,9 @@ void writeJsonToFile(QString& filename, Json::Value& root)
 } 
 
 // write
-void writeDocumentation(Json::Value& root)
+void writeDocumentation(string& filename, Json::Value& root)
 {
-	QFile docFile(":/glassfile_inline_doc.txt");
+	QFile docFile(filename.c_str());
 
 	if (!docFile.open(QIODevice::ReadOnly))
 		return;
@@ -465,10 +466,6 @@ GlassColor* readColor(Json::Value& root, string colorname, unsigned int& colorIn
 
 void writeColors(Json::Value& root, vector<GlassColor*>& colors)
 {
-	// give helpful advice about pointer scheme
-	root.setComment("// Color_0 is the global default color and is not saved.", 
-		Json::commentBefore);
-
 	for (unsigned int i = 0; i < colors.size(); ++i)
 		writeColor(root, colors[i], i+1);
 }
@@ -666,10 +663,6 @@ void readCaneSubcanes(Json::Value& root, PullPlan* cane, map<unsigned int, PullP
 // write 
 void writeCanes(Json::Value& root, vector<PullPlan*>& canes, vector<GlassColor*>& colors)
 {
-	// give helpful advice about pointer scheme
-	root.setComment("// Cane_0 and Cane_1 are the the global default circular and square canes and are not saved.",
-		Json::commentBefore);
-
 	// generate color map
 	map<GlassColor*, unsigned int> colorMap;
 	colorMap[GlobalGlass::color()] = 0;

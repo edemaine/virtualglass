@@ -7,3 +7,7 @@ The dependancies among objects (e.g. a cane using a color) are described by
 a set of pointer fields in canes, pickups, pieces (e.g. ''Color pointer'',
 ''Cane pointer'') and numeric object IDs (e.g. 9 in ''Color_9'', 
 5 in ''Cane_5'') in object names.
+
+A reserved set of color and cane IDs, specifically ''Color_0'', ''Cane_0'', 
+and ''Cane_1'' are reserved for global default glass objects and should not
+be used in any .glass file.

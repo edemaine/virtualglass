@@ -1,9 +1,13 @@
+// This is a VirtualGlass file containing a color library.
+//
+// Editing attributes by hand is possible, and reading/editing these files
+// programmatically is possible using a Json library, e.g. JsonCpp.
 {
    "Build information" : {
       "Date" : "2013-02-11",
       "Revision" : 876
    },
-   "Collection name" : "Reichenbach - Transparents",// Color_0 is the global default color and is not saved.
+   "Collection name" : "Reichenbach - Transparents",
    "Colors" : {
       "Color_1" : {
          "Alpha" : 0.0,

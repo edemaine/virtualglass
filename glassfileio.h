@@ -31,7 +31,7 @@ namespace GlassFileIOInternal
 {
 	void writeJsonToFile(QString& filename, Json::Value& root);
 
-	void writeDocumentation(Json::Value& root);
+	void writeDocumentation(string& filename, Json::Value& root);
 
 	GlassColor* safeColorMap(map<unsigned int, GlassColor*>& colorMap, unsigned int index);
 	PullPlan* safeCaneMap(map<unsigned int, PullPlan*>& caneMap, unsigned int index);
