@@ -18,6 +18,56 @@ using std::string;
 using std::vector;
 using std::map;
 
+
+
+// write
+bool writeColorFile(QString filename, QString collectionName, vector<GlassColor*>& colors)
+{
+	Json::Value root;
+	//GlassFileIOInternal::writeDocumentation(root);
+	GlassFileIOInternal::writeBuildInformation(root); 
+	root["Collection name"] = collectionName.toStdString();
+	GlassFileIOInternal::writeColors(root["Colors"], colors);
+
+	GlassFileIOInternal::writeJsonToFile(filename, root);
+
+	return true;
+}
+
+// read
+bool readColorFile(QString filename, QString& collectionname, vector<GlassColor*>& colors)
+{
+	// TODO:fail when error is encountered, rather than charging blindly into the chars
+	QFile openFile(filename);
+	openFile.open(QIODevice::ReadOnly | QIODevice::Text);
+	QTextStream fileInput(&openFile);
+	QString qStr = fileInput.readAll();
+	string str = qStr.toStdString();
+	openFile.close();
+	Json::Value root;
+	Json::Reader reader;
+
+	bool parsedSuccess = reader.parse(str, root, false);
+	if (!parsedSuccess)
+		return false;
+
+	unsigned int revision;
+	string date;
+	GlassFileIOInternal::readBuildInformation(root, revision, date);
+	if (0 < revision && revision < 875) // if you got a valid number and it's not current
+		return false;
+
+	if (!root.isMember("Collection name"))
+		return false;
+	collectionname = root["Collection name"].asString().c_str();
+
+	map<unsigned int, GlassColor*> colorMap;
+	if (root.isMember("Colors"))
+		GlassFileIOInternal::readColors(root["Colors"], colorMap, colors);
+
+	return true;
+}
+
 // write
 bool writeGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, 
 	vector<Piece*>& pieces)
@@ -30,17 +80,8 @@ bool writeGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPl
 	GlassFileIOInternal::writeCanes(root["Canes"], canes, colors);
 	GlassFileIOInternal::writePieces(root["Pieces"], pieces, canes, colors);
 
-	// convert it to text using json library
-        Json::StyledWriter writer;
-        string outputText = writer.write(root);
-
-	// open a savefile and write the string to it
-	QFile saveFile(filename);
-	saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
-	QTextStream fileOutput(&saveFile);
-	fileOutput << QString::fromStdString(outputText);
-	saveFile.close();
-
+	GlassFileIOInternal::writeJsonToFile(filename, root);
+	
 	return true; // successlol
 }
 
@@ -83,6 +124,20 @@ bool readGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPla
 
 namespace GlassFileIOInternal
 {
+
+void writeJsonToFile(QString& filename, Json::Value& root)
+{
+	// convert it to text using json library
+        Json::StyledWriter writer;
+        string outputText = writer.write(root);
+
+	// open a savefile and write the string to it
+	QFile saveFile(filename);
+	saveFile.open(QIODevice::WriteOnly | QIODevice::Text);
+	QTextStream fileOutput(&saveFile);
+	fileOutput << QString::fromStdString(outputText);
+	saveFile.close();
+} 
 
 // write
 void writeDocumentation(Json::Value& root)

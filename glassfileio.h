@@ -21,12 +21,15 @@ using std::map;
 using std::vector;
 using std::string;
 
-bool readGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, vector<Piece*>& pieces);
+// returns whether the read or write succeeded (true) or ran into issues (false) 
+bool writeColorFile(QString filename, QString collectionName, vector<GlassColor*>& colors); 
+bool readColorFile(QString filename, QString& collectionName, vector<GlassColor*>& colors); 
 bool writeGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, vector<Piece*>& pieces);
+bool readGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, vector<Piece*>& pieces);
 
 namespace GlassFileIOInternal
 {
-	// returns whether the read or write succeeded (true) or ran into issues (false) 
+	void writeJsonToFile(QString& filename, Json::Value& root);
 
 	void writeDocumentation(Json::Value& root);
 

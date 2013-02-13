@@ -9,6 +9,7 @@
 #include "glasscolor.h"
 #include "colorreader.h"
 #include "coloreditorwidget.h"
+#include "glassfileio.h"
 
 ColorEditorWidget :: ColorEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -91,6 +92,7 @@ void ColorEditorWidget :: setupLayout()
 	loadCollection(":/kugler-transparent-colors.vgc");
 	loadCollection(":/gaffer-opaque-colors.vgc");
 	loadCollection(":/gaffer-transparent-colors.vgc");
+	loadCollection(":/marty-favorite-colors.vgc");
 
 	QHBoxLayout* alphaLayout = new QHBoxLayout(this);
 	editorLayout->addLayout(alphaLayout);
@@ -120,19 +122,13 @@ void ColorEditorWidget :: setupConnections()
 
 void ColorEditorWidget :: loadCollection(QString fileName)
 {
-	QFile file(fileName);
-	file.open(QIODevice::ReadOnly | QIODevice::Text);
-	// Add the list name to the dropdown menu of lists
-	if (file.atEnd())
-	{
-		file.close();
+	vector<GlassColor*> colors;
+	QString collectionName;
+
+	if(!readColorFile(fileName, collectionName, colors))
 		return;
-	}
-	else
-	{
-		// First line of file is collection name
-		collectionComboBox->insertItem(collectionComboBox->count()-1, file.readLine().trimmed());
-	}
+
+	collectionComboBox->insertItem(collectionComboBox->count()-1, collectionName);
 
 	// This part sets up the necessary GUI parts 
 	// related to the color list.
@@ -153,33 +149,13 @@ void ColorEditorWidget :: loadCollection(QString fileName)
 	listLayout->setSpacing(10);
 	colorLibraryWidget->setLayout(listLayout);
 
-	// Here we now actually read the list from the file and
-	// create a list of GUI labels for the colors
-	// Create each library item and add it to the listLayout
-	Color colorRGB;
-	QString colorName;
-	while (!file.atEnd())
+	for (unsigned int i = 0; i < colors.size(); ++i)
 	{
-		QString line = file.readLine();
-		line = line.trimmed();
-		if (line.isEmpty())
-			continue;
-
-		if (line.at(0) == '[')
-		{
-			// if there's no second line for RGB values, quit
-			if (file.atEnd())
-			{
-				file.close();
-				return;
-			}
-			colorName = lineToColorName(line);
-			colorRGB = lineToColorRGB(file.readLine()); 
-			PureColorLibraryWidget* pclw = new PureColorLibraryWidget(colorRGB, colorName, this);
-			listLayout->addWidget(pclw);
-		}
+		PureColorLibraryWidget* pclw = new PureColorLibraryWidget(*(colors[i]->getColor()), 
+			*(colors[i]->getName()), this);
+		listLayout->addWidget(pclw);
+		// memory leak here because GlassColor objects are now forgotten
 	}
-	file.close();
 }
 
 void ColorEditorWidget :: alphaSliderPositionChanged(int)

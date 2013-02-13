@@ -1,27 +1,93 @@
-Martin Demaine - Favorites
-
-[K100 Lead Crystal]
-- 247,247,247,126
-[K141A Cherry Red]
-- 204,0,0,126
-[K210 Sari Blue]
-- 0,112,179,126
-[K212A Brilliant Gold]
-- 254,220,29,126
-[K228 Dark Heliotrope]
-- 164,116,184,126
-[K215A Gold Brown]
-- 163,118,58,126
-[K213 Brilliant Green]
-- 153,204,51,126
-[K061 Enamel White]
-- 255,255,255,255
-[K095 Opal Black]
-- 0,0,0,255
-[K070 Opal Green]
-- 0,140,0,255
-[K078A Canary Yellow]
-- 249,219,6,255
-[K086 Turquoise]
-- 121,190,196,255
-
+{
+   "Build information" : {
+      "Date" : "2013-02-11",
+      "Revision" : 876
+   },
+   "Collection name" : "Martin Demaine - Favorites",// Color_0 is the global default color and is not saved.
+   "Colors" : {
+      "Color_1" : {
+         "Alpha" : 0.4941176474094391,
+         "B" : 0.9686274528503418,
+         "G" : 0.9686274528503418,
+         "Name" : "K100 Lead Crystal",
+         "R" : 0.9686274528503418
+      },
+      "Color_10" : {
+         "Alpha" : 0.4941176474094391,
+         "B" : 0.2000000029802322,
+         "G" : 0.8000000119209290,
+         "Name" : "K213 Brilliant Green",
+         "R" : 0.6000000238418579
+      },
+      "Color_11" : {
+         "Alpha" : 1.0,
+         "B" : 1.0,
+         "G" : 1.0,
+         "Name" : "K061 Enamel White",
+         "R" : 1.0
+      },
+      "Color_12" : {
+         "Alpha" : 1.0,
+         "B" : 0.0,
+         "G" : 0.0,
+         "Name" : "K095 Opal Black",
+         "R" : 0.0
+      },
+      "Color_2" : {
+         "Alpha" : 1.0,
+         "B" : 0.0,
+         "G" : 0.5490196347236633,
+         "Name" : "K070 Opal Green",
+         "R" : 0.0
+      },
+      "Color_3" : {
+         "Alpha" : 1.0,
+         "B" : 0.02352941222488880,
+         "G" : 0.8588235378265381,
+         "Name" : "K078A Canary Yellow",
+         "R" : 0.9764705896377563
+      },
+      "Color_4" : {
+         "Alpha" : 1.0,
+         "B" : 0.7686274647712708,
+         "G" : 0.7450980544090271,
+         "Name" : "K086 Turquoise",
+         "R" : 0.4745098054409027
+      },
+      "Color_5" : {
+         "Alpha" : 0.4941176474094391,
+         "B" : 0.0,
+         "G" : 0.0,
+         "Name" : "K141A Cherry Red",
+         "R" : 0.8000000119209290
+      },
+      "Color_6" : {
+         "Alpha" : 0.4941176474094391,
+         "B" : 0.7019608020782471,
+         "G" : 0.4392156898975372,
+         "Name" : "K210 Sari Blue",
+         "R" : 0.0
+      },
+      "Color_7" : {
+         "Alpha" : 0.4941176474094391,
+         "B" : 0.1137254908680916,
+         "G" : 0.8627451062202454,
+         "Name" : "K212A Brilliant Gold",
+         "R" : 0.9960784316062927
+      },
+      "Color_8" : {
+         "Alpha" : 0.4941176474094391,
+         "B" : 0.7215686440467834,
+         "G" : 0.4549019634723663,
+         "Name" : "K228 Dark Heliotrope",
+         "R" : 0.6431372761726379
+      },
+      "Color_9" : {
+         "Alpha" : 0.4941176474094391,
+         "B" : 0.2274509817361832,
+         "G" : 0.4627451002597809,
+         "Name" : "K215A Gold Brown",
+         "R" : 0.6392157077789307
+      }
+   }
+}
