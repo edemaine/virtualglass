@@ -2,24 +2,31 @@
 #define GLASSCOLOR_H
 
 #include "primitives.h"
-#include <QString>
+#include <string>
+
+using std::string;
 
 class GlassColor 
 {
 	public:
 		GlassColor();
-		GlassColor(Color _color, QString _name);
-		Color* getColor();
+		GlassColor(Color _color, string _shortName, string _longName);
+
+		Color getColor();
 		void setColor(Color _color);
 
-		QString* getName();
-		void setName(QString _name);
+		string getShortName();
+		void setShortName(string _name);
+
+		string getLongName();
+		void setLongName(string _name);
 
 		GlassColor* copy() const;
 
 	private:
 		Color color;
-		QString name;	
+		string shortName;	
+		string longName;	
 };
 
 GlassColor* deep_copy(const GlassColor* _gc);

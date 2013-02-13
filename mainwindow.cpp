@@ -297,7 +297,7 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 
 	if (cblw != NULL)
 	{
-		GlassMime::encode(buf, cblw->getGlassColor()->getColor(), GlassMime::colorbar);
+		GlassMime::encode(buf, cblw->getGlassColor(), GlassMime::colorbar);
 		pixmap = *cblw->getDragPixmap();
 	}
 	else if (plplw != NULL)

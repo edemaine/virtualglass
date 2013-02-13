@@ -83,8 +83,8 @@ void AsyncPullPlanLibraryWidget :: drawSubplan(float x, float y, float drawWidth
 		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
 
 		// Fill with actual casing color (highlighting white or some other color)
-		Color* c = plan->getCasingColor(i)->getColor();
-		QColor qc(255*c->r, 255*c->g, 255*c->b, 255*c->a);
+		Color c = plan->getCasingColor(i)->getColor();
+		QColor qc(255*c.r, 255*c.g, 255*c.b, 255*c.a);
 		painter->setBrush(qc);
 		setBoundaryPainter(painter, outermostLevel);
 		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);

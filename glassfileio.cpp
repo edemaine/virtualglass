@@ -435,11 +435,11 @@ void readBuildInformation(Json::Value& root, unsigned int& revision, string& dat
 // write
 void writeColor(Json::Value& root, GlassColor* color, unsigned int colorIndex)
 {
-	string colorName = color->getName()->toStdString();
 	string colorname = idAndNameToString(colorIndex, "Color");
-	Color c = *(color->getColor());
+	Color c = color->getColor();
 
-	root[colorname]["Name"] = colorName;
+	root[colorname]["Short name"] = color->getShortName();
+	root[colorname]["Long name"] = color->getLongName();
 	root[colorname]["R"] = c.r;
 	root[colorname]["G"] = c.g;
 	root[colorname]["B"] = c.b;
@@ -449,8 +449,10 @@ void writeColor(Json::Value& root, GlassColor* color, unsigned int colorIndex)
 // read
 GlassColor* readColor(Json::Value& root, string colorname, unsigned int& colorIndex)
 {
-	string colorName = root[colorname]["Name"].asString();
 	colorIndex = stringToId(colorname);
+
+	string shortName = root[colorname]["Short name"].asString();
+	string longName = root[colorname]["Long name"].asString();
 
 	Color color;
 	color.r = root[colorname]["R"].asFloat();
@@ -458,7 +460,7 @@ GlassColor* readColor(Json::Value& root, string colorname, unsigned int& colorIn
 	color.b = root[colorname]["B"].asFloat();
 	color.a = root[colorname]["Alpha"].asFloat();
 
-	return new GlassColor(color, QString::fromStdString(colorName));
+	return new GlassColor(color, shortName, longName);
 }
 
 void writeColors(Json::Value& root, vector<GlassColor*>& colors)
@@ -484,11 +486,8 @@ void readColors(Json::Value& colorRoot, map<unsigned int, GlassColor*>& colorMap
         {
 		unsigned int colorIndex;
 		GlassColor* gc = readColor(colorRoot, colorRoot.getMemberNames()[i], colorIndex);
-		if (gc != NULL)
-		{
-			readColors.push_back(gc);
-			colorMap[colorIndex] = gc;
-		}
+		readColors.push_back(gc);
+		colorMap[colorIndex] = gc;
 	}
 }
 
@@ -709,11 +708,8 @@ void readCanes(Json::Value& canesRoot, map<unsigned int, PullPlan*>& caneMap,
 		unsigned int caneIndex;
 		string canename = canesRoot.getMemberNames()[i];
 		PullPlan* cane = readCane(canename, canesRoot, caneIndex, colorMap);
-		if (cane != NULL)
-		{
-			readCanes.push_back(cane);
-			caneMap[caneIndex] = cane;
-		}	
+		readCanes.push_back(cane);
+		caneMap[caneIndex] = cane;
 	}
 
 	// loop again to fill in subcanes
@@ -938,10 +934,7 @@ void readPieces(Json::Value& piecesRoot, map<unsigned int, PullPlan*>& caneMap, 
         for (unsigned int i = 0; i < piecesRoot.getMemberNames().size(); ++i)
         {
                 Piece* piece = readPiece(piecesRoot.getMemberNames()[i], piecesRoot, caneMap, colorMap);
-                if (piece != NULL)
-                {
-                        readPieces.push_back(piece);
-                }      
+		readPieces.push_back(piece);
         }
 }
 

@@ -8,7 +8,7 @@ void web1Piece(GlassColor** gc, PullPlan** pp, Piece** p)
 	c.g = 160/255.0;
 	c.b = 91/255.0;
 	c.a = 0.5;
-	*gc = new GlassColor(c, "R-27");
+	*gc = new GlassColor(c, "R-27", "R-27 Anna Green");
 
 	*pp = new PullPlan(PullTemplate::BASE_CIRCLE);	
 	(*pp)->addCasing(CIRCLE_SHAPE);
@@ -32,7 +32,7 @@ void web2Piece(GlassColor** gc, PullPlan** pp1, PullPlan** pp2, Piece** p)
 	c.g = 74/255.0;
 	c.b = 223/255.0;
 	c.a = 0.5;
-	*gc = new GlassColor(c, "R-45");
+	*gc = new GlassColor(c, "R-45", "R-45 Marine Blue");
 
 	*pp1 = new PullPlan(PullTemplate::BASE_SQUARE);	
 	(*pp1)->addCasing(CIRCLE_SHAPE);	

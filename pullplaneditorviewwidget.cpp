@@ -250,7 +250,7 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDropEvent*
 	if (subplansHighlighted.size() > 0)  // if you hit something, set highlight color and get out
 	{
 		if (isDraggingColor)
-			highlightColor = *(draggedColor->getColor());
+			highlightColor = draggedColor->getColor();
 		else
 			highlightColor.r = highlightColor.g = highlightColor.b = highlightColor.a = 1.0;
 		return;
@@ -258,7 +258,7 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDropEvent*
 	populateHighlightedCasings(x, y);
 	if (casingsHighlighted.size() > 0) 
 	{
-		highlightColor = *(draggedColor->getColor());
+		highlightColor = draggedColor->getColor();
 		return;
 	}
 }
@@ -482,8 +482,8 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		}
 		else
 		{
-			Color* c = plan->getCasingColor(i)->getColor();
-			QColor qc(255*c->r, 255*c->g, 255*c->b, 255*c->a);
+			Color c = plan->getCasingColor(i)->getColor();
+			QColor qc(255*c.r, 255*c.g, 255*c.b, 255*c.a);
 			painter->setBrush(qc);
 		}
 

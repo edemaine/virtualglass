@@ -12,7 +12,6 @@ it is involved in modifying the cane.
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <algorithm>
 #include <stdexcept>
 #include "constants.h"
 #include "niceviewwidget.h"

@@ -20,7 +20,7 @@ void AsyncColorBarLibraryWidget :: paintEvent(QPaintEvent *event)
 	AsyncRenderWidget::paintEvent(event);
 	QPainter painter(this);
 	painter.setPen(QPen(Qt::black));
-	painter.drawText(rect().adjusted(5, 0, 0, -2), Qt::AlignBottom | Qt::AlignLeft, *(glassColor->getName()));
+	painter.drawText(rect().adjusted(5, 0, 0, -2), Qt::AlignBottom | Qt::AlignLeft, glassColor->getShortName().c_str());
 }
 
 void AsyncColorBarLibraryWidget :: updateDragPixmap()
@@ -30,21 +30,11 @@ void AsyncColorBarLibraryWidget :: updateDragPixmap()
         QPainter painter(&_pixmap);
 	
 	// Fill in with color
-	Color* c = glassColor->getColor();
-	QColor qc(255*c->r, 255*c->g, 255*c->b, MAX(255*c->a, 20));
+	Color c = glassColor->getColor();
+	QColor qc(255*c.r, 255*c.g, 255*c.b, MAX(255*c.a, 20));
 	painter.setBrush(qc);
         painter.setPen(Qt::NoPen);
 	painter.drawEllipse(10, 10, 180, 180);
-
-	/*
-	// Draw the little outer boundary line
-	QPen pen;
-	pen.setWidth(3);
-	pen.setColor(Qt::black);
-	painter.setPen(pen);
-	painter.drawEllipse(10, 10, 180, 180);
-	*/
-
         painter.end();
 
         dragPixmap = _pixmap.scaled(100, 100);

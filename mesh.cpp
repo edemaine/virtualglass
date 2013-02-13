@@ -774,11 +774,11 @@ void recurseMesh(PickupPlan* pickup, Geometry *geometry, vector<ancestor>* ances
 	// top level means that you want a pickup (and not a piece formed from a pickup)
 	// in this case, the slab is not ensureVisible'd, but the canes are, as the pickup
 	// serves as a guide for where to put subcanes, which must be visible
-	meshPickupCasingSlab(geometry, *(pickup->casingGlassColor->getColor()), 0.0, thickness, !isTopLevel);
+	meshPickupCasingSlab(geometry, pickup->casingGlassColor->getColor(), 0.0, thickness, !isTopLevel);
 
 	// overlay/underlays
-	meshPickupCasingSlab(geometry, *(pickup->underlayGlassColor->getColor()), thickness + 0.1, 0.05);
-	meshPickupCasingSlab(geometry, *(pickup->overlayGlassColor->getColor()), -(thickness + 0.1), 0.05);
+	meshPickupCasingSlab(geometry, pickup->underlayGlassColor->getColor(), thickness + 0.1, 0.05);
+	meshPickupCasingSlab(geometry, pickup->overlayGlassColor->getColor(), -(thickness + 0.1), 0.05);
 }
 
 /*
@@ -806,13 +806,13 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>* ancestors
 		{
 			// punting on actually doing this geometry right and just making it a cylinder
 			// (that intersects its subcanes)
-			meshBaseCane(geometry, ancestors, *(plan->getCasingColor(0)->getColor()), 
+			meshBaseCane(geometry, ancestors, plan->getCasingColor(0)->getColor(), 
 				plan->getCasingShape(0), length-0.001, plan->getCasingThickness(0), quality, 
 				ensureVisible && outermostLayer);
 		}
 		else
 		{
-			meshBaseCasing(geometry, ancestors, *(plan->getCasingColor(i)->getColor()), 
+			meshBaseCasing(geometry, ancestors, plan->getCasingColor(i)->getColor(), 
 				plan->getCasingShape(i), plan->getCasingShape(i-1), length,
 				plan->getCasingThickness(i), plan->getCasingThickness(i-1)+0.05, quality,
 				ensureVisible && outermostLayer);

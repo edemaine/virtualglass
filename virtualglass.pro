@@ -63,7 +63,6 @@ HEADERS += glew/glew.h \
         primitives.h \
         constants.h \
         Vector.hpp \
-	colorreader.h \
 	globalglass.h \
 	exampleglass.h \
 	randomglass.h \
@@ -116,7 +115,6 @@ HEADERS += glew/glew.h \
 SOURCES += main.cpp \ 
 	glew/glew.c \
 	librarywidget.cpp \
-	colorreader.cpp \
 	exampleglass.cpp \
 	randomglass.cpp \
 	templateparameter.cpp \

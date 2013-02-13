@@ -556,8 +556,8 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 		painter->setPen(Qt::NoPen); // Will draw boundary after all filling is done
 		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
 
-		Color* casingColor = plan->getCasingColor(i)->getColor();
-		QColor qc(255*casingColor->r, 255*casingColor->g, 255*casingColor->b, 255*casingColor->a);
+		Color casingColor = plan->getCasingColor(i)->getColor();
+		QColor qc(255*casingColor.r, 255*casingColor.g, 255*casingColor.b, 255*casingColor.a);
 		painter->setBrush(qc);
 		setBoundaryPainter(painter, outermostLevel, outermostLevel);
 		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);

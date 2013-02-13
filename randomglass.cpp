@@ -13,52 +13,25 @@
 #include "piecetemplate.h"
 #include "colorreader.h"
 #include "randomglass.h"
+#include "glassfileio.h"
+#include "globalglass.h"
 
 GlassColor* randomGlassColor()
 {
-	// Sample from reichenbach transparents
-	QFile file(":/reichenbach-transparent-colors.vgc");
+	vector<GlassColor*> colors;
+	QString collectionName;
 
-	// First see how many colors are in there
-	file.open(QIODevice::ReadOnly | QIODevice::Text);
-	unsigned int totalColors = 0;
-	while (!file.atEnd())
+	if(!readColorFile(":/reichenbach-opaque-colors.vgc", collectionName, colors))
+		return GlobalGlass::color();
+	
+	unsigned int choice = qrand() % colors.size();
+	for (unsigned int i = 0; i < colors.size(); ++i)
 	{
-		QString line = file.readLine();
-		line = line.trimmed();
-		if (line.isEmpty())
-			continue;
-
-		if (line.at(0) == '[')
-			++totalColors;
+		if (i != choice)
+			delete colors[i];
 	}
 
-	unsigned int colorChoice = qrand() % totalColors;
-	file.seek(0);	
-	Color color;
-	QString colorName;
-	unsigned int count = 0;
-	while (!file.atEnd())
-	{
-		QString line = file.readLine();
-		line = line.trimmed();
-		if (line.isEmpty())
-			continue;
-
-		if (line.at(0) == '[')
-		{
-			if (count == colorChoice)
-			{
-				colorName = lineToColorName(line);
-				color = lineToColorRGB(file.readLine());	
-				break;
-			}
-			++count;
-		}
-	}
-	file.close();
-
-	return new GlassColor(color, shortColorName(colorName));
+	return colors[choice];
 }
 
 PullPlan* randomSimplePullPlan(enum GeometricShape outermostCasingShape, GlassColor* color)
