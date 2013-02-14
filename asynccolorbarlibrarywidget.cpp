@@ -6,13 +6,16 @@
 #include "pulltemplate.h"
 #include "pullplan.h"
 
-AsyncColorBarLibraryWidget :: AsyncColorBarLibraryWidget(GlassColor* _glassColor, QWidget* _parent) 
-	: AsyncRenderWidget(_parent), glassColor(_glassColor) 
+AsyncColorBarLibraryWidget :: AsyncColorBarLibraryWidget(GlassColor* _glassColor, QWidget* _parent, 
+	PullPlan* _circlePlan, PullPlan* _squarePlan) : AsyncRenderWidget(_parent), glassColor(_glassColor), 
+	circlePlan(_circlePlan), squarePlan(_squarePlan) 
 {
 	setFixedSize(100, 100);
-	circlePlan = new PullPlan(PullTemplate::BASE_CIRCLE);
+	if (_circlePlan == NULL)
+		circlePlan = new PullPlan(PullTemplate::BASE_CIRCLE);
 	circlePlan->setOutermostCasingColor(_glassColor);
-	squarePlan = new PullPlan(PullTemplate::BASE_SQUARE);
+	if (_squarePlan == NULL)
+		squarePlan = new PullPlan(PullTemplate::BASE_SQUARE);
 	squarePlan->setOutermostCasingColor(_glassColor);
 	updatePixmaps();
 }

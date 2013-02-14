@@ -395,9 +395,9 @@ void MainWindow :: web1PieceExampleActionTriggered()
 
 	web1Piece(&gc, &pp, &p);
 
-	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(gc));
-	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pp));
-	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(p));
+	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(gc, this));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pp, this));
+	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(p, this));
 
 	pieceEditorWidget->setPiece(p);
 	setViewMode(PIECE_VIEW_MODE);
@@ -411,10 +411,10 @@ void MainWindow :: web2PieceExampleActionTriggered()
 
 	web2Piece(&gc, &pp1, &pp2, &p);
 
-	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(gc));
-	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pp1));
-	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pp2));
-	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(p));
+	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(gc, this));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pp1, this));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pp2, this));
+	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(p, this));
 
 	pieceEditorWidget->setPiece(p);
 	setViewMode(PIECE_VIEW_MODE);
@@ -425,9 +425,9 @@ void MainWindow :: randomSimpleCaneExampleActionTriggered()
 	GlassColor* randomGC = randomGlassColor();
 	PullPlan* randomPP = randomSimplePullPlan(CIRCLE_SHAPE, randomGC);
 
-	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC));
+	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC, this));
 
-	AsyncPullPlanLibraryWidget* pplw = new AsyncPullPlanLibraryWidget(randomPP);
+	AsyncPullPlanLibraryWidget* pplw = new AsyncPullPlanLibraryWidget(randomPP, this);
 	pullPlanLibraryLayout->addWidget(pplw);
 
 	pullPlanEditorWidget->setPlan(randomPP);
@@ -441,14 +441,14 @@ void MainWindow :: randomComplexCaneExampleActionTriggered()
 	PullPlan* randomSPP = randomSimplePullPlan(SQUARE_SHAPE, randomGC);
 	PullPlan* randomComplexPP = randomComplexPullPlan(randomCPP, randomSPP);
 
-	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC));
-	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomComplexPP));
+	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC, this));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomComplexPP, this));
 	// add simple plans only if they are used
 	// memory leak! as unused ones never appear in library
 	if (randomComplexPP->hasDependencyOn(randomCPP))
-		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomCPP));
+		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomCPP, this));
 	if (randomComplexPP->hasDependencyOn(randomSPP))
-		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomSPP));
+		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomSPP, this));
 
 	pullPlanEditorWidget->setPlan(randomComplexPP);
 	setViewMode(PULLPLAN_VIEW_MODE);
@@ -460,10 +460,10 @@ void MainWindow :: randomSimplePieceExampleActionTriggered()
 	PullPlan* randomSPP = randomSimplePullPlan(SQUARE_SHAPE, randomGC);
 	Piece* randomP = randomPiece(randomPickup(randomSPP));
 
-	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC));
-	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomSPP));
+	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC, this));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomSPP, this));
 
-	AsyncPieceLibraryWidget* plw = new AsyncPieceLibraryWidget(randomP);
+	AsyncPieceLibraryWidget* plw = new AsyncPieceLibraryWidget(randomP, this);
 	pieceLibraryLayout->addWidget(plw);
 
 	pieceEditorWidget->setPiece(randomP);
@@ -481,16 +481,16 @@ void MainWindow :: randomComplexPieceExampleActionTriggered()
 	Piece* randomP = randomPiece(randomPickup(randomComplexPP1, randomComplexPP2));
 
 	if (randomP->hasDependencyOn(randomGC1)) // memory leak if returns no
-		colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC1));
+		colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC1, this));
 	if (randomP->hasDependencyOn(randomGC2)) // memory leak if returns no
-		colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC2));
+		colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(randomGC2, this));
 	if (randomP->hasDependencyOn(randomCPP)) // memory leak if returns no
-		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomCPP));
+		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomCPP, this));
 	if (randomP->hasDependencyOn(randomSPP)) // memory leak if returns no
-		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomSPP));
-	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomComplexPP1));
-	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomComplexPP2));
-	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(randomP));
+		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomSPP, this));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomComplexPP1, this));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(randomComplexPP2, this));
+	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(randomP, this));
 
 	pieceEditorWidget->setPiece(randomP);
 	setViewMode(PIECE_VIEW_MODE);
@@ -659,14 +659,14 @@ void MainWindow :: setupPullPlanEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
 	pullPlanEditorWidget = new PullPlanEditorWidget(editorStack);
-	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pullPlanEditorWidget->getPlan()));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pullPlanEditorWidget->getPlan(), this));
 }
 
 void MainWindow :: setupPieceEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
 	pieceEditorWidget = new PieceEditorWidget(editorStack);
-	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(pieceEditorWidget->getPiece()));
+	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(pieceEditorWidget->getPiece(), this));
 }
 
 void MainWindow :: newPiece()
@@ -675,7 +675,7 @@ void MainWindow :: newPiece()
 	Piece* newEditorPiece = new Piece(PieceTemplate::TUMBLER);
 
 	// Create the new library entry
-	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(newEditorPiece));
+	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(newEditorPiece, this));
 	pieceEditorWidget->setPiece(newEditorPiece);
 
 	// Load up the right editor
@@ -689,7 +689,7 @@ void MainWindow :: copyPiece()
 
 	// Create the new piece
 	Piece* newEditorPiece = pieceEditorWidget->getPiece()->copy();
-	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(newEditorPiece));
+	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(newEditorPiece, this));
 	pieceEditorWidget->setPiece(newEditorPiece);
 
 	emit someDataChanged();
@@ -744,10 +744,10 @@ void MainWindow :: copyPullPlan()
 
 void MainWindow :: newPullPlan(PullPlan* newPlan)
 {
-	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(newPlan));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(newPlan, this));
 
 	// Give the new plan to the editor
-    pullPlanEditorWidget->setPlan(newPlan);
+	pullPlanEditorWidget->setPlan(newPlan);
 
 	// Load up the right editor
 	setViewMode(PULLPLAN_VIEW_MODE);
@@ -1288,6 +1288,8 @@ void MainWindow::getLibraryContents(vector<GlassColor*>& colors, vector<PullPlan
 		cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 		colors.push_back(cblw->glassColor);
+		plans.push_back(cblw->circlePlan);
+		plans.push_back(cblw->squarePlan);
 	}
 
 	AsyncPullPlanLibraryWidget* pplw;
@@ -1343,9 +1345,9 @@ void MainWindow::newFile()
 	clearLibrary();
 
 	// 3. add the three new guys from the editors into the library 
-        colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(colorEditorWidget->getGlassColor()));
-        pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pullPlanEditorWidget->getPlan()));
-	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(pieceEditorWidget->getPiece())); 
+        colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(colorEditorWidget->getGlassColor(), this));
+        pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pullPlanEditorWidget->getPlan(), this));
+	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(pieceEditorWidget->getPiece(), this)); 
 
 	// 4. go back to empty view mode
 	setViewMode(EMPTY_VIEW_MODE);
@@ -1403,11 +1405,60 @@ void MainWindow::openFile()
 	// put the read objects into the library	
 	clearLibrary();	
 	for (unsigned int i = 0; i < colors.size(); ++i)
-		colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(colors[i]));
+	{
+		// search ad hoc for plans that match the description of being 
+		// the type of plans that live in color bar library widgets, and 
+		// have the right color
+		// 
+		// this approach is biased *towards* sucking plans into color bar
+		// library widgets. if you actually make pull plans that look exactly
+		// like color bars (no subplans, one casing), it will rip the first one
+		// out of the pull plan list (where you had it) and put it in the 
+		// corresponding color library widget. 
+		//
+		// preserving the library exactly in all cases would require explicitly 
+		// writing membership in the save file, either in colors or pull plans.
+		// we don't do this for now to keep the save files as simple as possible,
+		// and bias the user's mental model towards "color bars live in color
+		// objects" and away from "I need to make a new color bar pull plan to
+		// use a color". 
+		//
+		// if the json file is never hand edited and the read list of plans
+		// is in the same order as the written list of plans, then save/load 
+		// preserves the library *exactly*.
+		PullPlan* circlePlan = NULL;
+		for (unsigned int j = 0; j < plans.size(); ++j)
+		{
+			// we take the *first* matching plan because in getLibraryContents()
+			// we add the color library widget plans to the plans list *first*.
+			if (plans[j]->getTemplateType() == PullTemplate::BASE_CIRCLE 
+				&& plans[j]->getCasingCount() == 1
+				&& plans[j]->getOutermostCasingColor() == colors[i])
+			{
+				circlePlan = plans[j];
+				plans.erase(plans.begin() + j);
+				break;
+			}
+		}
+		PullPlan* squarePlan = NULL;
+		for (unsigned int j = 0; j < plans.size(); ++j)
+		{
+			if (plans[j]->getTemplateType() == PullTemplate::BASE_SQUARE 
+				&& plans[j]->getCasingCount() == 1
+				&& plans[j]->getOutermostCasingColor() == colors[i])
+			{
+				squarePlan = plans[j];
+				plans.erase(plans.begin() + j);
+				break;
+			}
+		}
+		colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(colors[i], this, 
+			circlePlan, squarePlan));
+	}
 	for (unsigned int i = 0; i < plans.size(); ++i)
-		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(plans[i]));
+		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(plans[i], this));
 	for (unsigned int i = 0; i < pieces.size(); ++i)
-		pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(pieces[i]));
+		pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(pieces[i], this));
 
 	// go back to empty mode
 	setViewMode(EMPTY_VIEW_MODE);
@@ -1476,6 +1527,7 @@ void MainWindow::saveAllFile()
 	{
 		// call the actual file-saving code in GlassFileWriter
 		vector<GlassColor*> colors;
+		vector<PullPlan*> colorPlans;
 		vector<PullPlan*> plans;
 		vector<Piece*> pieces;
 		getLibraryContents(colors, plans, pieces);

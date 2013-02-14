@@ -69,8 +69,7 @@ bool readColorFile(QString filename, QString& collectionname, vector<GlassColor*
 }
 
 // write
-bool writeGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, 
-	vector<Piece*>& pieces)
+bool writeGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, vector<Piece*>& pieces)
 {
 	// produce the json tree representation
 	Json::Value root;
@@ -448,10 +447,8 @@ void writeColor(Json::Value& root, GlassColor* color, unsigned int colorIndex)
 }
 
 // read
-GlassColor* readColor(Json::Value& root, string colorname, unsigned int& colorIndex)
+GlassColor* readColor(Json::Value& root, string colorname)
 {
-	colorIndex = stringToId(colorname);
-
 	string shortName = root[colorname]["Short name"].asString();
 	string longName = root[colorname]["Long name"].asString();
 
@@ -472,20 +469,29 @@ void writeColors(Json::Value& root, vector<GlassColor*>& colors)
 
 void readColors(Json::Value& colorRoot, map<unsigned int, GlassColor*>& colorMap, vector<GlassColor*>& readColors)
 {
-	// clear out readColors for consistency with readCanes()
-	readColors.clear();
-
 	// add global color for map completeness
 	colorMap[0] = GlobalGlass::color();
 	
 	//loop over all colors; read each and add it to the map
         for (unsigned int i = 0; i < colorRoot.getMemberNames().size(); i++) 
         {
-		unsigned int colorIndex;
-		GlassColor* gc = readColor(colorRoot, colorRoot.getMemberNames()[i], colorIndex);
-		readColors.push_back(gc);
+		string colorname = colorRoot.getMemberNames()[i];
+		unsigned int colorIndex = stringToId(colorname);
+		GlassColor* gc = readColor(colorRoot, colorname);
 		colorMap[colorIndex] = gc;
 	}
+
+	// create sorted readColors
+	vector<int> colorIndices;
+	for (map<unsigned int, GlassColor*>::iterator cI = colorMap.begin(); cI != colorMap.end(); ++cI)
+	{
+		// ignore global glass index 0
+		if (cI->first >= 1)
+			colorIndices.push_back(cI->first);
+	}
+	readColors.clear();
+	for (unsigned int i = 0; i < colorIndices.size(); ++i)
+		readColors.push_back(colorMap[colorIndices[i]]);	
 }
 
 
@@ -576,11 +582,8 @@ void writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<Pu
 
 
 // read
-PullPlan* readCane(string canename, Json::Value& root, unsigned int& caneIndex, 
-	map<unsigned int, GlassColor*>& colorMap)
+PullPlan* readCane(string canename, Json::Value& root, map<unsigned int, GlassColor*>& colorMap)
 {
-        caneIndex = stringToId(canename);
-
 	// read singletons: pull template, twist
 	PullPlan* cane = new PullPlan(stringToPullTemplate(root[canename]["Pull template"].asString()));
 	cane->setTwist(root[canename]["Twist"].asInt());
@@ -687,10 +690,6 @@ void writeCanes(Json::Value& root, vector<PullPlan*>& canes, vector<GlassColor*>
 void readCanes(Json::Value& canesRoot, map<unsigned int, PullPlan*>& caneMap, 
 	map<unsigned int, GlassColor*>& colorMap, vector<PullPlan*>& readCanes)
 {
-	// clear out readCanes, since the correspondence between 
-	// readCanes[i] and canesRoot.getMemberNames()[i] is used
-	readCanes.clear();
-
 	// add global plan to map for completeness
 	caneMap[0] = GlobalGlass::circlePlan();
 	caneMap[1] = GlobalGlass::squarePlan();
@@ -698,19 +697,32 @@ void readCanes(Json::Value& canesRoot, map<unsigned int, PullPlan*>& caneMap,
 	// loop over canes
 	for (unsigned int i = 0; i < canesRoot.getMemberNames().size(); ++i)
 	{
-		unsigned int caneIndex;
 		string canename = canesRoot.getMemberNames()[i];
-		PullPlan* cane = readCane(canename, canesRoot, caneIndex, colorMap);
-		readCanes.push_back(cane);
+        	unsigned int caneIndex = stringToId(canename);
+		PullPlan* cane = readCane(canename, canesRoot, colorMap);
 		caneMap[caneIndex] = cane;
 	}
 
 	// loop again to fill in subcanes
 	for (unsigned int i = 0; i < canesRoot.getMemberNames().size(); ++i)
 	{
-		Json::Value caneRoot = canesRoot[canesRoot.getMemberNames()[i]];	
-		readCaneSubcanes(caneRoot, readCanes[i], caneMap);
+		unsigned int caneIndex;
+		string canename = canesRoot.getMemberNames()[i];
+        	caneIndex = stringToId(canename);
+		readCaneSubcanes(canesRoot[canename], caneMap[caneIndex], caneMap);
 	}
+
+	// now sort readCanes
+	vector<int> caneIndices;
+	for (map<unsigned int, PullPlan*>::iterator cI = caneMap.begin(); cI != caneMap.end(); ++cI)
+	{
+		// ignore global glass indices 0 and 1
+		if (cI->first >= 2)
+			caneIndices.push_back(cI->first);
+	}
+	readCanes.clear();
+	for (unsigned int i = 0; i < caneIndices.size(); ++i)
+		readCanes.push_back(caneMap[caneIndices[i]]);	
 }
 
 /*
@@ -919,16 +931,26 @@ void writePieces(Json::Value& root, vector<Piece*>& pieces, vector<PullPlan*>& c
 void readPieces(Json::Value& piecesRoot, map<unsigned int, PullPlan*>& caneMap, map<unsigned int, 
 	GlassColor*>& colorMap, vector<Piece*>& readPieces)
 {
-        // clear out readPieces, since the correspondence between 
-        // readPieces[i] and piecesRoot.getMemberNames()[i] is used
-        readPieces.clear();
+	// doesn't exist otherwise, so we make it up just to sort them
+	map<unsigned int, Piece*> pieceMap;
 
         // loop over pieces
         for (unsigned int i = 0; i < piecesRoot.getMemberNames().size(); ++i)
         {
-                Piece* piece = readPiece(piecesRoot.getMemberNames()[i], piecesRoot, caneMap, colorMap);
-		readPieces.push_back(piece);
+		string piecename = piecesRoot.getMemberNames()[i];
+        	unsigned int pieceIndex = stringToId(piecename);
+                Piece* piece = readPiece(piecename, piecesRoot, caneMap, colorMap);
+		pieceMap[pieceIndex] = piece;
         }
+
+	// create sorted readColors
+	vector<int> pieceIndices;
+	for (map<unsigned int, Piece*>::iterator cI = pieceMap.begin(); cI != pieceMap.end(); ++cI)
+		pieceIndices.push_back(cI->first);
+	readPieces.clear();
+	for (unsigned int i = 0; i < pieceIndices.size(); ++i)
+		readPieces.push_back(pieceMap[pieceIndices[i]]);	
+
 }
 
 }

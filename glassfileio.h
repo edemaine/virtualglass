@@ -58,15 +58,14 @@ namespace GlassFileIOInternal
 	enum PieceTemplate::Type stringToPieceTemplate(string s);
 	
 	void writeColor(Json::Value& root, GlassColor* color, unsigned int colorIndex);
-	GlassColor* readColor(Json::Value& root, string rootname, unsigned int& colorIndex);
+	GlassColor* readColor(Json::Value& root, string rootname);
 
 	void writeColors(Json::Value& root, vector<GlassColor*>& colors);
 	void readColors(Json::Value& root, map<unsigned int, GlassColor*>& colorMap, vector<GlassColor*>& readColors);
 
 	void writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<PullPlan*, unsigned int>& caneMap, 
 		map<GlassColor*, unsigned int>& colorMap);
-	PullPlan* readCane(string canename, Json::Value& root, unsigned int& caneIndex, 
-		map<unsigned int, GlassColor*>& colorMap);
+	PullPlan* readCane(string canename, Json::Value& root, map<unsigned int, GlassColor*>& colorMap);
 
 	void writeCanes(Json::Value& root, vector<PullPlan*>& canes, vector<GlassColor*>& colors);
 	void readCaneSubcanes(Json::Value& caneRoot, PullPlan* cane, map<unsigned int, PullPlan*>& caneMap);

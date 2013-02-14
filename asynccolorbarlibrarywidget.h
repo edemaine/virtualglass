@@ -9,7 +9,8 @@ class PullPlan;
 class AsyncColorBarLibraryWidget : public AsyncRenderWidget
 {
 	public:
-		AsyncColorBarLibraryWidget(GlassColor* _color, QWidget* _parent=NULL);
+		AsyncColorBarLibraryWidget(GlassColor* _color, QWidget* _parent=NULL,
+			PullPlan* _circlePlan=NULL, PullPlan* _squarePlan=NULL);
 		const QPixmap *getDragPixmap();
 		void updatePixmaps();
 		virtual void paintEvent(QPaintEvent *); //to overlay color name
