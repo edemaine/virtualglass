@@ -10,12 +10,11 @@ class AsyncPullPlanLibraryWidget : public AsyncRenderWidget
 {
 	public:
 		AsyncPullPlanLibraryWidget(PullPlan *plan, QWidget * parent=NULL);
-		PullPlan *getPullPlan();
+		PullPlan *pullPlan;
 		const QPixmap *getDragPixmap();
 		void updatePixmaps();
 
 	private:
-		PullPlan *pullPlan;
 		QPixmap dragPixmap;
 
 		void updateDragPixmap();

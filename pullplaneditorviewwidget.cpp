@@ -14,8 +14,8 @@ PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* pa
 	setMinimumSize(200, 200);
 	this->plan = plan;
 
-	isDraggingColor = false;
-	isDraggingPlan = false;
+	draggedLibraryColor = NULL;
+	draggedPlan = NULL;
 	isDraggingCasing = false;
 }
 
@@ -218,12 +218,13 @@ void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 	GlassMime::decode(event->mimeData()->text().toAscii().constData(), &ptr, &type);
 	switch (type)
 	{
-		case GlassMime::COLORBAR_MIME:
-			isDraggingColor = true;
+		case GlassMime::COLORLIBRARY_MIME:
+			draggedLibraryColor = reinterpret_cast<AsyncColorBarLibraryWidget*>(ptr);
+			break;
+		case GlassMime::COLOR_MIME:
 			draggedColor = reinterpret_cast<GlassColor*>(ptr);
 			break;
 		case GlassMime::PULLPLAN_MIME:
-			isDraggingPlan = true;
 			draggedPlan = reinterpret_cast<PullPlan*>(ptr);
 			break;
 	}
@@ -233,7 +234,9 @@ void PullPlanEditorViewWidget :: dragLeaveEvent(QDragLeaveEvent* /*event*/)
 {
 	subplansHighlighted.clear();
 	casingsHighlighted.clear();
-	isDraggingPlan = isDraggingColor = false;
+	draggedLibraryColor = NULL;
+	draggedColor = NULL;
+	draggedPlan = NULL;
 }
 
 
@@ -249,7 +252,9 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDropEvent*
 	populateHighlightedSubplans(x, y, event);
 	if (subplansHighlighted.size() > 0)  // if you hit something, set highlight color and get out
 	{
-		if (isDraggingColor)
+		if (draggedLibraryColor != NULL)
+			highlightColor = draggedLibraryColor->glassColor->getColor();
+		else if (draggedColor != NULL)
 			highlightColor = draggedColor->getColor();
 		else
 			highlightColor.r = highlightColor.g = highlightColor.b = highlightColor.a = 1.0;
@@ -258,7 +263,11 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDropEvent*
 	populateHighlightedCasings(x, y);
 	if (casingsHighlighted.size() > 0) 
 	{
-		highlightColor = draggedColor->getColor();
+		if (draggedLibraryColor != NULL)
+			highlightColor = draggedLibraryColor->glassColor->getColor();
+		else if (draggedColor != NULL)
+			highlightColor = draggedColor->getColor();
+		// else should not happen
 		return;
 	}
 }
@@ -277,31 +286,38 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		event->accept();
 		for (unsigned int i = 0; i < subplansHighlighted.size(); ++i)
 		{
-			if (isDraggingColor)
+			if (draggedLibraryColor != NULL)
 			{
-				// this is a memory leak as of Jan 31, 2013.
-				// need to either:
-				// 1. make user responsible for it by adding to the library
-				// 2. do primitive reference counting 
-				// 3. give it a special "this is just a dropped color plan" mark
-				// 4. accept that the memory is lost forever 
-				PullPlan* newColorBarPlan = new PullPlan(PullTemplate::BASE_CIRCLE);
-				newColorBarPlan->setCasingColor(draggedColor, 0);
-				newColorBarPlan->setOutermostCasingShape(plan->subs[subplansHighlighted[i]].shape);
-				plan->subs[subplansHighlighted[i]].plan = newColorBarPlan;
+				switch (plan->subs[subplansHighlighted[i]].shape)
+				{
+					case CIRCLE_SHAPE:
+						plan->subs[subplansHighlighted[i]].plan = draggedLibraryColor->circlePlan;
+						break;
+					case SQUARE_SHAPE:
+						plan->subs[subplansHighlighted[i]].plan = draggedLibraryColor->squarePlan;
+						break;
+					default: // should not happen
+						break;
+				}
 			}
 			else // isDraggingPlan == true
 				plan->subs[subplansHighlighted[i]].plan = draggedPlan;
 		}
 	}
-	// casings highlighted is definitely a dragged plan
+	// casings highlighted means a dragged color
 	else if (casingsHighlighted.size() > 0)
 	{
 		event->accept();
-		plan->setCasingColor(draggedColor, casingsHighlighted[0]);
+		if (draggedLibraryColor != NULL)
+			plan->setCasingColor(draggedLibraryColor->glassColor, casingsHighlighted[0]);
+		else if (draggedColor != NULL)
+			plan->setCasingColor(draggedColor, casingsHighlighted[0]);
+		// else should not happen
 	}
 
-	isDraggingPlan = isDraggingColor = false;
+	draggedLibraryColor = NULL;
+	draggedColor = NULL;
+	draggedPlan = NULL;
 	subplansHighlighted.clear();
 	casingsHighlighted.clear();
 	emit someDataChanged();
@@ -315,11 +331,11 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, QDrop
 	subplansHighlighted.clear();
 
 	// if you ain't draggin, get out
-	if (!isDraggingColor && !isDraggingPlan)
+	if (draggedLibraryColor == NULL && draggedColor == NULL && draggedPlan == NULL)
 		return;
 
 	// can't drag into yourself
-	if (isDraggingPlan && draggedPlan->hasDependencyOn(plan)) 
+	if (draggedPlan != NULL && draggedPlan->hasDependencyOn(plan)) 
 		return;
 
 	int drawSize = squareSize - 20;
@@ -336,16 +352,16 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, QDrop
 			continue;
 
 		// if you're dragging color, you win
-		if (isDraggingColor)
+		if (draggedLibraryColor != NULL)
 		{
 			subplansHighlighted.push_back(i);
 		}
 		// else have to do shape type-checking
-		else if (/* isDraggingPlan && */ subpull->shape == draggedPlan->getOutermostCasingShape())
+		else if (draggedPlan != NULL && subpull->shape == draggedPlan->getOutermostCasingShape())
 		{
 			subplansHighlighted.push_back(i);
 		}
-
+		// else shouldn't happen
 	}
 	
 	// the remainder of the code is to handle the "fill-all" behavior when the shift key is being held down
@@ -362,9 +378,9 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, QDrop
 		for (unsigned int i = 0; i < plan->subs.size(); ++i)
 		{
 			SubpullTemplate* subpull = &(plan->subs[i]);
-			if (isDraggingColor)
+			if (draggedLibraryColor != NULL)
 				subplansHighlighted.push_back(i);
-			else if (/* isDraggingPlan && */ subpull->shape == draggedPlan->getOutermostCasingShape())
+			else if (draggedPlan != NULL && subpull->shape == draggedPlan->getOutermostCasingShape())
 				subplansHighlighted.push_back(i);
 		}
 	}
@@ -373,14 +389,16 @@ void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, QDrop
 
 void PullPlanEditorViewWidget :: populateHighlightedCasings(int x, int y)
 {
-	if (!isDraggingColor)
+	if (draggedLibraryColor == NULL && draggedColor == NULL)
 		return; 
 
 	// Deal w/casing
 	float drawSize = (squareSize - 20);
 	float distanceFromCenter;
-	for (unsigned int i = 0; i < plan->getCasingCount(); ++i) {
-		switch (plan->getCasingShape(i)) {
+	for (unsigned int i = 0; i < plan->getCasingCount(); ++i) 
+	{
+		switch (plan->getCasingShape(i)) 
+		{
 			case CIRCLE_SHAPE:
 				distanceFromCenter = sqrt(pow(x - (drawSize/2.0 + 10.0), 2.0)
 					+ pow(y - (drawSize/2.0 + 10.0), 2.0));

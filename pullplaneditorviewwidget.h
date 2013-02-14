@@ -57,10 +57,8 @@ class PullPlanEditorViewWidget : public QWidget
 
 		PullPlan* plan;
 
-		bool isDraggingColor;
+		AsyncColorBarLibraryWidget* draggedLibraryColor;
 		GlassColor* draggedColor;
-
-		bool isDraggingPlan;
 		PullPlan* draggedPlan;
 
 		bool isDraggingCasing;

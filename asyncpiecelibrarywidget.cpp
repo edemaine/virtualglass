@@ -11,11 +11,6 @@ AsyncPieceLibraryWidget :: AsyncPieceLibraryWidget(Piece* _piece, QWidget* _pare
 	updatePixmap();
 }
 
-Piece* AsyncPieceLibraryWidget :: getPiece()
-{
-	return piece;
-}
-
 void AsyncPieceLibraryWidget :: updateEyePosition(Vector3f _eyePosition)
 {
 	eyePosition = _eyePosition;

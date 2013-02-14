@@ -1,6 +1,8 @@
 
 #include "pickupplaneditorviewwidget.h"
 #include "pickupgeometrythread.h"
+#include "asynccolorbarlibrarywidget.h"
+#include "asyncpullplanlibrarywidget.h"
 
 PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWidget* parent) : QWidget(parent)
 {
@@ -173,30 +175,21 @@ void PickupPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
 	void* droppedObject;
-	GlassColor* droppedColor = 0;
 	PullPlan* droppedPlan = 0;
 	enum GlassMime::Type type;
 
 	GlassMime::decode(event->mimeData()->text().toAscii().constData(), &droppedObject, &type);
 	switch (type)
 	{
-		case GlassMime::COLORBAR_MIME:
-			droppedColor = reinterpret_cast<GlassColor*>(droppedObject);
+		case GlassMime::COLORLIBRARY_MIME:
+			droppedPlan = reinterpret_cast<AsyncColorBarLibraryWidget*>(droppedObject)->circlePlan;
 			break;
 		case GlassMime::PULLPLAN_MIME:
 			droppedPlan = reinterpret_cast<PullPlan*>(droppedObject);
 			break;
-	}
-
-	if (type == GlassMime::COLORBAR_MIME)
-	{
-		event->accept();
-		if ((event->keyboardModifiers() & Qt::ShiftModifier))
-			pickup->overlayGlassColor = droppedColor;
-		else
-			pickup->underlayGlassColor = droppedColor;
-		emit someDataChanged();
-		return;
+		case GlassMime::COLOR_MIME:
+			// we don't serve this kind here...how would this even happen?
+			break;
 	}
 
 	// otherwise it's a pull plan, and we do some complicated things now

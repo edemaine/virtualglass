@@ -3,16 +3,18 @@
 #include "glasscolor.h"
 #include "pullplanrenderdata.h"
 #include "asynccolorbarlibrarywidget.h"
+#include "pulltemplate.h"
+#include "pullplan.h"
 
-AsyncColorBarLibraryWidget :: AsyncColorBarLibraryWidget(GlassColor* _glassColor, QWidget* _parent): AsyncRenderWidget(_parent), glassColor(_glassColor) 
+AsyncColorBarLibraryWidget :: AsyncColorBarLibraryWidget(GlassColor* _glassColor, QWidget* _parent) 
+	: AsyncRenderWidget(_parent), glassColor(_glassColor) 
 {
 	setFixedSize(100, 100);
+	circlePlan = new PullPlan(PullTemplate::BASE_CIRCLE);
+	circlePlan->setOutermostCasingColor(_glassColor);
+	squarePlan = new PullPlan(PullTemplate::BASE_SQUARE);
+	squarePlan->setOutermostCasingColor(_glassColor);
 	updatePixmaps();
-}
-
-GlassColor* AsyncColorBarLibraryWidget :: getGlassColor()
-{
-	return glassColor;
 }
 
 void AsyncColorBarLibraryWidget :: paintEvent(QPaintEvent *event)

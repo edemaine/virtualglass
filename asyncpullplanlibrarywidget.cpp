@@ -11,11 +11,6 @@ AsyncPullPlanLibraryWidget :: AsyncPullPlanLibraryWidget(PullPlan *_pullPlan, QW
 	updatePixmaps();
 }
 
-PullPlan* AsyncPullPlanLibraryWidget :: getPullPlan()
-{
-	return pullPlan;
-}
-
 void AsyncPullPlanLibraryWidget :: updatePixmaps()
 {
 	// This is fast enough to do in real time
