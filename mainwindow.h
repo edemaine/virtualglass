@@ -88,9 +88,11 @@ class MainWindow : public QMainWindow
 		void setDirtyBit(bool v);
 		void setSaveFilename(QString filename);
 		void getLibraryContents(vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces);
+		void getDependantLibraryContents(GlassColor* color, vector<GlassColor*>& colors, vector<PullPlan*>& plans);
 		void getDependantLibraryContents(PullPlan* plan, vector<GlassColor*>& colors, vector<PullPlan*>& plans);
 		void getDependantLibraryContents(Piece* piece, vector<GlassColor*>& colors, vector<PullPlan*>& plans,
 			vector<Piece*>& pieces);
+		void addToLibrary(vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces);
 
 		// Variables
 		bool dirtyBit;

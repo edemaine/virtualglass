@@ -54,6 +54,7 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 	copyPieceButton->setEnabled(false);
 	exportPLYFileAction->setEnabled(false);
 	exportOBJFileAction->setEnabled(false);
+	saveSelectedAsFileAction->setEnabled(false);
 	switch (_mode)
 	{
 		case EMPTY_VIEW_MODE:
@@ -61,16 +62,19 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			break;
 		case COLORBAR_VIEW_MODE:
 			copyColorBarButton->setEnabled(true);
+			saveSelectedAsFileAction->setEnabled(true);
 			break;
 		case PULLPLAN_VIEW_MODE:
 			copyPullPlanButton->setEnabled(true);
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
+			saveSelectedAsFileAction->setEnabled(true);
 			break;
 		case PIECE_VIEW_MODE:
 			copyPieceButton->setEnabled(true);
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
+			saveSelectedAsFileAction->setEnabled(true);
 			break;
 	}
 	emit someDataChanged();
@@ -1244,10 +1248,14 @@ void MainWindow::getDependantLibraryContents(Piece* piece, vector<GlassColor*>& 
 {
 	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 	{
-		GlassColor* color = dynamic_cast<AsyncColorBarLibraryWidget*>(
-				dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget())->glassColor;
-		if (piece->hasDependencyOn(color))
-			colors.push_back(color);
+		AsyncColorBarLibraryWidget *cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
+				dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
+		if (piece->hasDependencyOn(cblw->glassColor))
+		{
+			colors.push_back(cblw->glassColor);
+			plans.push_back(cblw->circlePlan);
+			plans.push_back(cblw->squarePlan);
+		}
 	}
 
 	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
@@ -1265,10 +1273,14 @@ void MainWindow::getDependantLibraryContents(PullPlan* plan, vector<GlassColor*>
 {
 	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 	{
-		GlassColor* color = dynamic_cast<AsyncColorBarLibraryWidget*>(
-				dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget())->glassColor;
-		if (plan->hasDependencyOn(color))
-			colors.push_back(color);
+		AsyncColorBarLibraryWidget *cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
+				dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
+		if (plan->hasDependencyOn(cblw->glassColor))
+		{
+			colors.push_back(cblw->glassColor);
+			plans.push_back(cblw->circlePlan);
+			plans.push_back(cblw->squarePlan);
+		}
 	}
 
 	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
@@ -1280,30 +1292,43 @@ void MainWindow::getDependantLibraryContents(PullPlan* plan, vector<GlassColor*>
 	}
 }
 
-void MainWindow::getLibraryContents(vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces)
+void MainWindow::getDependantLibraryContents(GlassColor* color, vector<GlassColor*>& colors, vector<PullPlan*>& plans)
 {
-	AsyncColorBarLibraryWidget* cblw;
 	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 	{
-		cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
-			dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
+		AsyncColorBarLibraryWidget *cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
+				dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
+		if (cblw->glassColor == color)
+		{
+			colors.push_back(cblw->glassColor);
+			plans.push_back(cblw->circlePlan);
+			plans.push_back(cblw->squarePlan);
+			break;
+		}
+	}
+}
+
+void MainWindow::getLibraryContents(vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces)
+{
+	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
+	{
+		AsyncColorBarLibraryWidget *cblw = dynamic_cast<AsyncColorBarLibraryWidget*>(
+				dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 		colors.push_back(cblw->glassColor);
 		plans.push_back(cblw->circlePlan);
 		plans.push_back(cblw->squarePlan);
 	}
 
-	AsyncPullPlanLibraryWidget* pplw;
 	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 	{
-		pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
+		AsyncPullPlanLibraryWidget* pplw = dynamic_cast<AsyncPullPlanLibraryWidget*>(
 			dynamic_cast<QWidgetItem*>(pullPlanLibraryLayout->itemAt(i))->widget());
 		plans.push_back(pplw->pullPlan);
 	}
 
-	AsyncPieceLibraryWidget* plw;
 	for (int i = 0; i < pieceLibraryLayout->count(); ++i)
 	{
-		plw = dynamic_cast<AsyncPieceLibraryWidget*>(
+		AsyncPieceLibraryWidget* plw = dynamic_cast<AsyncPieceLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 		pieces.push_back(plw->piece);
 	}
@@ -1357,6 +1382,65 @@ void MainWindow::newFile()
 	setDirtyBit(false);
 }
 
+void MainWindow::addToLibrary(vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces)
+{
+	for (unsigned int i = 0; i < colors.size(); ++i)
+	{
+		// search ad hoc for plans that match the description of being 
+		// the type of plans that live in color bar library widgets, and 
+		// have the right color
+		// 
+		// this approach is biased *towards* sucking plans into color bar
+		// library widgets. if you actually make pull plans that look exactly
+		// like color bars (no subplans, one casing), it will rip the first one
+		// out of the pull plan list (where you had it) and put it in the 
+		// corresponding color library widget. 
+		//
+		// preserving the library exactly in all cases would require explicitly 
+		// writing membership in the save file, either in colors or pull plans.
+		// we don't do this for now to keep the save files as simple as possible,
+		// and bias the user's mental model towards "color bars live in color
+		// objects" and away from "I need to make a new color bar pull plan to
+		// use a color". 
+		//
+		// if the json file is never hand edited and the plans have the same label
+		// ordering as that induced when writing to a file, then save/load preserves
+		// the library exactly
+		PullPlan* circlePlan = NULL;
+		for (unsigned int j = 0; j < plans.size(); ++j)
+		{
+			// we take the *first* matching plan because in getLibraryContents()
+			// we add the color library widget plans to the plans list *first*.
+			if (plans[j]->getTemplateType() == PullTemplate::BASE_CIRCLE 
+				&& plans[j]->getCasingCount() == 1
+				&& plans[j]->getOutermostCasingColor() == colors[i])
+			{
+				circlePlan = plans[j];
+				plans.erase(plans.begin() + j);
+				break;
+			}
+		}
+		PullPlan* squarePlan = NULL;
+		for (unsigned int j = 0; j < plans.size(); ++j)
+		{
+			if (plans[j]->getTemplateType() == PullTemplate::BASE_SQUARE 
+				&& plans[j]->getCasingCount() == 1
+				&& plans[j]->getOutermostCasingColor() == colors[i])
+			{
+				squarePlan = plans[j];
+				plans.erase(plans.begin() + j);
+				break;
+			}
+		}
+		colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(colors[i], this, 
+			circlePlan, squarePlan));
+	}
+	for (unsigned int i = 0; i < plans.size(); ++i)
+		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(plans[i], this));
+	for (unsigned int i = 0; i < pieces.size(); ++i)
+		pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(pieces[i], this));
+
+}
 
 void MainWindow::openFile()
 {
@@ -1402,63 +1486,8 @@ void MainWindow::openFile()
 		return;
 	}		
 
-	// put the read objects into the library	
 	clearLibrary();	
-	for (unsigned int i = 0; i < colors.size(); ++i)
-	{
-		// search ad hoc for plans that match the description of being 
-		// the type of plans that live in color bar library widgets, and 
-		// have the right color
-		// 
-		// this approach is biased *towards* sucking plans into color bar
-		// library widgets. if you actually make pull plans that look exactly
-		// like color bars (no subplans, one casing), it will rip the first one
-		// out of the pull plan list (where you had it) and put it in the 
-		// corresponding color library widget. 
-		//
-		// preserving the library exactly in all cases would require explicitly 
-		// writing membership in the save file, either in colors or pull plans.
-		// we don't do this for now to keep the save files as simple as possible,
-		// and bias the user's mental model towards "color bars live in color
-		// objects" and away from "I need to make a new color bar pull plan to
-		// use a color". 
-		//
-		// if the json file is never hand edited and the read list of plans
-		// is in the same order as the written list of plans, then save/load 
-		// preserves the library *exactly*.
-		PullPlan* circlePlan = NULL;
-		for (unsigned int j = 0; j < plans.size(); ++j)
-		{
-			// we take the *first* matching plan because in getLibraryContents()
-			// we add the color library widget plans to the plans list *first*.
-			if (plans[j]->getTemplateType() == PullTemplate::BASE_CIRCLE 
-				&& plans[j]->getCasingCount() == 1
-				&& plans[j]->getOutermostCasingColor() == colors[i])
-			{
-				circlePlan = plans[j];
-				plans.erase(plans.begin() + j);
-				break;
-			}
-		}
-		PullPlan* squarePlan = NULL;
-		for (unsigned int j = 0; j < plans.size(); ++j)
-		{
-			if (plans[j]->getTemplateType() == PullTemplate::BASE_SQUARE 
-				&& plans[j]->getCasingCount() == 1
-				&& plans[j]->getOutermostCasingColor() == colors[i])
-			{
-				squarePlan = plans[j];
-				plans.erase(plans.begin() + j);
-				break;
-			}
-		}
-		colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(colors[i], this, 
-			circlePlan, squarePlan));
-	}
-	for (unsigned int i = 0; i < plans.size(); ++i)
-		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(plans[i], this));
-	for (unsigned int i = 0; i < pieces.size(); ++i)
-		pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(pieces[i], this));
+	addToLibrary(colors, plans, pieces);	
 
 	// go back to empty mode
 	setViewMode(EMPTY_VIEW_MODE);
@@ -1480,21 +1509,11 @@ void MainWindow::addFile()
 	vector<GlassColor*> colors;
 	vector<PullPlan*> plans;
 	vector<Piece*> pieces;
-	vector<GlassColor*> partialColors;
-	vector<PullPlan*> partialPlans;
-	vector<Piece*> partialPieces;
 	for (int i = 0; i < userSpecifiedFilenames.size(); ++i)
 	{
-		if (readGlassFile(userSpecifiedFilenames[i], partialColors, partialPlans, partialPieces))
-		{
-			for (unsigned int j = 0; j < partialColors.size(); ++j)
-				colors.push_back(partialColors[j]);
-			for (unsigned int j = 0; j < partialPlans.size(); ++j)
-				plans.push_back(partialPlans[j]);
-			for (unsigned int j = 0; j < partialPieces.size(); ++j)
-				pieces.push_back(partialPieces[j]);
-		}
-		else // yes, we're popping up a dialog for every file that can't be read...don't try 1000 at a time
+		if (readGlassFile(userSpecifiedFilenames[i], colors, plans, pieces))
+			addToLibrary(colors, plans, pieces);	
+		else 
 		{
 			QMessageBox msgBox;
 			msgBox.setText("The file " + userSpecifiedFilenames[i] + " cannot be read.");
@@ -1503,14 +1522,6 @@ void MainWindow::addFile()
 			return;
 		}	
 	}
-
-	// put the read objects into the library	
-	for (unsigned int i = 0; i < colors.size(); ++i)
-		colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(colors[i]));
-	for (unsigned int i = 0; i < plans.size(); ++i)
-		pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(plans[i]));
-	for (unsigned int i = 0; i < pieces.size(); ++i)
-		pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(pieces[i]));
 
 	// go back to empty mode
 	setViewMode(EMPTY_VIEW_MODE);
@@ -1566,7 +1577,7 @@ void MainWindow::saveSelectedAsFile()
 		case EMPTY_VIEW_MODE:
 			return; // nothing to save
 		case COLORBAR_VIEW_MODE:
-			colors.push_back(colorEditorWidget->getGlassColor());
+			getDependantLibraryContents(colorEditorWidget->getGlassColor(), colors, plans);
 			break;
 		case PULLPLAN_VIEW_MODE:
 			getDependantLibraryContents(pullPlanEditorWidget->getPlan(), colors, plans);
