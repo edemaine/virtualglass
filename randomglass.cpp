@@ -59,7 +59,7 @@ PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimp
 	
 	// set parameters
 	int direction = (qrand() % 3) - 1;
-	plan->setTwist(direction * (qrand() % 35 + 15));
+	plan->twist = direction * (qrand() % 10);
 	TemplateParameter p;
 	for (unsigned int i = 0; i < plan->getParameterCount(); ++i)
 	{

@@ -52,6 +52,7 @@ void PullPlanEditorWidget :: setupThreading()
 
 void PullPlanEditorWidget :: updateEverything()
 {
+	// set casing buttons
 	switch (plan->getOutermostCasingShape())
 	{
 		case CIRCLE_SHAPE:
@@ -63,12 +64,13 @@ void PullPlanEditorWidget :: updateEverything()
 			squareCasingPushButton->setDown(true);
 			break;
 	}
+	removeCasingButton->setEnabled(!plan->hasMinimumCasingCount());
 
-	int twist = plan->getTwist();
-	twistSlider->setSliderPosition(twist);
+	double twist = plan->twist;
 	twistSpin->setValue(twist);
-	twistSlider->setEnabled(!plan->hasSquareCasing());
-	twistSpin->setEnabled(!plan->hasSquareCasing());
+	twistSlider->setSliderPosition(twist*10);
+	twistSpin->setEnabled(plan->getOutermostCasingShape() == CIRCLE_SHAPE);
+	twistSlider->setEnabled(plan->getOutermostCasingShape() == CIRCLE_SHAPE);
 
 	viewWidget->setPullPlan(plan);
 	customizeViewWidget->setPullPlan(plan);
@@ -212,22 +214,23 @@ void PullPlanEditorWidget :: setupLayout()
 	QLabel* twistLabel1 = new QLabel("Twist:", editorWidget);
 	twistLayout->addWidget(twistLabel1);
 
-	twistSpin = new QSpinBox(editorWidget);
-	twistSpin->setRange(-50, 50);
-	twistSpin->setSingleStep(1);
+	twistSpin = new QDoubleSpinBox(editorWidget);
+	twistSpin->setRange(-10.0, 10.0);
+	twistSpin->setSingleStep(0.1);
+	twistSpin->setDecimals(1);
 	twistLayout->addWidget(twistSpin, 1);
 
-	QLabel* twistLabel2 = new QLabel("-50", editorWidget);
+	QLabel* twistLabel2 = new QLabel("-10.0", editorWidget);
 	twistLayout->addWidget(twistLabel2);
 
 	twistSlider = new QSlider(Qt::Horizontal, editorWidget);
-	twistSlider->setRange(-50, 50);
-	twistSlider->setSliderPosition(0);
-	twistSlider->setTickInterval(50);	
+	twistSlider->setRange(-100, 100);
+	twistSlider->setSingleStep(1);
+	twistSlider->setTickInterval(100);	
 	twistSlider->setTickPosition(QSlider::TicksBothSides);
 	twistLayout->addWidget(twistSlider, 10);
 
-	QLabel* twistLabel3 = new QLabel("50", editorWidget);
+	QLabel* twistLabel3 = new QLabel("10.0", editorWidget);
 	twistLayout->addWidget(twistLabel3);
 
 	// Editor layout: parameter spin stuff
@@ -386,7 +389,7 @@ void PullPlanEditorWidget :: setupConnections()
 	connect(addCircleButton, SIGNAL(pressed()), this, SLOT(addCircleButtonPressed()));
 	connect(addSquareButton, SIGNAL(pressed()), this, SLOT(addSquareButtonPressed()));
 	connect(twistSlider, SIGNAL(valueChanged(int)), this, SLOT(twistSliderChanged(int)));
-	connect(twistSpin, SIGNAL(valueChanged(int)), this, SLOT(twistSpinChanged(int)));
+	connect(twistSpin, SIGNAL(valueChanged(double)), this, SLOT(twistSpinChanged(double)));
 	for (unsigned int i = 0; i < paramSpins.size(); ++i)
 	{
 		connect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
@@ -442,21 +445,21 @@ void PullPlanEditorWidget :: paramSliderChanged(int)
 
 void PullPlanEditorWidget :: twistSliderChanged(int)
 {
-	float twist = twistSlider->sliderPosition();
+	float twist = twistSlider->value() / 10.0;
 
-	if (twist == plan->getTwist())
+	if (twist == plan->twist)
 		return;
-	plan->setTwist(twist);
+	plan->twist = twist;
 	emit someDataChanged();
 }
 
-void PullPlanEditorWidget :: twistSpinChanged(int)
+void PullPlanEditorWidget :: twistSpinChanged(double)
 {
-	float twist = twistSpin->value();
+	double twist = twistSpin->value();
 
-	if (twist == plan->getTwist())
+	if (twist == plan->twist)
 		return;
-	plan->setTwist(twist);
+	plan->twist = twist;
 	emit someDataChanged();
 }
 

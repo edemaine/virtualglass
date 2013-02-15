@@ -188,18 +188,18 @@ GlassColor* PullPlan :: getCasingColor(unsigned int index) {
 	return this->casings[index].glassColor;
 }
 
+bool PullPlan :: hasMinimumCasingCount() {
+	if (this->templateType == PullTemplate::BASE_CIRCLE 
+		|| this->templateType == PullTemplate::BASE_SQUARE) 
+		return (this->casings.size() == 1);
+	else
+		return (this->casings.size() == 2);
+}	
+		
+
 unsigned int PullPlan :: getCasingCount() {
 
 	return this->casings.size();
-}
-
-void PullPlan :: setTwist(int t) {
-	this->twist = t;
-}
-
-int PullPlan :: getTwist() {
-
-	return this->twist;
 }
 
 enum PullTemplate::Type PullPlan :: getTemplateType() {
@@ -260,17 +260,6 @@ void PullPlan :: removeCasing() {
 }
 
 
-
-bool PullPlan :: hasSquareCasing() {
-	
-	for (unsigned int i = 1; i < casings.size(); ++i) {
-		if (casings[i].shape == SQUARE_SHAPE) {
-			return true;
-		}
-	}
-	return false;	
-}
-
 void PullPlan :: addCasing(enum GeometricShape _shape) {
 
 	// rescale casings
@@ -297,7 +286,7 @@ void PullPlan :: addCasing(enum GeometricShape _shape) {
 
 	// add the new casing
 	casings.push_back(Casing(1.0, _shape, GlobalGlass::color()));
-	if (hasSquareCasing())
+	if (this->getOutermostCasingShape() != CIRCLE_SHAPE)
 		this->twist = 0.0;
 
 	// update subpulls by rescaling them according to innermost casing rescaling
@@ -346,7 +335,7 @@ void PullPlan :: setOutermostCasingShape(enum GeometricShape _shape) {
 
 	// DO THE CHANGE
 	casings[casings.size()-1].shape = _shape;
-	if (hasSquareCasing())
+	if (this->getOutermostCasingShape() != CIRCLE_SHAPE)
 		this->twist = 0.0;
 
 	// because innermost casing thickness might have changed, update subcane scales

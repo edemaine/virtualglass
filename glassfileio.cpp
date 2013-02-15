@@ -537,7 +537,7 @@ void writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<Pu
 	
 	// write singletons: pull template, twist
 	root[canename]["Pull template"] = pullTemplateToString(cane->getTemplateType());
-	root[canename]["Twist"] = cane->getTwist();
+	root[canename]["Twist"] = cane->twist;
 
 	// write casings	
 	root[canename]["Casings"];
@@ -586,7 +586,7 @@ PullPlan* readCane(string canename, Json::Value& root, map<unsigned int, GlassCo
 {
 	// read singletons: pull template, twist
 	PullPlan* cane = new PullPlan(stringToPullTemplate(root[canename]["Pull template"].asString()));
-	cane->setTwist(root[canename]["Twist"].asInt());
+	cane->twist = root[canename]["Twist"].asFloat();
 
 	// make a temporary list of casings that can be modified freely, unlike those stashed inside
 	// a cane, which have constraints due to collision, etc.

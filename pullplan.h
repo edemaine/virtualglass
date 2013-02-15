@@ -34,19 +34,18 @@ class PullPlan
 		void setOutermostCasingShape(enum GeometricShape s);
 		enum GeometricShape getCasingShape(unsigned int index);
 		enum GeometricShape getOutermostCasingShape();
-		bool hasSquareCasing();
 
 		void setCasingColor(GlassColor* gc, unsigned int index);
 		void setOutermostCasingColor(GlassColor* gc);
 		GlassColor* getCasingColor(unsigned int index);
 		GlassColor* getOutermostCasingColor();
 
+		float twist;
+
 		void addCasing(enum GeometricShape s);
 		void removeCasing();
 		unsigned int getCasingCount(); 
-
-		void setTwist(int t);
-		int getTwist();
+		bool hasMinimumCasingCount();
 
 		PullPlan* copy() const;
 
@@ -58,7 +57,6 @@ class PullPlan
 	private:
 		enum PullTemplate::Type templateType;
 		vector<Casing> casings;
-		float twist;
 		vector<TemplateParameter> parameters;
 
 		// Methods

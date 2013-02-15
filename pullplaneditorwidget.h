@@ -51,7 +51,7 @@ class PullPlanEditorWidget : public QWidget
 		void deleteSelectedButtonPressed();
 		void viewWidgetDataChanged();
 		void customizeViewWidgetDataChanged();
-		void twistSpinChanged(int);
+		void twistSpinChanged(double);
 		void twistSliderChanged(int);
 		void paramSpinChanged(int);
 		void paramSliderChanged(int);
@@ -79,7 +79,7 @@ class PullPlanEditorWidget : public QWidget
 		PullPlan* plan;
 		PullPlanEditorViewWidget* viewWidget;	
 		PullPlanCustomizeViewWidget* customizeViewWidget;	
-		QSpinBox* twistSpin;
+		QDoubleSpinBox* twistSpin;
 		QSlider* twistSlider;
 		vector<QLabel*> paramLabels;
 		vector<QSpinBox*> paramSpins;
