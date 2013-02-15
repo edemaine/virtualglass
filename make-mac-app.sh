@@ -5,6 +5,8 @@ rm -r ./virtualglass.app
 make
 /usr/bin/macdeployqt-4.8 ./virtualglass.app/
 cp ./virtualglass.Info.plist ./virtualglass.app/Contents/Info.plist
+mv ./virtualglass.app/ ./Virtual\ Glass.app/ 
+qmake -spec macx-g++ -config debug virtualglass.pro
 
 # User-readable instructions 
 # How to create a standalone executable on Mac OS X:

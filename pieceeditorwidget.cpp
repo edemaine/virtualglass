@@ -222,6 +222,7 @@ void PieceEditorWidget :: setupLayout()
 	QWidget* pickupTemplateLibraryWidget = new QWidget(this);
 	pickupTemplateLibraryLayout = new QHBoxLayout(pickupTemplateLibraryWidget);
 	pickupTemplateLibraryLayout->setSpacing(10);
+	pickupTemplateLibraryLayout->setContentsMargins(10, 10, 10, 10);
 	pickupTemplateLibraryWidget->setLayout(pickupTemplateLibraryLayout);
 
 	QScrollArea* pickupTemplateLibraryScrollArea = new QScrollArea(this);
@@ -230,12 +231,13 @@ void PieceEditorWidget :: setupLayout()
 	pickupTemplateLibraryScrollArea->setWidgetResizable(true);
 	pickupTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	pickupTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	pickupTemplateLibraryScrollArea->setFixedHeight(130);
+	pickupTemplateLibraryScrollArea->setFixedHeight(140);
 	editorLayout->addWidget(pickupTemplateLibraryScrollArea, 1, 0);
 
 	QWidget* pieceTemplateLibraryWidget = new QWidget(this);
 	pieceTemplateLibraryLayout = new QHBoxLayout(pieceTemplateLibraryWidget);
 	pieceTemplateLibraryLayout->setSpacing(10);
+        pieceTemplateLibraryLayout->setContentsMargins(10, 10, 10, 10);
 	pieceTemplateLibraryWidget->setLayout(pieceTemplateLibraryLayout);
 
 	QScrollArea* pieceTemplateLibraryScrollArea = new QScrollArea(this);
@@ -244,7 +246,7 @@ void PieceEditorWidget :: setupLayout()
 	pieceTemplateLibraryScrollArea->setWidgetResizable(true);
 	pieceTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	pieceTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	pieceTemplateLibraryScrollArea->setFixedHeight(130);
+	pieceTemplateLibraryScrollArea->setFixedHeight(140);
 	editorLayout->addWidget(pieceTemplateLibraryScrollArea, 1, 1);
 
 	// layouts containing pickup and piece template parameters in the third row

@@ -532,6 +532,8 @@ void MainWindow :: setupLibrary()
 	centralLayout->addWidget(bigOleLibraryWidget);
 
 	QVBoxLayout* libraryAreaLayout = new QVBoxLayout(bigOleLibraryWidget);
+	libraryAreaLayout->setSpacing(10);
+	libraryAreaLayout->setContentsMargins(10, 10, 10, 10);
 	bigOleLibraryWidget->setLayout(libraryAreaLayout);
 
 	QScrollArea* libraryScrollArea = new QScrollArea(bigOleLibraryWidget);

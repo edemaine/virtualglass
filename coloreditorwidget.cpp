@@ -91,7 +91,6 @@ void ColorEditorWidget :: setupLayout()
 	loadCollection(":/kugler-transparent-colors.vgc");
 	loadCollection(":/gaffer-opaque-colors.vgc");
 	loadCollection(":/gaffer-transparent-colors.vgc");
-	loadCollection(":/marty-favorite-colors.vgc");
 
 	QHBoxLayout* alphaLayout = new QHBoxLayout(this);
 	editorLayout->addLayout(alphaLayout);
@@ -145,7 +144,7 @@ void ColorEditorWidget :: loadCollection(QString fileName)
 	collectionStack->addWidget(listScrollArea); // add this to the layout
 	listScrollArea->setBackgroundRole(QPalette::Dark);
 	listScrollArea->setWidgetResizable(true);
-	listScrollArea->setMinimumWidth(320);
+	listScrollArea->setFixedWidth(340);
 	listScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	listScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	QWidget* colorLibraryWidget = new QWidget(listScrollArea);
@@ -153,6 +152,7 @@ void ColorEditorWidget :: loadCollection(QString fileName)
 	QVBoxLayout* listLayout = new QVBoxLayout(colorLibraryWidget);
 	colorLibraryLayouts.push_back(listLayout);
 	listLayout->setSpacing(10);
+	listLayout->setContentsMargins(10, 10, 10, 10);
 	colorLibraryWidget->setLayout(listLayout);
 
 	for (unsigned int i = 0; i < colors.size(); ++i)

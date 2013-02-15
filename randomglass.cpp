@@ -11,7 +11,6 @@
 #include "subpulltemplate.h"
 #include "piece.h"
 #include "piecetemplate.h"
-#include "colorreader.h"
 #include "randomglass.h"
 #include "glassfileio.h"
 #include "globalglass.h"

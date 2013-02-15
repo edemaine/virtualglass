@@ -174,6 +174,7 @@ void PullPlanEditorWidget :: setupLayout()
 	QWidget* templateLibraryWidget = new QWidget(editorWidget);
 	templateLibraryLayout = new QHBoxLayout(templateLibraryWidget);
 	templateLibraryLayout->setSpacing(10);
+	templateLibraryLayout->setContentsMargins(10, 10, 10, 10);
 	templateLibraryWidget->setLayout(templateLibraryLayout);
 
 	QScrollArea* pullTemplateLibraryScrollArea = new QScrollArea(editorWidget);
@@ -182,7 +183,7 @@ void PullPlanEditorWidget :: setupLayout()
 	pullTemplateLibraryScrollArea->setWidgetResizable(true);
 	pullTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	pullTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	pullTemplateLibraryScrollArea->setFixedHeight(130);
+	pullTemplateLibraryScrollArea->setFixedHeight(140);
 	editorLayout->addWidget(pullTemplateLibraryScrollArea, 0);
 
 	// Editor layout: casing buttons layout
