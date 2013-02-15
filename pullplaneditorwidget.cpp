@@ -91,10 +91,13 @@ void PullPlanEditorWidget :: updateEverything()
 		paramSpins[i]->setRange(tp.lowerLimit, tp.upperLimit);
 		connect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
 		paramSpins[i]->setValue(tp.value);
+		paramSliders[i]->setRange(tp.lowerLimit, tp.upperLimit);
+		paramSliders[i]->setValue(tp.value);
 		if (i != 0)
 		{
 			paramLabels[i]->show();
 			paramSpins[i]->show();
+			paramSliders[i]->show();
 		}
 	}
 	for (; i < paramLabels.size(); ++i)
@@ -103,6 +106,7 @@ void PullPlanEditorWidget :: updateEverything()
 		{
 			paramLabels[i]->hide();
 			paramSpins[i]->hide();
+			paramSliders[i]->hide();
 		}
 	}
 
@@ -239,10 +243,14 @@ void PullPlanEditorWidget :: setupLayout()
 	paramSpins.push_back(new QSpinBox(paramWidget));
 	paramSpins.push_back(new QSpinBox(paramWidget));
 	paramSpins.push_back(new QSpinBox(paramWidget));
+	paramSliders.push_back(new QSlider(Qt::Horizontal, paramWidget));
+	paramSliders.push_back(new QSlider(Qt::Horizontal, paramWidget));
+	paramSliders.push_back(new QSlider(Qt::Horizontal, paramWidget));
 	for (unsigned int i = 0; i < paramLabels.size(); ++i)
 	{
 		paramLayout->addWidget(paramLabels[i]);
 		paramLayout->addWidget(paramSpins[i]);
+		paramLayout->addWidget(paramSliders[i]);
 	}
 	paramStack->addWidget(new QWidget(paramStack));
 	editorLayout->addWidget(paramStack);	
@@ -380,7 +388,10 @@ void PullPlanEditorWidget :: setupConnections()
 	connect(twistSlider, SIGNAL(valueChanged(int)), this, SLOT(twistSliderChanged(int)));
 	connect(twistSpin, SIGNAL(valueChanged(int)), this, SLOT(twistSpinChanged(int)));
 	for (unsigned int i = 0; i < paramSpins.size(); ++i)
+	{
 		connect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
+		connect(paramSliders[i], SIGNAL(valueChanged(int)), this, SLOT(paramSliderChanged(int)));
+	}
 
 	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
@@ -409,6 +420,21 @@ void PullPlanEditorWidget :: paramSpinChanged(int)
 		if (tp.value != paramSpins[i]->value())
 		{
 			plan->setParameter(i, paramSpins[i]->value());
+			emit someDataChanged();
+		}
+	}
+}
+
+void PullPlanEditorWidget :: paramSliderChanged(int)
+{
+	// update template
+	for (unsigned int i = 0; i < plan->getParameterCount(); ++i)
+	{
+		TemplateParameter tp;
+		plan->getParameter(i, &tp);
+		if (tp.value != paramSliders[i]->value())
+		{
+			plan->setParameter(i, paramSliders[i]->value());
 			emit someDataChanged();
 		}
 	}

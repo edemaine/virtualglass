@@ -4,6 +4,7 @@
 #include "geometry.h"
 #include "mesh.h"
 #include "pullplanrenderdata.h"
+#include "globalgraphicssetting.h"
 
 #ifdef UNORDERED_MAP_WORKAROUND
 #include <tr1/unordered_map>
@@ -31,7 +32,7 @@ PullPlanRenderData::~PullPlanRenderData() {
 
 Geometry *PullPlanRenderData::getGeometry() {
 	Geometry *geom = new Geometry();
-	generatePullMesh(plan, geom, 5);
+	generatePullMesh(plan, geom, GlobalGraphicsSetting::getQuality());
 	return geom;
 }
 
@@ -43,7 +44,7 @@ GlassColorRenderData::~GlassColorRenderData() {
 
 Geometry *GlassColorRenderData::getGeometry() {
 	Geometry *geom = new Geometry();
-	generateColorMesh(glassColor, geom, 4);
+	generateColorMesh(glassColor, geom, GlobalGraphicsSetting::getQuality());
 	return geom;
 
 }

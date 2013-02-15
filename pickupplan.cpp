@@ -183,7 +183,7 @@ void PickupPlan :: updateSubs() {
 			for (int i = 0; i < parameters[0].value; ++i) {
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = -1.0;
-							//p.z = 2.0;
+				//p.z = 2.0;
 				pushNewSubplan(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 2.0, width-0.0001, SQUARE_SHAPE);
 			}
 			break;
@@ -261,29 +261,29 @@ void PickupPlan :: setTemplateType(enum PickupTemplate::Type _type, bool force) 
 	parameters.clear();
 	switch (type) {
 		case PickupTemplate::VERTICALS_AND_HORIZONTALS:
-			parameters.push_back(TemplateParameter(10, string("Column count"), 6, 30));
+			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 30));
 			break;
 		case PickupTemplate::VERTICAL:
-			parameters.push_back(TemplateParameter(10, string("Column count"), 6, 30));
+			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 30));
 			break;
 		case PickupTemplate::MURRINE_COLUMN:
-			parameters.push_back(TemplateParameter(10, string("Column count"), 6, 30));
+			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 30));
 			break;
 		case PickupTemplate::MURRINE_ROW:
-			parameters.push_back(TemplateParameter(10, string("Column count"), 6, 30));
+			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 30));
 			break;
 		case PickupTemplate::MURRINE:
-			parameters.push_back(TemplateParameter(6, string("Row/Column count"), 6, 14));
-			parameters.push_back(TemplateParameter(10, string("Thickness"), 1, 40));
+			parameters.push_back(TemplateParameter(6, string("Row/Column count:"), 6, 14));
+			parameters.push_back(TemplateParameter(10, string("Thickness:"), 1, 40));
 			break;
 		case PickupTemplate::RETICELLO_VERTICAL_HORIZONTAL:
-			parameters.push_back(TemplateParameter(10, string("Column count"), 6, 30));
+			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 30));
 			break;
 		case PickupTemplate::VERTICAL_HORIZONTAL_VERTICAL:
-			parameters.push_back(TemplateParameter(10, string("Column count"), 6, 20));
+			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 20));
 			break;
 		case PickupTemplate::VERTICAL_WITH_LIP_WRAP:
-			parameters.push_back(TemplateParameter(10, string("Column count"), 6, 30));
+			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 30));
 			break;
 	}
 

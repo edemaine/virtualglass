@@ -85,7 +85,7 @@ void applySubplanTransform(Vertex* v, ancestor a)
 	// Adjust location in parent for twist
 	float r = sqrt(locationInParent.x * locationInParent.x + locationInParent.y * locationInParent.y);
 	float preTheta = atan2(locationInParent.y, locationInParent.x); 
-	float postTheta = a.parent->getTwist() / 10.0 * v->position.z + preTheta;
+	float postTheta = a.parent->getTwist() * TWO_PI * v->position.z + preTheta;
 	v->position.x += (r * cos(postTheta) - r * cos(preTheta));
 	v->position.y += (r * sin(postTheta) - r * sin(preTheta));
 }

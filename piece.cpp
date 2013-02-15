@@ -94,28 +94,28 @@ void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
 		// Is it possible to just make a string const and hope it's 
 		// kept around as long as the TemplateParameter is?
 		case PieceTemplate::VASE:
-			parameters.push_back(TemplateParameter(0, string("Lip width"), 0, 100));
-			parameters.push_back(TemplateParameter(0, string("Body width"), 0, 100));
-			parameters.push_back(TemplateParameter(0, string("Twist"), 0, 100));
+			parameters.push_back(TemplateParameter(0, string("Lip width:"), 0, 100));
+			parameters.push_back(TemplateParameter(0, string("Body width:"), 0, 100));
+			parameters.push_back(TemplateParameter(0, string("Twist:"), 0, 100));
 			break;
 		case PieceTemplate::TUMBLER:
-			parameters.push_back(TemplateParameter(30, string("Width"), 0, 100));
-			parameters.push_back(TemplateParameter(50, string("Roundedness"), 0, 100));
-			parameters.push_back(TemplateParameter(0, string("Twist"), 0, 100));
+			parameters.push_back(TemplateParameter(30, string("Width:"), 0, 100));
+			parameters.push_back(TemplateParameter(50, string("Roundedness:"), 0, 100));
+			parameters.push_back(TemplateParameter(0, string("Twist:"), 0, 100));
 			break;
 		case PieceTemplate::BOWL:
-			parameters.push_back(TemplateParameter(10, string("Openness"), 0, 100));
-			parameters.push_back(TemplateParameter(0, string("Size"), 0, 100));
-			parameters.push_back(TemplateParameter(0, string("Twist"), 0, 100));
+			parameters.push_back(TemplateParameter(10, string("Openness:"), 0, 100));
+			parameters.push_back(TemplateParameter(0, string("Size:"), 0, 100));
+			parameters.push_back(TemplateParameter(0, string("Twist:"), 0, 100));
 			break;
 		case PieceTemplate::POT:
-			parameters.push_back(TemplateParameter(50, string("Lip width"), 0, 100));
-			parameters.push_back(TemplateParameter(50, string("Body width"), 0, 100));
-			parameters.push_back(TemplateParameter(50, string("Bottom width"), 0, 100));
+			parameters.push_back(TemplateParameter(50, string("Lip width:"), 0, 100));
+			parameters.push_back(TemplateParameter(50, string("Body width:"), 0, 100));
+			parameters.push_back(TemplateParameter(50, string("Bottom width:"), 0, 100));
 			break;
 		case PieceTemplate::WAVY_PLATE:
-			parameters.push_back(TemplateParameter(30, string("Wave count"), 0, 100));
-			parameters.push_back(TemplateParameter(50, string("Wave depth"), 0, 100));
+			parameters.push_back(TemplateParameter(30, string("Wave count:"), 0, 100));
+			parameters.push_back(TemplateParameter(50, string("Wave depth:"), 0, 100));
 			break;
 		case PieceTemplate::PICKUP:
 			break;

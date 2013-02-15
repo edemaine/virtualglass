@@ -125,38 +125,38 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force)
 		case PullTemplate::HORIZONTAL_LINE_CIRCLE:
 			casings[0].shape = CIRCLE_SHAPE;
 			casings[0].thickness = 0.9 * casings[1].thickness;
-			parameters.push_back(TemplateParameter(3, string("Row count"), 2, 30));
+			parameters.push_back(TemplateParameter(3, string("Row count:"), 2, 30));
 			break;
 		case PullTemplate::HORIZONTAL_LINE_SQUARE:
 			casings[0].shape  = CIRCLE_SHAPE;
 			casings[0].thickness = 0.9 * casings[1].thickness;
-			parameters.push_back(TemplateParameter(3, string("Row count"), 2, 30));
+			parameters.push_back(TemplateParameter(3, string("Row count:"), 2, 30));
 			break;
 		case PullTemplate::SURROUNDING_CIRCLE:
 			casings[0].shape  = CIRCLE_SHAPE;
 			casings[0].thickness = 0.9 * casings[1].thickness;
-			parameters.push_back(TemplateParameter(8, string("Count"), 3, 30));
+			parameters.push_back(TemplateParameter(8, string("Count:"), 3, 30));
 			break;
 		case PullTemplate::CROSS:
 			casings[0].shape  = CIRCLE_SHAPE;
 			casings[0].thickness = 0.9 * casings[1].thickness;
-			parameters.push_back(TemplateParameter(3, string("Radial count"), 2, 20));
+			parameters.push_back(TemplateParameter(3, string("Radial count:"), 2, 20));
 			break;
 		case PullTemplate::SQUARE_OF_SQUARES:
 		case PullTemplate::SQUARE_OF_CIRCLES:
 			casings[0].shape = SQUARE_SHAPE;
 			casings[0].thickness = 0.9 * 1 / SQRT_TWO * casings[1].thickness;
-			parameters.push_back(TemplateParameter(4, string("Row count"), 2, 8));
+			parameters.push_back(TemplateParameter(4, string("Row count:"), 2, 8));
 			break;
 		case PullTemplate::TRIPOD:
 			casings[0].shape  = CIRCLE_SHAPE;
 			casings[0].thickness = 0.9 * casings[1].thickness;
-			parameters.push_back(TemplateParameter(3, string("Radial count"), 2, 20));
+			parameters.push_back(TemplateParameter(3, string("Radial count:"), 2, 20));
 			break;
 		case PullTemplate::SURROUNDING_SQUARE:
 			casings[0].shape = SQUARE_SHAPE;
 			casings[0].thickness = 0.9 * 1 / SQRT_TWO * casings[1].thickness;
-			parameters.push_back(TemplateParameter(2, string("Column count"), 2, 10));
+			parameters.push_back(TemplateParameter(2, string("Column count:"), 2, 10));
 			break;
 		case PullTemplate::CUSTOM:
 			// we don't touch anything, who knows what's going on in there

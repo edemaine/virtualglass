@@ -54,6 +54,7 @@ class PullPlanEditorWidget : public QWidget
 		void twistSpinChanged(int);
 		void twistSliderChanged(int);
 		void paramSpinChanged(int);
+		void paramSliderChanged(int);
 		void tabChanged(int);
 		void geometryThreadFinishedMesh();
 
@@ -82,6 +83,7 @@ class PullPlanEditorWidget : public QWidget
 		QSlider* twistSlider;
 		vector<QLabel*> paramLabels;
 		vector<QSpinBox*> paramSpins;
+		vector<QSlider*> paramSliders;
 		QStackedWidget* paramStack;
 		QHBoxLayout* templateLibraryLayout;
 		QPushButton* addCasingButton;
