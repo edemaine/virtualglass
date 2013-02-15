@@ -3,8 +3,8 @@
 ######################################################################
 
 !*-msvc* {
-QMAKE_LFLAGS_RELEASE += -static-libgcc
-QMAKE_CFLAGS_RELEASE += -static-libgcc
+	QMAKE_LFLAGS_RELEASE += -static-libgcc
+	QMAKE_CFLAGS_RELEASE += -static-libgcc
 }
 
 TEMPLATE = app
@@ -17,15 +17,16 @@ RESOURCES = virtualglass.qrc
 DEFINES += GLEW_MX
 
 unix:!macx {
-  QMAKE_CXXFLAGS += -std=gnu++0x
-  LIBS += -lGLU
+	QMAKE_CXXFLAGS += -std=gnu++0x
+	LIBS += -lGLU
 }
 macx {
-  QMAKE_CC = g++
-  QMAKE_CFLAGS += -Qunused-arguments
-  QMAKE_CXX = g++
-  QMAKE_CXXFLAGS += -DUNORDERED_MAP_WORKAROUND -I src/jsoncpp/include 
-  ICON = virtualglass.icns
+	QMAKE_CC = g++
+	QMAKE_CFLAGS += -Qunused-arguments
+	QMAKE_CXX = g++
+	QMAKE_CXXFLAGS += -DUNORDERED_MAP_WORKAROUND -I src/jsoncpp/include 
+	ICON = virtualglass.icns
+	QMAKE_INFO_PLIST = virtualglass.Info.plist
 }
 
 *-msvc* {
@@ -48,7 +49,10 @@ macx {
 	LIBS += -lexpat
 }
 
-HEADERS += glew/glew.h \
+
+
+HEADERS += vgapp.h \ 
+	glew/glew.h \
 	glew/glxew.h \
 	glew/wglew.h \
 	bubble.h \
@@ -113,6 +117,7 @@ HEADERS += glew/glew.h \
 	globalgraphicssetting.h \
 
 SOURCES += main.cpp \ 
+	vgapp.cpp \
 	glew/glew.c \
 	librarywidget.cpp \
 	exampleglass.cpp \

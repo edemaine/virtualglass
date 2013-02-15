@@ -1,7 +1,5 @@
 
 #include <QtGui>
-#include <QFileDialog>
-
 #include "constants.h"
 #include "dependancy.h"
 #include "niceviewwidget.h"
@@ -30,6 +28,7 @@ MainWindow :: MainWindow()
 	centralWidget = new QWidget(this);
 	this->setCentralWidget(centralWidget);
 
+	// allocate ALL the memory
 	centralLayout = new QHBoxLayout(centralWidget);
 	setupLibrary();
 	setupEditors();
@@ -40,6 +39,7 @@ MainWindow :: MainWindow()
 	setWindowTitle(windowTitle());
 	setupViews();
 
+	// do the finishing touches to put the GUI in fresh state
 	setViewMode(EMPTY_VIEW_MODE);
 	show();
 	setDirtyBit(false);
@@ -340,15 +340,15 @@ void MainWindow :: setupConnections()
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 
 	// the file IO menu stuff
-	connect(newFileAction, SIGNAL(triggered()), this, SLOT(newFile()));
-	connect(openFileAction, SIGNAL(triggered()), this, SLOT(openFile()));
-	connect(addFileAction, SIGNAL(triggered()), this, SLOT(addFile()));
-	connect(importSVGFileAction, SIGNAL(triggered()), this, SLOT(importSVG()));
-	connect(exportPLYFileAction, SIGNAL(triggered()), this, SLOT(exportPLY()));
-	connect(exportOBJFileAction, SIGNAL(triggered()), this, SLOT(exportOBJ()));
-	connect(saveAllFileAction, SIGNAL(triggered()), this, SLOT(saveAllFile()));
-	connect(saveAllAsFileAction, SIGNAL(triggered()), this, SLOT(saveAllAsFile()));
-	connect(saveSelectedAsFileAction, SIGNAL(triggered()), this, SLOT(saveSelectedAsFile()));
+	connect(newFileAction, SIGNAL(triggered()), this, SLOT(newFileActionTriggered()));
+	connect(openFileAction, SIGNAL(triggered()), this, SLOT(openFileActionTriggered()));
+	connect(addFileAction, SIGNAL(triggered()), this, SLOT(addFileActionTriggered()));
+	connect(importSVGFileAction, SIGNAL(triggered()), this, SLOT(importSVGActionTriggered()));
+	connect(exportPLYFileAction, SIGNAL(triggered()), this, SLOT(exportPLYActionTriggered()));
+	connect(exportOBJFileAction, SIGNAL(triggered()), this, SLOT(exportOBJActionTriggered()));
+	connect(saveAllFileAction, SIGNAL(triggered()), this, SLOT(saveAllFileActionTriggered()));
+	connect(saveAllAsFileAction, SIGNAL(triggered()), this, SLOT(saveAllAsFileActionTriggered()));
+	connect(saveSelectedAsFileAction, SIGNAL(triggered()), this, SLOT(saveSelectedAsFileActionTriggered()));
 	connect(exitAction, SIGNAL(triggered()), this, SLOT(attemptToQuit()));
 
 	connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
@@ -699,11 +699,6 @@ void MainWindow :: copyPiece()
 	emit someDataChanged();
 }
 
-PickupPlan* MainWindow :: newPickupPlan()
-{
-	return new PickupPlan(PickupTemplate::VERTICAL);
-}
-
 void MainWindow :: newColorBar()
 {
 	GlassColor* newGlassColor = new GlassColor();
@@ -1004,7 +999,7 @@ void MainWindow::attemptToQuit()
 		case QMessageBox::Cancel:
 			return;
 		case QMessageBox::Save:
-			saveAllFile();
+			saveAllFileActionTriggered();
 			break;
 		case QMessageBox::Discard:
 			break;
@@ -1143,7 +1138,7 @@ void MainWindow::setupMenus()
 	graphicsMenu->addAction(lowGraphicsAction);
 }
 
-void MainWindow::exportOBJ()
+void MainWindow::exportOBJActionTriggered()
 {
 	// should never be invoked if menu disabling is working correctly, but just in case
 	if (editorStack->currentIndex() == EMPTY_VIEW_MODE 
@@ -1170,7 +1165,7 @@ void MainWindow::exportOBJ()
 	}	
 }
 
-void MainWindow::exportPLY()
+void MainWindow::exportPLYActionTriggered()
 {
 	// should never be invoked if menu disabling is working correctly, but just in case
 	if (editorStack->currentIndex() == EMPTY_VIEW_MODE 
@@ -1197,7 +1192,7 @@ void MainWindow::exportPLY()
 	}	
 }
 
-void MainWindow::importSVG()
+void MainWindow::importSVGActionTriggered()
 {
 	// use below instead as dialog?
         // QString userSpecifiedFilename = QFileDialog::getOpenFileName(this, "Open your SVG cane crossection file",
@@ -1335,7 +1330,7 @@ void MainWindow::getLibraryContents(vector<GlassColor*>& colors, vector<PullPlan
 }
 
 
-void MainWindow::newFile()
+void MainWindow::newFileActionTriggered()
 {
 	// ask the person what they want to do with the current state
 	if (dirtyBit)
@@ -1352,7 +1347,7 @@ void MainWindow::newFile()
 			case QMessageBox::Cancel:
 				return;
 			case QMessageBox::Save:
-				saveAllFile();
+				saveAllFileActionTriggered();
 				break;
 			case QMessageBox::Discard:
 				break;
@@ -1442,7 +1437,40 @@ void MainWindow::addToLibrary(vector<GlassColor*>& colors, vector<PullPlan*>& pl
 
 }
 
-void MainWindow::openFile()
+void MainWindow::openFile(QString filename, bool add)
+{
+	// try to read in the file
+	vector<GlassColor*> colors;
+	vector<PullPlan*> plans;
+	vector<Piece*> pieces;
+	bool success = readGlassFile(filename, colors, plans, pieces);
+
+	// if it failed, pop a sad little message box 
+	if (!success) 
+	{
+		QMessageBox msgBox;
+		msgBox.setText("The file " + filename + " cannot be read.");
+		msgBox.setStandardButtons(QMessageBox::Ok);
+		msgBox.exec();
+		return;
+	}		
+
+	// deal with save filenames and dirty bits
+	if (add)
+	{
+		setDirtyBit(true);
+	}
+	else 
+	{
+		clearLibrary();	
+		setSaveFilename(filename);
+		setDirtyBit(false);
+	}
+	
+	addToLibrary(colors, plans, pieces);	
+}
+
+void MainWindow::openFileActionTriggered()
 {
 	// first, if user's current file is dirty, confirm that they are ok to throw away their current changes
 	// notice that if the open file dialog fails, then their changes won't actually be thrown away.
@@ -1470,26 +1498,9 @@ void MainWindow::openFile()
 	if (userSpecifiedFilename.isNull())
 		return;
 
-	// try to read in the file
-	vector<GlassColor*> colors;
-	vector<PullPlan*> plans;
-	vector<Piece*> pieces;
-	bool success = readGlassFile(userSpecifiedFilename, colors, plans, pieces);
+	// load the file
+	openFile(userSpecifiedFilename, false);
 
-	// if it failed, pop a sad little message box 
-	if (!success) 
-	{
-		QMessageBox msgBox;
-		msgBox.setText("The file " + userSpecifiedFilename + " cannot be read.");
-		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.exec();
-		return;
-	}		
-
-	clearLibrary();	
-	addToLibrary(colors, plans, pieces);	
-
-	// go back to empty mode
 	setViewMode(EMPTY_VIEW_MODE);
 	
 	// set the save file info
@@ -1497,7 +1508,7 @@ void MainWindow::openFile()
 	setDirtyBit(false);
 }
 
-void MainWindow::addFile()
+void MainWindow::addFileActionTriggered()
 {
 	// do the dialog
 	QStringList userSpecifiedFilenames = QFileDialog::getOpenFileNames(this, tr("Open file..."), QDir::currentPath(), 
@@ -1506,34 +1517,19 @@ void MainWindow::addFile()
 		return;
 
 	// try to read in the files....ALL OF THEM
-	vector<GlassColor*> colors;
-	vector<PullPlan*> plans;
-	vector<Piece*> pieces;
 	for (int i = 0; i < userSpecifiedFilenames.size(); ++i)
-	{
-		if (readGlassFile(userSpecifiedFilenames[i], colors, plans, pieces))
-			addToLibrary(colors, plans, pieces);	
-		else 
-		{
-			QMessageBox msgBox;
-			msgBox.setText("The file " + userSpecifiedFilenames[i] + " cannot be read.");
-			msgBox.setStandardButtons(QMessageBox::Ok);
-			msgBox.exec();
-			return;
-		}	
-	}
+		openFile(userSpecifiedFilenames[i], true);
 
-	// go back to empty mode
 	setViewMode(EMPTY_VIEW_MODE);
 
 	// turn *on* dirty bit, because we just added stuff
 	setDirtyBit(true);
 }
 
-void MainWindow::saveAllFile()
+void MainWindow::saveAllFileActionTriggered()
 {
 	if (saveFilename == "[unsaved]")
-		saveAllAsFile();
+		saveAllAsFileActionTriggered();
 	else
 	{
 		// call the actual file-saving code in GlassFileWriter
@@ -1547,7 +1543,7 @@ void MainWindow::saveAllFile()
 	}
 }
 
-void MainWindow::saveAllAsFile()
+void MainWindow::saveAllAsFileActionTriggered()
 {
 	// do the dialog thing to set saveFilename
 	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."), 
@@ -1565,13 +1561,17 @@ void MainWindow::saveAllAsFile()
 	setDirtyBit(false);
 }
 
-void MainWindow::saveSelectedAsFile()
+void MainWindow::saveSelectedAsFileActionTriggered()
 {
-	// grab the one thing you want to save
+	// do the dialog thing to get a one-time filename that you save to
+	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."), 
+		QDir::currentPath(), tr("VirtualGlass (*.glass)"));
+	if (userSpecifiedFilename.isNull())
+		return;
+
 	vector<GlassColor*> colors;
 	vector<PullPlan*> plans;
 	vector<Piece*> pieces;
-
 	switch (editorStack->currentIndex())
 	{
 		case EMPTY_VIEW_MODE:
@@ -1587,12 +1587,6 @@ void MainWindow::saveSelectedAsFile()
 			break;
 	}
 	
-	// do the dialog thing to get a one-time filename that you save to
-	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."), 
-		QDir::currentPath(), tr("VirtualGlass (*.glass)"));
-	if (userSpecifiedFilename.isNull())
-		return;
-
 	// pass off "curated" library to regular write file; 
 	// effectively pretending that the library only has your thing and its dependancies
 	writeGlassFile(userSpecifiedFilename, colors, plans, pieces);	

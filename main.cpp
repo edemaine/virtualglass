@@ -1,29 +1,19 @@
 
 #include <QtGui>
-#include "mainwindow.h"
-
-extern void qt_set_sequence_auto_mnemonic(bool b);
+#include "vgapp.h"
 
 int main(int argc, char** argv)
 {
-	MainWindow* mainWindow;
-	QApplication* app;
+	VGApp* app;
 
 	// make X Windows stuff thread-safe?
 	QCoreApplication::setAttribute(Qt::AA_X11InitThreads);
-
-	app = new QApplication(argc, argv);
+	app = new VGApp(argc, argv);
 
 	// drag distance used in drag-n-drop of canes, colors
 	app->setStartDragDistance(3);
-
 	// make a decent seed
 	qsrand(QDateTime::currentDateTime().toTime_t());
-
-	qt_set_sequence_auto_mnemonic(true);
-
-	mainWindow = new MainWindow();
-	mainWindow->showMaximized();
 
 	QDir pluginsDir = QDir(app->applicationDirPath());
 	#if defined(Q_OS_WIN)

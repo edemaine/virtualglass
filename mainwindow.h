@@ -46,7 +46,7 @@ class MainWindow : public QMainWindow
 		void setupViews();
 		void keyPressEvent(QKeyEvent* e);
 		QString windowTitle();
-		PickupPlan* newPickupPlan();
+		void openFile(QString filename, bool add);
 
 	protected:
 		void closeEvent(QCloseEvent *event);
@@ -147,15 +147,15 @@ class MainWindow : public QMainWindow
 		QAction *lowGraphicsAction;
 
 	private slots:
-		void newFile();
-		void openFile();
-		void addFile();
-		void saveAllFile();
-		void saveAllAsFile();
-		void saveSelectedAsFile();
-		void importSVG();
-		void exportPLY();
-		void exportOBJ();
+		void newFileActionTriggered();
+		void openFileActionTriggered();
+		void addFileActionTriggered();
+		void saveAllFileActionTriggered();
+		void saveAllAsFileActionTriggered();
+		void saveSelectedAsFileActionTriggered();
+		void importSVGActionTriggered();
+		void exportPLYActionTriggered();
+		void exportOBJActionTriggered();
 		void updateEverything();
 		void newColorBar();
 		void newPullPlan();
