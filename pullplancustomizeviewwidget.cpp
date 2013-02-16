@@ -24,6 +24,13 @@ PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget
 	BOUNDING_BOX_SPACE = 1; //squareSize isn't set yet, so can't do MAX(squareSize / 100, 1);
 	boundActiveBox();
 	this->setMouseTracking(true);
+	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+	connect(this, SIGNAL(someDataChanged()), this, SLOT(setCustomTemplate()));
+}
+
+void PullPlanCustomizeViewWidget :: setCustomTemplate()
+{
+	plan->setTemplateType(PullTemplate::CUSTOM);	
 }
 
 void PullPlanCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
@@ -433,25 +440,14 @@ void PullPlanCustomizeViewWidget :: keyPressEvent(QKeyEvent* event)
 void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* _plan)
 {
 	plan = _plan;
-	if (isVisible())
-	{
-		if (plan->getTemplateType() != PullTemplate::CUSTOM)
-		{
-			subplansSelected.clear();
-			activeControlPoint = -1;
-			hoveringIndex = -1;
-			activeBoxIndex = -1;
-		}
-	
-		plan->setTemplateType(PullTemplate::CUSTOM);	
-	}
-	else
-	{
-		subplansSelected.clear();
-		activeControlPoint = -1;
-		hoveringIndex = -1;
-		activeBoxIndex = -1;
-	}
+
+	// reset gui stuffs
+	subplansSelected.clear();
+	activeControlPoint = -1;
+	hoveringIndex = -1;
+	activeBoxIndex = -1;
+	updateEverything();
+
 	for (unsigned int i = 0; i < subplansSelected.size(); i++)
 	{
 		if (subplansSelected[i] >= plan->subs.size())
@@ -466,6 +462,10 @@ void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* _plan)
 	mouseStartingLoc.x = FLT_MAX;
 	mouseStartingLoc.y = FLT_MAX;
 	boundActiveBox();
+}
+
+void PullPlanCustomizeViewWidget :: updateEverything()
+{
 	this->repaint();
 }
 

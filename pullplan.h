@@ -3,17 +3,17 @@
 #ifndef PULLPLAN_H
 #define PULLPLAN_H
 
+#include <vector>
 #include "pulltemplate.h"
 #include "shape.h"
 #include "primitives.h"
 #include "subpulltemplate.h"
 #include "casing.h"
-#include <vector>
+#include "templateparameter.h"
 
 using std::vector;
 
 class PullPlan;
-class TemplateParameter;
 class GlassColor;
 
 class PullPlan
@@ -24,9 +24,9 @@ class PullPlan
 		void setTemplateType(enum PullTemplate::Type t, bool force=false);
 		enum PullTemplate::Type getTemplateType();
 
-		unsigned int getParameterCount();
-		void getParameter(unsigned int index, TemplateParameter* dest);
-		void setParameter(unsigned int index, int value);
+		bool hasParameter();
+		unsigned int getCount();
+		void setCount(unsigned int count);
 
 		void setCasingThickness(float t, unsigned int index);
 		float getCasingThickness(unsigned int index);
@@ -57,7 +57,7 @@ class PullPlan
 	private:
 		enum PullTemplate::Type templateType;
 		vector<Casing> casings;
-		vector<TemplateParameter> parameters;
+		unsigned int count;
 
 		// Methods
 		void initializeTemplate();

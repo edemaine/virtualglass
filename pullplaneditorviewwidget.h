@@ -69,6 +69,9 @@ class PullPlanEditorViewWidget : public QWidget
 		vector<unsigned int> subplansHighlighted; 
 
 		float ulX, ulY, squareSize;
+
+	public slots:
+		void updateEverything();
 };
 
 

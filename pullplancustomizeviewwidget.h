@@ -78,6 +78,9 @@ private:
 
 	int BOUNDING_BOX_SPACE;
 
+public slots:
+	void setCustomTemplate();
+	void updateEverything();
 };
 
 #endif // PULLPLANCUSTOMIZEVIEWWIDGET_H

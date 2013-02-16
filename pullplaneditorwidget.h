@@ -53,9 +53,8 @@ class PullPlanEditorWidget : public QWidget
 		void customizeViewWidgetDataChanged();
 		void twistSpinChanged(double);
 		void twistSliderChanged(int);
-		void paramSpinChanged(int);
-		void paramSliderChanged(int);
-		void tabChanged(int);
+		void countSpinChanged(int);
+		void controlTabChanged(int);
 		void geometryThreadFinishedMesh();
 
 	private:
@@ -81,25 +80,22 @@ class PullPlanEditorWidget : public QWidget
 		PullPlanCustomizeViewWidget* customizeViewWidget;	
 		QDoubleSpinBox* twistSpin;
 		QSlider* twistSlider;
-		vector<QLabel*> paramLabels;
-		vector<QSpinBox*> paramSpins;
-		vector<QSlider*> paramSliders;
-		QStackedWidget* paramStack;
+		QLabel* countLabel;
+		QSpinBox* countSpin;
 		QHBoxLayout* templateLibraryLayout;
 		QPushButton* addCasingButton;
 		QPushButton* removeCasingButton;
 		QPushButton* customizePlanButton;
 		QPushButton* circleCasingPushButton;
 		QPushButton* squareCasingPushButton;
-		QPushButton* confirmChangesButton;
-		QPushButton* cancelChangesButton;
 		QPushButton* addCircleButton;
 		QPushButton* addSquareButton;
 		QPushButton* copySelectedButton;
 		QPushButton* deleteSelectedButton;
-		QTabWidget* tabs;
+		QStackedWidget* viewEditorStack;
 		QLabel* descriptionLabel;
 		NiceViewWidget* niceViewWidget;
+		QTabWidget* controlsTab;
 
 		void setupLayout();
 		void setupThreading();

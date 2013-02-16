@@ -551,19 +551,7 @@ void writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<Pu
 	}
 
 	// write pull template parameters
-	root[canename]["Pull template parameters"];
-	for (unsigned int i = 0; i < cane->getParameterCount(); ++i)
-	{
-		TemplateParameter tmpParam;
-		cane->getParameter(i, &tmpParam);
-
-		string paramName = idAndNameToString(i, "PullTemplateParam");
-		root[canename]["Pull template parameters"][paramName]["Index"] = i;
-		root[canename]["Pull template parameters"][paramName]["Name"] = tmpParam.name;
-		root[canename]["Pull template parameters"][paramName]["Value"] = tmpParam.value;
-		root[canename]["Pull template parameters"][paramName]["Lower limit"] = tmpParam.lowerLimit;
-		root[canename]["Pull template parameters"][paramName]["Upper limit"] = tmpParam.upperLimit;
-	}
+	root[canename]["Count"] = cane->getCount();
 
 	// loop over subpulls
 	root[canename]["Subcanes"];
@@ -625,15 +613,7 @@ PullPlan* readCane(string canename, Json::Value& root, map<unsigned int, GlassCo
 		cane->setCasingColor(tempCasings[i].glassColor, i);
 	}
 
-	// loop over pull template parameters
-	for (unsigned int i = 0; i < root[canename]["Pull template parameters"].getMemberNames().size(); ++i)
-	{
-		string paramname = root[canename]["Pull template parameters"].getMemberNames()[i];
-		
-		unsigned int paramIndex = root[canename]["Pull template parameters"][paramname]["Index"].asUInt();
-		cane->setParameter(paramIndex, root[canename]["Pull template parameters"][paramname]["Value"].asInt());
-		// don't bother to read name or lower/upper limits
-	}
+	cane->setCount(root[canename]["Count"].asUInt());
 
 	return cane;
 }

@@ -66,51 +66,15 @@ void PullPlanEditorWidget :: updateEverything()
 	}
 	removeCasingButton->setEnabled(!plan->hasMinimumCasingCount());
 
+	countSpin->setValue(plan->getCount());
+	countLabel->setEnabled(plan->getTemplateType() != PullTemplate::CUSTOM);
+	countSpin->setEnabled(plan->getTemplateType() != PullTemplate::CUSTOM);
+
 	double twist = plan->twist;
 	twistSpin->setValue(twist);
 	twistSlider->setSliderPosition(twist*10);
 	twistSpin->setEnabled(plan->getOutermostCasingShape() == CIRCLE_SHAPE);
 	twistSlider->setEnabled(plan->getOutermostCasingShape() == CIRCLE_SHAPE);
-
-	viewWidget->setPullPlan(plan);
-	customizeViewWidget->setPullPlan(plan);
-
-	// we always keep the first parameter shown so that the stack widget
-	// occupies the correct region, even if the template has no parameters
-	// parameters 2..k are hidden, though
-	if (plan->getParameterCount() > 0)
-		paramStack->setCurrentIndex(0);
-	else 
-		paramStack->setCurrentIndex(1);
-	
-	unsigned int i = 0;
-	for (; i < plan->getParameterCount(); ++i)
-	{
-		TemplateParameter tp;
-		plan->getParameter(i, &tp);
-		paramLabels[i]->setText(tp.name.c_str());
-		disconnect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
-		paramSpins[i]->setRange(tp.lowerLimit, tp.upperLimit);
-		connect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
-		paramSpins[i]->setValue(tp.value);
-		paramSliders[i]->setRange(tp.lowerLimit, tp.upperLimit);
-		paramSliders[i]->setValue(tp.value);
-		if (i != 0)
-		{
-			paramLabels[i]->show();
-			paramSpins[i]->show();
-			paramSliders[i]->show();
-		}
-	}
-	for (; i < paramLabels.size(); ++i)
-	{
-		if (i != 0)
-		{
-			paramLabels[i]->hide();
-			paramSpins[i]->hide();
-			paramSliders[i]->hide();
-		}
-	}
 
 	tempPullPlanMutex.lock();
 	deep_delete(tempPullPlan);
@@ -130,6 +94,9 @@ void PullPlanEditorWidget :: updateEverything()
 		else
 		        ptlw->setDependancy(false);
 	}
+
+	viewWidget->updateEverything();
+	customizeViewWidget->updateEverything();
 }
 
 void PullPlanEditorWidget :: geometryThreadFinishedMesh()
@@ -168,136 +135,111 @@ void PullPlanEditorWidget :: geometryThreadFinishedMesh()
 
 void PullPlanEditorWidget :: setupLayout()
 {
-	// Editor layout
-	QWidget* editorWidget = new QWidget(this);
-	QVBoxLayout* editorLayout = new QVBoxLayout(editorWidget);
-	editorWidget->setLayout(editorLayout);
-
-	// Editor layout: interactive top-down visualization
-	editorLayout->addWidget(viewWidget, 1);
-
 	// Editor layout: pull template scrolling library
-	QWidget* templateLibraryWidget = new QWidget(editorWidget);
+	QWidget* templateLibraryWidget = new QWidget(this);
 	templateLibraryLayout = new QHBoxLayout(templateLibraryWidget);
 	templateLibraryLayout->setSpacing(10);
 	templateLibraryLayout->setContentsMargins(10, 10, 10, 10);
 	templateLibraryWidget->setLayout(templateLibraryLayout);
 
-	QScrollArea* pullTemplateLibraryScrollArea = new QScrollArea(editorWidget);
+	QScrollArea* pullTemplateLibraryScrollArea = new QScrollArea(this);
 	pullTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
 	pullTemplateLibraryScrollArea->setWidget(templateLibraryWidget);
 	pullTemplateLibraryScrollArea->setWidgetResizable(true);
 	pullTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	pullTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pullTemplateLibraryScrollArea->setFixedHeight(140);
-	editorLayout->addWidget(pullTemplateLibraryScrollArea, 0);
 
-	// Editor layout: casing buttons layout
-	QHBoxLayout* pullTemplateShapeLayout = new QHBoxLayout(editorWidget);
+	// Editor layout: casing buttons (and param spinbox) layout
+	QWidget* casingWidget = new QWidget(this);
+	QHBoxLayout* casingLayout = new QHBoxLayout(casingWidget);
 	QLabel* casingLabel = new QLabel("Casing:");
 	circleCasingPushButton = new QPushButton(QString(QChar(9673))); 
 	squareCasingPushButton = new QPushButton(QString(QChar(9635)));
 	addCasingButton = new QPushButton("+");
 	removeCasingButton = new QPushButton("-");
-	pullTemplateShapeLayout->addWidget(casingLabel);
-	pullTemplateShapeLayout->addWidget(circleCasingPushButton);
-	pullTemplateShapeLayout->addWidget(squareCasingPushButton);
-	pullTemplateShapeLayout->addWidget(addCasingButton);
-	pullTemplateShapeLayout->addWidget(removeCasingButton);
-	pullTemplateShapeLayout->addStretch(1);
-	editorLayout->addLayout(pullTemplateShapeLayout, 0);
+	casingLayout->addWidget(casingLabel);
+	casingLayout->addWidget(circleCasingPushButton);
+	casingLayout->addWidget(squareCasingPushButton);
+	casingLayout->addWidget(addCasingButton);
+	casingLayout->addWidget(removeCasingButton);
+	countLabel = new QLabel("Count:", casingWidget);
+	countSpin = new QSpinBox(casingWidget);
+	casingLayout->addStretch(1);
+	casingLayout->addWidget(countLabel);
+	casingLayout->addWidget(countSpin);
 
 	// Editor layout: twist layout
-	QHBoxLayout* twistLayout = new QHBoxLayout(editorWidget);
-	editorLayout->addLayout(twistLayout, 0);
-
-	QLabel* twistLabel1 = new QLabel("Twist:", editorWidget);
+	QWidget* twistWidget = new QWidget(this);
+	QHBoxLayout* twistLayout = new QHBoxLayout(twistWidget);
+	twistWidget->setLayout(twistLayout);
+	QLabel* twistLabel1 = new QLabel("Twist:", this);
 	twistLayout->addWidget(twistLabel1);
-
-	twistSpin = new QDoubleSpinBox(editorWidget);
+	twistSpin = new QDoubleSpinBox(this);
 	twistSpin->setRange(-10.0, 10.0);
 	twistSpin->setSingleStep(0.1);
 	twistSpin->setDecimals(1);
 	twistLayout->addWidget(twistSpin, 1);
-
-	QLabel* twistLabel2 = new QLabel("-10.0", editorWidget);
+	QLabel* twistLabel2 = new QLabel("-10.0", this);
 	twistLayout->addWidget(twistLabel2);
-
-	twistSlider = new QSlider(Qt::Horizontal, editorWidget);
+	twistSlider = new QSlider(Qt::Horizontal, this);
 	twistSlider->setRange(-100, 100);
 	twistSlider->setSingleStep(1);
 	twistSlider->setTickInterval(100);	
 	twistSlider->setTickPosition(QSlider::TicksBothSides);
 	twistLayout->addWidget(twistSlider, 10);
-
-	QLabel* twistLabel3 = new QLabel("10.0", editorWidget);
+	QLabel* twistLabel3 = new QLabel("10.0", this);
 	twistLayout->addWidget(twistLabel3);
 
-	// Editor layout: parameter spin stuff
-	paramStack = new QStackedWidget(editorWidget); 
-	QWidget* paramWidget = new QWidget(paramStack);
-	paramStack->addWidget(paramWidget);
-	QHBoxLayout* paramLayout = new QHBoxLayout(paramWidget);
-	paramWidget->setLayout(paramLayout);
-	paramLayout->setContentsMargins(0, 0, 0, 0);
-	paramLabels.push_back(new QLabel("Param 1:", paramWidget));
-	paramLabels.push_back(new QLabel("Param 2:", paramWidget));
-	paramLabels.push_back(new QLabel("Param 3:", paramWidget));
-	paramSpins.push_back(new QSpinBox(paramWidget));
-	paramSpins.push_back(new QSpinBox(paramWidget));
-	paramSpins.push_back(new QSpinBox(paramWidget));
-	paramSliders.push_back(new QSlider(Qt::Horizontal, paramWidget));
-	paramSliders.push_back(new QSlider(Qt::Horizontal, paramWidget));
-	paramSliders.push_back(new QSlider(Qt::Horizontal, paramWidget));
-	for (unsigned int i = 0; i < paramLabels.size(); ++i)
-	{
-		paramLayout->addWidget(paramLabels[i]);
-		paramLayout->addWidget(paramSpins[i]);
-		paramLayout->addWidget(paramSliders[i]);
-	}
-	paramStack->addWidget(new QWidget(paramStack));
-	editorLayout->addWidget(paramStack);	
-
-	// Customize layout
-	QWidget* customizeWidget = new QWidget(this);
-	QVBoxLayout* customizeLayout = new QVBoxLayout(customizeWidget);
-	customizeWidget->setLayout(customizeLayout);
-
-	// Customize layout: interactive editor
-	customizeLayout->addWidget(customizeViewWidget, 1);
-
-	// Customize layout: add cane layout
-	QHBoxLayout* addCaneLayout = new QHBoxLayout(customizeWidget);
-	addCircleButton = new QPushButton("Add New Circle");
-	addSquareButton = new QPushButton("Add New Square");
-	addCaneLayout->addWidget(addCircleButton);
-	addCaneLayout->addWidget(addSquareButton);
-	addCaneLayout->addStretch();
-	customizeLayout->addLayout(addCaneLayout, 0);
-
 	// Customize layout: duplicate/delete cane layout
-	QHBoxLayout* windowControlsLayout = new QHBoxLayout(customizeWidget);
-	copySelectedButton = new QPushButton("Duplicate Selection");
-	deleteSelectedButton = new QPushButton("Delete Selection");
-	confirmChangesButton = new QPushButton("Confirm changes");
-	cancelChangesButton = new QPushButton("Cancel");
-	windowControlsLayout->addWidget(copySelectedButton);
-	windowControlsLayout->addWidget(deleteSelectedButton);
-	windowControlsLayout->addStretch();
-	customizeLayout->addLayout(windowControlsLayout, 0);
+	QWidget* customControlsWidget = new QWidget(this);
+	QHBoxLayout* customControlsLayout = new QHBoxLayout(customControlsWidget);
+	customControlsWidget->setLayout(customControlsLayout);
+	addCircleButton = new QPushButton("Add Circle");
+	addSquareButton = new QPushButton("Add Square");
+	copySelectedButton = new QPushButton("Duplicate");
+	deleteSelectedButton = new QPushButton("Delete");
+	customControlsLayout->addStretch(1);
+	customControlsLayout->addWidget(addCircleButton);
+	customControlsLayout->addWidget(addSquareButton);
+	customControlsLayout->addWidget(copySelectedButton);
+	customControlsLayout->addWidget(deleteSelectedButton);
+	customControlsLayout->addStretch(1);
 	
 	// Combine editor and customize layouts into a pair of tabs with 
 	// descriptive text in the left layout
 	QWidget* leftWidget = new QWidget(this);
 	QVBoxLayout* leftLayout = new QVBoxLayout(leftWidget);
 	leftWidget->setLayout(leftLayout);
-	tabs = new QTabWidget(leftWidget);
-	tabs->addTab(editorWidget, QString("Fill Arrangement"));
-	tabs->addTab(customizeWidget, QString("Rearrange Current"));
-	leftLayout->addWidget(tabs, 1);
+	viewEditorStack = new QStackedWidget(leftWidget);
+	viewEditorStack->addWidget(viewWidget);
+	viewEditorStack->addWidget(customizeViewWidget);
+	leftLayout->addWidget(viewEditorStack, 10);
+	leftLayout->addWidget(pullTemplateLibraryScrollArea);
+
+	controlsTab = new QTabWidget(this);
+
+	QWidget* tab1Widget = new QWidget(this);
+	QVBoxLayout* tab1Layout = new QVBoxLayout(tab1Widget);
+	tab1Widget->setLayout(tab1Layout);
+	tab1Layout->addWidget(casingWidget);
+	tab1Layout->addWidget(twistWidget);
+	tab1Layout->addStretch(1);
+	controlsTab->addTab(tab1Widget, "Fill and Case");
+
+	QWidget* tab2Widget = new QWidget(this);
+	QVBoxLayout* tab2Layout = new QVBoxLayout(tab2Widget);
+	tab2Widget->setLayout(tab2Layout);
+	tab2Layout->addWidget(customControlsWidget);
+	tab2Layout->addStretch(1);
+	controlsTab->addTab(tab2Widget, "Customize Layout");
+
+	leftLayout->addWidget(controlsTab);
+
 	descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", leftWidget);
 	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	leftLayout->addWidget(descriptionLabel, 0);
+	leftLayout->addStretch(1);
+	leftLayout->addWidget(descriptionLabel);
 
 	// Combine 3D viewer and descriptive text into the right layout
 	QWidget* rightWidget = new QWidget(this);
@@ -311,8 +253,8 @@ void PullPlanEditorWidget :: setupLayout()
 	// Combine left and right layouts
 	QHBoxLayout* pageLayout = new QHBoxLayout(this);
 	this->setLayout(pageLayout);
-	pageLayout->addWidget(leftWidget, 1);
-	pageLayout->addWidget(rightWidget, 1);
+	pageLayout->addWidget(leftWidget, 3);
+	pageLayout->addWidget(rightWidget, 2);
 }
 
 void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
@@ -323,29 +265,33 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
 	{
 		if (ptlw->type == PullTemplate::CUSTOM)
 		{
-			// the custom template being in the list is for 
-			// consistency in *indicating* which template the plan is,
-			// and not for *changing* the plan.
-			//
-			// if the user selects CUSTOM, don't automatically change it;
-			// refer the user to the way in which CUSTOM templates come
-			// about: modifying the template in the customize widget
-			tabs->setCurrentIndex(1); 
-		}	
+			// simulate user pressing customize tab
+			controlsTab->setCurrentIndex(1);
+		}
 		else
 		{
-			plan->setTemplateType(ptlw->type);
+			// put the user back in fill and case mode,
+			// as they're no longer working on a custom template
+			controlsTab->setCurrentIndex(0);
+			plan->setTemplateType(ptlw->type);	
 			emit someDataChanged();
 		}
 	}
 }
 
-void PullPlanEditorWidget :: tabChanged(int i)
+void PullPlanEditorWidget :: controlTabChanged(int tab)
 {
-	if (i == 0)
+	// change the blueprint view to match the tab
+	viewEditorStack->setCurrentIndex(tab); 
+
+	if (tab == 0) // Fill and case mode
 		descriptionLabel->setText("Cane editor - drag color or other canes in.");
-	else
+	else // customize mode
+	{
+		plan->setTemplateType(PullTemplate::CUSTOM);				
 		descriptionLabel->setText("Cane customizer - select and drag shapes around to customize cane layout.");
+		emit someDataChanged();
+	}
 }
 
 void PullPlanEditorWidget :: circleCasingButtonPressed()
@@ -404,17 +350,12 @@ void PullPlanEditorWidget :: setupConnections()
 	connect(addSquareButton, SIGNAL(pressed()), this, SLOT(addSquareButtonPressed()));
 	connect(twistSlider, SIGNAL(valueChanged(int)), this, SLOT(twistSliderChanged(int)));
 	connect(twistSpin, SIGNAL(valueChanged(double)), this, SLOT(twistSpinChanged(double)));
-	for (unsigned int i = 0; i < paramSpins.size(); ++i)
-	{
-		connect(paramSpins[i], SIGNAL(valueChanged(int)), this, SLOT(paramSpinChanged(int)));
-		connect(paramSliders[i], SIGNAL(valueChanged(int)), this, SLOT(paramSliderChanged(int)));
-	}
-
+	connect(countSpin, SIGNAL(valueChanged(int)), this, SLOT(countSpinChanged(int)));
 	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(viewWidgetDataChanged()));
 	connect(customizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(customizeViewWidgetDataChanged()));
-	connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+	connect(controlsTab, SIGNAL(currentChanged(int)), this, SLOT(controlTabChanged(int)));
 }
 
 void PullPlanEditorWidget :: viewWidgetDataChanged()
@@ -427,33 +368,14 @@ void PullPlanEditorWidget :: customizeViewWidgetDataChanged()
 	emit someDataChanged();
 }
 
-void PullPlanEditorWidget :: paramSpinChanged(int)
+void PullPlanEditorWidget :: countSpinChanged(int)
 {
 	// update template
-	for (unsigned int i = 0; i < plan->getParameterCount(); ++i)
+	unsigned int count = plan->getCount();
+	if (count != static_cast<unsigned int>(countSpin->value()))
 	{
-		TemplateParameter tp;
-		plan->getParameter(i, &tp);
-		if (tp.value != paramSpins[i]->value())
-		{
-			plan->setParameter(i, paramSpins[i]->value());
-			emit someDataChanged();
-		}
-	}
-}
-
-void PullPlanEditorWidget :: paramSliderChanged(int)
-{
-	// update template
-	for (unsigned int i = 0; i < plan->getParameterCount(); ++i)
-	{
-		TemplateParameter tp;
-		plan->getParameter(i, &tp);
-		if (tp.value != paramSliders[i]->value())
-		{
-			plan->setParameter(i, paramSliders[i]->value());
-			emit someDataChanged();
-		}
+		plan->setCount(countSpin->value());
+		emit someDataChanged();
 	}
 }
 
@@ -500,6 +422,8 @@ void PullPlanEditorWidget :: seedTemplates()
 void PullPlanEditorWidget :: setPlan(PullPlan* p)
 {
 	plan = p;
+	viewWidget->setPullPlan(plan);
+	customizeViewWidget->setPullPlan(plan);
 	emit someDataChanged();	
 }
 

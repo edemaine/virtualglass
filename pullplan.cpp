@@ -28,7 +28,7 @@ PullPlan :: PullPlan(PullTemplate::Type _templateType)
 	// setup default twist
 	twist = 0;
 
-	// setup template (subplans and parameters) `forcefully', i.e.
+	// setup template (subplans and parameter) `forcefully', i.e.
 	// occuring regardless of what current template type is
 	// if an attempt is made to initialize to custom, first
 	// initialize with default real template, then set to custom.
@@ -110,9 +110,19 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force)
 	}
 	this->templateType = templateType;
 
+	if (force)
+	{
+		if (templateType == PullTemplate::BASE_CIRCLE
+			|| templateType == PullTemplate::BASE_SQUARE
+			|| templateType == PullTemplate::CUSTOM)
+			count = 0;
+		else 
+			count = 3;
+	}
+	
 	// setup starter casings (casing 0 may be changed depending upon template)
-	parameters.clear();
-	switch (templateType) {
+	switch (templateType) 
+	{
 		case PullTemplate::BASE_CIRCLE:
 			casings[0].shape = CIRCLE_SHAPE;
 			break;
@@ -125,38 +135,31 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force)
 		case PullTemplate::HORIZONTAL_LINE_CIRCLE:
 			casings[0].shape = CIRCLE_SHAPE;
 			casings[0].thickness = 0.9 * casings[1].thickness;
-			parameters.push_back(TemplateParameter(3, string("Row count:"), 2, 30));
 			break;
 		case PullTemplate::HORIZONTAL_LINE_SQUARE:
 			casings[0].shape  = CIRCLE_SHAPE;
 			casings[0].thickness = 0.9 * casings[1].thickness;
-			parameters.push_back(TemplateParameter(3, string("Row count:"), 2, 30));
 			break;
 		case PullTemplate::SURROUNDING_CIRCLE:
 			casings[0].shape  = CIRCLE_SHAPE;
 			casings[0].thickness = 0.9 * casings[1].thickness;
-			parameters.push_back(TemplateParameter(8, string("Count:"), 3, 30));
 			break;
 		case PullTemplate::CROSS:
 			casings[0].shape  = CIRCLE_SHAPE;
 			casings[0].thickness = 0.9 * casings[1].thickness;
-			parameters.push_back(TemplateParameter(3, string("Radial count:"), 2, 20));
 			break;
 		case PullTemplate::SQUARE_OF_SQUARES:
 		case PullTemplate::SQUARE_OF_CIRCLES:
 			casings[0].shape = SQUARE_SHAPE;
 			casings[0].thickness = 0.9 * 1 / SQRT_TWO * casings[1].thickness;
-			parameters.push_back(TemplateParameter(4, string("Row count:"), 2, 8));
 			break;
 		case PullTemplate::TRIPOD:
 			casings[0].shape  = CIRCLE_SHAPE;
 			casings[0].thickness = 0.9 * casings[1].thickness;
-			parameters.push_back(TemplateParameter(3, string("Radial count:"), 2, 20));
 			break;
 		case PullTemplate::SURROUNDING_SQUARE:
 			casings[0].shape = SQUARE_SHAPE;
 			casings[0].thickness = 0.9 * 1 / SQRT_TWO * casings[1].thickness;
-			parameters.push_back(TemplateParameter(2, string("Column count:"), 2, 10));
 			break;
 		case PullTemplate::CUSTOM:
 			// we don't touch anything, who knows what's going on in there
@@ -207,26 +210,26 @@ enum PullTemplate::Type PullPlan :: getTemplateType() {
 	return this->templateType;
 }
 
-unsigned int PullPlan :: getParameterCount()
+bool PullPlan :: hasParameter()
 {
-	return parameters.size();
+	return (this->templateType != PullTemplate::BASE_CIRCLE 
+		&& this->templateType != PullTemplate::BASE_SQUARE
+		&& this->templateType != PullTemplate::CUSTOM); 
 }
 
-void PullPlan :: getParameter(unsigned int _index, TemplateParameter* dest)
+unsigned int PullPlan :: getCount()
 {
-	assert(_index < parameters.size());
-	*dest = parameters[_index];
+	return this->count;
 }
 
-void PullPlan :: setParameter(unsigned int _index, int value)
+void PullPlan :: setCount(unsigned int _count)
 {
-	assert(_index < parameters.size());
-	parameters[_index].value = value;
+	this->count = _count;
 	resetSubs(false);
 }
 
-void PullPlan :: removeCasing() {
-
+void PullPlan :: removeCasing() 
+{
 	int count = casings.size();
 	if (templateType == PullTemplate::BASE_CIRCLE || templateType == PullTemplate::BASE_SQUARE)
 	{
@@ -399,21 +402,20 @@ of subplans, as well as increasing or decreasing the number of subplans.
 void PullPlan :: resetSubs(bool hardReset)
 {
 	Point p = make_vector(0.0f, 0.0f, 0.0f);
-	assert(!casings.empty());
 	float radius = casings[0].thickness;
 
 	vector<SubpullTemplate> newSubs;
 	
-	switch (templateType) {
+	switch (templateType) 
+	{
 		case PullTemplate::BASE_CIRCLE:
 		case PullTemplate::BASE_SQUARE:
 			break;
 		case PullTemplate::HORIZONTAL_LINE_CIRCLE:
 		{
-			assert(parameters.size() == 1);
-			int count = parameters[0].value;
-			for (int i = 0; i < count; ++i) {
-				float littleRadius = (2 * radius / count) / 2;
+			for (unsigned int i = 0; i < this->count; ++i) 
+			{
+				float littleRadius = (2 * radius / this->count) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
 				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0);
 			}
@@ -421,11 +423,10 @@ void PullPlan :: resetSubs(bool hardReset)
 		}
 		case PullTemplate::HORIZONTAL_LINE_SQUARE:
 		{
-			assert(parameters.size() == 1);
 			radius *= 0.9;
-			int count = parameters[0].value;
-			for (int i = 0; i < count; ++i) {
-				float littleRadius = (2 * radius / count) / 2;
+			for (unsigned int i = 0; i < this->count; ++i) 
+			{
+				float littleRadius = (2 * radius / this->count) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
 				pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, littleRadius * 2.0);
 			}
@@ -433,29 +434,27 @@ void PullPlan :: resetSubs(bool hardReset)
 		}
 		case PullTemplate::SURROUNDING_CIRCLE:
 		{
-			assert(parameters.size() == 1);
-			int count = parameters[0].value;
-			float theta = TWO_PI / count;
+			float theta = TWO_PI / this->count;
 			float k = sin(theta/2) / (1 + sin(theta/2));
 
 			p.x = p.y = 0.0;
 			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, (1 - 2 * k) * 2 * radius);
-			for (int i = 0; i < count; ++i) {
-				p.x = (1.0 - k) * radius * cos(TWO_PI / count * i);
-				p.y = (1.0 - k) * radius * sin(TWO_PI / count * i);
+			for (unsigned int i = 0; i < this->count; ++i) 
+			{
+				p.x = (1.0 - k) * radius * cos(TWO_PI / this->count * i);
+				p.y = (1.0 - k) * radius * sin(TWO_PI / this->count * i);
 				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * k * radius);
 			}
 			break;
 		}
 		case PullTemplate::CROSS:
 		{
-			assert(parameters.size() == 1);
-			int count = parameters[0].value-1;
-			float littleRadius = (radius / (count + 0.5)) / 2.0;
+			float littleRadius = (radius / (this->count + 0.5)) / 2.0;
 
 			p.x = p.y = 0.0;
 			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0);
-			for (int i = 0; i < count; ++i) {
+			for (unsigned int i = 0; i < this->count; ++i) 
+			{
 				p.x = (i+1) * 2 * littleRadius;
 				p.y = 0.0;
 				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0);
@@ -474,19 +473,19 @@ void PullPlan :: resetSubs(bool hardReset)
 		case PullTemplate::SQUARE_OF_CIRCLES:
 		case PullTemplate::SQUARE_OF_SQUARES:
 		{
-			assert(parameters.size() == 1);
 			if (this->casings[0].shape == CIRCLE_SHAPE)
 				radius *= 1 / SQRT_TWO;
 
-			int count = parameters[0].value;
-			float littleRadius = radius / count;
+			float littleRadius = radius / this->count;
 
 			// We add the subtemplates in this funny way so that the
 			// ith subcane is always at the same location regardless of
 			// parameters. This is needed for delete to work correctly.
-			for (int s = 0; s < count; ++s) {
-				int i, j;
-				for (i = 0; i < s; ++i) {
+			for (unsigned int s = 0; s < this->count; ++s) 
+			{
+				unsigned int i, j;
+				for (unsigned int i = 0; i < s; ++i) 
+				{
 					j = s;
 					p.x = -radius + littleRadius + 2 * littleRadius * i;
 					p.y = -radius + littleRadius + 2 * littleRadius * j;
@@ -495,7 +494,8 @@ void PullPlan :: resetSubs(bool hardReset)
 					else
 						pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius);
 				}
-				for (j = s; j >= 0; --j) {
+				for (j = s; j <= s; --j) 
+				{
 					i = s;
 					p.x = -radius + littleRadius + 2 * littleRadius * i;
 					p.y = -radius + littleRadius + 2 * littleRadius * j;
@@ -510,14 +510,14 @@ void PullPlan :: resetSubs(bool hardReset)
 		}
 		case PullTemplate::TRIPOD:
 		{
-			assert(parameters.size() == 1);
-			int count = parameters[0].value;
-			float littleRadius = radius / (2 * count - 1);
+			float littleRadius = radius / (2 * this->count - 1);
 
 			p.x = p.y = 0.0;
 			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
-			for (int i = 1; i < count; ++i) {
-				for (int theta = 0; theta < 3; ++theta) {
+			for (unsigned int i = 1; i < this->count; ++i) 
+			{
+				for (unsigned int theta = 0; theta < 3; ++theta) 
+				{
 					p.x = (littleRadius * 2 * i) * cos(TWO_PI / 3 * theta);
 					p.y = (littleRadius * 2 * i) * sin(TWO_PI / 3 * theta);
 					pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2);
@@ -527,33 +527,35 @@ void PullPlan :: resetSubs(bool hardReset)
 		}
 		case PullTemplate::SURROUNDING_SQUARE:
 		{
-			assert(parameters.size() == 1);
 			if (this->casings[0].shape == CIRCLE_SHAPE)
 				radius *= 1 / SQRT_TWO;
 
-			int count = parameters[0].value;
-			float littleRadius = radius / (count + 2);
+			float littleRadius = radius / (this->count + 2);
 
 			p.x = p.y = 0.0;
-			pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius * count);
-			for (int i = 0; i < count + 1; ++i) {
-				p.x = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * i;
-				p.y = -2 * littleRadius * (count + 1) / 2.0;
+			pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius * this->count);
+			for (unsigned int i = 0; i < this->count + 1; ++i) 
+			{
+				p.x = -2 * littleRadius * (this->count + 1) / 2.0 + 2 * littleRadius * i;
+				p.y = -2 * littleRadius * (this->count + 1) / 2.0;
 				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 			}
-			for (int j = 0; j < count + 1; ++j) {
-				p.x = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * (count + 1);
-				p.y = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * j;
+			for (unsigned int j = 0; j < this->count + 1; ++j) 
+			{
+				p.x = -2 * littleRadius * (this->count + 1) / 2.0 + 2 * littleRadius * (this->count + 1);
+				p.y = -2 * littleRadius * (this->count + 1) / 2.0 + 2 * littleRadius * j;
 				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 			}
-			for (int i = count + 1; i >= 1; --i) {
-				p.x = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * i;
-				p.y = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * (count + 1);
+			for (unsigned int i = this->count + 1; i >= 1; --i) 
+			{
+				p.x = -2 * littleRadius * (this->count + 1) / 2.0 + 2 * littleRadius * i;
+				p.y = -2 * littleRadius * (this->count + 1) / 2.0 + 2 * littleRadius * (this->count + 1);
 				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 			}
-			for (int j = count + 1; j >= 1; --j) {
-				p.x = -2 * littleRadius * (count + 1) / 2.0;
-				p.y = -2 * littleRadius * (count + 1) / 2.0 + 2 * littleRadius * j;
+			for (unsigned int j = this->count + 1; j >= 1; --j) 
+			{
+				p.x = -2 * littleRadius * (this->count + 1) / 2.0;
+				p.y = -2 * littleRadius * (this->count + 1) / 2.0 + 2 * littleRadius * j;
 				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 			}
 			break;
@@ -577,16 +579,14 @@ void PullPlan :: resetSubs(bool hardReset)
 	subs = newSubs;
 }
 
-PullPlan* PullPlan :: copy() const {
+PullPlan* PullPlan :: copy() const 
+{
 
 	PullPlan* c = new PullPlan(templateType);
 
 	c->casings = casings;
 	c->twist = twist;
-	for (unsigned int i = 0; i < parameters.size(); ++i)
-	{
-		c->parameters[i] = parameters[i];
-	}
+	c->count = count;
 	// need to copy SubpullTemplate list in the case that it's a custom
 	// template, in which case the only record of the subpull
 	// location, shape, size, etc. is the SubpullTemplate list
