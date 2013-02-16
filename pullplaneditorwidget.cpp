@@ -321,8 +321,22 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 	if (ptlw != NULL)
 	{
-		plan->setTemplateType(ptlw->type);
-		emit someDataChanged();
+		if (ptlw->type == PullTemplate::CUSTOM)
+		{
+			// the custom template being in the list is for 
+			// consistency in *indicating* which template the plan is,
+			// and not for *changing* the plan.
+			//
+			// if the user selects CUSTOM, don't automatically change it;
+			// refer the user to the way in which CUSTOM templates come
+			// about: modifying the template in the customize widget
+			tabs->setCurrentIndex(1); 
+		}	
+		else
+		{
+			plan->setTemplateType(ptlw->type);
+			emit someDataChanged();
+		}
 	}
 }
 
@@ -466,7 +480,9 @@ void PullPlanEditorWidget :: twistSpinChanged(double)
 void PullPlanEditorWidget :: seedTemplates()
 {
 	char filename[100];
-
+	
+	// read image filenames according to some correspondence:
+	// e.g. the 7th pull template's image filename is "pulltemplate7.png" 
 	for (int i = PullTemplate::firstSeedTemplate(); i <= PullTemplate::lastSeedTemplate(); ++i)
 	{
 		sprintf(filename, ":/images/pulltemplate%d.png", i);
@@ -474,6 +490,11 @@ void PullPlanEditorWidget :: seedTemplates()
 			QPixmap::fromImage(QImage(filename)), static_cast<PullTemplate::Type>(i));
 		templateLibraryLayout->addWidget(ptlw);
 	}
+
+	// add the custom template last
+	PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
+		QPixmap::fromImage(QImage(":/images/pulltemplate_custom.png")), PullTemplate::CUSTOM);
+	templateLibraryLayout->addWidget(ptlw);
 }
 
 void PullPlanEditorWidget :: setPlan(PullPlan* p)
