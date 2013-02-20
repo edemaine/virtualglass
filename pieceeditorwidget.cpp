@@ -1,7 +1,7 @@
 
 #include "pieceeditorwidget.h"
 #include "piecegeometrythread.h"
-
+#include "twistwidget.h"
 
 PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -90,7 +90,6 @@ void PieceEditorWidget :: updateEverything()
 	tempPieceMutex.unlock();
 	wakeWait.wakeOne(); // wake up the thread if it's sleeping
 
-	
 	for (i = 0; i < piece->spline.size(); ++i)
 	{
 		pieceSplineSpins[i]->blockSignals(true);
@@ -195,14 +194,19 @@ void PieceEditorWidget :: pickupParameterSliderChanged(int)
 		emit someDataChanged();
 }
 
-void PieceEditorWidget :: addPieceParam(QVBoxLayout* pieceParamLayout)
+void PieceEditorWidget :: addPieceSpline(QGridLayout* pieceParamLayout)
 {
 	QDoubleSpinBox* splineSpin = new QDoubleSpinBox(this);
-        splineSpin->setRange(0.0, 20.0);
+        splineSpin->setRange(-10.0, 20.0);
         splineSpin->setSingleStep(0.1);
         splineSpin->setDecimals(1);
 	pieceSplineSpins.push_back(splineSpin);
-	pieceParamLayout->addWidget(splineSpin);
+
+	int column = pieceParamLayout->columnCount();
+	char buf[20];
+	snprintf(buf, 18, "Control %d:", column);
+	pieceParamLayout->addWidget(new QLabel(buf, this), 0, column);
+	pieceParamLayout->addWidget(splineSpin, 1, column);
 }
 
 void PieceEditorWidget :: addPickupParam(QVBoxLayout* pickupParamLayout)
@@ -217,7 +221,6 @@ void PieceEditorWidget :: addPickupParam(QVBoxLayout* pickupParamLayout)
 	pickupParamSliders.push_back(pickupParameterSlider);
 	QHBoxLayout* pickupParameterLayout = new QHBoxLayout(pickupParameterWidget);
 	pickupParameterWidget->setLayout(pickupParameterLayout);
-	pickupParameterLayout->setContentsMargins(0, 0, 0, 0);
 	pickupParameterLayout->addWidget(pickupParameterLabel);
 	pickupParameterLayout->addWidget(pickupParameterSpinBox);
 	pickupParameterLayout->addWidget(pickupParameterSlider);
@@ -270,29 +273,45 @@ void PieceEditorWidget :: setupLayout()
 	// layouts containing pickup and piece template parameters in the third row
 
 	// Pickup parameter layout
-	QVBoxLayout* pickupParamLayout = new QVBoxLayout(this);
-	editorLayout->addLayout(pickupParamLayout, 2, 0);
+        pickupControlsTab = new QTabWidget(this);
+	editorLayout->addWidget(pickupControlsTab, 2, 0);
 
+	QWidget* pickupParamWidget = new QWidget(pickupControlsTab);
+	QVBoxLayout* pickupParamLayout = new QVBoxLayout(pickupParamWidget);
+	pickupParamWidget->setLayout(pickupParamLayout);
 	addPickupParam(pickupParamLayout);
 	addPickupParam(pickupParamLayout);
+	pickupControlsTab->addTab(pickupParamWidget, "Fill and Case");
 
-	QLabel* pieceEditorDescriptionLabel = new QLabel("Pickup editor - drag canes in.", this);
-	pieceEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	pickupParamLayout->addWidget(pieceEditorDescriptionLabel);
-
+	QLabel* pickupEditorDescriptionLabel = new QLabel("Pickup editor - drag canes in.", this);
+	pickupEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	editorLayout->addWidget(pickupEditorDescriptionLabel, 3, 0);
+	
 	// Piece parameter layout 
-	QVBoxLayout* pieceParamLayout = new QVBoxLayout(this);
-	editorLayout->addLayout(pieceParamLayout, 2, 1);
+        pieceControlsTab = new QTabWidget(this);
+	editorLayout->addWidget(pieceControlsTab, 2, 1);
 
-	// add piece param GUI stuff
-	addPieceParam(pieceParamLayout);	
-	addPieceParam(pieceParamLayout);	
-	addPieceParam(pieceParamLayout);	
-	addPieceParam(pieceParamLayout);	
+	QWidget* tab1Widget = new QWidget(pieceControlsTab);
+	QVBoxLayout* tab1Layout = new QVBoxLayout(tab1Widget);
+	tab1Widget->setLayout(tab1Layout); 
+	twistWidget = new TwistWidget(&(piece->twist), 3.0, pieceControlsTab);
+	tab1Layout->addWidget(twistWidget, 0);
+	tab1Layout->addStretch(10);
+	pieceControlsTab->addTab(tab1Widget, "Twist");
 
-	QLabel* niceViewDescriptionLabel = new QLabel("Piece editor.", this);
-	niceViewDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	pieceParamLayout->addWidget(niceViewDescriptionLabel);
+	QWidget* tab2Widget = new QWidget(pieceControlsTab);
+	QGridLayout* splineParamLayout = new QGridLayout(tab2Widget);
+	tab2Widget->setLayout(splineParamLayout);
+	addPieceSpline(splineParamLayout);	
+	addPieceSpline(splineParamLayout);	
+	addPieceSpline(splineParamLayout);	
+	addPieceSpline(splineParamLayout);	
+	splineParamLayout->setRowStretch(2, 1);
+	pieceControlsTab->addTab(tab2Widget, "Customize");
+
+	pieceEditorDescriptionLabel = new QLabel("Piece editor.", this);
+	pieceEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	editorLayout->addWidget(pieceEditorDescriptionLabel, 3, 1);
 }
 
 void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
@@ -310,8 +329,11 @@ void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
 	}
 	else if (ptlw != NULL)
 	{
-		if (ptlw->type != piece->getTemplateType())
+		if (ptlw->type == PieceTemplate::CUSTOM)
+			pieceControlsTab->setCurrentIndex(1);
+		else
 		{
+			pieceControlsTab->setCurrentIndex(0);
 			piece->setTemplateType(ptlw->type);
 			emit someDataChanged();
 		}
@@ -348,7 +370,24 @@ void PieceEditorWidget :: setupConnections()
 
 	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
 	connect(pickupViewWidget, SIGNAL(someDataChanged()), this, SLOT(pickupViewWidgetDataChanged()));
+	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(updateEverything()));
+        connect(pieceControlsTab, SIGNAL(currentChanged(int)), this, SLOT(pieceControlsTabChanged(int)));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+}
+
+void PieceEditorWidget :: pieceControlsTabChanged(int tab)
+{
+        // change the blueprint view to match the tab
+	// lolnvm, no customizer view yet
+
+	if (tab == 0) // Twist mode
+		pieceEditorDescriptionLabel->setText("Piece editor.");
+	else // customize mode
+	{
+		piece->setTemplateType(PieceTemplate::CUSTOM);
+		pieceEditorDescriptionLabel->setText("Piece customizer.");
+		emit someDataChanged();
+	}
 }
 
 void PieceEditorWidget :: pickupViewWidgetDataChanged()
@@ -375,6 +414,11 @@ void PieceEditorWidget :: seedTemplates()
 			QPixmap::fromImage(QImage(filename)), static_cast<PieceTemplate::Type>(i));
 		pieceTemplateLibraryLayout->addWidget(ptlw);
 	}
+	PieceTemplateLibraryWidget *ptlw = new PieceTemplateLibraryWidget(
+		QPixmap::fromImage(QImage(":/images/piecetemplate_custom.png")), 
+		static_cast<PieceTemplate::Type>(PieceTemplate::CUSTOM));
+	pieceTemplateLibraryLayout->addWidget(ptlw);
+	
 }
 
 void PieceEditorWidget :: updateLibraryWidgetPixmaps(AsyncPieceLibraryWidget* w)
@@ -403,6 +447,7 @@ void PieceEditorWidget :: setPickupTemplateType(enum PickupTemplate::Type _type)
 void PieceEditorWidget :: setPiece(Piece* p)
 {
 	piece = p;
+	twistWidget->setTwist(&(p->twist));
 	emit someDataChanged();	
 }
 

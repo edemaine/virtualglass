@@ -2,20 +2,29 @@
 #ifndef PULLPLANEDITORWIDGET_H
 #define PULLPLANEDITORWIDGET_H
 
-#include <QtGui>
+#include <QWidget>
+#include <QMutex>
+#include <QWaitCondition>
 #include <string>
 #include "shape.h"
 #include "mesh.h"
 
 class PullPlan;
 class Geometry;
-class Mesher;
 class PullPlanEditorViewWidget;
 class PullPlanCustomizeViewWidget;
 class NiceViewWidget;
 class AsyncPullPlanLibraryWidget;
 class PullTemplateLibraryWidget;
 class PullPlanGeometryThread;
+class TwistWidget;
+
+class QPushButton;
+class QStackedWidget;
+class QLabel;
+class QTabWidget;
+class QSpinBox;
+class QHBoxLayout;
 
 class PullPlanEditorWidget : public QWidget
 {
@@ -51,10 +60,8 @@ class PullPlanEditorWidget : public QWidget
 		void deleteSelectedButtonPressed();
 		void viewWidgetDataChanged();
 		void customizeViewWidgetDataChanged();
-		void twistSpinChanged(double);
-		void twistSliderChanged(int);
 		void countSpinChanged(int);
-		void controlTabChanged(int);
+		void controlsTabChanged(int);
 		void geometryThreadFinishedMesh();
 
 	private:
@@ -78,8 +85,7 @@ class PullPlanEditorWidget : public QWidget
 		PullPlan* plan;
 		PullPlanEditorViewWidget* viewWidget;	
 		PullPlanCustomizeViewWidget* customizeViewWidget;	
-		QDoubleSpinBox* twistSpin;
-		QSlider* twistSlider;
+		TwistWidget* twistWidget;
 		QLabel* countLabel;
 		QSpinBox* countSpin;
 		QHBoxLayout* templateLibraryLayout;

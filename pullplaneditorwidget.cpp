@@ -1,4 +1,5 @@
 
+#include <QtGui>
 #include "pullplan.h"
 #include "geometry.h"
 #include "pullplaneditorwidget.h"
@@ -11,6 +12,7 @@
 #include "dependancy.h"
 #include "templateparameter.h"
 #include "pullplangeometrythread.h"
+#include "twistwidget.h"
 
 PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -70,11 +72,7 @@ void PullPlanEditorWidget :: updateEverything()
 	countLabel->setEnabled(plan->getTemplateType() != PullTemplate::CUSTOM);
 	countSpin->setEnabled(plan->getTemplateType() != PullTemplate::CUSTOM);
 
-	double twist = plan->twist;
-	twistSpin->setValue(twist);
-	twistSlider->setSliderPosition(twist*10);
-	twistSpin->setEnabled(plan->getOutermostCasingShape() == CIRCLE_SHAPE);
-	twistSlider->setEnabled(plan->getOutermostCasingShape() == CIRCLE_SHAPE);
+	twistWidget->setEnabled(plan->getOutermostCasingShape() == CIRCLE_SHAPE);
 
 	tempPullPlanMutex.lock();
 	deep_delete(tempPullPlan);
@@ -170,26 +168,7 @@ void PullPlanEditorWidget :: setupLayout()
 	casingLayout->addWidget(countSpin);
 
 	// Editor layout: twist layout
-	QWidget* twistWidget = new QWidget(this);
-	QHBoxLayout* twistLayout = new QHBoxLayout(twistWidget);
-	twistWidget->setLayout(twistLayout);
-	QLabel* twistLabel1 = new QLabel("Twist:", this);
-	twistLayout->addWidget(twistLabel1);
-	twistSpin = new QDoubleSpinBox(this);
-	twistSpin->setRange(-10.0, 10.0);
-	twistSpin->setSingleStep(0.1);
-	twistSpin->setDecimals(1);
-	twistLayout->addWidget(twistSpin, 1);
-	QLabel* twistLabel2 = new QLabel("-10.0", this);
-	twistLayout->addWidget(twistLabel2);
-	twistSlider = new QSlider(Qt::Horizontal, this);
-	twistSlider->setRange(-100, 100);
-	twistSlider->setSingleStep(1);
-	twistSlider->setTickInterval(100);	
-	twistSlider->setTickPosition(QSlider::TicksBothSides);
-	twistLayout->addWidget(twistSlider, 10);
-	QLabel* twistLabel3 = new QLabel("10.0", this);
-	twistLayout->addWidget(twistLabel3);
+	twistWidget = new TwistWidget(&(plan->twist), 10, this);
 
 	// Customize layout: duplicate/delete cane layout
 	QWidget* customControlsWidget = new QWidget(this);
@@ -238,7 +217,6 @@ void PullPlanEditorWidget :: setupLayout()
 
 	descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", leftWidget);
 	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	leftLayout->addStretch(1);
 	leftLayout->addWidget(descriptionLabel);
 
 	// Combine 3D viewer and descriptive text into the right layout
@@ -279,7 +257,7 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
 	}
 }
 
-void PullPlanEditorWidget :: controlTabChanged(int tab)
+void PullPlanEditorWidget :: controlsTabChanged(int tab)
 {
 	// change the blueprint view to match the tab
 	viewEditorStack->setCurrentIndex(tab); 
@@ -348,14 +326,13 @@ void PullPlanEditorWidget :: setupConnections()
 	connect(deleteSelectedButton, SIGNAL(pressed()), this, SLOT(deleteSelectedButtonPressed()));
 	connect(addCircleButton, SIGNAL(pressed()), this, SLOT(addCircleButtonPressed()));
 	connect(addSquareButton, SIGNAL(pressed()), this, SLOT(addSquareButtonPressed()));
-	connect(twistSlider, SIGNAL(valueChanged(int)), this, SLOT(twistSliderChanged(int)));
-	connect(twistSpin, SIGNAL(valueChanged(double)), this, SLOT(twistSpinChanged(double)));
+	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(updateEverything()));
 	connect(countSpin, SIGNAL(valueChanged(int)), this, SLOT(countSpinChanged(int)));
 	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(viewWidgetDataChanged()));
 	connect(customizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(customizeViewWidgetDataChanged()));
-	connect(controlsTab, SIGNAL(currentChanged(int)), this, SLOT(controlTabChanged(int)));
+	connect(controlsTab, SIGNAL(currentChanged(int)), this, SLOT(controlsTabChanged(int)));
 }
 
 void PullPlanEditorWidget :: viewWidgetDataChanged()
@@ -377,26 +354,6 @@ void PullPlanEditorWidget :: countSpinChanged(int)
 		plan->setCount(countSpin->value());
 		emit someDataChanged();
 	}
-}
-
-void PullPlanEditorWidget :: twistSliderChanged(int)
-{
-	float twist = twistSlider->value() / 10.0;
-
-	if (twist == plan->twist)
-		return;
-	plan->twist = twist;
-	emit someDataChanged();
-}
-
-void PullPlanEditorWidget :: twistSpinChanged(double)
-{
-	double twist = twistSpin->value();
-
-	if (twist == plan->twist)
-		return;
-	plan->twist = twist;
-	emit someDataChanged();
 }
 
 void PullPlanEditorWidget :: seedTemplates()
@@ -422,6 +379,7 @@ void PullPlanEditorWidget :: seedTemplates()
 void PullPlanEditorWidget :: setPlan(PullPlan* p)
 {
 	plan = p;
+	twistWidget->setTwist(&(plan->twist));
 	viewWidget->setPullPlan(plan);
 	customizeViewWidget->setPullPlan(plan);
 	emit someDataChanged();	

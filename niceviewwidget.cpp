@@ -8,8 +8,8 @@ it is involved in modifying the cane.
 #ifdef _WIN32
 #  include <windows.h>
 #endif
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <string.h>
 #include <math.h>
 #include <stdexcept>

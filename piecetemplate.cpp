@@ -10,17 +10,7 @@ namespace PieceTemplate
 
 	enum Type lastSeedTemplate()
 	{
-		return PICKUP;
-	}
-
-	enum Type firstTemplate()
-	{
-		return TUMBLER;
-	}
-
-	enum Type lastTemplate()
-	{
-		return PICKUP;
+		return PLATE;
 	}
 }
 

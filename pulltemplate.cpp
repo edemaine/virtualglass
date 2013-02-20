@@ -34,16 +34,6 @@ namespace PullTemplate
 	{
 		return BASE_CIRCLE;
 	}
-
-	enum Type lastTemplate()
-	{
-		return CUSTOM;
-	}
-
-	const char* enumToString(enum Type t)
-	{
-		return names[t];
-	}
 }
 
 

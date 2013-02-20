@@ -19,8 +19,6 @@ namespace PickupTemplate
 		MURRINE
 	};
 
-	enum Type firstTemplate();
-	enum Type lastTemplate();
 	enum Type firstSeedTemplate();
 	enum Type lastSeedTemplate();
 }

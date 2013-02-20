@@ -4,7 +4,7 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <stdio.h> // for sscanf
+#include <cstdio> // for sscanf
 #include <QTextStream>
 #include <QFile>
 
@@ -373,10 +373,10 @@ string pieceTemplateToString(enum PieceTemplate::Type type)
 			return "Pot";
 		case PieceTemplate::PLATE:
 			return "Plate";
-		case PieceTemplate::PICKUP:
-			return "Pickup";
+		case PieceTemplate::CUSTOM:
+			return "Custom";
 		default:
-			return "Tumbler";
+			return "Custom";
 	}
 }
 
@@ -393,10 +393,10 @@ enum PieceTemplate::Type stringToPieceTemplate(string s)
 		return PieceTemplate::POT;
 	if (s == "Plate")
 		return PieceTemplate::PLATE;
-	if (s == "Pickup")
-		return PieceTemplate::PICKUP;
+	if (s == "Custom")
+		return PieceTemplate::CUSTOM;
 
-	return PieceTemplate::TUMBLER;
+	return PieceTemplate::CUSTOM;
 }
 
 // write

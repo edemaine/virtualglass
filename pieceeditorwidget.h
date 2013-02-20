@@ -14,6 +14,7 @@
 #include "mesh.h"
 
 class PieceGeometryThread;
+class TwistWidget;
 		
 class PieceEditorWidget : public QWidget
 {
@@ -42,6 +43,7 @@ class PieceEditorWidget : public QWidget
 		void updateEverything();
 
 	private slots:
+		void pieceControlsTabChanged(int);
 		void pickupViewWidgetDataChanged();
 		void pieceSplineSpinBoxChanged(double);
 		void pickupParameterSpinBoxChanged(int);
@@ -76,7 +78,11 @@ class PieceEditorWidget : public QWidget
 		vector<QSpinBox*> pickupParamSpinBoxes;
 		vector<QSlider*> pickupParamSliders;
 		vector<QDoubleSpinBox*> pieceSplineSpins;
-
+		QTabWidget* pickupControlsTab;
+		QTabWidget* pieceControlsTab;
+		TwistWidget* twistWidget;
+		QLabel* pieceEditorDescriptionLabel;
+	
 		QHBoxLayout* pickupTemplateLibraryLayout;
 		QHBoxLayout* pieceTemplateLibraryLayout;
 
@@ -84,7 +90,7 @@ class PieceEditorWidget : public QWidget
 		void setupThreading();
 		void setupConnections();
 		void addPickupParam(QVBoxLayout* pickupParamLayout);
-		void addPieceParam(QVBoxLayout* pieceParamLayout);
+		void addPieceSpline(QGridLayout* pieceParamLayout);
 };
 
 #endif

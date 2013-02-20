@@ -115,6 +115,7 @@ HEADERS += vgapp.h \
 	pickupgeometrythread.h \
 	pullplangeometrythread.h \
 	globalgraphicssetting.h \
+	twistwidget.h \
 
 SOURCES += main.cpp \ 
 	vgapp.cpp \
@@ -168,5 +169,6 @@ SOURCES += main.cpp \
 	pickupgeometrythread.cpp \
 	pullplangeometrythread.cpp \
 	globalgraphicssetting.cpp \
+	twistwidget.cpp \
 
 

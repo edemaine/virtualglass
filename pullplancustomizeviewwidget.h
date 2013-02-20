@@ -2,7 +2,6 @@
 #define PULLPLANCUSTOMIZEVIEWWIDGET_H
 
 #include <QtGui>
-#include <QtDebug>
 #include <cfloat>
 #include <vector>
 #include "primitives.h"
@@ -60,9 +59,9 @@ private:
 	void boundActiveBox();
 	void updateIndexes(QPoint pos);
 
+	GUIMode mode;
 	PullPlan* plan;
 	PullPlan* hoveringPlan;
-	GUIMode mode;
 	int hoveringIndex;
 	int activeBoxIndex;
 	Point mouseStartingLoc;

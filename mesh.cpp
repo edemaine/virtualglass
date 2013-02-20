@@ -136,7 +136,6 @@ void applyUnbasedPieceTransform(Vertex& v, float twist, vector<float>& spline)
 
 	v.position.x = radius * cos(theta);
 	v.position.y = radius * sin(theta);
-	v.position.z -= 5.0;
 }
 
 void applyBasedPieceTransform(Vertex& v, float twist, vector<float>& spline)
@@ -146,7 +145,7 @@ void applyBasedPieceTransform(Vertex& v, float twist, vector<float>& spline)
 	float caneLoc = v.position.y;
 
 	float width = spline[0];
-	float turnLength = 0.5; 
+	float turnLength = 1.0; 
 	float baseLength = width - turnLength * 2 / PI; 
 
 	float turnStart = baseLength;
@@ -186,9 +185,6 @@ void applyBasedPieceTransform(Vertex& v, float twist, vector<float>& spline)
 
 void applyPieceTransform(Geometry* geom, Piece* piece)
 {
-	if (piece->getTemplateType() == PieceTemplate::PICKUP)
-		return;
-
 	for (uint32_t i = 0; i < geom->vertices.size(); ++i)
 	{
 		Vertex& v = geom->vertices[i];

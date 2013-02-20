@@ -13,13 +13,11 @@ namespace PieceTemplate
 		VASE,
 		POT,
 		PLATE,
-		PICKUP
+		CUSTOM
 	};
 	
 	enum Type firstSeedTemplate();
 	enum Type lastSeedTemplate();
-	enum Type firstTemplate();
-	enum Type lastTemplate();
 }
 
 #endif
