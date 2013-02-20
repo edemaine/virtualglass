@@ -24,15 +24,15 @@ class Piece
 		PickupPlan* pickup;
 		bool hasDependencyOn(GlassColor* c);
 		bool hasDependencyOn(PullPlan* p);
-
-		unsigned int getParameterCount();
-		void getParameter(unsigned int index, TemplateParameter* dest);
-		void setParameter(unsigned int index, int value);
+		bool isBased();
+	
+		float twist;
+		vector<float> spline;
 	
 	private:
 		// Variables
 		enum PieceTemplate::Type type;
-		vector<TemplateParameter> parameters;
+		bool based;
 };
 
 Piece *deep_copy(const Piece *);

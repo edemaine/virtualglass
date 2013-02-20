@@ -12,7 +12,7 @@ namespace PieceTemplate
 		BOWL,
 		VASE,
 		POT,
-		WAVY_PLATE,
+		PLATE,
 		PICKUP
 	};
 	

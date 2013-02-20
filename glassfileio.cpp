@@ -105,7 +105,7 @@ bool readGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPla
 	unsigned int revision;
 	string date;
 	GlassFileIOInternal::readBuildInformation(root, revision, date);
-	if (0 < revision && revision < 875) // if you got a valid number and it's not current
+	if (0 < revision && revision < 893) // if you got a valid number and it's not current
 		return false;
 
 	map<unsigned int, GlassColor*> colorMap;
@@ -371,8 +371,8 @@ string pieceTemplateToString(enum PieceTemplate::Type type)
 			return "Vase";
 		case PieceTemplate::POT:
 			return "Pot";
-		case PieceTemplate::WAVY_PLATE:
-			return "Wavy plate";
+		case PieceTemplate::PLATE:
+			return "Plate";
 		case PieceTemplate::PICKUP:
 			return "Pickup";
 		default:
@@ -391,8 +391,8 @@ enum PieceTemplate::Type stringToPieceTemplate(string s)
 		return PieceTemplate::VASE;
 	if (s == "Pot")
 		return PieceTemplate::POT;
-	if (s == "Wavy plate")
-		return PieceTemplate::WAVY_PLATE;
+	if (s == "Plate")
+		return PieceTemplate::PLATE;
 	if (s == "Pickup")
 		return PieceTemplate::PICKUP;
 
@@ -825,11 +825,12 @@ PickupPlan* readPickup(string pickupname, Json::Value& root,
 following layers of piece information in the Json representation:
 piece
 	piece template
-	piece template parameters
+	twist
+	basedness
+	piece spline parameters
 		parameter1
+			index
 			value 
-			lower limit
-			upper limit
 		parameter2
 		...
 	pickups (done separately)
@@ -839,22 +840,18 @@ void writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<Pu
 {
 	string piecename = idAndNameToString(pieceIndex, "Piece");
 
-	// write singletons: piece template	
+	// write singletons: piece template, twist, based-ness
 	root[piecename]["Piece template"] = pieceTemplateToString(piece->getTemplateType());
+	root[piecename]["Twist"] = piece->twist;
+	root[piecename]["Based"] = piece->isBased();
 
 	// write piece template parameters
-	root[piecename]["Piece template parameters"];
-	for (unsigned int i = 0; i < piece->getParameterCount(); ++i)
+	root[piecename]["Piece spline parameters"];
+	for (unsigned int i = 0; i < piece->spline.size(); ++i)
 	{
-		TemplateParameter tmpParam;
-		piece->getParameter(i, &tmpParam);
-
-		string paramName = idAndNameToString(i, "PieceTemplateParam");
-		root[piecename]["Piece template parameters"][paramName]["Index"] = i;
-		root[piecename]["Piece template parameters"][paramName]["Name"] = tmpParam.name;
-		root[piecename]["Piece template parameters"][paramName]["Value"] = tmpParam.value;
-		root[piecename]["Piece template parameters"][paramName]["Lower limit"] = tmpParam.lowerLimit;
-		root[piecename]["Piece template parameters"][paramName]["Upper limit"] = tmpParam.upperLimit;
+		string paramName = idAndNameToString(i, "PieceSplineParam");
+		root[piecename]["Piece spline parameters"][paramName]["Index"] = i;
+		root[piecename]["Piece spline parameters"][paramName]["Value"] = piece->spline[i];
 	}
 
 	// write pickups (currently only one)
@@ -866,15 +863,16 @@ Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, PullPlan
 {
 	// read singletons: piece template
 	Piece* piece = new Piece(stringToPieceTemplate(root[piecename]["Piece template"].asString()));
+	piece->twist = root[piecename]["Twist"].asFloat();
 
 	// read piece template parameters
-	for (unsigned int i = 0; i < root[piecename]["Piece template parameters"].getMemberNames().size(); ++i)
+	for (unsigned int i = 0; i < root[piecename]["Piece spline parameters"].getMemberNames().size(); ++i)
 	{
-		string paramname = root[piecename]["Piece template parameters"].getMemberNames()[i];
-		unsigned int paramIndex = root[piecename]["Piece template parameters"][paramname]["Index"].asUInt();
+		string paramname = root[piecename]["Piece spline parameters"].getMemberNames()[i];
+		unsigned int paramIndex = root[piecename]["Piece spline parameters"][paramname]["Index"].asUInt();
 
-		int paramValue = root[piecename]["Piece template parameters"][paramname]["Value"].asInt();	
-		piece->setParameter(paramIndex, paramValue); 
+		float paramValue = root[piecename]["Piece template parameters"][paramname]["Value"].asFloat();	
+		piece->spline[paramIndex] = paramValue;
 	}
 
 	// read pickups (currently only one)

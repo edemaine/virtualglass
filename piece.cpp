@@ -3,9 +3,16 @@
 
 Piece :: Piece(enum PieceTemplate::Type _type)
 {
+	twist = 0.0;
+	based = true;
 	setTemplateType(_type, true);
 	// initialize the piece's pickup to be something boring and base
 	this->pickup = new PickupPlan(PickupTemplate::VERTICAL);
+}
+
+bool Piece :: isBased()
+{
+	return based;
 }
 
 bool Piece :: hasDependencyOn(PullPlan* plan)
@@ -23,7 +30,6 @@ bool Piece :: hasDependencyOn(PullPlan* plan)
 
 	return pickupPlansDependOn;
 }
-
 
 bool Piece :: hasDependencyOn(GlassColor* glassColor)
 {
@@ -53,32 +59,12 @@ Piece* Piece :: copy() const
 {
 	Piece* c = new Piece(type);
 
-	for (unsigned int i = 0; i < parameters.size(); ++i)
-	{
-		c->parameters[i] = parameters[i];
-	}
-
+	c->twist = this->twist;
+	c->based = this->based;
+	c->spline = this->spline;
 	c->pickup = this->pickup->copy();
 	
 	return c;
-}
-
-unsigned int Piece :: getParameterCount()
-{
-	return parameters.size();
-}
-
-void Piece :: getParameter(unsigned int _index, TemplateParameter* dest)
-{
-	assert(_index < parameters.size());
-	*dest = parameters[_index];
-}
-
-void Piece :: setParameter(unsigned int _index, int _value)
-{
-	assert(_index < parameters.size());
-	assert(parameters[_index].lowerLimit <= _value && _value <= parameters[_index].upperLimit);
-	parameters[_index].value = _value;
 }
 
 void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
@@ -88,36 +74,50 @@ void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
 
 	this->type = _type;
 
-	parameters.clear();
+	spline.clear();
+	spline.push_back(1.0);
+	spline.push_back(1.0);
+	spline.push_back(1.0);
+	spline.push_back(1.0);
 	switch (type)
 	{
-		// Is it possible to just make a string const and hope it's 
-		// kept around as long as the TemplateParameter is?
-		case PieceTemplate::VASE:
-			parameters.push_back(TemplateParameter(0, string("Lip width:"), 0, 100));
-			parameters.push_back(TemplateParameter(0, string("Body width:"), 0, 100));
-			parameters.push_back(TemplateParameter(0, string("Twist:"), 0, 100));
-			break;
 		case PieceTemplate::TUMBLER:
-			parameters.push_back(TemplateParameter(30, string("Width:"), 0, 100));
-			parameters.push_back(TemplateParameter(50, string("Roundedness:"), 0, 100));
-			parameters.push_back(TemplateParameter(0, string("Twist:"), 0, 100));
+			based = true;
+			spline[0] = 3.0;
+			spline[1] = 3.0;
+			spline[2] = 3.0;
+			spline[3] = 3.0;
+			break;
+		case PieceTemplate::VASE:
+			based = true;
+			spline[0] = 1.0;
+			spline[1] = 1.0;
+			spline[2] = 1.0;
+			spline[3] = 5.0;
 			break;
 		case PieceTemplate::BOWL:
-			parameters.push_back(TemplateParameter(10, string("Openness:"), 0, 100));
-			parameters.push_back(TemplateParameter(0, string("Size:"), 0, 100));
-			parameters.push_back(TemplateParameter(0, string("Twist:"), 0, 100));
+			based = true;
+			spline[0] = 1.0;
+			spline[1] = 1.0;
+			spline[2] = 1.0;
+			spline[3] = 5.0;
 			break;
 		case PieceTemplate::POT:
-			parameters.push_back(TemplateParameter(50, string("Lip width:"), 0, 100));
-			parameters.push_back(TemplateParameter(50, string("Body width:"), 0, 100));
-			parameters.push_back(TemplateParameter(50, string("Bottom width:"), 0, 100));
+			based = false;
+			spline[0] = 1.0;
+			spline[1] = 1.0;
+			spline[2] = 1.0;
+			spline[3] = 5.0;
 			break;
-		case PieceTemplate::WAVY_PLATE:
-			parameters.push_back(TemplateParameter(30, string("Wave count:"), 0, 100));
-			parameters.push_back(TemplateParameter(50, string("Wave depth:"), 0, 100));
+		case PieceTemplate::PLATE:
+			based = true;
+			spline[0] = 8.0;
+			spline[1] = 8.0;
+			spline[2] = 8.0;
+			spline[3] = 8.0;
 			break;
 		case PieceTemplate::PICKUP:
+			based = false;
 			break;
 	}
 
@@ -131,7 +131,7 @@ enum PieceTemplate::Type Piece :: getTemplateType()
 Piece *deep_copy(const Piece *_piece) {
 	assert(_piece);
 	Piece *piece = _piece->copy();
-	//Replace piece with a deep copy:
+	//Replace pickup with a deep copy:
 	delete piece->pickup;
 	piece->pickup = deep_copy(_piece->pickup);
 	return piece;

@@ -43,7 +43,7 @@ class PieceEditorWidget : public QWidget
 
 	private slots:
 		void pickupViewWidgetDataChanged();
-		void pieceParameterSliderChanged(int);
+		void pieceSplineSpinBoxChanged(double);
 		void pickupParameterSpinBoxChanged(int);
 		void pickupParameterSliderChanged(int);
 		void geometryThreadFinishedMesh();
@@ -71,25 +71,20 @@ class PieceEditorWidget : public QWidget
 		NiceViewWidget* niceViewWidget;
 		PickupPlanEditorViewWidget* pickupViewWidget;	
 
-		vector<QLabel*> pickupParamLabels;
-		vector<QSpinBox*> pickupParamSpinboxes;
-		vector<QSlider*> pickupParamSliders;
 		vector<QStackedWidget*> pickupParamStacks;
-		vector<QLabel*> pieceParamLabels;
-		vector<QSlider*> pieceParamSliders;
-		vector<QStackedWidget*> pieceParamStacks;
+		vector<QLabel*> pickupParamLabels;
+		vector<QSpinBox*> pickupParamSpinBoxes;
+		vector<QSlider*> pickupParamSliders;
+		vector<QDoubleSpinBox*> pieceSplineSpins;
 
 		QHBoxLayout* pickupTemplateLibraryLayout;
 		QHBoxLayout* pieceTemplateLibraryLayout;
-		QButtonGroup* shapeButtonGroup;
-		QSlider* casingThicknessSlider;
-		QHBoxLayout* templateLibraryLayout;
-		QPushButton* addCasingButton;
 
 		void setupLayout();
 		void setupThreading();
 		void setupConnections();
-
+		void addPickupParam(QVBoxLayout* pickupParamLayout);
+		void addPieceParam(QVBoxLayout* pieceParamLayout);
 };
 
 #endif

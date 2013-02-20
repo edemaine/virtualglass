@@ -20,9 +20,9 @@ void web1Piece(GlassColor** gc, PullPlan** pp, Piece** p)
 	(*p)->pickup->setParameter(0, 15);	
 	for (unsigned int i = 0; i < (*p)->pickup->subs.size(); ++i)
 		(*p)->pickup->subs[i].plan = (*pp);
-	(*p)->setParameter(0, 20);
-	(*p)->setParameter(1, 65);
-	(*p)->setParameter(2, 40);
+	(*p)->spline[0] = 0.8;
+	(*p)->spline[1] = 2.0;
+	(*p)->spline[2] = 0.8;
 }
 
 void web2Piece(GlassColor** gc, PullPlan** pp1, PullPlan** pp2, Piece** p)
@@ -52,9 +52,9 @@ void web2Piece(GlassColor** gc, PullPlan** pp1, PullPlan** pp2, Piece** p)
 		(*p)->pickup->subs[i].plan = (*pp1);
 	for (unsigned int i = 1; i < (*p)->pickup->subs.size(); i += 2)
 		(*p)->pickup->subs[i].plan = (*pp2);
-	(*p)->setParameter(0, 15);
-	(*p)->setParameter(1, 65);
-	(*p)->setParameter(2, 0);
+	(*p)->spline[0] = 0.7;
+	(*p)->spline[1] = 1.2;
+	(*p)->spline[2] = 0.3;
 }
 
 

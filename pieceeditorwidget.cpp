@@ -55,20 +55,14 @@ void PieceEditorWidget :: updateEverything()
 		piece->pickup->getParameter(i, &tp);
 		pickupParamLabels[i]->setText(tp.name.c_str());
 
-		// temporarily disconnect the signals because 
-		// it appears that (bugged?) setRange() calls valueChanged()
-		disconnect(pickupParamSpinboxes[i], SIGNAL(valueChanged(int)),
-			this, SLOT(pickupParameterSpinBoxChanged(int)));
-		disconnect(pickupParamSliders[i], SIGNAL(valueChanged(int)),
-			this, SLOT(pickupParameterSliderChanged(int)));
-		pickupParamSpinboxes[i]->setRange(tp.lowerLimit, tp.upperLimit);
-		pickupParamSpinboxes[i]->setValue(tp.value);
+		pickupParamSpinBoxes[i]->blockSignals(true);
+		pickupParamSliders[i]->blockSignals(true);
+		pickupParamSpinBoxes[i]->setRange(tp.lowerLimit, tp.upperLimit);
+		pickupParamSpinBoxes[i]->setValue(tp.value);
 		pickupParamSliders[i]->setRange(tp.lowerLimit, tp.upperLimit);
 		pickupParamSliders[i]->setValue(tp.value);
-		connect(pickupParamSpinboxes[i], SIGNAL(valueChanged(int)),
-			this, SLOT(pickupParameterSpinBoxChanged(int)));
-		connect(pickupParamSliders[i], SIGNAL(valueChanged(int)),
-			this, SLOT(pickupParameterSliderChanged(int)));
+		pickupParamSpinBoxes[i]->blockSignals(false);
+		pickupParamSliders[i]->blockSignals(false);
 
 		pickupParamStacks[i]->setCurrentIndex(0); // show
 	}
@@ -96,26 +90,12 @@ void PieceEditorWidget :: updateEverything()
 	tempPieceMutex.unlock();
 	wakeWait.wakeOne(); // wake up the thread if it's sleeping
 
-	i = 0;
-	for (; i < piece->getParameterCount(); ++i)
+	
+	for (i = 0; i < piece->spline.size(); ++i)
 	{
-		TemplateParameter tp;
-		piece->getParameter(i, &tp);
-		pieceParamLabels[i]->setText(tp.name.c_str());
-		// temporarily disconnect the signals because 
-		// it appears that (bugged?) setRange() calls valueChanged()
-		disconnect(pieceParamSliders[i], SIGNAL(valueChanged(int)),
-			this, SLOT(pieceParameterSliderChanged(int)));
-		pieceParamSliders[i]->setRange(tp.lowerLimit, tp.upperLimit);
-		pieceParamSliders[i]->setValue(tp.value);
-		connect(pieceParamSliders[i], SIGNAL(valueChanged(int)),
-			this, SLOT(pieceParameterSliderChanged(int)));
-
-		pieceParamStacks[i]->setCurrentIndex(0); // show
-	}
-	for (; i < pieceParamStacks.size(); ++i)
-	{
-		pieceParamStacks[i]->setCurrentIndex(1); // hide
+		pieceSplineSpins[i]->blockSignals(true);
+		pieceSplineSpins[i]->setValue(piece->spline[i]);
+		pieceSplineSpins[i]->blockSignals(false);
 	}
 }
 
@@ -166,36 +146,41 @@ void PieceEditorWidget :: geometryThreadFinishedMesh()
 	niceViewWidget->repaint();
 }
 
-void PieceEditorWidget :: pieceParameterSliderChanged(int)
+void PieceEditorWidget :: pieceSplineSpinBoxChanged(double)
 {
-	for (unsigned int i = 0; i < piece->getParameterCount(); ++i)
+	bool pieceChanged = false;
+	for (unsigned int i = 0; i < piece->spline.size(); ++i)
 	{
-		TemplateParameter tp;
-		piece->getParameter(i, &tp);
-		if (tp.value != pieceParamSliders[i]->value())
+		if (piece->spline[i] != pieceSplineSpins[i]->value())
 		{
-			piece->setParameter(i, pieceParamSliders[i]->value());
-			emit someDataChanged();
+			piece->spline[i] = pieceSplineSpins[i]->value();
+			pieceChanged = true;
 		}
 	}
+	if (pieceChanged)
+		emit someDataChanged();
 }
 
 void PieceEditorWidget :: pickupParameterSpinBoxChanged(int)
 {
+	bool pieceChanged = false;
 	for (unsigned int i = 0; i < piece->pickup->getParameterCount(); ++i)
 	{
 		TemplateParameter tp;
 		piece->pickup->getParameter(i, &tp);
-		if (tp.value != pickupParamSpinboxes[i]->value())
+		if (tp.value != pickupParamSpinBoxes[i]->value())
 		{
-			piece->pickup->setParameter(i, pickupParamSpinboxes[i]->value());
-			emit someDataChanged();
+			piece->pickup->setParameter(i, pickupParamSpinBoxes[i]->value());
+			pieceChanged = true;
 		}
 	}
+	if (pieceChanged)
+		emit someDataChanged();
 }
 
 void PieceEditorWidget :: pickupParameterSliderChanged(int)
 {
+	bool pieceChanged = false;
 	for (unsigned int i = 0; i < piece->pickup->getParameterCount(); ++i)
 	{
 		TemplateParameter tp;
@@ -203,9 +188,42 @@ void PieceEditorWidget :: pickupParameterSliderChanged(int)
 		if (tp.value != pickupParamSliders[i]->value())
 		{
 			piece->pickup->setParameter(i, pickupParamSliders[i]->value());
-			emit someDataChanged();
+			pieceChanged = true;
 		}
 	}
+	if (pieceChanged)
+		emit someDataChanged();
+}
+
+void PieceEditorWidget :: addPieceParam(QVBoxLayout* pieceParamLayout)
+{
+	QDoubleSpinBox* splineSpin = new QDoubleSpinBox(this);
+        splineSpin->setRange(0.0, 20.0);
+        splineSpin->setSingleStep(0.1);
+        splineSpin->setDecimals(1);
+	pieceSplineSpins.push_back(splineSpin);
+	pieceParamLayout->addWidget(splineSpin);
+}
+
+void PieceEditorWidget :: addPickupParam(QVBoxLayout* pickupParamLayout)
+{
+	pickupParamStacks.push_back(new QStackedWidget(this));
+	QWidget* pickupParameterWidget = new QWidget(pickupParamStacks.back());
+	QLabel* pickupParameterLabel = new QLabel("???");
+	pickupParamLabels.push_back(pickupParameterLabel);
+	QSpinBox* pickupParameterSpinBox = new QSpinBox(pickupParameterWidget);
+	pickupParamSpinBoxes.push_back(pickupParameterSpinBox);
+	QSlider* pickupParameterSlider = new QSlider(Qt::Horizontal, pickupParameterWidget);
+	pickupParamSliders.push_back(pickupParameterSlider);
+	QHBoxLayout* pickupParameterLayout = new QHBoxLayout(pickupParameterWidget);
+	pickupParameterWidget->setLayout(pickupParameterLayout);
+	pickupParameterLayout->setContentsMargins(0, 0, 0, 0);
+	pickupParameterLayout->addWidget(pickupParameterLabel);
+	pickupParameterLayout->addWidget(pickupParameterSpinBox);
+	pickupParameterLayout->addWidget(pickupParameterSlider);
+	pickupParamStacks.back()->addWidget(pickupParameterWidget);
+	pickupParamStacks.back()->addWidget(new QWidget(pickupParamStacks.back()));
+	pickupParamLayout->addWidget(pickupParamStacks.back());
 }
 
 void PieceEditorWidget :: setupLayout()
@@ -255,41 +273,8 @@ void PieceEditorWidget :: setupLayout()
 	QVBoxLayout* pickupParamLayout = new QVBoxLayout(this);
 	editorLayout->addLayout(pickupParamLayout, 2, 0);
 
-	pickupParamStacks.push_back(new QStackedWidget(this));
-	QWidget* pickupParameter1Widget = new QWidget(pickupParamStacks[0]);
-	QLabel* pickupParameter1Label = new QLabel("Parameter 1");
-	pickupParamLabels.push_back(pickupParameter1Label);
-	QSpinBox* pickupParameter1SpinBox = new QSpinBox(pickupParameter1Widget);
-	pickupParamSpinboxes.push_back(pickupParameter1SpinBox);
-	QSlider* pickupParameter1Slider = new QSlider(Qt::Horizontal, pickupParameter1Widget);
-	pickupParamSliders.push_back(pickupParameter1Slider);
-	QHBoxLayout* pickupParameter1Layout = new QHBoxLayout(pickupParameter1Widget);
-	pickupParameter1Widget->setLayout(pickupParameter1Layout);
-	pickupParameter1Layout->setContentsMargins(0, 0, 0, 0);
-	pickupParameter1Layout->addWidget(pickupParameter1Label);
-	pickupParameter1Layout->addWidget(pickupParameter1SpinBox);
-	pickupParameter1Layout->addWidget(pickupParameter1Slider);
-	pickupParamStacks[0]->addWidget(pickupParameter1Widget);
-	pickupParamStacks[0]->addWidget(new QWidget(pickupParamStacks[0]));
-	pickupParamLayout->addWidget(pickupParamStacks[0]);
-
-	pickupParamStacks.push_back(new QStackedWidget(this));
-	QWidget* pickupParameter2Widget = new QWidget(pickupParamStacks[1]);
-	QLabel* pickupParameter2Label = new QLabel("Parameter 2");
-	pickupParamLabels.push_back(pickupParameter2Label);
-	QSpinBox* pickupParameter2SpinBox = new QSpinBox(pickupParameter2Widget);
-	pickupParamSpinboxes.push_back(pickupParameter2SpinBox);
-	QSlider* pickupParameter2Slider = new QSlider(Qt::Horizontal, pickupParameter2Widget);
-	pickupParamSliders.push_back(pickupParameter2Slider);
-	QHBoxLayout* pickupParameter2Layout = new QHBoxLayout(pickupParameter2Widget);
-	pickupParameter2Widget->setLayout(pickupParameter2Layout);
-	pickupParameter2Layout->setContentsMargins(0, 0, 0, 0);
-	pickupParameter2Layout->addWidget(pickupParameter2Label);
-	pickupParameter2Layout->addWidget(pickupParameter2SpinBox);
-	pickupParameter2Layout->addWidget(pickupParameter2Slider);
-	pickupParamStacks[1]->addWidget(pickupParameter2Widget);
-	pickupParamStacks[1]->addWidget(new QWidget(pickupParamStacks[1]));
-	pickupParamLayout->addWidget(pickupParamStacks[1]);
+	addPickupParam(pickupParamLayout);
+	addPickupParam(pickupParamLayout);
 
 	QLabel* pieceEditorDescriptionLabel = new QLabel("Pickup editor - drag canes in.", this);
 	pieceEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
@@ -299,51 +284,12 @@ void PieceEditorWidget :: setupLayout()
 	QVBoxLayout* pieceParamLayout = new QVBoxLayout(this);
 	editorLayout->addLayout(pieceParamLayout, 2, 1);
 
-	pieceParamStacks.push_back(new QStackedWidget(this));
-	QWidget* pieceParameter1Widget = new QWidget(pieceParamStacks[0]);
-	QLabel* pieceParameter1Label = new QLabel("Parameter 1");
-	pieceParamLabels.push_back(pieceParameter1Label);
-	QSlider* pieceParameter1Slider = new QSlider(Qt::Horizontal, pieceParameter1Widget);
-	pieceParamSliders.push_back(pieceParameter1Slider);
-	QHBoxLayout* pieceParameter1Layout = new QHBoxLayout(pieceParameter1Widget);
-	pieceParameter1Widget->setLayout(pieceParameter1Layout);
-	pieceParameter1Layout->setContentsMargins(0, 0, 0, 0);
-	pieceParameter1Layout->addWidget(pieceParameter1Label);
-	pieceParameter1Layout->addWidget(pieceParameter1Slider);
-	pieceParamStacks[0]->addWidget(pieceParameter1Widget);
-	pieceParamStacks[0]->addWidget(new QWidget());
-	pieceParamLayout->addWidget(pieceParamStacks[0]);
+	// add piece param GUI stuff
+	addPieceParam(pieceParamLayout);	
+	addPieceParam(pieceParamLayout);	
+	addPieceParam(pieceParamLayout);	
+	addPieceParam(pieceParamLayout);	
 
-	pieceParamStacks.push_back(new QStackedWidget(this));
-	QWidget* pieceParameter2Widget = new QWidget(pieceParamStacks[1]);
-	QLabel* pieceTemplateParameter2Label = new QLabel("Parameter 2");
-	pieceParamLabels.push_back(pieceTemplateParameter2Label);
-	QSlider* pieceTemplateParameter2Slider = new QSlider(Qt::Horizontal, pieceParameter2Widget);
-	pieceParamSliders.push_back(pieceTemplateParameter2Slider);
-	QHBoxLayout* pieceParameter2Layout = new QHBoxLayout(pieceParameter2Widget);
-	pieceParameter2Widget->setLayout(pieceParameter2Layout);
-	pieceParameter2Layout->setContentsMargins(0, 0, 0, 0);
-	pieceParameter2Layout->addWidget(pieceTemplateParameter2Label);
-	pieceParameter2Layout->addWidget(pieceTemplateParameter2Slider);
-	pieceParamStacks[1]->addWidget(pieceParameter2Widget);
-	pieceParamStacks[1]->addWidget(new QWidget());
-	pieceParamLayout->addWidget(pieceParamStacks[1]);
-
-	pieceParamStacks.push_back(new QStackedWidget(this));
-	QWidget* pieceParameter3Widget = new QWidget(pieceParamStacks[2]);
-	QLabel* pieceParameter3Label = new QLabel("Parameter 3");
-	pieceParamLabels.push_back(pieceParameter3Label);
-	QSlider* pieceParameter3Slider = new QSlider(Qt::Horizontal, pieceParameter3Widget);
-	pieceParamSliders.push_back(pieceParameter3Slider);
-	QHBoxLayout* pieceParameter3Layout = new QHBoxLayout(pieceParameter3Widget);
-	pieceParameter3Widget->setLayout(pieceParameter3Layout);
-	pieceParameter3Layout->setContentsMargins(0, 0, 0, 0);
-	pieceParameter3Layout->addWidget(pieceParameter3Label);
-	pieceParameter3Layout->addWidget(pieceParameter3Slider);
-	pieceParamStacks[2]->addWidget(pieceParameter3Widget);
-	pieceParamStacks[2]->addWidget(new QWidget());
-	pieceParamLayout->addWidget(pieceParamStacks[2]);
-	
 	QLabel* niceViewDescriptionLabel = new QLabel("Piece editor.", this);
 	niceViewDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	pieceParamLayout->addWidget(niceViewDescriptionLabel);
@@ -384,9 +330,9 @@ void PieceEditorWidget :: setupThreading()
 
 void PieceEditorWidget :: setupConnections()
 {
-	for (unsigned int i = 0; i < pickupParamSpinboxes.size(); ++i)
+	for (unsigned int i = 0; i < pickupParamSpinBoxes.size(); ++i)
 	{
-		connect(pickupParamSpinboxes[i], SIGNAL(valueChanged(int)),
+		connect(pickupParamSpinBoxes[i], SIGNAL(valueChanged(int)),
 			this, SLOT(pickupParameterSpinBoxChanged(int)));
 	}
 	for (unsigned int i = 0; i < pickupParamSliders.size(); ++i)
@@ -394,10 +340,10 @@ void PieceEditorWidget :: setupConnections()
 		connect(pickupParamSliders[i], SIGNAL(valueChanged(int)),
 			this, SLOT(pickupParameterSliderChanged(int)));
 	}
-	for (unsigned int i = 0; i < pieceParamSliders.size(); ++i)
+	for (unsigned int i = 0; i < pieceSplineSpins.size(); ++i)
 	{
-		connect(pieceParamSliders[i], SIGNAL(valueChanged(int)),
-			this, SLOT(pieceParameterSliderChanged(int)));
+		connect(pieceSplineSpins[i], SIGNAL(valueChanged(double)),
+			this, SLOT(pieceSplineSpinBoxChanged(double)));
 	}
 
 	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
@@ -433,7 +379,6 @@ void PieceEditorWidget :: seedTemplates()
 
 void PieceEditorWidget :: updateLibraryWidgetPixmaps(AsyncPieceLibraryWidget* w)
 {
-	//w->updateEyePosition(niceViewWidget->eyePosition());
 	w->updatePixmap();
 }
 

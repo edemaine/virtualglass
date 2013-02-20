@@ -120,11 +120,8 @@ Piece* randomPiece(PickupPlan* pickup)
 
 	// set piece parameters
 	TemplateParameter p;
-	for (unsigned int i = 0; i < piece->getParameterCount(); ++i)
-	{
-		piece->getParameter(i, &p);
-		piece->setParameter(i, qrand() % (p.upperLimit - p.lowerLimit) + p.lowerLimit);
-	}	
+	for (unsigned int i = 0; i < piece->spline.size(); ++i)
+		piece->spline[i] = 1.0 + (qrand() % 10) * 0.1;
 
 	// set pickup
 	piece->pickup = pickup;
