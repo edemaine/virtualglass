@@ -1,4 +1,6 @@
 
+#include <QMouseEvent>
+#include <QVBoxLayout>
 #include "pickupplaneditorviewwidget.h"
 #include "pickupgeometrythread.h"
 #include "asynccolorbarlibrarywidget.h"
@@ -224,12 +226,12 @@ void PickupPlanEditorViewWidget :: setPickup(PickupPlan* _pickup)
 {
 	pickup = _pickup;
 
-        tempPickupMutex.lock();
-        deep_delete(tempPickup);
-        tempPickup = deep_copy(pickup);
-        tempPickupDirty = true;
-        tempPickupMutex.unlock();
-        wakeWait.wakeOne(); // wake up the thread if it's sleeping
+	tempPickupMutex.lock();
+	deep_delete(tempPickup);
+	tempPickup = deep_copy(pickup);
+	tempPickupDirty = true;
+	tempPickupMutex.unlock();
+	wakeWait.wakeOne(); // wake up the thread if it's sleeping
 }
 
 void PickupPlanEditorViewWidget :: geometryThreadFinishedMesh()
@@ -240,22 +242,22 @@ void PickupPlanEditorViewWidget :: geometryThreadFinishedMesh()
 	if (!dirty)
 		return;
 
-        if (tempGeometry1Mutex.tryLock())
-        {
-                geometry.vertices = tempGeometry1.vertices;
-                geometry.triangles = tempGeometry1.triangles;
-                geometry.groups = tempGeometry1.groups;
-                tempGeometry1Mutex.unlock();
-        }
-        else if (tempGeometry2Mutex.tryLock())
-        {
-                geometry.vertices = tempGeometry2.vertices;
-                geometry.triangles = tempGeometry2.triangles;
-                geometry.groups = tempGeometry2.groups;
-                tempGeometry2Mutex.unlock();
-        }
+	if (tempGeometry1Mutex.tryLock())
+	{
+		geometry.vertices = tempGeometry1.vertices;
+		geometry.triangles = tempGeometry1.triangles;
+		geometry.groups = tempGeometry1.groups;
+		tempGeometry1Mutex.unlock();
+	}
+	else if (tempGeometry2Mutex.tryLock())
+	{
+		geometry.vertices = tempGeometry2.vertices;
+		geometry.triangles = tempGeometry2.triangles;
+		geometry.groups = tempGeometry2.groups;
+		tempGeometry2Mutex.unlock();
+	}
 
-        niceViewWidget->repaint();
+	niceViewWidget->repaint();
 }
 
 

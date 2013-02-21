@@ -1,5 +1,8 @@
 
-#include <QtGui>
+#include <QComboBox>
+#include <QStackedWidget>
+#include <QFileDialog>
+#include <QMouseEvent>
 #include <algorithm>
 #include "pullplan.h"
 #include "niceviewwidget.h"

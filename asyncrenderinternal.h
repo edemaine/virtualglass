@@ -4,11 +4,12 @@
 #include <QThread>
 #include <QMutex>
 #include <QWaitCondition>
+// glew.h must come before qgl.h
 #include "glew.h"
 #include <qgl.h>
-#include "asyncrenderwidget.h"
 #include <deque>
 #include <vector>
+#include "asyncrenderwidget.h"
 
 using std::deque;
 using std::vector;

@@ -1,5 +1,17 @@
 
-#include <QtGui>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QDir>
+#include <QStackedWidget>
+#include <QMenuBar>
+#include <QMenu>
+#include <QAction>
+#include <QPushButton>
+#include <QMouseEvent>
+#include <QDrag>
+#include <QTextStream>
+#include <QApplication>
+
 #include "constants.h"
 #include "dependancy.h"
 #include "niceviewwidget.h"
@@ -606,20 +618,20 @@ void MainWindow :: clearLibrary()
 	while (colorBarLibraryLayout->count() > 0)
 	{
 		w = colorBarLibraryLayout->takeAt(0);
-                delete w->widget();
-                delete w;
+		delete w->widget();
+		delete w;
 	}
 	while (pullPlanLibraryLayout->count() > 0)
 	{
 		w = pullPlanLibraryLayout->takeAt(0);
-                delete w->widget();
-                delete w;
+		delete w->widget();
+		delete w;
 	}
 	while (pieceLibraryLayout->count() > 0)
 	{
 		w = pieceLibraryLayout->takeAt(0);
-                delete w->widget();
-                delete w;
+		delete w->widget();
+		delete w;
 	}
 }
 
@@ -1148,8 +1160,8 @@ void MainWindow::exportOBJActionTriggered()
 		return; 
 
 	// get filename
-        QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."),
-                QDir::currentPath(), tr("Wavefront object file (*.obj)"));
+	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."),
+		QDir::currentPath(), tr("Wavefront object file (*.obj)"));
 	if (userSpecifiedFilename.isNull())
 		return; 
 
@@ -1175,8 +1187,8 @@ void MainWindow::exportPLYActionTriggered()
 		return; 
 
 	// get filename
-        QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."),
-                QDir::currentPath(), tr("Polygon file (*.ply)"));
+	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."),
+		QDir::currentPath(), tr("Polygon file (*.ply)"));
 	if (userSpecifiedFilename.isNull())
 		return; 
 
@@ -1197,7 +1209,7 @@ void MainWindow::exportPLYActionTriggered()
 void MainWindow::importSVGActionTriggered()
 {
 	// use below instead as dialog?
-        // QString userSpecifiedFilename = QFileDialog::getOpenFileName(this, "Open your SVG cane crossection file",
+	// QString userSpecifiedFilename = QFileDialog::getOpenFileName(this, "Open your SVG cane crossection file",
 	//	QDir::currentPath(), "Scalable Vector Graphics (*.svg)");
 
 	QFileDialog importFileDialog(this);
@@ -1367,8 +1379,8 @@ void MainWindow::newFileActionTriggered()
 	clearLibrary();
 
 	// 3. add the three new guys from the editors into the library 
-        colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(colorEditorWidget->getGlassColor(), this));
-        pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pullPlanEditorWidget->getPlan(), this));
+	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(colorEditorWidget->getGlassColor(), this));
+	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pullPlanEditorWidget->getPlan(), this));
 	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(pieceEditorWidget->getPiece(), this)); 
 
 	// 4. go back to empty view mode

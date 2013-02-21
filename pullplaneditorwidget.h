@@ -64,21 +64,21 @@ class PullPlanEditorWidget : public QWidget
 		void geometryThreadFinishedMesh();
 
 	private:
-                QMutex tempPullPlanMutex;
-                PullPlan* tempPullPlan;
-                bool tempPullPlanDirty;
+		QMutex tempPullPlanMutex;
+		PullPlan* tempPullPlan;
+		bool tempPullPlanDirty;
 
-                QWaitCondition wakeWait;
-                QMutex wakeMutex;
+		QWaitCondition wakeWait;
+		QMutex wakeMutex;
 
-                PullPlanGeometryThread* geometryThread;
-	
+		PullPlanGeometryThread* geometryThread;
+
 		QMutex geometryDirtyMutex;
 		bool geometryDirty;
-                QMutex tempGeometry1Mutex;
-                QMutex tempGeometry2Mutex;
-                Geometry tempGeometry1;
-                Geometry tempGeometry2;
+		QMutex tempGeometry1Mutex;
+		QMutex tempGeometry2Mutex;
+		Geometry tempGeometry1;
+		Geometry tempGeometry2;
 
 		Geometry geometry;
 		PullPlan* plan;

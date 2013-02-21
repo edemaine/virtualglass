@@ -1,7 +1,7 @@
+
 #ifndef PICKUPTEMPLATELIBRARYWIDGET_H
 #define PICKUPTEMPLATELIBRARYWIDGET_H
 
-#include <QtGui>
 #include "pickuptemplate.h"
 #include "templatelibrarywidget.h"
 

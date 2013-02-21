@@ -20,7 +20,7 @@ void TemplateLibraryWidget::setHighlighted(bool isHighlighted)
 	if (isHighlighted)
 		color = QColor(0, 0, 255);	
 	else
-                color = QColor(200, 200, 200);
+		color = QColor(200, 200, 200);
 
 	style.append("border: 2px solid " + color.name() + ";");
 	setStyleSheet(style);

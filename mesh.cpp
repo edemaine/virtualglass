@@ -7,33 +7,34 @@
 #include "subpulltemplate.h"
 #include "mesh.h"
 
+using namespace MeshInternal;
 
 void generateMesh(Piece* piece, Geometry* geometry, unsigned int quality)
 {
 	geometry->clear();
-	vector<MeshInternal::ancestor> ancestors;
-	MeshInternal::recurseMesh(piece, geometry, ancestors, quality);
+	vector<ancestor> ancestors;
+	recurseMesh(piece, geometry, ancestors, quality);
 	geometry->compute_normals_from_triangles();
 }
 
 void generateMesh(PickupPlan* pickup, Geometry* geometry, unsigned int quality)
 {
 	geometry->clear();
-	vector<MeshInternal::ancestor> ancestors;
-	MeshInternal::recurseMesh(pickup, geometry, ancestors, quality, true);
+	vector<ancestor> ancestors;
+	recurseMesh(pickup, geometry, ancestors, quality, true);
 	geometry->compute_normals_from_triangles();
 }
 
 void generatePullMesh(PullPlan* plan, Geometry* geometry, unsigned int quality)
 {
 	geometry->clear();
-	vector<MeshInternal::ancestor> ancestors;
-	MeshInternal::recurseMesh(plan, geometry, ancestors, 2.0, quality, true);
+	vector<ancestor> ancestors;
+	recurseMesh(plan, geometry, ancestors, 2.0, quality, true);
 
 	// Make skinnier to more closely mimic the canes found in pickups
 	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
 	{
-		MeshInternal::applyResizeTransform(geometry->vertices[v], 0.5);
+		applyResizeTransform(geometry->vertices[v], 0.5);
 	}
 	geometry->compute_normals_from_triangles();
 }
@@ -44,8 +45,8 @@ void generateColorMesh(GlassColor* gc, Geometry* geometry, unsigned int quality)
 	dummyPlan.setOutermostCasingColor(gc);
 
 	geometry->clear();
-	vector<MeshInternal::ancestor> ancestors;
-	MeshInternal::recurseMesh(&dummyPlan, geometry, ancestors, 2.0, 
+	vector<ancestor> ancestors;
+	recurseMesh(&dummyPlan, geometry, ancestors, 2.0, 
 		quality, true);
 	geometry->compute_normals_from_triangles();
 }

@@ -1,12 +1,15 @@
 #ifndef PULLPLANCUSTOMIZEVIEWWIDGET_H
 #define PULLPLANCUSTOMIZEVIEWWIDGET_H
 
-#include <QtGui>
+#include <QWidget>
+#include <QMouseEvent>
+#include <QDragMoveEvent>
 #include <cfloat>
 #include <vector>
 #include "primitives.h"
 #include "shape.h"
 
+class QPainter;
 class GlassColor;
 class PullPlan;
 

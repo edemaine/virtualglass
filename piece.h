@@ -3,7 +3,7 @@
 #ifndef PIECE_H
 #define PIECE_H
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <vector>
 #include "templateparameter.h"
 #include "piecetemplate.h"

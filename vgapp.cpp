@@ -1,4 +1,6 @@
 
+#include <QFileOpenEvent>
+#include <QEvent>
 #include <QString>
 #include "vgapp.h"
 
@@ -28,7 +30,7 @@ VGApp::~VGApp()
 
 bool VGApp::event(QEvent *event)
 {
-        switch (event->type()) 
+	switch (event->type()) 
 	{
 		case QEvent::FileOpen:
 			// and this catches command line opens on the rest (Mac?)

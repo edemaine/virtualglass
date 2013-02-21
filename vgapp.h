@@ -2,7 +2,7 @@
 #ifndef VGAPP_H
 #define VGAPP_H
 
-#include <QtGui>
+#include <QApplication>
 #include "mainwindow.h"
 
 class VGApp : public QApplication

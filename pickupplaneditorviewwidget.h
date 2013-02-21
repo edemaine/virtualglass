@@ -2,7 +2,8 @@
 #ifndef PICKUPPLANEDITORVIEWWIDGET_H
 #define PICKUPPLANEDITORVIEWWIDGET_H
 
-#include <QtGui>
+#include <QMutex>
+#include <QWaitCondition>
 #include "pickupplan.h"
 #include "niceviewwidget.h"
 #include "mesh.h"
@@ -35,7 +36,7 @@ class PickupPlanEditorViewWidget : public QWidget
 		void resizeEvent(QResizeEvent* event);
 
 	private slots:
-                void geometryThreadFinishedMesh();
+		void geometryThreadFinishedMesh();
 
 	private:
 		QMutex tempPickupMutex;

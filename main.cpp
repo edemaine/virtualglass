@@ -1,5 +1,8 @@
 
-#include <QtGui>
+#include <QCoreApplication>
+#include <QDir>
+#include <Qt>
+#include <QDateTime>
 #include "vgapp.h"
 
 int main(int argc, char** argv)

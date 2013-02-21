@@ -2,7 +2,7 @@
 #ifndef PIECEEDITORWIDGET_H
 #define PIECEEDITORWIDGET_H
 
-#include <QtGui>
+#include <QWidget>
 #include "piece.h"
 #include "pullplan.h"
 #include "pickupplaneditorviewwidget.h"
@@ -13,9 +13,17 @@
 #include "geometry.h"
 #include "mesh.h"
 
+class QGridLayout;
+class QVBoxLayout;
+class QHBoxLayout;
+class QTabWidget;
+class QStackedWidget;
+class QSpinBox;
+class QDoubleSpinBox;
+class QSlider;
 class PieceGeometryThread;
-class TwistWidget;
-		
+class TwistWidget;	
+	
 class PieceEditorWidget : public QWidget
 {
 	Q_OBJECT

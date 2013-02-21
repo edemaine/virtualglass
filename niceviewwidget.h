@@ -5,15 +5,12 @@
 #ifdef _WIN32
 #  include <windows.h>
 #endif
-#include <QtGui>
 #include <QGLFramebufferObject>
 #include <qgl.h>
 #include "primitives.h"
 #include "geometry.h"
 #include "peelrenderer.h"
 #include "bubble.h"
-
-using namespace std;
 
 class NiceViewWidget : public QGLWidget
 {

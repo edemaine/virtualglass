@@ -1,4 +1,5 @@
 
+#include <QPainter>
 #include "constants.h"
 #include "glasscolor.h"
 #include "pullplan.h"

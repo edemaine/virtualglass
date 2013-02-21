@@ -1,5 +1,11 @@
 
-#include <QtGui>
+#include <QSpinBox>
+#include <QHBoxLayout>
+#include <QTabWidget>
+#include <QPushButton>
+#include <QStackedWidget>
+#include <QScrollArea>
+
 #include "pullplan.h"
 #include "geometry.h"
 #include "pullplaneditorwidget.h"

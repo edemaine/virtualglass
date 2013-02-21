@@ -1,4 +1,6 @@
 
+#include <QPainter>
+#include <QPen>
 #include "purecolorlibrarywidget.h"
 #include "glasscolor.h"
 

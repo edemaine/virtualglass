@@ -1,7 +1,6 @@
 #ifndef PIECETEMPLATELIBRARYWIDGET_H
 #define PIECETEMPLATELIBRARYWIDGET_H
 
-#include <QtGui>
 #include "piecetemplate.h"
 #include "templatelibrarywidget.h"
 

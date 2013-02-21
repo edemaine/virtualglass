@@ -2,7 +2,7 @@
 #ifndef PULLPLANEDITORVIEWWIDGET_H
 #define PULLPLANEDITORVIEWWIDGET_H
 
-#include <QtGui>
+#include <QWidget>
 #include <vector>
 #include "primitives.h"
 #include "shape.h"

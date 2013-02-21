@@ -1,7 +1,7 @@
 #ifndef PURECOLORLIBRARYWIDGET_H
 #define PURECOLORLIBRARYWIDGET_H
 
-#include <QtGui>
+#include <QLabel>
 #include <string>
 #include "primitives.h"
 

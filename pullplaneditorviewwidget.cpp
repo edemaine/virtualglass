@@ -1,4 +1,8 @@
 
+#include <QResizeEvent>
+#include <QMouseEvent>
+#include <QDragEnterEvent>
+#include <QPainter>
 #include "constants.h"
 #include "glasscolor.h"
 #include "pullplan.h"

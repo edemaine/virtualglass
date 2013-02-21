@@ -1,4 +1,14 @@
 
+#include <QGridLayout>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QTabWidget>
+#include <QStackedWidget>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
+#include <QSlider>
+#include <QScrollArea>
+#include <QMouseEvent>
 #include "pieceeditorwidget.h"
 #include "piecegeometrythread.h"
 #include "twistwidget.h"
@@ -191,9 +201,9 @@ void PieceEditorWidget :: pickupParameterSliderChanged(int)
 void PieceEditorWidget :: addPieceSpline(QGridLayout* pieceParamLayout)
 {
 	QDoubleSpinBox* splineSpin = new QDoubleSpinBox(this);
-        splineSpin->setRange(-10.0, 20.0);
-        splineSpin->setSingleStep(0.1);
-        splineSpin->setDecimals(1);
+	splineSpin->setRange(-10.0, 20.0);
+	splineSpin->setSingleStep(0.1);
+	splineSpin->setDecimals(1);
 	pieceSplineSpins.push_back(splineSpin);
 
 	int column = pieceParamLayout->columnCount();
@@ -252,7 +262,7 @@ void PieceEditorWidget :: setupLayout()
 	QWidget* pieceTemplateLibraryWidget = new QWidget(this);
 	pieceTemplateLibraryLayout = new QHBoxLayout(pieceTemplateLibraryWidget);
 	pieceTemplateLibraryLayout->setSpacing(10);
-        pieceTemplateLibraryLayout->setContentsMargins(10, 10, 10, 10);
+	pieceTemplateLibraryLayout->setContentsMargins(10, 10, 10, 10);
 	pieceTemplateLibraryWidget->setLayout(pieceTemplateLibraryLayout);
 
 	QScrollArea* pieceTemplateLibraryScrollArea = new QScrollArea(this);
@@ -267,7 +277,7 @@ void PieceEditorWidget :: setupLayout()
 	// layouts containing pickup and piece template parameters in the third row
 
 	// Pickup parameter layout
-        pickupControlsTab = new QTabWidget(this);
+	pickupControlsTab = new QTabWidget(this);
 	editorLayout->addWidget(pickupControlsTab, 2, 0);
 
 	QWidget* pickupParamWidget = new QWidget(pickupControlsTab);
@@ -282,7 +292,7 @@ void PieceEditorWidget :: setupLayout()
 	editorLayout->addWidget(pickupEditorDescriptionLabel, 3, 0);
 	
 	// Piece parameter layout 
-        pieceControlsTab = new QTabWidget(this);
+	pieceControlsTab = new QTabWidget(this);
 	editorLayout->addWidget(pieceControlsTab, 2, 1);
 
 	QWidget* tab1Widget = new QWidget(pieceControlsTab);
@@ -365,13 +375,13 @@ void PieceEditorWidget :: setupConnections()
 	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
 	connect(pickupViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
-        connect(pieceControlsTab, SIGNAL(currentChanged(int)), this, SLOT(pieceControlsTabChanged(int)));
+	connect(pieceControlsTab, SIGNAL(currentChanged(int)), this, SLOT(pieceControlsTabChanged(int)));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }
 
 void PieceEditorWidget :: pieceControlsTabChanged(int tab)
 {
-        // change the blueprint view to match the tab
+	// change the blueprint view to match the tab
 	// lolnvm, no customizer view yet
 
 	if (tab == 0) // Twist mode

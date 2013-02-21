@@ -1,6 +1,4 @@
 
-
-#include <QtGlobal>
 #include <QFile>
 #include <QIODevice>
 #include "glasscolor.h"

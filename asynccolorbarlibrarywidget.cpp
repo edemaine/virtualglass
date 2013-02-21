@@ -30,19 +30,19 @@ void AsyncColorBarLibraryWidget :: paintEvent(QPaintEvent *event)
 
 void AsyncColorBarLibraryWidget :: updateDragPixmap()
 {
-        QPixmap _pixmap(200, 200);
-        _pixmap.fill(Qt::transparent);
-        QPainter painter(&_pixmap);
+	QPixmap _pixmap(200, 200);
+	_pixmap.fill(Qt::transparent);
+	QPainter painter(&_pixmap);
 	
 	// Fill in with color
 	Color c = glassColor->getColor();
 	QColor qc(255*c.r, 255*c.g, 255*c.b, MAX(255*c.a, 20));
 	painter.setBrush(qc);
-        painter.setPen(Qt::NoPen);
+	painter.setPen(Qt::NoPen);
 	painter.drawEllipse(10, 10, 180, 180);
-        painter.end();
+	painter.end();
 
-        dragPixmap = _pixmap.scaled(100, 100);
+	dragPixmap = _pixmap.scaled(100, 100);
 }
 
 const QPixmap* AsyncColorBarLibraryWidget :: getDragPixmap()

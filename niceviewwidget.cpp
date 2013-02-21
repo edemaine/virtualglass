@@ -10,21 +10,20 @@ it is involved in modifying the cane.
 #endif
 #include <cstdlib>
 #include <cstdio>
-#include <string.h>
-#include <math.h>
+#include <string>
+#include <cmath>
 #include <stdexcept>
+#include <QMouseEvent>
 #include "constants.h"
 #include "niceviewwidget.h"
 #include "bubble.h"
-
-using namespace std;
 
 namespace {
 void gl_errors(string const &where) {
 	GLuint err;
 	while ((err = glGetError()) != GL_NO_ERROR) {
-	cerr << "(in " << where << ") OpenGL error #" << err
-		 << ": " << gluErrorString(err) << endl;
+	std::cerr << "(in " << where << ") OpenGL error #" << err
+		 << ": " << gluErrorString(err) << std::endl;
 	}
 }
 }

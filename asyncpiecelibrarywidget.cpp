@@ -1,5 +1,5 @@
 
-#include <QtGui>
+
 #include "asyncpiecelibrarywidget.h"
 
 AsyncPieceLibraryWidget :: AsyncPieceLibraryWidget(Piece* _piece, QWidget* _parent): AsyncRenderWidget(_parent), piece(_piece)

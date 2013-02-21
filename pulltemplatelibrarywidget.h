@@ -1,7 +1,6 @@
 #ifndef PULLTEMPLATELIBRARYWIDGET_H
 #define PULLTEMPLATELIBRARYWIDGET_H
 
-#include <QtGui>
 #include "pulltemplate.h"
 #include "templatelibrarywidget.h"
 

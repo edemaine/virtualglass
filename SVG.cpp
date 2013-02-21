@@ -33,7 +33,7 @@ public:
 class Parse {
 public:
 Parse(std::istream &in, SVG &_into, PullPlan* myPullPlan) : into(_into) {
-    pullPlan = myPullPlan;
+	pullPlan = myPullPlan;
 	parser = XML_ParserCreate(NULL);
 	XML_SetUserData(parser, this);
 	XML_SetElementHandler(parser, &wrap_start_element, &wrap_end_element);
@@ -442,55 +442,56 @@ void start_element(string const &name, map< string, string > &atts) {
 		}
 	} else if (name == "rect") {
 		double x,y,width,height;
-		if (svg_length(atts, "x", x) && svg_length(atts, "y", y) && svg_length(atts, "width", width) && svg_length(atts, "height", height)) {
-            if (width == height) {
+		if (svg_length(atts, "x", x) && svg_length(atts, "y", y) && svg_length(atts, "width", width) 
+			&& svg_length(atts, "height", height)) {
+			if (width == height) {
 
-                // Grab page size (right now we assume it's square because it will error later otherwise).
-                float pageSize = (float) into.page.c[0];
+			// Grab page size (right now we assume it's square because it will error later otherwise).
+			float pageSize = (float) into.page.c[0];
 
-                // Convert coordinates from 0, 0 in upper left to 0,0 in center and scale
-                Point p = make_vector((float) ((x +width/2-pageSize/2)/ pageSize* sqrt(2.0)),
-                                      (float) (( y +width/2 - pageSize/2)/ pageSize*sqrt(2.0)), 0.0f);
-                // Scale radius
-                float diameter = width/ pageSize * sqrt(2);
+			// Convert coordinates from 0, 0 in upper left to 0,0 in center and scale
+			Point p = make_vector((float) ((x +width/2-pageSize/2)/ pageSize* sqrt(2.0)),
+					      (float) (( y +width/2 - pageSize/2)/ pageSize*sqrt(2.0)), 0.0f);
+			// Scale radius
+			float diameter = width/ pageSize * sqrt(2);
 
-                // Add square to pullPlan
-                pullPlan->subs.insert(pullPlan->subs.begin(),
-                    SubpullTemplate(new PullPlan(PullTemplate::BASE_SQUARE), SQUARE_SHAPE, p, diameter));
-            } else {
-                node.moveto(make_vector(x,y));
-                node.lineto(make_vector(x+width,y));
-                node.lineto(make_vector(x+width,y+height));
-                node.lineto(make_vector(x,y+height));
-                node.closepath();
-            }
-		} else {
-			Error(this) << "rect without x,y,width, or height.";
-		}
-    } else if (name == "circle") {
+			// Add square to pullPlan
+			pullPlan->subs.insert(pullPlan->subs.begin(),
+			    SubpullTemplate(new PullPlan(PullTemplate::BASE_SQUARE), SQUARE_SHAPE, p, diameter));
+			} else {
+				node.moveto(make_vector(x,y));
+				node.lineto(make_vector(x+width,y));
+				node.lineto(make_vector(x+width,y+height));
+				node.lineto(make_vector(x,y+height));
+				node.closepath();
+			}
+			} else {
+				Error(this) << "rect without x,y,width, or height.";
+			}
+			} else if (name == "circle") {
 
-        double cx, cy, r;
-        if (svg_length(atts, "cx", cx) && svg_length(atts, "cy", cy) && svg_length(atts, "r", r)) {
+				double cx, cy, r;
+				if (svg_length(atts, "cx", cx) && svg_length(atts, "cy", cy) && svg_length(atts, "r", r)) {
 
-            // Grab page size (right now we assume it's square because it will error later otherwise).
-            float pageSize = (float) into.page.c[0];
+				// Grab page size (right now we assume it's square because it will error later otherwise).
+				float pageSize = (float) into.page.c[0];
 
-            // Convert coordinates from 0, 0 in upper left to 0,0 in center and scale
-            Point p = make_vector((float) ((cx -pageSize/2)/ pageSize* sqrt(2.0)),
-                                  (float) (( cy - pageSize/2)/ pageSize*sqrt(2.0)), 0.0f);
-            // Scale radius
-            float diameter = 2*r/ pageSize * sqrt(2);
+				// Convert coordinates from 0, 0 in upper left to 0,0 in center and scale
+				Point p = make_vector((float) ((cx -pageSize/2)/ pageSize* sqrt(2.0)),
+						  (float) (( cy - pageSize/2)/ pageSize*sqrt(2.0)), 0.0f);
+				// Scale radius
+				float diameter = 2*r/ pageSize * sqrt(2);
 
-            // Add circle to pullPlan
-            pullPlan->subs.insert(pullPlan->subs.begin(),
-                SubpullTemplate(new PullPlan(PullTemplate::BASE_CIRCLE), CIRCLE_SHAPE, p, diameter));
+				// Add circle to pullPlan
+				pullPlan->subs.insert(pullPlan->subs.begin(),
+				SubpullTemplate(new PullPlan(PullTemplate::BASE_CIRCLE), CIRCLE_SHAPE, p, diameter));
 
-        } else {
-            Error(this) << "circle without cx, cy, or r.";
-        }
-    }
+			} else {
+				Error(this) << "circle without cx, cy, or r.";
+			}
+	}
 
-    { //translate command list
+	{ //translate command list
 		Vector2d subpath_start = make_vector(0.0, 0.0);
 		Vector2d prev = make_vector(0.0, 0.0);
 		while (!commands.empty()) {
@@ -860,8 +861,8 @@ void Node::execute(Matrix const &xform, double tol, vector< vector< Vector2d > >
 }
 
 bool load_svg(std::string const &filename, SVG &into, PullPlan *pullPlan) {
-    std::ifstream file(filename.c_str());
-    Parse parse(file, into, pullPlan);
+	std::ifstream file(filename.c_str());
+	Parse parse(file, into, pullPlan);
 	return parse.errors.empty();
 }
 

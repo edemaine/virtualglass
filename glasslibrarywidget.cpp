@@ -1,5 +1,4 @@
 
-#include <QtGui>
 #include "glasslibrarywidget.h"
 
 GlassLibraryWidget :: GlassLibraryWidget(QWidget* _parent) : QLabel(_parent)

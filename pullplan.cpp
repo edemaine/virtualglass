@@ -231,15 +231,15 @@ void PullPlan :: addCasing(enum GeometricShape _shape) {
 	float oldInnermostCasingThickness = casings[0].thickness;
 	for (unsigned int i = 0; i < casings.size(); ++i) 
 	{
-                switch (casings[i].shape)
-                {
-                        case CIRCLE_SHAPE:
+		switch (casings[i].shape)
+		{
+			case CIRCLE_SHAPE:
 				casings[i].thickness -= MIN(0.1, casings[i].thickness/2);
-                                break;
-                        case SQUARE_SHAPE:
+				break;
+			case SQUARE_SHAPE:
 				casings[i].thickness -= MIN(0.1 / SQRT_TWO, casings[i].thickness/2);
-                                break;
-                }
+				break;
+		}
 	}
 	
 	// if casing addition is circle around a square, rescale everything down a bit more

@@ -4,21 +4,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QtGui>
-#include <QObject>
 #include <json/json.h>
-
-class GlassColor;
-class PullPlan;
-class PickupPlan;
-class Piece;
-class NiceViewWidget;
-class AsyncPieceLibraryWidget;
-class AsyncPullPlanLibraryWidget;
-class AsyncColorBarLibraryWidget;
-class PullPlanEditorWidget;
-class ColorEditorWidget;
-class PieceEditorWidget;
 
 class QMouseEvent;
 class QKeyEvent;
@@ -31,6 +17,19 @@ class QWidget;
 class QPushButton;
 class QMenu;
 class QAction;
+class QActionGroup;
+
+class GlassColor;
+class PullPlan;
+class PickupPlan;
+class Piece;
+class NiceViewWidget;
+class AsyncPieceLibraryWidget;
+class AsyncPullPlanLibraryWidget;
+class AsyncColorBarLibraryWidget;
+class PullPlanEditorWidget;
+class ColorEditorWidget;
+class PieceEditorWidget;
 
 using std::vector;
 

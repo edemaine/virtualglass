@@ -3,7 +3,6 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include <QObject>
 #include <vector>
 #include "geometry.h"
 #include "subpickuptemplate.h"

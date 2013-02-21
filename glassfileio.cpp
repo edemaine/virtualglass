@@ -128,8 +128,8 @@ namespace GlassFileIOInternal
 void writeJsonToFile(QString& filename, Json::Value& root)
 {
 	// convert it to text using json library
-        Json::StyledWriter writer;
-        string outputText = writer.write(root);
+	Json::StyledWriter writer;
+	string outputText = writer.write(root);
 
 	// open a savefile and write the string to it
 	QFile saveFile(filename);
@@ -473,8 +473,8 @@ void readColors(Json::Value& colorRoot, map<unsigned int, GlassColor*>& colorMap
 	colorMap[0] = GlobalGlass::color();
 	
 	//loop over all colors; read each and add it to the map
-        for (unsigned int i = 0; i < colorRoot.getMemberNames().size(); i++) 
-        {
+	for (unsigned int i = 0; i < colorRoot.getMemberNames().size(); i++) 
+	{
 		string colorname = colorRoot.getMemberNames()[i];
 		unsigned int colorIndex = stringToId(colorname);
 		GlassColor* gc = readColor(colorRoot, colorname);
@@ -678,7 +678,7 @@ void readCanes(Json::Value& canesRoot, map<unsigned int, PullPlan*>& caneMap,
 	for (unsigned int i = 0; i < canesRoot.getMemberNames().size(); ++i)
 	{
 		string canename = canesRoot.getMemberNames()[i];
-        	unsigned int caneIndex = stringToId(canename);
+		unsigned int caneIndex = stringToId(canename);
 		PullPlan* cane = readCane(canename, canesRoot, colorMap);
 		caneMap[caneIndex] = cane;
 	}
@@ -688,7 +688,7 @@ void readCanes(Json::Value& canesRoot, map<unsigned int, PullPlan*>& caneMap,
 	{
 		unsigned int caneIndex;
 		string canename = canesRoot.getMemberNames()[i];
-        	caneIndex = stringToId(canename);
+		caneIndex = stringToId(canename);
 		readCaneSubcanes(canesRoot[canename], caneMap[caneIndex], caneMap);
 	}
 
@@ -888,22 +888,22 @@ Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, PullPlan
 void writePieces(Json::Value& root, vector<Piece*>& pieces, vector<PullPlan*>& canes, 
 	vector<GlassColor*>& colors)
 {
-        // generate color map
-        map<GlassColor*, unsigned int> colorMap;
-        colorMap[GlobalGlass::color()] = 0;
-        for (unsigned int i = 0; i < colors.size(); ++i)
-                colorMap[colors[i]] = i+1;
+	// generate color map
+	map<GlassColor*, unsigned int> colorMap;
+	colorMap[GlobalGlass::color()] = 0;
+	for (unsigned int i = 0; i < colors.size(); ++i)
+		colorMap[colors[i]] = i+1;
 
-        // generate pull plan map
-        map<PullPlan*, unsigned int> caneMap;
-        caneMap[GlobalGlass::circlePlan()] = 0;
-        caneMap[GlobalGlass::squarePlan()] = 1;
-        for (unsigned int i = 0; i < canes.size(); ++i)
-                caneMap[canes[i]] = i+2;
+	// generate pull plan map
+	map<PullPlan*, unsigned int> caneMap;
+	caneMap[GlobalGlass::circlePlan()] = 0;
+	caneMap[GlobalGlass::squarePlan()] = 1;
+	for (unsigned int i = 0; i < canes.size(); ++i)
+		caneMap[canes[i]] = i+2;
 
-        // call writeCane() on each cane
-        for (unsigned int i = 0; i < pieces.size(); ++i)
-                writePiece(root, pieces[i], i, caneMap, colorMap);
+	// call writeCane() on each cane
+	for (unsigned int i = 0; i < pieces.size(); ++i)
+		writePiece(root, pieces[i], i, caneMap, colorMap);
 }
 
 void readPieces(Json::Value& piecesRoot, map<unsigned int, PullPlan*>& caneMap, map<unsigned int, 
@@ -912,14 +912,14 @@ void readPieces(Json::Value& piecesRoot, map<unsigned int, PullPlan*>& caneMap, 
 	// doesn't exist otherwise, so we make it up just to sort them
 	map<unsigned int, Piece*> pieceMap;
 
-        // loop over pieces
-        for (unsigned int i = 0; i < piecesRoot.getMemberNames().size(); ++i)
-        {
+	// loop over pieces
+	for (unsigned int i = 0; i < piecesRoot.getMemberNames().size(); ++i)
+	{
 		string piecename = piecesRoot.getMemberNames()[i];
-        	unsigned int pieceIndex = stringToId(piecename);
-                Piece* piece = readPiece(piecename, piecesRoot, caneMap, colorMap);
+		unsigned int pieceIndex = stringToId(piecename);
+		Piece* piece = readPiece(piecename, piecesRoot, caneMap, colorMap);
 		pieceMap[pieceIndex] = piece;
-        }
+	}
 
 	// create sorted readColors
 	vector<int> pieceIndices;

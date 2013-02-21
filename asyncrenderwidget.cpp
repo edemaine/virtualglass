@@ -2,7 +2,6 @@
 #ifdef _WIN32
 #  include <windows.h>
 #endif
-#include <QtGui>
 
 #include "asyncrenderwidget.h"
 #include "asyncrenderinternal.h"
