@@ -130,10 +130,20 @@ void PullPlanEditorWidget :: geometryThreadFinishedMesh()
 	niceViewWidget->repaint();
 }
 
-
 void PullPlanEditorWidget :: setupLayout()
 {
-	// Editor layout: pull template scrolling library
+	// we use a grid layout, with the edit-y parts in the left column 
+	// and 3D view in the right column 
+	QGridLayout* editorLayout = new QGridLayout(this);
+	this->setLayout(editorLayout);
+
+	// build pair of editor views: regular and custom
+	viewEditorStack = new QStackedWidget(this);
+	viewEditorStack->addWidget(viewWidget);
+	viewEditorStack->addWidget(customizeViewWidget);
+	editorLayout->addWidget(viewEditorStack, 0, 0);
+
+	// next is scrollable library of templates
 	QWidget* templateLibraryWidget = new QWidget(this);
 	templateLibraryLayout = new QHBoxLayout(templateLibraryWidget);
 	templateLibraryLayout->setSpacing(10);
@@ -147,8 +157,14 @@ void PullPlanEditorWidget :: setupLayout()
 	pullTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	pullTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pullTemplateLibraryScrollArea->setFixedHeight(140);
+	editorLayout->addWidget(pullTemplateLibraryScrollArea, 1, 0);
 
-	// Editor layout: casing buttons (and param spinbox) layout
+	// now the two tabs of controls, one for each GUI mode
+	controlsTab = new QTabWidget(this);
+
+	// this is the regular view one, with casing, count, and twist controls
+
+	// casing controls
 	QWidget* casingWidget = new QWidget(this);
 	QHBoxLayout* casingLayout = new QHBoxLayout(casingWidget);
 	QLabel* casingLabel = new QLabel("Casing:");
@@ -161,16 +177,27 @@ void PullPlanEditorWidget :: setupLayout()
 	casingLayout->addWidget(squareCasingPushButton);
 	casingLayout->addWidget(addCasingButton);
 	casingLayout->addWidget(removeCasingButton);
+
+	// count controls
 	countLabel = new QLabel("Count:", casingWidget);
 	countSpin = new QSpinBox(casingWidget);
 	casingLayout->addStretch(1);
 	casingLayout->addWidget(countLabel);
 	casingLayout->addWidget(countSpin);
 
-	// Editor layout: twist layout
+	// prepackaged twist controls
 	twistWidget = new TwistWidget(&(plan->twist), 10, this);
 
-	// Customize layout: duplicate/delete cane layout
+	// combine controls into a widget for the first tab
+	QWidget* tab1Widget = new QWidget(this);
+	QVBoxLayout* tab1Layout = new QVBoxLayout(tab1Widget);
+	tab1Widget->setLayout(tab1Layout);
+	tab1Layout->addWidget(casingWidget);
+	tab1Layout->addWidget(twistWidget);
+	tab1Layout->addStretch(1);
+	controlsTab->addTab(tab1Widget, "Fill and Case");
+
+	// next build the controls for the custom view
 	QWidget* customControlsWidget = new QWidget(this);
 	QHBoxLayout* customControlsLayout = new QHBoxLayout(customControlsWidget);
 	customControlsWidget->setLayout(customControlsLayout);
@@ -185,54 +212,38 @@ void PullPlanEditorWidget :: setupLayout()
 	customControlsLayout->addWidget(deleteSelectedButton);
 	customControlsLayout->addStretch(1);
 	
-	// Combine editor and customize layouts into a pair of tabs with 
-	// descriptive text in the left layout
-	QWidget* leftWidget = new QWidget(this);
-	QVBoxLayout* leftLayout = new QVBoxLayout(leftWidget);
-	leftWidget->setLayout(leftLayout);
-	viewEditorStack = new QStackedWidget(leftWidget);
-	viewEditorStack->addWidget(viewWidget);
-	viewEditorStack->addWidget(customizeViewWidget);
-	leftLayout->addWidget(viewEditorStack, 10);
-	leftLayout->addWidget(pullTemplateLibraryScrollArea);
-
-	controlsTab = new QTabWidget(this);
-
-	QWidget* tab1Widget = new QWidget(this);
-	QVBoxLayout* tab1Layout = new QVBoxLayout(tab1Widget);
-	tab1Widget->setLayout(tab1Layout);
-	tab1Layout->addWidget(casingWidget);
-	tab1Layout->addWidget(twistWidget);
-	tab1Layout->addStretch(1);
-	controlsTab->addTab(tab1Widget, "Fill and Case");
-
+	// combine controls into a widget for the second tab
 	QWidget* tab2Widget = new QWidget(this);
 	QVBoxLayout* tab2Layout = new QVBoxLayout(tab2Widget);
 	tab2Widget->setLayout(tab2Layout);
 	tab2Layout->addWidget(customControlsWidget);
 	tab2Layout->addStretch(1);
 	controlsTab->addTab(tab2Widget, "Customize Layout");
+	editorLayout->addWidget(controlsTab, 2, 0);
 
-	leftLayout->addWidget(controlsTab);
-
-	descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", leftWidget);
+	// below the tabs goes a labeled descriptor (changes depending on view)
+	descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", this);
 	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	leftLayout->addWidget(descriptionLabel);
+	editorLayout->addWidget(descriptionLabel, 3, 0);
 
-	// Combine 3D viewer and descriptive text into the right layout
-	QWidget* rightWidget = new QWidget(this);
-	QVBoxLayout* rightLayout = new QVBoxLayout(rightWidget);
-	rightWidget->setLayout(rightLayout);
-	rightLayout->addWidget(niceViewWidget, 1);
-	QLabel* niceViewDescriptionLabel = new QLabel("3D view of cane.", rightWidget);
+	// at this point the editor GUI elements are done
+
+	// now add the 3D view and its label
+	editorLayout->addWidget(niceViewWidget, 0, 1, 3, 1);
+	QLabel* niceViewDescriptionLabel = new QLabel("3D view of cane.", this);
 	niceViewDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	rightLayout->addWidget(niceViewDescriptionLabel, 0);
+	editorLayout->addWidget(niceViewDescriptionLabel, 3, 1);
 
-	// Combine left and right layouts
-	QHBoxLayout* pageLayout = new QHBoxLayout(this);
-	this->setLayout(pageLayout);
-	pageLayout->addWidget(leftWidget, 3);
-	pageLayout->addWidget(rightWidget, 2);
+	// set proportions of the various parts: 
+	// horizontally, 60% is the editor, 40% is the 3D view
+	editorLayout->setColumnStretch(0, 3);
+	editorLayout->setColumnStretch(1, 2);
+
+	// vertically, the editor view that the user manipulates/interacts with 
+	// takes up all extra space
+	// controls are compressed as much as possible 
+	// (they are ugly and don't require much precision)
+	editorLayout->setRowStretch(0, 10);
 }
 
 void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)

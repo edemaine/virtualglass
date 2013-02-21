@@ -15,6 +15,7 @@ PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* pa
 	this->plan = plan;
 
 	draggedLibraryColor = NULL;
+	draggedColor = NULL;
 	draggedPlan = NULL;
 	isDraggingCasing = false;
 }
