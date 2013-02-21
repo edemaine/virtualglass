@@ -363,8 +363,8 @@ void PieceEditorWidget :: setupConnections()
 	}
 
 	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
-	connect(pickupViewWidget, SIGNAL(someDataChanged()), this, SLOT(pickupViewWidgetDataChanged()));
-	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(updateEverything()));
+	connect(pickupViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
+	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
         connect(pieceControlsTab, SIGNAL(currentChanged(int)), this, SLOT(pieceControlsTabChanged(int)));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }
@@ -384,7 +384,7 @@ void PieceEditorWidget :: pieceControlsTabChanged(int tab)
 	}
 }
 
-void PieceEditorWidget :: pickupViewWidgetDataChanged()
+void PieceEditorWidget :: childWidgetDataChanged()
 {
 	emit someDataChanged();
 }

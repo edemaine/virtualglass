@@ -58,8 +58,7 @@ class PullPlanEditorWidget : public QWidget
 		void addSquareButtonPressed();
 		void copySelectedButtonPressed();
 		void deleteSelectedButtonPressed();
-		void viewWidgetDataChanged();
-		void customizeViewWidgetDataChanged();
+		void childWidgetDataChanged();
 		void countSpinChanged(int);
 		void controlsTabChanged(int);
 		void geometryThreadFinishedMesh();

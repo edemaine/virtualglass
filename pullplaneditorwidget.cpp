@@ -334,21 +334,16 @@ void PullPlanEditorWidget :: setupConnections()
 	connect(deleteSelectedButton, SIGNAL(pressed()), this, SLOT(deleteSelectedButtonPressed()));
 	connect(addCircleButton, SIGNAL(pressed()), this, SLOT(addCircleButtonPressed()));
 	connect(addSquareButton, SIGNAL(pressed()), this, SLOT(addSquareButtonPressed()));
-	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(updateEverything()));
+	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(countSpin, SIGNAL(valueChanged(int)), this, SLOT(countSpinChanged(int)));
 	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
-	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(viewWidgetDataChanged()));
-	connect(customizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(customizeViewWidgetDataChanged()));
+	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
+	connect(customizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(controlsTab, SIGNAL(currentChanged(int)), this, SLOT(controlsTabChanged(int)));
 }
 
-void PullPlanEditorWidget :: viewWidgetDataChanged()
-{
-	emit someDataChanged();
-}
-
-void PullPlanEditorWidget :: customizeViewWidgetDataChanged()
+void PullPlanEditorWidget :: childWidgetDataChanged()
 {
 	emit someDataChanged();
 }

@@ -44,7 +44,7 @@ class PieceEditorWidget : public QWidget
 
 	private slots:
 		void pieceControlsTabChanged(int);
-		void pickupViewWidgetDataChanged();
+		void childWidgetDataChanged();
 		void pieceSplineSpinBoxChanged(double);
 		void pickupParameterSpinBoxChanged(int);
 		void pickupParameterSliderChanged(int);
