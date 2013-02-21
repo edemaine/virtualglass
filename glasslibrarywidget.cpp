@@ -1,14 +1,14 @@
 
 #include <QtGui>
-#include "librarywidget.h"
+#include "glasslibrarywidget.h"
 
-LibraryWidget :: LibraryWidget(QWidget* _parent) : QLabel(_parent)
+GlassLibraryWidget :: GlassLibraryWidget(QWidget* _parent) : QLabel(_parent)
 {
 	isBusy = false;
 	hasDependancy = false;
 }
 
-void LibraryWidget :: updateStyleSheet() 
+void GlassLibraryWidget :: updateStyleSheet() 
 {
 	QColor color;
 
@@ -52,13 +52,13 @@ void LibraryWidget :: updateStyleSheet()
 	setStyleSheet(style);
 }
 
-void LibraryWidget::setBusy(bool _b)
+void GlassLibraryWidget::setBusy(bool _b)
 {
 	isBusy = _b;
 	updateStyleSheet();
 }
 
-void LibraryWidget::setDependancy(bool _hd, enum Dependancy _d)
+void GlassLibraryWidget::setDependancy(bool _hd, enum Dependancy _d)
 {
 	hasDependancy = _hd;
 	dependancy = _d;

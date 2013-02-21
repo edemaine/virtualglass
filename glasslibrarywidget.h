@@ -1,15 +1,15 @@
-#ifndef LIBRARYWIDGET_H
-#define LIBRARYWIDGET_H
+#ifndef GLASSLIBRARYWIDGET_H
+#define GLASSLIBRARYWIDGET_H
 
 #include <QLabel>
 #include "dependancy.h" 
 
 class QWidget;
 
-class LibraryWidget : public QLabel
+class GlassLibraryWidget : public QLabel
 {
 	public:
-		LibraryWidget(QWidget* parent);
+		GlassLibraryWidget(QWidget* parent);
 		void setBusy(bool isBusy);
 		void setDependancy(bool hasDependancy, enum Dependancy _d=IS_DEPENDANCY);
 
@@ -22,4 +22,4 @@ class LibraryWidget : public QLabel
 		bool isBusy;
 };
 
-#endif // LIBRARYWIDGET_H
+#endif 

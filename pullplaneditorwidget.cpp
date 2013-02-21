@@ -87,10 +87,7 @@ void PullPlanEditorWidget :: updateEverything()
 	{
 		ptlw = dynamic_cast<PullTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(templateLibraryLayout->itemAt(i))->widget());
-		if (ptlw->type == plan->getTemplateType())
-			ptlw->setDependancy(true, IS_DEPENDANCY);
-		else
-		        ptlw->setDependancy(false);
+		ptlw->setHighlighted(ptlw->type == plan->getTemplateType());
 	}
 
 	viewWidget->updateEverything();

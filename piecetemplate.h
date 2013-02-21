@@ -5,7 +5,7 @@
 namespace PieceTemplate
 {
 	// When adding a new template, be sure to update the 
-	// names[] array and the first/last template functions in piecetemplate.cpp
+	// first/last template functions in piecetemplate.cpp
 	enum Type
 	{
 		TUMBLER=1,

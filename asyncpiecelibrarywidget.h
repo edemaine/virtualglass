@@ -3,7 +3,6 @@
 
 #include "asyncrenderwidget.h"
 #include "piecerenderdata.h"
-#include "librarywidget.h"
 
 class Piece;
 class QWidget;

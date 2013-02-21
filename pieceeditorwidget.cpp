@@ -39,10 +39,7 @@ void PieceEditorWidget :: updateEverything()
 	{
 		pktlw = dynamic_cast<PickupTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget());
-		if (pktlw->type == piece->pickup->getTemplateType())
-			pktlw->setDependancy(true, IS_DEPENDANCY);
-		else
-			pktlw->setDependancy(false);
+		pktlw->setHighlighted(pktlw->type == piece->pickup->getTemplateType());
 	}
 
 	pickupViewWidget->setPickup(piece->pickup);
@@ -77,10 +74,7 @@ void PieceEditorWidget :: updateEverything()
 	{
 		ptlw = dynamic_cast<PieceTemplateLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(pieceTemplateLibraryLayout->itemAt(i))->widget());
-		if (ptlw->type == piece->getTemplateType())
-			ptlw->setDependancy(true, IS_DEPENDANCY);
-		else
-			ptlw->setDependancy(false);
+		ptlw->setHighlighted(ptlw->type == piece->getTemplateType());
 	}
 	
 	tempPieceMutex.lock();

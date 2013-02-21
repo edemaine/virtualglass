@@ -2,7 +2,7 @@
 #define ASYNCRENDERWIDGET_H
 
 #include "Vector.hpp"
-#include "librarywidget.h"
+#include "glasslibrarywidget.h"
 
 class Geometry;
 
@@ -30,7 +30,7 @@ class Camera
 		Vector2ui size; //size of desired image, in pixels
 };
 
-class AsyncRenderWidget : public LibraryWidget
+class AsyncRenderWidget : public GlassLibraryWidget
 {
 	Q_OBJECT
 

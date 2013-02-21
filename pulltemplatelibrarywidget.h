@@ -3,12 +3,12 @@
 
 #include <QtGui>
 #include "pulltemplate.h"
-#include "librarywidget.h"
+#include "templatelibrarywidget.h"
 
-class PullTemplateLibraryWidget : public LibraryWidget
+class PullTemplateLibraryWidget : public TemplateLibraryWidget
 {
 	public:
-		PullTemplateLibraryWidget(QPixmap view, enum PullTemplate::Type t, QWidget* parent=0);
+		PullTemplateLibraryWidget(QPixmap view, enum PullTemplate::Type type, QWidget* parent=0);
 		enum PullTemplate::Type type;
 };
 

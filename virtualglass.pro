@@ -70,7 +70,7 @@ HEADERS += vgapp.h \
 	globalglass.h \
 	exampleglass.h \
 	randomglass.h \
-	librarywidget.h \
+	glasslibrarywidget.h \
 	dependancy.h \
 	shape.h \
 	templateparameter.h \
@@ -116,11 +116,12 @@ HEADERS += vgapp.h \
 	pullplangeometrythread.h \
 	globalgraphicssetting.h \
 	twistwidget.h \
+	templatelibrarywidget.h \
 
 SOURCES += main.cpp \ 
 	vgapp.cpp \
 	glew/glew.c \
-	librarywidget.cpp \
+	glasslibrarywidget.cpp \
 	exampleglass.cpp \
 	randomglass.cpp \
 	templateparameter.cpp \
@@ -170,5 +171,6 @@ SOURCES += main.cpp \
 	pullplangeometrythread.cpp \
 	globalgraphicssetting.cpp \
 	twistwidget.cpp \
+	templatelibrarywidget.cpp \
 
 
