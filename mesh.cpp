@@ -41,6 +41,7 @@ void generatePullMesh(PullPlan* plan, Geometry* geometry, unsigned int quality)
 void generateColorMesh(GlassColor* gc, Geometry* geometry, unsigned int quality)
 {
 	PullPlan dummyPlan(PullTemplate::BASE_CIRCLE);
+	dummyPlan.setTemplateType(PullTemplate::CUSTOM);
 	dummyPlan.setOutermostCasingColor(gc);
 
 	geometry->clear();

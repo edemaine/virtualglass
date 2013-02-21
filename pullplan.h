@@ -21,10 +21,9 @@ class PullPlan
 	public:
 		PullPlan(enum PullTemplate::Type t);
 
-		void setTemplateType(enum PullTemplate::Type t, bool force=false);
+		void setTemplateType(enum PullTemplate::Type t);
 		enum PullTemplate::Type getTemplateType();
 
-		bool hasParameter();
 		unsigned int getCount();
 		void setCount(unsigned int count);
 
@@ -64,6 +63,7 @@ class PullPlan
 		void resetSubs(bool hardReset);
 		void pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs,
 			enum GeometricShape s, Point location, float diameter);
+
 };
 
 PullPlan *deep_copy(const PullPlan *plan);

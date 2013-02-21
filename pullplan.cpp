@@ -23,24 +23,17 @@ using std::make_pair;
 
 PullPlan :: PullPlan(PullTemplate::Type _templateType)
 {
-	casings.push_back(Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
-
 	// setup default twist
 	twist = 0;
 
-	// setup template (subplans and parameter) `forcefully', i.e.
-	// occuring regardless of what current template type is
-	// if an attempt is made to initialize to custom, first
-	// initialize with default real template, then set to custom.
-	// remember: custom isn't a real template, it's just the lack
-	// of conformance to a real template, i.e. an admission of failure 
-	if (_templateType == PullTemplate::CUSTOM)
-	{
-		setTemplateType(PullTemplate::BASE_CIRCLE, true);
-		setTemplateType(PullTemplate::CUSTOM, false);
-	}
-	else
-		setTemplateType(_templateType, true);
+	// initialize casings and subplans to something simple
+	casings.push_back(Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
+	casings[0].shape = CIRCLE_SHAPE;
+	count = 0;
+	this->templateType = PullTemplate::BASE_CIRCLE;
+
+	// now initialize for real
+	setTemplateType(_templateType);
 }
 
 bool PullPlan :: hasDependencyOn(PullPlan* plan) {
@@ -77,50 +70,26 @@ bool PullPlan :: hasDependencyOn(GlassColor* glassColor) {
 	return childrenAreDependent;
 }
 
-void PullPlan :: setTemplateType(PullTemplate::Type templateType, bool force) 
+void PullPlan :: setTemplateType(PullTemplate::Type templateType) 
 {
-	// the parameter "force" really means "is this the first time?", as if so
-	// we do a hard reset of some values that we don't do otherwise for continuity's sake
-
-	if (!force && templateType == this->templateType)
+	if (templateType == this->templateType)
 		return;
 
 	// adjust number of casing if you switched between types that have subcanes or not
 	// note that this doesn't handle resizing or shape changing of the newly added casing...
 	// that is done in the switch statement, as it's specific to the new template
-	if (force) // you're being initialized
-	{
-		if (!(templateType == PullTemplate::BASE_CIRCLE || templateType == PullTemplate::BASE_SQUARE))
-			casings.push_back(Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
-	}
-	else // you're having your existing tempalte type changed
-	{
-		bool curIsOneCasingType;
-		bool newIsOneCasingType;
-		
-		curIsOneCasingType = (this->templateType == PullTemplate::BASE_CIRCLE || 
-			this->templateType == PullTemplate::BASE_SQUARE);
-		newIsOneCasingType = (templateType == PullTemplate::BASE_CIRCLE || 
-			templateType == PullTemplate::BASE_SQUARE);
+	if (casings.size() < 2 && templateHasSubplans(templateType))
+		casings.insert(casings.begin(), Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
+	if (templateHasSubplans(this->templateType) && templateHasNoSubplans(templateType))
+		casings.erase(casings.begin());
 
-		if (curIsOneCasingType && !newIsOneCasingType)
-			casings.insert(casings.begin(), Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
-		else if (!curIsOneCasingType && newIsOneCasingType)
-			casings.erase(casings.begin());
-	}
+	// if you're switching to a template where count matters, and it's a funky value,
+	// set it to something more reasonable
+	if (this->count < 2 && templateHasSubplans(templateType))
+		this->count = 3;
+
 	this->templateType = templateType;
 
-	if (force)
-	{
-		if (templateType == PullTemplate::BASE_CIRCLE
-			|| templateType == PullTemplate::BASE_SQUARE
-			|| templateType == PullTemplate::CUSTOM)
-			count = 0;
-		else 
-			count = 3;
-	}
-	
-	// setup starter casings (casing 0 may be changed depending upon template)
 	switch (templateType) 
 	{
 		case PullTemplate::BASE_CIRCLE:
@@ -208,13 +177,6 @@ unsigned int PullPlan :: getCasingCount() {
 enum PullTemplate::Type PullPlan :: getTemplateType() {
 
 	return this->templateType;
-}
-
-bool PullPlan :: hasParameter()
-{
-	return (this->templateType != PullTemplate::BASE_CIRCLE 
-		&& this->templateType != PullTemplate::BASE_SQUARE
-		&& this->templateType != PullTemplate::CUSTOM); 
 }
 
 unsigned int PullPlan :: getCount()

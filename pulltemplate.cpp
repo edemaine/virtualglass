@@ -30,9 +30,31 @@ namespace PullTemplate
 		return SURROUNDING_SQUARE;
 	}
 
-	enum Type firstTemplate()
+	// returns true only if it's for sure
+	bool templateHasNoSubplans(PullTemplate::Type t)
 	{
-		return BASE_CIRCLE;
+		switch (t)
+		{
+			case BASE_CIRCLE:
+			case BASE_SQUARE:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	// returns true only if it's for sure
+	bool templateHasSubplans(PullTemplate::Type t)
+	{
+		switch (t)
+		{
+			case BASE_CIRCLE:
+			case BASE_SQUARE:
+			case CUSTOM:
+				return false;
+			default:
+				return true;
+		}
 	}
 }
 

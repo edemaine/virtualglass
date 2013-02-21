@@ -24,6 +24,9 @@ namespace PullTemplate
 
 	enum Type firstSeedTemplate();
 	enum Type lastSeedTemplate();
+
+	bool templateHasNoSubplans(PullTemplate::Type t);
+	bool templateHasSubplans(PullTemplate::Type t);
 }
 
 #endif
