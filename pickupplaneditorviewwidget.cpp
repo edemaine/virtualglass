@@ -35,6 +35,7 @@ void PickupPlanEditorViewWidget :: setupThreading()
 void PickupPlanEditorViewWidget :: setupConnections()
 {
 	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
+	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }
 
 void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** subplan, int* subplanIndex)
@@ -225,7 +226,11 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 void PickupPlanEditorViewWidget :: setPickup(PickupPlan* _pickup)
 {
 	pickup = _pickup;
+	updateEverything();
+}
 
+void PickupPlanEditorViewWidget :: updateEverything()
+{
 	tempPickupMutex.lock();
 	deep_delete(tempPickup);
 	tempPickup = deep_copy(pickup);

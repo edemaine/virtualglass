@@ -29,6 +29,9 @@ class PickupPlanEditorViewWidget : public QWidget
 	signals:
 		void someDataChanged();
 
+	public slots:
+		void updateEverything();
+
 	protected:
 		void mousePressEvent(QMouseEvent* event);
 		void dragEnterEvent(QDragEnterEvent* dee);

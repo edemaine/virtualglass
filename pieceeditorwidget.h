@@ -23,6 +23,7 @@ class QDoubleSpinBox;
 class QSlider;
 class PieceGeometryThread;
 class TwistWidget;	
+class PieceCustomizeViewWidget;
 	
 class PieceEditorWidget : public QWidget
 {
@@ -78,8 +79,11 @@ class PieceEditorWidget : public QWidget
 		Geometry geometry;
 
 		Piece* piece;
-		NiceViewWidget* niceViewWidget;
+
 		PickupPlanEditorViewWidget* pickupViewWidget;	
+		NiceViewWidget* pieceNiceViewWidget;
+		PieceCustomizeViewWidget* pieceCustomizeViewWidget;
+                QStackedWidget* pieceViewStack;
 
 		vector<QStackedWidget*> pickupParamStacks;
 		vector<QLabel*> pickupParamLabels;

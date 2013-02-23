@@ -9,17 +9,20 @@
 #include <QSlider>
 #include <QScrollArea>
 #include <QMouseEvent>
+
 #include "pieceeditorwidget.h"
 #include "piecegeometrythread.h"
 #include "twistwidget.h"
+#include "piececustomizeviewwidget.h"
 
 PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 {
 	resetPiece();
 
 	this->pickupViewWidget = new PickupPlanEditorViewWidget(piece->pickup, this);	
-	this->niceViewWidget = new NiceViewWidget(NiceViewWidget::PIECE_CAMERA_MODE, this);
-	niceViewWidget->setGeometry(&geometry);
+	this->pieceNiceViewWidget = new NiceViewWidget(NiceViewWidget::PIECE_CAMERA_MODE, this);
+	pieceNiceViewWidget->setGeometry(&geometry);
+	this->pieceCustomizeViewWidget = new PieceCustomizeViewWidget(piece, this);
 
 	setupLayout();
 	setupThreading();
@@ -52,7 +55,7 @@ void PieceEditorWidget :: updateEverything()
 		pktlw->setHighlighted(pktlw->type == piece->pickup->getTemplateType());
 	}
 
-	pickupViewWidget->setPickup(piece->pickup);
+	pickupViewWidget->updateEverything();		
 
 	unsigned int i = 0;
 	for (; i < piece->pickup->getParameterCount(); ++i)
@@ -79,6 +82,8 @@ void PieceEditorWidget :: updateEverything()
 	}
 
 	// update piece stuff
+	pieceCustomizeViewWidget->updateEverything();	
+
 	PieceTemplateLibraryWidget* ptlw;
 	for (int i = 0; i < pieceTemplateLibraryLayout->count(); ++i)
 	{
@@ -146,7 +151,7 @@ void PieceEditorWidget :: geometryThreadFinishedMesh()
 	// p is probability of the scenario each time. If it's a linear function
 	// of running time, then it's probably < 1%. 
 	
-	niceViewWidget->repaint();
+	pieceNiceViewWidget->repaint();
 }
 
 void PieceEditorWidget :: pieceSplineSpinBoxChanged(double)
@@ -240,7 +245,10 @@ void PieceEditorWidget :: setupLayout()
 
 	// two 3D views in the first row (and stretched to take up all the slack space 
 	editorLayout->addWidget(pickupViewWidget, 0, 0); 
-	editorLayout->addWidget(niceViewWidget, 0, 1); 
+	pieceViewStack = new QStackedWidget(this);
+	pieceViewStack->addWidget(pieceNiceViewWidget);
+	pieceViewStack->addWidget(pieceCustomizeViewWidget);
+	editorLayout->addWidget(pieceViewStack, 0, 1);
 	editorLayout->setRowStretch(0, 10);
 
 	// pickup template and piece template selectors in the second row
@@ -381,8 +389,8 @@ void PieceEditorWidget :: setupConnections()
 
 void PieceEditorWidget :: pieceControlsTabChanged(int tab)
 {
-	// change the blueprint view to match the tab
-	// lolnvm, no customizer view yet
+	// change the view to match the tab
+        pieceViewStack->setCurrentIndex(tab);
 
 	if (tab == 0) // Twist mode
 		pieceEditorDescriptionLabel->setText("Piece editor.");
@@ -451,6 +459,7 @@ void PieceEditorWidget :: setPickupTemplateType(enum PickupTemplate::Type _type)
 void PieceEditorWidget :: setPiece(Piece* p)
 {
 	piece = p;
+	pickupViewWidget->setPickup(p->pickup);
 	twistWidget->setTwist(&(p->twist));
 	emit someDataChanged();	
 }
