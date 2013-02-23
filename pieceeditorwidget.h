@@ -3,16 +3,13 @@
 #define PIECEEDITORWIDGET_H
 
 #include <QWidget>
-#include "piece.h"
-#include "pullplan.h"
-#include "pickupplaneditorviewwidget.h"
-#include "asyncpiecelibrarywidget.h"
-#include "pickuptemplatelibrarywidget.h"
-#include "piecetemplatelibrarywidget.h"
-#include "niceviewwidget.h"
+#include <QMutex>
+#include <QWaitCondition>
+#include "pickuptemplate.h"
+#include "piecetemplate.h"
 #include "geometry.h"
-#include "mesh.h"
 
+class QLabel;
 class QGridLayout;
 class QVBoxLayout;
 class QHBoxLayout;
@@ -21,9 +18,14 @@ class QStackedWidget;
 class QSpinBox;
 class QDoubleSpinBox;
 class QSlider;
+
 class PieceGeometryThread;
 class TwistWidget;	
 class PieceCustomizeViewWidget;
+class AsyncPieceLibraryWidget;
+class PickupPlanEditorViewWidget;
+class NiceViewWidget;
+class Piece;
 	
 class PieceEditorWidget : public QWidget
 {

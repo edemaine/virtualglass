@@ -1,5 +1,4 @@
 
-
 #ifndef PIECE_H
 #define PIECE_H
 
@@ -9,6 +8,7 @@
 #include "piecetemplate.h"
 #include "pickupplan.h"
 #include "glasscolor.h"
+#include "spline.h"
 
 using std::vector;
 
@@ -27,7 +27,7 @@ class Piece
 		bool isBased();
 	
 		float twist;
-		vector<float> spline;
+		Spline spline;
 	
 	private:
 		// Variables

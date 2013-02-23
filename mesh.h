@@ -14,6 +14,7 @@ class PickupPlan;
 class PullPlan;
 class Piece;
 class SubpullTemplate;
+class Spline;
 
 using std::vector;
 
@@ -40,7 +41,6 @@ namespace MeshInternal
 	float totalShrink(vector<ancestor>& ancestors);
 	unsigned int computeAxialResolution(float length, unsigned int quality);
 	unsigned int computeAngularResolution(float finalDiameter, unsigned int quality);
-	float splineVal(vector<float>& spline, float t);
 	void meshBaseCasing(Geometry* g, vector<ancestor>& ancestors, 
 		Color c, enum GeometricShape outerShape, enum GeometricShape innerShape, 
 		float length, float outerRadius, float innerRadius, unsigned int quality, bool ensureVisible=false);
@@ -50,13 +50,18 @@ namespace MeshInternal
 		unsigned int angularResolution, unsigned int axialResolution, bool flipOrientation=false);
 	void getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution, 
 		enum GeometricShape shape, float radius);
-	void meshPickupCasingSlab(Geometry* g, Color c, float y, float thickness, bool ensureVisible=false);
+
 	void applySubplanTransform(Vertex& v, ancestor a);
 	void applySubplanTransform(Geometry& geometry, ancestor a);
 	void applySubplanTransforms(Vertex& p, vector<ancestor>& ancestors);
 	void applyResizeTransform(Vertex& v, float scale);
+
 	void applyPickupTransform(Vertex& p, SubpickupTemplate& spt);
-	void applyPieceTransform(Vertex& v, float twist, vector<float>& spline);
+	void meshPickupCasingSlab(Geometry* g, Color c, float y, float thickness, bool ensureVisible=false);
+
+	void applyUnbasedPieceTransform(Vertex& v, float twist, Spline& spline);
+	void applyBasedPieceTransform(Vertex& v, float twist, Spline& spline);
+	void applyPieceTransform(Vertex& v, float twist, Spline& spline);
 	void applyPieceTransform(Geometry* geometry, Piece* piece);
 }
 #endif

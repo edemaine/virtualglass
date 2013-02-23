@@ -3,6 +3,7 @@
 #include "pieceeditorwidget.h"
 #include "piece.h"
 #include "globalgraphicssetting.h"
+#include "mesh.h"
 
 PieceGeometryThread::PieceGeometryThread(PieceEditorWidget* _pew) : pew(_pew)
 {

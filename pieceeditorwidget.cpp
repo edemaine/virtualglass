@@ -10,10 +10,15 @@
 #include <QScrollArea>
 #include <QMouseEvent>
 
+#include "pickupplaneditorviewwidget.h"
+#include "piece.h"
 #include "pieceeditorwidget.h"
 #include "piecegeometrythread.h"
 #include "twistwidget.h"
 #include "piececustomizeviewwidget.h"
+#include "piecetemplatelibrarywidget.h"
+#include "pickuptemplatelibrarywidget.h"
+#include "asyncpiecelibrarywidget.h"
 
 PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -99,10 +104,10 @@ void PieceEditorWidget :: updateEverything()
 	tempPieceMutex.unlock();
 	wakeWait.wakeOne(); // wake up the thread if it's sleeping
 
-	for (i = 0; i < piece->spline.size(); ++i)
+	for (i = 0; i < piece->spline.values.size(); ++i)
 	{
 		pieceSplineSpins[i]->blockSignals(true);
-		pieceSplineSpins[i]->setValue(piece->spline[i]);
+		pieceSplineSpins[i]->setValue(piece->spline.values[i]);
 		pieceSplineSpins[i]->blockSignals(false);
 	}
 }
@@ -157,11 +162,11 @@ void PieceEditorWidget :: geometryThreadFinishedMesh()
 void PieceEditorWidget :: pieceSplineSpinBoxChanged(double)
 {
 	bool pieceChanged = false;
-	for (unsigned int i = 0; i < piece->spline.size(); ++i)
+	for (unsigned int i = 0; i < piece->spline.values.size(); ++i)
 	{
-		if (piece->spline[i] != pieceSplineSpins[i]->value())
+		if (piece->spline.values[i] != pieceSplineSpins[i]->value())
 		{
-			piece->spline[i] = pieceSplineSpins[i]->value();
+			piece->spline.values[i] = pieceSplineSpins[i]->value();
 			pieceChanged = true;
 		}
 	}

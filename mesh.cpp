@@ -6,6 +6,7 @@
 #include "piece.h"
 #include "subpulltemplate.h"
 #include "mesh.h"
+#include "spline.h"
 
 using namespace MeshInternal;
 
@@ -121,31 +122,23 @@ void applyPickupTransform(Vertex& v, SubpickupTemplate& spt)
 	v.position.y = v.position.y + spt.location.z * 5.0;
 }
 
-float splineVal(vector<float>& spline, float t)
-{
-	assert(spline.size() == 4);
-
-	return pow((1.0 - t), 3) * spline[0] + 3 * pow(1.0 - t, 2) * t * spline[1] 
-		+ 3 * (1.0 - t) * pow(t, 2) * spline[2] + pow(t, 3) * spline[3];
-}
-
-void applyUnbasedPieceTransform(Vertex& v, float twist, vector<float>& spline)
+void applyUnbasedPieceTransform(Vertex& v, float twist, Spline& spline)
 {
 	float theta = PI * v.position.x / 5.0 + twist * TWO_PI * v.position.z / 10.0;
 	float caneLoc = v.position.y;
-	float radius = splineVal(spline, (v.position.z - -5.0) / 10.0) - caneLoc;
+	float radius = spline.get((v.position.z - -5.0) / 10.0) - caneLoc;
 
 	v.position.x = radius * cos(theta);
 	v.position.y = radius * sin(theta);
 }
 
-void applyBasedPieceTransform(Vertex& v, float twist, vector<float>& spline)
+void applyBasedPieceTransform(Vertex& v, float twist, Spline& spline)
 {
 	float diskTheta = PI * v.position.x / 5.0 + twist * TWO_PI * v.position.z / 10.0;
 	float diskR = v.position.z + 5.0;
 	float caneLoc = v.position.y;
 
-	float width = spline[0];
+	float width = spline.start();
 	float turnLength = 1.0; 
 	float baseLength = width - turnLength * 2 / PI; 
 
@@ -175,7 +168,7 @@ void applyBasedPieceTransform(Vertex& v, float twist, vector<float>& spline)
 	else if (turnEnd - 0.1 < diskR) // vertical lip part
 	{
 		float sphereRadius = (turnLength * 2) / PI;
-		float radius = splineVal(spline, (v.position.z - -5.0 - turnEnd)/(10.0 - turnEnd)) - caneLoc;
+		float radius = spline.get((v.position.z - -5.0 - turnEnd)/(10.0 - turnEnd)) - caneLoc;
 
 		v.position.x = radius * cos(diskTheta);
 		v.position.y = radius * sin(diskTheta);

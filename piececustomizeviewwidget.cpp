@@ -61,26 +61,6 @@ float PieceCustomizeViewWidget :: rawY(float adjustedY)
 	return adjustedY + ulY;
 }
 
-unsigned int PieceCustomizeViewWidget :: choose(unsigned int n, unsigned int k)
-{
-	if (n < k)
-		return 0;
-	unsigned int total = 1;
-	for (unsigned int i = n; i > n - k; --i)
-		total *= i; // get the numerator
-	for (unsigned int i = k; i > 0; --i)
-		total /= i; // get the denominator
-	return total;
-}
-
-float PieceCustomizeViewWidget :: splineVal(vector<float>& spline, float t)
-{
-	float val = 0;
-	for (unsigned int i = 0; i < spline.size(); ++i)
-		val += choose(spline.size()-1, i) * pow((1.0 - t), spline.size() - 1 - i) * pow(t, i) * spline[i]; 
-	return val;
-}
-
 void PieceCustomizeViewWidget :: mousePressEvent(QMouseEvent* /*event*/)
 {
 
@@ -163,7 +143,7 @@ void PieceCustomizeViewWidget :: setPiece(Piece* _piece)
 void PieceCustomizeViewWidget :: drawPiece()
 {
 	// draw the spline
-	vector<float>& spline = piece->spline;
+	Spline& spline = piece->spline;
 
 	// note that pixels are specified from upper left, so many Ys
 	// are inverted. we assume a canvas of size 20 x 20 and adjust
@@ -188,22 +168,22 @@ void PieceCustomizeViewWidget :: drawPiece()
 	
 	// first draw bottom
 	QPointF start;
-	start.setX((size * 0.5 - spline[0]) * blowup);
+	start.setX((size * 0.5 - spline.start()) * blowup);
 	start.setY(size * 0.75 * blowup);
 
 	QPointF end;
-	end.setX((size * 0.5 + spline[0]) * blowup);
+	end.setX((size * 0.5 + spline.start()) * blowup);
 	end.setY(size * 0.75 * blowup);
 	
 	painter.drawLine(QLineF(start, end));
 
 	// next draw turn
 	QPointF center;
-	float turnCenterX = size * 0.5 + spline[0];
+	float turnCenterX = size * 0.5 + spline.start();
 	float turnCenterY = size * 0.75 - 4 / PI;
 	painter.drawArc((turnCenterX - 4 / PI) * blowup, (turnCenterY - 4 / PI) * blowup, 8 / PI * blowup, 8 / PI * blowup,
 		0 * 16, -90 * 16); 
-	turnCenterX = size * 0.5 - spline[0];
+	turnCenterX = size * 0.5 - spline.start();
 	turnCenterY = size * 0.75 - 4 / PI;
 	painter.drawArc((turnCenterX - 4 / PI) * blowup, (turnCenterY - 4 / PI) * blowup, 8 / PI * blowup, 8 / PI * blowup,
 		-180 * 16, 90 * 16); 
@@ -213,14 +193,14 @@ void PieceCustomizeViewWidget :: drawPiece()
 	{
 		float t_delta = t + 0.01;	
 
-		start.setX((size * 0.5 + splineVal(spline, t) + 4/PI) * blowup);
-		start.setY((size * 0.75 - (4/PI + t * (9.0 - spline[0]))) * blowup);	
-		end.setX((size * 0.5 + splineVal(spline, t_delta) + 4/PI) * blowup);
-		end.setY((size * 0.75 - (4/PI + t_delta * (9.0 - spline[0]))) * blowup);	
+		start.setX((size * 0.5 + spline.get(t) + 4/PI) * blowup);
+		start.setY((size * 0.75 - (4/PI + t * (9.0 - spline.start()))) * blowup);	
+		end.setX((size * 0.5 + spline.get(t_delta) + 4/PI) * blowup);
+		end.setY((size * 0.75 - (4/PI + t_delta * (9.0 - spline.start()))) * blowup);	
 		painter.drawLine(QLineF(start, end));
 
-		start.setX((size * 0.5 - splineVal(spline, t) - 4/PI) * blowup);
-		end.setX((size * 0.5 - splineVal(spline, t_delta) - 4/PI) * blowup);
+		start.setX((size * 0.5 - spline.get(t) - 4/PI) * blowup);
+		end.setX((size * 0.5 - spline.get(t_delta) - 4/PI) * blowup);
 		painter.drawLine(QLineF(start, end));
 	}
 

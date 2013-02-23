@@ -847,11 +847,11 @@ void writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<Pu
 
 	// write piece template parameters
 	root[piecename]["Piece spline parameters"];
-	for (unsigned int i = 0; i < piece->spline.size(); ++i)
+	for (unsigned int i = 0; i < piece->spline.values.size(); ++i)
 	{
 		string paramName = idAndNameToString(i, "PieceSplineParam");
 		root[piecename]["Piece spline parameters"][paramName]["Index"] = i;
-		root[piecename]["Piece spline parameters"][paramName]["Value"] = piece->spline[i];
+		root[piecename]["Piece spline parameters"][paramName]["Value"] = piece->spline.values[i];
 	}
 
 	// write pickups (currently only one)
@@ -872,7 +872,7 @@ Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, PullPlan
 		unsigned int paramIndex = root[piecename]["Piece spline parameters"][paramname]["Index"].asUInt();
 
 		float paramValue = root[piecename]["Piece template parameters"][paramname]["Value"].asFloat();	
-		piece->spline[paramIndex] = paramValue;
+		piece->spline.values[paramIndex] = paramValue;
 	}
 
 	// read pickups (currently only one)

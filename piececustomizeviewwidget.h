@@ -35,8 +35,6 @@ class PieceCustomizeViewWidget : public QWidget
 		float adjustedY(float rawX);
 		float rawX(float adjustedX);
 		float rawY(float adjustedY);
-		float splineVal(vector<float>& spline, float t);
-		unsigned int choose(unsigned int n, unsigned int k);
 		void drawPiece();
 
 		Piece* piece;

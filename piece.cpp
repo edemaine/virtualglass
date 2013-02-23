@@ -78,43 +78,43 @@ void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
 	{
 		case PieceTemplate::TUMBLER:
 			based = true;
-			spline.clear();
-			spline.push_back(3.0);
-			spline.push_back(3.0);
-			spline.push_back(3.0);
-			spline.push_back(3.0);
+			spline.values.clear();
+			spline.values.push_back(3.0);
+			spline.values.push_back(3.0);
+			spline.values.push_back(3.0);
+			spline.values.push_back(3.0);
 			break;
 		case PieceTemplate::VASE:
 			based = true;
-			spline.clear();
-			spline.push_back(1.3);
-			spline.push_back(4.0);
-			spline.push_back(0.0);
-			spline.push_back(2.0);
+			spline.values.clear();
+			spline.values.push_back(1.3);
+			spline.values.push_back(4.0);
+			spline.values.push_back(0.0);
+			spline.values.push_back(2.0);
 			break;
 		case PieceTemplate::BOWL:
 			based = true;
-			spline.clear();
-			spline.push_back(2.8);
-			spline.push_back(6.9);
-			spline.push_back(7.0);
-			spline.push_back(7.2);
+			spline.values.clear();
+			spline.values.push_back(2.8);
+			spline.values.push_back(6.9);
+			spline.values.push_back(7.0);
+			spline.values.push_back(7.2);
 			break;
 		case PieceTemplate::POT:
 			based = true;
-			spline.clear();
-			spline.push_back(2.0);
-			spline.push_back(3.5);
-			spline.push_back(3.5);
-			spline.push_back(2.0);
+			spline.values.clear();
+			spline.values.push_back(2.0);
+			spline.values.push_back(3.5);
+			spline.values.push_back(3.5);
+			spline.values.push_back(2.0);
 			break;
 		case PieceTemplate::PLATE:
 			based = true;
-			spline.clear();
-			spline.push_back(9.0);
-			spline.push_back(9.1);
-			spline.push_back(9.2);
-			spline.push_back(9.3);
+			spline.values.clear();
+			spline.values.push_back(9.0);
+			spline.values.push_back(9.1);
+			spline.values.push_back(9.2);
+			spline.values.push_back(9.3);
 			break;
 		case PieceTemplate::CUSTOM:
 			break;

@@ -117,7 +117,8 @@ HEADERS += vgapp.h \
 	globalgraphicssetting.h \
 	twistwidget.h \
 	templatelibrarywidget.h \
-	piececustomizeviewwidget.h \
+	piececustomizeviewwidget.h \ 
+	spline.h \
 
 SOURCES += main.cpp \ 
 	vgapp.cpp \
@@ -174,5 +175,6 @@ SOURCES += main.cpp \
 	twistwidget.cpp \
 	templatelibrarywidget.cpp \
 	piececustomizeviewwidget.cpp \
+	spline.cpp \
 
 
