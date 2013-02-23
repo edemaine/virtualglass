@@ -68,7 +68,6 @@ HEADERS += vgapp.h \
         constants.h \
         Vector.hpp \
 	globalglass.h \
-	exampleglass.h \
 	randomglass.h \
 	glasslibrarywidget.h \
 	dependancy.h \
@@ -124,7 +123,6 @@ SOURCES += main.cpp \
 	vgapp.cpp \
 	glew/glew.c \
 	glasslibrarywidget.cpp \
-	exampleglass.cpp \
 	randomglass.cpp \
 	templateparameter.cpp \
 	pullplancustomizeviewwidget.cpp \

@@ -27,7 +27,6 @@
 #include "pieceeditorwidget.h"
 #include "randomglass.h"
 #include "glassmime.h"
-#include "exampleglass.h"
 #include "pulltemplate.h"
 #include "mainwindow.h"
 #include "globalglass.h"
@@ -369,9 +368,6 @@ void MainWindow :: setupConnections()
 	connect(randomComplexCaneAction, SIGNAL(triggered()), this, SLOT(randomComplexCaneExampleActionTriggered()));
 	connect(randomComplexPieceAction, SIGNAL(triggered()), this, SLOT(randomComplexPieceExampleActionTriggered()));
 
-	connect(web1PieceAction, SIGNAL(triggered()), this, SLOT(web1PieceExampleActionTriggered()));
-	connect(web2PieceAction, SIGNAL(triggered()), this, SLOT(web2PieceExampleActionTriggered()));
-
 	connect(depthPeelAction, SIGNAL(triggered()), this, SLOT(depthPeelActionTriggered()));
 	connect(highGraphicsAction, SIGNAL(triggered()), this, SLOT(highGraphicsActionTriggered()));
 	connect(mediumGraphicsAction, SIGNAL(triggered()), this, SLOT(mediumGraphicsActionTriggered()));
@@ -401,39 +397,6 @@ void MainWindow :: depthPeelActionTriggered()
 	NiceViewWidget::peelEnable = !(NiceViewWidget::peelEnable);
 	depthPeelAction->setChecked(NiceViewWidget::peelEnable);
 	emit someDataChanged();
-}
-
-void MainWindow :: web1PieceExampleActionTriggered()
-{
-	GlassColor* gc;
-	PullPlan *pp;
-	Piece* p;
-
-	web1Piece(&gc, &pp, &p);
-
-	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(gc, this));
-	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pp, this));
-	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(p, this));
-
-	pieceEditorWidget->setPiece(p);
-	setViewMode(PIECE_VIEW_MODE);
-}
-
-void MainWindow :: web2PieceExampleActionTriggered()
-{
-	GlassColor* gc;
-	PullPlan *pp1, *pp2;
-	Piece* p;
-
-	web2Piece(&gc, &pp1, &pp2, &p);
-
-	colorBarLibraryLayout->addWidget(new AsyncColorBarLibraryWidget(gc, this));
-	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pp1, this));
-	pullPlanLibraryLayout->addWidget(new AsyncPullPlanLibraryWidget(pp2, this));
-	pieceLibraryLayout->addWidget(new AsyncPieceLibraryWidget(p, this));
-
-	pieceEditorWidget->setPiece(p);
-	setViewMode(PIECE_VIEW_MODE);
 }
 
 void MainWindow :: randomSimpleCaneExampleActionTriggered()
@@ -1091,14 +1054,6 @@ void MainWindow::setupMenus()
 	fileMenu->addSeparator();
 	fileMenu->addAction(exitAction);
 
-	//examples:webtutorial1
-	web1PieceAction = new QAction("Tutorial 1", this);
-	web1PieceAction->setToolTip("The first tutorial found on virtualglass.org");
-
-	//examples:webtutorial2
-	web2PieceAction = new QAction("Tutorial 2", this);
-	web2PieceAction->setToolTip("The second tutorial found on virtualglass.org");
-
 	//examples:random:simple cane
 	randomSimpleCaneAction = new QAction("&Simple Cane", this);
 	randomSimpleCaneAction->setToolTip("Randomly generate a simple example cane.");
@@ -1117,15 +1072,11 @@ void MainWindow::setupMenus()
 
 	// Examples menu and Examples:Random menu
 	examplesMenu = menuBar()->addMenu("&Examples"); //create menu for cane/piece examples
-	webExamplesMenu = examplesMenu->addMenu("&Web");
-	webExamplesMenu->addAction(web1PieceAction);
-	webExamplesMenu->addAction(web2PieceAction);
-	randomExamplesMenu = examplesMenu->addMenu("&Random");
-	randomExamplesMenu->addAction(randomSimpleCaneAction);
-	randomExamplesMenu->addAction(randomComplexCaneAction);
-	randomExamplesMenu->addSeparator();
-	randomExamplesMenu->addAction(randomSimplePieceAction);
-	randomExamplesMenu->addAction(randomComplexPieceAction);
+	examplesMenu->addAction(randomSimpleCaneAction);
+	examplesMenu->addAction(randomComplexCaneAction);
+	examplesMenu->addSeparator();
+	examplesMenu->addAction(randomSimplePieceAction);
+	examplesMenu->addAction(randomComplexPieceAction);
 
 	// toggle depth peeling
 	depthPeelAction = new QAction("Depth peeling", this);

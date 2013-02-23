@@ -117,15 +117,11 @@ class MainWindow : public QMainWindow
 		QPushButton* copyPullPlanButton;
 		QPushButton* copyPieceButton;
 		QPushButton* mergeButton;
-		QMenu *webExamplesMenu;
-		QMenu *randomExamplesMenu;
 		QMenu *examplesMenu;
 		QAction *randomSimpleCaneAction;
 		QAction *randomSimplePieceAction;
 		QAction *randomComplexCaneAction;
 		QAction *randomComplexPieceAction;
-		QAction *web1PieceAction;
-		QAction *web2PieceAction;
 		QMenu *fileMenu;
 		QAction *newFileAction;
 		QAction *openFileAction;
@@ -167,8 +163,6 @@ class MainWindow : public QMainWindow
 		void randomSimplePieceExampleActionTriggered();
 		void randomComplexCaneExampleActionTriggered();
 		void randomComplexPieceExampleActionTriggered();
-		void web1PieceExampleActionTriggered();
-		void web2PieceExampleActionTriggered();
 		void depthPeelActionTriggered();
 		void highGraphicsActionTriggered(); 	
 		void mediumGraphicsActionTriggered(); 	
