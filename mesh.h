@@ -20,8 +20,7 @@ using std::vector;
 
 void generatePullMesh(PullPlan* plan, Geometry* geometry, unsigned int quality);
 void generateColorMesh(GlassColor* glassColor, Geometry* geometry, unsigned int quality);
-void generateMesh(PickupPlan* plan, Geometry* geometry, unsigned int quality);
-void generateMesh(Piece* piece, Geometry* geometry, unsigned int quality);
+void generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometry, unsigned int quality);
 
 namespace MeshInternal
 {
@@ -32,8 +31,7 @@ namespace MeshInternal
 	};
 
 	// Methods
-	void recurseMesh(PickupPlan* plan, Geometry *geometry, vector<ancestor>& ancestors, unsigned int quality,
-		bool isTopLevel=false);
+	void generateMesh(PickupPlan* plan, Geometry *geometry, unsigned int quality, bool isTopLevel=false);
 	void recurseMesh(Piece* piece, Geometry *geometry, vector<ancestor>& ancestors, unsigned int quality);
 	void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors, 
 		float length, unsigned int quality, bool isTopLevel=false);

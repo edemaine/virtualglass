@@ -19,6 +19,7 @@
 #include "piecetemplatelibrarywidget.h"
 #include "pickuptemplatelibrarywidget.h"
 #include "asyncpiecelibrarywidget.h"
+#include "niceviewwidget.h"
 
 PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -125,9 +126,12 @@ void PieceEditorWidget :: geometryThreadFinishedMesh()
 		geometryDirtyMutex.lock();
 		geometryDirty = false;
 		geometryDirtyMutex.unlock();
-		geometry.vertices = tempGeometry1.vertices;
-		geometry.triangles = tempGeometry1.triangles;
-		geometry.groups = tempGeometry1.groups;
+		geometry.vertices = tempPieceGeometry1.vertices;
+		geometry.triangles = tempPieceGeometry1.triangles;
+		geometry.groups = tempPieceGeometry1.groups;
+		pickupViewWidget->geometry.vertices = tempPickupGeometry1.vertices;
+		pickupViewWidget->geometry.triangles = tempPickupGeometry1.triangles;
+		pickupViewWidget->geometry.groups = tempPickupGeometry1.groups;
 		tempGeometry1Mutex.unlock();
 	}
 	else if (tempGeometry2Mutex.tryLock())
@@ -135,9 +139,12 @@ void PieceEditorWidget :: geometryThreadFinishedMesh()
 		geometryDirtyMutex.lock();
 		geometryDirty = false;
 		geometryDirtyMutex.unlock();
-		geometry.vertices = tempGeometry2.vertices;
-		geometry.triangles = tempGeometry2.triangles;
-		geometry.groups = tempGeometry2.groups;
+		geometry.vertices = tempPieceGeometry2.vertices;
+		geometry.triangles = tempPieceGeometry2.triangles;
+		geometry.groups = tempPieceGeometry2.groups;
+		pickupViewWidget->geometry.vertices = tempPickupGeometry2.vertices;
+		pickupViewWidget->geometry.triangles = tempPickupGeometry2.triangles;
+		pickupViewWidget->geometry.groups = tempPickupGeometry2.groups;
 		tempGeometry2Mutex.unlock();
 	}
 	// else: this might happen if we get incredibly unlucky:
@@ -156,6 +163,7 @@ void PieceEditorWidget :: geometryThreadFinishedMesh()
 	// p is probability of the scenario each time. If it's a linear function
 	// of running time, then it's probably < 1%. 
 	
+	pickupViewWidget->repaint();
 	pieceNiceViewWidget->repaint();
 }
 

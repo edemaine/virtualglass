@@ -111,7 +111,6 @@ HEADERS += vgapp.h \
         Matrix.hpp \
 	glassfileio.h \
 	piecegeometrythread.h \
-	pickupgeometrythread.h \
 	pullplangeometrythread.h \
 	globalgraphicssetting.h \
 	twistwidget.h \
@@ -167,7 +166,6 @@ SOURCES += main.cpp \
         bubble.cpp \
 	glassfileio.cpp \
 	piecegeometrythread.cpp \
-	pickupgeometrythread.cpp \
 	pullplangeometrythread.cpp \
 	globalgraphicssetting.cpp \
 	twistwidget.cpp \

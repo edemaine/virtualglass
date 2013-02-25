@@ -1,10 +1,13 @@
 
 #include <QMouseEvent>
 #include <QVBoxLayout>
+
 #include "pickupplaneditorviewwidget.h"
-#include "pickupgeometrythread.h"
 #include "asynccolorbarlibrarywidget.h"
 #include "asyncpullplanlibrarywidget.h"
+#include "niceviewwidget.h"
+#include "glassmime.h"
+#include "glasscolor.h"
 
 PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWidget* parent) : QWidget(parent)
 {
@@ -19,22 +22,11 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWi
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addWidget(niceViewWidget, 1);
 
-	setupThreading();
 	setupConnections();
-}
-
-void PickupPlanEditorViewWidget :: setupThreading()
-{
-	geometryDirty = false;
-	tempPickup = deep_copy(pickup);
-	tempPickupDirty = true;
-	geometryThread = new PickupGeometryThread(this);
-	geometryThread->start();
 }
 
 void PickupPlanEditorViewWidget :: setupConnections()
 {
-	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }
 
@@ -231,38 +223,6 @@ void PickupPlanEditorViewWidget :: setPickup(PickupPlan* _pickup)
 
 void PickupPlanEditorViewWidget :: updateEverything()
 {
-	tempPickupMutex.lock();
-	deep_delete(tempPickup);
-	tempPickup = deep_copy(pickup);
-	tempPickupDirty = true;
-	tempPickupMutex.unlock();
-	wakeWait.wakeOne(); // wake up the thread if it's sleeping
+	this->repaint();
 }
-
-void PickupPlanEditorViewWidget :: geometryThreadFinishedMesh()
-{
-	geometryDirtyMutex.lock();
-	bool dirty = geometryDirty;
-	geometryDirtyMutex.unlock();
-	if (!dirty)
-		return;
-
-	if (tempGeometry1Mutex.tryLock())
-	{
-		geometry.vertices = tempGeometry1.vertices;
-		geometry.triangles = tempGeometry1.triangles;
-		geometry.groups = tempGeometry1.groups;
-		tempGeometry1Mutex.unlock();
-	}
-	else if (tempGeometry2Mutex.tryLock())
-	{
-		geometry.vertices = tempGeometry2.vertices;
-		geometry.triangles = tempGeometry2.triangles;
-		geometry.groups = tempGeometry2.groups;
-		tempGeometry2Mutex.unlock();
-	}
-
-	niceViewWidget->repaint();
-}
-
 

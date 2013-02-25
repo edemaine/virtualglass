@@ -27,10 +27,10 @@ void PieceGeometryThread::run()
 		
 			// now lock the geometry
 			pew->tempGeometry1Mutex.lock();
-			generateMesh(myTempPiece, &(pew->tempGeometry1), quality);
+			generateMesh(myTempPiece, &(pew->tempPieceGeometry1), &(pew->tempPickupGeometry1), quality);
 			pew->tempGeometry1Mutex.unlock();	
 			pew->tempGeometry2Mutex.lock();
-			generateMesh(myTempPiece, &(pew->tempGeometry2), quality);
+			generateMesh(myTempPiece, &(pew->tempPieceGeometry2), &(pew->tempPickupGeometry2), quality);
 			pew->tempGeometry2Mutex.unlock();	
 			pew->geometryDirtyMutex.lock();
 			pew->geometryDirty = true;

@@ -10,22 +10,40 @@
 
 using namespace MeshInternal;
 
-void generateMesh(Piece* piece, Geometry* geometry, unsigned int quality)
+void generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometry, unsigned int quality)
 {
-	geometry->clear();
-	vector<ancestor> ancestors;
-	recurseMesh(piece, geometry, ancestors, quality);
-	geometry->compute_normals_from_triangles();
+	if (piece == NULL || pieceGeometry == NULL)
+		return;
+
+	if (pickupGeometry == NULL)
+	{
+		// just do everything in the piece geometry
+		pieceGeometry->clear();
+		generateMesh(piece->pickup, pieceGeometry, quality);
+		applyPieceTransform(pieceGeometry, piece);
+		pieceGeometry->compute_normals_from_triangles();
+	}
+	else
+	{
+		// compute pickup geometry and copy it into piece geometry
+		// to save all the work of computing the same thing again
+
+		// clear geometry
+		pickupGeometry->clear();
+		pieceGeometry->clear();
+		// compute pickup geometry
+		generateMesh(piece->pickup, pickupGeometry, quality);
+		pickupGeometry->compute_normals_from_triangles();
+		// copy into piece geometry and apply piece transform there
+		pieceGeometry->vertices = pickupGeometry->vertices;
+		pieceGeometry->triangles = pickupGeometry->triangles;
+		pieceGeometry->groups = pickupGeometry->groups;
+		applyPieceTransform(pieceGeometry, piece);
+		pieceGeometry->compute_normals_from_triangles();
+	}
 }
 
-void generateMesh(PickupPlan* pickup, Geometry* geometry, unsigned int quality)
-{
-	geometry->clear();
-	vector<ancestor> ancestors;
-	recurseMesh(pickup, geometry, ancestors, quality, true);
-	geometry->compute_normals_from_triangles();
-}
-
+// fix the names of these, can just use generateMesh()
 void generatePullMesh(PullPlan* plan, Geometry* geometry, unsigned int quality)
 {
 	geometry->clear();
@@ -628,17 +646,7 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors,
 		first_vert, geometry->vertices.size() - first_vert, color, ensureVisible));
 }
 
-void recurseMesh(Piece* piece, Geometry* geometry, vector<ancestor>& ancestors, unsigned int quality)
-{
-	if (piece == NULL)
-		return;
-
-	geometry->clear();
-	recurseMesh(piece->pickup, geometry, ancestors, quality);
-	applyPieceTransform(geometry, piece);
-}
-
-void recurseMesh(PickupPlan* pickup, Geometry *geometry, vector<ancestor>& ancestors, unsigned int quality, bool isTopLevel)
+void generateMesh(PickupPlan* pickup, Geometry *geometry, unsigned int quality, bool isTopLevel)
 {
 	if (pickup == NULL)
 		return;
@@ -646,7 +654,7 @@ void recurseMesh(PickupPlan* pickup, Geometry *geometry, vector<ancestor>& ances
 	geometry->clear();
 	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
 	{
-		ancestors.clear();
+		vector<ancestor> ancestors;
 		uint32_t startPlanVerts = geometry->vertices.size();
 		recurseMesh(pickup->subs[i].plan, geometry, 
 			ancestors, pickup->subs[i].length, quality, isTopLevel); 

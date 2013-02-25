@@ -75,8 +75,10 @@ class PieceEditorWidget : public QWidget
 		bool geometryDirty;
 		QMutex tempGeometry1Mutex;
 		QMutex tempGeometry2Mutex;
-		Geometry tempGeometry1;
-		Geometry tempGeometry2;
+		Geometry tempPieceGeometry1;
+		Geometry tempPickupGeometry1;
+		Geometry tempPieceGeometry2;
+		Geometry tempPickupGeometry2;
 
 		Geometry geometry;
 
