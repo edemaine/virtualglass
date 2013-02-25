@@ -19,7 +19,8 @@ void generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometr
 	{
 		// just do everything in the piece geometry
 		pieceGeometry->clear();
-		generateMesh(piece->pickup, pieceGeometry, quality);
+		generateMesh(piece->pickup, pieceGeometry, quality, true);
+		casePickup(pieceGeometry, piece);
 		applyPieceTransform(pieceGeometry, piece);
 		pieceGeometry->compute_normals_from_triangles();
 	}
@@ -32,19 +33,19 @@ void generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometr
 		pickupGeometry->clear();
 		pieceGeometry->clear();
 		// compute pickup geometry
-		generateMesh(piece->pickup, pickupGeometry, quality);
+		generateMesh(piece->pickup, pickupGeometry, quality, true);
 		pickupGeometry->compute_normals_from_triangles();
 		// copy into piece geometry and apply piece transform there
 		pieceGeometry->vertices = pickupGeometry->vertices;
 		pieceGeometry->triangles = pickupGeometry->triangles;
 		pieceGeometry->groups = pickupGeometry->groups;
+		casePickup(pieceGeometry, piece);
 		applyPieceTransform(pieceGeometry, piece);
 		pieceGeometry->compute_normals_from_triangles();
 	}
 }
 
-// fix the names of these, can just use generateMesh()
-void generatePullMesh(PullPlan* plan, Geometry* geometry, unsigned int quality)
+void generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality)
 {
 	geometry->clear();
 	vector<ancestor> ancestors;
@@ -58,7 +59,7 @@ void generatePullMesh(PullPlan* plan, Geometry* geometry, unsigned int quality)
 	geometry->compute_normals_from_triangles();
 }
 
-void generateColorMesh(GlassColor* gc, Geometry* geometry, unsigned int quality)
+void generateMesh(GlassColor* gc, Geometry* geometry, unsigned int quality)
 {
 	PullPlan dummyPlan(PullTemplate::BASE_CIRCLE);
 	dummyPlan.setOutermostCasingColor(gc);
@@ -195,11 +196,33 @@ void applyBasedPieceTransform(Vertex& v, float twist, Spline& spline)
 	v.position.z -= (10.0 - turnEnd)/2;
 }
 
-void applyPieceTransform(Geometry* geom, Piece* piece)
+void casePickup(Geometry* geometry, Piece* piece)
 {
-	for (uint32_t i = 0; i < geom->vertices.size(); ++i)
+	// allow canes to be invisible now, since casing will be added around them
+	// and clear "visibility" is an index of refraction thing between air and glass
+	for (unsigned int i = 0; i < geometry->groups.size(); ++i)
+		geometry->groups[i].ensureVisible = false;
+
+	// base thickness of casing off of representative (first) cane in pickup
+	float thickness;
+	if (piece->pickup->subs[0].orientation == MURRINE_PICKUP_CANE_ORIENTATION)
+		thickness = piece->pickup->subs[0].length*2.5;	
+	else
+		thickness = piece->pickup->subs[0].width*2.5;
+
+	meshPickupCasingSlab(geometry, piece->pickup->casingGlassColor->getColor(), 0.0, thickness);
+	//meshPickupCasingSlab(geometry, pickup->underlayGlassColor->getColor(), thickness + 0.1, 0.05);
+	//meshPickupCasingSlab(geometry, pickup->overlayGlassColor->getColor(), -(thickness + 0.1), 0.05);
+
+}
+
+void applyPieceTransform(Geometry* geometry, Piece* piece)
+{
+
+	// second, shape the pickup slab into a piece
+	for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
 	{
-		Vertex& v = geom->vertices[i];
+		Vertex& v = geometry->vertices[i];
 		if (piece->isBased())
 			applyBasedPieceTransform(v, piece->twist, piece->spline);
 		else
@@ -213,7 +236,7 @@ void applySubplanTransforms(Vertex& v, vector<ancestor>& ancestors)
 		applySubplanTransform(v, ancestors[i]);
 }
 
-void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickness, bool ensureVisible)
+void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickness)
 {
 	unsigned int slabResolution = 100;
 
@@ -255,9 +278,9 @@ void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickn
 			Point p;
 			p.xy = points[j];
 			if (i == 0)
-				p.z = -4.999;
+				p.z = -5.001;
 			else
-				p.z = -4.999 + 9.998 * i / (slabResolution-1);
+				p.z = -5.001 + 10.002 * i / (slabResolution-1);
 			Point n;
 			//This is a terrible normal estimate, but I guess it gets re-estimated anyway.
 			n.x = p.x;
@@ -344,7 +367,7 @@ void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickn
 	assert(geometry->valid());
 
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, color, ensureVisible));
+		first_vert, geometry->vertices.size() - first_vert, color, true));
 }
 
 void getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution, 
@@ -666,21 +689,6 @@ void generateMesh(PickupPlan* pickup, Geometry *geometry, unsigned int quality, 
 		}
 	}
 
-	float thickness;
-	// base thickness of casing off of representative (first) cane in pickup
-	if (pickup->subs[0].orientation == MURRINE_PICKUP_CANE_ORIENTATION)
-		thickness = pickup->subs[0].length*2.5;	
-	else
-		thickness = pickup->subs[0].width*2.5;
-
-	// top level means that you want a pickup (and not a piece formed from a pickup)
-	// in this case, the slab is not ensureVisible'd, but the canes are, as the pickup
-	// serves as a guide for where to put subcanes, which must be visible
-	meshPickupCasingSlab(geometry, pickup->casingGlassColor->getColor(), 0.0, thickness, !isTopLevel);
-
-	// overlay/underlays
-	meshPickupCasingSlab(geometry, pickup->underlayGlassColor->getColor(), thickness + 0.1, 0.05);
-	meshPickupCasingSlab(geometry, pickup->overlayGlassColor->getColor(), -(thickness + 0.1), 0.05);
 }
 
 /*

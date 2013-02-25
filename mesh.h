@@ -18,8 +18,8 @@ class Spline;
 
 using std::vector;
 
-void generatePullMesh(PullPlan* plan, Geometry* geometry, unsigned int quality);
-void generateColorMesh(GlassColor* glassColor, Geometry* geometry, unsigned int quality);
+void generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality);
+void generateMesh(GlassColor* glassColor, Geometry* geometry, unsigned int quality);
 void generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometry, unsigned int quality);
 
 namespace MeshInternal
@@ -55,11 +55,12 @@ namespace MeshInternal
 	void applyResizeTransform(Vertex& v, float scale);
 
 	void applyPickupTransform(Vertex& p, SubpickupTemplate& spt);
-	void meshPickupCasingSlab(Geometry* g, Color c, float y, float thickness, bool ensureVisible=false);
+	void meshPickupCasingSlab(Geometry* g, Color c, float y, float thickness);
 
 	void applyUnbasedPieceTransform(Vertex& v, float twist, Spline& spline);
 	void applyBasedPieceTransform(Vertex& v, float twist, Spline& spline);
 	void applyPieceTransform(Vertex& v, float twist, Spline& spline);
+	void casePickup(Geometry* geometry, Piece* piece);
 	void applyPieceTransform(Geometry* geometry, Piece* piece);
 }
 #endif

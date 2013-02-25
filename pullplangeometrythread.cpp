@@ -27,10 +27,10 @@ void PullPlanGeometryThread::run()
 		
 			// now lock the geometry
 			ppew->tempGeometry1Mutex.lock();
-			generatePullMesh(myTempPullPlan, &(ppew->tempGeometry1), quality);
+			generateMesh(myTempPullPlan, &(ppew->tempGeometry1), quality);
 			ppew->tempGeometry1Mutex.unlock();	
 			ppew->tempGeometry2Mutex.lock();
-			generatePullMesh(myTempPullPlan, &(ppew->tempGeometry2), quality);
+			generateMesh(myTempPullPlan, &(ppew->tempGeometry2), quality);
 			ppew->tempGeometry2Mutex.unlock();	
 			ppew->geometryDirtyMutex.lock();
 			ppew->geometryDirty = true;
