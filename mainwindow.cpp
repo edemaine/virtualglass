@@ -17,7 +17,7 @@
 #include "niceviewwidget.h"
 #include "piecelibrarywidget.h"
 #include "pullplanlibrarywidget.h"
-#include "colorbarlibrarywidget.h"
+#include "glasscolorlibrarywidget.h"
 #include "pullplan.h"
 #include "pulltemplate.h"
 #include "pickupplan.h"
@@ -61,7 +61,7 @@ MainWindow :: MainWindow()
 void MainWindow :: setViewMode(enum ViewMode _mode)
 {
 	editorStack->setCurrentIndex(_mode);
-	copyColorBarButton->setEnabled(false);
+	copyGlassColorButton->setEnabled(false);
 	copyPullPlanButton->setEnabled(false);
 	copyPieceButton->setEnabled(false);
 	exportPLYFileAction->setEnabled(false);
@@ -73,7 +73,7 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			// leave all copy buttons disabled
 			break;
 		case COLORBAR_VIEW_MODE:
-			copyColorBarButton->setEnabled(true);
+			copyGlassColorButton->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
 			break;
 		case PULLPLAN_VIEW_MODE:
@@ -129,7 +129,7 @@ void MainWindow :: unhighlightAllLibraryWidgets()
 	for (int j = 0; j < colorBarLibraryLayout->count(); ++j)
 	{
 		w = colorBarLibraryLayout->itemAt(j);
-		static_cast<ColorBarLibraryWidget*>(w->widget())->setDependancy(false);
+		static_cast<GlassColorLibraryWidget*>(w->widget())->setDependancy(false);
 	}
 	for (int j = 0; j < pullPlanLibraryLayout->count(); ++j)
 	{
@@ -164,7 +164,7 @@ void MainWindow :: deleteCurrentEditingObject()
 			for (i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
 				w = colorBarLibraryLayout->itemAt(i);
-				GlassColor* gc = dynamic_cast<ColorBarLibraryWidget*>(w->widget())->glassColor;
+				GlassColor* gc = dynamic_cast<GlassColorLibraryWidget*>(w->widget())->glassColor;
 				if (gc == colorEditorWidget->getGlassColor())
 				{
 					if (glassColorIsDependancy(gc))
@@ -184,7 +184,7 @@ void MainWindow :: deleteCurrentEditingObject()
 				}
 			}
 
-			colorEditorWidget->setGlassColor(dynamic_cast<ColorBarLibraryWidget*>(colorBarLibraryLayout->itemAt(
+			colorEditorWidget->setGlassColor(dynamic_cast<GlassColorLibraryWidget*>(colorBarLibraryLayout->itemAt(
 					MIN(colorBarLibraryLayout->count()-1, i))->widget())->glassColor);
 			emit someDataChanged();
 			break;
@@ -257,7 +257,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	// If this is a drag and not the end of a click, don't process (dropEvent will do it instead)
 	if (isDragging && (event->pos() - dragStartPosition).manhattanLength() > QApplication::startDragDistance()) return;
 
-	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
+	GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(childAt(event->pos()));
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
 	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
 
@@ -281,7 +281,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 
 void MainWindow :: mousePressEvent(QMouseEvent* event)
 {
-	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
+	GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(childAt(event->pos()));
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
 
 	if (event->button() == Qt::LeftButton && (cblw != NULL || plplw != NULL))
@@ -305,7 +305,7 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	if (!isDragging || (event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
 		return;
 
-	ColorBarLibraryWidget* cblw = dynamic_cast<ColorBarLibraryWidget*>(childAt(event->pos()));
+	GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(childAt(event->pos()));
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
 
 	char buf[500];
@@ -339,8 +339,8 @@ void MainWindow :: setupConnections()
 {
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 
-	connect(newColorBarButton, SIGNAL(pressed()), this, SLOT(newColorBar()));
-	connect(copyColorBarButton, SIGNAL(pressed()), this, SLOT(copyColorBar()));
+	connect(newGlassColorButton, SIGNAL(pressed()), this, SLOT(newGlassColor()));
+	connect(copyGlassColorButton, SIGNAL(pressed()), this, SLOT(copyGlassColor()));
 	connect(colorEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 
 	connect(newPullPlanButton, SIGNAL(pressed()), this, SLOT(newPullPlan()));
@@ -405,7 +405,7 @@ void MainWindow :: randomSimpleCaneExampleActionTriggered()
 	GlassColor* randomGC = randomGlassColor();
 	PullPlan* randomPP = randomSimplePullPlan(CIRCLE_SHAPE, randomGC);
 
-	colorBarLibraryLayout->addWidget(new ColorBarLibraryWidget(randomGC, this));
+	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(randomGC, this));
 
 	PullPlanLibraryWidget* pplw = new PullPlanLibraryWidget(randomPP, this);
 	pullPlanLibraryLayout->addWidget(pplw);
@@ -421,7 +421,7 @@ void MainWindow :: randomComplexCaneExampleActionTriggered()
 	PullPlan* randomSPP = randomSimplePullPlan(SQUARE_SHAPE, randomGC);
 	PullPlan* randomComplexPP = randomComplexPullPlan(randomCPP, randomSPP);
 
-	colorBarLibraryLayout->addWidget(new ColorBarLibraryWidget(randomGC, this));
+	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(randomGC, this));
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(randomComplexPP, this));
 	// add simple plans only if they are used
 	// memory leak! as unused ones never appear in library
@@ -440,7 +440,7 @@ void MainWindow :: randomSimplePieceExampleActionTriggered()
 	PullPlan* randomSPP = randomSimplePullPlan(SQUARE_SHAPE, randomGC);
 	Piece* randomP = randomPiece(randomPickup(randomSPP));
 
-	colorBarLibraryLayout->addWidget(new ColorBarLibraryWidget(randomGC, this));
+	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(randomGC, this));
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(randomSPP, this));
 
 	PieceLibraryWidget* plw = new PieceLibraryWidget(randomP, this);
@@ -461,9 +461,9 @@ void MainWindow :: randomComplexPieceExampleActionTriggered()
 	Piece* randomP = randomPiece(randomPickup(randomComplexPP1, randomComplexPP2));
 
 	if (randomP->hasDependencyOn(randomGC1)) // memory leak if returns no
-		colorBarLibraryLayout->addWidget(new ColorBarLibraryWidget(randomGC1, this));
+		colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(randomGC1, this));
 	if (randomP->hasDependencyOn(randomGC2)) // memory leak if returns no
-		colorBarLibraryLayout->addWidget(new ColorBarLibraryWidget(randomGC2, this));
+		colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(randomGC2, this));
 	if (randomP->hasDependencyOn(randomCPP)) // memory leak if returns no
 		pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(randomCPP, this));
 	if (randomP->hasDependencyOn(randomSPP)) // memory leak if returns no
@@ -526,17 +526,17 @@ void MainWindow :: setupLibrary()
 	QGridLayout* superlibraryLayout = new QGridLayout(libraryWidget);
 	libraryWidget->setLayout(superlibraryLayout);
 
-	newColorBarButton = new QPushButton("New Color", libraryWidget);
+	newGlassColorButton = new QPushButton("New Color", libraryWidget);
 	newPullPlanButton = new QPushButton("New Cane", libraryWidget);
 	newPieceButton = new QPushButton("New Piece", libraryWidget);
-	superlibraryLayout->addWidget(newColorBarButton, 0, 0);
+	superlibraryLayout->addWidget(newGlassColorButton, 0, 0);
 	superlibraryLayout->addWidget(newPullPlanButton, 0, 1);
 	superlibraryLayout->addWidget(newPieceButton, 0, 2);
 
-	copyColorBarButton = new QPushButton("Copy Color", libraryWidget);
+	copyGlassColorButton = new QPushButton("Copy Color", libraryWidget);
 	copyPullPlanButton = new QPushButton("Copy Cane", libraryWidget);
 	copyPieceButton = new QPushButton("Copy Piece", libraryWidget);
-	superlibraryLayout->addWidget(copyColorBarButton, 1, 0);
+	superlibraryLayout->addWidget(copyGlassColorButton, 1, 0);
 	superlibraryLayout->addWidget(copyPullPlanButton, 1, 1);
 	superlibraryLayout->addWidget(copyPieceButton, 1, 2);
 
@@ -634,7 +634,7 @@ void MainWindow :: setupColorEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
 	colorEditorWidget = new ColorEditorWidget(editorStack);
-	colorBarLibraryLayout->addWidget(new ColorBarLibraryWidget(colorEditorWidget->getGlassColor(), this));
+	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(colorEditorWidget->getGlassColor(), this));
 }
 
 void MainWindow :: setupPullPlanEditor()
@@ -677,19 +677,19 @@ void MainWindow :: copyPiece()
 	emit someDataChanged();
 }
 
-void MainWindow :: newColorBar()
+void MainWindow :: newGlassColor()
 {
 	GlassColor* newGlassColor = new GlassColor();
 
 	// Create the new library entry
-	colorBarLibraryLayout->addWidget(new ColorBarLibraryWidget(newGlassColor, this));
+	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(newGlassColor, this));
 	colorEditorWidget->setGlassColor(newGlassColor);
 
 	// Load up the right editor
 	setViewMode(COLORBAR_VIEW_MODE);
 }
 
-void MainWindow :: copyColorBar()
+void MainWindow :: copyGlassColor()
 {
 	if (editorStack->currentIndex() != COLORBAR_VIEW_MODE)
 		return;
@@ -697,7 +697,7 @@ void MainWindow :: copyColorBar()
 	GlassColor* newEditorGlassColor = colorEditorWidget->getGlassColor()->copy();
 
 	// Create the new library entry
-	colorBarLibraryLayout->addWidget(new ColorBarLibraryWidget(newEditorGlassColor, this));
+	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(newEditorGlassColor, this));
 	colorEditorWidget->setGlassColor(newEditorGlassColor);
 
 	// Trigger GUI updates
@@ -821,10 +821,10 @@ void MainWindow :: updateLibrary()
 	{
 		case COLORBAR_VIEW_MODE:
 		{
-			ColorBarLibraryWidget* cblw;
+			GlassColorLibraryWidget* cblw;
 			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
-				cblw = dynamic_cast<ColorBarLibraryWidget*>(
+				cblw = dynamic_cast<GlassColorLibraryWidget*>(
 						dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 				if (colorEditorWidget->getGlassColor() == cblw->glassColor)
 				{
@@ -862,10 +862,10 @@ void MainWindow :: updateLibrary()
 		}
 		case PULLPLAN_VIEW_MODE:
 		{
-			ColorBarLibraryWidget* cblw;
+			GlassColorLibraryWidget* cblw;
 			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
-				cblw = dynamic_cast<ColorBarLibraryWidget*>(
+				cblw = dynamic_cast<GlassColorLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(cblw->glassColor))
 					cblw->setDependancy(true, USEDBY_DEPENDANCY);
@@ -912,10 +912,10 @@ void MainWindow :: updateLibrary()
 		}
 		case PIECE_VIEW_MODE:
 		{
-			ColorBarLibraryWidget* cblw;
+			GlassColorLibraryWidget* cblw;
 			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
-				cblw = dynamic_cast<ColorBarLibraryWidget*>(
+				cblw = dynamic_cast<GlassColorLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 				if (pieceEditorWidget->getPiece()->hasDependencyOn(cblw->glassColor))
 					cblw->setDependancy(true, USEDBY_DEPENDANCY);
@@ -1209,7 +1209,7 @@ void MainWindow::getDependantLibraryContents(Piece* piece, vector<GlassColor*>& 
 {
 	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 	{
-		ColorBarLibraryWidget *cblw = dynamic_cast<ColorBarLibraryWidget*>(
+		GlassColorLibraryWidget *cblw = dynamic_cast<GlassColorLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 		if (piece->hasDependencyOn(cblw->glassColor))
 		{
@@ -1234,7 +1234,7 @@ void MainWindow::getDependantLibraryContents(PullPlan* plan, vector<GlassColor*>
 {
 	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 	{
-		ColorBarLibraryWidget *cblw = dynamic_cast<ColorBarLibraryWidget*>(
+		GlassColorLibraryWidget *cblw = dynamic_cast<GlassColorLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 		if (plan->hasDependencyOn(cblw->glassColor))
 		{
@@ -1257,7 +1257,7 @@ void MainWindow::getDependantLibraryContents(GlassColor* color, vector<GlassColo
 {
 	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 	{
-		ColorBarLibraryWidget *cblw = dynamic_cast<ColorBarLibraryWidget*>(
+		GlassColorLibraryWidget *cblw = dynamic_cast<GlassColorLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 		if (cblw->glassColor == color)
 		{
@@ -1273,7 +1273,7 @@ void MainWindow::getLibraryContents(vector<GlassColor*>& colors, vector<PullPlan
 {
 	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 	{
-		ColorBarLibraryWidget *cblw = dynamic_cast<ColorBarLibraryWidget*>(
+		GlassColorLibraryWidget *cblw = dynamic_cast<GlassColorLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 		colors.push_back(cblw->glassColor);
 		plans.push_back(cblw->circlePlan);
@@ -1331,7 +1331,7 @@ void MainWindow::newFileActionTriggered()
 	clearLibrary();
 
 	// 3. add the three new guys from the editors into the library 
-	colorBarLibraryLayout->addWidget(new ColorBarLibraryWidget(colorEditorWidget->getGlassColor(), this));
+	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(colorEditorWidget->getGlassColor(), this));
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(pullPlanEditorWidget->getPlan(), this));
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(pieceEditorWidget->getPiece(), this)); 
 
@@ -1393,7 +1393,7 @@ void MainWindow::addToLibrary(vector<GlassColor*>& colors, vector<PullPlan*>& pl
 				break;
 			}
 		}
-		colorBarLibraryLayout->addWidget(new ColorBarLibraryWidget(colors[i], this, 
+		colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(colors[i], this, 
 			circlePlan, squarePlan));
 	}
 	for (unsigned int i = 0; i < plans.size(); ++i)

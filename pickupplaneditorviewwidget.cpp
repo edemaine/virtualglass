@@ -3,7 +3,7 @@
 #include <QVBoxLayout>
 
 #include "pickupplaneditorviewwidget.h"
-#include "colorbarlibrarywidget.h"
+#include "glasscolorlibrarywidget.h"
 #include "pullplanlibrarywidget.h"
 #include "niceviewwidget.h"
 #include "glassmime.h"
@@ -177,7 +177,7 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	switch (type)
 	{
 		case GlassMime::COLORLIBRARY_MIME:
-			droppedPlan = reinterpret_cast<ColorBarLibraryWidget*>(droppedObject)->circlePlan;
+			droppedPlan = reinterpret_cast<GlassColorLibraryWidget*>(droppedObject)->circlePlan;
 			break;
 		case GlassMime::PULLPLAN_MIME:
 			droppedPlan = reinterpret_cast<PullPlan*>(droppedObject);

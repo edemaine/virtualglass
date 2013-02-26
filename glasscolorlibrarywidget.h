@@ -1,15 +1,15 @@
-#ifndef COLORBARLIBRARYWIDGET_H
-#define COLORBARLIBRARYWIDGET_H
+#ifndef GLASSCOLORLIBRARYWIDGET_H
+#define GLASSCOLORLIBRARYWIDGET_H
 
 #include "asyncrenderwidget.h"
 
 class GlassColor;
 class PullPlan;
 
-class ColorBarLibraryWidget : public AsyncRenderWidget
+class GlassColorLibraryWidget : public AsyncRenderWidget
 {
 	public:
-		ColorBarLibraryWidget(GlassColor* _color, QWidget* _parent=NULL,
+		GlassColorLibraryWidget(GlassColor* _color, QWidget* _parent=NULL,
 			PullPlan* _circlePlan=NULL, PullPlan* _squarePlan=NULL);
 		const QPixmap *getDragPixmap();
 		void updatePixmaps();

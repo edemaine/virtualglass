@@ -8,7 +8,7 @@
 #include "pullplan.h"
 #include "glassmime.h"
 #include "pullplanlibrarywidget.h"
-#include "colorbarlibrarywidget.h"
+#include "glasscolorlibrarywidget.h"
 #include "pullplaneditorviewwidget.h"
 
 PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
@@ -224,7 +224,7 @@ void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 	switch (type)
 	{
 		case GlassMime::COLORLIBRARY_MIME:
-			draggedLibraryColor = reinterpret_cast<ColorBarLibraryWidget*>(ptr);
+			draggedLibraryColor = reinterpret_cast<GlassColorLibraryWidget*>(ptr);
 			break;
 		case GlassMime::COLOR_MIME:
 			draggedColor = reinterpret_cast<GlassColor*>(ptr);

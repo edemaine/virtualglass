@@ -101,7 +101,7 @@ HEADERS += vgapp.h \
 	pullplanrenderdata.h \
 	piecerenderdata.h \
 	pullplanlibrarywidget.h \
-	colorbarlibrarywidget.h \
+	glasscolorlibrarywidget.h \
 	piecelibrarywidget.h \
 	pullplancustomizeviewwidget.h \
 	glassmime.h \
@@ -156,7 +156,7 @@ SOURCES += main.cpp \
 	pullplanrenderdata.cpp \
 	piecerenderdata.cpp \
 	pullplanlibrarywidget.cpp \
-	colorbarlibrarywidget.cpp \
+	glasscolorlibrarywidget.cpp \
 	piecelibrarywidget.cpp \
 	glassmime.cpp \
 	glasscolor.cpp \

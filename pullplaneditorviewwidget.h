@@ -10,7 +10,7 @@
 class GlassColor;
 class PullPlan;
 class PullPlanLibraryWidget;
-class ColorBarLibraryWidget;
+class GlassColorLibraryWidget;
 
 using std::vector;
 
@@ -57,7 +57,7 @@ class PullPlanEditorViewWidget : public QWidget
 
 		PullPlan* plan;
 
-		ColorBarLibraryWidget* draggedLibraryColor;
+		GlassColorLibraryWidget* draggedLibraryColor;
 		GlassColor* draggedColor;
 		PullPlan* draggedPlan;
 
