@@ -223,8 +223,6 @@ void casePickup(Geometry* geometry, Piece* piece)
 
 void applyPieceTransform(Geometry* geometry, Piece* piece)
 {
-
-	// second, shape the pickup slab into a piece
 	for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
 	{
 		Vertex& v = geometry->vertices[i];
@@ -232,7 +230,7 @@ void applyPieceTransform(Geometry* geometry, Piece* piece)
 			applyBasedPieceTransform(v, piece->twist, piece->spline);
 		else
 			applyUnbasedPieceTransform(v, piece->twist, piece->spline);
-	} // end loop over vertices
+	} 
 }
 
 void applySubplanTransforms(Vertex& v, vector<ancestor>& ancestors)
