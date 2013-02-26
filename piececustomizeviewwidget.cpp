@@ -10,6 +10,7 @@ PieceCustomizeViewWidget :: PieceCustomizeViewWidget(Piece* _piece, QWidget* _pa
 	// setup draw widget
 	setMinimumSize(200, 200);
 	this->piece = _piece;
+	this->viewSize = 22.0;	
 
 	isDraggingControlPoint = false;
 	draggedControlPointIndex = 0;
@@ -18,6 +19,15 @@ PieceCustomizeViewWidget :: PieceCustomizeViewWidget(Piece* _piece, QWidget* _pa
 QRect PieceCustomizeViewWidget :: usedRect()
 {
 	return QRect(ulX, ulY, squareSize, squareSize);
+}
+
+void PieceCustomizeViewWidget :: wheelEvent(QWheelEvent *e)
+{
+	if (e->delta() > 0)
+		viewSize *= 0.8; 
+	else if (e->delta() < 0)	
+		viewSize *= 1.2;
+	updateEverything();
 }
 
 void PieceCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
@@ -43,37 +53,37 @@ void PieceCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
 
 float PieceCustomizeViewWidget :: adjustedX(float rawX)
 {
-	float blowup = squareSize / 22.0;
+	float blowup = squareSize / viewSize;
 	return (rawX - ulX) / blowup;
 }
 
 float PieceCustomizeViewWidget :: adjustedY(float rawY)
 {
-	float blowup = squareSize / 22.0;
+	float blowup = squareSize / viewSize;
 	return (rawY - ulY) / blowup;
 }
 
 float PieceCustomizeViewWidget :: rawX(float adjustedX)
 {
-	float blowup = squareSize / 22.0;
+	float blowup = squareSize / viewSize;
 	return adjustedX * blowup + ulX;
 }
 
 float PieceCustomizeViewWidget :: rawY(float adjustedY)
 {
-	float blowup = squareSize / 22.0;
+	float blowup = squareSize / viewSize;
 	return adjustedY * blowup + ulY;
 }
 
 float PieceCustomizeViewWidget :: rawScale(float adjustedScale)
 {
-	float blowup = squareSize / 22.0;
+	float blowup = squareSize / viewSize;
 	return adjustedScale * blowup; 
 }
 
 float PieceCustomizeViewWidget :: adjustedScale(float rawScale)
 {
-	float blowup = squareSize / 22.0;
+	float blowup = squareSize / viewSize;
 	return rawScale / blowup; 
 }
 
@@ -83,8 +93,8 @@ Point PieceCustomizeViewWidget :: controlPointRawLocation(unsigned int index)
 
 	float vertLength = 9.0 - piece->spline.values()[0];
 	float yOffset = 0.5 * vertLength;
-	p.x = rawX(11 - piece->spline.values()[index]); 
-	p.y = rawY(11 + yOffset - 2 / PI - vertLength * index / (static_cast<float>(piece->spline.values().size()) - 1.0));
+	p.x = rawX(viewSize/2 - piece->spline.values()[index]); 
+	p.y = rawY(viewSize/2 + yOffset - 2 / PI - vertLength * index / (static_cast<float>(piece->spline.values().size()) - 1.0));
 
 	return p;
 } 
@@ -134,6 +144,7 @@ void PieceCustomizeViewWidget :: updateEverything()
 void PieceCustomizeViewWidget :: setPiece(Piece* _piece)
 {
 	this->piece = _piece;
+	this->viewSize = 22.0;
 	updateEverything();
 }
 
@@ -161,21 +172,21 @@ void PieceCustomizeViewWidget :: drawPiece()
 	// and spline determining remaining side curve, after a PI/2 turn with 
 	// length 1.0
 	float yOffset = 0.5 * (9.0 - spline.values()[0]);
+	float center = viewSize/2;
 
 	// first draw bottom
 	QPointF start;
-	start.setX(rawX(11 - spline.values()[0] + 2 / PI));
-	start.setY(rawY(11 + yOffset));
+	start.setX(rawX(center - spline.values()[0] + 2 / PI));
+	start.setY(rawY(center + yOffset));
 	QPointF end;
-	end.setX(rawX(11 + spline.values()[0] - 2 / PI));
+	end.setX(rawX(center + spline.values()[0] - 2 / PI));
 	end.setY(start.y());
 	painter.drawLine(QLineF(start, end));
 
 	// next draw turns
-	QPointF center;
-	painter.drawArc(rawX(11 + spline.values()[0] - 4 / PI), rawY(11 + yOffset - 4 / PI), rawScale(4 / PI), rawScale(4 / PI),
+	painter.drawArc(rawX(center + spline.values()[0] - 4 / PI), rawY(center + yOffset - 4 / PI), rawScale(4 / PI), rawScale(4 / PI),
 		0 * 16, -90 * 16); 
-	painter.drawArc(rawX(11 - spline.values()[0]), rawY(11 + yOffset - 4 / PI), rawScale(4 / PI), rawScale(4 / PI),
+	painter.drawArc(rawX(center - spline.values()[0]), rawY(center + yOffset - 4 / PI), rawScale(4 / PI), rawScale(4 / PI),
 		-180 * 16, 90 * 16); 
 	
 	// now draw remainder	
@@ -183,14 +194,14 @@ void PieceCustomizeViewWidget :: drawPiece()
 	{
 		float t_delta = t + 0.01;	
 
-		start.setX(rawX(11 + spline.get(t)));
-		start.setY(rawY(11 + yOffset - 2 / PI - (t * (9.0 - spline.values()[0]))));	
-		end.setX(rawX(11 + spline.get(t_delta)));
-		end.setY(rawY(11 + yOffset - 2 / PI - (t_delta * (9.0 - spline.values()[0]))));
+		start.setX(rawX(center + spline.get(t)));
+		start.setY(rawY(center + yOffset - 2 / PI - (t * (9.0 - spline.values()[0]))));	
+		end.setX(rawX(center + spline.get(t_delta)));
+		end.setY(rawY(center + yOffset - 2 / PI - (t_delta * (9.0 - spline.values()[0]))));
 		painter.drawLine(QLineF(start, end));
 
-		start.setX(rawX(11 - spline.get(t)));
-		end.setX(rawX(11 - spline.get(t_delta)));
+		start.setX(rawX(center - spline.get(t)));
+		end.setX(rawX(center - spline.get(t_delta)));
 		painter.drawLine(QLineF(start, end));
 	}
 

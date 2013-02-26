@@ -25,6 +25,7 @@ class PieceCustomizeViewWidget : public QWidget
 		void mouseReleaseEvent(QMouseEvent* event);
 		void paintEvent(QPaintEvent *event);
 		void resizeEvent(QResizeEvent* event);
+                void wheelEvent(QWheelEvent* e);
 
 	private:
 		float adjustedX(float rawX);
@@ -40,7 +41,7 @@ class PieceCustomizeViewWidget : public QWidget
 
 		bool isDraggingControlPoint;
 		unsigned int draggedControlPointIndex;
-		float ulX, ulY, squareSize;
+		float ulX, ulY, squareSize, viewSize;
 
 	public slots:
 		void updateEverything();
