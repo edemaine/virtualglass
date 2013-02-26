@@ -11,15 +11,14 @@ namespace GlobalGraphicsSetting
 	// approximately: 1 is bad, 10 is good, 5 is ok.
 	enum Setting
 	{
-		LOW=3,
-		MEDIUM=6,
+		VERY_LOW=1,
+		LOW=4,
+		MEDIUM=7,
 		HIGH=10,	
 	};
 
 	enum Setting get();
-	unsigned int getQuality();
 	void set(enum Setting s);	
-	
 }
 
 #endif

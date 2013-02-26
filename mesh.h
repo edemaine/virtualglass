@@ -31,7 +31,7 @@ namespace MeshInternal
 	};
 
 	// Methods
-	void generateMesh(PickupPlan* plan, Geometry *geometry, unsigned int quality, bool isTopLevel=false);
+	void generateMesh(PickupPlan* plan, Geometry *geometry, unsigned int quality);
 	void recurseMesh(Piece* piece, Geometry *geometry, vector<ancestor>& ancestors, unsigned int quality);
 	void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors, 
 		float length, unsigned int quality, bool isTopLevel=false);
@@ -41,7 +41,7 @@ namespace MeshInternal
 	unsigned int computeAngularResolution(float finalDiameter, unsigned int quality);
 	void meshBaseCasing(Geometry* g, vector<ancestor>& ancestors, 
 		Color c, enum GeometricShape outerShape, enum GeometricShape innerShape, 
-		float length, float outerRadius, float innerRadius, unsigned int quality, bool ensureVisible=false);
+		float length, float outerRadius, float innerRadius, unsigned int quality, bool ensureVisible);
 	void meshBaseCane(Geometry* g, vector<ancestor>& ancestors, Color c, 
 		enum GeometricShape s, float length, float radius, unsigned int quality, bool ensureVisible);
 	void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float length, float radius, 

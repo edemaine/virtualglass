@@ -10,11 +10,6 @@ namespace GlobalGraphicsSetting
 		return setting;
 	}
 
-	unsigned int getQuality()
-	{
-		return static_cast<unsigned int>(setting);
-	}	
-
 	void set(enum Setting s)
 	{
 		setting = s;

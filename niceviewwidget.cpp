@@ -143,8 +143,6 @@ void NiceViewWidget :: initializeGL()
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_COLOR_MATERIAL);
-	glEnable (GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
@@ -253,10 +251,6 @@ void NiceViewWidget :: paintWithoutDepthPeeling()
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	glEnable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	glEnable (GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//Check that Vertex and Triangle have proper size:
 	assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3));
@@ -267,15 +261,34 @@ void NiceViewWidget :: paintWithoutDepthPeeling()
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 
+	// make a pass on mandatory transparent things, drawing them without culling/depth testing
+	// this doesn't do much except fake the glass/air interface
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) 
 	{
 		Color c = g->color;
-		if (!g->ensureVisible && c.a < 0.01) // don't even draw it if it's not going to be visible
-			continue;
-		if (g->ensureVisible) 
-			glColor4f(c.r, c.g, c.b, MAX(c.a, 0.1));
+		if (g->ensureVisible)
+			glColor4f(c.r, c.g, c.b, 0.1);
 		else
-			glColor4f(c.r, c.g, c.b, c.a);
+			continue; 
+		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
+			GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
+	}
+
+	// make a pass on opaque things, round pretty opaque things up to no transparency
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+	for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) 
+	{
+		Color c = g->color;
+		if (c.a > 0.1)
+			glColor4f(c.r, c.g, c.b, 1.0);
+		else
+			continue; 
 		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 			GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
 	}

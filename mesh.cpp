@@ -1,4 +1,6 @@
 
+#include <vector>
+#include <utility>
 #include "constants.h"
 #include "glasscolor.h"
 #include "pullplan.h"
@@ -10,6 +12,9 @@
 
 using namespace MeshInternal;
 
+using std::vector;
+using std::pair;
+
 void generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometry, unsigned int quality)
 {
 	if (piece == NULL || pieceGeometry == NULL)
@@ -19,7 +24,7 @@ void generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometr
 	{
 		// just do everything in the piece geometry
 		pieceGeometry->clear();
-		generateMesh(piece->pickup, pieceGeometry, quality, true);
+		generateMesh(piece->pickup, pieceGeometry, quality);
 		casePickup(pieceGeometry, piece);
 		applyPieceTransform(pieceGeometry, piece);
 		pieceGeometry->compute_normals_from_triangles();
@@ -33,7 +38,7 @@ void generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometr
 		pickupGeometry->clear();
 		pieceGeometry->clear();
 		// compute pickup geometry
-		generateMesh(piece->pickup, pickupGeometry, quality, true);
+		generateMesh(piece->pickup, pickupGeometry, quality);
 		pickupGeometry->compute_normals_from_triangles();
 		// copy into piece geometry and apply piece transform there
 		pieceGeometry->vertices = pickupGeometry->vertices;
@@ -669,26 +674,82 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors,
 		first_vert, geometry->vertices.size() - first_vert, color, ensureVisible));
 }
 
-void generateMesh(PickupPlan* pickup, Geometry *geometry, unsigned int quality, bool isTopLevel)
+void generateMesh(PickupPlan* pickup, Geometry *geometry, unsigned int quality)
 {
 	if (pickup == NULL)
 		return;
 
 	geometry->clear();
+	
+	// first, generate all the plans that are used (both plan and length, 
+	// both of which affect mesh). 
+	vector< pair<SubpickupTemplate, Geometry> > plan_and_geom;
 	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
 	{
-		vector<ancestor> ancestors;
-		uint32_t startPlanVerts = geometry->vertices.size();
-		recurseMesh(pickup->subs[i].plan, geometry, 
-			ancestors, pickup->subs[i].length, quality, isTopLevel); 
-		uint32_t endPlanVerts = geometry->vertices.size();
-		
-		for (uint32_t v = startPlanVerts; v < endPlanVerts; ++v)
+		bool found = false;
+		for (unsigned int j = 0; j < plan_and_geom.size(); ++j)
 		{
-			applyPickupTransform(geometry->vertices[v], pickup->subs[i]);
+			if (plan_and_geom[j].first.plan == pickup->subs[i].plan
+				&& plan_and_geom[j].first.length == pickup->subs[i].length)
+			{
+				found = true;
+				break;
+			}
+		}
+		if (!found)
+		{
+			pair<SubpickupTemplate, Geometry> newPair(pickup->subs[i], Geometry());
+			vector<ancestor> ancestors;
+			recurseMesh(newPair.first.plan, &(newPair.second), ancestors, newPair.first.length, quality, true);
+			plan_and_geom.push_back(newPair);
 		}
 	}
 
+	// next, use the generated cane set as a basis for all the subplans
+	// if a cane appears multiple times, make multiple copies, applying
+	// the specific pickup transformations for it, according to where it 
+	// lives in the pickup.
+	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
+	{
+		Geometry* subGeom;
+		bool found = false;
+		for (unsigned int j = 0; j < plan_and_geom.size(); ++j)
+		{
+			if (plan_and_geom[j].first.plan == pickup->subs[i].plan
+				&& plan_and_geom[j].first.length == pickup->subs[i].length)
+			{
+				found = true;
+				subGeom = &(plan_and_geom[i].second); 
+				break;
+			}
+		}
+		assert(found);
+
+		uint32_t startVert = geometry->vertices.size();
+		for (unsigned int j = 0; j < subGeom->vertices.size(); ++j)
+		{
+			Vertex v = subGeom->vertices[j];
+			// apply the transformation specific to location in pickup 
+			applyPickupTransform(v, pickup->subs[i]); 
+			geometry->vertices.push_back(v);
+		}	
+		uint32_t startTri = geometry->triangles.size();
+		for (unsigned int j = 0; j < subGeom->triangles.size(); ++j)
+		{
+			Triangle t = subGeom->triangles[j];
+			t.v1 += startVert;
+			t.v2 += startVert;
+			t.v3 += startVert;
+			geometry->triangles.push_back(t);
+		}
+		for (unsigned int j = 0; j < subGeom->groups.size(); ++j)
+		{
+			Group g = subGeom->groups[j];
+			g.vertex_begin += startVert;
+			g.triangle_begin += startTri;
+			geometry->groups.push_back(g);
+		}
+	}
 }
 
 /*

@@ -73,5 +73,6 @@ void TwistWidget :: sliderValueChanged(int v)
 void TwistWidget :: setTwist(float* _twist)
 {
 	this->twist = _twist;
+	updateEverything();
 }
 

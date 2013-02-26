@@ -16,8 +16,14 @@ void PullPlanGeometryThread::run()
 	{
 		ppew->wakeWait.wait(&(ppew->wakeMutex));
 
-		for (unsigned int quality = 1; quality <= GlobalGraphicsSetting::getQuality(); ++quality)
+		for (unsigned int i = 0; i < 2; ++i)
 		{	
+			unsigned int quality;
+			if (i == 0)
+				quality = GlobalGraphicsSetting::VERY_LOW;
+			else
+				quality = GlobalGraphicsSetting::HIGH;
+
 			// get lock for ppew's tempPullPlan 
 			// and make a copy to get out of his way as fast as possible	
 			ppew->tempPullPlanMutex.lock();

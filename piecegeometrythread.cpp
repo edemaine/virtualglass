@@ -16,8 +16,14 @@ void PieceGeometryThread::run()
 	{
 		pew->wakeWait.wait(&(pew->wakeMutex));
 
-		for (unsigned int quality = 1; quality <= GlobalGraphicsSetting::getQuality(); ++quality)
-		{	
+		for (unsigned int i = 0; i < 2; ++i)
+		{
+			unsigned int quality;
+			if (i == 0)
+				quality = GlobalGraphicsSetting::VERY_LOW; 
+			else
+				quality = GlobalGraphicsSetting::get();
+	
 			// get lock for pew's tempPiece 
 			// and make a copy to get out of his way as fast as possible	
 			pew->tempPieceMutex.lock();
