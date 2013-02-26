@@ -118,8 +118,8 @@ Piece* randomPiece(PickupPlan* pickup)
 
 	// set piece parameters
 	TemplateParameter p;
-	for (unsigned int i = 0; i < piece->spline.values.size(); ++i)
-		piece->spline.values[i] = 2.0 + (qrand() % 5) * 1.0;
+	for (unsigned int i = 0; i < piece->spline.values().size(); ++i)
+		piece->spline.set(i, 2.0 + (qrand() % 5) * 1.0);
 
 	// set pickup
 	piece->pickup = pickup;

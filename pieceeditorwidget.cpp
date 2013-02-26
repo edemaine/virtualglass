@@ -9,6 +9,7 @@
 #include <QSlider>
 #include <QScrollArea>
 #include <QMouseEvent>
+#include <QPushButton>
 
 #include "pickupplaneditorviewwidget.h"
 #include "piece.h"
@@ -104,13 +105,6 @@ void PieceEditorWidget :: updateEverything()
 	tempPieceDirty = true;
 	tempPieceMutex.unlock();
 	wakeWait.wakeOne(); // wake up the thread if it's sleeping
-
-	for (i = 0; i < piece->spline.values.size(); ++i)
-	{
-		pieceSplineSpins[i]->blockSignals(true);
-		pieceSplineSpins[i]->setValue(piece->spline.values[i]);
-		pieceSplineSpins[i]->blockSignals(false);
-	}
 }
 
 void PieceEditorWidget :: geometryThreadFinishedMesh()
@@ -167,20 +161,6 @@ void PieceEditorWidget :: geometryThreadFinishedMesh()
 	pieceNiceViewWidget->repaint();
 }
 
-void PieceEditorWidget :: pieceSplineSpinBoxChanged(double)
-{
-	bool pieceChanged = false;
-	for (unsigned int i = 0; i < piece->spline.values.size(); ++i)
-	{
-		if (piece->spline.values[i] != pieceSplineSpins[i]->value())
-		{
-			piece->spline.values[i] = pieceSplineSpins[i]->value();
-			pieceChanged = true;
-		}
-	}
-	emit someDataChanged();
-}
-
 void PieceEditorWidget :: pickupParameterSpinBoxChanged(int)
 {
 	bool pieceChanged = false;
@@ -213,21 +193,6 @@ void PieceEditorWidget :: pickupParameterSliderChanged(int)
 	}
 	if (pieceChanged)
 		emit someDataChanged();
-}
-
-void PieceEditorWidget :: addPieceSpline(QGridLayout* pieceParamLayout)
-{
-	QDoubleSpinBox* splineSpin = new QDoubleSpinBox(this);
-	splineSpin->setRange(-10.0, 20.0);
-	splineSpin->setSingleStep(0.1);
-	splineSpin->setDecimals(1);
-	pieceSplineSpins.push_back(splineSpin);
-
-	int column = pieceParamLayout->columnCount();
-	char buf[20];
-	snprintf(buf, 18, "Control %d:", column);
-	pieceParamLayout->addWidget(new QLabel(buf, this), 0, column);
-	pieceParamLayout->addWidget(splineSpin, 1, column);
 }
 
 void PieceEditorWidget :: addPickupParam(QVBoxLayout* pickupParamLayout)
@@ -326,11 +291,12 @@ void PieceEditorWidget :: setupLayout()
 	QWidget* tab2Widget = new QWidget(pieceControlsTab);
 	QGridLayout* splineParamLayout = new QGridLayout(tab2Widget);
 	tab2Widget->setLayout(splineParamLayout);
-	addPieceSpline(splineParamLayout);	
-	addPieceSpline(splineParamLayout);	
-	addPieceSpline(splineParamLayout);	
-	addPieceSpline(splineParamLayout);	
-	splineParamLayout->setRowStretch(2, 1);
+	addControlPointButton = new QPushButton("Add control point", tab2Widget);
+	removeControlPointButton = new QPushButton("Remove control point", tab2Widget);
+	splineParamLayout->addWidget(addControlPointButton, 0, 0);
+	splineParamLayout->addWidget(removeControlPointButton, 0, 1);
+	splineParamLayout->setRowStretch(1, 1);
+	splineParamLayout->setColumnStretch(2, 1);
 	pieceControlsTab->addTab(tab2Widget, "Customize");
 
 	pieceEditorDescriptionLabel = new QLabel("Piece editor.", this);
@@ -386,18 +352,27 @@ void PieceEditorWidget :: setupConnections()
 		connect(pickupParamSliders[i], SIGNAL(valueChanged(int)),
 			this, SLOT(pickupParameterSliderChanged(int)));
 	}
-	for (unsigned int i = 0; i < pieceSplineSpins.size(); ++i)
-	{
-		connect(pieceSplineSpins[i], SIGNAL(valueChanged(double)),
-			this, SLOT(pieceSplineSpinBoxChanged(double)));
-	}
-
+	connect(addControlPointButton, SIGNAL(clicked()), this, SLOT(addControlPointButtonClicked()));
+	connect(removeControlPointButton, SIGNAL(clicked()), this, SLOT(removeControlPointButtonClicked()));
+	
 	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
 	connect(pickupViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(pieceCustomizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(pieceControlsTab, SIGNAL(currentChanged(int)), this, SLOT(pieceControlsTabChanged(int)));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+}
+
+void PieceEditorWidget :: addControlPointButtonClicked()
+{
+	piece->spline.addValue();
+	emit someDataChanged();
+}
+
+void PieceEditorWidget :: removeControlPointButtonClicked()
+{
+	piece->spline.removeValue();
+	emit someDataChanged();
 }
 
 void PieceEditorWidget :: pieceControlsTabChanged(int tab)
@@ -474,6 +449,7 @@ void PieceEditorWidget :: setPiece(Piece* p)
 	piece = p;
 	pickupViewWidget->setPickup(p->pickup);
 	twistWidget->setTwist(&(p->twist));
+	pieceCustomizeViewWidget->setPiece(p);
 	emit someDataChanged();	
 }
 

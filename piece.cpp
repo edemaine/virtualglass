@@ -74,47 +74,44 @@ void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
 
 	this->type = _type;
 
-	switch (type)
+	if (this->type != PieceTemplate::CUSTOM)
+		spline.reset();
+	switch (this->type)
 	{
 		case PieceTemplate::TUMBLER:
 			based = true;
-			spline.values.clear();
-			spline.values.push_back(3.0);
-			spline.values.push_back(3.0);
-			spline.values.push_back(3.0);
-			spline.values.push_back(3.0);
+			spline.set(0, 3.0);
+			spline.set(1, 3.0);
+			spline.set(2, 3.0);
+			spline.set(3, 3.0);
 			break;
 		case PieceTemplate::VASE:
 			based = true;
-			spline.values.clear();
-			spline.values.push_back(1.3);
-			spline.values.push_back(4.0);
-			spline.values.push_back(0.0);
-			spline.values.push_back(2.0);
+			spline.set(0, 1.3);
+			spline.set(1, 4.0);
+			spline.set(2, 0.0);
+			spline.set(3, 2.0);
 			break;
 		case PieceTemplate::BOWL:
 			based = true;
-			spline.values.clear();
-			spline.values.push_back(2.8);
-			spline.values.push_back(6.9);
-			spline.values.push_back(7.0);
-			spline.values.push_back(7.2);
+			spline.set(0, 2.8);
+			spline.set(1, 6.9);
+			spline.set(2, 7.0);
+			spline.set(3, 7.2);
 			break;
 		case PieceTemplate::POT:
 			based = true;
-			spline.values.clear();
-			spline.values.push_back(2.0);
-			spline.values.push_back(3.5);
-			spline.values.push_back(3.5);
-			spline.values.push_back(2.0);
+			spline.set(0, 2.0);
+			spline.set(1, 3.5);
+			spline.set(2, 3.5);
+			spline.set(3, 2.0);
 			break;
 		case PieceTemplate::PLATE:
 			based = true;
-			spline.values.clear();
-			spline.values.push_back(9.0);
-			spline.values.push_back(9.1);
-			spline.values.push_back(9.2);
-			spline.values.push_back(9.3);
+			spline.set(0, 9.0);
+			spline.set(1, 9.1);
+			spline.set(2, 9.2);
+			spline.set(3, 9.3);
 			break;
 		case PieceTemplate::CUSTOM:
 			break;

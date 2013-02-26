@@ -4,27 +4,38 @@
 
 Spline :: Spline()
 {
-	this->values.push_back(1.0);
-	this->values.push_back(1.0);
-	this->values.push_back(1.0);
-	this->values.push_back(1.0);
+	this->reset();
 }
 
-Spline :: Spline(vector<float> _vals)
+void Spline :: reset()
 {
-	this->values = _vals;
+	this->vals.clear();
+	this->vals.push_back(3.0);
+	this->vals.push_back(3.0);
+	this->vals.push_back(3.0);
+	this->vals.push_back(3.0);
 }
 
-float Spline :: start()
+void Spline :: set(unsigned int i, float v)
 {
-	assert(this->values.size() > 0);
-	return this->values.front();
+	if (i < this->vals.size())
+		this->vals[i] = v;
 }
 
-float Spline :: end()
+const vector<float>& Spline :: values()
 {
-	assert(this->values.size() > 0);
-	return this->values.back();
+	return this->vals;
+}
+
+void Spline :: addValue()
+{
+	this->vals.push_back(3.0);
+}
+
+void Spline :: removeValue()
+{
+	if (this->vals.size() > 4)
+		this->vals.pop_back();
 }
 
 unsigned int Spline :: choose(unsigned int n, unsigned int k)
@@ -62,10 +73,10 @@ float Spline :: get(float t)
 	assert(-0.1 < t && t < 1.1); // if you're outside this, you're probably a bug
 
 	float val = 0;
-	for (unsigned int i = 0; i < this->values.size(); ++i)
-		val += choose(this->values.size()-1, i) 
-			* pow((1.0 - t), this->values.size() - 1 - i) 
-			* pow(t, i) * this->values[i];
+	for (unsigned int i = 0; i < this->vals.size(); ++i)
+		val += choose(this->vals.size()-1, i) 
+			* pow((1.0 - t), this->vals.size() - 1 - i) 
+			* pow(t, i) * this->vals[i];
 	return val; 
 }
 

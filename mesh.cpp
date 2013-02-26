@@ -162,7 +162,7 @@ void applyBasedPieceTransform(Vertex& v, float twist, Spline& spline)
 	float diskR = v.position.z + 5.0;
 	float caneLoc = v.position.y;
 
-	float width = spline.start();
+	float width = spline.values()[0];
 	float turnLength = 1.0; 
 	float baseLength = width - turnLength * 2 / PI; 
 

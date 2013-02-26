@@ -225,7 +225,7 @@ enum GeometricShape stringToGeometricShape(string id)
 {
 	if (id == "Square")
 		return SQUARE_SHAPE;
-	else 
+	else
 		return CIRCLE_SHAPE;
 }
 
@@ -847,11 +847,11 @@ void writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<Pu
 
 	// write piece template parameters
 	root[piecename]["Piece spline parameters"];
-	for (unsigned int i = 0; i < piece->spline.values.size(); ++i)
+	for (unsigned int i = 0; i < piece->spline.values().size(); ++i)
 	{
 		string paramName = idAndNameToString(i, "PieceSplineParam");
 		root[piecename]["Piece spline parameters"][paramName]["Index"] = i;
-		root[piecename]["Piece spline parameters"][paramName]["Value"] = piece->spline.values[i];
+		root[piecename]["Piece spline parameters"][paramName]["Value"] = piece->spline.values()[i];
 	}
 
 	// write pickups (currently only one)
@@ -866,13 +866,15 @@ Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, PullPlan
 	piece->twist = root[piecename]["Twist"].asFloat();
 
 	// read piece template parameters
+	for (unsigned int i = piece->spline.values().size(); i < root[piecename]["Piece spline parameters"].getMemberNames().size(); ++i)
+		piece->spline.addValue(); // pad spline to be big enough for all the parameters
 	for (unsigned int i = 0; i < root[piecename]["Piece spline parameters"].getMemberNames().size(); ++i)
 	{
 		string paramname = root[piecename]["Piece spline parameters"].getMemberNames()[i];
 		unsigned int paramIndex = root[piecename]["Piece spline parameters"][paramname]["Index"].asUInt();
 
-		float paramValue = root[piecename]["Piece template parameters"][paramname]["Value"].asFloat();	
-		piece->spline.values[paramIndex] = paramValue;
+		float paramValue = root[piecename]["Piece spline parameters"][paramname]["Value"].asFloat();	
+		piece->spline.set(paramIndex, paramValue);
 	}
 
 	// read pickups (currently only one)

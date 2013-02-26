@@ -10,15 +10,17 @@ class Spline
 {
 	public:
 		Spline();
-		Spline(vector<float> vals);
+		void reset();
 		float get(float t);
-		vector<float> values;
-		float start();		
-		float end();
+		const vector<float>& values();
+		void addValue();
+		void removeValue();
+		void set(unsigned int i, float v);
 
 	private:
 		static float pow(float base, int power);
 		static unsigned int choose(unsigned int n, unsigned int k);
+		vector<float> vals;
 };
 
 #endif

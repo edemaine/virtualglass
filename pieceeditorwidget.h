@@ -16,8 +16,8 @@ class QHBoxLayout;
 class QTabWidget;
 class QStackedWidget;
 class QSpinBox;
-class QDoubleSpinBox;
 class QSlider;
+class QPushButton;
 
 class PieceGeometryThread;
 class TwistWidget;	
@@ -56,10 +56,11 @@ class PieceEditorWidget : public QWidget
 	private slots:
 		void pieceControlsTabChanged(int);
 		void childWidgetDataChanged();
-		void pieceSplineSpinBoxChanged(double);
 		void pickupParameterSpinBoxChanged(int);
 		void pickupParameterSliderChanged(int);
 		void geometryThreadFinishedMesh();
+		void addControlPointButtonClicked();
+		void removeControlPointButtonClicked();
 
 	private:
 		QMutex tempPieceMutex;
@@ -89,11 +90,12 @@ class PieceEditorWidget : public QWidget
 		PieceCustomizeViewWidget* pieceCustomizeViewWidget;
                 QStackedWidget* pieceViewStack;
 
+		QPushButton* addControlPointButton;
+		QPushButton* removeControlPointButton;
 		vector<QStackedWidget*> pickupParamStacks;
 		vector<QLabel*> pickupParamLabels;
 		vector<QSpinBox*> pickupParamSpinBoxes;
 		vector<QSlider*> pickupParamSliders;
-		vector<QDoubleSpinBox*> pieceSplineSpins;
 		QTabWidget* pickupControlsTab;
 		QTabWidget* pieceControlsTab;
 		TwistWidget* twistWidget;
@@ -106,7 +108,6 @@ class PieceEditorWidget : public QWidget
 		void setupThreading();
 		void setupConnections();
 		void addPickupParam(QVBoxLayout* pickupParamLayout);
-		void addPieceSpline(QGridLayout* pieceParamLayout);
 };
 
 #endif

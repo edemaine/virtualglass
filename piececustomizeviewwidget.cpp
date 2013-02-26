@@ -81,10 +81,10 @@ Point PieceCustomizeViewWidget :: controlPointRawLocation(unsigned int index)
 {
 	Point p;
 
-	float vertLength = 9.0 - piece->spline.start();
+	float vertLength = 9.0 - piece->spline.values()[0];
 	float yOffset = 0.5 * vertLength;
-	p.x = rawX(11 - piece->spline.values[index]); 
-	p.y = rawY(11 + yOffset - 2 / PI - vertLength * index / (static_cast<float>(piece->spline.values.size()) - 1.0));
+	p.x = rawX(11 - piece->spline.values()[index]); 
+	p.y = rawY(11 + yOffset - 2 / PI - vertLength * index / (static_cast<float>(piece->spline.values().size()) - 1.0));
 
 	return p;
 } 
@@ -97,7 +97,7 @@ void PieceCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 	mouse.y = event->pos().y();
 	
 	// check and see if it's on a control point
-	for (unsigned int i = 0; i < piece->spline.values.size(); ++i)
+	for (unsigned int i = 0; i < piece->spline.values().size(); ++i)
 	{
 		Point p = controlPointRawLocation(i);
 		if (fabs(mouse.x - p.x) + fabs(mouse.y - p.y) < 4 * MAX(squareSize / 100, 1))
@@ -117,7 +117,7 @@ void PieceCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 	Point mouse;
 	mouse.x = event->pos().x();
 	float delta = adjustedScale(mouse.x - controlPointRawLocation(draggedControlPointIndex).x);	
-	piece->spline.values[draggedControlPointIndex] -= delta;	
+	piece->spline.set(draggedControlPointIndex, piece->spline.values()[draggedControlPointIndex] - delta);	
 	emit someDataChanged();
 }
 
@@ -160,22 +160,22 @@ void PieceCustomizeViewWidget :: drawPiece()
 	// total line length is 10, with spline[0] determining bottom width,
 	// and spline determining remaining side curve, after a PI/2 turn with 
 	// length 1.0
-	float yOffset = 0.5 * (9.0 - spline.start()); // adjust for centering the piece	
+	float yOffset = 0.5 * (9.0 - spline.values()[0]);
 
 	// first draw bottom
 	QPointF start;
-	start.setX(rawX(11 - spline.start() + 2 / PI));
+	start.setX(rawX(11 - spline.values()[0] + 2 / PI));
 	start.setY(rawY(11 + yOffset));
 	QPointF end;
-	end.setX(rawX(11 + spline.start() - 2 / PI));
+	end.setX(rawX(11 + spline.values()[0] - 2 / PI));
 	end.setY(start.y());
 	painter.drawLine(QLineF(start, end));
 
 	// next draw turns
 	QPointF center;
-	painter.drawArc(rawX(11 + spline.start() - 4 / PI), rawY(11 + yOffset - 4 / PI), rawScale(4 / PI), rawScale(4 / PI),
+	painter.drawArc(rawX(11 + spline.values()[0] - 4 / PI), rawY(11 + yOffset - 4 / PI), rawScale(4 / PI), rawScale(4 / PI),
 		0 * 16, -90 * 16); 
-	painter.drawArc(rawX(11 - spline.start()), rawY(11 + yOffset - 4 / PI), rawScale(4 / PI), rawScale(4 / PI),
+	painter.drawArc(rawX(11 - spline.values()[0]), rawY(11 + yOffset - 4 / PI), rawScale(4 / PI), rawScale(4 / PI),
 		-180 * 16, 90 * 16); 
 	
 	// now draw remainder	
@@ -184,9 +184,9 @@ void PieceCustomizeViewWidget :: drawPiece()
 		float t_delta = t + 0.01;	
 
 		start.setX(rawX(11 + spline.get(t)));
-		start.setY(rawY(11 + yOffset - 2 / PI - (t * (9.0 - spline.start()))));	
+		start.setY(rawY(11 + yOffset - 2 / PI - (t * (9.0 - spline.values()[0]))));	
 		end.setX(rawX(11 + spline.get(t_delta)));
-		end.setY(rawY(11 + yOffset - 2 / PI - (t_delta * (9.0 - spline.start()))));
+		end.setY(rawY(11 + yOffset - 2 / PI - (t_delta * (9.0 - spline.values()[0]))));
 		painter.drawLine(QLineF(start, end));
 
 		start.setX(rawX(11 - spline.get(t)));
@@ -200,7 +200,7 @@ void PieceCustomizeViewWidget :: drawPiece()
         pen.setColor(Qt::white);
         pen.setStyle(Qt::SolidLine);
         painter.setPen(pen);
-	for (unsigned int i = 0; i < spline.values.size(); ++i)
+	for (unsigned int i = 0; i < spline.values().size(); ++i)
 	{
 		Point p = controlPointRawLocation(i);
 		start.setX(p.x);
