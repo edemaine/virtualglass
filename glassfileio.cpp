@@ -598,14 +598,9 @@ PullPlan* readCane(string canename, Json::Value& root, map<unsigned int, GlassCo
 		tempCasings[casingIndex].glassColor = safeColorMap(colorMap, casingColorIndex);
 	}
 	// make an initial pass to get casings with the right shapes piled on
-	// note: innermost casing shape is determined by pull template
+	cane->setOutermostCasingShape(tempCasings[0].shape);
 	for (unsigned int i = 1; i < tempCasings.size(); ++i)
-	{
-		if (i == 1 && cane->getCasingCount() == 2) // you already got your casing
-			cane->setOutermostCasingShape(tempCasings[i].shape);
-		else 
-			cane->addCasing(tempCasings[i].shape);
-	}
+		cane->addCasing(tempCasings[i].shape);
 	// make a second pass to set thickness and color
 	for (unsigned int i = 0; i < tempCasings.size(); ++i) 
 	{

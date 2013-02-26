@@ -75,14 +75,6 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType)
 	if (templateType == this->templateType)
 		return;
 
-	// adjust number of casing if you switched between types that have subcanes or not
-	// note that this doesn't handle resizing or shape changing of the newly added casing...
-	// that is done in the switch statement, as it's specific to the new template
-	if (casings.size() < 2 && templateHasSubplans(templateType))
-		casings.insert(casings.begin(), Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
-	if (templateHasSubplans(this->templateType) && templateHasNoSubplans(templateType))
-		casings.erase(casings.begin());
-
 	// if you're switching to a template where count matters, and it's a funky value,
 	// set it to something more reasonable
 	if (this->count < 2 && templateHasSubplans(templateType))
@@ -97,38 +89,34 @@ void PullPlan :: setTemplateType(PullTemplate::Type templateType)
 			break;
 		case PullTemplate::BASE_SQUARE:
 			casings[0].shape = SQUARE_SHAPE;
-			if (casings.size() > 1) // if you're in a multiple casing world, size off next largest
-				casings[0].thickness = 0.9 * 1 / SQRT_TWO * casings[1].thickness;
-			// else, the old template had one casing of radius 1.0, and you'll keep it that way
+			if (casings.size() > 1) 
+				casings[0].thickness = MIN(casings[0].thickness, 0.9 * 1 / SQRT_TWO * casings[1].thickness);
 			break;
 		case PullTemplate::HORIZONTAL_LINE_CIRCLE:
 			casings[0].shape = CIRCLE_SHAPE;
-			casings[0].thickness = 0.9 * casings[1].thickness;
 			break;
 		case PullTemplate::HORIZONTAL_LINE_SQUARE:
 			casings[0].shape  = CIRCLE_SHAPE;
-			casings[0].thickness = 0.9 * casings[1].thickness;
 			break;
 		case PullTemplate::SURROUNDING_CIRCLE:
 			casings[0].shape  = CIRCLE_SHAPE;
-			casings[0].thickness = 0.9 * casings[1].thickness;
 			break;
 		case PullTemplate::CROSS:
 			casings[0].shape  = CIRCLE_SHAPE;
-			casings[0].thickness = 0.9 * casings[1].thickness;
 			break;
 		case PullTemplate::SQUARE_OF_SQUARES:
 		case PullTemplate::SQUARE_OF_CIRCLES:
 			casings[0].shape = SQUARE_SHAPE;
-			casings[0].thickness = 0.9 * 1 / SQRT_TWO * casings[1].thickness;
+			if (casings.size() > 1)
+				casings[0].thickness = MIN(casings[0].thickness, 0.9 * 1 / SQRT_TWO * casings[1].thickness);
 			break;
 		case PullTemplate::TRIPOD:
 			casings[0].shape  = CIRCLE_SHAPE;
-			casings[0].thickness = 0.9 * casings[1].thickness;
 			break;
 		case PullTemplate::SURROUNDING_SQUARE:
 			casings[0].shape = SQUARE_SHAPE;
-			casings[0].thickness = 0.9 * 1 / SQRT_TWO * casings[1].thickness;
+			if (casings.size() > 1)
+				casings[0].thickness = MIN(casings[0].thickness, 0.9 * 1 / SQRT_TWO * casings[1].thickness);
 			break;
 		case PullTemplate::CUSTOM:
 			// we don't touch anything, who knows what's going on in there
@@ -144,7 +132,8 @@ void PullPlan :: setCasingColor(GlassColor* gc, unsigned int index) {
 	this->casings[index].glassColor = gc;
 }
 
-void PullPlan :: setOutermostCasingColor(GlassColor* gc) {
+void PullPlan :: setOutermostCasingColor(GlassColor* gc) 
+{
 	this->casings[casings.size()-1].glassColor = gc;
 }
 
@@ -161,11 +150,7 @@ GlassColor* PullPlan :: getCasingColor(unsigned int index) {
 }
 
 bool PullPlan :: hasMinimumCasingCount() {
-	if (this->templateType == PullTemplate::BASE_CIRCLE 
-		|| this->templateType == PullTemplate::BASE_SQUARE) 
-		return (this->casings.size() == 1);
-	else
-		return (this->casings.size() == 2);
+	return (this->casings.size() < 2);
 }	
 		
 
@@ -193,16 +178,8 @@ void PullPlan :: setCount(unsigned int _count)
 void PullPlan :: removeCasing() 
 {
 	int count = casings.size();
-	if (templateType == PullTemplate::BASE_CIRCLE || templateType == PullTemplate::BASE_SQUARE)
-	{
-		if (count < 2) 
-			return;
-	}
-	else
-	{ 
-		if (count < 3) 
-			return;	
-	}
+	if (count < 2) 
+		return;
 
 	float oldInnermostCasingThickness = casings[0].thickness;
 
@@ -277,25 +254,32 @@ void PullPlan :: setCasingThickness(float t, unsigned int index) {
 		this->casings[index].thickness = t;
 }
 
-void PullPlan :: setOutermostCasingShape(enum GeometricShape _shape) {
-
+void PullPlan :: setOutermostCasingShape(enum GeometricShape _shape) 
+{
 	if (_shape == getOutermostCasingShape()) 
 		return;
 
-	float oldInnermostCasingThickness = casings[0].thickness;
-
-	// simple case of only 1 casing
-	if (casings.size() == 1) {
-		casings[0].shape = _shape;
-		return;
+	if (this->casings.size() > 1) 
+	{
+		// if we're moving from square to circle and the interior casing is square and
+		// would collide with the new casing shape, scale everything down to make room
+		if (_shape == CIRCLE_SHAPE && this->casings[this->casings.size()-2].shape == SQUARE_SHAPE
+			&& this->casings[this->casings.size()-2].thickness > 1 / SQRT_TWO) 
+		{ 
+			for (unsigned int i = 0; i < casings.size() - 1; ++i) 
+				this->casings[i].thickness *= 1 / SQRT_TWO;
+		}
 	}
-
-	// if we're moving from square to circle and the interior casing is square and
-	// would collide with the new casing shape, scale everything down to make room
-	if (_shape == CIRCLE_SHAPE && casings[casings.size()-2].shape == SQUARE_SHAPE
-		&& casings[casings.size()-2].thickness > 1 / SQRT_TWO) { 
-		for (unsigned int i = 0; i < casings.size() - 1; ++i) 
-			casings[i].thickness *= 1 / SQRT_TWO;
+	else 
+	{
+		// special case: if you only have one casing and your template is 
+		// "I am this shape" (e.g. BASE_*), then changing casing shape should
+		// change template type implicitly, since a a BASE_CIRCLE consisting of 
+		// a single SQUARE_SHAPE casing makes no sense
+		if (this->templateType == PullTemplate::BASE_CIRCLE && _shape == SQUARE_SHAPE)
+			this->setTemplateType(PullTemplate::BASE_SQUARE);
+		else if (this->templateType == PullTemplate::BASE_SQUARE && _shape == CIRCLE_SHAPE)
+			this->setTemplateType(PullTemplate::BASE_CIRCLE);
 	}
 
 	// DO THE CHANGE
@@ -303,9 +287,7 @@ void PullPlan :: setOutermostCasingShape(enum GeometricShape _shape) {
 	if (this->getOutermostCasingShape() != CIRCLE_SHAPE)
 		this->twist = 0.0;
 
-	// because innermost casing thickness might have changed, update subcane scales
-	for (unsigned int i = 0; i < subs.size(); ++i) 
-		subs[i].rescale(casings[0].thickness / oldInnermostCasingThickness);
+	resetSubs(false);
 }
 
 float PullPlan :: getCasingThickness(unsigned int index) {
