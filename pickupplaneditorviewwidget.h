@@ -6,7 +6,7 @@
 #include "mesh.h"
 #include "geometry.h"
 #include "pickupplan.h"
-#include "asyncpullplanlibrarywidget.h"
+#include "pullplanlibrarywidget.h"
 
 class NiceViewWidget;
 

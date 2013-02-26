@@ -3,8 +3,8 @@
 #include <QVBoxLayout>
 
 #include "pickupplaneditorviewwidget.h"
-#include "asynccolorbarlibrarywidget.h"
-#include "asyncpullplanlibrarywidget.h"
+#include "colorbarlibrarywidget.h"
+#include "pullplanlibrarywidget.h"
 #include "niceviewwidget.h"
 #include "glassmime.h"
 #include "glasscolor.h"
@@ -100,7 +100,7 @@ void PickupPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	getSubplanAt(x, y, &subplan, &subplanIndex);
 	if (subplan != NULL)
 	{
-		AsyncPullPlanLibraryWidget plplw(subplan);
+		PullPlanLibraryWidget plplw(subplan);
 
 		char buf[500];
 		sprintf(buf, "%p %d", subplan, GlassMime::PULLPLAN_MIME);
@@ -177,7 +177,7 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	switch (type)
 	{
 		case GlassMime::COLORLIBRARY_MIME:
-			droppedPlan = reinterpret_cast<AsyncColorBarLibraryWidget*>(droppedObject)->circlePlan;
+			droppedPlan = reinterpret_cast<ColorBarLibraryWidget*>(droppedObject)->circlePlan;
 			break;
 		case GlassMime::PULLPLAN_MIME:
 			droppedPlan = reinterpret_cast<PullPlan*>(droppedObject);

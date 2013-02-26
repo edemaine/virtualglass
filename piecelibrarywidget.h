@@ -1,5 +1,5 @@
-#ifndef ASYNCPIECELIBRARYWIDGET_H
-#define ASYNCPIECELIBRARYWIDGET_H
+#ifndef PIECELIBRARYWIDGET_H
+#define PIECELIBRARYWIDGET_H
 
 #include "asyncrenderwidget.h"
 #include "piecerenderdata.h"
@@ -7,10 +7,10 @@
 class Piece;
 class QWidget;
 
-class AsyncPieceLibraryWidget : public AsyncRenderWidget
+class PieceLibraryWidget : public AsyncRenderWidget
 {
 	public:
-		AsyncPieceLibraryWidget(Piece* _piece, QWidget* parent=0);
+		PieceLibraryWidget(Piece* _piece, QWidget* parent=0);
 		Piece* piece;
 		void updatePixmap();
 		void updateEyePosition(Vector3f eyePosition);

@@ -1,15 +1,15 @@
-#ifndef ASYNCPULLPLANLIBRARYWIDGET_H
-#define ASYNCPULLPLANLIBRARYWIDGET_H
+#ifndef PULLPLANLIBRARYWIDGET_H
+#define PULLPLANLIBRARYWIDGET_H
 
 #include "asyncrenderwidget.h"
 #include "shape.h"
 
 class PullPlan;
 
-class AsyncPullPlanLibraryWidget : public AsyncRenderWidget
+class PullPlanLibraryWidget : public AsyncRenderWidget
 {
 	public:
-		AsyncPullPlanLibraryWidget(PullPlan *plan, QWidget * parent=NULL);
+		PullPlanLibraryWidget(PullPlan *plan, QWidget * parent=NULL);
 		PullPlan *pullPlan;
 		const QPixmap *getDragPixmap();
 		void updatePixmaps();
@@ -24,4 +24,4 @@ class AsyncPullPlanLibraryWidget : public AsyncRenderWidget
 			PullPlan* plan, bool outermostLevel, QPainter* painter);
 };
 
-#endif //ASYNCPULLPLANLIBRARYWIDGET_H
+#endif //PULLPLANLIBRARYWIDGET_H

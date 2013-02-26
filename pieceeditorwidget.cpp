@@ -18,7 +18,7 @@
 #include "piececustomizeviewwidget.h"
 #include "piecetemplatelibrarywidget.h"
 #include "pickuptemplatelibrarywidget.h"
-#include "asyncpiecelibrarywidget.h"
+#include "piecelibrarywidget.h"
 #include "niceviewwidget.h"
 
 PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
@@ -446,7 +446,7 @@ void PieceEditorWidget :: seedTemplates()
 	
 }
 
-void PieceEditorWidget :: updateLibraryWidgetPixmaps(AsyncPieceLibraryWidget* w)
+void PieceEditorWidget :: updateLibraryWidgetPixmaps(PieceLibraryWidget* w)
 {
 	w->updatePixmap();
 }

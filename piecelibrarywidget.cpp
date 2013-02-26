@@ -1,8 +1,8 @@
 
 
-#include "asyncpiecelibrarywidget.h"
+#include "piecelibrarywidget.h"
 
-AsyncPieceLibraryWidget :: AsyncPieceLibraryWidget(Piece* _piece, QWidget* _parent): AsyncRenderWidget(_parent), piece(_piece)
+PieceLibraryWidget :: PieceLibraryWidget(Piece* _piece, QWidget* _parent): AsyncRenderWidget(_parent), piece(_piece)
 {
 	setFixedSize(100, 100);
 	eyePosition.x = -16.0;
@@ -11,12 +11,12 @@ AsyncPieceLibraryWidget :: AsyncPieceLibraryWidget(Piece* _piece, QWidget* _pare
 	updatePixmap();
 }
 
-void AsyncPieceLibraryWidget :: updateEyePosition(Vector3f _eyePosition)
+void PieceLibraryWidget :: updateEyePosition(Vector3f _eyePosition)
 {
 	eyePosition = _eyePosition;
 }
 
-void AsyncPieceLibraryWidget :: updatePixmap()
+void PieceLibraryWidget :: updatePixmap()
 {
 	//queue up an async update:
 	Camera camera;

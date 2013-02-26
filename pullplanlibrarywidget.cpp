@@ -3,15 +3,15 @@
 #include "pullplan.h"
 #include "glasscolor.h"
 #include "pullplanrenderdata.h"
-#include "asyncpullplanlibrarywidget.h"
+#include "pullplanlibrarywidget.h"
 
-AsyncPullPlanLibraryWidget :: AsyncPullPlanLibraryWidget(PullPlan *_pullPlan, QWidget *_parent) : AsyncRenderWidget(_parent), pullPlan(_pullPlan)
+PullPlanLibraryWidget :: PullPlanLibraryWidget(PullPlan *_pullPlan, QWidget *_parent) : AsyncRenderWidget(_parent), pullPlan(_pullPlan)
 {
 	setFixedSize(100, 100);
 	updatePixmaps();
 }
 
-void AsyncPullPlanLibraryWidget :: updatePixmaps()
+void PullPlanLibraryWidget :: updatePixmaps()
 {
 	// This is fast enough to do in real time
 	updateDragPixmap();
@@ -27,12 +27,12 @@ void AsyncPullPlanLibraryWidget :: updatePixmaps()
 }
 
 
-const QPixmap* AsyncPullPlanLibraryWidget :: getDragPixmap()
+const QPixmap* PullPlanLibraryWidget :: getDragPixmap()
 {
 	return &(this->dragPixmap);
 }
 
-void AsyncPullPlanLibraryWidget :: updateDragPixmap()
+void PullPlanLibraryWidget :: updateDragPixmap()
 {
 	QPixmap _pixmap(200, 200);
 	_pixmap.fill(Qt::transparent); 
@@ -50,7 +50,7 @@ void AsyncPullPlanLibraryWidget :: updateDragPixmap()
 	dragPixmap = _pixmap.scaled(100, 100);
 }
 
-void AsyncPullPlanLibraryWidget :: drawSubplan(float x, float y, float drawWidth, float drawHeight,
+void PullPlanLibraryWidget :: drawSubplan(float x, float y, float drawWidth, float drawHeight,
 	PullPlan* plan, bool outermostLevel, QPainter* painter) {
 
 	// Fill the subplan area with some `cleared out' color
@@ -99,7 +99,7 @@ void AsyncPullPlanLibraryWidget :: drawSubplan(float x, float y, float drawWidth
 	}
 }
 
-void AsyncPullPlanLibraryWidget :: setBoundaryPainter(QPainter* painter, bool outermostLevel) 
+void PullPlanLibraryWidget :: setBoundaryPainter(QPainter* painter, bool outermostLevel) 
 {
 	if (outermostLevel)
 	{
@@ -117,7 +117,7 @@ void AsyncPullPlanLibraryWidget :: setBoundaryPainter(QPainter* painter, bool ou
 	}
 }
 
-void AsyncPullPlanLibraryWidget :: paintShape(float x, float y, float size, enum GeometricShape shape, QPainter* painter)
+void PullPlanLibraryWidget :: paintShape(float x, float y, float size, enum GeometricShape shape, QPainter* painter)
 {
 	switch (shape)
 	{

@@ -2,11 +2,11 @@
 #include "constants.h"
 #include "glasscolor.h"
 #include "pullplanrenderdata.h"
-#include "asynccolorbarlibrarywidget.h"
+#include "colorbarlibrarywidget.h"
 #include "pulltemplate.h"
 #include "pullplan.h"
 
-AsyncColorBarLibraryWidget :: AsyncColorBarLibraryWidget(GlassColor* _glassColor, QWidget* _parent, 
+ColorBarLibraryWidget :: ColorBarLibraryWidget(GlassColor* _glassColor, QWidget* _parent, 
 	PullPlan* _circlePlan, PullPlan* _squarePlan) : AsyncRenderWidget(_parent), glassColor(_glassColor), 
 	circlePlan(_circlePlan), squarePlan(_squarePlan) 
 {
@@ -20,7 +20,7 @@ AsyncColorBarLibraryWidget :: AsyncColorBarLibraryWidget(GlassColor* _glassColor
 	updatePixmaps();
 }
 
-void AsyncColorBarLibraryWidget :: paintEvent(QPaintEvent *event)
+void ColorBarLibraryWidget :: paintEvent(QPaintEvent *event)
 {
 	AsyncRenderWidget::paintEvent(event);
 	QPainter painter(this);
@@ -28,7 +28,7 @@ void AsyncColorBarLibraryWidget :: paintEvent(QPaintEvent *event)
 	painter.drawText(rect().adjusted(5, 0, 0, -2), Qt::AlignBottom | Qt::AlignLeft, glassColor->getShortName().c_str());
 }
 
-void AsyncColorBarLibraryWidget :: updateDragPixmap()
+void ColorBarLibraryWidget :: updateDragPixmap()
 {
 	QPixmap _pixmap(200, 200);
 	_pixmap.fill(Qt::transparent);
@@ -45,12 +45,12 @@ void AsyncColorBarLibraryWidget :: updateDragPixmap()
 	dragPixmap = _pixmap.scaled(100, 100);
 }
 
-const QPixmap* AsyncColorBarLibraryWidget :: getDragPixmap()
+const QPixmap* ColorBarLibraryWidget :: getDragPixmap()
 {
 	return &(this->dragPixmap);
 }
 
-void AsyncColorBarLibraryWidget :: updatePixmaps()
+void ColorBarLibraryWidget :: updatePixmaps()
 {
 	updateDragPixmap();
 

@@ -9,8 +9,8 @@
 
 class GlassColor;
 class PullPlan;
-class AsyncPullPlanLibraryWidget;
-class AsyncColorBarLibraryWidget;
+class PullPlanLibraryWidget;
+class ColorBarLibraryWidget;
 
 using std::vector;
 
@@ -57,7 +57,7 @@ class PullPlanEditorViewWidget : public QWidget
 
 		PullPlan* plan;
 
-		AsyncColorBarLibraryWidget* draggedLibraryColor;
+		ColorBarLibraryWidget* draggedLibraryColor;
 		GlassColor* draggedColor;
 		PullPlan* draggedPlan;
 

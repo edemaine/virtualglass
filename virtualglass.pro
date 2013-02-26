@@ -100,9 +100,9 @@ HEADERS += vgapp.h \
 	asyncrenderthread.h \
 	pullplanrenderdata.h \
 	piecerenderdata.h \
-	asyncpullplanlibrarywidget.h \
-	asynccolorbarlibrarywidget.h \
-	asyncpiecelibrarywidget.h \
+	pullplanlibrarywidget.h \
+	colorbarlibrarywidget.h \
+	piecelibrarywidget.h \
 	pullplancustomizeviewwidget.h \
 	glassmime.h \
         glasscolor.h \
@@ -155,9 +155,9 @@ SOURCES += main.cpp \
 	asyncrenderthread.cpp \
 	pullplanrenderdata.cpp \
 	piecerenderdata.cpp \
-	asyncpullplanlibrarywidget.cpp \
-	asynccolorbarlibrarywidget.cpp \
-	asyncpiecelibrarywidget.cpp \
+	pullplanlibrarywidget.cpp \
+	colorbarlibrarywidget.cpp \
+	piecelibrarywidget.cpp \
 	glassmime.cpp \
 	glasscolor.cpp \
         jsoncpp/src/lib_json/json_reader.cpp \

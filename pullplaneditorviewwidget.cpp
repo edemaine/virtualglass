@@ -7,8 +7,8 @@
 #include "glasscolor.h"
 #include "pullplan.h"
 #include "glassmime.h"
-#include "asyncpullplanlibrarywidget.h"
-#include "asynccolorbarlibrarywidget.h"
+#include "pullplanlibrarywidget.h"
+#include "colorbarlibrarywidget.h"
 #include "pullplaneditorviewwidget.h"
 
 PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
@@ -110,7 +110,7 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	if (selectedSubplan != NULL)
 	{
 		enum GlassMime::Type type = GlassMime::PULLPLAN_MIME;
-		AsyncPullPlanLibraryWidget plplw(selectedSubplan);		
+		PullPlanLibraryWidget plplw(selectedSubplan);		
 		QPixmap pixmap = *(plplw.getDragPixmap());
 
 	        char buf[500];
@@ -224,7 +224,7 @@ void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 	switch (type)
 	{
 		case GlassMime::COLORLIBRARY_MIME:
-			draggedLibraryColor = reinterpret_cast<AsyncColorBarLibraryWidget*>(ptr);
+			draggedLibraryColor = reinterpret_cast<ColorBarLibraryWidget*>(ptr);
 			break;
 		case GlassMime::COLOR_MIME:
 			draggedColor = reinterpret_cast<GlassColor*>(ptr);

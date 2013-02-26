@@ -22,7 +22,7 @@ class QSlider;
 class PieceGeometryThread;
 class TwistWidget;	
 class PieceCustomizeViewWidget;
-class AsyncPieceLibraryWidget;
+class PieceLibraryWidget;
 class PickupPlanEditorViewWidget;
 class NiceViewWidget;
 class Piece;
@@ -37,7 +37,7 @@ class PieceEditorWidget : public QWidget
 		PieceEditorWidget(QWidget* parent=0);
 		void resetPiece();
 		Piece* getPiece();
-		void updateLibraryWidgetPixmaps(AsyncPieceLibraryWidget* w);
+		void updateLibraryWidgetPixmaps(PieceLibraryWidget* w);
 		void seedTemplates();
 		void setPiece(Piece* p);
 		void setPieceTemplateType(enum PieceTemplate::Type t);
