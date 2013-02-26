@@ -178,8 +178,7 @@ void PieceEditorWidget :: pieceSplineSpinBoxChanged(double)
 			pieceChanged = true;
 		}
 	}
-	if (pieceChanged)
-		emit someDataChanged();
+	emit someDataChanged();
 }
 
 void PieceEditorWidget :: pickupParameterSpinBoxChanged(int)
@@ -396,6 +395,7 @@ void PieceEditorWidget :: setupConnections()
 	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
 	connect(pickupViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
+	connect(pieceCustomizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(pieceControlsTab, SIGNAL(currentChanged(int)), this, SLOT(pieceControlsTabChanged(int)));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }

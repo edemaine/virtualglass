@@ -3,13 +3,9 @@
 #define PIECECUSTOMIZEVIEWWIDGET_H
 
 #include <QWidget>
-#include <vector>
 #include "primitives.h"
-#include "shape.h"
 
 class Piece;
-
-using std::vector;
 
 class PieceCustomizeViewWidget : public QWidget
 {
@@ -35,13 +31,15 @@ class PieceCustomizeViewWidget : public QWidget
 		float adjustedY(float rawX);
 		float rawX(float adjustedX);
 		float rawY(float adjustedY);
+		float rawScale(float adjustedScale);
+		float adjustedScale(float rawScale);
+		Point controlPointRawLocation(unsigned int index);
 		void drawPiece();
 
 		Piece* piece;
 
-		bool isDraggingPoint;
-		unsigned int draggedPointIndex;
-
+		bool isDraggingControlPoint;
+		unsigned int draggedControlPointIndex;
 		float ulX, ulY, squareSize;
 
 	public slots:

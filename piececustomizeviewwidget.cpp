@@ -11,8 +11,8 @@ PieceCustomizeViewWidget :: PieceCustomizeViewWidget(Piece* _piece, QWidget* _pa
 	setMinimumSize(200, 200);
 	this->piece = _piece;
 
-	isDraggingPoint = false;
-	draggedPointIndex = 0;
+	isDraggingControlPoint = false;
+	draggedControlPointIndex = 0;
 }
 
 QRect PieceCustomizeViewWidget :: usedRect()
@@ -43,90 +43,87 @@ void PieceCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
 
 float PieceCustomizeViewWidget :: adjustedX(float rawX)
 {
-	return rawX - ulX;
+	float blowup = squareSize / 22.0;
+	return (rawX - ulX) / blowup;
 }
 
 float PieceCustomizeViewWidget :: adjustedY(float rawY)
 {
-	return rawY - ulY;
+	float blowup = squareSize / 22.0;
+	return (rawY - ulY) / blowup;
 }
 
 float PieceCustomizeViewWidget :: rawX(float adjustedX)
 {
-	return adjustedX + ulX;
+	float blowup = squareSize / 22.0;
+	return adjustedX * blowup + ulX;
 }
 
 float PieceCustomizeViewWidget :: rawY(float adjustedY)
 {
-	return adjustedY + ulY;
+	float blowup = squareSize / 22.0;
+	return adjustedY * blowup + ulY;
 }
 
-void PieceCustomizeViewWidget :: mousePressEvent(QMouseEvent* /*event*/)
+float PieceCustomizeViewWidget :: rawScale(float adjustedScale)
 {
+	float blowup = squareSize / 22.0;
+	return adjustedScale * blowup; 
+}
 
-#ifdef UNDEF
-	float x = (adjustedX(event->pos().x()) - squareSize/2) / float(squareSize/2-10);
-	float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
+float PieceCustomizeViewWidget :: adjustedScale(float rawScale)
+{
+	float blowup = squareSize / 22.0;
+	return rawScale / blowup; 
+}
 
-	// Check for casing resize
-	for (unsigned int i = 0; i < plan->getCasingCount() - 1; ++i) 
+Point PieceCustomizeViewWidget :: controlPointRawLocation(unsigned int index)
+{
+	Point p;
+
+	float vertLength = 9.0 - piece->spline.start();
+	float yOffset = 0.5 * vertLength;
+	p.x = rawX(11 - piece->spline.values[index] - 4 / PI); 
+	p.y = rawY(11 + yOffset - 4 / PI - vertLength * index / (static_cast<float>(piece->spline.values.size()) - 1.0));
+
+	return p;
+} 
+
+void PieceCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
+{
+	// get press position
+	Point mouse;
+	mouse.x = event->pos().x();
+	mouse.y = event->pos().y();
+	
+	// check and see if it's on a control point
+	for (unsigned int i = 0; i < piece->spline.values.size(); ++i)
 	{
-		if (isOnCasing(i, x, y))
+		Point p = controlPointRawLocation(i);
+		if (fabs(mouse.x - p.x) + fabs(mouse.y - p.y) < 4 * MAX(squareSize / 100, 1))
 		{
-			isDraggingCasing = true; 
-			draggedCasingIndex = i;
+			isDraggingControlPoint = true;
+			draggedControlPointIndex = i;
 			return;
-		}	
-	}
-
-	// Check for convenience subplan-to-subplan drag
-	PullPlan* selectedSubplan = getSubplanAt(x, y);
-	if (selectedSubplan != NULL)
-	{
-		enum GlassMime::Type type = GlassMime::PULLPLAN_MIME;
-		AsyncPullPlanLibraryWidget plplw(selectedSubplan);		
-		QPixmap pixmap = *(plplw.getDragPixmap());
-
-	        char buf[500];
-		GlassMime::encode(buf, selectedSubplan, type);
-		QByteArray pointerData(buf);
-		QMimeData* mimeData = new QMimeData;
-		mimeData->setText(pointerData);
-
-		QDrag *drag = new QDrag(this);
-		drag->setMimeData(mimeData);
-		drag->setPixmap(pixmap);
-
-		drag->exec(Qt::CopyAction);
+		}
 	}	
-#endif
 }
 
-void PieceCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* /*event*/)
+void PieceCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 {
-#ifdef UNDEF
-	if (!isDraggingCasing)
+	if (!isDraggingControlPoint)
 		return;
 
-	float x = (adjustedX(event->pos().x()) - squareSize/2);
-	float y = (adjustedY(event->pos().y()) - squareSize/2);
-	float radius = getShapeRadius(plan->getCasingShape(draggedCasingIndex), x, y) / (squareSize/2 - 10);
-
-	float min;
-	float max;
-
-	setMinMaxCasingRadii(&min, &max);	
-	plan->setCasingThickness(MIN(MAX(radius, min), max), draggedCasingIndex);
-
+	Point mouse;
+	mouse.x = event->pos().x();
+	float delta = adjustedScale(mouse.x - controlPointRawLocation(draggedControlPointIndex).x);	
+	piece->spline.values[draggedControlPointIndex] -= delta;	
 	emit someDataChanged();
-#endif
 }
 
-void PieceCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent* /*event*/)
+void PieceCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent*)
 {
-#ifdef UNDEF
-	isDraggingCasing = false;
-#endif
+	isDraggingControlPoint = false;
 }
 
 void PieceCustomizeViewWidget :: updateEverything()
@@ -155,7 +152,7 @@ void PieceCustomizeViewWidget :: drawPiece()
 
 	QPen pen;
 	pen.setColor(QColor(0, 0, 0));
-	pen.setWidth(7);
+	pen.setWidth(MAX(squareSize/100, 1) * 2);
 	pen.setCapStyle(Qt::RoundCap);
 	painter.setPen(pen);
 	painter.setBrush(QColor(100, 100, 100));
@@ -163,29 +160,25 @@ void PieceCustomizeViewWidget :: drawPiece()
 	// total line length is 10, with spline[0] determining bottom width,
 	// and spline determining remaining side curve, after a PI/2 turn with 
 	// length 1.0
-	float size = 25.0;
-	float blowup = squareSize / size;
-	
+	float yOffset = 0.5 * (9.0 - spline.start()); // adjust for centering the piece	
+
 	// first draw bottom
 	QPointF start;
-	start.setX((size * 0.5 - spline.start()) * blowup);
-	start.setY(size * 0.75 * blowup);
-
+	start.setX(rawX(11 - spline.start()));
+	start.setY(rawY(11 + yOffset));
 	QPointF end;
-	end.setX((size * 0.5 + spline.start()) * blowup);
-	end.setY(size * 0.75 * blowup);
-	
+	end.setX(rawX(11 + spline.start()));
+	end.setY(start.y());
 	painter.drawLine(QLineF(start, end));
 
 	// next draw turn
 	QPointF center;
-	float turnCenterX = size * 0.5 + spline.start();
-	float turnCenterY = size * 0.75 - 4 / PI;
-	painter.drawArc((turnCenterX - 4 / PI) * blowup, (turnCenterY - 4 / PI) * blowup, 8 / PI * blowup, 8 / PI * blowup,
+	float turnCenterX = 11 + spline.start();
+	float turnCenterY = 11 + yOffset - 4 / PI;
+	painter.drawArc(rawX(turnCenterX - 4 / PI), rawY(turnCenterY - 4 / PI), rawScale(8 / PI), rawScale(8 / PI),
 		0 * 16, -90 * 16); 
-	turnCenterX = size * 0.5 - spline.start();
-	turnCenterY = size * 0.75 - 4 / PI;
-	painter.drawArc((turnCenterX - 4 / PI) * blowup, (turnCenterY - 4 / PI) * blowup, 8 / PI * blowup, 8 / PI * blowup,
+	turnCenterX = 11 - spline.start();
+	painter.drawArc(rawX(turnCenterX - 4 / PI), rawY(turnCenterY - 4 / PI), rawScale(8 / PI), rawScale(8 / PI),
 		-180 * 16, 90 * 16); 
 	
 	// now draw remainder	
@@ -193,19 +186,31 @@ void PieceCustomizeViewWidget :: drawPiece()
 	{
 		float t_delta = t + 0.01;	
 
-		start.setX((size * 0.5 + spline.get(t) + 4/PI) * blowup);
-		start.setY((size * 0.75 - (4/PI + t * (9.0 - spline.start()))) * blowup);	
-		end.setX((size * 0.5 + spline.get(t_delta) + 4/PI) * blowup);
-		end.setY((size * 0.75 - (4/PI + t_delta * (9.0 - spline.start()))) * blowup);	
+		start.setX(rawX(11 + spline.get(t) + 4/PI));
+		start.setY(rawY(11 + yOffset - 4 / PI - (t * (9.0 - spline.start()))));	
+		end.setX(rawX(11 + spline.get(t_delta) + 4/PI));
+		end.setY(rawY(11 + yOffset - 4 / PI - (t_delta * (9.0 - spline.start()))));
 		painter.drawLine(QLineF(start, end));
 
-		start.setX((size * 0.5 - spline.get(t) - 4/PI) * blowup);
-		end.setX((size * 0.5 - spline.get(t_delta) - 4/PI) * blowup);
+		start.setX(rawX(11 - spline.get(t) - 4/PI));
+		end.setX(rawX(11 - spline.get(t_delta) - 4/PI));
 		painter.drawLine(QLineF(start, end));
 	}
 
 	// finally, draw control points
-	
+        painter.setBrush(QColor(0, 0, 0, 255));
+        pen.setWidth(2);
+        pen.setColor(Qt::white);
+        pen.setStyle(Qt::SolidLine);
+        painter.setPen(pen);
+	for (unsigned int i = 0; i < spline.values.size(); ++i)
+	{
+		Point p = controlPointRawLocation(i);
+		start.setX(p.x);
+		start.setY(p.y);
+		int pointRadius = MAX(squareSize / 100, 1) * 2;
+                painter.drawEllipse(start, pointRadius, pointRadius);
+	}
 
 	painter.end();
 }
