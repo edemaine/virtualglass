@@ -3,7 +3,6 @@
 
 GlassLibraryWidget :: GlassLibraryWidget(QWidget* _parent) : QLabel(_parent)
 {
-	isBusy = false;
 	hasDependancy = false;
 }
 
@@ -37,24 +36,7 @@ void GlassLibraryWidget :: updateStyleSheet()
 		style.append("border: 2px solid " + color.name() + ";");
 	}
 
-	if (isBusy)
-	{
-		color = QColor(0, 0, 0); 
-		style.append("background-color: " + color.name() + ";");
-	}
-	else 
-	{
-		color = QColor(200, 200, 200);
-		style.append("background-color: " + color.name() + ";");
-	}	
-
 	setStyleSheet(style);
-}
-
-void GlassLibraryWidget::setBusy(bool _b)
-{
-	isBusy = _b;
-	updateStyleSheet();
 }
 
 void GlassLibraryWidget::setDependancy(bool _hd, enum Dependancy _d)

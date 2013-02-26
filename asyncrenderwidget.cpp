@@ -41,8 +41,6 @@ void AsyncRenderWidget::renderFinished(Camera const &/*unused: camera */, Render
 	delete data;
 	delete geometry;
 	delete image;
-
-	this->setBusy(false);
 }
 
 

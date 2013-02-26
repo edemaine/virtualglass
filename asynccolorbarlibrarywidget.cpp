@@ -54,10 +54,6 @@ void AsyncColorBarLibraryWidget :: updatePixmaps()
 {
 	updateDragPixmap();
 
-	// indicate to the user that the image is being updated
-	// busy-ness is turned off inherited AsyncRenderWidget::renderFinished()
-	setBusy(true);
-
 	//queue up an async update (though as of 9/12 the rendering
 	//is real-time anyway):
 	Camera camera;

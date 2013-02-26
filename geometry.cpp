@@ -9,6 +9,43 @@
 using std::vector;
 
 
+Vertex :: Vertex(Point const &_position, Point const &_normal = make_vector(0.0f, 0.0f, 0.0f)) 
+	: position(_position), normal(_normal) 
+{
+}
+
+Triangle :: Triangle(uint32_t _v1 = -1U, uint32_t _v2 = -1U, uint32_t _v3 = -1U) : v1(_v1), v2(_v2), v3(_v3) 
+{
+}
+
+Group :: Group(uint32_t _triangle_begin, uint32_t _triangle_size, uint32_t _vertex_begin, uint32_t _vertex_size,
+	Color _color, bool _ensureVisible) : triangle_begin(_triangle_begin), triangle_size(_triangle_size), 
+	vertex_begin(_vertex_begin), vertex_size(_vertex_size), color(_color), ensureVisible(_ensureVisible) 
+{
+}
+
+void Geometry :: clear() {
+	vertices.clear();
+	triangles.clear();
+	groups.clear();
+}
+
+bool Geometry :: valid() const {
+	for (std::vector< Triangle >::const_iterator t = triangles.begin(); t != triangles.end(); ++t) {
+		if (t->v1 >= vertices.size()) return false;
+		if (t->v2 >= vertices.size()) return false;
+		if (t->v3 >= vertices.size()) return false;
+	}
+	for (std::vector< Group >::const_iterator g = groups.begin(); g != groups.end(); ++g) {
+		if (g->triangle_begin >= triangles.size()) return false;
+		if (g->triangle_begin + g->triangle_size > triangles.size()) return false;
+		if (g->vertex_begin >= vertices.size()) return false;
+		if (g->vertex_begin + g->vertex_size > vertices.size()) return false;
+	}
+	return true;
+}
+
+
 //compute normals by using area-weighted normals of adjacent triangles.
 //this may not be the correct approximation, but I just wanted some sort of hack
 //to hold us until proper normal transforms could be written.

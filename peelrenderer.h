@@ -1,7 +1,7 @@
 #ifndef PEELRENDERER_HPP
 #define PEELRENDERER_HPP
 
-#include <glew.h>
+#include "glew.h"
 #include <QGLContext>
 
 class Geometry;

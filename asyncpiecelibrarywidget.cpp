@@ -18,10 +18,6 @@ void AsyncPieceLibraryWidget :: updateEyePosition(Vector3f _eyePosition)
 
 void AsyncPieceLibraryWidget :: updatePixmap()
 {
-	// indicate to the user that the image is being updated
-	// busy-ness is turned off in inherited AsyncRenderWidget::renderFinished()
-	setBusy(true);
-
 	//queue up an async update:
 	Camera camera;
 	camera.eye = eyePosition;

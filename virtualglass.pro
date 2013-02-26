@@ -117,6 +117,7 @@ HEADERS += vgapp.h \
 	templatelibrarywidget.h \
 	piececustomizeviewwidget.h \ 
 	spline.h \
+	globaldepthpeelingsetting.h \
 
 SOURCES += main.cpp \ 
 	vgapp.cpp \
@@ -172,5 +173,6 @@ SOURCES += main.cpp \
 	templatelibrarywidget.cpp \
 	piececustomizeviewwidget.cpp \
 	spline.cpp \
+	globaldepthpeelingsetting.cpp \
 
 

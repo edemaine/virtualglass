@@ -16,10 +16,6 @@ void AsyncPullPlanLibraryWidget :: updatePixmaps()
 	// This is fast enough to do in real time
 	updateDragPixmap();
 
-	// indicate to the user that the image is being updated
-	// busy-ness is turned off inherited AsyncRenderWidget::renderFinished()
-	setBusy(true);
-
 	// queue up an async update:
 	Camera camera;
 	camera.eye = make_vector(0.0f, 11.0f, 5.0f);

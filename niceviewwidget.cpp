@@ -1,42 +1,42 @@
-/*
-This class is the QT GUI object that does 3D rendering.
-It also responds to mouse clicks and mouse movement within
-its extent. As this object handles mouse clicks and movement,
-it is involved in modifying the cane.
-*/
 
+// This class is the QT GUI object that does 3D rendering.
+// It also responds to mouse clicks and mouse movement within
+// its extent, which serve to change the camera view. 
+
+#include "glew.h"
 #ifdef _WIN32
 #  include <windows.h>
 #endif
-#include <cstdlib>
-#include <cstdio>
+#include <iostream>
 #include <string>
-#include <cmath>
-#include <stdexcept>
 #include <QMouseEvent>
+#include <QGLFramebufferObject>
+
 #include "constants.h"
 #include "niceviewwidget.h"
-#include "bubble.h"
+#include "globaldepthpeelingsetting.h"
 
 namespace {
-void gl_errors(string const &where) {
+
+void gl_errors(string const &where) 
+{
 	GLuint err;
 	while ((err = glGetError()) != GL_NO_ERROR) {
-	std::cerr << "(in " << where << ") OpenGL error #" << err
-		 << ": " << gluErrorString(err) << std::endl;
+		std::cerr << "(in " << where << ") OpenGL error #" << err
+			 << ": " << gluErrorString(err) << std::endl;
 	}
 }
+
 }
-
-
-bool NiceViewWidget::peelEnable = true;
 
 NiceViewWidget :: NiceViewWidget(enum CameraMode cameraMode, QWidget *parent) 
 	: QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent), peelRenderer(NULL)
 {
-	viewAll = false;
 	leftMouseDown = false;
-	bgColor = QColor(200, 200, 200);
+
+	this->backgroundColor.r = this->backgroundColor.g = this->backgroundColor.b = 200.0 / 255.0;
+	this->backgroundColor.a = 1.0;
+
 	geometry = NULL;
 	this->cameraMode = cameraMode;
 
@@ -72,7 +72,6 @@ NiceViewWidget :: NiceViewWidget(enum CameraMode cameraMode, QWidget *parent)
 	mouseLocY = 0;
 
 	initializeGLCalled = false;
-	geometry = NULL;
 }
 
 NiceViewWidget :: ~NiceViewWidget()
@@ -80,17 +79,13 @@ NiceViewWidget :: ~NiceViewWidget()
 	//Deallocate all the depth peeling resources we may have created:
 	makeCurrent();
 
-	if (peelRenderer) {
+	if (peelRenderer) 
+	{
 		GLEWContext *ctx = peelRenderer->glewContext;
 		delete peelRenderer;
 		peelRenderer = NULL;
 		delete ctx;
 	}
-}
-
-void NiceViewWidget :: setViewAll(bool value)
-{
-	this->viewAll = value;
 }
 
 void NiceViewWidget :: initializePeel()
@@ -116,24 +111,6 @@ void NiceViewWidget :: initializePeel()
 	}
 } 
 
-void NiceViewWidget :: resetPickupEditorView()
-{
-	theta = -PI/2.0;
-	phi = PI/2;
-	// rho set in resizeGL() b/c it depends on window size
-	lookAtLoc[0] = 0.0;
-	lookAtLoc[1] = 0.0;
-	lookAtLoc[2] = 0.0;
-	mouseLocX = 0;
-	mouseLocY = 0;
-	resizeGL(this->width(), this->height());
-}
-
-void NiceViewWidget :: setViewAllPickupEditorView()
-{
-	phi = PI/4;
-}
-
 void NiceViewWidget :: initializeGL()
 {
 	initializeGLCalled = true;
@@ -150,8 +127,10 @@ void NiceViewWidget :: initializeGL()
 	gl_errors("NiceViewWidget::initializeGL");
 }
 
-QImage NiceViewWidget :: renderImage() {
-	if (!initializeGLCalled) {
+QImage NiceViewWidget :: renderImage() 
+{
+	if (!initializeGLCalled) 
+	{
 		initializeGL();
 	}
 	makeCurrent();
@@ -163,67 +142,6 @@ QImage NiceViewWidget :: renderImage() {
 	glPopAttrib();
 	fb.release();
 	return fb.toImage();
-}
-
-/*void NiceViewWidget :: Bubble(void)
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				glColor3d(1,0,0);
-
-				glPushMatrix();
-								glTranslated(0.0,1.2,-6);
-								glutSolidSphere(1,50,50);
-				glPopMatrix();
-
-				glPushMatrix();
-								glTranslated(0.0,-1.2,-6);
-								glutWireSphere(1,16,16);
-				glPopMatrix();
-
-				glutSwapBuffers();
-}*/
-
-void NiceViewWidget :: displayBubble(Bubble sphere)
-{
-	int const win_width  = 300; // retrieve window dimensions from
-					int const win_height = 300; // framework of choice here
-					float const win_aspect = (float)win_width / (float)win_height;
-
-					glViewport(0, 0, win_width, win_height);
-
-					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-					glMatrixMode(GL_PROJECTION);
-					glLoadIdentity();
-					gluPerspective(45, win_aspect, 1, 10);
-
-					glMatrixMode(GL_MODELVIEW);
-					glLoadIdentity();
-
-	#ifdef DRAW_WIREFRAME
-					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	#endif
-					this->drawBubble(0, 0, -5, sphere);
-
-					swapBuffers();
-}
-
-void NiceViewWidget :: drawBubble(GLfloat x, GLfloat y, GLfloat z, Bubble sphere)
-{
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glTranslatef(x,y,z);
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	glVertexPointer(3, GL_FLOAT, 0, &(sphere.vertices)[0]);
-	glNormalPointer(GL_FLOAT, 0, &(sphere.normals)[0]);
-	glTexCoordPointer(2, GL_FLOAT, 0, &(sphere.texcoords)[0]);
-	glDrawElements(GL_QUADS, sphere.indices.size(), GL_UNSIGNED_SHORT, &(sphere.indices)[0]);
-	glPopMatrix();
-	this->paintGL();
 }
 
 /*
@@ -238,15 +156,15 @@ void NiceViewWidget :: paintGL()
 	setGLMatrices();
 
 	// we've got geometry, now check that peeling is a-peeling
-	if (peelRenderer && peelEnable) 
-		peelRenderer->render(make_vector< float >(bgColor.redF(), bgColor.greenF(), bgColor.blueF()), *geometry);
+	if (peelRenderer && GlobalDepthPeelingSetting::enabled())
+		peelRenderer->render(make_vector<float>(backgroundColor.r, backgroundColor.g, backgroundColor.b), *geometry);
 	else 
 		paintWithoutDepthPeeling();
 }
 
 void NiceViewWidget :: paintWithoutDepthPeeling()
 {
-	this->qglClearColor(bgColor);
+	this->qglClearColor(QColor(backgroundColor.r*255, backgroundColor.g*255, backgroundColor.b*255));
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnable(GL_LIGHTING);
@@ -316,15 +234,13 @@ void NiceViewWidget :: resizeGL(int width, int height)
 	}
 
 	glViewport(0, 0, width, height);
-	if (this->width() != width || this->height() != height) {
-		std::cerr << "resizeGL(" << width << ", " << height << ") called while this->width,height are (" << this->width() << ", " << this->height() << "). This may mess up aspect ratio." << std::endl;
+	if (this->width() != width || this->height() != height) 
+	{
+		std::cerr << "resizeGL(" << width << ", " << height << ") called while this->width,height are (" 
+			<< this->width() << ", " << this->height() << "). This may mess up aspect ratio." << std::endl;
 	}
-	//I think paintGL will get called now...
 }
 
-/*
-Called to set up projection and modelview matrices
-*/
 void NiceViewWidget :: setGLMatrices()
 {
 	glMatrixMode(GL_PROJECTION);
@@ -343,11 +259,9 @@ void NiceViewWidget :: setGLMatrices()
 			break;
 		case PULLPLAN_CAMERA_MODE:
 		case PICKUPPLAN_CAMERA_MODE:
-			{
-				float a = h / w;
-				float s = 2.2f / rho;
-				glScalef(a * s, s,-0.01);
-			}
+			float a = h / w;
+			float s = 2.2f / rho;
+			glScalef(a * s, s,-0.01);
 			break;
 	}
 
@@ -364,12 +278,12 @@ void NiceViewWidget :: setGLMatrices()
 Currently catches all mouse press events
 (left and right buttons, etc.).
 */
-void NiceViewWidget :: mousePressEvent (QMouseEvent* e)
+void NiceViewWidget :: mousePressEvent(QMouseEvent* e)
 {
 	// In pickup plan mode, user does not move camera location, zoom, etc.
 	// The widget is a passive `display' widget only, with an interactive layer
 	// on top of it (PickupPlanEditorViewWidget), which we pass the event up to.
-	if ((cameraMode == PICKUPPLAN_CAMERA_MODE)&&(!viewAll))
+	if (cameraMode == PICKUPPLAN_CAMERA_MODE)
 	{
 		e->ignore(); 
 		return;
@@ -380,9 +294,7 @@ void NiceViewWidget :: mousePressEvent (QMouseEvent* e)
 	mouseLocY = e->y();
 
 	if (e->button() == Qt::LeftButton)
-	{
 		leftMouseDown = true;
-	}
 }
 
 void NiceViewWidget :: setGeometry(Geometry* g)
@@ -400,46 +312,32 @@ Vector3f NiceViewWidget :: eyePosition()
 	return loc;
 }
 
-/*
-Currently catches all mouse release events
-(left and right buttons, etc.).
-*/
-void NiceViewWidget :: mouseReleaseEvent (QMouseEvent* e)
+void NiceViewWidget :: mouseReleaseEvent(QMouseEvent* e)
 {
 	if (e->button() == Qt::LeftButton)
 		leftMouseDown = false;
 }
 
-/*
-This method is an event handler called when the mouse
-is moved *and a button is down*. Depending on the mode,
-the cane (and view of the cane) changes. This is
-part of the mode feature.
-*/
-void NiceViewWidget :: mouseMoveEvent (QMouseEvent* e)
+void NiceViewWidget :: mouseMoveEvent(QMouseEvent* e)
 {
 	float relX, relY;
-	float windowWidth, windowHeight;
 	int oldMouseLocX, oldMouseLocY;
-
-	windowWidth = this->width();
-	windowHeight = this->height();
 
 	// Calculate how much mouse moved
 	oldMouseLocX = mouseLocX;
 	mouseLocX = e->x();
-	relX = (mouseLocX - oldMouseLocX) / windowWidth;
+	relX = (mouseLocX - oldMouseLocX) / static_cast<float>(this->width());
 	oldMouseLocY = mouseLocY;
 	mouseLocY = e->y();
-	relY = (mouseLocY - oldMouseLocY) / windowHeight;
+	relY = (mouseLocY - oldMouseLocY) / static_cast<float>(this->height());
 
-	if ((cameraMode == PICKUPPLAN_CAMERA_MODE)&&(!viewAll))
+	if (cameraMode == PICKUPPLAN_CAMERA_MODE)
 		return;
 
 	if (leftMouseDown)
 	{
 		theta -= (relX * 100.0 * PI / 180.0);
-		if (cameraMode == PIECE_CAMERA_MODE | cameraMode == PICKUPPLAN_CAMERA_MODE)
+		if (cameraMode == PIECE_CAMERA_MODE)
 			phi = MIN(PI-0.0001, MAX(0.0001, phi - (relY * 100.0 * PI / 180.0)));
 		update();
 	}
@@ -448,29 +346,30 @@ void NiceViewWidget :: mouseMoveEvent (QMouseEvent* e)
 
 void NiceViewWidget :: wheelEvent(QWheelEvent *e)
 {
-	if ((cameraMode == PICKUPPLAN_CAMERA_MODE)&&(!viewAll))
-		return;
-	if(cameraMode == PULLPLAN_CAMERA_MODE)
+	switch (cameraMode)
 	{
-		if (e->delta() > 0)
-			rho *= 0.8;
-		else
-		{ 
-			if (e->delta() < 0)
+		case PULLPLAN_CAMERA_MODE:
+			if (e->delta() > 0)
+				rho *= 0.8;
+			else if (e->delta() < 0)
 			{
 				if (rho*1.2 > 11.0)
 					rho=11.0;
 				else
 					rho *= 1.2;
 			}
-		}
-	}
-	else
-	{
-		if (e->delta() > 0)
-			rho *= 0.8;
-		else if (e->delta() < 0)
-			rho *= 1.2;
+			break;
+		case PICKUPPLAN_CAMERA_MODE:
+			return;
+		case PIECE_CAMERA_MODE:
+		default:
+			if (e->delta() > 0)
+				rho *= 0.8;
+			else if (e->delta() < 0)
+				rho *= 1.2;
+			break;
 	}
 	update();	
 }
+
+

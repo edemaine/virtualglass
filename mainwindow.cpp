@@ -33,6 +33,7 @@
 #include "SVG.hpp"
 #include "glassfileio.h"
 #include "globalgraphicssetting.h"
+#include "globaldepthpeelingsetting.h"
 
 MainWindow :: MainWindow()
 {
@@ -394,8 +395,8 @@ void MainWindow :: lowGraphicsActionTriggered()
 
 void MainWindow :: depthPeelActionTriggered()
 {
-	NiceViewWidget::peelEnable = !(NiceViewWidget::peelEnable);
-	depthPeelAction->setChecked(NiceViewWidget::peelEnable);
+	GlobalDepthPeelingSetting::setEnabled(!GlobalDepthPeelingSetting::enabled());
+	depthPeelAction->setChecked(GlobalDepthPeelingSetting::enabled());
 	emit someDataChanged();
 }
 
@@ -1081,7 +1082,7 @@ void MainWindow::setupMenus()
 	// toggle depth peeling
 	depthPeelAction = new QAction("Depth peeling", this);
 	depthPeelAction->setCheckable(true);
-	depthPeelAction->setChecked(NiceViewWidget::peelEnable);
+	depthPeelAction->setChecked(GlobalDepthPeelingSetting::enabled());
 	depthPeelAction->setToolTip(tr("Toggle high-quality transparency rendering in 3D views"));
 
 	// Performance menu

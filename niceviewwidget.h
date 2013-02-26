@@ -1,68 +1,55 @@
 #ifndef NICEVIEWWIDGET_H
 #define NICEVIEWWIDGET_H
 
-#include "glew.h"
-#ifdef _WIN32
-#  include <windows.h>
-#endif
-#include <QGLFramebufferObject>
-#include <qgl.h>
 #include "primitives.h"
 #include "geometry.h"
 #include "peelrenderer.h"
-#include "bubble.h"
+
+class QGLFramebufferObject;
 
 class NiceViewWidget : public QGLWidget
 {
 	Q_OBJECT
 
-public:
-	enum CameraMode
-	{
-		PULLPLAN_CAMERA_MODE,
-		PICKUPPLAN_CAMERA_MODE,
-		PIECE_CAMERA_MODE 
-	};
-	
-	static bool peelEnable;
+	public:
+		enum CameraMode
+		{
+			PULLPLAN_CAMERA_MODE,
+			PICKUPPLAN_CAMERA_MODE,
+			PIECE_CAMERA_MODE 
+		};
+		
+		NiceViewWidget(enum CameraMode cameraMode, QWidget* parent=0);
+		virtual ~NiceViewWidget();
+		Vector3f eyePosition();
+		QImage renderImage();
+		void setGeometry(Geometry* g);
 
-	NiceViewWidget(enum CameraMode cameraMode, QWidget* parent=0);
-	virtual ~NiceViewWidget();
-	void displayBubble(Bubble);
-	void drawBubble(GLfloat, GLfloat, GLfloat, Bubble);
-	Vector3f eyePosition();
-	QImage renderImage();
-	void resetPickupEditorView();
-	void setViewAllPickupEditorView();
-	void setViewAll(bool);
-	void setGeometry(Geometry* g);
+	protected:
+		void initializeGL();
+		void initializePeel();
+		void destructPeel();
+		void paintWithoutDepthPeeling();
+		void paintGL();
+		void resizeGL(int width, int height);
+		void mousePressEvent(QMouseEvent* e);
+		void mouseReleaseEvent(QMouseEvent* e);
+		void mouseMoveEvent(QMouseEvent* e);
+		void wheelEvent(QWheelEvent* e);
 
-protected:
-	void initializeGL();
-	void initializePeel();
-	void destructPeel();
-	void paintWithoutDepthPeeling();
-	void paintGL();
-	void resizeGL(int width, int height);
-	void mousePressEvent(QMouseEvent* e);
-	void mouseReleaseEvent(QMouseEvent* e);
-	void mouseMoveEvent(QMouseEvent* e);
-	void wheelEvent(QWheelEvent* e);
+	private:
+		bool leftMouseDown;
+		Color backgroundColor;
+		Geometry *geometry;
+		enum CameraMode cameraMode;
+		float lookAtLoc[3];
+		float theta, phi, rho;
+		int mouseLocX, mouseLocY;
+		QGLFramebufferObject *selectBuffer;
+		bool initializeGLCalled;
+		PeelRenderer *peelRenderer;
 
-private:
-	bool leftMouseDown;
-	QColor bgColor;
-	Geometry *geometry;
-	enum CameraMode cameraMode;
-	float lookAtLoc[3];
-	float theta, phi, rho;
-	int mouseLocX, mouseLocY;
-	QGLFramebufferObject *selectBuffer;
-	bool initializeGLCalled;
-	PeelRenderer *peelRenderer;
-	bool viewAll;
-
-	void setGLMatrices();
+		void setGLMatrices();
 };
 
 #endif

@@ -1,8 +1,11 @@
+
+
 #include "asyncrenderthread.h"
 #include "asyncrenderinternal.h"
 #include "asyncrenderwidget.h"
 #include "geometry.h"
 #include "peelrenderer.h"
+#include "globaldepthpeelingsetting.h"
 
 #include <QGLFramebufferObject>
 
@@ -46,35 +49,38 @@ void RenderThread::run() {
 	GLEWContext *glewContext = new GLEWContext;
 	GLenum err = glewInit();
 	PeelRenderer *peelRenderer = NULL;
-	if (err != GLEW_OK) {
+	if (err != GLEW_OK) 
+	{
 		std::cerr << "WARNING: Failure initializing glew: " << glewGetErrorString(err) << std::endl;
 		std::cerr << " ... we will continue, but code that uses extensions will cause a crash" << std::endl;
-	} else {
-		try {
+	} 
+	else 
+	{
+		try 
+		{
 			peelRenderer = new PeelRenderer(glewContext);
-		} catch (...) {
+		} 
+		catch (...) 
+		{
 			std::cerr << "Caught exception constructing peelRenderer, will fall back to regular rendering." << std::endl;
 			peelRenderer = NULL;
 		}
 	}
 
-	//----------------------------------------
-	//Setup lighting (and other) state for OpenGL:
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_COLOR_MATERIAL);
-	glEnable (GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
-	//TODO: I should really set the position and color of LIGHT0, but w/e
 	
 	gl_errors("RenderThread setup");
 
 	controller->renderQueueLock.lock();
-	while (!controller->quitThreads) {
-		if (controller->renderQueue.empty()) {
+	while (!controller->quitThreads) 
+	{
+		if (controller->renderQueue.empty()) 
+		{
 			controller->renderQueueHasData.wait(&controller->renderQueueLock);
 			continue;
 		}
@@ -85,7 +91,8 @@ void RenderThread::run() {
 
 		controller->renderQueueLock.unlock();
 
-		assert(QGLContext::currentContext() == widget->context()); //shouldn't change if it's a per-thread context, which I've been lead to suspect is true.
+		//shouldn't change if it's a per-thread context, which I've been lead to suspect is true.
+		assert(QGLContext::currentContext() == widget->context()); 
 
 		//TODO: could cache fb; not clear it's more efficient.
 		QGLFramebufferObject fb(job->camera.size.x, job->camera.size.y, QGLFramebufferObject::Depth);
@@ -93,13 +100,11 @@ void RenderThread::run() {
 		glPushAttrib(GL_VIEWPORT_BIT);
 		glViewport(0,0,job->camera.size.x, job->camera.size.y);
 
-
 		setupCamera(job->camera);
-		if (peelRenderer) {
+		if (peelRenderer && GlobalDepthPeelingSetting::enabled()) 
 			peelRenderer->render(bgColor, *job->geometry);
-		} else {
+		else 
 			simpleRender(*job->geometry);
-		}
 
 		glPopAttrib();
 		fb.release();
@@ -145,15 +150,14 @@ void RenderThread::setupCamera(Camera const &camera) {
 	gl_errors("RenderThread::setupCamera");
 }
 
-void RenderThread::simpleRender(Geometry const &geometry) {
-
+void RenderThread::simpleRender(Geometry const &geometry) 
+{
 	glClearColor(bgColor.r, bgColor.g, bgColor.b, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);
-	//glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+
 	//Check that Vertex and Triangle have proper size:
 	assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3));
 	assert(sizeof(Triangle) == sizeof(GLuint) * 3);
@@ -163,21 +167,40 @@ void RenderThread::simpleRender(Geometry const &geometry) {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 
-	for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g) 
+	// make a pass on mandatory transparent things, drawing them without culling/depth testing
+	// this doesn't do much except fake the glass/air interface
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g)
 	{
 		Color c = g->color;
-		glColor4f(c.r, c.g, c.b, c.a);
+		if (g->ensureVisible)
+			glColor4f(c.r, c.g, c.b, 0.1);
+		else
+			continue;
 		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 			GL_UNSIGNED_INT, &(geometry.triangles[g->triangle_begin].v1));
 	}
 
+	// make a pass on opaque things, round pretty opaque things up to no transparency
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+	for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g)
+	{
+		Color c = g->color;
+		if (c.a > 0.1)
+			glColor4f(c.r, c.g, c.b, 1.0);
+		else
+			continue;
+		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
+			GL_UNSIGNED_INT, &(geometry.triangles[g->triangle_begin].v1));
+	}
+	
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
-
-	//glDisable(GL_LIGHTING);
-
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
 
 	gl_errors("RenderThread::simpleRender");
 }
