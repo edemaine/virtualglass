@@ -19,6 +19,7 @@
 #include "templateparameter.h"
 #include "pullplangeometrythread.h"
 #include "twistwidget.h"
+#include "pullplancrosssectionrender.h"
 
 PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -367,15 +368,19 @@ void PullPlanEditorWidget :: countSpinChanged(int)
 
 void PullPlanEditorWidget :: seedTemplates()
 {
-	char filename[100];
-	
-	// read image filenames according to some correspondence:
-	// e.g. the 7th pull template's image filename is "pulltemplate7.png" 
 	for (int i = PullTemplate::firstSeedTemplate(); i <= PullTemplate::lastSeedTemplate(); ++i)
 	{
-		sprintf(filename, ":/images/pulltemplate%d.png", i);
-		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
-			QPixmap::fromImage(QImage(filename)), static_cast<PullTemplate::Type>(i));
+		PullTemplate::Type t = static_cast<PullTemplate::Type>(i);
+		PullPlan plan(t);
+
+		QPixmap templatePixmap(100, 100);
+		templatePixmap.fill(QColor(200, 200, 200));
+
+		QPainter painter(&templatePixmap);
+		PullPlanCrossSectionRender::render(&painter, 100, &plan);
+		painter.end();
+
+		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(templatePixmap, t);
 		templateLibraryLayout->addWidget(ptlw);
 	}
 
