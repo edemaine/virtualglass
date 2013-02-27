@@ -739,7 +739,7 @@ void PullPlanCustomizeViewWidget :: deleteSelectionPressed()
 
 void PullPlanCustomizeViewWidget :: addCirclePressed()
 {
-	Point p = make_vector(0.0f, 0.0f, 0.0f);
+	Point2D p = make_vector(0.0f, 0.0f);
 	float diameter = 0;
 	for (unsigned int i = 0; i < plan->subs.size(); i++)
 	{
@@ -760,7 +760,7 @@ void PullPlanCustomizeViewWidget :: addCirclePressed()
 
 void PullPlanCustomizeViewWidget :: addSquarePressed()
 {
-	Point p = make_vector(0.0f, 0.0f, 0.0f);
+	Point2D p = make_vector(0.0f, 0.0f);
 	float diameter = 0;
 	for (unsigned int i = 0; i < plan->subs.size(); i++)
 	{

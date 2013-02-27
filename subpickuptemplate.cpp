@@ -2,7 +2,7 @@
 
 #include "subpickuptemplate.h"
 
-SubpickupTemplate :: SubpickupTemplate(PullPlan* _plan, Point _location, PickupCaneOrientation _orientation, float _length, 
+SubpickupTemplate :: SubpickupTemplate(PullPlan* _plan, Point3D _location, PickupCaneOrientation _orientation, float _length, 
 	float _width, enum GeometricShape _shape)
 {
 	plan = _plan;

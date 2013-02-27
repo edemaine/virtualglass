@@ -450,8 +450,8 @@ void start_element(string const &name, map< string, string > &atts) {
 			float pageSize = (float) into.page.c[0];
 
 			// Convert coordinates from 0, 0 in upper left to 0,0 in center and scale
-			Point p = make_vector((float) ((x +width/2-pageSize/2)/ pageSize* sqrt(2.0)),
-					      (float) (( y +width/2 - pageSize/2)/ pageSize*sqrt(2.0)), 0.0f);
+			Point2D p = make_vector((float) ((x +width/2-pageSize/2)/ pageSize* sqrt(2.0)),
+					      (float) (( y +width/2 - pageSize/2)/ pageSize*sqrt(2.0)));
 			// Scale radius
 			float diameter = width/ pageSize * sqrt(2);
 
@@ -477,8 +477,8 @@ void start_element(string const &name, map< string, string > &atts) {
 				float pageSize = (float) into.page.c[0];
 
 				// Convert coordinates from 0, 0 in upper left to 0,0 in center and scale
-				Point p = make_vector((float) ((cx -pageSize/2)/ pageSize* sqrt(2.0)),
-						  (float) (( cy - pageSize/2)/ pageSize*sqrt(2.0)), 0.0f);
+				Point2D p = make_vector((float) ((cx -pageSize/2)/ pageSize* sqrt(2.0)),
+						  (float) (( cy - pageSize/2)/ pageSize*sqrt(2.0)));
 				// Scale radius
 				float diameter = 2*r/ pageSize * sqrt(2);
 

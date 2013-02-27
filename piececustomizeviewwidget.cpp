@@ -87,12 +87,13 @@ float PieceCustomizeViewWidget :: adjustedScale(float rawScale)
 	return rawScale / blowup; 
 }
 
-Point PieceCustomizeViewWidget :: controlPointRawLocation(unsigned int index)
+Point2D PieceCustomizeViewWidget :: controlPointRawLocation(unsigned int index)
 {
-	Point p;
+	Point2D cp = piece->spline.controlPoints()[index];
 
-	p.x = rawX(viewSize/2 - piece->spline.values()[index]); 
-	p.y = rawY(viewSize/2 - 10 * index / (static_cast<float>(piece->spline.values().size()) - 1.0) + 5.0);
+	Point2D p;
+	p.x = rawX(viewSize/2 - cp.x);
+	p.y = rawY(viewSize/2 - cp.y);
 
 	return p;
 } 
@@ -100,14 +101,14 @@ Point PieceCustomizeViewWidget :: controlPointRawLocation(unsigned int index)
 void PieceCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 {
 	// get press position
-	Point mouse;
+	Point2D mouse;
 	mouse.x = event->pos().x();
 	mouse.y = event->pos().y();
 	
 	// check and see if it's on a control point
-	for (unsigned int i = 0; i < piece->spline.values().size(); ++i)
+	for (unsigned int i = 0; i < piece->spline.controlPoints().size(); ++i)
 	{
-		Point p = controlPointRawLocation(i);
+		Point2D p = controlPointRawLocation(i);
 		if (fabs(mouse.x - p.x) + fabs(mouse.y - p.y) < 4 * MAX(squareSize / 100, 1))
 		{
 			isDraggingControlPoint = true;
@@ -122,10 +123,25 @@ void PieceCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 	if (!isDraggingControlPoint)
 		return;
 
-	Point mouse;
-	mouse.x = event->pos().x();
-	float delta = adjustedScale(mouse.x - controlPointRawLocation(draggedControlPointIndex).x);	
-	piece->spline.set(draggedControlPointIndex, piece->spline.values()[draggedControlPointIndex] - delta);	
+	float center = viewSize/2; 
+	if (draggedControlPointIndex == 0)
+	{
+		Point2D p;
+		float delta_y = adjustedScale(event->pos().y() - rawY(center - piece->spline.controlPoints()[0].y));
+		for (unsigned int i = 0; i < piece->spline.controlPoints().size(); ++i)
+		{
+			p = piece->spline.controlPoints()[i];
+			p.y -= delta_y;
+			piece->spline.set(i, p);
+		}
+	}
+	else
+	{
+		Point2D p;
+		p.x = center - adjustedX(event->pos().x());
+		p.y = center - adjustedY(event->pos().y());
+		piece->spline.set(draggedControlPointIndex, p);
+	}
 	emit someDataChanged();
 }
 
@@ -170,21 +186,33 @@ void PieceCustomizeViewWidget :: drawPiece()
 	QPointF start;
 	QPointF end;
 	float center = viewSize/2;
-	for (float t = 0.0; t < 1.0; t += 0.01)
+	for (float t = 0.0; t < 1.0; t += 0.001)
 	{
-		float t_delta = t + 0.01;	
-
 		// draw right side
-		start.setX(rawX(center + spline.get(t)));
-		start.setY(rawY(center - t * 10.0 + 5.0));	
-		end.setX(rawX(center + spline.get(t_delta)));
-		end.setY(rawY(center - t_delta * 10.0 + 5.0));
-		painter.drawLine(QLineF(start, end));
+		Point2D p = spline.get(t);
+		start.setX(rawX(center + p.x));
+		start.setY(rawY(center - p.y));	
+		painter.drawPoint(start);
 
 		// draw mirrored left side (y-values the same)
-		start.setX(rawX(center - spline.get(t)));
-		end.setX(rawX(center - spline.get(t_delta)));
-		painter.drawLine(QLineF(start, end));
+		start.setX(rawX(center - p.x));
+		painter.drawPoint(start);
+	}
+
+	// draw control point connectors
+        pen.setWidth(2);
+        pen.setColor(Qt::white);
+        pen.setStyle(Qt::SolidLine);
+        painter.setPen(pen);
+	for (unsigned int i = 0; i < spline.controlPoints().size()-1; ++i)
+	{
+		Point2D p = controlPointRawLocation(i);
+		start.setX(p.x);
+		start.setY(p.y);
+		p = controlPointRawLocation(i+1);
+		end.setX(p.x);
+		end.setY(p.y);
+                painter.drawLine(start, end);
 	}
 
 	// draw control points
@@ -193,9 +221,9 @@ void PieceCustomizeViewWidget :: drawPiece()
         pen.setColor(Qt::white);
         pen.setStyle(Qt::SolidLine);
         painter.setPen(pen);
-	for (unsigned int i = 0; i < spline.values().size(); ++i)
+	for (unsigned int i = 0; i < spline.controlPoints().size(); ++i)
 	{
-		Point p = controlPointRawLocation(i);
+		Point2D p = controlPointRawLocation(i);
 		start.setX(p.x);
 		start.setY(p.y);
 		int pointRadius = MAX(squareSize / 100, 1) * 2;
@@ -213,3 +241,7 @@ void PieceCustomizeViewWidget :: paintEvent(QPaintEvent *event)
 	painter.end();
 	drawPiece();
 }
+
+
+
+

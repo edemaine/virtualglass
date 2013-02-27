@@ -564,7 +564,6 @@ void writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<Pu
 		root[canename]["Subcanes"][subpullName]["Shape"] = geometricShapeToString(cane->subs[i].shape);
 		root[canename]["Subcanes"][subpullName]["X"] = cane->subs[i].location.x;
 		root[canename]["Subcanes"][subpullName]["Y"] = cane->subs[i].location.y;
-		root[canename]["Subcanes"][subpullName]["Z"] = cane->subs[i].location.z;
 	}
 }
 
@@ -619,7 +618,7 @@ void readCaneSubcanes(Json::Value& root, PullPlan* cane, map<unsigned int, PullP
 	// so we make an initial pass over the subcanes just to build an initial list of the correct size
 	if (cane->getTemplateType() == PullTemplate::CUSTOM)
 	{
-		Point location;
+		Point2D location;
 		for (unsigned int i = 0; i < root["Subcanes"].getMemberNames().size(); ++i)
 			cane->subs.push_back(SubpullTemplate(cane, CIRCLE_SHAPE, location, 1.0));
 	}
@@ -634,7 +633,6 @@ void readCaneSubcanes(Json::Value& root, PullPlan* cane, map<unsigned int, PullP
 		cane->subs[subpullIndex].shape = stringToGeometricShape(root["Subcanes"][subpullname]["Shape"].asString());
 		cane->subs[subpullIndex].location.x = root["Subcanes"][subpullname]["X"].asFloat();
 		cane->subs[subpullIndex].location.y = root["Subcanes"][subpullname]["Y"].asFloat();
-		cane->subs[subpullIndex].location.z = root["Subcanes"][subpullname]["Z"].asFloat();
 	}
 }
 
@@ -835,18 +833,18 @@ void writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<Pu
 {
 	string piecename = idAndNameToString(pieceIndex, "Piece");
 
-	// write singletons: piece template, twist, based-ness
+	// write singletons: piece template, twist
 	root[piecename]["Piece template"] = pieceTemplateToString(piece->getTemplateType());
 	root[piecename]["Twist"] = piece->twist;
-	root[piecename]["Based"] = piece->isBased();
 
 	// write piece template parameters
-	root[piecename]["Piece spline parameters"];
-	for (unsigned int i = 0; i < piece->spline.values().size(); ++i)
+	root[piecename]["Piece spline control points"];
+	for (unsigned int i = 0; i < piece->spline.controlPoints().size(); ++i)
 	{
-		string paramName = idAndNameToString(i, "PieceSplineParam");
-		root[piecename]["Piece spline parameters"][paramName]["Index"] = i;
-		root[piecename]["Piece spline parameters"][paramName]["Value"] = piece->spline.values()[i];
+		string paramName = idAndNameToString(i, "PieceSplineCtrlPt");
+		root[piecename]["Piece spline control points"][paramName]["Index"] = i;
+		root[piecename]["Piece spline control points"][paramName]["X"] = piece->spline.controlPoints()[i].x;
+		root[piecename]["Piece spline control points"][paramName]["Y"] = piece->spline.controlPoints()[i].y;
 	}
 
 	// write pickups (currently only one)
@@ -861,14 +859,16 @@ Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, PullPlan
 	piece->twist = root[piecename]["Twist"].asFloat();
 
 	// read piece template parameters
-	for (unsigned int i = piece->spline.values().size(); i < root[piecename]["Piece spline parameters"].getMemberNames().size(); ++i)
-		piece->spline.addValue(); // pad spline to be big enough for all the parameters
-	for (unsigned int i = 0; i < root[piecename]["Piece spline parameters"].getMemberNames().size(); ++i)
+	for (unsigned int i = piece->spline.controlPoints().size(); i < root[piecename]["Piece spline control points"].getMemberNames().size(); ++i)
+		piece->spline.addPoint(Point2D()); // pad spline to be big enough for all the parameters
+	for (unsigned int i = 0; i < root[piecename]["Piece spline control points"].getMemberNames().size(); ++i)
 	{
-		string paramname = root[piecename]["Piece spline parameters"].getMemberNames()[i];
-		unsigned int paramIndex = root[piecename]["Piece spline parameters"][paramname]["Index"].asUInt();
+		string paramname = root[piecename]["Piece spline control points"].getMemberNames()[i];
+		unsigned int paramIndex = root[piecename]["Piece spline control points"][paramname]["Index"].asUInt();
 
-		float paramValue = root[piecename]["Piece spline parameters"][paramname]["Value"].asFloat();	
+		Point2D paramValue;
+		paramValue.x = root[piecename]["Piece spline control points"][paramname]["X"].asFloat();	
+		paramValue.y = root[piecename]["Piece spline control points"][paramname]["Y"].asFloat();	
 		piece->spline.set(paramIndex, paramValue);
 	}
 

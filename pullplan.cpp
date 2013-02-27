@@ -306,7 +306,7 @@ enum GeometricShape PullPlan :: getCasingShape(unsigned int index) {
 }
 
 void PullPlan :: pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs,
-	enum GeometricShape _shape, Point p, float diameter) 
+	enum GeometricShape _shape, Point2D p, float diameter) 
 {
 	PullPlan* plan = 0;
 
@@ -345,7 +345,7 @@ of subplans, as well as increasing or decreasing the number of subplans.
 */
 void PullPlan :: resetSubs(bool hardReset)
 {
-	Point p = make_vector(0.0f, 0.0f, 0.0f);
+	Point2D p = make_vector(0.0f, 0.0f);
 	float radius = casings[0].thickness;
 
 	vector<SubpullTemplate> newSubs;

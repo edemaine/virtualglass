@@ -97,7 +97,7 @@ void applyResizeTransform(Vertex& v, float scale)
 void applySubplanTransform(Vertex& v, ancestor a)
 {
 	SubpullTemplate& subTemp = a.parent->subs[a.child];
-	Point locationInParent = subTemp.location;
+	Point2D locationInParent = subTemp.location;
 	float diameter = subTemp.diameter;
 
 	// Adjust diameter
@@ -150,15 +150,21 @@ void applyPieceTransform(Vertex& v, float twist, Spline& spline)
 {
 	float diskTheta = PI * v.position.x / 5.0 + twist * TWO_PI * v.position.z / 10.0;
 	float caneLoc = v.position.y;
+	float t = (v.position.z - -5.0) / 10.0;
 
-	float radius = spline.get((v.position.z - -5.0) / 10.0);
-	float delta_radius = spline.get((v.position.z + 0.01 - -5.0) / 10.0);
-	float delta_theta = atan2(0.01, delta_radius - radius);
+	Point2D p1 = spline.get(t);
+	Point2D p2 = spline.get(t + 0.01);
+	// remove artifacts at piece base due to bevel-like angling of pickup slab
+	float fix = 0.05;
+	if (t < fix)
+		p2.y = 1.0 / fix * (fix - t) * p1.y + 1.0 / fix * t * p2.y;
+
+	float delta_theta = atan2(p2.y - p1.y, p2.x - p1.x);
 	delta_theta -= PI/2;
 
-	v.position.x = (radius + cos(delta_theta) * -caneLoc) * cos(diskTheta);
-	v.position.y = (radius + cos(delta_theta) * -caneLoc) * sin(diskTheta);
-	v.position.z = v.position.z + -caneLoc * sin(delta_theta);
+	v.position.x = (p1.x + cos(delta_theta) * -caneLoc) * cos(diskTheta);
+	v.position.y = (p1.x + cos(delta_theta) * -caneLoc) * sin(diskTheta);
+	v.position.z = p1.y + -caneLoc * sin(delta_theta);
 }
 
 void casePickup(Geometry* geometry, Piece* piece)
@@ -232,13 +238,13 @@ void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickn
 	{
 		for (unsigned int j = 0; j < points.size(); ++j)
 		{
-			Point p;
+			Point3D p;
 			p.xy = points[j];
 			if (i == 0)
 				p.z = -5.001;
 			else
 				p.z = -5.001 + 10.002 * i / (slabResolution-1);
-			Point n;
+			Point3D n;
 			//This is a terrible normal estimate, but I guess it gets re-estimated anyway.
 			n.x = p.x;
 			n.y = p.y;
@@ -278,11 +284,11 @@ void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickn
 	base = geometry->vertices.size();
 	for (unsigned int j = 0; j < points.size(); ++j)
 	{
-		Point p;
+		Point3D p;
 		p.xy = points[j];
 		p.z = -4.99;
 
-		Point n;
+		Point3D n;
 		n.x = 0.0; n.y = 0.0; n.z = -1.0;
 		geometry->vertices.push_back(Vertex(p, n));
 	}
@@ -301,11 +307,11 @@ void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickn
 	base = geometry->vertices.size();
 	for (unsigned int j = 0; j < points.size(); ++j)
 	{
-		Point p;
+		Point3D p;
 		p.xy = points[j];
 		p.z = 4.99;
 
-		Point n;
+		Point3D n;
 		n.x = 0.0; n.y = 0.0; n.z = 1.0;
 		geometry->vertices.push_back(Vertex(p, n));
 	}
@@ -399,13 +405,13 @@ void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float lengt
 	{
 		for (unsigned int j = 0; j < points.size(); ++j)
 		{
-			Point p;
+			Point3D p;
 			p.xy = points[j];
 			if (i == 0)
 				p.z = 0.0;
 			else
 				p.z = 5.0 * length * i / (axialResolution-1);
-			Point n;
+			Point3D n;
 			//This is a terrible normal estimate, but I guess it gets re-estimated anyway.
 			n.x = p.x;
 			n.y = p.y;
@@ -576,13 +582,13 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors,
 			z = 0.0;
 		}
 
-		Point n;
+		Point3D n;
 		n.x = 0.0; 
 		n.y = 0.0; 
 		n.z = (side ? 1.0:-1.0);
 
 		// throw down first layer of points and triangles (central layer)
-		Point p;
+		Point3D p;
 		p.x = p.y = 0.0;
 		p.z = z;
 		geometry->vertices.push_back(Vertex(p, n));

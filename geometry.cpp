@@ -9,7 +9,7 @@
 using std::vector;
 
 
-Vertex :: Vertex(Point const &_position, Point const &_normal = make_vector(0.0f, 0.0f, 0.0f)) 
+Vertex :: Vertex(Point3D const &_position, Point3D const &_normal = make_vector(0.0f, 0.0f, 0.0f)) 
 	: position(_position), normal(_normal) 
 {
 }

@@ -34,7 +34,7 @@ class PieceCustomizeViewWidget : public QWidget
 		float rawY(float adjustedY);
 		float rawScale(float adjustedScale);
 		float adjustedScale(float rawScale);
-		Point controlPointRawLocation(unsigned int index);
+		Point2D controlPointRawLocation(unsigned int index);
 		void drawPiece();
 
 		Piece* piece;

@@ -116,11 +116,6 @@ Piece* randomPiece(PickupPlan* pickup)
 		+ PieceTemplate::firstSeedTemplate();
 	Piece* piece = new Piece(static_cast<PieceTemplate::Type>(randomTemplateNumber));
 
-	// set piece parameters
-	TemplateParameter p;
-	for (unsigned int i = 0; i < piece->spline.values().size(); ++i)
-		piece->spline.set(i, 2.0 + (qrand() % 5) * 1.0);
-
 	// set pickup
 	piece->pickup = pickup;
 

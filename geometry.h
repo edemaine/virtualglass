@@ -13,9 +13,9 @@ class Cane;
 class Vertex
 {
 	public:
-		Vertex(Point const &_position, Point const &_normal);
-		Point position;
-		Point normal;
+		Vertex(Point3D const &_position, Point3D const &_normal);
+		Point3D position;
+		Point3D normal;
 };
 
 class Triangle

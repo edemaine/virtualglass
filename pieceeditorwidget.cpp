@@ -365,13 +365,16 @@ void PieceEditorWidget :: setupConnections()
 
 void PieceEditorWidget :: addControlPointButtonClicked()
 {
-	piece->spline.addValue();
+	Point2D lastPoint = piece->spline.controlPoints().back();
+	lastPoint.x += 1.0;
+	lastPoint.y += 1.0;
+	piece->spline.addPoint(lastPoint);
 	emit someDataChanged();
 }
 
 void PieceEditorWidget :: removeControlPointButtonClicked()
 {
-	piece->spline.removeValue();
+	piece->spline.removePoint();
 	emit someDataChanged();
 }
 

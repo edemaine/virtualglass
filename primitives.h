@@ -4,7 +4,8 @@
 
 #include "Vector.hpp"
 
-typedef Vector3f Point;
+typedef Vector2f Point2D;
+typedef Vector3f Point3D;
 typedef Vector4f Color;
 
 #endif

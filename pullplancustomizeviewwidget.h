@@ -67,7 +67,7 @@ private:
 	PullPlan* hoveringPlan;
 	int hoveringIndex;
 	int activeBoxIndex;
-	Point mouseStartingLoc;
+	Point2D mouseStartingLoc;
 	QPoint* clickedLoc;
 	bool clickMoved;
 	vector<unsigned int> subplansSelected;

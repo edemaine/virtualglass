@@ -20,7 +20,6 @@ class PickupPlan
 		PickupPlan();
 
 		void setTemplateType(enum PickupTemplate::Type t, bool force=false);
-		void viewLayer(int);
 		enum PickupTemplate::Type getTemplateType();
 
 		unsigned int getParameterCount();
@@ -35,13 +34,10 @@ class PickupPlan
 		GlassColor* overlayGlassColor;
 		GlassColor* underlayGlassColor;
 		GlassColor* casingGlassColor;
-		int layer;
-		bool getViewAll();
-		void setViewAll(bool);
 
 	private:
 		void updateSubs();
-		void pushNewSubplan(vector<SubpickupTemplate>* newSubs, Point location,
+		void pushNewSubplan(vector<SubpickupTemplate>* newSubs, Point3D location,
 			enum PickupCaneOrientation ori, float length, float width, enum GeometricShape s); 
 		enum PickupTemplate::Type type;
 		vector<TemplateParameter> parameters;

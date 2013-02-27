@@ -4,15 +4,9 @@
 Piece :: Piece(enum PieceTemplate::Type _type)
 {
 	twist = 0.0;
-	based = true;
 	setTemplateType(_type, true);
 	// initialize the piece's pickup to be something boring and base
 	this->pickup = new PickupPlan(PickupTemplate::VERTICAL);
-}
-
-bool Piece :: isBased()
-{
-	return based;
 }
 
 bool Piece :: hasDependencyOn(PullPlan* plan)
@@ -60,7 +54,6 @@ Piece* Piece :: copy() const
 	Piece* c = new Piece(type);
 
 	c->twist = this->twist;
-	c->based = this->based;
 	c->spline = this->spline;
 	c->pickup = this->pickup->copy();
 	
@@ -74,44 +67,55 @@ void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
 
 	this->type = _type;
 
-	if (this->type != PieceTemplate::CUSTOM)
-		spline.reset();
 	switch (this->type)
 	{
 		case PieceTemplate::TUMBLER:
-			based = true;
-			spline.set(0, 3.0);
-			spline.set(1, 3.0);
-			spline.set(2, 3.0);
-			spline.set(3, 3.0);
+			while (spline.controlPoints().size() < 4)
+				spline.addPoint(Point2D(make_vector(0.0f, 0.0f)));
+			while (spline.controlPoints().size() > 4)
+				spline.removePoint();
+			spline.set(0, Point2D(make_vector(0.0f, -4.24f)));
+			spline.set(1, Point2D(make_vector(8.85f, -4.84f)));
+			spline.set(2, Point2D(make_vector(4.73f, 2.59f)));
+			spline.set(3, Point2D(make_vector(4.56f, 6.18f)));
 			break;
 		case PieceTemplate::VASE:
-			based = true;
-			spline.set(0, 1.3);
-			spline.set(1, 4.0);
-			spline.set(2, 0.0);
-			spline.set(3, 2.0);
+			while (spline.controlPoints().size() < 5)
+				spline.addPoint(Point2D(make_vector(0.0f, 0.0f)));
+			while (spline.controlPoints().size() > 5)
+				spline.removePoint();
+			spline.set(0, Point2D(make_vector(0.0f, -5.68f)));
+			spline.set(1, Point2D(make_vector(3.57f, -5.62f)));
+			spline.set(2, Point2D(make_vector(3.54f, -0.02f)));
+			spline.set(3, Point2D(make_vector(-0.44f, 1.90f)));
+			spline.set(4, Point2D(make_vector(2.22f, 5.13f)));
 			break;
 		case PieceTemplate::BOWL:
-			based = true;
-			spline.set(0, 2.8);
-			spline.set(1, 6.9);
-			spline.set(2, 7.0);
-			spline.set(3, 7.2);
+			while (spline.controlPoints().size() < 4)
+				spline.addPoint(Point2D(make_vector(0.0f, 0.0f)));
+			while (spline.controlPoints().size() > 4)
+				spline.removePoint();
+			spline.set(0, Point2D(make_vector(0.0f, -2.45f)));
+			spline.set(1, Point2D(make_vector(4.42f, -2.52f)));
+			spline.set(2, Point2D(make_vector(7.44f, 1.60f)));
+			spline.set(3, Point2D(make_vector(7.62f, 5.51f)));
 			break;
 		case PieceTemplate::POT:
-			based = true;
-			spline.set(0, 2.0);
-			spline.set(1, 3.5);
-			spline.set(2, 3.5);
-			spline.set(3, 2.0);
+			while (spline.controlPoints().size() < 4)
+				spline.addPoint(Point2D(make_vector(0.0f, 0.0f)));
+			while (spline.controlPoints().size() > 4)
+				spline.removePoint();
+			spline.set(0, Point2D(make_vector(0.0f, -4.64f)));
+			spline.set(1, Point2D(make_vector(4.27f, -4.87f)));
+			spline.set(2, Point2D(make_vector(4.47f, 1.59f)));
+			spline.set(3, Point2D(make_vector(1.59f, 5.16f)));
 			break;
 		case PieceTemplate::PLATE:
-			based = true;
-			spline.set(0, 9.0);
-			spline.set(1, 9.1);
-			spline.set(2, 9.2);
-			spline.set(3, 9.3);
+			while (spline.controlPoints().size() > 3)
+				spline.removePoint();
+			spline.set(0, Point2D(make_vector(0.0f, 0.0f)));
+			spline.set(1, Point2D(make_vector(6.48f, -0.01f)));
+			spline.set(2, Point2D(make_vector(7.48f, 0.99f)));
 			break;
 		case PieceTemplate::CUSTOM:
 			break;

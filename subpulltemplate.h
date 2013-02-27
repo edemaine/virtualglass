@@ -10,10 +10,10 @@ class PullPlan;
 class SubpullTemplate
 {
 	public:
-		SubpullTemplate(PullPlan* plan, enum GeometricShape s, Point location, float diameter);
+		SubpullTemplate(PullPlan* plan, enum GeometricShape s, Point2D location, float diameter);
 		PullPlan* plan;
 		enum GeometricShape shape;
-		Point location;
+		Point2D location;
 		float diameter;
 
 		void rescale(float ratio);

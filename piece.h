@@ -24,7 +24,6 @@ class Piece
 		PickupPlan* pickup;
 		bool hasDependencyOn(GlassColor* c);
 		bool hasDependencyOn(PullPlan* p);
-		bool isBased();
 	
 		float twist;
 		Spline spline;
@@ -32,7 +31,6 @@ class Piece
 	private:
 		// Variables
 		enum PieceTemplate::Type type;
-		bool based;
 };
 
 Piece *deep_copy(const Piece *);

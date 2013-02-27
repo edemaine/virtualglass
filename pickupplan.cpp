@@ -11,8 +11,6 @@
 
 PickupPlan :: PickupPlan(enum PickupTemplate::Type _type) {
 	vertices = 0;
-	layer = 1;
-	viewAll = 0;
 	casingGlassColor = underlayGlassColor = overlayGlassColor = GlobalGlass::color();
 	setTemplateType(_type, true);
 }
@@ -49,7 +47,7 @@ unsigned int PickupPlan :: getVertices()
 }
 
 void PickupPlan :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
-	Point location, enum PickupCaneOrientation ori, float length, float width, enum GeometricShape shape) {
+	Point3D location, enum PickupCaneOrientation ori, float length, float width, enum GeometricShape shape) {
 
 	if (newSubs->size() < subs.size())
 	{
@@ -63,47 +61,11 @@ void PickupPlan :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
 	}
 }
 
-bool PickupPlan :: getViewAll()
-{
-	return this->viewAll;
-}
-
-void PickupPlan :: setViewAll(bool value)
-{
-	viewAll = value;
-}
-
-void PickupPlan :: viewLayer(int layer)
-{
-	vector<SubpickupTemplate>* newSubs = new vector<SubpickupTemplate>;
-	float caneDiameter;
-	Point location;
-
-
-	if (this->subs[0].orientation == MURRINE_PICKUP_CANE_ORIENTATION)
-		caneDiameter = this->subs[0].length;
-	else
-		caneDiameter = this->subs[0].width;
-
-	location.x = location.y = 0.0;
-	float width = 2.0 / MAX(this->parameters[0].value, 1);
-	location.y = -1.0;
-	location.z = layer*caneDiameter*-1;
-	std::cout << "diameter " << caneDiameter << std::endl;
-	std::cout << "location " << location.z;
-	std::cout << std::endl;
-	for (int i = 0; i < this->parameters[0].value; ++i) {
-		location.x = -1.0 + width / 2 + width * i;
-		pushNewSubplan(newSubs, location, VERTICAL_PICKUP_CANE_ORIENTATION, 2.0, width-0.0001, CIRCLE_SHAPE);
-	}
-	subs = *newSubs;
-}
-
 void PickupPlan :: updateSubs() {
 
 	vector<SubpickupTemplate> newSubs;
 
-	Point p;
+	Point3D p;
 	float width, length;
 	switch (this->type) {
 		case PickupTemplate::MURRINE:
