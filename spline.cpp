@@ -59,7 +59,7 @@ float Spline :: pow(float base, int power)
 		p_power = power;
 
 	float total = 1.0;
-	for (unsigned int i = 0; i < p_power; ++i)
+	for (unsigned int i = 1; i <= p_power; ++i)
 		total *= base;
 	
 	if (power < 0)
@@ -73,10 +73,9 @@ float Spline :: get(float t)
 	assert(-0.1 < t && t < 1.1); // if you're outside this, you're probably a bug
 
 	float val = 0;
-	for (unsigned int i = 0; i < this->vals.size(); ++i)
-		val += choose(this->vals.size()-1, i) 
-			* pow((1.0 - t), this->vals.size() - 1 - i) 
-			* pow(t, i) * this->vals[i];
+	unsigned int n = this->vals.size()-1;
+	for (unsigned int i = 0; i <= n; ++i)
+		val += choose(n, i) * pow((1.0 - t), n - i) * pow(t, i) * this->vals[i];
 	return val; 
 }
 

@@ -57,10 +57,8 @@ namespace MeshInternal
 	void applyPickupTransform(Vertex& p, SubpickupTemplate& spt);
 	void meshPickupCasingSlab(Geometry* g, Color c, float y, float thickness);
 
-	void applyUnbasedPieceTransform(Vertex& v, float twist, Spline& spline);
-	void applyBasedPieceTransform(Vertex& v, float twist, Spline& spline);
-	void applyPieceTransform(Vertex& v, float twist, Spline& spline);
 	void casePickup(Geometry* geometry, Piece* piece);
+	void applyPieceTransform(Vertex& v, float twist, Spline& spline);
 	void applyPieceTransform(Geometry* geometry, Piece* piece);
 }
 #endif

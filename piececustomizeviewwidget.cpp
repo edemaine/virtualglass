@@ -91,10 +91,8 @@ Point PieceCustomizeViewWidget :: controlPointRawLocation(unsigned int index)
 {
 	Point p;
 
-	float vertLength = 9.0 - piece->spline.values()[0];
-	float yOffset = 0.5 * vertLength;
 	p.x = rawX(viewSize/2 - piece->spline.values()[index]); 
-	p.y = rawY(viewSize/2 + yOffset - 2 / PI - vertLength * index / (static_cast<float>(piece->spline.values().size()) - 1.0));
+	p.y = rawY(viewSize/2 - 10 * index / (static_cast<float>(piece->spline.values().size()) - 1.0) + 5.0);
 
 	return p;
 } 
@@ -168,44 +166,28 @@ void PieceCustomizeViewWidget :: drawPiece()
 	painter.setPen(pen);
 	painter.setBrush(QColor(100, 100, 100));
 
-	// total line length is 10, with spline[0] determining bottom width,
-	// and spline determining remaining side curve, after a PI/2 turn with 
-	// length 1.0
-	float yOffset = 0.5 * (9.0 - spline.values()[0]);
-	float center = viewSize/2;
-
-	// first draw bottom
+	// draw spline
 	QPointF start;
-	start.setX(rawX(center - spline.values()[0] + 2 / PI));
-	start.setY(rawY(center + yOffset));
 	QPointF end;
-	end.setX(rawX(center + spline.values()[0] - 2 / PI));
-	end.setY(start.y());
-	painter.drawLine(QLineF(start, end));
-
-	// next draw turns
-	painter.drawArc(rawX(center + spline.values()[0] - 4 / PI), rawY(center + yOffset - 4 / PI), rawScale(4 / PI), rawScale(4 / PI),
-		0 * 16, -90 * 16); 
-	painter.drawArc(rawX(center - spline.values()[0]), rawY(center + yOffset - 4 / PI), rawScale(4 / PI), rawScale(4 / PI),
-		-180 * 16, 90 * 16); 
-	
-	// now draw remainder	
+	float center = viewSize/2;
 	for (float t = 0.0; t < 1.0; t += 0.01)
 	{
 		float t_delta = t + 0.01;	
 
+		// draw right side
 		start.setX(rawX(center + spline.get(t)));
-		start.setY(rawY(center + yOffset - 2 / PI - (t * (9.0 - spline.values()[0]))));	
+		start.setY(rawY(center - t * 10.0 + 5.0));	
 		end.setX(rawX(center + spline.get(t_delta)));
-		end.setY(rawY(center + yOffset - 2 / PI - (t_delta * (9.0 - spline.values()[0]))));
+		end.setY(rawY(center - t_delta * 10.0 + 5.0));
 		painter.drawLine(QLineF(start, end));
 
+		// draw mirrored left side (y-values the same)
 		start.setX(rawX(center - spline.get(t)));
 		end.setX(rawX(center - spline.get(t_delta)));
 		painter.drawLine(QLineF(start, end));
 	}
 
-	// finally, draw control points
+	// draw control points
         painter.setBrush(QColor(0, 0, 0, 255));
         pen.setWidth(2);
         pen.setColor(Qt::white);

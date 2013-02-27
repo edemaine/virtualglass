@@ -146,59 +146,19 @@ void applyPickupTransform(Vertex& v, SubpickupTemplate& spt)
 	v.position.y = v.position.y + spt.location.z * 5.0;
 }
 
-void applyUnbasedPieceTransform(Vertex& v, float twist, Spline& spline)
-{
-	float theta = PI * v.position.x / 5.0 + twist * TWO_PI * v.position.z / 10.0;
-	float caneLoc = v.position.y;
-	float radius = spline.get((v.position.z - -5.0) / 10.0) - caneLoc;
-
-	v.position.x = radius * cos(theta);
-	v.position.y = radius * sin(theta);
-}
-
-void applyBasedPieceTransform(Vertex& v, float twist, Spline& spline)
+void applyPieceTransform(Vertex& v, float twist, Spline& spline)
 {
 	float diskTheta = PI * v.position.x / 5.0 + twist * TWO_PI * v.position.z / 10.0;
-	float diskR = v.position.z + 5.0;
 	float caneLoc = v.position.y;
 
-	float width = spline.values()[0];
-	float turnLength = 1.0; 
-	float baseLength = width - turnLength * 2 / PI; 
+	float radius = spline.get((v.position.z - -5.0) / 10.0);
+	float delta_radius = spline.get((v.position.z + 0.01 - -5.0) / 10.0);
+	float delta_theta = atan2(0.01, delta_radius - radius);
+	delta_theta -= PI/2;
 
-	float turnStart = baseLength;
-	float turnEnd = turnStart + turnLength;
-
-	if (turnStart < diskR && diskR < turnEnd) // curved part
-	{	
-		float sphereRadius = (turnLength * 2) / PI;
-		float spherePhi = ((diskR - turnStart) / turnLength) * (PI/2) - PI/2;
-
-		Point sphereCenter;
-		sphereCenter.x = turnStart * cos(diskTheta);
-		sphereCenter.y = turnStart * sin(diskTheta);
-		sphereCenter.z = sphereRadius; 
-
-		v.position.x = (sphereRadius - caneLoc) * cos(diskTheta) * cos(spherePhi) + sphereCenter.x;
-		v.position.y = (sphereRadius - caneLoc) * sin(diskTheta) * cos(spherePhi) + sphereCenter.y;
-		v.position.z = (sphereRadius - caneLoc) * sin(spherePhi) + sphereCenter.z;
-	}
-	else if (diskR < turnStart + 0.1) // base
-	{
-		v.position.x = diskR * cos(diskTheta);
-		v.position.y = diskR * sin(diskTheta);
-		v.position.z = caneLoc;
-	}
-	else if (turnEnd - 0.1 < diskR) // vertical lip part
-	{
-		float sphereRadius = (turnLength * 2) / PI;
-		float radius = spline.get((v.position.z - -5.0 - turnEnd)/(10.0 - turnEnd)) - caneLoc;
-
-		v.position.x = radius * cos(diskTheta);
-		v.position.y = radius * sin(diskTheta);
-		v.position.z = (v.position.z - turnEnd) + sphereRadius + 5.0;	
-	}
-	v.position.z -= (10.0 - turnEnd)/2;
+	v.position.x = (radius + cos(delta_theta) * -caneLoc) * cos(diskTheta);
+	v.position.y = (radius + cos(delta_theta) * -caneLoc) * sin(diskTheta);
+	v.position.z = v.position.z + -caneLoc * sin(delta_theta);
 }
 
 void casePickup(Geometry* geometry, Piece* piece)
@@ -224,13 +184,7 @@ void casePickup(Geometry* geometry, Piece* piece)
 void applyPieceTransform(Geometry* geometry, Piece* piece)
 {
 	for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
-	{
-		Vertex& v = geometry->vertices[i];
-		if (piece->isBased())
-			applyBasedPieceTransform(v, piece->twist, piece->spline);
-		else
-			applyUnbasedPieceTransform(v, piece->twist, piece->spline);
-	} 
+		applyPieceTransform(geometry->vertices[i], piece->twist, piece->spline);
 }
 
 void applySubplanTransforms(Vertex& v, vector<ancestor>& ancestors)
