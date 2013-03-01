@@ -373,6 +373,8 @@ string pieceTemplateToString(enum PieceTemplate::Type type)
 			return "Pot";
 		case PieceTemplate::PLATE:
 			return "Plate";
+		case PieceTemplate::FISHTRAP:
+			return "Fishtrap";
 		case PieceTemplate::CUSTOM:
 			return "Custom";
 		default:
@@ -393,6 +395,8 @@ enum PieceTemplate::Type stringToPieceTemplate(string s)
 		return PieceTemplate::POT;
 	if (s == "Plate")
 		return PieceTemplate::PLATE;
+	if (s == "Fishtrap")
+		return PieceTemplate::FISHTRAP;
 	if (s == "Custom")
 		return PieceTemplate::CUSTOM;
 

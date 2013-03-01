@@ -15,6 +15,7 @@ class PieceCustomizeViewWidget : public QWidget
 		PieceCustomizeViewWidget(Piece* piece, QWidget* parent=0);
 		void setPiece(Piece* piece);
 		QRect usedRect();
+		void resetZoom();
 	
 	signals:
 		void someDataChanged();
@@ -41,7 +42,7 @@ class PieceCustomizeViewWidget : public QWidget
 
 		bool isDraggingControlPoint;
 		unsigned int draggedControlPointIndex;
-		float ulX, ulY, squareSize, viewSize;
+		float ulX, ulY, squareSize, zoom, defaultZoom;
 
 	public slots:
 		void updateEverything();

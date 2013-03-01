@@ -10,7 +10,7 @@ namespace PieceTemplate
 
 	enum Type lastSeedTemplate()
 	{
-		return PLATE;
+		return FISHTRAP;
 	}
 }
 

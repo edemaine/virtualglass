@@ -119,6 +119,7 @@ HEADERS += vgapp.h \
 	spline.h \
 	globaldepthpeelingsetting.h \
 	pullplancrosssectionrender.h \
+	piececrosssectionrender.h \
 
 SOURCES += main.cpp \ 
 	vgapp.cpp \
@@ -176,5 +177,5 @@ SOURCES += main.cpp \
 	spline.cpp \
 	globaldepthpeelingsetting.cpp \
 	pullplancrosssectionrender.cpp \
-
+	piececrosssectionrender.cpp \
 

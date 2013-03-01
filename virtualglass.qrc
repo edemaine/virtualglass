@@ -1,10 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/piecetemplate1.png</file>
-        <file>images/piecetemplate2.png</file>
-        <file>images/piecetemplate3.png</file>
-        <file>images/piecetemplate4.png</file>
-        <file>images/piecetemplate5.png</file>
         <file>images/piecetemplate_custom.png</file>
         <file>images/pickuptemplate1.png</file>
         <file>images/pickuptemplate2.png</file>

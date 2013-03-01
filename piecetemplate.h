@@ -13,6 +13,7 @@ namespace PieceTemplate
 		VASE,
 		POT,
 		PLATE,
+		FISHTRAP,
 		CUSTOM
 	};
 	

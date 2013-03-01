@@ -21,6 +21,7 @@
 #include "pickuptemplatelibrarywidget.h"
 #include "piecelibrarywidget.h"
 #include "niceviewwidget.h"
+#include "piececrosssectionrender.h"
 
 PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -365,10 +366,7 @@ void PieceEditorWidget :: setupConnections()
 
 void PieceEditorWidget :: addControlPointButtonClicked()
 {
-	Point2D lastPoint = piece->spline.controlPoints().back();
-	lastPoint.x += 1.0;
-	lastPoint.y += 1.0;
-	piece->spline.addPoint(lastPoint);
+	piece->spline.addPoint(Point2D(make_vector(0.0f, 0.0f)));
 	emit someDataChanged();
 }
 
@@ -412,9 +410,17 @@ void PieceEditorWidget :: seedTemplates()
 
 	for (int i = PieceTemplate::firstSeedTemplate(); i <= PieceTemplate::lastSeedTemplate(); ++i)
 	{
-		sprintf(filename, ":/images/piecetemplate%d.png", i);
-		PieceTemplateLibraryWidget *ptlw = new PieceTemplateLibraryWidget(
-			QPixmap::fromImage(QImage(filename)), static_cast<PieceTemplate::Type>(i));
+		PieceTemplate::Type t = static_cast<PieceTemplate::Type>(i);
+		Piece piece(t);
+
+		QPixmap templatePixmap(100, 100);
+		templatePixmap.fill(QColor(200, 200, 200));
+
+		QPainter painter(&templatePixmap);
+		PieceCrossSectionRender::render(&painter, 100, &piece);
+		painter.end();
+
+		PieceTemplateLibraryWidget *ptlw = new PieceTemplateLibraryWidget(templatePixmap, t);
 		pieceTemplateLibraryLayout->addWidget(ptlw);
 	}
 	PieceTemplateLibraryWidget *ptlw = new PieceTemplateLibraryWidget(

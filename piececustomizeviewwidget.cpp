@@ -10,10 +10,16 @@ PieceCustomizeViewWidget :: PieceCustomizeViewWidget(Piece* _piece, QWidget* _pa
 	// setup draw widget
 	setMinimumSize(200, 200);
 	this->piece = _piece;
-	this->viewSize = 22.0;	
+	this->zoom = this->defaultZoom = 12.0;
 
 	isDraggingControlPoint = false;
 	draggedControlPointIndex = 0;
+}
+
+void PieceCustomizeViewWidget :: resetZoom()
+{
+	this->zoom = this->defaultZoom;
+	updateEverything();
 }
 
 QRect PieceCustomizeViewWidget :: usedRect()
@@ -24,9 +30,9 @@ QRect PieceCustomizeViewWidget :: usedRect()
 void PieceCustomizeViewWidget :: wheelEvent(QWheelEvent *e)
 {
 	if (e->delta() > 0)
-		viewSize *= 0.8; 
+		this->zoom *= 0.8;
 	else if (e->delta() < 0)	
-		viewSize *= 1.2;
+		this->zoom *= 1.2;
 	updateEverything();
 }
 
@@ -53,37 +59,37 @@ void PieceCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
 
 float PieceCustomizeViewWidget :: adjustedX(float rawX)
 {
-	float blowup = squareSize / viewSize;
+	float blowup = squareSize / zoom;
 	return (rawX - ulX) / blowup;
 }
 
 float PieceCustomizeViewWidget :: adjustedY(float rawY)
 {
-	float blowup = squareSize / viewSize;
+	float blowup = squareSize / zoom;
 	return (rawY - ulY) / blowup;
 }
 
 float PieceCustomizeViewWidget :: rawX(float adjustedX)
 {
-	float blowup = squareSize / viewSize;
+	float blowup = squareSize / zoom;
 	return adjustedX * blowup + ulX;
 }
 
 float PieceCustomizeViewWidget :: rawY(float adjustedY)
 {
-	float blowup = squareSize / viewSize;
+	float blowup = squareSize / zoom;
 	return adjustedY * blowup + ulY;
 }
 
 float PieceCustomizeViewWidget :: rawScale(float adjustedScale)
 {
-	float blowup = squareSize / viewSize;
+	float blowup = squareSize / zoom;
 	return adjustedScale * blowup; 
 }
 
 float PieceCustomizeViewWidget :: adjustedScale(float rawScale)
 {
-	float blowup = squareSize / viewSize;
+	float blowup = squareSize / zoom;
 	return rawScale / blowup; 
 }
 
@@ -92,8 +98,8 @@ Point2D PieceCustomizeViewWidget :: controlPointRawLocation(unsigned int index)
 	Point2D cp = piece->spline.controlPoints()[index];
 
 	Point2D p;
-	p.x = rawX(viewSize/2 - cp.x);
-	p.y = rawY(viewSize/2 - cp.y);
+	p.x = rawX(zoom/2 - cp.x);
+	p.y = rawY(zoom/2 - cp.y);
 
 	return p;
 } 
@@ -123,17 +129,13 @@ void PieceCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 	if (!isDraggingControlPoint)
 		return;
 
-	float center = viewSize/2; 
+	float center = zoom/2; 
 	if (draggedControlPointIndex == 0)
 	{
-		Point2D p;
-		float delta_y = adjustedScale(event->pos().y() - rawY(center - piece->spline.controlPoints()[0].y));
-		for (unsigned int i = 0; i < piece->spline.controlPoints().size(); ++i)
-		{
-			p = piece->spline.controlPoints()[i];
-			p.y -= delta_y;
-			piece->spline.set(i, p);
-		}
+		// only adjust Y
+		Point2D p = piece->spline.controlPoints()[0];
+		p.y = center - adjustedY(event->pos().y());
+		piece->spline.set(0, p);
 	}
 	else
 	{
@@ -158,7 +160,7 @@ void PieceCustomizeViewWidget :: updateEverything()
 void PieceCustomizeViewWidget :: setPiece(Piece* _piece)
 {
 	this->piece = _piece;
-	this->viewSize = 22.0;
+	resetZoom();
 	updateEverything();
 }
 
@@ -185,7 +187,7 @@ void PieceCustomizeViewWidget :: drawPiece()
 	// draw spline
 	QPointF start;
 	QPointF end;
-	float center = viewSize/2;
+	float center = zoom / 2.0;
 	for (float t = 0.0; t < 1.0; t += 0.001)
 	{
 		// draw right side
