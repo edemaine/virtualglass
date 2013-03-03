@@ -1,5 +1,6 @@
 
 #include "glasslibrarywidget.h"
+#include "globalbackgroundcolor.h"
 
 GlassLibraryWidget :: GlassLibraryWidget(QWidget* _parent) : QLabel(_parent)
 {
@@ -32,7 +33,7 @@ void GlassLibraryWidget :: updateStyleSheet()
 	}
 	else
 	{
-		color = QColor(200, 200, 200);
+		color = GlobalBackgroundColor::qcolor;
 		style.append("border: 2px solid " + color.name() + ";");
 	}
 

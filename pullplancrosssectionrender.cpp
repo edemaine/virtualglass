@@ -4,6 +4,7 @@
 #include "pullplan.h"
 #include "pullplancrosssectionrender.h"
 #include "glasscolor.h"
+#include "globalbackgroundcolor.h"
 
 namespace PullPlanCrossSectionRender
 {
@@ -47,8 +48,7 @@ void paintShape(float x, float y, float size, enum GeometricShape shape, QPainte
 void drawSubplan(float x, float y, float drawWidth, float drawHeight, 
 	PullPlan* plan, bool outermostLevel, QPainter* painter) 
 {
-	// Fill the subplan area with some `cleared out' color
-	painter->setBrush(QColor(200, 200, 200));
+	painter->setBrush(GlobalBackgroundColor::qcolor);
 	painter->setPen(Qt::NoPen);
 	paintShape(x, y, drawWidth, plan->getOutermostCasingShape(), painter);
 
@@ -61,7 +61,7 @@ void drawSubplan(float x, float y, float drawWidth, float drawHeight,
 		int casingY = y + drawHeight / 2 - casingHeight / 2;
 
 		// Fill with solid neutral grey (in case fill is transparent)
-		painter->setBrush(QColor(200, 200, 200));
+		painter->setBrush(GlobalBackgroundColor::qcolor);
 		painter->setPen(Qt::NoPen); // Will draw boundary after all filling is done
 		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
 		

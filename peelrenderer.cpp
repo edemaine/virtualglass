@@ -3,6 +3,8 @@
 #include "constants.h"
 #include "geometry.h"
 #include "peelrenderer.h"
+#include "glassopengl.h"
+#include "globalbackgroundcolor.h"
 
 #define glewGetContext() glewContext
 
@@ -52,16 +54,6 @@ PeelRenderer::~PeelRenderer() {
 		nopeelProgram = 0;
 	}
 
-}
-
-namespace {
-void gl_errors(std::string const &where) {
-	GLuint err;
-	while ((err = glGetError()) != GL_NO_ERROR) {
-	std::cerr << "(in " << where << ") OpenGL error #" << err
-	          << ": " << gluErrorString(err) << std::endl;
-	}
-}
 }
 
 namespace {
@@ -120,10 +112,11 @@ namespace {
 	}
 }
 
-void PeelRenderer::render(Vector3f bgColor, Geometry const & geometry) {
+void PeelRenderer::render(Geometry const & geometry) 
+{
 	assert(QGLContext::currentContext() == expectedGLContext);
 
-	gl_errors("(before depth peeling)");
+	GlassOpenGL::errors("(before depth peeling)");
 	//viewport is {x,y,w,h} in window.
 	//We're querying here to get the width and height.
 	GLint viewport[4] = {0,0,0,0};
@@ -165,7 +158,7 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const & geometry) {
 			0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
 		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 
-		gl_errors("(depth peeling setup)");
+		GlassOpenGL::errors("(depth peeling setup)");
 	}
 
 	if (bufferSize.x == 0 || bufferSize.y == 0) {
@@ -190,7 +183,7 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const & geometry) {
 		"	gl_FragColor = vec4(gl_Color.xyz * gl_Color.w, gl_Color.w); \n"
 		"} \n";
 		peelProgram = load_program(peel_frag, glewContext);
-		gl_errors("compiling peel program.");
+		GlassOpenGL::errors("compiling peel program.");
 	}
 
 	if (nopeelProgram == 0) {
@@ -202,7 +195,7 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const & geometry) {
 
 
 		nopeelProgram = load_program(nopeel_frag, glewContext);
-		gl_errors("compiling nopeel program.");
+		GlassOpenGL::errors("compiling nopeel program.");
 	}
 
 	GLuint query = 0;
@@ -231,10 +224,10 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const & geometry) {
 				std::cerr << "WARNING: FRAMEBUFFER not complete!" << std::endl;
 			}
 		}
-		gl_errors("(depth framebuffer setup)");
+		GlassOpenGL::errors("(depth framebuffer setup)");
 
 		//clear the framebuffer:
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f); 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//Set up peeling program to reject (close) stuff we've already rendered
@@ -263,40 +256,37 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const & geometry) {
 		if (do_query) {
 			glBeginQueryARB(GL_SAMPLES_PASSED_ARB, query);
 		}
-		//---------- draw scene --------
+
 		glDisable(GL_CULL_FACE);
-		glDisable(GL_LIGHTING);
 
-		{ //actual rendering!
-			glEnable(GL_LIGHTING);
-			//Check that Vertex and Triangle have proper size:
-			assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3));
-			assert(sizeof(Triangle) == sizeof(GLuint) * 3);
+		//---------- draw scene --------
 
-			glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry.vertices[0].position));
-			glNormalPointer(GL_FLOAT, sizeof(Vertex), &(geometry.vertices[0].normal));
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableClientState(GL_NORMAL_ARRAY);
+		//Check that Vertex and Triangle have proper size:
+		assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3));
+		assert(sizeof(Triangle) == sizeof(GLuint) * 3);
 
-			for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g) 
-			{
-				Color c = g->color;
-				if (g->ensureVisible) // if you need to be seen, round up transparency
-					glColor4f(c.r, c.g, c.b, MAX(c.a, 0.1));
-				else if (c.a < 0.01) // otherwise, if you're pretty much clear, do nothing
-					continue;
-				else // otherwise plain ole color
-					glColor4f(c.r, c.g, c.b, c.a);
-				glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
-							   GL_UNSIGNED_INT, &(geometry.triangles[g->triangle_begin].v1));
-			}
+		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry.vertices[0].position));
+		glNormalPointer(GL_FLOAT, sizeof(Vertex), &(geometry.vertices[0].normal));
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_NORMAL_ARRAY);
 
-
-			glDisableClientState(GL_VERTEX_ARRAY);
-			glDisableClientState(GL_NORMAL_ARRAY);
-
-			glDisable(GL_LIGHTING);
+		for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g) 
+		{
+			Color c = g->color;
+			if (g->ensureVisible) // if you need to be seen, round up transparency
+				glColor4f(c.r, c.g, c.b, MAX(c.a, 0.1));
+			else if (c.a < 0.01) // otherwise, if you're pretty much clear, do nothing
+				continue;
+			else // otherwise plain ole color
+				glColor4f(c.r, c.g, c.b, c.a);
+			glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
+						   GL_UNSIGNED_INT, &(geometry.triangles[g->triangle_begin].v1));
 		}
+		
+		//--------------------------
+
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_NORMAL_ARRAY);
 
 		if (do_query) {
 			glEndQueryARB(GL_SAMPLES_PASSED_ARB);
@@ -305,19 +295,15 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const & geometry) {
 		//Done drawing scene; detach framebuffer:
 		glPopAttrib();
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, base_draw_framebuffer); //detach framebuffer
-		gl_errors("(depth framebuffer render)");
-
-		//--------------------------
+		GlassOpenGL::errors("(depth framebuffer render)");
 
 		glUseProgramObjectARB(0);
 		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
-
 
 		if (do_query) {
 			GLuint count = 0;
 			glGetQueryObjectuivARB(query, GL_QUERY_RESULT_ARB, &count);
 
-			//std::cout << "On pass " << pass << ", generated " << count << " fragments." << std::endl;
 			//if we're no longer rendering any fragments, skip the pixel copy:
 			if (count == 0) {
 				break;
@@ -326,7 +312,6 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const & geometry) {
 
 		//swap out depth textures, now that we've rendered a new one:
 		std::swap(prevDepthTex, depthTex);
-
 
 		//Copy pixels over to visible framebuffer:
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, buffer);
@@ -349,12 +334,13 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const & geometry) {
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, base_read_framebuffer);
 
-		gl_errors("(copy framebuffer)");
+		GlassOpenGL::errors("(copy framebuffer)");
 	}
 
 	glDeleteQueriesARB(1, &query);
 
 	//final pass -- render background color behind everything else.
+	glDisable(GL_LIGHTING);
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
@@ -366,7 +352,9 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const & geometry) {
 	glPushMatrix();
 	glLoadIdentity();
 	glBegin(GL_QUADS);
-	glColor3f(bgColor.r, bgColor.g, bgColor.b);
+	glColor3f(GlobalBackgroundColor::color.r, 
+		GlobalBackgroundColor::color.g, 
+		GlobalBackgroundColor::color.b); 
 	glVertex2f(-1.1f,-1.1f);
 	glVertex2f( 1.1f,-1.1f);
 	glVertex2f( 1.1f, 1.1f);
@@ -376,4 +364,6 @@ void PeelRenderer::render(Vector3f bgColor, Geometry const & geometry) {
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
+
+	glEnable(GL_LIGHTING);
 }

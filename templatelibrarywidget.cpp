@@ -3,6 +3,7 @@
 #include <QString>
 #include <QWidget>
 #include "templatelibrarywidget.h"
+#include "globalbackgroundcolor.h"
 
 TemplateLibraryWidget :: TemplateLibraryWidget(QPixmap _view, QWidget* _parent) : QLabel(_parent)
 {
@@ -20,7 +21,7 @@ void TemplateLibraryWidget::setHighlighted(bool isHighlighted)
 	if (isHighlighted)
 		color = QColor(0, 0, 255);	
 	else
-		color = QColor(200, 200, 200);
+		color = GlobalBackgroundColor::qcolor;
 
 	style.append("border: 2px solid " + color.name() + ";");
 	setStyleSheet(style);

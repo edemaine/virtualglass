@@ -10,6 +10,7 @@
 #include "pullplanlibrarywidget.h"
 #include "glasscolorlibrarywidget.h"
 #include "pullplaneditorviewwidget.h"
+#include "globalbackgroundcolor.h"
 
 PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
 {
@@ -476,7 +477,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	PullPlan* plan, bool highlightThis, bool outermostLevel, QPainter* painter) {
 
 	// Fill the subplan area with some `cleared out' color
-	painter->setBrush(QColor(200, 200, 200));
+	painter->setBrush(GlobalBackgroundColor::qcolor);
 	painter->setPen(Qt::NoPen);
 	paintShape(x, y, drawWidth, plan->getOutermostCasingShape(), painter);
 
@@ -498,7 +499,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		int casingY = y + drawHeight / 2 - casingHeight / 2;
 
 		// Fill with solid neutral grey (in case fill is transparent)
-		painter->setBrush(QColor(200, 200, 200));
+		painter->setBrush(GlobalBackgroundColor::qcolor);
 		painter->setPen(Qt::NoPen); // Will draw boundary after all filling is done
 		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
 		
@@ -557,7 +558,7 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 	painter.begin(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 
-	painter.fillRect(event->rect(), QColor(200, 200, 200));
+	painter.fillRect(event->rect(), GlobalBackgroundColor::qcolor);
 	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan, false, true, &painter);
 
 	painter.setBrush(Qt::NoBrush);

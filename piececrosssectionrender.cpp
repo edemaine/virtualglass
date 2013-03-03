@@ -23,7 +23,6 @@ void render(QPainter* painter, int targetSize, Piece* piece)
 	pen.setWidth(4);
 	pen.setCapStyle(Qt::RoundCap);
 	painter->setPen(pen);
-	painter->setBrush(QColor(100, 100, 100));
 
 	// draw 
 	float center = zoom / 2.0;

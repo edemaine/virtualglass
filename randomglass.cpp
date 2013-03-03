@@ -58,7 +58,7 @@ PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimp
 	// set parameters
 	int direction = (qrand() % 3) - 1;
 	plan->twist = direction * (qrand() % 10);
-	plan->setCount(qrand() % 15 + 4);
+	plan->setCount(qrand() % 10 + 2);
 
 	// set subplans
 	for (unsigned int i = 0; i < plan->subs.size(); ++i)

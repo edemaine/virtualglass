@@ -9,21 +9,21 @@ class Geometry;
 //Make sure you call all functions of PeelRenderer (including the constructor and destructor) while the same OpenGL context is current.
 class PeelRenderer
 {
-public:
-	PeelRenderer(GLEWContext *glewContext);
-	~PeelRenderer();
-	void render(Vector3f backgroundColor, Geometry const &geometry);
+	public:
+		PeelRenderer(GLEWContext *glewContext);
+		~PeelRenderer();
+		void render(Geometry const &geometry);
 
-	GLEWContext *glewContext;
+		GLEWContext *glewContext;
 
-	const QGLContext *expectedGLContext; //to keep you honest.
-	Vector2ui bufferSize;
-	GLuint buffer; //framebuffer
-	GLuint colorTex; //color texture, stores current layer
-	GLuint depthTex; //depth texture, stores current depth
-	GLuint prevDepthTex; //stores previous depth
-	GLhandleARB peelProgram; //program that rejects fragments based on depth
-	GLhandleARB nopeelProgram; //program that premultiplies by alpha, but doesn't actually reject
+		const QGLContext *expectedGLContext; //to keep you honest.
+		Vector2ui bufferSize;
+		GLuint buffer; //framebuffer
+		GLuint colorTex; //color texture, stores current layer
+		GLuint depthTex; //depth texture, stores current depth
+		GLuint prevDepthTex; //stores previous depth
+		GLhandleARB peelProgram; //program that rejects fragments based on depth
+		GLhandleARB nopeelProgram; //program that premultiplies by alpha, but doesn't actually reject
 
 };
 

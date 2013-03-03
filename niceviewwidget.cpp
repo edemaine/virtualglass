@@ -7,35 +7,18 @@
 #ifdef _WIN32
 #  include <windows.h>
 #endif
-#include <iostream>
-#include <string>
 #include <QMouseEvent>
-#include <QGLFramebufferObject>
 
 #include "constants.h"
 #include "niceviewwidget.h"
 #include "globaldepthpeelingsetting.h"
-
-namespace {
-
-void gl_errors(string const &where) 
-{
-	GLuint err;
-	while ((err = glGetError()) != GL_NO_ERROR) {
-		std::cerr << "(in " << where << ") OpenGL error #" << err
-			 << ": " << gluErrorString(err) << std::endl;
-	}
-}
-
-}
+#include "globalbackgroundcolor.h"
+#include "glassopengl.h"
 
 NiceViewWidget :: NiceViewWidget(enum CameraMode cameraMode, QWidget *parent) 
 	: QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent), peelRenderer(NULL)
 {
 	leftMouseDown = false;
-
-	this->backgroundColor.r = this->backgroundColor.g = this->backgroundColor.b = 200.0 / 255.0;
-	this->backgroundColor.a = 1.0;
 
 	geometry = NULL;
 	this->cameraMode = cameraMode;
@@ -116,111 +99,25 @@ void NiceViewWidget :: initializeGL()
 	initializeGLCalled = true;
 	initializePeel();
 
-	// For shadow/lighting
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_COLOR_MATERIAL);
-	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-	glShadeModel(GL_SMOOTH);
-	glEnable(GL_DEPTH_TEST);
-
-	gl_errors("NiceViewWidget::initializeGL");
+	GlassOpenGL::initialize();
+	GlassOpenGL::errors("NiceViewWidget::initializeGL");
 }
 
-QImage NiceViewWidget :: renderImage() 
-{
-	if (!initializeGLCalled) 
-	{
-		initializeGL();
-	}
-	makeCurrent();
-	QGLFramebufferObject fb(300, 300, QGLFramebufferObject::Depth);
-	fb.bind();
-	glPushAttrib(GL_VIEWPORT_BIT);
-	glViewport(0,0,300,300);
-	paintGL();
-	glPopAttrib();
-	fb.release();
-	return fb.toImage();
-}
-
-/*
-Handles the drawing of a triangle mesh.
-*/
+// Handles the drawing of a triangle mesh.
 void NiceViewWidget :: paintGL()
 {
-	// it don't mean a thing, if it aint got that mesh-ing
 	if (!geometry) 
 		return;
 
 	setGLMatrices();
 
-	// we've got geometry, now check that peeling is a-peeling
 	if (peelRenderer && GlobalDepthPeelingSetting::enabled())
-		peelRenderer->render(make_vector<float>(backgroundColor.r, backgroundColor.g, backgroundColor.b), *geometry);
+		peelRenderer->render(*geometry);
 	else 
-		paintWithoutDepthPeeling();
+		GlassOpenGL::renderWithoutDepthPeeling(*geometry);
 }
 
-void NiceViewWidget :: paintWithoutDepthPeeling()
-{
-	this->qglClearColor(QColor(backgroundColor.r*255, backgroundColor.g*255, backgroundColor.b*255));
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-
-	//Check that Vertex and Triangle have proper size:
-	assert(sizeof(Vertex) == sizeof(GLfloat) * (3 + 3));
-	assert(sizeof(Triangle) == sizeof(GLuint) * 3);
-
-	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].position));
-	glNormalPointer(GL_FLOAT, sizeof(Vertex), &(geometry->vertices[0].normal));
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-
-	// make a pass on mandatory transparent things, drawing them without culling/depth testing
-	// this doesn't do much except fake the glass/air interface
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) 
-	{
-		Color c = g->color;
-		if (g->ensureVisible)
-			glColor4f(c.r, c.g, c.b, 0.1);
-		else
-			continue; 
-		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
-			GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
-	}
-
-	// make a pass on opaque things, round pretty opaque things up to no transparency
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
-	for (std::vector< Group >::const_iterator g = geometry->groups.begin(); g != geometry->groups.end(); ++g) 
-	{
-		Color c = g->color;
-		if (c.a > 0.1)
-			glColor4f(c.r, c.g, c.b, 1.0);
-		else
-			continue; 
-		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
-			GL_UNSIGNED_INT, &(geometry->triangles[g->triangle_begin].v1));
-	}
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-
-	//called automatically: swapBuffers();
-}
-
-
-/*
-Calls if the NiceViewWidget object is resized (in the GUI sense).
-*/
+// Called if the NiceViewWidget object is resized (in the GUI sense).
 void NiceViewWidget :: resizeGL(int width, int height)
 {
 	if (this->cameraMode == PICKUPPLAN_CAMERA_MODE)

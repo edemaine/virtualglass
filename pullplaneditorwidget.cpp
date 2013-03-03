@@ -20,6 +20,7 @@
 #include "pullplangeometrythread.h"
 #include "twistwidget.h"
 #include "pullplancrosssectionrender.h"
+#include "globalbackgroundcolor.h"
 
 PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -374,7 +375,7 @@ void PullPlanEditorWidget :: seedTemplates()
 		PullPlan plan(t);
 
 		QPixmap templatePixmap(100, 100);
-		templatePixmap.fill(QColor(200, 200, 200));
+		templatePixmap.fill(GlobalBackgroundColor::qcolor);
 
 		QPainter painter(&templatePixmap);
 		PullPlanCrossSectionRender::render(&painter, 100, &plan);

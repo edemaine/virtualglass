@@ -4,6 +4,7 @@
 #include "piececustomizeviewwidget.h"
 #include "piece.h"
 #include "constants.h"
+#include "globalbackgroundcolor.h"
 
 PieceCustomizeViewWidget :: PieceCustomizeViewWidget(Piece* _piece, QWidget* _parent) : QWidget(_parent)
 {
@@ -170,55 +171,42 @@ void PieceCustomizeViewWidget :: drawPiece()
 	Spline& spline = piece->spline;
 
 	// note that pixels are specified from upper left, so many Ys
-	// are inverted. we assume a canvas of size 20 x 20 and adjust
-	// using a "blowup" multiplier
+	// are inverted. we assume a canvas of size zoom x zoom
+	// and adjust using a "blowup" multiplier
 
 	QPainter painter;
 	painter.begin(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 
 	QPen pen;
-	pen.setColor(QColor(0, 0, 0));
+	pen.setColor(Qt::black);
 	pen.setWidth(MAX(squareSize/100, 1) * 2);
 	pen.setCapStyle(Qt::RoundCap);
 	painter.setPen(pen);
 	painter.setBrush(QColor(100, 100, 100));
 
 	// draw spline
-	QPointF start;
-	QPointF end;
 	float center = zoom / 2.0;
 	for (float t = 0.0; t < 1.0; t += 0.001)
 	{
-		// draw right side
 		Point2D p = spline.get(t);
-		start.setX(rawX(center + p.x));
-		start.setY(rawY(center - p.y));	
-		painter.drawPoint(start);
-
-		// draw mirrored left side (y-values the same)
-		start.setX(rawX(center - p.x));
-		painter.drawPoint(start);
+		painter.drawPoint(rawX(center + p.x), rawY(center - p.y));	
+		painter.drawPoint(rawX(center - p.x), rawY(center - p.y));	
 	}
 
 	// draw control point connectors
         pen.setWidth(2);
         pen.setColor(Qt::white);
-        pen.setStyle(Qt::SolidLine);
         painter.setPen(pen);
 	for (unsigned int i = 0; i < spline.controlPoints().size()-1; ++i)
 	{
-		Point2D p = controlPointRawLocation(i);
-		start.setX(p.x);
-		start.setY(p.y);
-		p = controlPointRawLocation(i+1);
-		end.setX(p.x);
-		end.setY(p.y);
-                painter.drawLine(start, end);
+		Point2D p1 = controlPointRawLocation(i);
+		Point2D p2 = controlPointRawLocation(i+1);
+                painter.drawLine(p1.x, p1.y, p2.x, p2.y);
 	}
 
 	// draw control points
-        painter.setBrush(QColor(0, 0, 0, 255));
+        painter.setBrush(Qt::black);
         pen.setWidth(2);
         pen.setColor(Qt::white);
         pen.setStyle(Qt::SolidLine);
@@ -226,10 +214,11 @@ void PieceCustomizeViewWidget :: drawPiece()
 	for (unsigned int i = 0; i < spline.controlPoints().size(); ++i)
 	{
 		Point2D p = controlPointRawLocation(i);
-		start.setX(p.x);
-		start.setY(p.y);
+		QPointF ctrlPt;
+		ctrlPt.setX(p.x);
+		ctrlPt.setY(p.y);
 		int pointRadius = MAX(squareSize / 100, 1) * 2;
-                painter.drawEllipse(start, pointRadius, pointRadius);
+                painter.drawEllipse(ctrlPt, pointRadius, pointRadius);
 	}
 
 	painter.end();
@@ -239,7 +228,7 @@ void PieceCustomizeViewWidget :: paintEvent(QPaintEvent *event)
 {
 	QPainter painter;
 	painter.begin(this);
-	painter.fillRect(event->rect(), QColor(200, 200, 200));
+	painter.fillRect(event->rect(), GlobalBackgroundColor::qcolor);
 	painter.end();
 	drawPiece();
 }

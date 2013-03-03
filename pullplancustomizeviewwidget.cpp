@@ -6,6 +6,7 @@
 #include "pulltemplate.h"
 #include "subpulltemplate.h"
 #include "pullplancustomizeviewwidget.h"
+#include "globalbackgroundcolor.h"
 
 PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
 {
@@ -538,7 +539,7 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 	PullPlan* plan, bool outermostLevel, QPainter* painter)
 {
 	// Fill the subplan area with some `cleared out' color
-	painter->setBrush(QColor(200, 200, 200));
+	painter->setBrush(GlobalBackgroundColor::qcolor);
 	painter->setPen(Qt::NoPen);
 	paintShape(x, y, drawWidth, plan->getOutermostCasingShape(), painter);
 
@@ -553,7 +554,7 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 		int casingY = y + drawHeight / 2 - casingHeight / 2;
 
 		// Fill with solid neutral grey (in case fill is transparent)
-		painter->setBrush(QColor(200, 200, 200));
+		painter->setBrush(GlobalBackgroundColor::qcolor);
 		painter->setPen(Qt::NoPen); // Will draw boundary after all filling is done
 		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
 
@@ -591,7 +592,7 @@ void PullPlanCustomizeViewWidget :: drawActionControls(QPainter* painter)
 	pen.setWidth(2);
 	pen.setColor(Qt::black);
 	pen.setStyle(Qt::DotLine);
-	painter->setBrush(QColor(200, 200, 200, 0));
+	painter->setBrush(GlobalBackgroundColor::qcolor);
 	painter->setPen(pen);
 	for (unsigned int i = 0; i < subplansSelected.size(); i++)
 	{
@@ -665,7 +666,7 @@ void PullPlanCustomizeViewWidget :: paintEvent(QPaintEvent *event)
 	painter.begin(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 
-	painter.fillRect(event->rect(), QColor(200, 200, 200));
+	painter.fillRect(event->rect(), GlobalBackgroundColor::qcolor);
 	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan, true, &painter);
 
 	painter.setBrush(Qt::NoBrush);

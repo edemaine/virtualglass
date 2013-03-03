@@ -157,11 +157,6 @@ float PickupPlanEditorViewWidget :: rawY(float adjustedY)
 	return adjustedY + ulY;
 }
 
-QPixmap PickupPlanEditorViewWidget :: getPixmap()
-{
-	return QPixmap::fromImage(niceViewWidget->renderImage());
-}
-
 void PickupPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 {
 	event->acceptProposedAction();

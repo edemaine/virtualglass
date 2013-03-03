@@ -22,6 +22,7 @@
 #include "piecelibrarywidget.h"
 #include "niceviewwidget.h"
 #include "piececrosssectionrender.h"
+#include "globalbackgroundcolor.h"
 
 PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -414,7 +415,7 @@ void PieceEditorWidget :: seedTemplates()
 		Piece piece(t);
 
 		QPixmap templatePixmap(100, 100);
-		templatePixmap.fill(QColor(200, 200, 200));
+		templatePixmap.fill(GlobalBackgroundColor::qcolor);
 
 		QPainter painter(&templatePixmap);
 		PieceCrossSectionRender::render(&painter, 100, &piece);

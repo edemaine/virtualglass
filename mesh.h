@@ -34,7 +34,7 @@ namespace MeshInternal
 	void generateMesh(PickupPlan* plan, Geometry *geometry, unsigned int quality);
 	void recurseMesh(Piece* piece, Geometry *geometry, vector<ancestor>& ancestors, unsigned int quality);
 	void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors, 
-		float length, unsigned int quality, bool isTopLevel=false);
+		float length, unsigned int quality, bool isTopLevel);
 
 	float totalShrink(vector<ancestor>& ancestors);
 	unsigned int computeAxialResolution(float length, unsigned int quality);

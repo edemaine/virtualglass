@@ -71,8 +71,7 @@ void generateMesh(GlassColor* gc, Geometry* geometry, unsigned int quality)
 
 	geometry->clear();
 	vector<ancestor> ancestors;
-	recurseMesh(&dummyPlan, geometry, ancestors, 2.0, 
-		quality, true);
+	recurseMesh(&dummyPlan, geometry, ancestors, 2.0, quality, true);
 	geometry->compute_normals_from_triangles();
 }
 
@@ -208,7 +207,8 @@ void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickn
 
 	Vector2f p;
 	vector< Vector2f > points;
-		
+
+	// generate a basis set of points		
 	for (unsigned int i = 0; i < slabResolution; ++i)
 	{
 		p.x = 4.999 - 9.998* i / (slabResolution-1);
@@ -222,17 +222,7 @@ void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickn
 		points.push_back(p);
 	}
 
-	//Generate verts:
-	vector< Vector3ui > tris;
-	if (tris.empty() && points.size() >= 3) {
-		tris.resize(points.size() - 2);
-		for (unsigned int i = 0; i < tris.size(); ++i) {
-			tris[i].c[0] = 0;
-			tris[i].c[1] = i+1;
-			tris[i].c[2] = i+2;
-		}
-	}
-
+	// generate pull vertex set for slabs
 	unsigned int base = geometry->vertices.size();
 	for (unsigned int i = 0; i < slabResolution; ++i)
 	{
@@ -252,35 +242,34 @@ void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickn
 			geometry->vertices.push_back(Vertex(p,n));
 		}
 	}
-	//Generate triangles linking them:
+	// mesh slabs
 	for (unsigned int i = 0; i + 1 < slabResolution; ++i)
 	{
-		for (unsigned int j = 0; j < slabResolution-1; ++j)
-		{
-			uint32_t p1 = base + i * 2 * slabResolution + j;
-			uint32_t p2 = base + (i+1) * 2 * slabResolution + j;
-			uint32_t p3 = base + i * 2 * slabResolution + j+1;
-			uint32_t p4 = base + (i+1) * 2 * slabResolution + j+1;
-			// Four points that define a (non-flat) quad are used
-			// to create two triangles.
-			geometry->triangles.push_back(Triangle(p2, p1, p4));
-			geometry->triangles.push_back(Triangle(p1, p3, p4));
-		}
+		// outer slab
 		for (unsigned int j = slabResolution; j < 2 * slabResolution - 1; ++j)
 		{
 			uint32_t p1 = base + i * 2 * slabResolution + j;
 			uint32_t p2 = base + (i+1) * 2 * slabResolution + j;
 			uint32_t p3 = base + i * 2 * slabResolution + j+1;
 			uint32_t p4 = base + (i+1) * 2 * slabResolution + j+1;
-			// Four points that define a (non-flat) quad are used
-			// to create two triangles.
+
+			geometry->triangles.push_back(Triangle(p2, p1, p4));
+			geometry->triangles.push_back(Triangle(p1, p3, p4));
+		}
+		// inner slab
+		for (unsigned int j = 0; j < slabResolution-1; ++j)
+		{
+			uint32_t p1 = base + i * 2 * slabResolution + j;
+			uint32_t p2 = base + (i+1) * 2 * slabResolution + j;
+			uint32_t p3 = base + i * 2 * slabResolution + j+1;
+			uint32_t p4 = base + (i+1) * 2 * slabResolution + j+1;
+
 			geometry->triangles.push_back(Triangle(p2, p1, p4));
 			geometry->triangles.push_back(Triangle(p1, p3, p4));
 		}
 	}
 
-	assert(geometry->valid());
-
+	// generate vertex set for bottom strip
 	base = geometry->vertices.size();
 	for (unsigned int j = 0; j < points.size(); ++j)
 	{
@@ -292,18 +281,19 @@ void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickn
 		n.x = 0.0; n.y = 0.0; n.z = -1.0;
 		geometry->vertices.push_back(Vertex(p, n));
 	}
+	// mesh bottom strip connecting the two slabs
 	for (unsigned int j = 0; j < slabResolution; ++j)
 	{
 		uint32_t p1 = base + j;
 		uint32_t p2 = base + j+1;
 		uint32_t p3 = base + 2 * slabResolution-1 - j;
 		uint32_t p4 = base + 2 * slabResolution-1 - (j+1);
-		// Four points that define a (non-flat) quad are used
-		// to create two triangles.
+
 		geometry->triangles.push_back(Triangle(p2, p1, p4));
 		geometry->triangles.push_back(Triangle(p1, p3, p4));
 	}
-	
+
+	// generate vertex set for top strip connecting the two slabs
 	base = geometry->vertices.size();
 	for (unsigned int j = 0; j < points.size(); ++j)
 	{
@@ -315,20 +305,18 @@ void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickn
 		n.x = 0.0; n.y = 0.0; n.z = 1.0;
 		geometry->vertices.push_back(Vertex(p, n));
 	}
+	// mesh top strip connecting the two slabs	
 	for (unsigned int j = 0; j < slabResolution-1; ++j)
 	{
 		uint32_t p1 = base + j;
 		uint32_t p2 = base + j+1;
 		uint32_t p3 = base + 2 * slabResolution-1 - j;
 		uint32_t p4 = base + 2 * slabResolution-1 - (j+1);
-		// Four points that define a (non-flat) quad are used
-		// to create two triangles.
+
 		geometry->triangles.push_back(Triangle(p1, p2, p4));
 		geometry->triangles.push_back(Triangle(p1, p4, p3));
 	}
 	
-	assert(geometry->valid());
-
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
 		first_vert, geometry->vertices.size() - first_vert, color, true));
 }
@@ -724,6 +712,16 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors
 	if (plan == NULL || quality == 0) 
 		return;
 
+	// Make recursive calls depending on the type of the current node
+	ancestor me = {plan, 0};
+	for (unsigned int i = 0; i < plan->subs.size(); ++i)
+	{
+		me.child = i;
+		ancestors.push_back(me);
+		recurseMesh(plan->subs[i].plan, geometry, ancestors, length, quality, false);
+		ancestors.pop_back();
+	}
+
 	// if you're the root node of the cane, mark yourself as `needing to be visible'
 	// to fake incidence of refraction
 	bool ensureVisible = (ancestors.size() == 0) && isTopLevel; 
@@ -747,16 +745,6 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors
 				ensureVisible && outermostLayer);
 		}
 
-	}
-
-	// Make recursive calls depending on the type of the current node
-	ancestor me = {plan, 0};
-	for (unsigned int i = 0; i < plan->subs.size(); ++i)
-	{
-		me.child = i;
-		ancestors.push_back(me);
-		recurseMesh(plan->subs[i].plan, geometry, ancestors, length, quality);
-		ancestors.pop_back();
 	}
 }
 

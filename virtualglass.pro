@@ -120,6 +120,8 @@ HEADERS += vgapp.h \
 	globaldepthpeelingsetting.h \
 	pullplancrosssectionrender.h \
 	piececrosssectionrender.h \
+	globalbackgroundcolor.h \
+	glassopengl.h \
 
 SOURCES += main.cpp \ 
 	vgapp.cpp \
@@ -178,4 +180,5 @@ SOURCES += main.cpp \
 	globaldepthpeelingsetting.cpp \
 	pullplancrosssectionrender.cpp \
 	piececrosssectionrender.cpp \
+	glassopengl.cpp \
 

@@ -22,14 +22,12 @@ class NiceViewWidget : public QGLWidget
 		NiceViewWidget(enum CameraMode cameraMode, QWidget* parent=0);
 		virtual ~NiceViewWidget();
 		Vector3f eyePosition();
-		QImage renderImage();
 		void setGeometry(Geometry* g);
 
 	protected:
 		void initializeGL();
 		void initializePeel();
 		void destructPeel();
-		void paintWithoutDepthPeeling();
 		void paintGL();
 		void resizeGL(int width, int height);
 		void mousePressEvent(QMouseEvent* e);
@@ -39,7 +37,6 @@ class NiceViewWidget : public QGLWidget
 
 	private:
 		bool leftMouseDown;
-		Color backgroundColor;
 		Geometry *geometry;
 		enum CameraMode cameraMode;
 		float lookAtLoc[3];
