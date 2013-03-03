@@ -132,11 +132,6 @@ class MainWindow : public QMainWindow
 		QAction *exitAction;
 		QMenu *perfMenu;
 		QAction *depthPeelAction;
-		QMenu *graphicsMenu;
-		QActionGroup* graphicsActionGroup;
-		QAction *highGraphicsAction;
-		QAction *mediumGraphicsAction;
-		QAction *lowGraphicsAction;
 
 	private slots:
 		void newFileActionTriggered();
@@ -161,9 +156,6 @@ class MainWindow : public QMainWindow
 		void randomComplexCaneExampleActionTriggered();
 		void randomComplexPieceExampleActionTriggered();
 		void depthPeelActionTriggered();
-		void highGraphicsActionTriggered(); 	
-		void mediumGraphicsActionTriggered(); 	
-		void lowGraphicsActionTriggered(); 	
 		void attemptToQuit();
 };
 

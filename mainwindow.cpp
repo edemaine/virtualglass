@@ -370,27 +370,6 @@ void MainWindow :: setupConnections()
 	connect(randomComplexPieceAction, SIGNAL(triggered()), this, SLOT(randomComplexPieceExampleActionTriggered()));
 
 	connect(depthPeelAction, SIGNAL(triggered()), this, SLOT(depthPeelActionTriggered()));
-	connect(highGraphicsAction, SIGNAL(triggered()), this, SLOT(highGraphicsActionTriggered()));
-	connect(mediumGraphicsAction, SIGNAL(triggered()), this, SLOT(mediumGraphicsActionTriggered()));
-	connect(lowGraphicsAction, SIGNAL(triggered()), this, SLOT(lowGraphicsActionTriggered()));
-}
-
-void MainWindow :: highGraphicsActionTriggered()
-{
-	GlobalGraphicsSetting::set(GlobalGraphicsSetting::HIGH);
-	updateEverything();	
-}
-
-void MainWindow :: mediumGraphicsActionTriggered()
-{
-	GlobalGraphicsSetting::set(GlobalGraphicsSetting::MEDIUM);
-	updateEverything();	
-}
-
-void MainWindow :: lowGraphicsActionTriggered()
-{
-	GlobalGraphicsSetting::set(GlobalGraphicsSetting::LOW);
-	updateEverything();	
 }
 
 void MainWindow :: depthPeelActionTriggered()
@@ -479,7 +458,6 @@ void MainWindow :: randomComplexPieceExampleActionTriggered()
 void MainWindow :: setupGraphics()
 {
 	GlobalGraphicsSetting::set(GlobalGraphicsSetting::HIGH);
-	highGraphicsAction->setChecked(true);
 }
 
 void MainWindow :: setDirtyBit(bool v)
@@ -1088,20 +1066,6 @@ void MainWindow::setupMenus()
 	// Performance menu
 	perfMenu = menuBar()->addMenu("Performance");
 	perfMenu->addAction(depthPeelAction);
-	graphicsMenu = perfMenu->addMenu("Graphics quality");
-	graphicsActionGroup = new QActionGroup(this);
-	highGraphicsAction = new QAction("High", this);
-	highGraphicsAction->setCheckable(true);
-	graphicsActionGroup->addAction(highGraphicsAction);
-	graphicsMenu->addAction(highGraphicsAction);
-	mediumGraphicsAction = new QAction("Medium", this);
-	mediumGraphicsAction->setCheckable(true);
-	graphicsActionGroup->addAction(mediumGraphicsAction);
-	graphicsMenu->addAction(mediumGraphicsAction);
-	lowGraphicsAction = new QAction("Low", this);
-	lowGraphicsAction->setCheckable(true);
-	graphicsActionGroup->addAction(lowGraphicsAction);
-	graphicsMenu->addAction(lowGraphicsAction);
 }
 
 void MainWindow::exportOBJActionTriggered()
