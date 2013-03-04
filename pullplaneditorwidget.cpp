@@ -80,6 +80,7 @@ void PullPlanEditorWidget :: updateEverything()
 	countLabel->setEnabled(plan->getTemplateType() != PullTemplate::CUSTOM);
 	countSpin->setEnabled(plan->getTemplateType() != PullTemplate::CUSTOM);
 
+	twistWidget->updateEverything();
 	twistWidget->setEnabled(plan->getOutermostCasingShape() == CIRCLE_SHAPE);
 
 	tempPullPlanMutex.lock();

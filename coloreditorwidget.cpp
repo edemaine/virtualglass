@@ -40,8 +40,10 @@ GlassColor* ColorEditorWidget :: getGlassColor() {
 	return glassColor;
 }
 
-void ColorEditorWidget :: setGlassColor(GlassColor* _gc) {
+void ColorEditorWidget :: setGlassColor(GlassColor* _gc) 
+{
 	glassColor = _gc;
+	emit someDataChanged();
 }
 
 
