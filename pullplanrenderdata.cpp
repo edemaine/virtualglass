@@ -32,7 +32,7 @@ PullPlanRenderData::~PullPlanRenderData() {
 
 Geometry *PullPlanRenderData::getGeometry() {
 	Geometry *geom = new Geometry();
-	generateMesh(plan, geom, GlobalGraphicsSetting::get());
+	generateMesh(plan, geom, GlobalGraphicsSetting::HIGH);
 	return geom;
 }
 
@@ -44,7 +44,7 @@ GlassColorRenderData::~GlassColorRenderData() {
 
 Geometry *GlassColorRenderData::getGeometry() {
 	Geometry *geom = new Geometry();
-	generateMesh(glassColor, geom, GlobalGraphicsSetting::get());
+	generateMesh(glassColor, geom, GlobalGraphicsSetting::HIGH);
 	return geom;
 
 }

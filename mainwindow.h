@@ -71,7 +71,6 @@ class MainWindow : public QMainWindow
 		void setupConnections();
 		void setupMenus();
 		void setupSaveFile();
-		void setupGraphics();
 		void updateLibrary();
 		void initializeRandomPiece();
 		void deleteCurrentEditingObject();

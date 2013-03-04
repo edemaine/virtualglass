@@ -172,7 +172,6 @@ SOURCES += main.cpp \
 	glassfileio.cpp \
 	piecegeometrythread.cpp \
 	pullplangeometrythread.cpp \
-	globalgraphicssetting.cpp \
 	twistwidget.cpp \
 	templatelibrarywidget.cpp \
 	piececustomizeviewwidget.cpp \

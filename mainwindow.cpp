@@ -46,7 +46,6 @@ MainWindow :: MainWindow()
 	setupEditors();
 	setupMenus();
 	setupSaveFile();
-	setupGraphics();
 	setupConnections();
 	setWindowTitle(windowTitle());
 	setupViews();
@@ -377,6 +376,7 @@ void MainWindow :: depthPeelActionTriggered()
 	GlobalDepthPeelingSetting::setEnabled(!GlobalDepthPeelingSetting::enabled());
 	depthPeelAction->setChecked(GlobalDepthPeelingSetting::enabled());
 	emit someDataChanged();
+	// TODO: Redraw all the library widgets
 }
 
 void MainWindow :: randomSimpleCaneExampleActionTriggered()
@@ -453,11 +453,6 @@ void MainWindow :: randomComplexPieceExampleActionTriggered()
 
 	pieceEditorWidget->setPiece(randomP);
 	setViewMode(PIECE_VIEW_MODE);
-}
-
-void MainWindow :: setupGraphics()
-{
-	GlobalGraphicsSetting::set(GlobalGraphicsSetting::HIGH);
 }
 
 void MainWindow :: setDirtyBit(bool v)
@@ -1058,10 +1053,10 @@ void MainWindow::setupMenus()
 	examplesMenu->addAction(randomComplexPieceAction);
 
 	// toggle depth peeling
-	depthPeelAction = new QAction("Depth peeling", this);
+	depthPeelAction = new QAction("Transparency", this);
 	depthPeelAction->setCheckable(true);
 	depthPeelAction->setChecked(GlobalDepthPeelingSetting::enabled());
-	depthPeelAction->setToolTip(tr("Toggle high-quality transparency rendering in 3D views"));
+	depthPeelAction->setToolTip(tr("Toggle transparency in 3D views. Turn off for better framerate."));
 
 	// Performance menu
 	perfMenu = menuBar()->addMenu("Performance");

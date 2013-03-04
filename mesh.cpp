@@ -698,21 +698,17 @@ void generateMesh(PickupPlan* pickup, Geometry *geometry, unsigned int quality)
 	}
 }
 
-/*
-generateMesh() is the top-level function for turning a cane into
-a geometry that can be rendered. As generateMesh() is called recursively,
-the transforms array is filled with with the transformations encountered at each node. When a
-leaf is reached, these transformations are used to generate a complete mesh
-for the leaf node.
-*/
+// recurseMesh() turns a cane into geometry that can be rendered.
+// since canes can be nested, recurseMesh() processes these nestings recursively.
+// keeping a running stack of ancestors nodes in the dependancy DAG
+// and applying them when a leaf node is encountered.
 void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors, float length, 
 	unsigned int quality, bool isTopLevel)
 {
-	// quality == 0 is reserved for pickups and pieces that don't want to draw any contents at all
-	if (plan == NULL || quality == 0) 
+	if (plan == NULL)
 		return;
 
-	// Make recursive calls depending on the type of the current node
+	// Recurse through to children 
 	ancestor me = {plan, 0};
 	for (unsigned int i = 0; i < plan->subs.size(); ++i)
 	{
@@ -722,8 +718,9 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors
 		ancestors.pop_back();
 	}
 
-	// if you're the root node of the cane, mark yourself as `needing to be visible'
-	// to fake incidence of refraction
+	// if you're the outermost casing in the root node of the cane,
+	// you get a special flag that causes your alpha to be rounded up to some minimum
+	// value to fake incidence of refraction
 	bool ensureVisible = (ancestors.size() == 0) && isTopLevel; 
 	for (unsigned int i = 0; i < plan->getCasingCount(); ++i) 
 	{

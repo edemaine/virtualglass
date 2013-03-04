@@ -11,14 +11,10 @@ namespace GlobalGraphicsSetting
 	// approximately: 1 is bad, 10 is good, 5 is ok.
 	enum Setting
 	{
-		VERY_LOW=1,
-		LOW=4,
-		MEDIUM=7,
-		HIGH=10,	
+		VERY_LOW=0,
+		MEDIUM=3,
+		HIGH=10,
 	};
-
-	enum Setting get();
-	void set(enum Setting s);	
 }
 
 #endif

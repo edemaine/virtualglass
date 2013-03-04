@@ -73,54 +73,38 @@ void renderWithoutDepthPeeling(const Geometry& geometry)
 		Color c = g->color;
 		if (c.a < 0.1)
 			continue;
-		glColor3f(c.r, c.g, c.b);
+		glColor4f(c.r * 0.8f, c.g * 0.8f, c.b * 0.8f, 0.8f);
 		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 			GL_UNSIGNED_INT, &(geometry.triangles[g->triangle_begin].v1));
 	}
 
-
 	// make a pass on mandatory transparent things
-	glEnable(GL_CULL_FACE); // Note we cull face
-	glDisable(GL_DEPTH_TEST);
+	// this part assumes that there's only one mandatory transparent thing, 
+	// and anything inside the cane/piece has a single face of the mandatory transparent
+	// stuff in front of it.
+	// moreover, we set the alpha of this mandatory transparent stuff to 0.1 and its 
+	// color to the generic white (gray) colors
+
+	// We cull back faces and fake the combined front and back faces with just front faces
+	// to avoid blending and z-ordering issues associated with drawing multiple faces 
+	// covering the same pixel.
+	glEnable(GL_CULL_FACE); 
+	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+	glBlendFunc(GL_ONE, GL_ONE);
 	for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g)
 	{
 		Color c = g->color;
 		if (c.a >= 0.1)
 			continue;
-		if (g->ensureVisible)
-			c.a = MAX(c.a, 0.1);
-		if (c.a < 0.01)
+		if (!g->ensureVisible)
 			continue;
-		// Here we have to fake the color adjustment that occurs in depth peeling.
-		// We need to use a blend function that doesn't just do something additive,
-		// so we mimic depth peeling and use GL_ONE_MINUS_DST_ALPHA for the incoming color adjustments.
-		// But adjusting color based on existing alpha causes rendering order to matter;
-		// it gives weird artifacts caused by drawing some away-facing triangles first,
-		// and others second, giving canes a vertical "seam". So we cull back faces (GL_CULL_FACE). 
-		// Finally, this results in a brighter appearance than in depth peeling, since
-		// back faces have away-pointing normals that give them darker colors than toward-facing
-		// normals due to shading. We fix this by adjusting the color of the toward-facing triangle
-		// by a small amount matching the (assumed and approximate) contribution that the 
-		// normal + shading has on the away-facing triangle, and then *not* rendering the back face.
-		//
-		// We also "premultiply by alpha" for an unknown reason as done in PeelRenderer::render()
-		// In the end, it makes nearly invisible stuff match the color you'd expect, so seems good!
-		//
-		// Equations are as follows, given a cane with color c:
-		//
-		//       (front face with shading)    (back face with shading and ONE_MINUS_DST_ALPHA approx)
-		// red =     c.r * c.a * 1.2       +                c.r * c.a * -0.2 * (1.0 - (c.a + 0.1)) 
-		//     = c.r * c.a * (1.02 + 0.2 * c.a) 
-		//
-		//         (front face)   (back face with ONE_MINUS_DST_ALPHA approx)
-		// alpha =      c.a     +                (1.0 - (c.a + 0.1)) * c.a 
-		//       = c.a * (1.9 - c.a) 
-		
-		float color_coeff = c.a * (1.02 + 0.2 * c.a);
-		float alpha_coeff = (1.9 - c.a);
-		glColor4f(c.r * color_coeff, c.g * color_coeff, c.b * color_coeff, c.a * alpha_coeff);		
+		c.r = c.g = c.b = 1.0;
+		c.a = 0.1;
+
+		// the 1.2 ratio is meant to adjust for the default GL_AMBIENT
+		// coefficient of 0.2 and its contribution via the (undrawn) back face
+		glColor4f(c.r * 1.2 * c.a, c.g * 1.2 * c.a, c.b * 1.2 * c.a, 2.0 * c.a);
 		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 			GL_UNSIGNED_INT, &(geometry.triangles[g->triangle_begin].v1));
 	}
