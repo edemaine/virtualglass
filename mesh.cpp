@@ -245,8 +245,8 @@ void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickn
 	// mesh slabs
 	for (unsigned int i = 0; i + 1 < slabResolution; ++i)
 	{
-		// outer slab
-		for (unsigned int j = slabResolution; j < 2 * slabResolution - 1; ++j)
+		// inner slab
+		for (unsigned int j = 0; j < slabResolution-1; ++j)
 		{
 			uint32_t p1 = base + i * 2 * slabResolution + j;
 			uint32_t p2 = base + (i+1) * 2 * slabResolution + j;
@@ -256,8 +256,8 @@ void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickn
 			geometry->triangles.push_back(Triangle(p2, p1, p4));
 			geometry->triangles.push_back(Triangle(p1, p3, p4));
 		}
-		// inner slab
-		for (unsigned int j = 0; j < slabResolution-1; ++j)
+		// outer slab
+		for (unsigned int j = slabResolution; j < 2 * slabResolution - 1; ++j)
 		{
 			uint32_t p1 = base + i * 2 * slabResolution + j;
 			uint32_t p2 = base + (i+1) * 2 * slabResolution + j;
