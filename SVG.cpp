@@ -1,12 +1,11 @@
 #include "SVG.hpp"
 
-#include <expat.h>
-
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <deque>
 #include <map>
+#include <expat/lib/expat.h>
 
 #define LOG_INFO( X ) std::cerr << X << std::endl
 

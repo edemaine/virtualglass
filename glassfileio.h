@@ -2,9 +2,9 @@
 #ifndef GLASSFILEIO_H
 #define GLASSFILEIO_H
 
-#include <json/json.h>
 #include <map>
 #include <vector>
+#include <jsoncpp/include/json/json.h>
 #include "shape.h"
 #include "pulltemplate.h"
 #include "pickuptemplate.h"

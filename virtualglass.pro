@@ -122,6 +122,7 @@ HEADERS += vgapp.h \
 	piececrosssectionrender.h \
 	globalbackgroundcolor.h \
 	glassopengl.h \
+	expat/lib/expat.h \
 
 SOURCES += main.cpp \ 
 	vgapp.cpp \
