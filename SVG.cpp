@@ -5,7 +5,7 @@
 #include <sstream>
 #include <deque>
 #include <map>
-#include <expat/lib/expat.h>
+#include <expat.h>
 
 #define LOG_INFO( X ) std::cerr << X << std::endl
 

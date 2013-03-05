@@ -16,6 +16,10 @@ QT += opengl
 RESOURCES = virtualglass.qrc
 DEFINES += GLEW_MX
 
+# Standard on Mac and Linux(?). Windows folks can get dll, static library, and includes in
+# a tarball at http://sourceforge.net/projects/mingw/files/MinGW/Extension/expat/expat-2.0.1-1/
+LIBS += -lexpat
+
 unix:!macx {
 	QMAKE_CXXFLAGS += -std=gnu++0x
 	LIBS += -lGLU
@@ -38,7 +42,7 @@ macx {
 	QMAKE_CFLAGS_RELEASE += $${MYFLAGS}
 	QMAKE_CXXFLAGS += $${MYFLAGS}
 }
-#one hopes this catches mingw:
+
 !*-msvc* {
 	QMAKE_CFLAGS_DEBUG += -Wall -Werror -g
 	QMAKE_CFLAGS_RELEASE += -Wall -Werror -g
@@ -46,10 +50,7 @@ macx {
         win32 {
 		QMAKE_CXXFLAGS += -std=gnu++0x
 	}
-	LIBS += -lexpat
 }
-
-
 
 HEADERS += vgapp.h \ 
 	glew/glew.h \
@@ -121,8 +122,9 @@ HEADERS += vgapp.h \
 	pullplancrosssectionrender.h \
 	piececrosssectionrender.h \
 	globalbackgroundcolor.h \
-	glassopengl.h \
-	expat/lib/expat.h \
+        glassopengl.h \
+        expat/lib/expat.h \
+        expat/lib/expat_external.h \
 
 SOURCES += main.cpp \ 
 	vgapp.cpp \

@@ -1,5 +1,8 @@
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
+
+#include "glew.h"
+#ifdef _WIN32
+#  include <windows.h>
+#endif
 #include <vector>
 #include <cmath>
 #include "bubble.h"

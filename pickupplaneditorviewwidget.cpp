@@ -38,6 +38,7 @@ void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** sub
 	{
 		SubpickupTemplate* sp = &(pickup->subs[i]);
 		Point3D ll, ur;
+        ll = ur = make_vector<float>(0.0f, 0.0f, 0.0f);
 
 		switch (sp->orientation)
 		{
