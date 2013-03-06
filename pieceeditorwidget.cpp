@@ -64,7 +64,7 @@ void PieceEditorWidget :: updateEverything()
 		pktlw->setHighlighted(pktlw->type == piece->pickup->getTemplateType());
 	}
 
-	pickupViewWidget->updateEverything();		
+	pickupViewWidget->updateEverything();
 
 	unsigned int i = 0;
 	for (; i < piece->pickup->getParameterCount(); ++i)
@@ -106,7 +106,7 @@ void PieceEditorWidget :: updateEverything()
 	tempPiece = deep_copy(piece);
 	tempPieceDirty = true;
 	tempPieceMutex.unlock();
-	wakeWait.wakeOne(); // wake up the thread if it's sleeping
+	wakeWait.wakeOne();
 }
 
 void PieceEditorWidget :: geometryThreadFinishedMesh()
@@ -150,16 +150,9 @@ void PieceEditorWidget :: geometryThreadFinishedMesh()
 	// 
 	// Because the goal is to have a non-blocking GUI thread *and* geometry
 	// thread that continously writes new geometry regardless of whether the
-	// GUI thread read the last geometry, we can never *ensure* that we can read.
-	//
-	// However, since every piece change causes the geometry thread to emit multiple
-	// signals (dependent on number of mesh qualities created), this would 
-	// have to happen a number of times *in a row* to result in not getting
-	// any updated geometry for a new piece. Probability is p^quality, where
-	// p is probability of the scenario each time. If it's a linear function
-	// of running time, then it's probably < 1%. 
-	
-	pickupViewWidget->repaint();
+	// GUI thread read the last geometry, we can never *ensure* that we can read. 
+
+	pickupViewWidget->updateEverything();
 	pieceNiceViewWidget->repaint();
 }
 

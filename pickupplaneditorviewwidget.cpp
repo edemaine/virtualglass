@@ -37,8 +37,8 @@ void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** sub
 	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
 	{
 		SubpickupTemplate* sp = &(pickup->subs[i]);
-		Point3D ll, ur;
-        ll = ur = make_vector<float>(0.0f, 0.0f, 0.0f);
+		Point2D ll, ur;
+		ll = ur = make_vector<float>(0.0f, 0.0f);
 
 		switch (sp->orientation)
 		{
@@ -60,7 +60,7 @@ void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** sub
 				ur.x = sp->location.x + sp->width/2;	
 				ur.y = sp->location.y + sp->width/2;	
 				break;
-		}	
+        	}
 
 		// Need to invert event location, since upper left/lower left origins exist	
 		if (ll.x < x && x < ur.x && ll.y < -y && -y < ur.y)
@@ -219,6 +219,6 @@ void PickupPlanEditorViewWidget :: setPickup(PickupPlan* _pickup)
 
 void PickupPlanEditorViewWidget :: updateEverything()
 {
-	this->repaint();
+    this->niceViewWidget->repaint();
 }
 

@@ -73,23 +73,23 @@ void ColorEditorWidget :: collectionComboBoxChanged(int _index)
 
 void ColorEditorWidget :: setupLayout()
 {
-	QHBoxLayout* pageLayout = new QHBoxLayout(this);
-	this->setLayout(pageLayout);
-	editorLayout = new QVBoxLayout(this);
-	pageLayout->addLayout(editorLayout);
+	QGridLayout* editorLayout = new QGridLayout(this);
+	this->setLayout(editorLayout);
 
-	QHBoxLayout* sourceLayout = new QHBoxLayout(this);
-	editorLayout->addLayout(sourceLayout);
-	sourceLayout->addWidget(new QLabel("Collection:", this), 0);
-	collectionComboBox = new QComboBox(this);
+	// Setup collection menu
+	QWidget* colMenuWidget = new QWidget(this); 
+	QHBoxLayout* colMenuLayout = new QHBoxLayout(colMenuWidget);
+	colMenuWidget->setLayout(colMenuLayout);
+	colMenuLayout->addWidget(new QLabel("Collection:", colMenuWidget));
+	collectionComboBox = new QComboBox(colMenuWidget);
 	collectionComboBox->setDuplicatesEnabled(true);
-	sourceLayout->addWidget(collectionComboBox, 1);
-
 	collectionComboBox->addItem("Add collection...");
-
+	colMenuLayout->addWidget(collectionComboBox, 1);
+	editorLayout->addWidget(colMenuWidget, 0, 0);
+	
+	// Setup stack of collection libraries
 	collectionStack = new QStackedWidget(this);
-	editorLayout->addWidget(collectionStack);
-
+	editorLayout->addWidget(collectionStack, 2, 0);
 	loadCollection(":/reichenbach-opaque-colors.vgc");
 	loadCollection(":/reichenbach-transparent-colors.vgc");
 	loadCollection(":/kugler-opaque-colors.vgc");
@@ -97,23 +97,29 @@ void ColorEditorWidget :: setupLayout()
 	loadCollection(":/gaffer-opaque-colors.vgc");
 	loadCollection(":/gaffer-transparent-colors.vgc");
 
-	QHBoxLayout* alphaLayout = new QHBoxLayout(this);
-	editorLayout->addLayout(alphaLayout);
-	QLabel* alphaLabel1 = new QLabel("Transparency:", this);
-	alphaLayout->addWidget(alphaLabel1, 0);
-	QLabel* alphaLabel2 = new QLabel("0%", this);
-	alphaLayout->addWidget(alphaLabel2, 0);
-	alphaSlider = new QSlider(Qt::Horizontal, this);
+	// Add alpha (transparency) adjuster
+	QWidget* alphaWidget = new QWidget(this);
+	QHBoxLayout* alphaLayout = new QHBoxLayout(alphaWidget);
+	alphaLayout->addWidget(new QLabel("Transparency", alphaWidget), 0);
+	alphaLayout->addWidget(new QLabel("0%", alphaWidget));
+	alphaSlider = new QSlider(Qt::Horizontal, alphaWidget);
 	alphaSlider->setRange(0, 255);
-	alphaLayout->addWidget(alphaSlider);
-	QLabel* alphaLabel3 = new QLabel("100%", this);
-	alphaLayout->addWidget(alphaLabel3, 0);
-	pageLayout->addWidget(niceViewWidget, 10);
+	alphaLayout->addWidget(alphaSlider, 1);
+	alphaLayout->addWidget(new QLabel("100%", alphaWidget));
+	editorLayout->addWidget(alphaWidget, 3, 0);
 
 	// Little description for the editor
 	QLabel* descriptionLabel = new QLabel("Color editor.", this);
 	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	editorLayout->addWidget(descriptionLabel, 0);
+	editorLayout->addWidget(descriptionLabel, 4, 0);
+
+	// Add 3D view	
+	editorLayout->addWidget(niceViewWidget, 0, 1, 4, 1);
+
+	// Set relative areas used
+	//editorLayout->setRowStretch(1, 1);
+	editorLayout->setColumnStretch(1, 1);
+
 }
 
 void ColorEditorWidget :: setupConnections()

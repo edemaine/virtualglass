@@ -6,6 +6,7 @@
 #include <QWidget>
 #include <QScrollArea>
 #include <QVBoxLayout>
+#include <QGridLayout>
 #include <QString>
 #include <string>
 
@@ -15,6 +16,7 @@ class Geometry;
 class PureColorLibraryWidget;
 class NiceViewWidget;
 class QVBoxLayout;
+class QGridLayout;
 class QComboBox;
 class QSlider;
 class QStackedWidget;
@@ -48,7 +50,7 @@ class ColorEditorWidget : public QWidget
 		GlassColor* glassColor;	
 		QComboBox* collectionComboBox;
 		NiceViewWidget* niceViewWidget;
-		QVBoxLayout* editorLayout;
+		QGridLayout* editorLayout;
 		QSlider* alphaSlider;
 		vector<QScrollArea*> colorLibraryScrollAreas;
 		vector<QVBoxLayout*> colorLibraryLayouts;
