@@ -4,9 +4,6 @@
 
 #include <vector>
 #include <QWidget>
-#include <QScrollArea>
-#include <QVBoxLayout>
-#include <QGridLayout>
 #include <QString>
 #include <string>
 
@@ -52,7 +49,6 @@ class ColorEditorWidget : public QWidget
 		NiceViewWidget* niceViewWidget;
 		QGridLayout* editorLayout;
 		QSlider* alphaSlider;
-		vector<QScrollArea*> colorLibraryScrollAreas;
 		vector<QVBoxLayout*> colorLibraryLayouts;
 		QStackedWidget* collectionStack;
 		int prevCollection;

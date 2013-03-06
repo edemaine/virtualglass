@@ -3,7 +3,10 @@
 #include <QStackedWidget>
 #include <QFileDialog>
 #include <QMouseEvent>
+#include <QHBoxLayout>
+#include <QScrollArea>
 #include <algorithm>
+
 #include "pullplan.h"
 #include "niceviewwidget.h"
 #include "geometry.h"
@@ -151,7 +154,6 @@ void ColorEditorWidget :: loadCollection(QString fileName)
 	// related to the color list.
 	collectionComboBox->insertItem(collectionComboBox->count()-1, collectionName);
 	QScrollArea* listScrollArea = new QScrollArea(collectionStack);
-	colorLibraryScrollAreas.push_back(listScrollArea); // push the new scroll area
 	collectionStack->addWidget(listScrollArea); // add this to the layout
 	listScrollArea->setBackgroundRole(QPalette::Dark);
 	listScrollArea->setWidgetResizable(true);

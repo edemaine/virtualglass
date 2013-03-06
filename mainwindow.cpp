@@ -11,6 +11,8 @@
 #include <QDrag>
 #include <QTextStream>
 #include <QApplication>
+#include <QHBoxLayout>
+#include <QScrollArea>
 
 #include "constants.h"
 #include "dependancy.h"
