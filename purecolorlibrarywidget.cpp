@@ -50,11 +50,6 @@ void PureColorLibraryWidget :: renderPixmap()
 	setPixmap(pixmap);
 }
 
-void PureColorLibraryWidget :: setAlpha(float a)
-{
-	color->getColor().a = a;
-}
-
 GlassColor* PureColorLibraryWidget :: getGlassColorCopy()
 {
 	return deep_copy(color);

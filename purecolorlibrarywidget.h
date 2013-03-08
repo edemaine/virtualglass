@@ -17,7 +17,6 @@ class PureColorLibraryWidget : public QLabel
 		Color getColor();
 		string getShortName();
 		string getLongName();
-		void setAlpha(float a);
 		void setSelected(bool s);
 
 	private:
