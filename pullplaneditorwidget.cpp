@@ -174,8 +174,13 @@ void PullPlanEditorWidget :: setupLayout()
 	QWidget* casingWidget = new QWidget(this);
 	QHBoxLayout* casingLayout = new QHBoxLayout(casingWidget);
 	QLabel* casingLabel = new QLabel("Casing:");
-	circleCasingPushButton = new QPushButton(QString(QChar(9673))); 
-	squareCasingPushButton = new QPushButton(QString(QChar(9635)));
+
+	circleCasingPushButton = new QPushButton(this); 
+	QIcon circleIcon(QPixmap::fromImage(QImage(":/images/circle_icon.png")));
+	circleCasingPushButton->setIcon(circleIcon);
+	squareCasingPushButton = new QPushButton(this); 
+	QIcon squareIcon(QPixmap::fromImage(QImage(":/images/square_icon.png")));
+	squareCasingPushButton->setIcon(squareIcon);
 	addCasingButton = new QPushButton("+");
 	removeCasingButton = new QPushButton("-");
 	casingLayout->addWidget(casingLabel);

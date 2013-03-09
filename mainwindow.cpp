@@ -377,8 +377,22 @@ void MainWindow :: depthPeelActionTriggered()
 {
 	GlobalDepthPeelingSetting::setEnabled(!GlobalDepthPeelingSetting::enabled());
 	depthPeelAction->setChecked(GlobalDepthPeelingSetting::enabled());
-	emit someDataChanged();
-	// TODO: Redraw all the library widgets
+	
+	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
+	{
+		dynamic_cast<GlassColorLibraryWidget*>(
+			dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget())->updatePixmaps();
+	}
+	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
+	{
+		dynamic_cast<PullPlanLibraryWidget*>(
+			dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget())->updatePixmaps();
+	}
+	for (int i = 0; i < pieceLibraryLayout->count(); ++i)
+	{
+		dynamic_cast<PieceLibraryWidget*>(
+			dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget())->updatePixmap();
+	}
 }
 
 void MainWindow :: randomSimpleCaneExampleActionTriggered()
@@ -484,7 +498,6 @@ void MainWindow :: setupLibrary()
 
 	QVBoxLayout* libraryAreaLayout = new QVBoxLayout(bigOleLibraryWidget);
 	libraryAreaLayout->setSpacing(10);
-	libraryAreaLayout->setContentsMargins(10, 10, 10, 10);
 	bigOleLibraryWidget->setLayout(libraryAreaLayout);
 
 	QScrollArea* libraryScrollArea = new QScrollArea(bigOleLibraryWidget);
@@ -796,11 +809,10 @@ void MainWindow :: updateLibrary()
 	{
 		case COLORBAR_VIEW_MODE:
 		{
-			GlassColorLibraryWidget* cblw;
 			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
-				cblw = dynamic_cast<GlassColorLibraryWidget*>(
-						dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
+				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(
+					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 				if (colorEditorWidget->getGlassColor() == cblw->glassColor)
 				{
 					cblw->updatePixmaps();
@@ -808,11 +820,9 @@ void MainWindow :: updateLibrary()
 				}
 			}
 
-
-			PullPlanLibraryWidget* pplw;
 			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 			{
-				pplw = dynamic_cast<PullPlanLibraryWidget*>(
+				PullPlanLibraryWidget* pplw = dynamic_cast<PullPlanLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 				if (pplw->pullPlan->hasDependencyOn(colorEditorWidget->getGlassColor()))
 				{
@@ -821,10 +831,9 @@ void MainWindow :: updateLibrary()
 				}
 			}
 
-			PieceLibraryWidget* plw;
 			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
 			{
-				plw = dynamic_cast<PieceLibraryWidget*>(
+				PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 				if (plw->piece->hasDependencyOn(colorEditorWidget->getGlassColor()))
 				{
@@ -837,19 +846,16 @@ void MainWindow :: updateLibrary()
 		}
 		case PULLPLAN_VIEW_MODE:
 		{
-			GlassColorLibraryWidget* cblw;
 			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
-				cblw = dynamic_cast<GlassColorLibraryWidget*>(
+				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(cblw->glassColor))
 					cblw->setDependancy(true, USEDBY_DEPENDANCY);
 			}
-
-			PullPlanLibraryWidget* pplw;
 			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 			{
-				pplw = dynamic_cast<PullPlanLibraryWidget*>(
+				PullPlanLibraryWidget* pplw = dynamic_cast<PullPlanLibraryWidget*>(
 						dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
 				// Check whether the pull plan in the library is:
 				// 1. the plan currently being edited
@@ -870,11 +876,9 @@ void MainWindow :: updateLibrary()
 					pplw->setDependancy(true, USES_DEPENDANCY);
 				}
 			}
-
-			PieceLibraryWidget* plw;
 			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
 			{
-				plw = dynamic_cast<PieceLibraryWidget*>(
+				PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 				if (plw->piece->hasDependencyOn(pullPlanEditorWidget->getPlan()))
 				{
@@ -887,28 +891,23 @@ void MainWindow :: updateLibrary()
 		}
 		case PIECE_VIEW_MODE:
 		{
-			GlassColorLibraryWidget* cblw;
 			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
-				cblw = dynamic_cast<GlassColorLibraryWidget*>(
+				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 				if (pieceEditorWidget->getPiece()->hasDependencyOn(cblw->glassColor))
 					cblw->setDependancy(true, USEDBY_DEPENDANCY);
 			}
-
-			PullPlanLibraryWidget* pplw;
 			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 			{
-				pplw = dynamic_cast<PullPlanLibraryWidget*>(
+				PullPlanLibraryWidget* pplw = dynamic_cast<PullPlanLibraryWidget*>(
 					dynamic_cast<QWidgetItem*>(pullPlanLibraryLayout->itemAt(i))->widget());
 				if (pieceEditorWidget->getPiece()->hasDependencyOn(pplw->pullPlan))
 					pplw->setDependancy(true, USEDBY_DEPENDANCY);
 			}
-
-			PieceLibraryWidget* plw;
 			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
 			{
-				plw = dynamic_cast<PieceLibraryWidget*>(
+				PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(
 						dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 				if (plw->piece == pieceEditorWidget->getPiece())
 				{

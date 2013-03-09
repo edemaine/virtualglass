@@ -21,5 +21,7 @@
 	<file>colorfile_inline_doc.txt</file>
 	<file>glassfile_inline_doc.txt</file>
         <file>virtualglass.png</file>
+	<file>images/circle_icon.png</file>
+	<file>images/square_icon.png</file>
     </qresource>
 </RCC>

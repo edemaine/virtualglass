@@ -54,9 +54,9 @@ void PullPlanGeometryThread::run()
 		// high-res geometry that will immediately be replaced.
 		//
 		unsigned int delay_msecs = 2000;
-		for (unsigned int i = 0; i < delay_msecs / 500; ++i)
+		for (unsigned int i = 0; i < delay_msecs / 250; ++i)
 		{
-			msleep(500);
+			msleep(250);
 
 			// check if piece has changed and start over if so      
 			ppew->tempPullPlanMutex.lock();
