@@ -152,13 +152,13 @@ void NiceViewWidget :: setGLMatrices()
 	switch (cameraMode)
 	{
 		case PIECE_CAMERA_MODE:
-			gluPerspective(45.0, w / h, 0.01, 100.0);
+			gluPerspective(45.0, w / h, 0.1, 100.0);
 			break;
 		case PULLPLAN_CAMERA_MODE:
 		case PICKUPPLAN_CAMERA_MODE:
 			float a = h / w;
 			float s = 2.2f / rho;
-			glScalef(a * s, s,-0.01);
+			glScalef(a * s, s, -0.01);
 			break;
 	}
 

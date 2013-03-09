@@ -171,16 +171,19 @@ void PeelRenderer::render(Geometry const & geometry)
 
 	if (peelProgram == 0) {
 		const char *peel_frag =
+		"#version 120 \n"
 		"#extension GL_ARB_texture_rectangle : enable \n"
 		"uniform sampler2DRect min_depth; \n"
 		" \n"
 		"void main() { \n"
-		"	float depth = texture2DRect(min_depth, gl_FragCoord.xy).x; \n"
-		"	if (gl_FragCoord.z <= depth) { \n"
+		"	vec4 tex = texture2DRect(min_depth, gl_FragCoord.xy);\n"
+		"	float tex_depth = tex.z;\n"
+		"	float frag_depth = gl_FragCoord.z;\n"
+		"	if (frag_depth <= tex_depth) { \n"
 		"		discard; \n"
 		"	} \n"
 		"	//Premultiply alpha to make compositing easier later: \n"
-		"	gl_FragColor = vec4(gl_Color.xyz * gl_Color.w, gl_Color.w); \n"
+		"	gl_FragColor = vec4(gl_Color.rgb*gl_Color.a, gl_Color.a);\n"
 		"} \n";
 		peelProgram = load_program(peel_frag, glewContext);
 		GlassOpenGL::errors("compiling peel program.");
@@ -188,12 +191,11 @@ void PeelRenderer::render(Geometry const & geometry)
 
 	if (nopeelProgram == 0) {
 		const char *nopeel_frag =
+		"#version 120 \n"
 		"void main() { \n"
 		"	//Premultiply alpha to make compositing easier later: \n"
-		"	gl_FragColor = vec4(gl_Color.xyz * gl_Color.w, gl_Color.w); \n"
+		"	gl_FragColor = vec4(gl_Color.rgb*gl_Color.a, gl_Color.a);\n"
 		"} \n";
-
-
 		nopeelProgram = load_program(nopeel_frag, glewContext);
 		GlassOpenGL::errors("compiling nopeel program.");
 	}
@@ -206,13 +208,15 @@ void PeelRenderer::render(Geometry const & geometry)
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &base_draw_framebuffer);
 	glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &base_read_framebuffer);
 
+	glDisable(GL_CULL_FACE);
+
 	//Render depth layers, front-to-back, up to MaxPasses layers:
 	const unsigned int MaxPasses = 20;
 	for (unsigned int pass = 0; pass < MaxPasses; ++pass) {
 		//---------- setup framebuffer ----------
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, buffer);
 		glPushAttrib(GL_VIEWPORT_BIT);
-		glViewport(0,0,bufferSize.x,bufferSize.y);
+		glViewport(0, 0, bufferSize.x, bufferSize.y);
 
 		//Set up the proper depth-n-such attachments:
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE_ARB, colorTex, 0);
@@ -235,7 +239,6 @@ void PeelRenderer::render(Geometry const & geometry)
 			glUseProgramObjectARB(nopeelProgram);
 		} else {
 			glUseProgramObjectARB(peelProgram);
-			glUniform1iARB(glGetUniformLocationARB(peelProgram, "min_depth"), 0);
 			glBindTexture(GL_TEXTURE_RECTANGLE_ARB, prevDepthTex);
 		}
 
@@ -257,7 +260,6 @@ void PeelRenderer::render(Geometry const & geometry)
 			glBeginQueryARB(GL_SAMPLES_PASSED_ARB, query);
 		}
 
-		glDisable(GL_CULL_FACE);
 
 		//---------- draw scene --------
 
@@ -280,9 +282,9 @@ void PeelRenderer::render(Geometry const & geometry)
 			else // otherwise plain ole color
 				glColor4f(c.r, c.g, c.b, c.a);
 			glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
-						   GL_UNSIGNED_INT, &(geometry.triangles[g->triangle_begin].v1));
+				GL_UNSIGNED_INT, &(geometry.triangles[g->triangle_begin].v1));
 		}
-		
+
 		//--------------------------
 
 		glDisableClientState(GL_VERTEX_ARRAY);
@@ -326,6 +328,7 @@ void PeelRenderer::render(Geometry const & geometry)
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
 		}
+
 		glDisable(GL_DEPTH_TEST);
 		//TODO: possibly use alpha test here to save some fill?
 		glCopyPixels(0,0,bufferSize.x,bufferSize.y,GL_COLOR);
@@ -340,10 +343,11 @@ void PeelRenderer::render(Geometry const & geometry)
 	glDeleteQueriesARB(1, &query);
 
 	//final pass -- render background color behind everything else.
-	glDisable(GL_LIGHTING);
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+
+	glDisable(GL_LIGHTING);
 
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();

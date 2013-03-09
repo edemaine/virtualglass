@@ -120,7 +120,7 @@ void RenderThread::setupCamera(Camera const &camera)
 
 	if (camera.isPerspective) 
 	{
-		gluPerspective(45.0, w / h, 0.01, 100.0);
+		gluPerspective(45.0, w / h, 0.1, 100.0);
 	} 
 	else 
 	{
