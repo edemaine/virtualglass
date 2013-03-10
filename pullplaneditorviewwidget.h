@@ -3,7 +3,7 @@
 #define PULLPLANEDITORVIEWWIDGET_H
 
 #include <QWidget>
-#include <vector>
+#include <set>
 #include "primitives.h"
 #include "shape.h"
 
@@ -12,7 +12,7 @@ class PullPlan;
 class PullPlanLibraryWidget;
 class GlassColorLibraryWidget;
 
-using std::vector;
+using std::set;
 
 class PullPlanEditorViewWidget : public QWidget
 {
@@ -39,36 +39,30 @@ class PullPlanEditorViewWidget : public QWidget
 		void resizeEvent(QResizeEvent* event);
 
 	private:
-		void paintShape(float x, float y, float size, enum GeometricShape s, QPainter* p);
-		float adjustedX(float rawX);
-		float adjustedY(float rawX);
-		float rawX(float adjustedX);
-		float rawY(float adjustedY);
+		void paintShape(Point2D upperLeft, float size, enum GeometricShape s, QPainter* p);
 		void setBoundaryPainter(QPainter* painter, bool outermostLevel);
-		void drawSubplan(float x, float y, float width, float height, PullPlan* plan, 
+		void drawSubplan(Point2D upperLeft, float width, float height, PullPlan* plan, 
 			bool highlightThis, bool outermostLevel, QPainter* painter);
-		void updateHighlightedSubplansAndCasings(QDropEvent* event);
-		void populateHighlightedSubplans(int x, int y, QDropEvent* event);
-		void populateHighlightedCasings(int x, int y);
-		bool isOnCasing(int casingIndex, float x, float y);
-		float getShapeRadius(enum GeometricShape s, float x, float y);
+		void updateHighlightedSubplansAndCasings(QDragMoveEvent* event);
+		bool isOnCasing(int casingIndex, Point2D loc);
+		float getShapeRadius(enum GeometricShape s, Point2D loc);
 		void setMinMaxCasingRadii(float* min, float* max);
-		PullPlan* getSubplanAt(float x, float y);
+		PullPlan* getSubplanAt(Point2D loc);
+		int getSubplanIndexAt(Point2D loc);
+		int getCasingIndexAt(Point2D loc);
+		Point2D mouseToCaneCoords(float x, float y);
 
 		PullPlan* plan;
-
-		GlassColorLibraryWidget* draggedLibraryColor;
-		GlassColor* draggedColor;
-		PullPlan* draggedPlan;
 
 		bool isDraggingCasing;
 		unsigned int draggedCasingIndex;
 
 		Color highlightColor;
-		vector<unsigned int> casingsHighlighted;
-		vector<unsigned int> subplansHighlighted; 
+		set<unsigned int> casingsHighlighted;
+		set<unsigned int> subplansHighlighted; 
 
-		float ulX, ulY, squareSize;
+		Point2D drawUpperLeft;
+		float squareSize;
 
 	public slots:
 		void updateEverything();

@@ -3,6 +3,7 @@
 #include <QMouseEvent>
 #include <QDragEnterEvent>
 #include <QPainter>
+
 #include "constants.h"
 #include "glasscolor.h"
 #include "pullplan.h"
@@ -18,17 +19,13 @@ PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* pa
 	setAcceptDrops(true);
 	setMinimumSize(200, 200);
 	this->plan = plan;
-
-	draggedLibraryColor = NULL;
-	draggedColor = NULL;
-	draggedPlan = NULL;
 	isDraggingCasing = false;
 }
 
 
 QRect PullPlanEditorViewWidget :: usedRect()
 {
-	return QRect(ulX, ulY, squareSize, squareSize);
+	return QRect(drawUpperLeft.x, drawUpperLeft.y, squareSize, squareSize);
 }
 
 void PullPlanEditorViewWidget :: resizeEvent(QResizeEvent* event)
@@ -40,65 +37,44 @@ void PullPlanEditorViewWidget :: resizeEvent(QResizeEvent* event)
 
 	if (width > height) // wider than tall 
 	{
-		ulX = (width - height)/2.0;
-		ulY = 0;
+		drawUpperLeft.x = (width - height)/2.0;
+		drawUpperLeft.y = 0.0;
 		squareSize = height; 
 	}
 	else  
 	{
-		ulX = 0;
-		ulY = (height - width)/2.0;
+		drawUpperLeft.x = 0.0;
+		drawUpperLeft.y = (height - width)/2.0;
 		squareSize = width; 
 	}
 }
 
-float PullPlanEditorViewWidget :: adjustedX(float rawX)
-{
-	return rawX - ulX;
-}
-
-float PullPlanEditorViewWidget :: adjustedY(float rawY)
-{
-	return rawY - ulY;
-}
-
-float PullPlanEditorViewWidget :: rawX(float adjustedX)
-{
-	return adjustedX + ulX;
-}
-
-float PullPlanEditorViewWidget :: rawY(float adjustedY)
-{
-	return adjustedY + ulY;
-}
-
-float PullPlanEditorViewWidget :: getShapeRadius(enum GeometricShape shape, float x, float y)
+float PullPlanEditorViewWidget :: getShapeRadius(enum GeometricShape shape, Point2D loc)
 {
 	switch (shape)
 	{
 		case CIRCLE_SHAPE:
-			return sqrt(x * x + y * y); 
+			return sqrt(loc.x * loc.x + loc.y * loc.y); 
 		case SQUARE_SHAPE:
-			return MAX(fabs(x), fabs(y));
+			return MAX(fabs(loc.x), fabs(loc.y));
 	}
 
-	return -1;
+	return -1.0;
 }
 
-bool PullPlanEditorViewWidget :: isOnCasing(int casingIndex, float x, float y)
+bool PullPlanEditorViewWidget :: isOnCasing(int casingIndex, Point2D loc)
 {
-	return fabs(plan->getCasingThickness(casingIndex) - getShapeRadius(plan->getCasingShape(casingIndex), x, y)) < 0.02; 
+	return fabs(plan->getCasingThickness(casingIndex) - getShapeRadius(plan->getCasingShape(casingIndex), loc)) < 0.025; 
 }
 
 void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 {
-	float x = (adjustedX(event->pos().x()) - squareSize/2) / float(squareSize/2-10);
-	float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
+	Point2D mouseLoc = mouseToCaneCoords(event->pos().x(), event->pos().y());
 
 	// Check for casing resize
 	for (unsigned int i = 0; i < plan->getCasingCount() - 1; ++i) 
 	{
-		if (isOnCasing(i, x, y))
+		if (isOnCasing(i, mouseLoc))
 		{
 			isDraggingCasing = true; 
 			draggedCasingIndex = i;
@@ -107,7 +83,7 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	}
 
 	// Check for convenience subplan-to-subplan drag
-	PullPlan* selectedSubplan = getSubplanAt(x, y);
+	PullPlan* selectedSubplan = getSubplanAt(mouseLoc);
 	if (selectedSubplan != NULL)
 	{
 		enum GlassMime::Type type = GlassMime::PULLPLAN_MIME;
@@ -125,37 +101,91 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 		drag->setPixmap(pixmap);
 
 		drag->exec(Qt::CopyAction);
+
+		return;
 	}	
+
+	// Check for convenience casing-to-casing drag
+	int selectedCasingIndex = getCasingIndexAt(mouseLoc);
+	if (selectedCasingIndex != -1)
+	{
+		GlassColor* selectedColor = plan->getCasingColor(static_cast<unsigned int>(selectedCasingIndex)); 
+
+		QPixmap _pixmap(200, 200);
+		_pixmap.fill(Qt::transparent);
+		QPainter painter(&_pixmap);
+		Color c = selectedColor->getColor();
+		QColor qc(255*c.r, 255*c.g, 255*c.b, MAX(255*c.a, 30));
+		painter.setBrush(qc);
+		painter.setPen(Qt::NoPen);
+		painter.drawEllipse(10, 10, 180, 180);
+		painter.end();
+		QPixmap pixmap = _pixmap.scaled(100, 100);
+
+	        char buf[500];
+		GlassMime::encode(buf, selectedColor, GlassMime::COLOR_MIME);
+		QByteArray pointerData(buf);
+		QMimeData* mimeData = new QMimeData;
+		mimeData->setText(pointerData);
+
+		QDrag *drag = new QDrag(this);
+		drag->setMimeData(mimeData);
+		drag->setPixmap(pixmap);
+
+		drag->exec(Qt::CopyAction);
+
+		return;
+	}
 }
 
-PullPlan* PullPlanEditorViewWidget :: getSubplanAt(float x, float y)
+int PullPlanEditorViewWidget :: getCasingIndexAt(Point2D loc)
+{
+	for (unsigned int i = 0; i < plan->getCasingCount(); ++i) 
+	{
+		if (getShapeRadius(plan->getCasingShape(i), loc) < plan->getCasingThickness(i))
+			return i;
+	}
+
+	return -1;
+}
+
+int PullPlanEditorViewWidget :: getSubplanIndexAt(Point2D loc)
 {
 	// Recursively call drawing on subplans
 	for (unsigned int i = 0; i < plan->subs.size(); ++i)
 	{
-		SubpullTemplate* sub = &(plan->subs[i]);
-		if (getShapeRadius(sub->shape, x - sub->location.x, y - sub->location.y) < sub->diameter/2.0)
-			return sub->plan;
-	}			
+		SubpullTemplate& sub = plan->subs[i];
+		Point2D delta;
+		delta.x = loc.x - sub.location.x;
+		delta.y = loc.y - sub.location.y;
+		if (getShapeRadius(sub.shape, delta) < sub.diameter/2.0)
+			return i;
+	}
 
-	return NULL;
+	return -1;			
+}
+
+PullPlan* PullPlanEditorViewWidget :: getSubplanAt(Point2D loc)
+{
+	int subplanIndex = getSubplanIndexAt(loc);
+	if (subplanIndex == -1)
+		return NULL;
+	return plan->subs[subplanIndex].plan;
 }
 
 void PullPlanEditorViewWidget :: setMinMaxCasingRadii(float* min, float* max)
 {
-	/*
-	Goal here is to deal with casings of different shapes, and set upper and 
-	lower bounds for the radius of a particular casing based upon how much it
-	can change before bumping into the inscribed (next smallest) or 
-	circumscribed (next largest) casing. 
+	// Goal here is to deal with casings of different shapes, and set upper and 
+	// lower bounds for the radius of a particular casing based upon how much it
+	// can change before bumping into the inscribed (next smallest) or 
+	// circumscribed (next largest) casing. 
 
-	The major situation/issue to deal with is adjusting by sqrt(2) in the case
-	that the casing is square and is surrounded by two circle casings or vice versa.
-	We also allow adjacent casings of different shapes to get really close (0.01)
-	while casing of the same shape need to be spaced a little (0.05) for UX reasons:
-	if they are too close, it becomes hard to tell there are two casings, or to 
-	click on them reliably to resize them.
-	*/
+	// The major situation/issue to deal with is adjusting by sqrt(2) in the case
+	// that the casing is square and is surrounded by two circle casings or vice versa.
+	// We also allow adjacent casings of different shapes to get really close (0.01)
+	// while casing of the same shape need to be spaced a little (0.05) for UX reasons:
+	// if they are too close, it becomes hard to tell there are two casings, or to 
+	// click on them reliably to resize them.
 	
 	int csi, csi_minus_1, csi_plus_1;
 	float cti_minus_1, cti_plus_1;
@@ -198,9 +228,8 @@ void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 	if (!isDraggingCasing)
 		return;
 
-	float x = (adjustedX(event->pos().x()) - squareSize/2);
-	float y = (adjustedY(event->pos().y()) - squareSize/2);
-	float radius = getShapeRadius(plan->getCasingShape(draggedCasingIndex), x, y) / (squareSize/2 - 10);
+	Point2D mouseLoc = mouseToCaneCoords(event->pos().x(), event->pos().y());
+	float radius = getShapeRadius(plan->getCasingShape(draggedCasingIndex), mouseLoc);
 
 	float min;
 	float max;
@@ -211,7 +240,7 @@ void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 	emit someDataChanged();
 }
 
-void PullPlanEditorViewWidget :: mouseReleaseEvent(QMouseEvent* /*event*/)
+void PullPlanEditorViewWidget :: mouseReleaseEvent(QMouseEvent*)
 {
 	isDraggingCasing = false;
 }
@@ -219,63 +248,7 @@ void PullPlanEditorViewWidget :: mouseReleaseEvent(QMouseEvent* /*event*/)
 void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 {
 	event->acceptProposedAction();
-	void* ptr;
-	enum GlassMime::Type type;
-	GlassMime::decode(event->mimeData()->text().toAscii().constData(), &ptr, &type);
-	switch (type)
-	{
-		case GlassMime::COLORLIBRARY_MIME:
-			draggedLibraryColor = reinterpret_cast<GlassColorLibraryWidget*>(ptr);
-			break;
-		case GlassMime::COLOR_MIME:
-			draggedColor = reinterpret_cast<GlassColor*>(ptr);
-			break;
-		case GlassMime::PULLPLAN_MIME:
-			draggedPlan = reinterpret_cast<PullPlan*>(ptr);
-			break;
-	}
-}
-
-void PullPlanEditorViewWidget :: dragLeaveEvent(QDragLeaveEvent* /*event*/)
-{
-	subplansHighlighted.clear();
-	casingsHighlighted.clear();
-	draggedLibraryColor = NULL;
-	draggedColor = NULL;
-	draggedPlan = NULL;
-}
-
-
-void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDropEvent* event)
-{
-	QPoint mouse = mapFromGlobal(QCursor::pos());
-	int x = adjustedX(mouse.x());
-	int y = adjustedY(mouse.y());
-
-	subplansHighlighted.clear();
-	casingsHighlighted.clear();
-
-	populateHighlightedSubplans(x, y, event);
-	if (subplansHighlighted.size() > 0)  // if you hit something, set highlight color and get out
-	{
-		if (draggedLibraryColor != NULL)
-			highlightColor = draggedLibraryColor->glassColor->getColor();
-		else if (draggedColor != NULL)
-			highlightColor = draggedColor->getColor();
-		else
-			highlightColor.r = highlightColor.g = highlightColor.b = highlightColor.a = 1.0;
-		return;
-	}
-	populateHighlightedCasings(x, y);
-	if (casingsHighlighted.size() > 0) 
-	{
-		if (draggedLibraryColor != NULL)
-			highlightColor = draggedLibraryColor->glassColor->getColor();
-		else if (draggedColor != NULL)
-			highlightColor = draggedColor->getColor();
-		// else should not happen
-		return;
-	}
+	updateHighlightedSubplansAndCasings(event);
 }
 
 void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
@@ -284,150 +257,171 @@ void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 	repaint();
 }
 
+void PullPlanEditorViewWidget :: dragLeaveEvent(QDragLeaveEvent*)
+{
+	subplansHighlighted.clear();
+	casingsHighlighted.clear();
+}
+
+Point2D PullPlanEditorViewWidget :: mouseToCaneCoords(float x, float y)
+{
+	Point2D mouseLoc;
+	mouseLoc.x = (x - drawUpperLeft.x - squareSize/2) / static_cast<float>(squareSize/2-10);
+	mouseLoc.y = (y - drawUpperLeft.y - squareSize/2) / static_cast<float>(squareSize/2-10);
+
+	return mouseLoc;
+}
+
+void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEvent* event)
+{
+	Point2D mouseLoc = mouseToCaneCoords(event->pos().x(), event->pos().y());
+
+	subplansHighlighted.clear();
+	casingsHighlighted.clear();
+
+	// determine highlighted subplan or casing
+	void* ptr;
+	enum GlassMime::Type type;
+	GlassMime::decode(event->mimeData()->text().toAscii().constData(), &ptr, &type);
+	switch (type)
+	{
+		case GlassMime::COLORLIBRARY_MIME:
+		{
+			GlassColorLibraryWidget* draggedLibraryColor = reinterpret_cast<GlassColorLibraryWidget*>(ptr);
+			highlightColor = draggedLibraryColor->glassColor->getColor();
+			int subplanIndexUnderMouse = getSubplanIndexAt(mouseLoc);
+			if (subplanIndexUnderMouse != -1)
+			{
+				// if user is hovering over a subplan and the shift key is currently held down, fill in all subplans
+				// Note that this needs to wait until another event (say, a drag move) occurs to catch the shift button being down.
+				// The crazy thing is, on Windows a drag *blocks* the event loop, preventing the whole application from
+				// getting a keyPressEvent() until the drag is completed. So reading keyboardModifiers() actually 
+				// lets you notice that the shift key is down earlier, i.e. during the drag, which is the only time you care anyway.
+				if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
+				{
+					for (unsigned int i = 0; i < plan->subs.size(); ++i)
+						subplansHighlighted.insert(i);
+				}
+				else
+					subplansHighlighted.insert(subplanIndexUnderMouse);
+				break;
+			}
+			// If we didn't find a subplan under the mouse, see if there's a casing under it
+			int casingIndexUnderMouse = getCasingIndexAt(mouseLoc);
+			if (casingIndexUnderMouse == -1)
+				break;
+			if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
+			{
+				for (unsigned int i = 0; i < plan->getCasingCount(); ++i)
+					casingsHighlighted.insert(i);
+			}
+			else
+				casingsHighlighted.insert(casingIndexUnderMouse);
+			break;
+		}
+		case GlassMime::COLOR_MIME:
+		{
+			GlassColor* draggedColor = reinterpret_cast<GlassColor*>(ptr);
+			highlightColor = draggedColor->getColor();
+			int casingIndexUnderMouse = getCasingIndexAt(mouseLoc);
+			if (casingIndexUnderMouse == -1)
+				break;
+			if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
+			{
+				for (unsigned int i = 0; i < plan->getCasingCount(); ++i)
+					casingsHighlighted.insert(i);
+			}
+			else
+				casingsHighlighted.insert(casingIndexUnderMouse);
+			break;
+		}
+		case GlassMime::PULLPLAN_MIME:
+		{
+			PullPlan* draggedPlan = reinterpret_cast<PullPlan*>(ptr);
+			highlightColor.r = highlightColor.g = highlightColor.b = highlightColor.a = 1.0;
+			if (draggedPlan->hasDependencyOn(plan))
+				break;
+			int subplanIndexUnderMouse = getSubplanIndexAt(mouseLoc);
+			if (subplanIndexUnderMouse == -1)
+				break;
+			if (draggedPlan->getOutermostCasingShape() != plan->subs[subplanIndexUnderMouse].shape)
+				break;
+			if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
+			{
+				for (unsigned int i = 0; i < plan->subs.size(); ++i)
+				{
+					if (draggedPlan->getOutermostCasingShape() == plan->subs[i].shape)
+						subplansHighlighted.insert(i);
+				}
+			}
+			else
+				subplansHighlighted.insert(subplanIndexUnderMouse);
+			break;
+		}
+	}	
+}
+
 void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 {
-	// subplans highlighted can mean you're dragging color or plan
-	if (subplansHighlighted.size() > 0)
-	{
+	// Just so the drop animation looks right
+	if (subplansHighlighted.size() == 0 && casingsHighlighted.size() == 0)
+		return;		
+	else
 		event->accept();
-		for (unsigned int i = 0; i < subplansHighlighted.size(); ++i)
+
+	void* ptr;
+	enum GlassMime::Type type;
+	GlassMime::decode(event->mimeData()->text().toAscii().constData(), &ptr, &type);
+
+	switch (type)
+	{
+		case GlassMime::COLORLIBRARY_MIME:
 		{
-			if (draggedLibraryColor != NULL)
+			GlassColorLibraryWidget* draggedLibraryColor = reinterpret_cast<GlassColorLibraryWidget*>(ptr);
+			for (set<unsigned int>::iterator it = subplansHighlighted.begin(); it != subplansHighlighted.end(); ++it)
 			{
-				switch (plan->subs[subplansHighlighted[i]].shape)
+				SubpullTemplate& sub = plan->subs[*it];
+				switch (sub.shape)
 				{
 					case CIRCLE_SHAPE:
-						plan->subs[subplansHighlighted[i]].plan = draggedLibraryColor->circlePlan;
+						sub.plan = draggedLibraryColor->circlePlan;
 						break;
 					case SQUARE_SHAPE:
-						plan->subs[subplansHighlighted[i]].plan = draggedLibraryColor->squarePlan;
-						break;
-					default: // should not happen
+						sub.plan = draggedLibraryColor->squarePlan;
 						break;
 				}
 			}
-			else // isDraggingPlan == true
-				plan->subs[subplansHighlighted[i]].plan = draggedPlan;
+			for (set<unsigned int>::iterator it = casingsHighlighted.begin(); it != casingsHighlighted.end(); ++it)
+				plan->setCasingColor(draggedLibraryColor->glassColor, *it);
+			break;
+		}
+		case GlassMime::COLOR_MIME:
+		{
+			GlassColor* draggedColor = reinterpret_cast<GlassColor*>(ptr);
+			for (set<unsigned int>::iterator it = casingsHighlighted.begin(); it != casingsHighlighted.end(); ++it)
+				plan->setCasingColor(draggedColor, *it);
+			break;
+		}
+		case GlassMime::PULLPLAN_MIME:
+		{
+			PullPlan* draggedPlan = reinterpret_cast<PullPlan*>(ptr);
+			for (set<unsigned int>::iterator it = subplansHighlighted.begin(); it != subplansHighlighted.end(); ++it)
+			{
+				SubpullTemplate& sub = plan->subs[*it];
+				if (sub.shape == draggedPlan->getOutermostCasingShape())
+					sub.plan = draggedPlan;	
+			}
+			break;
 		}
 	}
-	// casings highlighted means a dragged color
-	else if (casingsHighlighted.size() > 0)
-	{
-		event->accept();
-		if (draggedLibraryColor != NULL)
-			plan->setCasingColor(draggedLibraryColor->glassColor, casingsHighlighted[0]);
-		else if (draggedColor != NULL)
-			plan->setCasingColor(draggedColor, casingsHighlighted[0]);
-		// else should not happen
-	}
 
-	draggedLibraryColor = NULL;
-	draggedColor = NULL;
-	draggedPlan = NULL;
 	subplansHighlighted.clear();
 	casingsHighlighted.clear();
 	emit someDataChanged();
 }
 
-void PullPlanEditorViewWidget :: populateHighlightedSubplans(int x, int y, QDropEvent* event)
-{
-	// the goal is to populate the list of subplans hit by the drag
-	// if the drag is color, then we hit no matter what due to the amorphous shape of color
-	// if the drag is a plan, then we have to do type-checking for correct shape
-	subplansHighlighted.clear();
-
-	// if you ain't draggin, get out
-	if (draggedLibraryColor == NULL && draggedColor == NULL && draggedPlan == NULL)
-		return;
-
-	// can't drag into yourself
-	if (draggedPlan != NULL && draggedPlan->hasDependencyOn(plan)) 
-		return;
-
-	int drawSize = squareSize - 20;
-	for (unsigned int i = 0; i < plan->subs.size(); ++i)
-	{
-		SubpullTemplate* subpull = &(plan->subs[i]);
-
-		// Determine if drop hit the subplan
-		float dx = x - (drawSize/2 * subpull->location.x + drawSize/2 + 10);
-		float dy = y - (drawSize/2 * subpull->location.y + drawSize/2 + 10);
-		bool hit = (getShapeRadius(subpull->shape, dx, dy) < (subpull->diameter/2.0) * drawSize/2);
-		
-		if (!hit)
-			continue;
-
-		// if you're dragging color, you win
-		if (draggedLibraryColor != NULL)
-		{
-			subplansHighlighted.push_back(i);
-		}
-		// else have to do shape type-checking
-		else if (draggedPlan != NULL && subpull->shape == draggedPlan->getOutermostCasingShape())
-		{
-			subplansHighlighted.push_back(i);
-		}
-		// else shouldn't happen
-	}
-	
-	// the remainder of the code is to handle the "fill-all" behavior when the shift key is being held down
-	
-	// if user is hovering over a subplan and the shift key is currently held down, fill in all subplans
-	// Note that this needs to wait until another event (say, a drag move) occurs to catch the shift button being down.
-	// The crazy thing is, on Windows a drag *blocks* the event loop, preventing the whole application from
-	// getting a keyPressEvent() until the drag is completed. So reading keyboardModifiers() actually 
-	// lets you notice that the shift key is down earlier, i.e. during the drag, which is the only time you care anyway.
-	if (subplansHighlighted.size() > 0 && event && (event->keyboardModifiers() & Qt::ShiftModifier))
-	{
-		// fill er up
-		subplansHighlighted.clear();	
-		for (unsigned int i = 0; i < plan->subs.size(); ++i)
-		{
-			SubpullTemplate* subpull = &(plan->subs[i]);
-			if (draggedLibraryColor != NULL)
-				subplansHighlighted.push_back(i);
-			else if (draggedPlan != NULL && subpull->shape == draggedPlan->getOutermostCasingShape())
-				subplansHighlighted.push_back(i);
-		}
-	}
-}
-
-
-void PullPlanEditorViewWidget :: populateHighlightedCasings(int x, int y)
-{
-	if (draggedLibraryColor == NULL && draggedColor == NULL)
-		return; 
-
-	// Deal w/casing
-	float drawSize = (squareSize - 20);
-	float distanceFromCenter;
-	for (unsigned int i = 0; i < plan->getCasingCount(); ++i) 
-	{
-		switch (plan->getCasingShape(i)) 
-		{
-			case CIRCLE_SHAPE:
-				distanceFromCenter = sqrt(pow(x - (drawSize/2.0 + 10.0), 2.0)
-					+ pow(y - (drawSize/2.0 + 10.0), 2.0));
-				if (distanceFromCenter <= drawSize/2 * plan->getCasingThickness(i))
-				{
-					casingsHighlighted.push_back(i);
-					return;
-				}
-				break;
-			case SQUARE_SHAPE:
-				if (MAX(fabs(x - squareSize/2.0), fabs(y - squareSize/2.0)) < drawSize/2 * plan->getCasingThickness(i))
-				{
-					casingsHighlighted.push_back(i);
-					return;
-				}
-				break;
-		}
-	}
-}
-
 void PullPlanEditorViewWidget :: updateEverything()
 {
-	updateHighlightedSubplansAndCasings(NULL);
 	this->repaint();	
 }
 
@@ -438,8 +432,8 @@ void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan)
 }
 
 
-void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, bool outermostLevel) {
-
+void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, bool outermostLevel) 
+{
 	if (outermostLevel)
 	{
 		QPen pen;
@@ -453,12 +447,12 @@ void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, bool oute
 	}
 }
 
-void PullPlanEditorViewWidget :: paintShape(float x, float y, float size, enum GeometricShape shape, QPainter* painter)
+void PullPlanEditorViewWidget :: paintShape(Point2D upperLeft, float size, enum GeometricShape shape, QPainter* painter)
 {
 	int roundedX, roundedY;
 
-	roundedX = floor(rawX(x) + 0.5);
-	roundedY = floor(rawY(y) + 0.5);
+	roundedX = upperLeft.x + drawUpperLeft.x + 0.5;
+	roundedY = upperLeft.y + drawUpperLeft.y + 0.5;
 
 	switch (shape)
 	{
@@ -472,39 +466,40 @@ void PullPlanEditorViewWidget :: paintShape(float x, float y, float size, enum G
 	
 }
 
-
-void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, float drawHeight, 
-	PullPlan* plan, bool highlightThis, bool outermostLevel, QPainter* painter) {
+void PullPlanEditorViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth, float drawHeight, 
+	PullPlan* plan, bool highlightThis, bool outermostLevel, QPainter* painter) 
+{
 
 	// Fill the subplan area with some `cleared out' color
 	painter->setBrush(GlobalBackgroundColor::qcolor);
 	painter->setPen(Qt::NoPen);
-	paintShape(x, y, drawWidth, plan->getOutermostCasingShape(), painter);
+	paintShape(upperLeft, drawWidth, plan->getOutermostCasingShape(), painter);
 
 	if (highlightThis)
 	{
 		painter->setBrush(QColor(255*highlightColor.r, 255*highlightColor.g, 255*highlightColor.b,
 			255*highlightColor.a));
 		painter->setPen(Qt::NoPen);
-		paintShape(x, y, drawWidth, plan->getOutermostCasingShape(), painter);
+		paintShape(upperLeft, drawWidth, plan->getOutermostCasingShape(), painter);
 		return;
 	}
 
 	// Do casing colors outermost to innermost to get concentric rings of each casing's color
 	for (unsigned int i = plan->getCasingCount() - 1; i < plan->getCasingCount(); --i) 
 	{
-		int casingWidth = drawWidth * plan->getCasingThickness(i);
-		int casingHeight = drawHeight * plan->getCasingThickness(i);
-		int casingX = x + drawWidth / 2 - casingWidth / 2;
-		int casingY = y + drawHeight / 2 - casingHeight / 2;
+		float casingWidth = drawWidth * plan->getCasingThickness(i);
+		float casingHeight = drawHeight * plan->getCasingThickness(i);
+		Point2D casingUpperLeft;
+		casingUpperLeft.x = upperLeft.x + drawWidth / 2 - casingWidth / 2;
+		casingUpperLeft.y = upperLeft.y + drawHeight / 2 - casingHeight / 2;
 
 		// Fill with solid neutral grey (in case fill is transparent)
 		painter->setBrush(GlobalBackgroundColor::qcolor);
 		painter->setPen(Qt::NoPen); // Will draw boundary after all filling is done
-		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
+		paintShape(casingUpperLeft, casingWidth, plan->getCasingShape(i), painter);
 		
 		// Fill with actual casing color (highlighting white or some other color)
-		if (outermostLevel && casingsHighlighted.size() > 0 && casingsHighlighted[0] == i)
+		if (outermostLevel && casingsHighlighted.find(i) != casingsHighlighted.end())
 		{
 			painter->setBrush(QColor(255*highlightColor.r, 255*highlightColor.g, 255*highlightColor.b, 
 				255*highlightColor.a));
@@ -517,7 +512,7 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 		}
 
 		setBoundaryPainter(painter, outermostLevel);
-		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
+		paintShape(casingUpperLeft, casingWidth, plan->getCasingShape(i), painter);
 	}
 
 	// Recursively call drawing on subplans
@@ -525,29 +520,18 @@ void PullPlanEditorViewWidget :: drawSubplan(float x, float y, float drawWidth, 
 	{
 		SubpullTemplate* sub = &(plan->subs[i]);
 
-		float rX = x + (sub->location.x - sub->diameter/2.0) * drawWidth/2 + drawWidth/2;
-		float rY = y + (sub->location.y - sub->diameter/2.0) * drawWidth/2 + drawHeight/2;
+		Point2D subUpperLeft;
+		subUpperLeft.x = upperLeft.x + (sub->location.x - sub->diameter/2.0) * drawWidth/2 + drawWidth/2;
+		subUpperLeft.y = upperLeft.y + (sub->location.y - sub->diameter/2.0) * drawWidth/2 + drawHeight/2;
 		float rWidth = sub->diameter * drawWidth/2;
 		float rHeight = sub->diameter * drawHeight/2;
 
-		if (outermostLevel) {
-			bool highlighted = false;
-			for (unsigned int j = 0; j < subplansHighlighted.size(); ++j) {
-				if (subplansHighlighted[j] == i)
-					highlighted = true;
-			}
-
-			drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
-				highlighted, false, painter);
-		}
-		else {
-			drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
-				false, false, painter);
-		}
+		drawSubplan(subUpperLeft, rWidth, rHeight, plan->subs[i].plan, 
+			outermostLevel && subplansHighlighted.find(i) != subplansHighlighted.end(), false, painter);
 		
 		painter->setBrush(Qt::NoBrush);
 		setBoundaryPainter(painter, outermostLevel); 
-		paintShape(rX, rY, rWidth, plan->subs[i].shape, painter);
+		paintShape(subUpperLeft, rWidth, plan->subs[i].shape, painter);
 	}
 }
 
@@ -559,11 +543,13 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 	painter.setRenderHint(QPainter::Antialiasing);
 
 	painter.fillRect(event->rect(), GlobalBackgroundColor::qcolor);
-	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan, false, true, &painter);
+	Point2D upperLeft;
+	upperLeft.x = upperLeft.y = 10.0;
+	drawSubplan(upperLeft, squareSize - 20, squareSize - 20, plan, false, true, &painter);
 
 	painter.setBrush(Qt::NoBrush);
 	setBoundaryPainter(&painter, true);
-	paintShape(10, 10, squareSize - 20, plan->getOutermostCasingShape(), &painter);
+	paintShape(upperLeft, squareSize - 20, plan->getOutermostCasingShape(), &painter);
 
 	painter.end();
 }
