@@ -6,11 +6,12 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include <string>
+
+#include "geometry.h"
 #include "shape.h"
 #include "mesh.h"
 
 class PullPlan;
-class Geometry;
 class PullPlanEditorViewWidget;
 class PullPlanCustomizeViewWidget;
 class NiceViewWidget;

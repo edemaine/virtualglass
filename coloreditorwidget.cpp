@@ -20,11 +20,9 @@ ColorEditorWidget :: ColorEditorWidget(QWidget* parent) : QWidget(parent)
 {
 	resetGlassColor();
 
-	geometry = new Geometry();
-
 	niceViewWidget = new NiceViewWidget(NiceViewWidget::PULLPLAN_CAMERA_MODE, this);
-	generateMesh(glassColor, geometry, 4);
-	niceViewWidget->setGeometry(geometry);
+	generateMesh(glassColor, &geometry, 10);
+	niceViewWidget->setGeometry(&geometry);
 
 	setupLayout();
 	setupConnections();
@@ -120,9 +118,7 @@ void ColorEditorWidget :: setupLayout()
 	editorLayout->addWidget(niceViewWidget, 0, 1, 4, 1);
 
 	// Set relative areas used
-	//editorLayout->setRowStretch(1, 1);
 	editorLayout->setColumnStretch(1, 1);
-
 }
 
 void ColorEditorWidget :: setupConnections()
@@ -204,8 +200,7 @@ void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 void ColorEditorWidget :: updateEverything()
 {
-	geometry->clear();
-	generateMesh(glassColor, geometry, 4);
+	generateMesh(glassColor, &geometry, 4);
 	niceViewWidget->repaint();
 
 	this->alphaSlider->setSliderPosition(255 - (int) (glassColor->getColor().a * 255));

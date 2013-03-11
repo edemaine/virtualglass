@@ -6,6 +6,7 @@
 #include <QDragMoveEvent>
 #include <cfloat>
 #include <vector>
+
 #include "primitives.h"
 #include "shape.h"
 
@@ -53,9 +54,9 @@ private:
 	float adjustedY(float rawX);
 	float rawX(float adjustedX);
 	float rawY(float adjustedY);
-	void drawSubplan(float x, float y, float drawWidth, float drawHeight,
+	void drawSubplan(Point2D upperLeft, float drawWidth, float drawHeight,
 		PullPlan* plan, bool outermostLevel, QPainter* painter);
-	void paintShape(float x, float y, float size, enum GeometricShape s, QPainter* painter);
+	void paintShape(Point2D upperLeft, float size, enum GeometricShape s, QPainter* painter);
 	void setBoundaryPainter(QPainter* painter, bool outermostLevel, bool greyedOut);
 	void drawActionControls(QPainter* painter);
 	bool isValidMovePosition(QMouseEvent* event);
@@ -76,7 +77,8 @@ private:
 	int activeBox_xmax;
 	int activeBox_ymax;
 	int activeControlPoint;
-	float ulX, ulY, squareSize;
+	Point2D drawUpperLeft;
+	float squareSize;
 
 	int BOUNDING_BOX_SPACE;
 

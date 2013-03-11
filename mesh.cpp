@@ -181,9 +181,9 @@ void casePickup(Geometry* geometry, Piece* piece)
 		thickness = piece->pickup->subs[0].width*2.5;
 
 	meshPickupCasingSlab(geometry, piece->pickup->casingGlassColor->getColor(), 0.0, thickness);
+	//for now we don't do these, but the intent is to reintroduce soon
 	//meshPickupCasingSlab(geometry, pickup->underlayGlassColor->getColor(), thickness + 0.1, 0.05);
 	//meshPickupCasingSlab(geometry, pickup->overlayGlassColor->getColor(), -(thickness + 0.1), 0.05);
-
 }
 
 void applyPieceTransform(Geometry* geometry, Piece* piece)
@@ -718,27 +718,45 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors
 		ancestors.pop_back();
 	}
 
-	// if you're the outermost casing in the root node of the cane,
-	// you get a special flag that causes your alpha to be rounded up to some minimum
-	// value to fake incidence of refraction
 	bool ensureVisible = (ancestors.size() == 0) && isTopLevel; 
+	// because we currently don't do thickness-based color,
+	// we combined adjacent casing layers with the same color into
+	// a single casing "interval" to avoid the "darkening" that happens 
+	// by just stacking the same casing color several times 
 	for (unsigned int i = 0; i < plan->getCasingCount(); ++i) 
 	{
-		bool outermostLayer = (i == plan->getCasingCount()-1);
+		// compute the interval of common color
+		unsigned int colorIntervalStart = i;
+		while (true)
+		{
+			if (i == plan->getCasingCount() - 1)
+				break;
+			// note we compare RGBA values, not GlassColor object pointers
+			// because identical colors to the user likely means "equal RGBA values"
+			// and not "the same library objects"
+			if (plan->getCasingColor(i+1)->getColor() != plan->getCasingColor(colorIntervalStart)->getColor())
+				break;
+			++i;
+		}
 
-		if (i == 0)
+		// if you're the outermost casing in the root node of the cane,
+		// you get a special flag that causes your alpha to be rounded up to some minimum
+		// value to fake incidence of refraction
+		bool outermostLayer = (i == plan->getCasingCount() - 1);
+
+		if (colorIntervalStart == 0)
 		{
 			// punting on actually doing this geometry right and just making it a cylinder
 			// (that intersects its subcanes)
-			meshBaseCane(geometry, ancestors, plan->getCasingColor(0)->getColor(), 
-				plan->getCasingShape(0), length-0.001, plan->getCasingThickness(0), quality, 
+			meshBaseCane(geometry, ancestors, plan->getCasingColor(colorIntervalStart)->getColor(), 
+				plan->getCasingShape(0), length-0.001, plan->getCasingThickness(i), quality, 
 				ensureVisible && outermostLayer);
 		}
 		else
 		{
-			meshBaseCasing(geometry, ancestors, plan->getCasingColor(i)->getColor(), 
-				plan->getCasingShape(i), plan->getCasingShape(i-1), length,
-				plan->getCasingThickness(i), plan->getCasingThickness(i-1)+0.05, quality,
+			meshBaseCasing(geometry, ancestors, plan->getCasingColor(colorIntervalStart)->getColor(), 
+				plan->getCasingShape(i), plan->getCasingShape(colorIntervalStart-1), length,
+				plan->getCasingThickness(i), plan->getCasingThickness(colorIntervalStart-1)+0.02, quality,
 				ensureVisible && outermostLayer);
 		}
 

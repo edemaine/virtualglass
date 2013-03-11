@@ -44,14 +44,14 @@ void PullPlanCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
 
 	if (width > height) // wider than tall 
 	{
-		ulX = (width - height)/2.0;
-		ulY = 0;
+		drawUpperLeft.x = (width - height)/2.0;
+		drawUpperLeft.y = 0;
 		squareSize = height;
 	}
 	else
 	{
-		ulX = 0;
-		ulY = (height - width)/2.0;
+		drawUpperLeft.x = 0;
+		drawUpperLeft.y = (height - width)/2.0;
 		squareSize = width;
 	}
 
@@ -60,22 +60,22 @@ void PullPlanCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
 
 float PullPlanCustomizeViewWidget :: adjustedX(float rawX)
 {
-	return rawX - ulX;
+	return rawX - drawUpperLeft.x;
 }
 
 float PullPlanCustomizeViewWidget :: adjustedY(float rawY)
 {
-	return rawY - ulY;
+	return rawY - drawUpperLeft.y;
 }
 
 float PullPlanCustomizeViewWidget :: rawX(float adjustedX)
 {
-	return adjustedX + ulX;
+	return adjustedX + drawUpperLeft.x;
 }
 
 float PullPlanCustomizeViewWidget :: rawY(float adjustedY)
 {
-	return adjustedY + ulY;
+	return adjustedY + drawUpperLeft.y;
 }
 
 void PullPlanCustomizeViewWidget :: dropEvent(QDropEvent* event)
@@ -517,12 +517,12 @@ void PullPlanCustomizeViewWidget :: setBoundaryPainter(QPainter* painter, bool o
 
 }
 
-void PullPlanCustomizeViewWidget :: paintShape(float x, float y, float size, enum GeometricShape shape, QPainter* painter)
+void PullPlanCustomizeViewWidget :: paintShape(Point2D upperLeft, float size, enum GeometricShape shape, QPainter* painter)
 {
 	int roundedX, roundedY;
 	
-	roundedX = floor(rawX(x) + 0.5);
-	roundedY = floor(rawY(y) + 0.5);
+	roundedX = rawX(upperLeft.x) + 0.5;
+	roundedY = rawY(upperLeft.y) + 0.5;
 
 	switch (shape)
 	{
@@ -535,34 +535,35 @@ void PullPlanCustomizeViewWidget :: paintShape(float x, float y, float size, enu
 	}
 
 }
-void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidth, float drawHeight,
+void PullPlanCustomizeViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth, float drawHeight,
 	PullPlan* plan, bool outermostLevel, QPainter* painter)
 {
 	// Fill the subplan area with some `cleared out' color
 	painter->setBrush(GlobalBackgroundColor::qcolor);
 	painter->setPen(Qt::NoPen);
-	paintShape(x, y, drawWidth, plan->getOutermostCasingShape(), painter);
+	paintShape(upperLeft, drawWidth, plan->getOutermostCasingShape(), painter);
 
 	// Do casing colors outermost to innermost to get concentric rings of each casing's color
 	// Skip outermost casing (that is done by your parent) and innermost (that is the `invisible'
 	// casing for you to resize your subcanes)
 	for (unsigned int i = plan->getCasingCount() - 1; i < plan->getCasingCount(); --i)
 	{
-		int casingWidth = drawWidth * plan->getCasingThickness(i);
-		int casingHeight = drawHeight * plan->getCasingThickness(i);
-		int casingX = x + drawWidth / 2 - casingWidth / 2;
-		int casingY = y + drawHeight / 2 - casingHeight / 2;
+		float casingWidth = drawWidth * plan->getCasingThickness(i);
+		float casingHeight = drawHeight * plan->getCasingThickness(i);
+		Point2D casingUpperLeft;
+		casingUpperLeft.x = upperLeft.x + drawWidth / 2 - casingWidth / 2;
+		casingUpperLeft.y = upperLeft.y + drawHeight / 2 - casingHeight / 2;
 
 		// Fill with solid neutral grey (in case fill is transparent)
 		painter->setBrush(GlobalBackgroundColor::qcolor);
 		painter->setPen(Qt::NoPen); // Will draw boundary after all filling is done
-		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
+		paintShape(casingUpperLeft, casingWidth, plan->getCasingShape(i), painter);
 
 		Color casingColor = plan->getCasingColor(i)->getColor();
 		QColor qc(255*casingColor.r, 255*casingColor.g, 255*casingColor.b, 255*casingColor.a);
 		painter->setBrush(qc);
 		setBoundaryPainter(painter, outermostLevel, outermostLevel);
-		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
+		paintShape(casingUpperLeft, casingWidth, plan->getCasingShape(i), painter);
 	}
 
 	// Recursively call drawing on subplans
@@ -570,16 +571,17 @@ void PullPlanCustomizeViewWidget :: drawSubplan(float x, float y, float drawWidt
 	{
 		SubpullTemplate* sub = &(plan->subs[i]);
 
-		float rX = x + (sub->location.x - sub->diameter/2.0) * drawWidth/2 + drawWidth/2;
-		float rY = y + (sub->location.y - sub->diameter/2.0) * drawWidth/2 + drawHeight/2;
+		Point2D subUpperLeft;
+		subUpperLeft.x = upperLeft.x + (sub->location.x - sub->diameter/2.0) * drawWidth/2 + drawWidth/2;
+		subUpperLeft.y = upperLeft.y + (sub->location.y - sub->diameter/2.0) * drawWidth/2 + drawHeight/2;
 		float rWidth = sub->diameter * drawWidth/2;
 		float rHeight = sub->diameter * drawHeight/2;
 
-		drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, false, painter);
+		drawSubplan(subUpperLeft, rWidth, rHeight, plan->subs[i].plan, false, painter);
 
 		setBoundaryPainter(painter, outermostLevel);
 		painter->setBrush(Qt::NoBrush);
-		paintShape(rX, rY, rWidth, plan->subs[i].shape, painter);
+		paintShape(subUpperLeft, rWidth, plan->subs[i].shape, painter);
 	}
 }
 
@@ -667,11 +669,14 @@ void PullPlanCustomizeViewWidget :: paintEvent(QPaintEvent *event)
 	painter.setRenderHint(QPainter::Antialiasing);
 
 	painter.fillRect(event->rect(), GlobalBackgroundColor::qcolor);
-	drawSubplan(10, 10, squareSize - 20, squareSize - 20, plan, true, &painter);
+	Point2D drawUpperLeft;
+	drawUpperLeft.x = 10.0;
+	drawUpperLeft.y = 10.0;
+	drawSubplan(drawUpperLeft, squareSize - 20, squareSize - 20, plan, true, &painter);
 
 	painter.setBrush(Qt::NoBrush);
 	setBoundaryPainter(&painter, true);
-	paintShape(10, 10, squareSize - 20, plan->getOutermostCasingShape(), &painter);
+	paintShape(drawUpperLeft, squareSize - 20, plan->getOutermostCasingShape(), &painter);
 	drawActionControls(&painter);
 
 	painter.end();

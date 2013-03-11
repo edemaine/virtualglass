@@ -7,9 +7,10 @@
 #include <QString>
 #include <string>
 
+#include "geometry.h"
+
 class GlassColor;
 class PullPlan;
-class Geometry;
 class PureColorLibraryWidget;
 class NiceViewWidget;
 class QVBoxLayout;
@@ -43,7 +44,7 @@ class ColorEditorWidget : public QWidget
 		void collectionComboBoxChanged(int);		
 
 	private:
-		Geometry* geometry;
+		Geometry geometry;
 		GlassColor* glassColor;	
 		QComboBox* collectionComboBox;
 		NiceViewWidget* niceViewWidget;
