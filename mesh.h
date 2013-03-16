@@ -31,14 +31,14 @@ namespace MeshInternal
 	};
 
 	// Methods
-	void generateMesh(PickupPlan* plan, Geometry *geometry, unsigned int quality);
+	void generateMesh(PickupPlan* plan, Geometry *geometry, bool isTopLevel, unsigned int quality);
 	void recurseMesh(Piece* piece, Geometry *geometry, vector<ancestor>& ancestors, unsigned int quality);
 	void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors, 
 		float length, unsigned int quality, bool isTopLevel);
 
-	float totalShrink(vector<ancestor>& ancestors);
+	float finalDiameter(vector<ancestor>& ancestors);
 	unsigned int computeAxialResolution(float length, unsigned int quality);
-	unsigned int computeAngularResolution(float finalDiameter, unsigned int quality);
+	unsigned int computeAngularResolution(float diameter, unsigned int quality);
 	void meshBaseCasing(Geometry* g, vector<ancestor>& ancestors, 
 		Color c, enum GeometricShape outerShape, enum GeometricShape innerShape, 
 		float length, float outerRadius, float innerRadius, unsigned int quality, bool ensureVisible);

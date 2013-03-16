@@ -33,13 +33,12 @@ class Group
 {
 	public:
 		Group(uint32_t _triangle_begin, uint32_t _triangle_size, uint32_t _vertex_begin, uint32_t _vertex_size, 
-			Color _color, bool _ensureVisible=false);
+			Color _color);
 		uint32_t triangle_begin;
 		uint32_t triangle_size;
 		uint32_t vertex_begin;
 		uint32_t vertex_size;
 		Color color;
-		bool ensureVisible;
 };
 
 class Geometry

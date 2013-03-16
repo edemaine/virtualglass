@@ -221,7 +221,6 @@ void PieceEditorWidget :: setupLayout()
 	pieceViewStack->addWidget(pieceNiceViewWidget);
 	pieceViewStack->addWidget(pieceCustomizeViewWidget);
 	editorLayout->addWidget(pieceViewStack, 0, 1);
-	editorLayout->setRowStretch(0, 10);
 
 	// pickup template and piece template selectors in the second row
 	QWidget* pickupTemplateLibraryWidget = new QWidget(this);
@@ -288,15 +287,17 @@ void PieceEditorWidget :: setupLayout()
 	tab2Widget->setLayout(splineParamLayout);
 	addControlPointButton = new QPushButton("Add control point", tab2Widget);
 	removeControlPointButton = new QPushButton("Remove control point", tab2Widget);
-	splineParamLayout->addWidget(addControlPointButton, 0, 0);
-	splineParamLayout->addWidget(removeControlPointButton, 0, 1);
-	splineParamLayout->setRowStretch(1, 1);
-	splineParamLayout->setColumnStretch(2, 1);
+	splineParamLayout->addWidget(addControlPointButton, 0, 1);
+	splineParamLayout->addWidget(removeControlPointButton, 0, 2);
+	splineParamLayout->setColumnStretch(0, 1);
+	splineParamLayout->setColumnStretch(3, 1);
 	pieceControlsTab->addTab(tab2Widget, "Customize");
 
 	pieceEditorDescriptionLabel = new QLabel("Piece editor.", this);
 	pieceEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	editorLayout->addWidget(pieceEditorDescriptionLabel, 3, 1);
+
+	editorLayout->setRowStretch(0, 10);
 }
 
 void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)

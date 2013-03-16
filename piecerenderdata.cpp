@@ -2,6 +2,7 @@
 #include "piecerenderdata.h"
 #include "piece.h"
 #include "mesh.h"
+#include "globalgraphicssetting.h"
 
 PieceRenderData::PieceRenderData(Piece const *_piece) : piece(deep_copy(_piece))
 {
@@ -17,6 +18,6 @@ PieceRenderData::~PieceRenderData()
 Geometry *PieceRenderData::getGeometry()
 {
 	Geometry *geometry = new Geometry;
-	generateMesh(piece, geometry, NULL, 5);
+	generateMesh(piece, geometry, NULL, GlobalGraphicsSetting::HIGH);
 	return geometry;
 }

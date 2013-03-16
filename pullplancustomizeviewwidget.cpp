@@ -500,7 +500,8 @@ void PullPlanCustomizeViewWidget :: boundActiveBox()
 	}
 }
 
-void PullPlanCustomizeViewWidget :: setBoundaryPainter(QPainter* painter, bool outermostLevel, bool greyedOut = false) {
+void PullPlanCustomizeViewWidget :: setBoundaryPainter(QPainter* painter, bool outermostLevel, bool greyedOut = false) 
+{
 
 	if (outermostLevel)
 	{
@@ -594,7 +595,7 @@ void PullPlanCustomizeViewWidget :: drawActionControls(QPainter* painter)
 	pen.setWidth(2);
 	pen.setColor(Qt::black);
 	pen.setStyle(Qt::DotLine);
-	painter->setBrush(GlobalBackgroundColor::qcolor);
+	painter->setBrush(Qt::NoBrush); 
 	painter->setPen(pen);
 	for (unsigned int i = 0; i < subplansSelected.size(); i++)
 	{
@@ -672,11 +673,13 @@ void PullPlanCustomizeViewWidget :: paintEvent(QPaintEvent *event)
 	Point2D drawUpperLeft;
 	drawUpperLeft.x = 10.0;
 	drawUpperLeft.y = 10.0;
-	drawSubplan(drawUpperLeft, squareSize - 20, squareSize - 20, plan, true, &painter);
 
 	painter.setBrush(Qt::NoBrush);
-	setBoundaryPainter(&painter, true);
+	setBoundaryPainter(&painter, true, true);
 	paintShape(drawUpperLeft, squareSize - 20, plan->getOutermostCasingShape(), &painter);
+
+	drawSubplan(drawUpperLeft, squareSize - 20, squareSize - 20, plan, true, &painter);
+
 	drawActionControls(&painter);
 
 	painter.end();

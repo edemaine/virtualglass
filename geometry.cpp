@@ -19,8 +19,8 @@ Triangle :: Triangle(uint32_t _v1 = -1U, uint32_t _v2 = -1U, uint32_t _v3 = -1U)
 }
 
 Group :: Group(uint32_t _triangle_begin, uint32_t _triangle_size, uint32_t _vertex_begin, uint32_t _vertex_size,
-	Color _color, bool _ensureVisible) : triangle_begin(_triangle_begin), triangle_size(_triangle_size), 
-	vertex_begin(_vertex_begin), vertex_size(_vertex_size), color(_color), ensureVisible(_ensureVisible) 
+	Color _color) : triangle_begin(_triangle_begin), triangle_size(_triangle_size), 
+	vertex_begin(_vertex_begin), vertex_size(_vertex_size), color(_color)
 {
 }
 

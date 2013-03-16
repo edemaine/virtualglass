@@ -19,8 +19,8 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWi
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	this->setLayout(layout);
-	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addWidget(niceViewWidget, 1);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	setupConnections();
 }

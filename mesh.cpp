@@ -1,5 +1,6 @@
 
 #include <vector>
+#include <map>
 #include <utility>
 #include "constants.h"
 #include "glasscolor.h"
@@ -14,36 +15,21 @@ using namespace MeshInternal;
 
 using std::vector;
 using std::pair;
+using std::map;
 
 void generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometry, unsigned int quality)
 {
-	if (piece == NULL || pieceGeometry == NULL)
-		return;
-
-	if (pickupGeometry == NULL)
+	if (pickupGeometry != NULL)
 	{
-		// just do everything in the piece geometry
-		pieceGeometry->clear();
-		generateMesh(piece->pickup, pieceGeometry, quality);
-		casePickup(pieceGeometry, piece);
-		applyPieceTransform(pieceGeometry, piece);
-		pieceGeometry->compute_normals_from_triangles();
-	}
-	else
-	{
-		// compute pickup geometry and copy it into piece geometry
-		// to save all the work of computing the same thing again
-
-		// clear geometry
 		pickupGeometry->clear();
-		pieceGeometry->clear();
-		// compute pickup geometry
-		generateMesh(piece->pickup, pickupGeometry, quality);
+		generateMesh(piece->pickup, pickupGeometry, true, quality);
 		pickupGeometry->compute_normals_from_triangles();
-		// copy into piece geometry and apply piece transform there
-		pieceGeometry->vertices = pickupGeometry->vertices;
-		pieceGeometry->triangles = pickupGeometry->triangles;
-		pieceGeometry->groups = pickupGeometry->groups;
+	}
+
+	if (pieceGeometry != NULL)
+	{
+		pieceGeometry->clear();
+		generateMesh(piece->pickup, pieceGeometry, false, quality);
 		casePickup(pieceGeometry, piece);
 		applyPieceTransform(pieceGeometry, piece);
 		pieceGeometry->compute_normals_from_triangles();
@@ -53,8 +39,9 @@ void generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometr
 void generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality)
 {
 	geometry->clear();
+
 	vector<ancestor> ancestors;
-	recurseMesh(plan, geometry, ancestors, 2.0, quality, true);
+	recurseMesh(plan, geometry, ancestors, 2.0, quality, true);			
 
 	// Make skinnier to more closely mimic the canes found in pickups
 	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
@@ -168,11 +155,6 @@ void applyPieceTransform(Vertex& v, float twist, Spline& spline)
 
 void casePickup(Geometry* geometry, Piece* piece)
 {
-	// allow canes to be invisible now, since casing will be added around them
-	// and clear "visibility" is an index of refraction thing between air and glass
-	for (unsigned int i = 0; i < geometry->groups.size(); ++i)
-		geometry->groups[i].ensureVisible = false;
-
 	// base thickness of casing off of representative (first) cane in pickup
 	float thickness;
 	if (piece->pickup->subs[0].orientation == MURRINE_PICKUP_CANE_ORIENTATION)
@@ -316,9 +298,10 @@ void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickn
 		geometry->triangles.push_back(Triangle(p1, p2, p4));
 		geometry->triangles.push_back(Triangle(p1, p4, p3));
 	}
-	
+
+	color.a = MAX(color.a, 0.1);
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, color, true));
+		first_vert, geometry->vertices.size() - first_vert, color));
 }
 
 void getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution, 
@@ -437,10 +420,10 @@ void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float lengt
 // 5 gives something decent with mild artifacts
 // 1 gives something really ugly but low triangle count
 // 10 gives something with no artifacts
-unsigned int computeAngularResolution(float finalDiameter, unsigned int quality)
+unsigned int computeAngularResolution(float diameter, unsigned int quality)
 {
 	// standard "full" cane diameter is 1.0 
-	unsigned int r = MAX(finalDiameter*14 + quality/1.2, 4); 
+	unsigned int r = MAX(diameter * 14 + quality/1.2, 4); 
 	return (r / 4) * 4; // round down to nearest multiple of 4
 }
 
@@ -451,11 +434,27 @@ unsigned int computeAxialResolution(float length, unsigned int quality)
 	return r;
 }
 
+float finalDiameter(vector<ancestor>& ancestors)
+{
+	float shrink = 1.0; // initial radius	
+
+	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
+	{
+		shrink *= (ancestors[i].parent->subs[ancestors[i].child].diameter * 0.5); 
+	}
+
+	return shrink;
+}
+
 void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color, 
 	enum GeometricShape outerShape, enum GeometricShape innerShape, float length, float outerRadius, 
 	float innerRadius, unsigned int quality, bool ensureVisible)
 {
-	unsigned int angularResolution = computeAngularResolution(totalShrink(ancestors), quality);
+	float diameter = finalDiameter(ancestors);
+	if (diameter < 0.01)
+		return;
+	
+	unsigned int angularResolution = computeAngularResolution(diameter, quality);
 	unsigned int axialResolution = computeAxialResolution(length, quality);
 	
 	uint32_t first_vert = geometry->vertices.size();
@@ -493,30 +492,24 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 	{
 		applySubplanTransforms(geometry->vertices[v], ancestors);
 	}
+
+	if (ensureVisible)
+		color.a = MAX(color.a, 0.1);
+	if (color.a < 0.01)
+		return;
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, color, ensureVisible));
+		first_vert, geometry->vertices.size() - first_vert, color));
 }
 
-float totalShrink(vector<ancestor>& ancestors)
-{
-	float shrink = 1.0; // initial radius	
-
-	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
-	{
-		shrink *= (ancestors[i].parent->subs[ancestors[i].child].diameter * 0.5); 
-	}
-
-	return shrink;
-}
-
-
-/*
-The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
-*/
+// The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
 void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors, 
 	Color color, enum GeometricShape shape, float length, float radius, unsigned int quality, bool ensureVisible)
 {
-	unsigned int angularResolution = computeAngularResolution(totalShrink(ancestors), quality);
+	float diameter = finalDiameter(ancestors);
+	if (diameter < 0.01)
+		return;
+
+	unsigned int angularResolution = computeAngularResolution(diameter, quality);
 	unsigned int axialResolution = computeAxialResolution(length, quality);
 
 	uint32_t first_vert = geometry->vertices.size();
@@ -616,84 +609,29 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors,
 	{
 		applySubplanTransforms(geometry->vertices[v], ancestors);
 	}
+
+	if (ensureVisible)
+		color.a = MAX(color.a, 0.1);
+	if (color.a < 0.01)
+		return;
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, color, ensureVisible));
+		first_vert, geometry->vertices.size() - first_vert, color));
 }
 
-void generateMesh(PickupPlan* pickup, Geometry *geometry, unsigned int quality)
+void generateMesh(PickupPlan* pickup, Geometry *geometry, bool isTopLevel, unsigned int quality)
 {
 	if (pickup == NULL)
 		return;
 
 	geometry->clear();
-	
-	// first, generate all the plans that are used (both plan and length, 
-	// both of which affect mesh). 
-	vector< pair<SubpickupTemplate, Geometry> > plan_and_geom;
 	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
 	{
-		bool found = false;
-		for (unsigned int j = 0; j < plan_and_geom.size(); ++j)
-		{
-			if (plan_and_geom[j].first.plan == pickup->subs[i].plan
-				&& plan_and_geom[j].first.length == pickup->subs[i].length)
-			{
-				found = true;
-				break;
-			}
-		}
-		if (!found)
-		{
-			pair<SubpickupTemplate, Geometry> newPair(pickup->subs[i], Geometry());
-			vector<ancestor> ancestors;
-			recurseMesh(newPair.first.plan, &(newPair.second), ancestors, newPair.first.length, quality, true);
-			plan_and_geom.push_back(newPair);
-		}
-	}
-
-	// next, use the generated cane set as a basis for all the subplans
-	// if a cane appears multiple times, make multiple copies, applying
-	// the specific pickup transformations for it, according to where it 
-	// lives in the pickup.
-	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
-	{
-		Geometry* subGeom;
-		bool found = false;
-		for (unsigned int j = 0; j < plan_and_geom.size(); ++j)
-		{
-			if (plan_and_geom[j].first.plan == pickup->subs[i].plan
-				&& plan_and_geom[j].first.length == pickup->subs[i].length)
-			{
-				found = true;
-				subGeom = &(plan_and_geom[i].second); 
-				break;
-			}
-		}
-		assert(found);
-
 		uint32_t startVert = geometry->vertices.size();
-		for (unsigned int j = 0; j < subGeom->vertices.size(); ++j)
+		vector<ancestor> ancestors;
+		recurseMesh(pickup->subs[i].plan, geometry, ancestors, pickup->subs[i].length, quality, isTopLevel);
+		for (unsigned int j = startVert; j < geometry->vertices.size(); ++j)
 		{
-			Vertex v = subGeom->vertices[j];
-			// apply the transformation specific to location in pickup 
-			applyPickupTransform(v, pickup->subs[i]); 
-			geometry->vertices.push_back(v);
-		}	
-		uint32_t startTri = geometry->triangles.size();
-		for (unsigned int j = 0; j < subGeom->triangles.size(); ++j)
-		{
-			Triangle t = subGeom->triangles[j];
-			t.v1 += startVert;
-			t.v2 += startVert;
-			t.v3 += startVert;
-			geometry->triangles.push_back(t);
-		}
-		for (unsigned int j = 0; j < subGeom->groups.size(); ++j)
-		{
-			Group g = subGeom->groups[j];
-			g.vertex_begin += startVert;
-			g.triangle_begin += startTri;
-			geometry->groups.push_back(g);
+			applyPickupTransform(geometry->vertices[j], pickup->subs[i]); 
 		}
 	}
 }
@@ -749,14 +687,14 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors
 			// punting on actually doing this geometry right and just making it a cylinder
 			// (that intersects its subcanes)
 			meshBaseCane(geometry, ancestors, plan->getCasingColor(colorIntervalStart)->getColor(), 
-				plan->getCasingShape(0), length-0.001, plan->getCasingThickness(i), quality, 
+				plan->getCasingShape(i), length-0.001, plan->getCasingThickness(i), quality, 
 				ensureVisible && outermostLayer);
 		}
 		else
 		{
 			meshBaseCasing(geometry, ancestors, plan->getCasingColor(colorIntervalStart)->getColor(), 
 				plan->getCasingShape(i), plan->getCasingShape(colorIntervalStart-1), length,
-				plan->getCasingThickness(i), plan->getCasingThickness(colorIntervalStart-1)+0.02, quality,
+				plan->getCasingThickness(i), plan->getCasingThickness(colorIntervalStart-1)+0.01, quality,
 				ensureVisible && outermostLayer);
 		}
 

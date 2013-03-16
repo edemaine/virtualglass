@@ -54,7 +54,7 @@ void renderWithoutDepthPeeling(const Geometry& geometry)
 	for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g)
 	{
 		Color c = g->color;
-		if (c.a < 0.1)
+		if (c.a < 0.11) // 0.1 is the rounded up alpha for transparent things that *must* be seen
 			continue;
 		glColor4f(c.r * 0.8f, c.g * 0.8f, c.b * 0.8f, 0.8f);
 		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
@@ -74,8 +74,6 @@ void renderWithoutDepthPeeling(const Geometry& geometry)
 	glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE); // only two faces (0.2) worth of alpha left after opaque drawing
 	for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g)
 	{
-		if (!g->ensureVisible)
-			continue;
 		Color c;
 		c.r = c.g = c.b = 1.0;
 		c.a = 0.1;

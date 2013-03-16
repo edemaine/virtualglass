@@ -275,12 +275,7 @@ void PeelRenderer::render(Geometry const & geometry)
 		for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g) 
 		{
 			Color c = g->color;
-			if (g->ensureVisible) // if you need to be seen, round up transparency
-				glColor4f(c.r, c.g, c.b, MAX(c.a, 0.1));
-			else if (c.a < 0.01) // otherwise, if you're pretty much clear, do nothing
-				continue;
-			else // otherwise plain ole color
-				glColor4f(c.r, c.g, c.b, c.a);
+			glColor4f(c.r, c.g, c.b, c.a);
 			glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 				GL_UNSIGNED_INT, &(geometry.triangles[g->triangle_begin].v1));
 		}
