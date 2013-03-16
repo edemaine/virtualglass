@@ -192,6 +192,7 @@ void PullPlanEditorWidget :: setupLayout()
 	// count controls
 	countLabel = new QLabel("Count:", casingWidget);
 	countSpin = new QSpinBox(casingWidget);
+	countSpin->setRange(0, 30);
 	casingLayout->addStretch(1);
 	casingLayout->addWidget(countLabel);
 	casingLayout->addWidget(countSpin);

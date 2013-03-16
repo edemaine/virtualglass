@@ -450,8 +450,15 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 	enum GeometricShape outerShape, enum GeometricShape innerShape, float length, float outerRadius, 
 	float innerRadius, unsigned int quality, bool ensureVisible)
 {
+	// cull out geometry that's extremely small
 	float diameter = finalDiameter(ancestors);
 	if (diameter < 0.01)
+		return;
+
+	// cull out geometry that's extremely clear
+	if (ensureVisible)
+		color.a = MAX(color.a, 0.1);
+	if (color.a < 0.01)
 		return;
 	
 	unsigned int angularResolution = computeAngularResolution(diameter, quality);
@@ -493,10 +500,6 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 		applySubplanTransforms(geometry->vertices[v], ancestors);
 	}
 
-	if (ensureVisible)
-		color.a = MAX(color.a, 0.1);
-	if (color.a < 0.01)
-		return;
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
 		first_vert, geometry->vertices.size() - first_vert, color));
 }
@@ -505,8 +508,15 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors, 
 	Color color, enum GeometricShape shape, float length, float radius, unsigned int quality, bool ensureVisible)
 {
+	// cull out geometry that's extremely small
 	float diameter = finalDiameter(ancestors);
 	if (diameter < 0.01)
+		return;
+
+	// cull out geometry that's extremely clear
+	if (ensureVisible)
+		color.a = MAX(color.a, 0.1);
+	if (color.a < 0.01)
 		return;
 
 	unsigned int angularResolution = computeAngularResolution(diameter, quality);
@@ -610,10 +620,6 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors,
 		applySubplanTransforms(geometry->vertices[v], ancestors);
 	}
 
-	if (ensureVisible)
-		color.a = MAX(color.a, 0.1);
-	if (color.a < 0.01)
-		return;
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
 		first_vert, geometry->vertices.size() - first_vert, color));
 }
