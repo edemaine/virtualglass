@@ -56,8 +56,7 @@ PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimp
 	PullPlan* plan = new PullPlan(static_cast<PullTemplate::Type>(randomTemplateNumber));
 	
 	// set parameters
-	int direction = (qrand() % 3) - 1;
-	plan->twist = direction * (qrand() % 10);
+	plan->twist = 0.0;
 	plan->setCount(qrand() % 10 + 2);
 
 	// set subplans

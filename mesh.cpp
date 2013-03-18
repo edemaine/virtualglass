@@ -30,8 +30,8 @@ void generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometr
 	{
 		pieceGeometry->clear();
 		generateMesh(piece->pickup, pieceGeometry, false, quality);
-		casePickup(pieceGeometry, piece);
 		applyPieceTransform(pieceGeometry, piece);
+		casePiece(pieceGeometry, piece);
 		pieceGeometry->compute_normals_from_triangles();
 	}
 }
@@ -66,12 +66,6 @@ void generateMesh(GlassColor* gc, Geometry* geometry, unsigned int quality)
 namespace MeshInternal
 {
 
-void applySubplanTransform(Geometry& geometry, ancestor a)
-{
-	for (uint32_t v = 0; v < geometry.vertices.size(); ++v)
-		applySubplanTransform(geometry.vertices[v], a);
-}
-
 void applyResizeTransform(Vertex& v, float scale)
 {
 	// Adjust diameter
@@ -79,27 +73,21 @@ void applyResizeTransform(Vertex& v, float scale)
 	v.position.y *= scale; 
 }
 
-// Does move, resize, and twist
-void applySubplanTransform(Vertex& v, ancestor a)
+void applyTwistTransform(Vertex& v, float twist)
 {
-	SubpullTemplate& subTemp = a.parent->subs[a.child];
-	Point2D locationInParent = subTemp.location;
-	float diameter = subTemp.diameter;
-
-	// Adjust diameter
-	v.position.x *= diameter / 2.0; 
-	v.position.y *= diameter / 2.0; 
-
-	// Adjust to location in parent
-	v.position.x += locationInParent.x;
-	v.position.y += locationInParent.y;
-
 	// Adjust location in parent for twist
-	float r = sqrt(locationInParent.x * locationInParent.x + locationInParent.y * locationInParent.y);
-	float preTheta = atan2(locationInParent.y, locationInParent.x); 
-	float postTheta = a.parent->twist * TWO_PI * v.position.z / 10.0 + preTheta;
+	float r = sqrt(v.position.x * v.position.x + v.position.y * v.position.y);
+	float preTheta = atan2(v.position.y, v.position.x);
+	float postTheta = twist * TWO_PI * v.position.z / 10.0 + preTheta;
 	v.position.x += (r * cos(postTheta) - r * cos(preTheta));
 	v.position.y += (r * sin(postTheta) - r * sin(preTheta));
+}
+
+// Does move, resize, and twist
+void applySubplanTransform(Vertex& v, Point2D location)
+{
+	v.position.x += location.x;
+	v.position.y += location.y;
 }
 
 void applyPickupTransform(Vertex& v, SubpickupTemplate& spt)
@@ -153,7 +141,7 @@ void applyPieceTransform(Vertex& v, float twist, Spline& spline)
 	v.position.z = p1.y + -caneLoc * sin(delta_theta);
 }
 
-void casePickup(Geometry* geometry, Piece* piece)
+void casePiece(Geometry* geometry, Piece* piece)
 {
 	// base thickness of casing off of representative (first) cane in pickup
 	float thickness;
@@ -161,8 +149,13 @@ void casePickup(Geometry* geometry, Piece* piece)
 		thickness = piece->pickup->subs[0].length*2.5;	
 	else
 		thickness = piece->pickup->subs[0].width*2.5;
-
+	
+	// mesh the slab and apply the casing
+	unsigned int verticesStart = geometry->vertices.size();
 	meshPickupCasingSlab(geometry, piece->pickup->casingGlassColor->getColor(), 0.0, thickness);
+	for (uint32_t i = verticesStart; i < geometry->vertices.size(); ++i)
+		applyPieceTransform(geometry->vertices[i], 0.0 /* NO TWIST */, piece->spline);
+
 	//for now we don't do these, but the intent is to reintroduce soon
 	//meshPickupCasingSlab(geometry, pickup->underlayGlassColor->getColor(), thickness + 0.1, 0.05);
 	//meshPickupCasingSlab(geometry, pickup->overlayGlassColor->getColor(), -(thickness + 0.1), 0.05);
@@ -174,15 +167,22 @@ void applyPieceTransform(Geometry* geometry, Piece* piece)
 		applyPieceTransform(geometry->vertices[i], piece->twist, piece->spline);
 }
 
-void applySubplanTransforms(Vertex& v, vector<ancestor>& ancestors)
+void applySubplanTransforms(Vertex& v, vector<ancestor>& ancestors, bool isRotInvar)
 {
-	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
-		applySubplanTransform(v, ancestors[i]);
+	for (vector<ancestor>::iterator a = ancestors.begin(); a != ancestors.end(); ++a)
+	{
+		SubpullTemplate& subTemp = a->parent->subs[a->child];
+		if (isRotInvar)
+			applyTwistTransform(v, -a->parent->twist);
+		applyResizeTransform(v, subTemp.diameter / 2.0);
+		applySubplanTransform(v, subTemp.location);
+		applyTwistTransform(v, a->parent->twist);
+	}
 }
 
 void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickness)
 {
-	unsigned int slabResolution = 100;
+	unsigned int slabResolution = 50;
 
 	uint32_t first_vert = geometry->vertices.size();
 	uint32_t first_triangle = geometry->triangles.size();
@@ -420,39 +420,53 @@ void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float lengt
 // 5 gives something decent with mild artifacts
 // 1 gives something really ugly but low triangle count
 // 10 gives something with no artifacts
-unsigned int computeAngularResolution(float diameter, unsigned int quality)
+unsigned int computeAngularResolution(float radius, unsigned int quality)
 {
-	// standard "full" cane diameter is 1.0 
-	unsigned int r = MAX(diameter * 14 + quality/1.2, 4); 
-	return (r / 4) * 4; // round down to nearest multiple of 4
+	// standard "full" cane radius is 1.0
+	// this function should return a multiple of 4
+	unsigned int r = radius * 4 * quality;
+	return MIN(MAX((r / 4) * 4, 4), 20); 
 }
 
-unsigned int computeAxialResolution(float length, unsigned int quality)
+unsigned int computeAxialResolution(float length, float twist, unsigned int quality)
 {
-	// standard "full" cane length is 2.0
-	unsigned int r = MAX(length * quality * 5, 5);
-	return r;
+	float twistCount = length * twist;
+	float samplesPerTwist = (quality + 1) / 2 + 1;
+	unsigned int rawRes = twistCount * samplesPerTwist;
+	return MIN(MAX(rawRes, quality * 5), 100);
 }
 
-float finalDiameter(vector<ancestor>& ancestors)
+float totalTwist(vector<ancestor>& ancestors)
 {
-	float shrink = 1.0; // initial radius	
+	float twist = 0.0;
+	
+	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
+	{
+		twist += ancestors[i].parent->twist;
+	}
+
+	return twist;
+}
+
+float finalRadius(vector<ancestor>& ancestors)
+{
+	float radius = 1.0; 
 
 	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
 	{
-		shrink *= (ancestors[i].parent->subs[ancestors[i].child].diameter * 0.5); 
+		radius *= (ancestors[i].parent->subs[ancestors[i].child].diameter * 0.5); 
 	}
 
-	return shrink;
+	return radius;
 }
 
 void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color, 
 	enum GeometricShape outerShape, enum GeometricShape innerShape, float length, float outerRadius, 
-	float innerRadius, unsigned int quality, bool ensureVisible)
+	float innerRadius, float twist, unsigned int quality, bool ensureVisible)
 {
 	// cull out geometry that's extremely small
-	float diameter = finalDiameter(ancestors);
-	if (diameter < 0.01)
+	float finalRad = finalRadius(ancestors);
+	if (finalRad < 0.01)
 		return;
 
 	// cull out geometry that's extremely clear
@@ -461,8 +475,8 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 	if (color.a < 0.01)
 		return;
 	
-	unsigned int angularResolution = computeAngularResolution(diameter, quality);
-	unsigned int axialResolution = computeAxialResolution(length, quality);
+	unsigned int angularResolution = computeAngularResolution(finalRad, quality);
+	unsigned int axialResolution = computeAxialResolution(length, totalTwist(ancestors) + twist, quality);
 	
 	uint32_t first_vert = geometry->vertices.size();
 	uint32_t first_triangle = geometry->triangles.size();
@@ -495,9 +509,22 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 	assert(geometry->valid());
 
 	// Actually do the transformations on the basic canonical cylinder mesh
+	bool isRotInvar = (outerShape == CIRCLE_SHAPE);
+	if (!isRotInvar)
+	{
+		for (uint32_t v = outerPointsBottomStart; v < innerPointsBottomStart; ++v)
+			applyTwistTransform(geometry->vertices[v], twist);
+	}
+	isRotInvar = (innerShape == CIRCLE_SHAPE);
+	if (!isRotInvar)
+	{
+		for (uint32_t v = innerPointsBottomStart; v < geometry->vertices.size(); ++v)
+			applyTwistTransform(geometry->vertices[v], twist);
+	}
+	isRotInvar = (outerShape == CIRCLE_SHAPE && innerShape == CIRCLE_SHAPE);
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
-		applySubplanTransforms(geometry->vertices[v], ancestors);
+		applySubplanTransforms(geometry->vertices[v], ancestors, isRotInvar);
 	}
 
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
@@ -506,11 +533,12 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 
 // The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
 void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors, 
-	Color color, enum GeometricShape shape, float length, float radius, unsigned int quality, bool ensureVisible)
+	Color color, enum GeometricShape shape, float length, float radius, float twist, 
+	unsigned int quality, bool ensureVisible)
 {
 	// cull out geometry that's extremely small
-	float diameter = finalDiameter(ancestors);
-	if (diameter < 0.01)
+	float finalRad = finalRadius(ancestors);
+	if (finalRad < 0.01)
 		return;
 
 	// cull out geometry that's extremely clear
@@ -519,8 +547,8 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors,
 	if (color.a < 0.01)
 		return;
 
-	unsigned int angularResolution = computeAngularResolution(diameter, quality);
-	unsigned int axialResolution = computeAxialResolution(length, quality);
+	unsigned int angularResolution = computeAngularResolution(finalRad, quality);
+	unsigned int axialResolution = computeAxialResolution(length, totalTwist(ancestors) + twist, quality);
 
 	uint32_t first_vert = geometry->vertices.size();
 	uint32_t first_triangle = geometry->triangles.size();
@@ -615,9 +643,12 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors,
 	assert(geometry->valid());
 
 	// Actually do the transformations on the basic canonical cylinder mesh
+	bool isRotInvar = (shape == CIRCLE_SHAPE);
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
-		applySubplanTransforms(geometry->vertices[v], ancestors);
+		if (!isRotInvar)
+			applyTwistTransform(geometry->vertices[v], twist);
+		applySubplanTransforms(geometry->vertices[v], ancestors, isRotInvar);
 	}
 
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
@@ -693,17 +724,16 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors
 			// punting on actually doing this geometry right and just making it a cylinder
 			// (that intersects its subcanes)
 			meshBaseCane(geometry, ancestors, plan->getCasingColor(colorIntervalStart)->getColor(), 
-				plan->getCasingShape(i), length-0.001, plan->getCasingThickness(i), quality, 
-				ensureVisible && outermostLayer);
+				plan->getCasingShape(i), length-0.001, plan->getCasingThickness(i), plan->twist, 
+				quality, ensureVisible && outermostLayer);
 		}
 		else
 		{
 			meshBaseCasing(geometry, ancestors, plan->getCasingColor(colorIntervalStart)->getColor(), 
 				plan->getCasingShape(i), plan->getCasingShape(colorIntervalStart-1), length,
-				plan->getCasingThickness(i), plan->getCasingThickness(colorIntervalStart-1)+0.01, quality,
-				ensureVisible && outermostLayer);
+				plan->getCasingThickness(i), plan->getCasingThickness(colorIntervalStart-1)+0.01, 
+				plan->twist, quality, ensureVisible && outermostLayer);
 		}
-
 	}
 }
 

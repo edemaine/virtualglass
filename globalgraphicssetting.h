@@ -11,8 +11,8 @@ namespace GlobalGraphicsSetting
 	// approximately: 1 is bad, 10 is good, 5 is ok.
 	enum Setting
 	{
-		VERY_LOW=0,
-		MEDIUM=3,
+		VERY_LOW=1,
+		MEDIUM=5,
 		HIGH=10,
 	};
 }

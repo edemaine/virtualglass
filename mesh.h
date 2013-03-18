@@ -36,28 +36,29 @@ namespace MeshInternal
 	void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors, 
 		float length, unsigned int quality, bool isTopLevel);
 
-	float finalDiameter(vector<ancestor>& ancestors);
-	unsigned int computeAxialResolution(float length, unsigned int quality);
+	float finalRadius(vector<ancestor>& ancestors);
+	float totalTwist(vector<ancestor>& ancestors);
+	unsigned int computeAxialResolution(float length, float twist, unsigned int quality);
 	unsigned int computeAngularResolution(float diameter, unsigned int quality);
 	void meshBaseCasing(Geometry* g, vector<ancestor>& ancestors, 
 		Color c, enum GeometricShape outerShape, enum GeometricShape innerShape, 
-		float length, float outerRadius, float innerRadius, unsigned int quality, bool ensureVisible);
+		float length, float outerRadius, float innerRadius, float twist, unsigned int quality, bool ensureVisible);
 	void meshBaseCane(Geometry* g, vector<ancestor>& ancestors, Color c, 
-		enum GeometricShape s, float length, float radius, unsigned int quality, bool ensureVisible);
+		enum GeometricShape s, float length, float radius, float twist, unsigned int quality, bool ensureVisible);
 	void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float length, float radius, 
 		unsigned int angularResolution, unsigned int axialResolution, bool flipOrientation=false);
 	void getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution, 
 		enum GeometricShape shape, float radius);
 
-	void applySubplanTransform(Vertex& v, ancestor a);
-	void applySubplanTransform(Geometry& geometry, ancestor a);
-	void applySubplanTransforms(Vertex& p, vector<ancestor>& ancestors);
+	void applySubplanTransforms(Vertex& v, vector<ancestor>& ancestors, bool isRotInvar);
+	void applySubplanTransform(Vertex& v, Point2D location);
 	void applyResizeTransform(Vertex& v, float scale);
+	void applyTwistTransform(Vertex& v, float twist);
 
 	void applyPickupTransform(Vertex& p, SubpickupTemplate& spt);
 	void meshPickupCasingSlab(Geometry* g, Color c, float y, float thickness);
 
-	void casePickup(Geometry* geometry, Piece* piece);
+	void casePiece(Geometry* geometry, Piece* piece);
 	void applyPieceTransform(Vertex& v, float twist, Spline& spline);
 	void applyPieceTransform(Geometry* geometry, Piece* piece);
 }

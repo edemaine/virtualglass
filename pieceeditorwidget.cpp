@@ -10,6 +10,7 @@
 #include <QScrollArea>
 #include <QMouseEvent>
 #include <QPushButton>
+#include <QTimer>
 
 #include "pickupplaneditorviewwidget.h"
 #include "piece.h"
@@ -117,43 +118,28 @@ void PieceEditorWidget :: geometryThreadFinishedMesh()
 	if (!dirty)
 		return;
 
-	if (tempGeometry1Mutex.tryLock())
+	if (tempGeometryMutex.tryLock())
 	{
 		geometryDirtyMutex.lock();
 		geometryDirty = false;
 		geometryDirtyMutex.unlock();
-		geometry.vertices = tempPieceGeometry1.vertices;
-		geometry.triangles = tempPieceGeometry1.triangles;
-		geometry.groups = tempPieceGeometry1.groups;
-		pickupViewWidget->geometry.vertices = tempPickupGeometry1.vertices;
-		pickupViewWidget->geometry.triangles = tempPickupGeometry1.triangles;
-		pickupViewWidget->geometry.groups = tempPickupGeometry1.groups;
-		tempGeometry1Mutex.unlock();
-	}
-	else if (tempGeometry2Mutex.tryLock())
-	{
-		geometryDirtyMutex.lock();
-		geometryDirty = false;
-		geometryDirtyMutex.unlock();
-		geometry.vertices = tempPieceGeometry2.vertices;
-		geometry.triangles = tempPieceGeometry2.triangles;
-		geometry.groups = tempPieceGeometry2.groups;
-		pickupViewWidget->geometry.vertices = tempPickupGeometry2.vertices;
-		pickupViewWidget->geometry.triangles = tempPickupGeometry2.triangles;
-		pickupViewWidget->geometry.groups = tempPickupGeometry2.groups;
-		tempGeometry2Mutex.unlock();
-	}
-	// else: this might happen if we get incredibly unlucky:
-	// We try lock 1 while the geometry thread has it, 
-	// and before we can try lock 2, the geometry thread unlocks 1
-	// and takes lock 2.
-	// 
-	// Because the goal is to have a non-blocking GUI thread *and* geometry
-	// thread that continously writes new geometry regardless of whether the
-	// GUI thread read the last geometry, we can never *ensure* that we can read. 
+		geometry.vertices = tempPieceGeometry.vertices;
+		geometry.triangles = tempPieceGeometry.triangles;
+		geometry.groups = tempPieceGeometry.groups;
+		pickupViewWidget->geometry.vertices = tempPickupGeometry.vertices;
+		pickupViewWidget->geometry.triangles = tempPickupGeometry.triangles;
+		pickupViewWidget->geometry.groups = tempPickupGeometry.groups;
+		tempGeometryMutex.unlock();
 
-	pickupViewWidget->updateEverything();
-	pieceNiceViewWidget->repaint();
+		pickupViewWidget->updateEverything();
+		pieceNiceViewWidget->repaint();
+	}
+	else
+	{
+		// try to get the lock again in 250 ms
+		QTimer::singleShot(250, this, SLOT(geometryThreadFinishedMesh()));
+	}
+
 }
 
 void PieceEditorWidget :: pickupParameterSpinBoxChanged(int)

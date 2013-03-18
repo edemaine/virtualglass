@@ -27,14 +27,10 @@ void PieceGeometryThread::run()
 		pew->tempPieceMutex.unlock();	
 		
 		// compute the low-res geometry
-		pew->tempGeometry1Mutex.lock();
-		generateMesh(myTempPiece, &(pew->tempPieceGeometry1), &(pew->tempPickupGeometry1), 
+		pew->tempGeometryMutex.lock();
+		generateMesh(myTempPiece, &(pew->tempPieceGeometry), &(pew->tempPickupGeometry), 
 			GlobalGraphicsSetting::VERY_LOW);
-		pew->tempGeometry1Mutex.unlock();	
-		pew->tempGeometry2Mutex.lock();
-		generateMesh(myTempPiece, &(pew->tempPieceGeometry1), &(pew->tempPickupGeometry1), 
-			GlobalGraphicsSetting::VERY_LOW);
-		pew->tempGeometry2Mutex.unlock();	
+		pew->tempGeometryMutex.unlock();	
 		pew->geometryDirtyMutex.lock();
 		pew->geometryDirty = true;
 		pew->geometryDirtyMutex.unlock();
@@ -74,14 +70,10 @@ void PieceGeometryThread::run()
 		}
 
 		// compute the high-res geometry
-		pew->tempGeometry1Mutex.lock();
-		generateMesh(myTempPiece, &(pew->tempPieceGeometry1), &(pew->tempPickupGeometry1), 
+		pew->tempGeometryMutex.lock();
+		generateMesh(myTempPiece, &(pew->tempPieceGeometry), &(pew->tempPickupGeometry), 
 			GlobalGraphicsSetting::HIGH);
-		pew->tempGeometry1Mutex.unlock();	
-		pew->tempGeometry2Mutex.lock();
-		generateMesh(myTempPiece, &(pew->tempPieceGeometry2), &(pew->tempPickupGeometry2), 
-			GlobalGraphicsSetting::HIGH);
-		pew->tempGeometry2Mutex.unlock();	
+		pew->tempGeometryMutex.unlock();	
 		pew->geometryDirtyMutex.lock();
 		pew->geometryDirty = true;
 		pew->geometryDirtyMutex.unlock();

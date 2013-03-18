@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QScrollArea>
+#include <QTimer>
 
 #include "pullplan.h"
 #include "geometry.h"
@@ -111,29 +112,23 @@ void PullPlanEditorWidget :: geometryThreadFinishedMesh()
 	if (!dirty)
 		return;
 
-	if (tempGeometry1Mutex.tryLock())
+	if (tempGeometryMutex.tryLock())
 	{
 		geometryDirtyMutex.lock();
 		geometryDirty = false;
 		geometryDirtyMutex.unlock();
-		geometry.vertices = tempGeometry1.vertices;
-		geometry.triangles = tempGeometry1.triangles;
-		geometry.groups = tempGeometry1.groups;
-		tempGeometry1Mutex.unlock();
+		geometry.vertices = tempGeometry.vertices;
+		geometry.triangles = tempGeometry.triangles;
+		geometry.groups = tempGeometry.groups;
+		tempGeometryMutex.unlock();
+
+		niceViewWidget->repaint();
 	}
-	else if (tempGeometry2Mutex.tryLock())
+	else
 	{
-		geometryDirtyMutex.lock();
-		geometryDirty = false;
-		geometryDirtyMutex.unlock();
-		geometry.vertices = tempGeometry2.vertices;
-		geometry.triangles = tempGeometry2.triangles;
-		geometry.groups = tempGeometry2.groups;
-		tempGeometry2Mutex.unlock();
-
+		// try to get the lock again in 250 ms
+		QTimer::singleShot(250, this, SLOT(geometryThreadFinishedMesh())); 
 	}
-
-	niceViewWidget->repaint();
 }
 
 void PullPlanEditorWidget :: setupLayout()
