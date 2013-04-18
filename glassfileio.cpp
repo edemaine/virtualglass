@@ -54,7 +54,7 @@ bool readColorFile(QString filename, QString& collectionname, vector<GlassColor*
 	unsigned int revision;
 	string date;
 	GlassFileIOInternal::readBuildInformation(root, revision, date);
-	if (0 < revision && revision < 875) // if you got a valid number and it's not current
+	if (0 < revision && revision < 943) // if you got a valid number and it's not current
 		return false;
 
 	if (!root.isMember("Collection name"))
