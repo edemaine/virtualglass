@@ -1071,11 +1071,16 @@ void MainWindow::exportOBJActionTriggered()
 		|| editorStack->currentIndex() == COLORBAR_VIEW_MODE)
 		return; 
 
-	// get filename
-	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, "Save as...",
-		QDir::currentPath(), "Wavefront object file (*.obj)");
+	// get a filename from the user, suggesting "untitled.obj".
+	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, "Save as...", 
+		"untitled.obj", "Wavefront object file (*.obj)");
+
+	// check that the user chose something
 	if (userSpecifiedFilename.isNull())
-		return; 
+		return;
+	// if they didn't chose a .obj file, make it one
+	if (!userSpecifiedFilename.endsWith(".obj"))
+		userSpecifiedFilename += ".obj";
 
 	// call it on currently selected object
 	switch (editorStack->currentIndex())
@@ -1093,16 +1098,16 @@ void MainWindow::exportOBJActionTriggered()
 
 void MainWindow::exportPLYActionTriggered()
 {
-	// should never be invoked if menu disabling is working correctly, but just in case
-	if (editorStack->currentIndex() == EMPTY_VIEW_MODE 
-		|| editorStack->currentIndex() == COLORBAR_VIEW_MODE)
-		return; 
+	// get a filename from the user, suggesting "untitled.ply".
+	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, "Save as...", 
+		"untitled.ply", "Polygon file (*.ply)");
 
-	// get filename
-	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, "Save as...",
-		QDir::currentPath(), "Polygon file (*.ply)");
+	// check that the user chose something
 	if (userSpecifiedFilename.isNull())
-		return; 
+		return;
+	// if they didn't chose a .ply file, make it one
+	if (!userSpecifiedFilename.endsWith(".ply"))
+		userSpecifiedFilename += ".ply";
 
 	// call it on currently selected object
 	switch (editorStack->currentIndex())
@@ -1120,47 +1125,33 @@ void MainWindow::exportPLYActionTriggered()
 
 void MainWindow::importSVGActionTriggered()
 {
-	// use below instead as dialog?
-	// QString userSpecifiedFilename = QFileDialog::getOpenFileName(this, "Open your SVG cane crossection file",
-	//	QDir::currentPath(), "Scalable Vector Graphics (*.svg)");
+	QStringList userSpecifiedFilenames = QFileDialog::getOpenFileNames(this, 
+		"Open file...", QDir::currentPath(), "Scalable Vector Graphics (*.svg)");
 
-	QFileDialog importFileDialog(this);
-	importFileDialog.setOption(QFileDialog::DontUseNativeDialog);
-	importFileDialog.setWindowTitle(tr("Open your SVG cane crosssection file"));
-	importFileDialog.setNameFilter(tr("Scalable Vector Graphics (*.svg)")); //avoid open non .svg files
-	importFileDialog.setFileMode(QFileDialog::ExistingFiles);
-	QStringList list;
-
-	if (importFileDialog.exec())
+	// Attempt to import the SVG into pullplan
+	for(int i = 0; i < userSpecifiedFilenames.size(); i++)
 	{
-		list = importFileDialog.selectedFiles(); //get the selected files after click open
-
-		// Loop through all files
-		for(int i = 0; i < list.size(); i++)
+		SVG::SVG svg;
+		PullPlan *newEditorPlan = new PullPlan(PullTemplate::BASE_SQUARE);
+		if (SVG::load_svg(userSpecifiedFilenames.at(i).toUtf8().constData(), svg, newEditorPlan)) 
 		{
-			// Attempt to import the SVG into pullplan
-			SVG::SVG svg;
-			PullPlan *newEditorPlan = new PullPlan(PullTemplate::BASE_SQUARE);
-			if (SVG::load_svg(list.at(i).toUtf8().constData(), svg, newEditorPlan)) 
+			// Test if it is square
+			if (svg.page.c[0] == svg.page.c[1]) 
 			{
-				// Test if it is square
-				if (svg.page.c[0] == svg.page.c[1]) 
-				{
-					emit newPullPlan(newEditorPlan);
-					pullPlanEditorWidget->update();
-				} 
-				else 
-				{
-					// If its not square, give a little error message
-					QMessageBox::warning(this, "Invalid File", 
-						"The SVG file appears to not be square :-(");
-				}
+				emit newPullPlan(newEditorPlan);
+				pullPlanEditorWidget->update();
 			} 
 			else 
 			{
-				// If import fails, give an error message
-				QMessageBox::warning(this, "Import Failed", "Failed to import SVG file :-(");
+				// If its not square, give a little error message
+				QMessageBox::warning(this, "Invalid File", 
+					"The SVG file appears to not be square :-(");
 			}
+		} 
+		else 
+		{
+			// If import fails, give an error message
+			QMessageBox::warning(this, "Import Failed", "Failed to import SVG file :-(");
 		}
 	}
 }
@@ -1419,13 +1410,11 @@ void MainWindow::openFileActionTriggered()
 		}
 	}
 	
-	// do the dialog
-	QString userSpecifiedFilename = QFileDialog::getOpenFileName(this, "Open file...", QDir::currentPath(), 
-		"VirtualGlass (*.glass)");
+	QString userSpecifiedFilename = QFileDialog::getOpenFileName(this, 
+		"Open file...", QDir::currentPath(), "VirtualGlass (*.glass)");
 	if (userSpecifiedFilename.isNull())
 		return;
 
-	// load the file
 	openFile(userSpecifiedFilename, false);
 
 	setViewMode(EMPTY_VIEW_MODE);
@@ -1437,9 +1426,8 @@ void MainWindow::openFileActionTriggered()
 
 void MainWindow::addFileActionTriggered()
 {
-	// do the dialog
-	QStringList userSpecifiedFilenames = QFileDialog::getOpenFileNames(this, "Open file...", QDir::currentPath(), 
-		tr("VirtualGlass (*.glass)"));
+	QStringList userSpecifiedFilenames = QFileDialog::getOpenFileNames(this, 
+		"Open file...", QDir::currentPath(), "VirtualGlass (*.glass)");
 	if (userSpecifiedFilenames.size() == 0) // emptiness iff empty list (hopefully?)
 		return;
 
@@ -1472,14 +1460,19 @@ void MainWindow::saveAllFileActionTriggered()
 
 void MainWindow::saveAllAsFileActionTriggered()
 {
-	// do the dialog thing to set saveFilename
+	// get a filename from the user, suggesting "untitled.glass".
 	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, "Save as...", 
-		QDir::currentPath(), "VirtualGlass (*.glass)");
-	if (!userSpecifiedFilename.isNull())
-		setSaveFilename(userSpecifiedFilename);
-	else
-		return;
+		"untitled.glass", "VirtualGlass glass file (*.glass)");
 
+	// check that the user chose something
+	if (userSpecifiedFilename.isNull())
+		return;
+	// if they didn't chose a .glass file, make it one
+	if (!userSpecifiedFilename.endsWith(".glass"))
+		userSpecifiedFilename += ".glass";
+	// set the program's running savefile to this name
+	setSaveFilename(userSpecifiedFilename);
+	
 	vector<GlassColor*> colors;
 	vector<PullPlan*> plans;
 	vector<Piece*> pieces;
@@ -1490,11 +1483,16 @@ void MainWindow::saveAllAsFileActionTriggered()
 
 void MainWindow::saveSelectedAsFileActionTriggered()
 {
-	// do the dialog thing to get a one-time filename that you save to
+	// get a filename from the user, suggesting "untitled.glass".
 	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, "Save as...", 
-		QDir::currentPath(), "VirtualGlass (*.glass)");
+		"untitled.glass", "VirtualGlass glass file (*.glass)");
+
+	// check that the user chose something
 	if (userSpecifiedFilename.isNull())
 		return;
+	// if they didn't chose a .glass file, make it one
+	if (!userSpecifiedFilename.endsWith(".glass"))
+		userSpecifiedFilename += ".glass";
 
 	vector<GlassColor*> colors;
 	vector<PullPlan*> plans;

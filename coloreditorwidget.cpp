@@ -61,8 +61,8 @@ void ColorEditorWidget :: collectionComboBoxChanged(int _index)
 		// faking the fact that ``Add collection...'' should not be 
 		// a selectable option like the real collections.
 		collectionComboBox->setCurrentIndex(prevCollection);
-		QString fileName = QFileDialog::getOpenFileName(this, "Load Color Library", "", 
-			"VirtualGlass Color Libraries (*.vgc)");
+		QString fileName = QFileDialog::getOpenFileName(this, "Open file...", 
+			QDir::currentPath(), "VirtualGlass color file (*.vgc)");
 
 		if (!fileName.isNull())
 		{
