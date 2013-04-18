@@ -95,7 +95,7 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 
 QString MainWindow :: windowTitle()
 {
-	QString title = tr("VirtualGlass");
+	QString title = "VirtualGlass";
 	QFile inFile(":/version.txt");
 	if (inFile.open(QIODevice::ReadOnly)) {
 		QTextStream in(&inFile);
@@ -1072,8 +1072,8 @@ void MainWindow::exportOBJActionTriggered()
 		return; 
 
 	// get filename
-	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."),
-		QDir::currentPath(), tr("Wavefront object file (*.obj)"));
+	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, "Save as...",
+		QDir::currentPath(), "Wavefront object file (*.obj)");
 	if (userSpecifiedFilename.isNull())
 		return; 
 
@@ -1099,8 +1099,8 @@ void MainWindow::exportPLYActionTriggered()
 		return; 
 
 	// get filename
-	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."),
-		QDir::currentPath(), tr("Polygon file (*.ply)"));
+	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, "Save as...",
+		QDir::currentPath(), "Polygon file (*.ply)");
 	if (userSpecifiedFilename.isNull())
 		return; 
 
@@ -1152,13 +1152,14 @@ void MainWindow::importSVGActionTriggered()
 				else 
 				{
 					// If its not square, give a little error message
-					QMessageBox::warning(this, tr("Invalid File"), tr("The SVG file appears to not be square :-("));
+					QMessageBox::warning(this, "Invalid File", 
+						"The SVG file appears to not be square :-(");
 				}
 			} 
 			else 
 			{
 				// If import fails, give an error message
-				QMessageBox::warning(this, tr("Import Failed"), tr("Failed to import SVG file :-("));
+				QMessageBox::warning(this, "Import Failed", "Failed to import SVG file :-(");
 			}
 		}
 	}
@@ -1419,8 +1420,8 @@ void MainWindow::openFileActionTriggered()
 	}
 	
 	// do the dialog
-	QString userSpecifiedFilename = QFileDialog::getOpenFileName(this, tr("Open file..."), QDir::currentPath(), 
-		tr("VirtualGlass (*.glass)"));
+	QString userSpecifiedFilename = QFileDialog::getOpenFileName(this, "Open file...", QDir::currentPath(), 
+		"VirtualGlass (*.glass)");
 	if (userSpecifiedFilename.isNull())
 		return;
 
@@ -1437,7 +1438,7 @@ void MainWindow::openFileActionTriggered()
 void MainWindow::addFileActionTriggered()
 {
 	// do the dialog
-	QStringList userSpecifiedFilenames = QFileDialog::getOpenFileNames(this, tr("Open file..."), QDir::currentPath(), 
+	QStringList userSpecifiedFilenames = QFileDialog::getOpenFileNames(this, "Open file...", QDir::currentPath(), 
 		tr("VirtualGlass (*.glass)"));
 	if (userSpecifiedFilenames.size() == 0) // emptiness iff empty list (hopefully?)
 		return;
@@ -1472,8 +1473,8 @@ void MainWindow::saveAllFileActionTriggered()
 void MainWindow::saveAllAsFileActionTriggered()
 {
 	// do the dialog thing to set saveFilename
-	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."), 
-		QDir::currentPath(), tr("VirtualGlass (*.glass)"));
+	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, "Save as...", 
+		QDir::currentPath(), "VirtualGlass (*.glass)");
 	if (!userSpecifiedFilename.isNull())
 		setSaveFilename(userSpecifiedFilename);
 	else
@@ -1490,8 +1491,8 @@ void MainWindow::saveAllAsFileActionTriggered()
 void MainWindow::saveSelectedAsFileActionTriggered()
 {
 	// do the dialog thing to get a one-time filename that you save to
-	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, tr("Save as..."), 
-		QDir::currentPath(), tr("VirtualGlass (*.glass)"));
+	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, "Save as...", 
+		QDir::currentPath(), "VirtualGlass (*.glass)");
 	if (userSpecifiedFilename.isNull())
 		return;
 

@@ -4,7 +4,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <json/json.h>
 
 class QMouseEvent;
 class QKeyEvent;
