@@ -1054,7 +1054,7 @@ void MainWindow::setupMenus()
 	examplesMenu->addAction(randomComplexPieceAction);
 
 	// toggle depth peeling
-	depthPeelAction = new QAction("Transparency", this);
+	depthPeelAction = new QAction("GPU Transparency", this);
 	depthPeelAction->setCheckable(true);
 	depthPeelAction->setChecked(GlobalDepthPeelingSetting::enabled());
 	depthPeelAction->setToolTip(tr("Toggle transparency in 3D views. Turn off for better framerate."));
