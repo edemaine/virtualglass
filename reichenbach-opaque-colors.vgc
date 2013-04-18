@@ -4,8 +4,8 @@
 // programmatically is possible using a Json library, e.g. JsonCpp.
 {
    "Build information" : {
-      "Date" : "2013-02-11",
-      "Revision" : 876
+      "Date" : "2013-04-18",
+      "Revision" : 943
    },
    "Collection name" : "Reichenbach - Opaques",
    "Colors" : {
