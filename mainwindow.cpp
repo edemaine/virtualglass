@@ -1126,7 +1126,7 @@ void MainWindow::exportPLYActionTriggered()
 void MainWindow::importSVGActionTriggered()
 {
 	QStringList userSpecifiedFilenames = QFileDialog::getOpenFileNames(this, 
-		"Open file...", QDir::currentPath(), "Scalable Vector Graphics (*.svg)");
+		"Open file...", QDir::currentPath(), "Scalable vector graphics file (*.svg)");
 
 	// Attempt to import the SVG into pullplan
 	for(int i = 0; i < userSpecifiedFilenames.size(); i++)
@@ -1411,7 +1411,7 @@ void MainWindow::openFileActionTriggered()
 	}
 	
 	QString userSpecifiedFilename = QFileDialog::getOpenFileName(this, 
-		"Open file...", QDir::currentPath(), "VirtualGlass (*.glass)");
+		"Open file...", QDir::currentPath(), "VirtualGlass glass file (*.glass)");
 	if (userSpecifiedFilename.isNull())
 		return;
 
@@ -1427,7 +1427,7 @@ void MainWindow::openFileActionTriggered()
 void MainWindow::addFileActionTriggered()
 {
 	QStringList userSpecifiedFilenames = QFileDialog::getOpenFileNames(this, 
-		"Open file...", QDir::currentPath(), "VirtualGlass (*.glass)");
+		"Open file...", QDir::currentPath(), "VirtualGlass glass file (*.glass)");
 	if (userSpecifiedFilenames.size() == 0) // emptiness iff empty list (hopefully?)
 		return;
 
