@@ -1,4 +1,17 @@
 
+***** Revision r944 *****
+
+-Save and load is here! Options in the "File" menu allow saving your glass library or individual objects to glass files (*.glass), as well as load and edit saved glass files. Files are saved in a well-known, human-readable format (JSON) allowing programmatic editing of the files.
+
+-Piece customization is here! Select the "Customize" tab in the piece editor to edit the silhouette of your piece, allowing a wide range of exotic forms. The spline-based representation yields pieces with smooth curves, while still allowing precise control over the silhouette. Piece rendering is also improved as a side-effect of this change.
+
+-The new "Examples" menu has a number of options for random generation of canes and pieces, useful for exploring the design space and brainstorming.
+
+-The new "Performance" menu allows users with machines lacking a discrete graphics card (GPU) to turn off intensive GPU transparency rendering, offering higher frame rates on these machines.
+
+-Multi-threading is now present in all three-dimensional views within VirtualGlass. This allows high-resolution views of canes and pieces without freezing or stuttering when manipulating objects in the editor. It also allows rendering in higher resolution than previously possible, improving the look of objects in all three-dimensional views.
+
+
 ***** Revision r732 *****
 
 -Fill rules have been reimplemented with a simple interface: drag and drop to fill one subcane, hold shift while dragging to fill all.
