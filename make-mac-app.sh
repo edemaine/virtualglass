@@ -6,7 +6,7 @@ bash make-version.sh
 qmake -spec macx-g++ -config release virtualglass.pro
 # clean everything and recompile
 rm -rf ./virtualglass.app/
-rm -rf ./Virtual\ Glass.app/
+rm -rf ./VirtualGlass.app/
 make clean
 make
 # copy our custom OS config file for file type associations, etc.
