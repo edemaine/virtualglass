@@ -457,7 +457,7 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 	float innerRadius, float twist, unsigned int quality, bool ensureVisible)
 {
 	// don't render casing that's extremely small
-	float finalRad = finalRadius(ancestors);
+	float finalRad = finalRadius(ancestors) * outerRadius;
 	if (finalRad < 0.01)
 		return;
 
@@ -555,7 +555,7 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors,
 	unsigned int quality, bool ensureVisible)
 {
 	// cull out geometry that's extremely small
-	float finalRad = finalRadius(ancestors);
+	float finalRad = finalRadius(ancestors) * radius;
 	if (finalRad < 0.01)
 		return;
 
