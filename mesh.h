@@ -46,7 +46,7 @@ namespace MeshInternal
 	void meshBaseCane(Geometry* g, vector<ancestor>& ancestors, Color c, 
 		enum GeometricShape s, float length, float radius, float twist, unsigned int quality, bool ensureVisible);
 	void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float length, float radius, 
-		unsigned int angularResolution, unsigned int axialResolution, bool flipOrientation=false);
+		unsigned int angularResolution, unsigned int axialResolution);
 	void getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution, 
 		enum GeometricShape shape, float radius);
 

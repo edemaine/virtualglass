@@ -1019,13 +1019,13 @@ void MainWindow::setupMenus()
 	fileMenu->addAction(openFileAction); 
 	fileMenu->addAction(addFileAction); 
 	fileMenu->addSeparator();
-	fileMenu->addAction(importSVGFileAction); 
-	fileMenu->addAction(exportPLYFileAction); 
-	fileMenu->addAction(exportOBJFileAction); 
-	fileMenu->addSeparator();
 	fileMenu->addAction(saveAllFileAction); 
 	fileMenu->addAction(saveAllAsFileAction); 
 	fileMenu->addAction(saveSelectedAsFileAction); 
+	fileMenu->addSeparator();
+	fileMenu->addAction(importSVGFileAction); 
+	fileMenu->addAction(exportPLYFileAction); 
+	fileMenu->addAction(exportOBJFileAction); 
 	fileMenu->addSeparator();
 	fileMenu->addAction(exitAction);
 

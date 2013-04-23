@@ -364,7 +364,7 @@ void getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution,
 } 
 
 void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float length, float radius, 
-	unsigned int angularResolution, unsigned int axialResolution, bool flipOrientation)
+	unsigned int angularResolution, unsigned int axialResolution)
 {
 	vector< Vector2f > points;
 	assert(angularResolution % 4 == 0);
@@ -401,16 +401,8 @@ void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float lengt
 			uint32_t p4 = base + (i+1) * points.size() + (j+1) % points.size();
 			// Four points that define a (non-flat) quad are used
 			// to create two triangles.
-			if (flipOrientation)
-			{	
-				geometry->triangles.push_back(Triangle(p1, p2, p4));
-				geometry->triangles.push_back(Triangle(p3, p1, p4));
-			}
-			else
-			{
-				geometry->triangles.push_back(Triangle(p2, p1, p4));
-				geometry->triangles.push_back(Triangle(p1, p3, p4));
-			}
+			geometry->triangles.push_back(Triangle(p2, p1, p4));
+			geometry->triangles.push_back(Triangle(p1, p3, p4));
 		}
 	}
 } 
@@ -424,7 +416,7 @@ unsigned int computeAngularResolution(float radius, unsigned int quality)
 {
 	// standard "full" cane radius is 1.0
 	// this function should return a multiple of 4
-	unsigned int r = radius * 4 * quality;
+	unsigned int r = radius * 6 * quality;
 	return MIN(MAX((r / 4) * 4, 4), 20); 
 }
 
@@ -464,12 +456,12 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 	enum GeometricShape outerShape, enum GeometricShape innerShape, float length, float outerRadius, 
 	float innerRadius, float twist, unsigned int quality, bool ensureVisible)
 {
-	// cull out geometry that's extremely small
+	// don't render casing that's extremely small
 	float finalRad = finalRadius(ancestors);
 	if (finalRad < 0.01)
 		return;
 
-	// cull out geometry that's extremely clear
+	// don't render casing that's extremely clear
 	if (ensureVisible)
 		color.a = MAX(color.a, 0.1);
 	if (color.a < 0.01)
@@ -485,10 +477,36 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 	unsigned int outerPointsBottomStart = geometry->vertices.size();
 	meshCylinderWall(geometry, outerShape, length, outerRadius, angularResolution, axialResolution);
 	unsigned int outerPointsTopStart = geometry->vertices.size() - angularResolution;
-	unsigned int innerPointsBottomStart = geometry->vertices.size();
-	meshCylinderWall(geometry, innerShape, length, innerRadius, angularResolution, axialResolution, true);
-	unsigned int innerPointsTopStart = geometry->vertices.size() - angularResolution;
 
+	// add vertices for bottom edge of inner shape 
+	unsigned int innerPointsBottomStart = geometry->vertices.size();
+	vector<Vector2f> points;
+	getTemplatePoints(&points, angularResolution, innerShape, innerRadius);
+	for (unsigned int j = 0; j < points.size(); ++j)
+	{
+		Point3D p;
+		p.xy = points[j];
+		p.z = 0.0;
+		Point3D n;
+		n.x = p.x;
+		n.y = p.y;
+		n.z = 0.0f;
+		geometry->vertices.push_back(Vertex(p,n));
+	}
+	// add vertices for top edge of inner shape 
+	unsigned int innerPointsTopStart = geometry->vertices.size();
+	for (unsigned int j = 0; j < points.size(); ++j)
+	{
+		Point3D p;
+		p.xy = points[j];
+		p.z = 5.0 * length;
+		Point3D n;
+		n.x = p.x;
+		n.y = p.y;
+		n.z = 0.0f;
+		geometry->vertices.push_back(Vertex(p,n));
+	}
+	// add triangles linking inner and outer shapes
 	for (unsigned int i = 0; i < angularResolution; ++i)
 	{
 		uint32_t p1 = innerPointsTopStart + i;
