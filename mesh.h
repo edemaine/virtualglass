@@ -47,7 +47,7 @@ namespace MeshInternal
 		enum GeometricShape s, float length, float radius, float twist, unsigned int quality, bool ensureVisible);
 	void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float length, float radius, 
 		unsigned int angularResolution, unsigned int axialResolution);
-	void getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution, 
+	void getTemplatePoints(vector<Point2D>& points, unsigned int angularResolution, 
 		enum GeometricShape shape, float radius);
 
 	void applySubplanTransforms(Vertex& v, vector<ancestor>& ancestors, bool isRotInvar);

@@ -195,22 +195,22 @@ void PieceCustomizeViewWidget :: drawPiece()
 	}
 
 	// draw control point connectors
-        pen.setWidth(2);
-        pen.setColor(Qt::white);
-        painter.setPen(pen);
+	pen.setWidth(2);
+	pen.setColor(Qt::white);
+	painter.setPen(pen);
 	for (unsigned int i = 0; i < spline.controlPoints().size()-1; ++i)
 	{
 		Point2D p1 = controlPointRawLocation(i);
 		Point2D p2 = controlPointRawLocation(i+1);
-                painter.drawLine(p1.x, p1.y, p2.x, p2.y);
+		painter.drawLine(p1.x, p1.y, p2.x, p2.y);
 	}
 
 	// draw control points
-        painter.setBrush(Qt::black);
-        pen.setWidth(2);
-        pen.setColor(Qt::white);
-        pen.setStyle(Qt::SolidLine);
-        painter.setPen(pen);
+	painter.setBrush(Qt::black);
+	pen.setWidth(2);
+	pen.setColor(Qt::white);
+	pen.setStyle(Qt::SolidLine);
+	painter.setPen(pen);
 	for (unsigned int i = 0; i < spline.controlPoints().size(); ++i)
 	{
 		Point2D p = controlPointRawLocation(i);
@@ -218,7 +218,7 @@ void PieceCustomizeViewWidget :: drawPiece()
 		ctrlPt.setX(p.x);
 		ctrlPt.setY(p.y);
 		int pointRadius = MAX(squareSize / 100, 1) * 2;
-                painter.drawEllipse(ctrlPt, pointRadius, pointRadius);
+		painter.drawEllipse(ctrlPt, pointRadius, pointRadius);
 	}
 
 	painter.end();

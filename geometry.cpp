@@ -24,7 +24,8 @@ Group :: Group(uint32_t _triangle_begin, uint32_t _triangle_size, uint32_t _vert
 {
 }
 
-void Geometry :: clear() {
+void Geometry :: clear() 
+{
 	vertices.clear();
 	triangles.clear();
 	groups.clear();

@@ -7,6 +7,9 @@
 #include "primitives.h"
 #include "pullplan.h"
 
+using std::vector;
+using std::string;
+
 class Cane;
 
 // Mesh stuff
@@ -44,15 +47,15 @@ class Group
 class Geometry
 {
 	public:
-		std::vector< Vertex > vertices;
-		std::vector< Triangle > triangles;
-		std::vector< Group > groups;
+		vector< Vertex > vertices;
+		vector< Triangle > triangles;
+		vector< Group > groups;
 		void clear();
 		bool valid() const;
 		void compute_normals_from_triangles();
-		void save_obj_file(std::string const &filename) const;
-		void save_ply_file(std::string const &filename) const;
-		void save_raw_file(std::string const &filename) const;
+		void save_obj_file(string const &filename) const;
+		void save_ply_file(string const &filename) const;
+		void save_raw_file(string const &filename) const;
 };
 
 #endif

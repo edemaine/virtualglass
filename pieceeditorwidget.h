@@ -85,7 +85,7 @@ class PieceEditorWidget : public QWidget
 		PickupPlanEditorViewWidget* pickupViewWidget;	
 		NiceViewWidget* pieceNiceViewWidget;
 		PieceCustomizeViewWidget* pieceCustomizeViewWidget;
-                QStackedWidget* pieceViewStack;
+		QStackedWidget* pieceViewStack;
 
 		QPushButton* addControlPointButton;
 		QPushButton* removeControlPointButton;

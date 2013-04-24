@@ -28,7 +28,7 @@ void PullPlanGeometryThread::run()
 	
 		// now lock the geometry
 		ppew->tempGeometryMutex.lock();
-		generateMesh(myTempPullPlan, &(ppew->tempGeometry), GlobalGraphicsSetting::VERY_LOW);
+		generateMesh(myTempPullPlan, &(ppew->tempGeometry), GlobalGraphicsSetting::MEDIUM);
 		ppew->tempGeometryMutex.unlock();	
 		ppew->geometryDirtyMutex.lock();
 		ppew->geometryDirty = true;
@@ -68,7 +68,7 @@ void PullPlanGeometryThread::run()
 
 		// now lock the geometry
 		ppew->tempGeometryMutex.lock();
-		generateMesh(myTempPullPlan, &(ppew->tempGeometry), GlobalGraphicsSetting::HIGH);
+		generateMesh(myTempPullPlan, &(ppew->tempGeometry), GlobalGraphicsSetting::VERY_HIGH);
 		ppew->tempGeometryMutex.unlock();	
 		ppew->geometryDirtyMutex.lock();
 		ppew->geometryDirty = true;

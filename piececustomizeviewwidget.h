@@ -26,7 +26,7 @@ class PieceCustomizeViewWidget : public QWidget
 		void mouseReleaseEvent(QMouseEvent* event);
 		void paintEvent(QPaintEvent *event);
 		void resizeEvent(QResizeEvent* event);
-                void wheelEvent(QWheelEvent* e);
+		void wheelEvent(QWheelEvent* e);
 
 	private:
 		float adjustedX(float rawX);

@@ -85,34 +85,34 @@ void renderWithoutDepthPeeling(const Geometry& geometry)
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
 
-        //final pass -- render background color behind everything else.
-        glDisable(GL_LIGHTING);
+	//final pass -- render background color behind everything else.
+	glDisable(GL_LIGHTING);
 	glDisable(GL_CULL_FACE);
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
 
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-        glBegin(GL_QUADS);
-        glColor3f(GlobalBackgroundColor::color.r,
-                GlobalBackgroundColor::color.g,
-                GlobalBackgroundColor::color.b);
-        glVertex2f(-1.1f,-1.1f);
-        glVertex2f( 1.1f,-1.1f);
-        glVertex2f( 1.1f, 1.1f);
-        glVertex2f(-1.1f, 1.1f);
-        glEnd();
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	glBegin(GL_QUADS);
+	glColor3f(GlobalBackgroundColor::color.r,
+		GlobalBackgroundColor::color.g,
+		GlobalBackgroundColor::color.b);
+	glVertex2f(-1.1f,-1.1f);
+	glVertex2f( 1.1f,-1.1f);
+	glVertex2f( 1.1f, 1.1f);
+	glVertex2f(-1.1f, 1.1f);
+	glEnd();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
 
-        glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 }
 

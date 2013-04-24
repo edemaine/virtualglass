@@ -123,6 +123,7 @@ void PieceEditorWidget :: geometryThreadFinishedMesh()
 		geometryDirtyMutex.lock();
 		geometryDirty = false;
 		geometryDirtyMutex.unlock();
+		
 		geometry.vertices = tempPieceGeometry.vertices;
 		geometry.triangles = tempPieceGeometry.triangles;
 		geometry.groups = tempPieceGeometry.groups;
@@ -252,7 +253,7 @@ void PieceEditorWidget :: setupLayout()
 	addPickupParam(pickupParamLayout);
 	pickupControlsTab->addTab(pickupParamWidget, "Fill and Case");
 
-	QLabel* pickupEditorDescriptionLabel = new QLabel("Pickup editor - drag canes in.", this);
+	QLabel* pickupEditorDescriptionLabel = new QLabel("Pickup editor - drag color or canes in.", this);
 	pickupEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	editorLayout->addWidget(pickupEditorDescriptionLabel, 3, 0);
 	
@@ -360,7 +361,7 @@ void PieceEditorWidget :: removeControlPointButtonClicked()
 void PieceEditorWidget :: pieceControlsTabChanged(int tab)
 {
 	// change the view to match the tab
-        pieceViewStack->setCurrentIndex(tab);
+	pieceViewStack->setCurrentIndex(tab);
 
 	if (tab == 0) // Twist mode
 		pieceEditorDescriptionLabel->setText("Piece editor.");

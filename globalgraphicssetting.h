@@ -14,6 +14,7 @@ namespace GlobalGraphicsSetting
 		VERY_LOW=1,
 		MEDIUM=5,
 		HIGH=10,
+		VERY_HIGH=10,
 	};
 }
 

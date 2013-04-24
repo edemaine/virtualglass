@@ -187,8 +187,8 @@ void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickn
 	uint32_t first_vert = geometry->vertices.size();
 	uint32_t first_triangle = geometry->triangles.size();
 
-	Vector2f p;
-	vector< Vector2f > points;
+	Point2D p;
+	vector<Point2D> points;
 
 	// generate a basis set of points		
 	for (unsigned int i = 0; i < slabResolution; ++i)
@@ -304,19 +304,19 @@ void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickn
 		first_vert, geometry->vertices.size() - first_vert, color));
 }
 
-void getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution, 
+void getTemplatePoints(vector<Point2D>& points, unsigned int angularResolution, 
 	enum GeometricShape shape, float radius)
 {
-	Vector2f p;
 
 	// force angularResolution to be the closest multiple of 4
 	// so square mesh has consistent resolution along each side
 	assert(angularResolution % 4 == 0);
 
-	points->clear();
+	points.clear();
 	// all shapes start at angle -PI/4 (i.e. x = 1.0, y = -1.0)
 	// this consistency is necessary for meshBaseCasing() which stitches the tops
 	// of them together	
+	Point2D p;
 	switch (shape)
 	{
 		case CIRCLE_SHAPE:
@@ -324,7 +324,7 @@ void getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution,
 			{
 				p.x = cos(TWO_PI * i / angularResolution - PI/4);
 				p.y = sin(TWO_PI * i / angularResolution - PI/4);
-				points->push_back(p);
+				points.push_back(p);
 			}
 			break;
 		case SQUARE_SHAPE:
@@ -332,33 +332,34 @@ void getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution,
 			{
 				p.x = 1.0;
 				p.y = -1.0 + 8.0 * i / angularResolution;
-				points->push_back(p);
+				points.push_back(p);
 			}
 			for (unsigned int i = 0; i < angularResolution / 4; ++i)
 			{
 				p.x = 1.0 - 8.0 * i / angularResolution;
 				p.y = 1.0;
-				points->push_back(p);
+				points.push_back(p);
 			}
 			for (unsigned int i = 0; i < angularResolution / 4; ++i)
 			{
 				p.x = -1.0;
 				p.y = 1.0 - 8.0 * i / angularResolution;
-				points->push_back(p);
+				points.push_back(p);
 			}
 			for (unsigned int i = 0; i < angularResolution / 4; ++i)
 			{
 				p.x = -1.0 + 8.0 * i / angularResolution;
 				p.y = -1.0;
-				points->push_back(p);
+				points.push_back(p);
 			}
 			break;
 	}
 
 	// scale for radius 
-	for (unsigned int i = 0; i < points->size(); ++i) {
-		(*points)[i].x *= radius;
-		(*points)[i].y *= radius;
+	for (unsigned int i = 0; i < points.size(); ++i) 
+	{
+		points[i].x *= radius;
+		points[i].y *= radius;
 	}
 
 } 
@@ -366,9 +367,9 @@ void getTemplatePoints(vector<Vector2f>* points, unsigned int angularResolution,
 void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float length, float radius, 
 	unsigned int angularResolution, unsigned int axialResolution)
 {
-	vector< Vector2f > points;
 	assert(angularResolution % 4 == 0);
-	getTemplatePoints(&points, angularResolution, shape, radius);
+	vector<Point2D> points;
+	getTemplatePoints(points, angularResolution, shape, radius);
 
 	// Create wall vertices row by row
 	unsigned int base = geometry->vertices.size();
@@ -458,13 +459,13 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 {
 	// don't render casing that's extremely small
 	float finalRad = finalRadius(ancestors) * outerRadius;
-	if (finalRad < 0.01)
+	if (finalRad < 0.001)
 		return;
 
-	// don't render casing that's extremely clear
 	if (ensureVisible)
 		color.a = MAX(color.a, 0.1);
-	if (color.a < 0.01)
+	// don't render casing that's extremely clear
+	if (color.a < 0.001)
 		return;
 	
 	unsigned int angularResolution = computeAngularResolution(finalRad, quality);
@@ -480,8 +481,8 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 
 	// add vertices for bottom edge of inner shape 
 	unsigned int innerPointsBottomStart = geometry->vertices.size();
-	vector<Vector2f> points;
-	getTemplatePoints(&points, angularResolution, innerShape, innerRadius);
+	vector<Point2D> points;
+	getTemplatePoints(points, angularResolution, innerShape, innerRadius);
 	for (unsigned int j = 0; j < points.size(); ++j)
 	{
 		Point3D p;
@@ -574,8 +575,8 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors,
 	meshCylinderWall(geometry, shape, length, radius, angularResolution, axialResolution);
 
 	// now mesh top and bottom
-	vector< Vector2f > points;
-	getTemplatePoints(&points, angularResolution, shape, radius);
+	vector<Point2D> points;
+	getTemplatePoints(points, angularResolution, shape, radius);
 
 	// Build top and bottom triangles (two concentric rings) 
 	vector< Vector3ui > layer1Tris;
