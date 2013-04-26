@@ -15,6 +15,7 @@
 #include "glasscolor.h"
 #include "coloreditorwidget.h"
 #include "glassfileio.h"
+#include "globalgraphicssetting.h"
 
 ColorEditorWidget :: ColorEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -199,7 +200,7 @@ void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 void ColorEditorWidget :: updateEverything()
 {
-	generateMesh(glassColor, &geometry, 4);
+	generateMesh(glassColor, &geometry, GlobalGraphicsSetting::VERY_HIGH);
 	niceViewWidget->repaint();
 
 	this->alphaSlider->setSliderPosition(255 - (int) (glassColor->getColor().a * 255));

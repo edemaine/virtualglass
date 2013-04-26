@@ -1,7 +1,6 @@
 
 #include <vector>
 #include <map>
-#include <utility>
 #include "constants.h"
 #include "glasscolor.h"
 #include "pullplan.h"
@@ -14,7 +13,6 @@
 using namespace MeshInternal;
 
 using std::vector;
-using std::pair;
 using std::map;
 
 void generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometry, unsigned int quality)

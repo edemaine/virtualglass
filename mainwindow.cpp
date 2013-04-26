@@ -379,7 +379,23 @@ void MainWindow :: depthPeelActionTriggered()
 {
 	GlobalDepthPeelingSetting::setEnabled(!GlobalDepthPeelingSetting::enabled());
 	depthPeelAction->setChecked(GlobalDepthPeelingSetting::enabled());
-	
+
+	// redraw current editor views
+	// other views are redraw upon changing views anyhow.
+	switch (editorStack->currentIndex())
+	{
+		case COLORBAR_VIEW_MODE:
+			colorEditorWidget->updateEverything();
+			break;
+		case PULLPLAN_VIEW_MODE:
+			pullPlanEditorWidget->updateEverything();
+			break;
+		case PIECE_VIEW_MODE:
+			pieceEditorWidget->updateEverything();
+			break;
+	}
+
+	// redraw all library thumbnails
 	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
 	{
 		dynamic_cast<GlassColorLibraryWidget*>(
