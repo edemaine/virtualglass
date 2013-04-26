@@ -169,14 +169,15 @@ void applyPieceTransform(Geometry* geometry, Piece* piece)
 
 void applySubplanTransforms(Vertex& v, vector<ancestor>& ancestors, bool isRotInvar)
 {
-	for (vector<ancestor>::iterator a = ancestors.begin(); a != ancestors.end(); ++a)
+	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
 	{
-		SubpullTemplate& subTemp = a->parent->subs[a->child];
+		ancestor& a = ancestors[i];
+		SubpullTemplate& subTemp = a.parent->subs[a.child];
 		if (isRotInvar)
-			applyTwistTransform(v, -a->parent->twist);
+			applyTwistTransform(v, -a.parent->twist);
 		applyResizeTransform(v, subTemp.diameter / 2.0);
 		applySubplanTransform(v, subTemp.location);
-		applyTwistTransform(v, a->parent->twist);
+		applyTwistTransform(v, a.parent->twist);
 	}
 }
 

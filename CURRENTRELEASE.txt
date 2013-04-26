@@ -1,5 +1,5 @@
 
-***** Revision r944 *****
+***** Revision r952 *****
 
 -Save and load is here! Options in the "File" menu allow saving your glass library or individual objects to glass files (*.glass), as well as load and edit saved glass files. Files are saved in a well-known, human-readable format (JSON) allowing programmatic editing of the files.
 
