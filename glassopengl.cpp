@@ -56,7 +56,8 @@ void renderWithoutDepthPeeling(const Geometry& geometry)
 		Color c = g->color;
 		if (c.a < 0.11) // 0.1 is the rounded up alpha for transparent things that *must* be seen
 			continue;
-		glColor4f(c.r * 0.8f, c.g * 0.8f, c.b * 0.8f, 0.8f);
+		c.a = 0.8;
+		glColor4f(c.r * c.a, c.g * c.a, c.b * c.a, c.a);
 		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 			GL_UNSIGNED_INT, &(geometry.triangles[g->triangle_begin].v1));
 	}
@@ -64,24 +65,19 @@ void renderWithoutDepthPeeling(const Geometry& geometry)
 	// make a pass on mandatory transparent things
 	// this part assumes that there's only one mandatory transparent thing,
 	// and that it's a polyhedron that contains everything else. 
-	// 
-	// for consistency, we set the color of this mandatory thing to (1.0, 1.0, 1.0, 0.1)
-	// i.e. the generic "clear" color, as otherwise the user sees some hidden
-	// state that determines whether a transparent color is shown.
-	glDisable(GL_CULL_FACE); 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE); // only two faces (0.2) worth of alpha left after opaque drawing
+	glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE); 
 	for (std::vector< Group >::const_iterator g = geometry.groups.begin(); g != geometry.groups.end(); ++g)
 	{
 		Color c;
-		c.r = c.g = c.b = 1.0;
+		c.r = c.g = c.b = 0.333;
 		c.a = 0.1;
 		glColor4f(c.r * c.a, c.g * c.a, c.b * c.a, c.a);
 		glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 			GL_UNSIGNED_INT, &(geometry.triangles[g->triangle_begin].v1));
 	}
-	
+
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
 
