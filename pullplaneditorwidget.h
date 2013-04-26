@@ -35,9 +35,9 @@ class PullPlanEditorWidget : public QWidget
 
 	public:
 		PullPlanEditorWidget(QWidget* parent=0);
-		void resetPlan();
-		PullPlan* getPlan();
-		void setPlan(PullPlan* p);
+		void resetPullPlan();
+		PullPlan* getPullPlan();
+		void setPullPlan(PullPlan* p);
 		void seedTemplates();
 		void mousePressEvent(QMouseEvent*);
 		void writePlanToPLYFile(QString& filename);

@@ -21,7 +21,6 @@ ColorEditorWidget :: ColorEditorWidget(QWidget* parent) : QWidget(parent)
 	resetGlassColor();
 
 	niceViewWidget = new NiceViewWidget(NiceViewWidget::PULLPLAN_CAMERA_MODE, this);
-	generateMesh(glassColor, &geometry, 10);
 	niceViewWidget->setGeometry(&geometry);
 
 	setupLayout();
@@ -36,14 +35,14 @@ void ColorEditorWidget :: resetGlassColor()
 	glassColor = new GlassColor();
 }
 
-GlassColor* ColorEditorWidget :: getGlassColor() {
-
+GlassColor* ColorEditorWidget :: getGlassColor() 
+{
 	return glassColor;
 }
 
-void ColorEditorWidget :: setGlassColor(GlassColor* _gc) 
+void ColorEditorWidget :: setGlassColor(GlassColor* _glassColor) 
 {
-	glassColor = _gc;
+	glassColor = _glassColor;
 	emit someDataChanged();
 }
 

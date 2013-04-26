@@ -435,12 +435,12 @@ void PieceEditorWidget :: setPickupTemplateType(enum PickupTemplate::Type _type)
 	emit someDataChanged();
 }
 
-void PieceEditorWidget :: setPiece(Piece* p)
+void PieceEditorWidget :: setPiece(Piece* _piece)
 {
-	piece = p;
-	pickupViewWidget->setPickup(p->pickup);
-	twistWidget->setTwist(&(p->twist));
-	pieceCustomizeViewWidget->setPiece(p);
+	piece = _piece;
+	pickupViewWidget->setPickup(piece->pickup);
+	twistWidget->setTwist(&(piece->twist));
+	pieceCustomizeViewWidget->setPiece(piece);
 	emit someDataChanged();	
 }
 

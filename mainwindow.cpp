@@ -71,7 +71,7 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 	switch (_mode)
 	{
 		case EMPTY_VIEW_MODE:
-			// leave all copy buttons disabled
+			// leave all copy and export buttons disabled
 			break;
 		case COLORBAR_VIEW_MODE:
 			copyGlassColorButton->setEnabled(true);
@@ -200,7 +200,7 @@ void MainWindow :: deleteCurrentEditingObject()
 			{
 				w = pullPlanLibraryLayout->itemAt(i);
 				PullPlan* p = dynamic_cast<PullPlanLibraryWidget*>(w->widget())->pullPlan;
-				if (p == pullPlanEditorWidget->getPlan())
+				if (p == pullPlanEditorWidget->getPullPlan())
 				{
 					if (pullPlanIsDependancy(p))
 					{
@@ -219,7 +219,7 @@ void MainWindow :: deleteCurrentEditingObject()
 				}
 			}
 
-			pullPlanEditorWidget->setPlan(dynamic_cast<PullPlanLibraryWidget*>(pullPlanLibraryLayout->itemAt(
+			pullPlanEditorWidget->setPullPlan(dynamic_cast<PullPlanLibraryWidget*>(pullPlanLibraryLayout->itemAt(
 					MIN(pullPlanLibraryLayout->count()-1, i))->widget())->pullPlan);
 			emit someDataChanged();
 			break;
@@ -256,7 +256,9 @@ void MainWindow :: deleteCurrentEditingObject()
 void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 {
 	// If this is a drag and not the end of a click, don't process (dropEvent will do it instead)
-	if (isDragging && (event->pos() - dragStartPosition).manhattanLength() > QApplication::startDragDistance()) return;
+	if (isDragging && (event->pos() - dragStartPosition).manhattanLength() 
+		> QApplication::startDragDistance()) 
+		return;
 
 	GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(childAt(event->pos()));
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
@@ -269,7 +271,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	}
 	else if (plplw != NULL)
 	{
-		pullPlanEditorWidget->setPlan(plplw->pullPlan);
+		pullPlanEditorWidget->setPullPlan(plplw->pullPlan);
 		setViewMode(PULLPLAN_VIEW_MODE);
 	}
 	else if (plw != NULL)
@@ -405,7 +407,7 @@ void MainWindow :: randomSimpleCaneExampleActionTriggered()
 	PullPlanLibraryWidget* pplw = new PullPlanLibraryWidget(randomPP, this);
 	pullPlanLibraryLayout->addWidget(pplw);
 
-	pullPlanEditorWidget->setPlan(randomPP);
+	pullPlanEditorWidget->setPullPlan(randomPP);
 	setViewMode(PULLPLAN_VIEW_MODE);
 }
 
@@ -425,7 +427,7 @@ void MainWindow :: randomComplexCaneExampleActionTriggered()
 	if (randomComplexPP->hasDependencyOn(randomSPP))
 		pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(randomSPP, this));
 
-	pullPlanEditorWidget->setPlan(randomComplexPP);
+	pullPlanEditorWidget->setPullPlan(randomComplexPP);
 	setViewMode(PULLPLAN_VIEW_MODE);
 }
 
@@ -629,7 +631,7 @@ void MainWindow :: setupPullPlanEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
 	pullPlanEditorWidget = new PullPlanEditorWidget(editorStack);
-	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(pullPlanEditorWidget->getPlan(), this));
+	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(pullPlanEditorWidget->getPullPlan(), this));
 }
 
 void MainWindow :: setupPieceEditor()
@@ -703,7 +705,7 @@ void MainWindow :: copyPullPlan()
 	if (editorStack->currentIndex() != PULLPLAN_VIEW_MODE)
 		return;
 
-	PullPlan *newEditorPlan = pullPlanEditorWidget->getPlan()->copy();
+	PullPlan *newEditorPlan = pullPlanEditorWidget->getPullPlan()->copy();
 	emit newPullPlan(newEditorPlan);
 }
 
@@ -712,7 +714,7 @@ void MainWindow :: newPullPlan(PullPlan* newPlan)
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(newPlan, this));
 
 	// Give the new plan to the editor
-	pullPlanEditorWidget->setPlan(newPlan);
+	pullPlanEditorWidget->setPullPlan(newPlan);
 
 	// Load up the right editor
 	setViewMode(PULLPLAN_VIEW_MODE);
@@ -720,7 +722,7 @@ void MainWindow :: newPullPlan(PullPlan* newPlan)
 
 void MainWindow :: updateEverything()
 {
-	setDirtyBit(1); // why are we updating? something probably changed...
+	setDirtyBit(true); // why are we updating? something probably changed...
 	switch (editorStack->currentIndex())
 	{
 		case COLORBAR_VIEW_MODE:
@@ -850,7 +852,7 @@ void MainWindow :: updateLibrary()
 			{
 				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
-				if (pullPlanEditorWidget->getPlan()->hasDependencyOn(cblw->glassColor))
+				if (pullPlanEditorWidget->getPullPlan()->hasDependencyOn(cblw->glassColor))
 					cblw->setDependancy(true, USEDBY_DEPENDANCY);
 			}
 			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
@@ -861,16 +863,16 @@ void MainWindow :: updateLibrary()
 				// 1. the plan currently being edited
 				// 2. a subplan of the plan current being edited
 				// 3. a plan with the plan currently being edited as a subplan
-				if (pullPlanEditorWidget->getPlan() == pplw->pullPlan)
+				if (pullPlanEditorWidget->getPullPlan() == pplw->pullPlan)
 				{
 					pplw->updatePixmaps();
 					pplw->setDependancy(true, IS_DEPENDANCY);
 				}
-				else if (pullPlanEditorWidget->getPlan()->hasDependencyOn(pplw->pullPlan))
+				else if (pullPlanEditorWidget->getPullPlan()->hasDependencyOn(pplw->pullPlan))
 				{
 					pplw->setDependancy(true, USEDBY_DEPENDANCY);
 				}
-				else if (pplw->pullPlan->hasDependencyOn(pullPlanEditorWidget->getPlan()))
+				else if (pplw->pullPlan->hasDependencyOn(pullPlanEditorWidget->getPullPlan()))
 				{
 					pplw->updatePixmaps();
 					pplw->setDependancy(true, USES_DEPENDANCY);
@@ -880,7 +882,7 @@ void MainWindow :: updateLibrary()
 			{
 				PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
-				if (plw->piece->hasDependencyOn(pullPlanEditorWidget->getPlan()))
+				if (plw->piece->hasDependencyOn(pullPlanEditorWidget->getPullPlan()))
 				{
 					plw->updatePixmap();
 					plw->setDependancy(true, USES_DEPENDANCY);
@@ -1276,7 +1278,7 @@ void MainWindow::newFileActionTriggered()
 
 	// 1. set editor objects to new (but default) objects
 	colorEditorWidget->resetGlassColor();
-	pullPlanEditorWidget->resetPlan();
+	pullPlanEditorWidget->resetPullPlan();
 	pieceEditorWidget->resetPiece();
 
 	// 2. delete everything in the library
@@ -1284,7 +1286,7 @@ void MainWindow::newFileActionTriggered()
 
 	// 3. add the three new guys from the editors into the library 
 	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(colorEditorWidget->getGlassColor(), this));
-	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(pullPlanEditorWidget->getPlan(), this));
+	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(pullPlanEditorWidget->getPullPlan(), this));
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(pieceEditorWidget->getPiece(), this)); 
 
 	// 4. go back to empty view mode
@@ -1505,7 +1507,7 @@ void MainWindow::saveSelectedAsFileActionTriggered()
 			getDependantLibraryContents(colorEditorWidget->getGlassColor(), colors, plans);
 			break;
 		case PULLPLAN_VIEW_MODE:
-			getDependantLibraryContents(pullPlanEditorWidget->getPlan(), colors, plans);
+			getDependantLibraryContents(pullPlanEditorWidget->getPullPlan(), colors, plans);
 			break;
 		case PIECE_VIEW_MODE:
 			getDependantLibraryContents(pieceEditorWidget->getPiece(), colors, plans, pieces);

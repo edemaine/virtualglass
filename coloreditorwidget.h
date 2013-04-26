@@ -57,7 +57,6 @@ class ColorEditorWidget : public QWidget
 		void setupLayout();
 		void setupConnections();
 		void loadCollection(QString fileName);
-		//static bool compareGlassColors(GlassColor* c1, GlassColor* c2);
 		static string getShortColorName(string colorName);
 };
 
