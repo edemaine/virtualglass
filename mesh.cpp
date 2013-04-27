@@ -1,54 +1,59 @@
 
-#include <vector>
 #include <map>
+
+#include "mesh.h"
 #include "constants.h"
 #include "glasscolor.h"
 #include "pullplan.h"
 #include "pickupplan.h"
 #include "piece.h"
 #include "subpulltemplate.h"
-#include "mesh.h"
 #include "spline.h"
 
 using namespace MeshInternal;
 
-using std::vector;
 using std::map;
 
-void generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometry, unsigned int quality)
+bool generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometry, unsigned int quality)
 {
+	clock_t startPickup = clock();	
+	clock_t endPickup = startPickup + CLOCKS_PER_SEC * 10;
+	bool completedPickup = true;
 	if (pickupGeometry != NULL)
 	{
 		pickupGeometry->clear();
-		generateMesh(piece->pickup, pickupGeometry, true, quality);
+		generateMesh(piece->pickup, pickupGeometry, true, quality, endPickup);
+		completedPickup = clock() < endPickup;
 		pickupGeometry->compute_normals_from_triangles();
 	}
 
+	clock_t startPiece = clock();	
+	clock_t endPiece = startPiece + CLOCKS_PER_SEC * 10;	
+	bool completedPiece = true;
 	if (pieceGeometry != NULL)
 	{
 		pieceGeometry->clear();
-		generateMesh(piece->pickup, pieceGeometry, false, quality);
+		generateMesh(piece->pickup, pieceGeometry, false, quality, endPiece);
+		completedPiece = clock() < endPiece;
 		applyPieceTransform(pieceGeometry, piece);
 		casePiece(pieceGeometry, piece);
 		pieceGeometry->compute_normals_from_triangles();
 	}
+
+	return completedPickup && completedPiece;		
 }
 
-void generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality)
+bool generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality)
 {
-	geometry->clear();
+	clock_t start = clock();
+	clock_t end = start + CLOCKS_PER_SEC * 20;
+	generateMesh(plan, geometry, quality, end);
 
-	vector<ancestor> ancestors;
-	recurseMesh(plan, geometry, ancestors, 2.0, quality, true);			
-
-	// Make skinnier to more closely mimic the canes found in pickups
-	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
-	{
-		applyResizeTransform(geometry->vertices[v], 0.5);
-	}
-	geometry->compute_normals_from_triangles();
+	return clock() < end;
 }
 
+// This thing always completes unless the user's machine is a potato.
+// So we totally assume it finishes and no time completion data is measured or returned.
 void generateMesh(GlassColor* gc, Geometry* geometry, unsigned int quality)
 {
 	PullPlan dummyPlan(PullTemplate::BASE_CIRCLE);
@@ -56,7 +61,7 @@ void generateMesh(GlassColor* gc, Geometry* geometry, unsigned int quality)
 
 	geometry->clear();
 	vector<ancestor> ancestors;
-	recurseMesh(&dummyPlan, geometry, ancestors, 2.0, quality, true);
+	recurseMesh(&dummyPlan, geometry, ancestors, 2.0, quality, true, clock() + CLOCKS_PER_SEC * 20);
 	geometry->compute_normals_from_triangles();
 }
 
@@ -456,18 +461,13 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 	enum GeometricShape outerShape, enum GeometricShape innerShape, float length, float outerRadius, 
 	float innerRadius, float twist, unsigned int quality, bool ensureVisible)
 {
-	// don't render casing that's extremely small
-	float finalRad = finalRadius(ancestors) * outerRadius;
-	if (finalRad < 0.001)
-		return;
-
 	if (ensureVisible)
 		color.a = MAX(color.a, 0.1);
 	// don't render casing that's extremely clear
 	if (color.a < 0.001)
 		return;
 	
-	unsigned int angularResolution = computeAngularResolution(finalRad, quality);
+	unsigned int angularResolution = computeAngularResolution(finalRadius(ancestors) * outerRadius, quality);
 	unsigned int axialResolution = computeAxialResolution(length, totalTwist(ancestors) + twist, quality);
 	
 	uint32_t first_vert = geometry->vertices.size();
@@ -554,18 +554,13 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors,
 	Color color, enum GeometricShape shape, float length, float radius, float twist, 
 	unsigned int quality, bool ensureVisible)
 {
-	// cull out geometry that's extremely small
-	float finalRad = finalRadius(ancestors) * radius;
-	if (finalRad < 0.01)
-		return;
-
 	// cull out geometry that's extremely clear
 	if (ensureVisible)
 		color.a = MAX(color.a, 0.1);
 	if (color.a < 0.01)
 		return;
 
-	unsigned int angularResolution = computeAngularResolution(finalRad, quality);
+	unsigned int angularResolution = computeAngularResolution(finalRadius(ancestors) * radius, quality);
 	unsigned int axialResolution = computeAxialResolution(length, totalTwist(ancestors) + twist, quality);
 
 	uint32_t first_vert = geometry->vertices.size();
@@ -673,7 +668,21 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors,
 		first_vert, geometry->vertices.size() - first_vert, color));
 }
 
-void generateMesh(PickupPlan* pickup, Geometry *geometry, bool isTopLevel, unsigned int quality)
+void generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality, clock_t end)
+{
+	geometry->clear();
+
+	vector<ancestor> ancestors;
+	recurseMesh(plan, geometry, ancestors, 2.0, quality, true, end);			
+
+	// Make skinnier to more closely mimic the canes found in pickups
+	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
+		applyResizeTransform(geometry->vertices[v], 0.5);
+
+	geometry->compute_normals_from_triangles();
+}
+
+void generateMesh(PickupPlan* pickup, Geometry *geometry, bool isTopLevel, unsigned int quality, clock_t end)
 {
 	if (pickup == NULL)
 		return;
@@ -683,7 +692,7 @@ void generateMesh(PickupPlan* pickup, Geometry *geometry, bool isTopLevel, unsig
 	{
 		uint32_t startVert = geometry->vertices.size();
 		vector<ancestor> ancestors;
-		recurseMesh(pickup->subs[i].plan, geometry, ancestors, pickup->subs[i].length, quality, isTopLevel);
+		recurseMesh(pickup->subs[i].plan, geometry, ancestors, pickup->subs[i].length, quality, isTopLevel, end);
 		for (unsigned int j = startVert; j < geometry->vertices.size(); ++j)
 		{
 			applyPickupTransform(geometry->vertices[j], pickup->subs[i]); 
@@ -696,9 +705,9 @@ void generateMesh(PickupPlan* pickup, Geometry *geometry, bool isTopLevel, unsig
 // keeping a running stack of ancestors nodes in the dependancy DAG
 // and applying them when a leaf node is encountered.
 void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors, float length, 
-	unsigned int quality, bool isTopLevel)
+	unsigned int quality, bool isTopLevel, clock_t end)
 {
-	if (plan == NULL)
+	if (plan == NULL || clock() > end)
 		return;
 
 	// Recurse through to children 
@@ -707,7 +716,7 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors
 	{
 		me.child = i;
 		ancestors.push_back(me);
-		recurseMesh(plan->subs[i].plan, geometry, ancestors, length, quality, false);
+		recurseMesh(plan->subs[i].plan, geometry, ancestors, length, quality, false, end);
 		ancestors.pop_back();
 	}
 

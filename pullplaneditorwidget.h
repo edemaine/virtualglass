@@ -45,7 +45,7 @@ class PullPlanEditorWidget : public QWidget
 
 	signals:
 		void someDataChanged();
-		void newPullPlan(PullPlan* p);
+		void showMessage(const QString& message);
 
 	public slots:
 		void updateEverything();
@@ -62,7 +62,7 @@ class PullPlanEditorWidget : public QWidget
 		void childWidgetDataChanged();
 		void countSpinChanged(int);
 		void controlsTabChanged(int);
-		void geometryThreadFinishedMesh();
+		void geometryThreadFinishedMesh(bool completed);
 
 	private:
 		QMutex tempPullPlanMutex;

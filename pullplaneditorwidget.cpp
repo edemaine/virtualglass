@@ -83,12 +83,15 @@ void PullPlanEditorWidget :: updateEverything()
 
 	twistWidget->updateEverything();
 	twistWidget->setEnabled(plan->getOutermostCasingShape() == CIRCLE_SHAPE);
-
+	
 	tempPullPlanMutex.lock();
 	deep_delete(tempPullPlan);
 	tempPullPlan = deep_copy(plan);
 	tempPullPlanDirty = true;
 	tempPullPlanMutex.unlock();
+
+	QString message("Rendering cane...");
+	emit showMessage(message);
 	wakeWait.wakeOne(); // wake up the thread if it's sleeping
 
 	// Highlight correct pull template
@@ -104,7 +107,7 @@ void PullPlanEditorWidget :: updateEverything()
 	customizeViewWidget->updateEverything();
 }
 
-void PullPlanEditorWidget :: geometryThreadFinishedMesh()
+void PullPlanEditorWidget :: geometryThreadFinishedMesh(bool completed)
 {
 	geometryDirtyMutex.lock();
 	bool dirty = geometryDirty;
@@ -127,7 +130,19 @@ void PullPlanEditorWidget :: geometryThreadFinishedMesh()
 	else
 	{
 		// try to get the lock again in 250 ms
-		QTimer::singleShot(250, this, SLOT(geometryThreadFinishedMesh())); 
+		QTimer::singleShot(250, this, SLOT(geometryThreadFinishedMesh(completed))); 
+		return;
+	}
+
+	if (completed)
+	{
+		QString message("Cane rendered successfully.");
+		emit showMessage(message);
+	}
+	else
+	{
+		QString message("The cane is too complex to render completely.");
+		emit showMessage(message);
 	}
 }
 
@@ -346,7 +361,7 @@ void PullPlanEditorWidget :: setupConnections()
 	connect(addSquareButton, SIGNAL(pressed()), this, SLOT(addSquareButtonPressed()));
 	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(countSpin, SIGNAL(valueChanged(int)), this, SLOT(countSpinChanged(int)));
-	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
+	connect(geometryThread, SIGNAL(finishedMesh(bool)), this, SLOT(geometryThreadFinishedMesh(bool)));
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(customizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));

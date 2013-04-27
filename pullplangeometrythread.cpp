@@ -1,4 +1,5 @@
 
+#include <time.h>
 
 #include "pullplangeometrythread.h"
 #include "pullplaneditorwidget.h"
@@ -12,9 +13,12 @@ PullPlanGeometryThread::PullPlanGeometryThread(PullPlanEditorWidget* _ppew) : pp
 
 void PullPlanGeometryThread::run()
 {
-	bool startOver;
+	bool pullPlanChanged;
+	bool completed;
 	while (1)
 	{
+		sleep:
+
 		ppew->wakeWait.wait(&(ppew->wakeMutex));
 
 		compute:
@@ -28,22 +32,27 @@ void PullPlanGeometryThread::run()
 	
 		// now lock the geometry
 		ppew->tempGeometryMutex.lock();
-		generateMesh(myTempPullPlan, &(ppew->tempGeometry), GlobalGraphicsSetting::MEDIUM);
+		completed = generateMesh(myTempPullPlan, &(ppew->tempGeometry), GlobalGraphicsSetting::MEDIUM);
 		ppew->tempGeometryMutex.unlock();	
 		ppew->geometryDirtyMutex.lock();
 		ppew->geometryDirty = true;
 		ppew->geometryDirtyMutex.unlock();
 
 		ppew->tempPullPlanMutex.lock();
-		startOver = ppew->tempPullPlanDirty;
+		pullPlanChanged = ppew->tempPullPlanDirty;
 		ppew->tempPullPlanMutex.unlock();
-		if (startOver)
+		if (pullPlanChanged)
 		{
 			deep_delete(myTempPullPlan);
 			goto compute;
 		}
 		
-		emit finishedMesh();
+		emit finishedMesh(completed);
+		if (!completed)
+		{
+			deep_delete(myTempPullPlan);
+			goto sleep;
+		}
 
 		// now we don't launch immediately into the high-res version
 		// the waiting is to avoid annoying flashing, gui blocking
@@ -57,9 +66,9 @@ void PullPlanGeometryThread::run()
 
 			// check if piece has changed and start over if so      
 			ppew->tempPullPlanMutex.lock();
-			startOver = ppew->tempPullPlanDirty;
+			pullPlanChanged = ppew->tempPullPlanDirty;
 			ppew->tempPullPlanMutex.unlock();
-			if (startOver)
+			if (pullPlanChanged)
 			{
 				deep_delete(myTempPullPlan);
 				goto compute;
@@ -68,23 +77,23 @@ void PullPlanGeometryThread::run()
 
 		// now lock the geometry
 		ppew->tempGeometryMutex.lock();
-		generateMesh(myTempPullPlan, &(ppew->tempGeometry), GlobalGraphicsSetting::VERY_HIGH);
+		completed = generateMesh(myTempPullPlan, &(ppew->tempGeometry), GlobalGraphicsSetting::VERY_HIGH);
 		ppew->tempGeometryMutex.unlock();	
 		ppew->geometryDirtyMutex.lock();
 		ppew->geometryDirty = true;
 		ppew->geometryDirtyMutex.unlock();
 
 		ppew->tempPullPlanMutex.lock();
-		startOver = ppew->tempPullPlanDirty;
+		pullPlanChanged = ppew->tempPullPlanDirty;
 		ppew->tempPullPlanMutex.unlock();
-		if (startOver)
+		if (pullPlanChanged)
 		{
 			deep_delete(myTempPullPlan);
 			goto compute;
 		}
 		
 		deep_delete(myTempPullPlan);
-		emit finishedMesh();
+		emit finishedMesh(completed);
 	}
 }
 

@@ -38,7 +38,6 @@ class MainWindow : public QMainWindow
 		void mousePressEvent(QMouseEvent* event);
 		void mouseReleaseEvent(QMouseEvent* event);
 		void mouseMoveEvent(QMouseEvent* event);
-		void setupViews();
 		void keyPressEvent(QKeyEvent* e);
 		QString windowTitle();
 		void openFile(QString filename, bool add);
@@ -69,6 +68,8 @@ class MainWindow : public QMainWindow
 		void setupPieceEditor();
 		void setupConnections();
 		void setupMenus();
+		void setupViews();
+		void setupStatusBar();
 		void setupSaveFile();
 		void updateLibrary();
 		void initializeRandomPiece();
@@ -155,6 +156,7 @@ class MainWindow : public QMainWindow
 		void randomComplexPieceExampleActionTriggered();
 		void depthPeelActionTriggered();
 		void attemptToQuit();
+		void showStatusMessage(const QString& message);
 };
 
 #endif

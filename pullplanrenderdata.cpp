@@ -1,4 +1,6 @@
 
+#include <time.h>
+
 #include "glasscolor.h"
 #include "pullplan.h"
 #include "geometry.h"
@@ -22,27 +24,33 @@ using std::pair;
 using std::make_pair;
 using std::vector;
 
-PullPlanRenderData::PullPlanRenderData(PullPlan const *_plan) : plan(deep_copy(_plan)) {
+PullPlanRenderData::PullPlanRenderData(PullPlan const *_plan) : plan(deep_copy(_plan)) 
+{
 }
 
-PullPlanRenderData::~PullPlanRenderData() {
+PullPlanRenderData::~PullPlanRenderData() 
+{
 	deep_delete(plan);
 	plan = NULL;
 }
 
-Geometry *PullPlanRenderData::getGeometry() {
+Geometry *PullPlanRenderData::getGeometry() 
+{
 	Geometry *geom = new Geometry();
 	generateMesh(plan, geom, GlobalGraphicsSetting::HIGH);
 	return geom;
 }
 
-GlassColorRenderData::GlassColorRenderData(GlassColor const *_glassColor) : glassColor(deep_copy(_glassColor)) {
+GlassColorRenderData::GlassColorRenderData(GlassColor const *_glassColor) : glassColor(deep_copy(_glassColor)) 
+{
 }
 
-GlassColorRenderData::~GlassColorRenderData() {
+GlassColorRenderData::~GlassColorRenderData() 
+{
 }
 
-Geometry *GlassColorRenderData::getGeometry() {
+Geometry *GlassColorRenderData::getGeometry() 
+{
 	Geometry *geom = new Geometry();
 	generateMesh(glassColor, geom, GlobalGraphicsSetting::HIGH);
 	return geom;

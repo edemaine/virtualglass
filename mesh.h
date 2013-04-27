@@ -4,6 +4,8 @@
 #define MESH_H
 
 #include <vector>
+#include <time.h>
+
 #include "geometry.h"
 #include "subpickuptemplate.h"
 #include "piecetemplate.h"
@@ -18,9 +20,9 @@ class Spline;
 
 using std::vector;
 
-void generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality);
 void generateMesh(GlassColor* glassColor, Geometry* geometry, unsigned int quality);
-void generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometry, unsigned int quality);
+bool generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality);
+bool generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometry, unsigned int quality);
 
 namespace MeshInternal
 {
@@ -31,10 +33,10 @@ namespace MeshInternal
 	};
 
 	// Methods
-	void generateMesh(PickupPlan* plan, Geometry *geometry, bool isTopLevel, unsigned int quality);
-	void recurseMesh(Piece* piece, Geometry *geometry, vector<ancestor>& ancestors, unsigned int quality);
+	void generateMesh(PickupPlan* plan, Geometry *geometry, bool isTopLevel, unsigned int quality, clock_t end);
+	void generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality, clock_t end);
 	void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors, 
-		float length, unsigned int quality, bool isTopLevel);
+		float length, unsigned int quality, bool isTopLevel, clock_t end);
 
 	float finalRadius(vector<ancestor>& ancestors);
 	float totalTwist(vector<ancestor>& ancestors);

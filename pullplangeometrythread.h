@@ -16,7 +16,7 @@ class PullPlanGeometryThread : public QThread
 		PullPlanEditorWidget* ppew;
 
 	signals:
-		void finishedMesh();
+		void finishedMesh(bool completed);
 };
 
 #endif

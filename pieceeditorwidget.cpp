@@ -107,10 +107,13 @@ void PieceEditorWidget :: updateEverything()
 	tempPiece = deep_copy(piece);
 	tempPieceDirty = true;
 	tempPieceMutex.unlock();
+
+	QString message("Rendering piece...");
+	emit showMessage(message);
 	wakeWait.wakeOne();
 }
 
-void PieceEditorWidget :: geometryThreadFinishedMesh()
+void PieceEditorWidget :: geometryThreadFinishedMesh(bool completed)
 {
 	geometryDirtyMutex.lock();
 	bool dirty = geometryDirty;
@@ -138,9 +141,23 @@ void PieceEditorWidget :: geometryThreadFinishedMesh()
 	else
 	{
 		// try to get the lock again in 250 ms
-		QTimer::singleShot(250, this, SLOT(geometryThreadFinishedMesh()));
+		QTimer::singleShot(250, this, SLOT(geometryThreadFinishedMesh(completed)));
+		return;
 	}
 
+	// If the geometry wasn't completed before the timeout, let the user know it happened.
+	// This is both informative (text explaining what happened and how to avoid) and 
+	// discouraging (popup dialogs are scary/annoying).
+	if (completed)
+	{
+		QString message("Piece rendered successfully.");
+		emit showMessage(message);
+	}
+	else
+	{
+		QString message("The piece is too complex to render completely.");
+		emit showMessage(message);
+	}
 }
 
 void PieceEditorWidget :: pickupParameterSpinBoxChanged(int)
@@ -338,7 +355,7 @@ void PieceEditorWidget :: setupConnections()
 	connect(addControlPointButton, SIGNAL(clicked()), this, SLOT(addControlPointButtonClicked()));
 	connect(removeControlPointButton, SIGNAL(clicked()), this, SLOT(removeControlPointButtonClicked()));
 	
-	connect(geometryThread, SIGNAL(finishedMesh()), this, SLOT(geometryThreadFinishedMesh()));
+	connect(geometryThread, SIGNAL(finishedMesh(bool)), this, SLOT(geometryThreadFinishedMesh(bool)));
 	connect(pickupViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(pieceCustomizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));

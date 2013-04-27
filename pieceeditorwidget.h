@@ -49,6 +49,7 @@ class PieceEditorWidget : public QWidget
 
 	signals:
 		void someDataChanged();
+		void showMessage(const QString& message);
 
 	public slots:
 		void updateEverything();
@@ -58,7 +59,7 @@ class PieceEditorWidget : public QWidget
 		void childWidgetDataChanged();
 		void pickupParameterSpinBoxChanged(int);
 		void pickupParameterSliderChanged(int);
-		void geometryThreadFinishedMesh();
+		void geometryThreadFinishedMesh(bool completed);
 		void addControlPointButtonClicked();
 		void removeControlPointButtonClicked();
 

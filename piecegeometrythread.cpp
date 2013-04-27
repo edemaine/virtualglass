@@ -1,4 +1,6 @@
 
+#include <time.h>
+
 #include "piecegeometrythread.h"
 #include "pieceeditorwidget.h"
 #include "piece.h"
@@ -12,10 +14,13 @@ PieceGeometryThread::PieceGeometryThread(PieceEditorWidget* _pew) : pew(_pew)
 
 void PieceGeometryThread::run()
 {
-	bool startOver;
+	bool pieceChanged;
+	bool completed;
 
 	while (1)
 	{
+		sleep:
+
 		pew->wakeWait.wait(&(pew->wakeMutex));
 		
 		compute:
@@ -28,7 +33,7 @@ void PieceGeometryThread::run()
 		
 		// compute the low-res geometry
 		pew->tempGeometryMutex.lock();
-		generateMesh(myTempPiece, &(pew->tempPieceGeometry), &(pew->tempPickupGeometry), 
+		completed = generateMesh(myTempPiece, &(pew->tempPieceGeometry), &(pew->tempPickupGeometry), 
 			GlobalGraphicsSetting::VERY_LOW);
 		pew->tempGeometryMutex.unlock();	
 		pew->geometryDirtyMutex.lock();
@@ -37,15 +42,21 @@ void PieceGeometryThread::run()
 
 		// if the piece already changed, start over
 		pew->tempPieceMutex.lock();
-		startOver = pew->tempPieceDirty;
+		pieceChanged = pew->tempPieceDirty;
 		pew->tempPieceMutex.unlock();
 
-		if (startOver)
+		if (pieceChanged)
 		{
 			deep_delete(myTempPiece);
 			goto compute;
 		}
-		emit finishedMesh();
+
+		emit finishedMesh(completed);
+		if (!completed)
+		{
+			deep_delete(myTempPiece);
+			goto sleep;
+		}
 
 		// now we don't launch immediately into the high-res version
 		// the waiting is to avoid annoying flashing, gui blocking
@@ -59,10 +70,10 @@ void PieceGeometryThread::run()
 			
 			// check if piece has changed and start over if so	
 			pew->tempPieceMutex.lock();
-			startOver = pew->tempPieceDirty;
+			pieceChanged = pew->tempPieceDirty;
 			pew->tempPieceMutex.unlock();
 
-			if (startOver)
+			if (pieceChanged)
 			{
 				deep_delete(myTempPiece);
 				goto compute;
@@ -71,7 +82,7 @@ void PieceGeometryThread::run()
 
 		// compute the high-res geometry
 		pew->tempGeometryMutex.lock();
-		generateMesh(myTempPiece, &(pew->tempPieceGeometry), &(pew->tempPickupGeometry), 
+		completed = generateMesh(myTempPiece, &(pew->tempPieceGeometry), &(pew->tempPickupGeometry), 
 			GlobalGraphicsSetting::HIGH);
 		pew->tempGeometryMutex.unlock();	
 		pew->geometryDirtyMutex.lock();
@@ -80,17 +91,17 @@ void PieceGeometryThread::run()
 
 		// if the piece changed, start over
 		pew->tempPieceMutex.lock();
-		startOver = pew->tempPieceDirty;
+		pieceChanged = pew->tempPieceDirty;
 		pew->tempPieceMutex.unlock();
 
-		if (startOver)
+		if (pieceChanged)
 		{
 			deep_delete(myTempPiece);
 			goto compute;
 		}
 
 		deep_delete(myTempPiece);
-		emit finishedMesh();
+		emit finishedMesh(completed);
 	}
 }
 

@@ -16,7 +16,7 @@ class PieceGeometryThread : public QThread
 		PieceEditorWidget* pew;
 
 	signals:
-		void finishedMesh();
+		void finishedMesh(bool completed);
 };
 
 #endif

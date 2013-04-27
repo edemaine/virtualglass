@@ -13,6 +13,7 @@
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QScrollArea>
+#include <QStatusBar>
 
 #include "constants.h"
 #include "dependancy.h"
@@ -48,6 +49,7 @@ MainWindow :: MainWindow()
 	setupEditors();
 	setupMenus();
 	setupSaveFile();
+	setupStatusBar();
 	setupConnections();
 	setWindowTitle(windowTitle());
 	setupViews();
@@ -107,6 +109,16 @@ QString MainWindow :: windowTitle()
 		title += " *";
 	title += " " + saveFilename;
 	return title;
+}
+
+void MainWindow :: setupStatusBar()
+{
+	statusBar();
+}
+
+void MainWindow :: showStatusMessage(const QString& message)
+{
+	statusBar()->showMessage(message, 5000);
 }
 
 void MainWindow :: setupViews()
@@ -354,7 +366,7 @@ void MainWindow :: setupConnections()
 	connect(copyPieceButton, SIGNAL(pressed()), this, SLOT(copyPiece()));
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 
-	// the file IO menu stuff
+	// the file menu stuff
 	connect(newFileAction, SIGNAL(triggered()), this, SLOT(newFileActionTriggered()));
 	connect(openFileAction, SIGNAL(triggered()), this, SLOT(openFileActionTriggered()));
 	connect(addFileAction, SIGNAL(triggered()), this, SLOT(addFileActionTriggered()));
@@ -366,13 +378,19 @@ void MainWindow :: setupConnections()
 	connect(saveSelectedAsFileAction, SIGNAL(triggered()), this, SLOT(saveSelectedAsFileActionTriggered()));
 	connect(exitAction, SIGNAL(triggered()), this, SLOT(attemptToQuit()));
 
+	// the examples menu stuff
 	connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
 	connect(randomSimplePieceAction, SIGNAL(triggered()), this, SLOT(randomSimplePieceExampleActionTriggered()));
 
 	connect(randomComplexCaneAction, SIGNAL(triggered()), this, SLOT(randomComplexCaneExampleActionTriggered()));
 	connect(randomComplexPieceAction, SIGNAL(triggered()), this, SLOT(randomComplexPieceExampleActionTriggered()));
 
+	// the performance menu stuff
 	connect(depthPeelAction, SIGNAL(triggered()), this, SLOT(depthPeelActionTriggered()));
+
+	// status bar stuff
+	connect(pullPlanEditorWidget, SIGNAL(showMessage(const QString&)), this, SLOT(showStatusMessage(const QString&)));
+	connect(pieceEditorWidget, SIGNAL(showMessage(const QString&)), this, SLOT(showStatusMessage(const QString&)));
 }
 
 void MainWindow :: depthPeelActionTriggered()
@@ -380,8 +398,7 @@ void MainWindow :: depthPeelActionTriggered()
 	GlobalDepthPeelingSetting::setEnabled(!GlobalDepthPeelingSetting::enabled());
 	depthPeelAction->setChecked(GlobalDepthPeelingSetting::enabled());
 
-	// redraw current editor views
-	// other views are redraw upon changing views anyhow.
+	// lazily redraw only the current editor's view(s)
 	switch (editorStack->currentIndex())
 	{
 		case COLORBAR_VIEW_MODE:
