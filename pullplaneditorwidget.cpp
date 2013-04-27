@@ -22,6 +22,7 @@
 #include "twistwidget.h"
 #include "pullplancrosssectionrender.h"
 #include "globalbackgroundcolor.h"
+#include "globalgraphicssetting.h"
 
 PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -91,7 +92,7 @@ void PullPlanEditorWidget :: updateEverything()
 	tempPullPlanMutex.unlock();
 
 	QString message("Rendering cane...");
-	emit showMessage(message);
+	emit showMessage(message, 0); // show until next message 
 	wakeWait.wakeOne(); // wake up the thread if it's sleeping
 
 	// Highlight correct pull template
@@ -107,7 +108,7 @@ void PullPlanEditorWidget :: updateEverything()
 	customizeViewWidget->updateEverything();
 }
 
-void PullPlanEditorWidget :: geometryThreadFinishedMesh(bool completed)
+void PullPlanEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned int quality)
 {
 	geometryDirtyMutex.lock();
 	bool dirty = geometryDirty;
@@ -130,20 +131,18 @@ void PullPlanEditorWidget :: geometryThreadFinishedMesh(bool completed)
 	else
 	{
 		// try to get the lock again in 250 ms
-		QTimer::singleShot(250, this, SLOT(geometryThreadFinishedMesh(completed))); 
+		QTimer::singleShot(250, this, SLOT(geometryThreadFinishedMesh(completed, quality))); 
 		return;
 	}
 
+	// report what happened if it's the high quality mesh
+	if (quality != GlobalGraphicsSetting::VERY_HIGH)
+		return;
+	QString result;
 	if (completed)
-	{
-		QString message("Cane rendered successfully.");
-		emit showMessage(message);
-	}
+		emit showMessage("Cane rendered successfully.", 5);
 	else
-	{
-		QString message("The cane is too complex to render completely.");
-		emit showMessage(message);
-	}
+		emit showMessage("Cane is too complex to render completely.", 5);
 }
 
 void PullPlanEditorWidget :: setupLayout()
@@ -351,6 +350,9 @@ void PullPlanEditorWidget :: addSquareButtonPressed()
 
 void PullPlanEditorWidget :: setupConnections()
 {
+	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+
+	// editor controls
 	connect(circleCasingPushButton, SIGNAL(clicked()), this, SLOT(circleCasingButtonPressed()));
 	connect(squareCasingPushButton, SIGNAL(clicked()), this, SLOT(squareCasingButtonPressed()));
 	connect(addCasingButton, SIGNAL(clicked()), this, SLOT(addCasingButtonPressed()));
@@ -361,11 +363,15 @@ void PullPlanEditorWidget :: setupConnections()
 	connect(addSquareButton, SIGNAL(pressed()), this, SLOT(addSquareButtonPressed()));
 	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(countSpin, SIGNAL(valueChanged(int)), this, SLOT(countSpinChanged(int)));
-	connect(geometryThread, SIGNAL(finishedMesh(bool)), this, SLOT(geometryThreadFinishedMesh(bool)));
-	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+	connect(controlsTab, SIGNAL(currentChanged(int)), this, SLOT(controlsTabChanged(int)));
+
+	// subeditors
 	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(customizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
-	connect(controlsTab, SIGNAL(currentChanged(int)), this, SLOT(controlsTabChanged(int)));
+	
+	// render thread	
+	connect(geometryThread, SIGNAL(finishedMesh(bool, unsigned int)), 
+		this, SLOT(geometryThreadFinishedMesh(bool, unsigned int)));
 }
 
 void PullPlanEditorWidget :: childWidgetDataChanged()

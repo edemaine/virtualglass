@@ -51,7 +51,7 @@ void PieceGeometryThread::run()
 			goto compute;
 		}
 
-		emit finishedMesh(completed);
+		emit finishedMesh(completed, GlobalGraphicsSetting::VERY_LOW);
 		if (!completed)
 		{
 			deep_delete(myTempPiece);
@@ -101,7 +101,7 @@ void PieceGeometryThread::run()
 		}
 
 		deep_delete(myTempPiece);
-		emit finishedMesh(completed);
+		emit finishedMesh(completed, GlobalGraphicsSetting::HIGH);
 	}
 }
 

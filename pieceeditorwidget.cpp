@@ -24,6 +24,7 @@
 #include "niceviewwidget.h"
 #include "piececrosssectionrender.h"
 #include "globalbackgroundcolor.h"
+#include "globalgraphicssetting.h"
 
 PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -109,11 +110,11 @@ void PieceEditorWidget :: updateEverything()
 	tempPieceMutex.unlock();
 
 	QString message("Rendering piece...");
-	emit showMessage(message);
+	emit showMessage(message, 0); // show until next message 
 	wakeWait.wakeOne();
 }
 
-void PieceEditorWidget :: geometryThreadFinishedMesh(bool completed)
+void PieceEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned int quality)
 {
 	geometryDirtyMutex.lock();
 	bool dirty = geometryDirty;
@@ -141,23 +142,18 @@ void PieceEditorWidget :: geometryThreadFinishedMesh(bool completed)
 	else
 	{
 		// try to get the lock again in 250 ms
-		QTimer::singleShot(250, this, SLOT(geometryThreadFinishedMesh(completed)));
+		QTimer::singleShot(250, this, SLOT(geometryThreadFinishedMesh(completed, quality)));
 		return;
 	}
 
-	// If the geometry wasn't completed before the timeout, let the user know it happened.
-	// This is both informative (text explaining what happened and how to avoid) and 
-	// discouraging (popup dialogs are scary/annoying).
+	// report what happened if it's the high quality mesh
+	if (quality != GlobalGraphicsSetting::HIGH)
+		return;
+	QString result;
 	if (completed)
-	{
-		QString message("Piece rendered successfully.");
-		emit showMessage(message);
-	}
+		emit showMessage("Piece rendered successfully.", 5);
 	else
-	{
-		QString message("The piece is too complex to render completely.");
-		emit showMessage(message);
-	}
+		emit showMessage("Piece is too complex to render completely.", 5);
 }
 
 void PieceEditorWidget :: pickupParameterSpinBoxChanged(int)
@@ -355,7 +351,8 @@ void PieceEditorWidget :: setupConnections()
 	connect(addControlPointButton, SIGNAL(clicked()), this, SLOT(addControlPointButtonClicked()));
 	connect(removeControlPointButton, SIGNAL(clicked()), this, SLOT(removeControlPointButtonClicked()));
 	
-	connect(geometryThread, SIGNAL(finishedMesh(bool)), this, SLOT(geometryThreadFinishedMesh(bool)));
+	connect(geometryThread, SIGNAL(finishedMesh(bool, unsigned int)), 
+		this, SLOT(geometryThreadFinishedMesh(bool, unsigned int)));
 	connect(pickupViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(pieceCustomizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));

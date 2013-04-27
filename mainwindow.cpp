@@ -78,21 +78,24 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 		case COLORBAR_VIEW_MODE:
 			copyGlassColorButton->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
+			colorEditorWidget->updateEverything();
 			break;
 		case PULLPLAN_VIEW_MODE:
 			copyPullPlanButton->setEnabled(true);
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
+			pullPlanEditorWidget->updateEverything();
 			break;
 		case PIECE_VIEW_MODE:
 			copyPieceButton->setEnabled(true);
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
+			pieceEditorWidget->updateEverything();
 			break;
 	}
-	emit someDataChanged();
+	updateLibrary();
 }
 
 QString MainWindow :: windowTitle()
@@ -116,9 +119,9 @@ void MainWindow :: setupStatusBar()
 	statusBar();
 }
 
-void MainWindow :: showStatusMessage(const QString& message)
+void MainWindow :: showStatusMessage(const QString& message, unsigned int timeout)
 {
-	statusBar()->showMessage(message, 5000);
+	statusBar()->showMessage(message, timeout * 1000);
 }
 
 void MainWindow :: setupViews()
@@ -278,18 +281,18 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 
 	if (cblw != NULL)
 	{
-		colorEditorWidget->setGlassColor(cblw->glassColor);
 		setViewMode(COLORBAR_VIEW_MODE);
+		colorEditorWidget->setGlassColor(cblw->glassColor);
 	}
 	else if (plplw != NULL)
 	{
-		pullPlanEditorWidget->setPullPlan(plplw->pullPlan);
 		setViewMode(PULLPLAN_VIEW_MODE);
+		pullPlanEditorWidget->setPullPlan(plplw->pullPlan);
 	}
 	else if (plw != NULL)
 	{
-		pieceEditorWidget->setPiece(plw->piece);
 		setViewMode(PIECE_VIEW_MODE);
+		pieceEditorWidget->setPiece(plw->piece);
 	}
 }
 
@@ -389,8 +392,8 @@ void MainWindow :: setupConnections()
 	connect(depthPeelAction, SIGNAL(triggered()), this, SLOT(depthPeelActionTriggered()));
 
 	// status bar stuff
-	connect(pullPlanEditorWidget, SIGNAL(showMessage(const QString&)), this, SLOT(showStatusMessage(const QString&)));
-	connect(pieceEditorWidget, SIGNAL(showMessage(const QString&)), this, SLOT(showStatusMessage(const QString&)));
+	connect(pullPlanEditorWidget, SIGNAL(showMessage(const QString&, unsigned int)), this, SLOT(showStatusMessage(const QString&, unsigned int)));
+	connect(pieceEditorWidget, SIGNAL(showMessage(const QString&, unsigned int)), this, SLOT(showStatusMessage(const QString&, unsigned int)));
 }
 
 void MainWindow :: depthPeelActionTriggered()

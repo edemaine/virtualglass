@@ -156,7 +156,7 @@ class MainWindow : public QMainWindow
 		void randomComplexPieceExampleActionTriggered();
 		void depthPeelActionTriggered();
 		void attemptToQuit();
-		void showStatusMessage(const QString& message);
+		void showStatusMessage(const QString& message, unsigned int timeout);
 };
 
 #endif

@@ -47,7 +47,7 @@ void PullPlanGeometryThread::run()
 			goto compute;
 		}
 		
-		emit finishedMesh(completed);
+		emit finishedMesh(completed, GlobalGraphicsSetting::MEDIUM);
 		if (!completed)
 		{
 			deep_delete(myTempPullPlan);
@@ -93,7 +93,7 @@ void PullPlanGeometryThread::run()
 		}
 		
 		deep_delete(myTempPullPlan);
-		emit finishedMesh(completed);
+		emit finishedMesh(completed, GlobalGraphicsSetting::VERY_HIGH);
 	}
 }
 
