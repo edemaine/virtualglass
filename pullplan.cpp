@@ -36,8 +36,8 @@ PullPlan :: PullPlan(PullTemplate::Type _templateType)
 	setTemplateType(_templateType);
 }
 
-bool PullPlan :: hasDependencyOn(PullPlan* plan) {
-
+bool PullPlan :: hasDependencyOn(PullPlan* plan) 
+{
 	if (this == plan)
 		return true;
 

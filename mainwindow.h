@@ -40,7 +40,7 @@ class MainWindow : public QMainWindow
 		void mouseMoveEvent(QMouseEvent* event);
 		void keyPressEvent(QKeyEvent* e);
 		QString windowTitle();
-		void openFile(QString filename, bool add);
+		bool openFile(QString filename, bool add);
 
 	protected:
 		void closeEvent(QCloseEvent *event);
@@ -145,7 +145,6 @@ class MainWindow : public QMainWindow
 		void updateEverything();
 		void newGlassColor();
 		void newPullPlan();
-		void newPullPlan(PullPlan* p);
 		void newPiece();
 		void copyGlassColor();
 		void copyPullPlan();

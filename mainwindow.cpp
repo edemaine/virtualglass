@@ -126,10 +126,6 @@ void MainWindow :: showStatusMessage(const QString& message, unsigned int timeou
 
 void MainWindow :: setupViews()
 {
-	// Load color stuff
-	setViewMode(COLORBAR_VIEW_MODE);
-	emit someDataChanged();
-
 	// Load pull template types
 	setViewMode(PULLPLAN_VIEW_MODE);
 	pullPlanEditorWidget->seedTemplates();
@@ -185,9 +181,8 @@ void MainWindow :: deleteCurrentEditingObject()
 				{
 					if (glassColorIsDependancy(gc))
 					{
-						QMessageBox msgBox;
-						msgBox.setText("This color cannot be deleted: other objects use it.");
-						msgBox.exec();
+						QMessageBox::warning(this, "Delete failed", 
+							"This color cannot be deleted:\nother objects use it.");
 					}
 					else
 					{
@@ -219,9 +214,8 @@ void MainWindow :: deleteCurrentEditingObject()
 				{
 					if (pullPlanIsDependancy(p))
 					{
-						QMessageBox msgBox;
-						msgBox.setText("This cane cannot be deleted: other objects use it.");
-						msgBox.exec();
+						QMessageBox::warning(this, "Delete failed", 
+							"This cane cannot be deleted:\nother objects use it.");
 					}
 					else
 					{
@@ -278,6 +272,10 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(childAt(event->pos()));
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
 	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
+
+	// zero out any status messages, as (currently, r957) they only pertain
+	// to rendering of 3D views and so are view mode-specific.
+	statusBar()->clearMessage();
 
 	if (cblw != NULL)
 	{
@@ -443,8 +441,8 @@ void MainWindow :: randomSimpleCaneExampleActionTriggered()
 	PullPlanLibraryWidget* pplw = new PullPlanLibraryWidget(randomPP, this);
 	pullPlanLibraryLayout->addWidget(pplw);
 
-	pullPlanEditorWidget->setPullPlan(randomPP);
 	setViewMode(PULLPLAN_VIEW_MODE);
+	pullPlanEditorWidget->setPullPlan(randomPP);
 }
 
 void MainWindow :: randomComplexCaneExampleActionTriggered()
@@ -463,8 +461,8 @@ void MainWindow :: randomComplexCaneExampleActionTriggered()
 	if (randomComplexPP->hasDependencyOn(randomSPP))
 		pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(randomSPP, this));
 
-	pullPlanEditorWidget->setPullPlan(randomComplexPP);
 	setViewMode(PULLPLAN_VIEW_MODE);
+	pullPlanEditorWidget->setPullPlan(randomComplexPP);
 }
 
 void MainWindow :: randomSimplePieceExampleActionTriggered()
@@ -479,8 +477,8 @@ void MainWindow :: randomSimplePieceExampleActionTriggered()
 	PieceLibraryWidget* plw = new PieceLibraryWidget(randomP, this);
 	pieceLibraryLayout->addWidget(plw);
 
-	pieceEditorWidget->setPiece(randomP);
 	setViewMode(PIECE_VIEW_MODE);
+	pieceEditorWidget->setPiece(randomP);
 }
 
 void MainWindow :: randomComplexPieceExampleActionTriggered()
@@ -505,8 +503,8 @@ void MainWindow :: randomComplexPieceExampleActionTriggered()
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(randomComplexPP2, this));
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(randomP, this));
 
-	pieceEditorWidget->setPiece(randomP);
 	setViewMode(PIECE_VIEW_MODE);
+	pieceEditorWidget->setPiece(randomP);
 }
 
 void MainWindow :: setDirtyBit(bool v)
@@ -679,81 +677,50 @@ void MainWindow :: setupPieceEditor()
 
 void MainWindow :: newPiece()
 {
-	// Create the new piece
 	Piece* newEditorPiece = new Piece(PieceTemplate::TUMBLER);
-
-	// Create the new library entry
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(newEditorPiece, this));
-	pieceEditorWidget->setPiece(newEditorPiece);
-
-	// Load up the right editor
 	setViewMode(PIECE_VIEW_MODE);
+	pieceEditorWidget->setPiece(newEditorPiece);
 }
 
 void MainWindow :: copyPiece()
 {
-	if (editorStack->currentIndex() != PIECE_VIEW_MODE)
-		return;
-
-	// Create the new piece
 	Piece* newEditorPiece = pieceEditorWidget->getPiece()->copy();
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(newEditorPiece, this));
+	setViewMode(PIECE_VIEW_MODE);
 	pieceEditorWidget->setPiece(newEditorPiece);
-
-	emit someDataChanged();
 }
 
 void MainWindow :: newGlassColor()
 {
 	GlassColor* newGlassColor = new GlassColor();
-
-	// Create the new library entry
 	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(newGlassColor, this));
-	colorEditorWidget->setGlassColor(newGlassColor);
-
-	// Load up the right editor
 	setViewMode(COLORBAR_VIEW_MODE);
+	colorEditorWidget->setGlassColor(newGlassColor);
 }
 
 void MainWindow :: copyGlassColor()
 {
-	if (editorStack->currentIndex() != COLORBAR_VIEW_MODE)
-		return;
-
 	GlassColor* newEditorGlassColor = colorEditorWidget->getGlassColor()->copy();
-
-	// Create the new library entry
 	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(newEditorGlassColor, this));
+	setViewMode(COLORBAR_VIEW_MODE);
 	colorEditorWidget->setGlassColor(newEditorGlassColor);
-
-	// Trigger GUI updates
-	emit someDataChanged();
 }
 
 void MainWindow :: newPullPlan()
 {
 	PullPlan *newEditorPlan = new PullPlan(PullTemplate::HORIZONTAL_LINE_CIRCLE);
-	emit newPullPlan(newEditorPlan);
+	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(newEditorPlan, this));
+	setViewMode(PULLPLAN_VIEW_MODE);
+	pullPlanEditorWidget->setPullPlan(newEditorPlan);
 }
 
 void MainWindow :: copyPullPlan()
 {
-	if (editorStack->currentIndex() != PULLPLAN_VIEW_MODE)
-		return;
-
 	PullPlan *newEditorPlan = pullPlanEditorWidget->getPullPlan()->copy();
-	emit newPullPlan(newEditorPlan);
-}
-
-void MainWindow :: newPullPlan(PullPlan* newPlan)
-{
-	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(newPlan, this));
-
-	// Give the new plan to the editor
-	pullPlanEditorWidget->setPullPlan(newPlan);
-
-	// Load up the right editor
+	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(newEditorPlan, this));
 	setViewMode(PULLPLAN_VIEW_MODE);
+	pullPlanEditorWidget->setPullPlan(newEditorPlan);
 }
 
 void MainWindow :: updateEverything()
@@ -1163,35 +1130,31 @@ void MainWindow::exportPLYActionTriggered()
 
 void MainWindow::importSVGActionTriggered()
 {
-	QStringList userSpecifiedFilenames = QFileDialog::getOpenFileNames(this, 
+	QString userSpecifiedFilename = QFileDialog::getOpenFileName(this, 
 		"Open file...", QDir::currentPath(), "Scalable vector graphics file (*.svg)");
+	if (userSpecifiedFilename.isNull())
+		return;
 
-	// Attempt to import the SVG into pullplan
-	for(int i = 0; i < userSpecifiedFilenames.size(); i++)
+	SVG::SVG svg;
+	PullPlan *newEditorPlan = new PullPlan(PullTemplate::BASE_SQUARE);
+	if (!SVG::load_svg(userSpecifiedFilename.toUtf8().constData(), svg, newEditorPlan)) 
 	{
-		SVG::SVG svg;
-		PullPlan *newEditorPlan = new PullPlan(PullTemplate::BASE_SQUARE);
-		if (SVG::load_svg(userSpecifiedFilenames.at(i).toUtf8().constData(), svg, newEditorPlan)) 
-		{
-			// Test if it is square
-			if (svg.page.c[0] == svg.page.c[1]) 
-			{
-				emit newPullPlan(newEditorPlan);
-				pullPlanEditorWidget->update();
-			} 
-			else 
-			{
-				// If its not square, give a little error message
-				QMessageBox::warning(this, "Invalid File", 
-					"The SVG file appears to not be square :-(");
-			}
-		} 
-		else 
-		{
-			// If import fails, give an error message
-			QMessageBox::warning(this, "Import Failed", "Failed to import SVG file :-(");
-		}
+		QMessageBox::warning(this, "Import failed", "Failed to read " + userSpecifiedFilename);
+		deep_delete(newEditorPlan);
+		return;
 	}
+
+	if (svg.page.c[0] != svg.page.c[1]) 
+	{
+		QMessageBox::warning(this, "Import failed", 
+			"The image in " + userSpecifiedFilename + " is not square.");
+		deep_delete(newEditorPlan);
+		return;
+	}
+
+	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(newEditorPlan, this));
+	setViewMode(PULLPLAN_VIEW_MODE);
+	pullPlanEditorWidget->setPullPlan(newEditorPlan);
 }
 
 void MainWindow::getDependantLibraryContents(Piece* piece, vector<GlassColor*>& colors, vector<PullPlan*>& plans, 
@@ -1404,10 +1367,7 @@ void MainWindow::openFile(QString filename, bool add)
 	// if it failed, pop a sad little message box 
 	if (!success) 
 	{
-		QMessageBox msgBox;
-		msgBox.setText("The file " + filename + " cannot be read.");
-		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.exec();
+		QMessageBox::warning(this, "Open failed", "The file " + filename + " cannot be read.");
 		return;
 	}		
 
@@ -1418,6 +1378,7 @@ void MainWindow::openFile(QString filename, bool add)
 	}
 	else 
 	{
+		setViewMode(EMPTY_VIEW_MODE);
 		clearLibrary();	
 		setSaveFilename(filename);
 		setDirtyBit(false);
@@ -1454,12 +1415,6 @@ void MainWindow::openFileActionTriggered()
 		return;
 
 	openFile(userSpecifiedFilename, false);
-
-	setViewMode(EMPTY_VIEW_MODE);
-	
-	// set the save file info
-	setSaveFilename(userSpecifiedFilename);
-	setDirtyBit(false);
 }
 
 void MainWindow::addFileActionTriggered()
@@ -1472,11 +1427,6 @@ void MainWindow::addFileActionTriggered()
 	// try to read in the files....ALL OF THEM
 	for (int i = 0; i < userSpecifiedFilenames.size(); ++i)
 		openFile(userSpecifiedFilenames[i], true);
-
-	setViewMode(EMPTY_VIEW_MODE);
-
-	// turn *on* dirty bit, because we just added stuff
-	setDirtyBit(true);
 }
 
 void MainWindow::saveAllFileActionTriggered()
