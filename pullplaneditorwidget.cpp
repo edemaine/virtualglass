@@ -176,31 +176,36 @@ void PullPlanEditorWidget :: setupLayout()
 	pullTemplateLibraryScrollArea->setFixedHeight(140);
 	editorLayout->addWidget(pullTemplateLibraryScrollArea, 1, 0);
 
+
+
 	// now the two tabs of controls, one for each GUI mode
 	controlsTab = new QTabWidget(this);
+	editorLayout->addWidget(controlsTab, 2, 0);
 
-	// this is the regular view one, with casing, count, and twist controls
 
-	// casing controls
-	QWidget* casingWidget = new QWidget(this);
+	// regular controls: casing, count, twist
+	QWidget* tab1Widget = new QWidget(controlsTab);
+	QVBoxLayout* tab1Layout = new QVBoxLayout(tab1Widget);
+	tab1Widget->setLayout(tab1Layout);
+	controlsTab->addTab(tab1Widget, "Fill and Case");
+
+	QWidget* casingWidget = new QWidget(tab1Widget);
 	QHBoxLayout* casingLayout = new QHBoxLayout(casingWidget);
-	QLabel* casingLabel = new QLabel("Casing:");
-
-	circleCasingPushButton = new QPushButton(this); 
+	QLabel* casingLabel = new QLabel("Casing:", casingWidget);
+	circleCasingPushButton = new QPushButton(casingWidget); 
 	QIcon circleIcon(QPixmap::fromImage(QImage(":/images/circle_icon.png")));
 	circleCasingPushButton->setIcon(circleIcon);
-	squareCasingPushButton = new QPushButton(this); 
+	squareCasingPushButton = new QPushButton(casingWidget); 
 	QIcon squareIcon(QPixmap::fromImage(QImage(":/images/square_icon.png")));
 	squareCasingPushButton->setIcon(squareIcon);
-	addCasingButton = new QPushButton("+");
-	removeCasingButton = new QPushButton("-");
+	addCasingButton = new QPushButton("+", casingWidget);
+	removeCasingButton = new QPushButton("-", casingWidget);
 	casingLayout->addWidget(casingLabel);
 	casingLayout->addWidget(circleCasingPushButton);
 	casingLayout->addWidget(squareCasingPushButton);
 	casingLayout->addWidget(addCasingButton);
 	casingLayout->addWidget(removeCasingButton);
 
-	// count controls
 	countLabel = new QLabel("Count:", casingWidget);
 	countSpin = new QSpinBox(casingWidget);
 	countSpin->setRange(0, 30);
@@ -208,26 +213,26 @@ void PullPlanEditorWidget :: setupLayout()
 	casingLayout->addWidget(countLabel);
 	casingLayout->addWidget(countSpin);
 
-	// prepackaged twist controls
-	twistWidget = new TwistWidget(&(plan->twist), 10, this);
+	twistWidget = new TwistWidget(&(plan->twist), 10, tab1Widget);
 
-	// combine controls into a widget for the first tab
-	QWidget* tab1Widget = new QWidget(this);
-	QVBoxLayout* tab1Layout = new QVBoxLayout(tab1Widget);
-	tab1Widget->setLayout(tab1Layout);
 	tab1Layout->addWidget(casingWidget);
 	tab1Layout->addWidget(twistWidget);
 	tab1Layout->addStretch(1);
-	controlsTab->addTab(tab1Widget, "Fill and Case");
 
-	// next build the controls for the custom view
-	QWidget* customControlsWidget = new QWidget(this);
+
+	// custom controls: add circle, square, duplicate selection, delete selection
+	QWidget* tab2Widget = new QWidget(controlsTab);
+	QVBoxLayout* tab2Layout = new QVBoxLayout(tab2Widget);
+	tab2Widget->setLayout(tab2Layout);
+	controlsTab->addTab(tab2Widget, "Customize Layout");
+
+	QWidget* customControlsWidget = new QWidget(tab2Widget);
 	QHBoxLayout* customControlsLayout = new QHBoxLayout(customControlsWidget);
 	customControlsWidget->setLayout(customControlsLayout);
-	addCircleButton = new QPushButton("Add Circle");
-	addSquareButton = new QPushButton("Add Square");
-	copySelectedButton = new QPushButton("Duplicate");
-	deleteSelectedButton = new QPushButton("Delete");
+	addCircleButton = new QPushButton("Add Circle", customControlsWidget);
+	addSquareButton = new QPushButton("Add Square", customControlsWidget);
+	copySelectedButton = new QPushButton("Duplicate", customControlsWidget);
+	deleteSelectedButton = new QPushButton("Delete", customControlsWidget);
 	customControlsLayout->addStretch(1);
 	customControlsLayout->addWidget(addCircleButton);
 	customControlsLayout->addWidget(addSquareButton);
@@ -235,14 +240,9 @@ void PullPlanEditorWidget :: setupLayout()
 	customControlsLayout->addWidget(deleteSelectedButton);
 	customControlsLayout->addStretch(1);
 	
-	// combine controls into a widget for the second tab
-	QWidget* tab2Widget = new QWidget(this);
-	QVBoxLayout* tab2Layout = new QVBoxLayout(tab2Widget);
-	tab2Widget->setLayout(tab2Layout);
 	tab2Layout->addWidget(customControlsWidget);
 	tab2Layout->addStretch(1);
-	controlsTab->addTab(tab2Widget, "Customize Layout");
-	editorLayout->addWidget(controlsTab, 2, 0);
+
 
 	// below the tabs goes a labeled descriptor (changes depending on view)
 	descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", this);
@@ -250,6 +250,8 @@ void PullPlanEditorWidget :: setupLayout()
 	editorLayout->addWidget(descriptionLabel, 3, 0);
 
 	// at this point the editor GUI elements are done
+
+
 
 	// now add the 3D view and its label
 	editorLayout->addWidget(niceViewWidget, 0, 1, 3, 1);
@@ -382,6 +384,7 @@ void PullPlanEditorWidget :: setupConnections()
 
 void PullPlanEditorWidget :: childWidgetDataChanged()
 {
+	updateEverything();
 	emit someDataChanged();
 }
 
@@ -424,13 +427,16 @@ void PullPlanEditorWidget :: seedTemplates()
 void PullPlanEditorWidget :: setPullPlan(PullPlan* _plan)
 {
 	plan = _plan;
+	controlsTab->setCurrentIndex(0);
+	updateEverything();
 	twistWidget->setTwist(&(plan->twist));
 	viewWidget->setPullPlan(plan);
 	customizeViewWidget->setPullPlan(plan);
-	updateEverything();
 }
 
 PullPlan* PullPlanEditorWidget :: getPullPlan()
 {
 	return plan;
 }
+
+

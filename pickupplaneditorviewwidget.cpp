@@ -203,6 +203,7 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		}
 		else
 			pickup->subs[subplanIndex].plan = droppedPlan;
+		updateEverything();
 		emit someDataChanged();
 	}
 	else

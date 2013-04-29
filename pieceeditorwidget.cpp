@@ -261,11 +261,14 @@ void PieceEditorWidget :: setupLayout()
 	pieceTemplateLibraryScrollArea->setFixedHeight(140);
 	editorLayout->addWidget(pieceTemplateLibraryScrollArea, 1, 1);
 
+
+
 	// layouts containing pickup and piece template parameters in the third row
 
 	// Pickup parameter layout
 	pickupControlsTab = new QTabWidget(this);
 	editorLayout->addWidget(pickupControlsTab, 2, 0);
+
 
 	QWidget* pickupParamWidget = new QWidget(pickupControlsTab);
 	QVBoxLayout* pickupParamLayout = new QVBoxLayout(pickupParamWidget);
@@ -274,33 +277,51 @@ void PieceEditorWidget :: setupLayout()
 	addPickupParam(pickupParamLayout);
 	pickupControlsTab->addTab(pickupParamWidget, "Fill and Case");
 
+	// below the tabs goes a labeled descriptor (changes depending on view)
 	QLabel* pickupEditorDescriptionLabel = new QLabel("Pickup editor - drag color or canes in.", this);
 	pickupEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	editorLayout->addWidget(pickupEditorDescriptionLabel, 3, 0);
+
+
 	
 	// Piece parameter layout 
 	pieceControlsTab = new QTabWidget(this);
 	editorLayout->addWidget(pieceControlsTab, 2, 1);
 
+
+	// Regular controls tab: twist
 	QWidget* tab1Widget = new QWidget(pieceControlsTab);
 	QVBoxLayout* tab1Layout = new QVBoxLayout(tab1Widget);
 	tab1Widget->setLayout(tab1Layout); 
+	pieceControlsTab->addTab(tab1Widget, "Twist");
+
 	twistWidget = new TwistWidget(&(piece->twist), 3.0, pieceControlsTab);
 	tab1Layout->addWidget(twistWidget, 0);
 	tab1Layout->addStretch(10);
-	pieceControlsTab->addTab(tab1Widget, "Twist");
 
+
+	// Custom controls tab
 	QWidget* tab2Widget = new QWidget(pieceControlsTab);
-	QGridLayout* splineParamLayout = new QGridLayout(tab2Widget);
-	tab2Widget->setLayout(splineParamLayout);
-	addControlPointButton = new QPushButton("Add control point", tab2Widget);
-	removeControlPointButton = new QPushButton("Remove control point", tab2Widget);
-	splineParamLayout->addWidget(addControlPointButton, 0, 1);
-	splineParamLayout->addWidget(removeControlPointButton, 0, 2);
-	splineParamLayout->setColumnStretch(0, 1);
-	splineParamLayout->setColumnStretch(3, 1);
+	QVBoxLayout* tab2Layout = new QVBoxLayout(tab2Widget);
+	tab2Widget->setLayout(tab2Layout);
 	pieceControlsTab->addTab(tab2Widget, "Customize");
 
+	QWidget* customPieceControlsWidget = new QWidget(tab2Widget);
+	QHBoxLayout* customPieceControlsLayout = new QHBoxLayout(tab2Widget);
+	customPieceControlsWidget->setLayout(customPieceControlsLayout); 
+
+	addControlPointButton = new QPushButton("Add control point", customPieceControlsWidget);
+	removeControlPointButton = new QPushButton("Remove control point", customPieceControlsWidget);
+	customPieceControlsLayout->addStretch(1);
+	customPieceControlsLayout->addWidget(addControlPointButton);
+	customPieceControlsLayout->addWidget(removeControlPointButton);
+	customPieceControlsLayout->addStretch(1);
+
+	tab2Layout->addWidget(customPieceControlsWidget);
+	tab2Layout->addStretch(1);	
+
+
+	// below the tabs goes a labeled descriptor (changes depending on view)
 	pieceEditorDescriptionLabel = new QLabel("Piece editor.", this);
 	pieceEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	editorLayout->addWidget(pieceEditorDescriptionLabel, 3, 1);
@@ -367,7 +388,6 @@ void PieceEditorWidget :: setupConnections()
 	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(pieceCustomizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(pieceControlsTab, SIGNAL(currentChanged(int)), this, SLOT(pieceControlsTabChanged(int)));
-	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }
 
 void PieceEditorWidget :: addControlPointButtonClicked()
@@ -469,10 +489,11 @@ void PieceEditorWidget :: setPickupTemplateType(enum PickupTemplate::Type _type)
 void PieceEditorWidget :: setPiece(Piece* _piece)
 {
 	piece = _piece;
+	pieceControlsTab->setCurrentIndex(0);
+	updateEverything();
 	pickupViewWidget->setPickup(piece->pickup);
 	twistWidget->setTwist(&(piece->twist));
 	pieceCustomizeViewWidget->setPiece(piece);
-	updateEverything();
 }
 
 Piece* PieceEditorWidget :: getPiece()

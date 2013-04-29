@@ -435,6 +435,7 @@ void MainWindow :: randomSimpleCaneExampleActionTriggered()
 
 	setViewMode(PULLPLAN_VIEW_MODE);
 	pullPlanEditorWidget->setPullPlan(randomPP);
+	updateLibrary();
 }
 
 void MainWindow :: randomComplexCaneExampleActionTriggered()
@@ -455,6 +456,7 @@ void MainWindow :: randomComplexCaneExampleActionTriggered()
 
 	setViewMode(PULLPLAN_VIEW_MODE);
 	pullPlanEditorWidget->setPullPlan(randomComplexPP);
+	updateLibrary();
 }
 
 void MainWindow :: randomSimplePieceExampleActionTriggered()
@@ -471,6 +473,7 @@ void MainWindow :: randomSimplePieceExampleActionTriggered()
 
 	setViewMode(PIECE_VIEW_MODE);
 	pieceEditorWidget->setPiece(randomP);
+	updateLibrary();
 }
 
 void MainWindow :: randomComplexPieceExampleActionTriggered()
@@ -497,6 +500,7 @@ void MainWindow :: randomComplexPieceExampleActionTriggered()
 
 	setViewMode(PIECE_VIEW_MODE);
 	pieceEditorWidget->setPiece(randomP);
+	updateLibrary();
 }
 
 void MainWindow :: setDirtyBitTrue()
@@ -681,6 +685,7 @@ void MainWindow :: newPiece()
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(newEditorPiece, this));
 	setViewMode(PIECE_VIEW_MODE);
 	pieceEditorWidget->setPiece(newEditorPiece);
+	updateLibrary();
 }
 
 void MainWindow :: copyPiece()
@@ -689,6 +694,7 @@ void MainWindow :: copyPiece()
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(newEditorPiece, this));
 	setViewMode(PIECE_VIEW_MODE);
 	pieceEditorWidget->setPiece(newEditorPiece);
+	updateLibrary();
 }
 
 void MainWindow :: newGlassColor()
@@ -697,6 +703,7 @@ void MainWindow :: newGlassColor()
 	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(newGlassColor, this));
 	setViewMode(COLORBAR_VIEW_MODE);
 	colorEditorWidget->setGlassColor(newGlassColor);
+	updateLibrary();
 }
 
 void MainWindow :: copyGlassColor()
@@ -705,6 +712,7 @@ void MainWindow :: copyGlassColor()
 	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(newEditorGlassColor, this));
 	setViewMode(COLORBAR_VIEW_MODE);
 	colorEditorWidget->setGlassColor(newEditorGlassColor);
+	updateLibrary();
 }
 
 void MainWindow :: newPullPlan()
@@ -713,6 +721,7 @@ void MainWindow :: newPullPlan()
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(newEditorPlan, this));
 	setViewMode(PULLPLAN_VIEW_MODE);
 	pullPlanEditorWidget->setPullPlan(newEditorPlan);
+	updateLibrary();
 }
 
 void MainWindow :: copyPullPlan()
@@ -721,6 +730,7 @@ void MainWindow :: copyPullPlan()
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(newEditorPlan, this));
 	setViewMode(PULLPLAN_VIEW_MODE);
 	pullPlanEditorWidget->setPullPlan(newEditorPlan);
+	updateLibrary();
 }
 
 // returns whether the pull plan is a dependancy of something in the library
@@ -970,15 +980,15 @@ void MainWindow::setupMenus()
 	addFileAction->setToolTip("Add an existing file.");
 
 	//import svg cane
-	importSVGFileAction = new QAction("&Import cane from SVG", this);
+	importSVGFileAction = new QAction("&Import cane from .svg", this);
 	importSVGFileAction->setToolTip("Import cane cross section from .svg file.");
 
 	//export ply object
-	exportPLYFileAction = new QAction("&Export glass to PLY", this);
+	exportPLYFileAction = new QAction("&Export glass to .ply", this);
 	exportPLYFileAction->setToolTip("Export cane or piece");
 	
 	//export obj object
-	exportOBJFileAction = new QAction("&Export glass to OBJ", this);
+	exportOBJFileAction = new QAction("&Export glass to .obj", this);
 	exportOBJFileAction->setToolTip("Export cane or piece");
 	
 	//save
