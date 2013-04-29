@@ -4,7 +4,7 @@
 
 GlassLibraryWidget :: GlassLibraryWidget(QWidget* _parent) : QLabel(_parent)
 {
-	hasDependancy = false;
+	setDependancy(false, IS_DEPENDANCY);
 }
 
 void GlassLibraryWidget :: updateStyleSheet() 

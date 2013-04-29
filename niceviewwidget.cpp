@@ -16,7 +16,7 @@
 #include "glassopengl.h"
 
 NiceViewWidget :: NiceViewWidget(enum CameraMode cameraMode, QWidget *parent) 
-	: QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer), parent), peelRenderer(NULL)
+	: QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer | QGL::SampleBuffers), parent), peelRenderer(NULL)
 {
 	leftMouseDown = false;
 
@@ -97,9 +97,10 @@ void NiceViewWidget :: initializePeel()
 void NiceViewWidget :: initializeGL()
 {
 	initializeGLCalled = true;
-	initializePeel();
 
 	GlassOpenGL::initialize();
+	initializePeel();
+
 	GlassOpenGL::errors("NiceViewWidget::initializeGL");
 }
 

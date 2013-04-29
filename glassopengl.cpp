@@ -31,6 +31,7 @@ void initialize()
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
 }
 
 void renderWithoutDepthPeeling(const Geometry& geometry)
