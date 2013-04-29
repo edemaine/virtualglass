@@ -40,7 +40,7 @@ class MainWindow : public QMainWindow
 		void mouseMoveEvent(QMouseEvent* event);
 		void keyPressEvent(QKeyEvent* e);
 		QString windowTitle();
-		bool openFile(QString filename, bool add);
+		void openFile(QString filename, bool add);
 
 	protected:
 		void closeEvent(QCloseEvent *event);
@@ -68,10 +68,8 @@ class MainWindow : public QMainWindow
 		void setupPieceEditor();
 		void setupConnections();
 		void setupMenus();
-		void setupViews();
 		void setupStatusBar();
 		void setupSaveFile();
-		void updateLibrary();
 		void initializeRandomPiece();
 		void deleteCurrentEditingObject();
 		void setViewMode(enum ViewMode m);
@@ -133,6 +131,7 @@ class MainWindow : public QMainWindow
 		QAction *depthPeelAction;
 
 	private slots:
+		void setDirtyBitTrue();
 		void newFileActionTriggered();
 		void openFileActionTriggered();
 		void addFileActionTriggered();
@@ -142,7 +141,7 @@ class MainWindow : public QMainWindow
 		void importSVGActionTriggered();
 		void exportPLYActionTriggered();
 		void exportOBJActionTriggered();
-		void updateEverything();
+		void updateLibrary();
 		void newGlassColor();
 		void newPullPlan();
 		void newPiece();

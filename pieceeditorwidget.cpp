@@ -38,6 +38,8 @@ PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 	setupLayout();
 	setupThreading();
 	setupConnections();
+
+	seedTemplates();
 }
 
 void PieceEditorWidget :: resetPiece()
@@ -170,7 +172,10 @@ void PieceEditorWidget :: pickupParameterSpinBoxChanged(int)
 		}
 	}
 	if (pieceChanged)
+	{
+		updateEverything();
 		emit someDataChanged();
+	}
 }
 
 void PieceEditorWidget :: pickupParameterSliderChanged(int)
@@ -187,7 +192,10 @@ void PieceEditorWidget :: pickupParameterSliderChanged(int)
 		}
 	}
 	if (pieceChanged)
+	{
+		updateEverything();
 		emit someDataChanged();
+	}
 }
 
 void PieceEditorWidget :: addPickupParam(QVBoxLayout* pickupParamLayout)
@@ -310,6 +318,7 @@ void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
 		if (pktlw->type != piece->pickup->getTemplateType())
 		{
 			piece->pickup->setTemplateType(pktlw->type);
+			updateEverything();
 			emit someDataChanged();
 		}
 	}
@@ -321,6 +330,7 @@ void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
 		{
 			pieceControlsTab->setCurrentIndex(0);
 			piece->setTemplateType(ptlw->type);
+			updateEverything();
 			emit someDataChanged();
 		}
 	}
@@ -363,12 +373,14 @@ void PieceEditorWidget :: setupConnections()
 void PieceEditorWidget :: addControlPointButtonClicked()
 {
 	piece->spline.addPoint(Point2D(make_vector(0.0f, 0.0f)));
+	updateEverything();
 	emit someDataChanged();
 }
 
 void PieceEditorWidget :: removeControlPointButtonClicked()
 {
 	piece->spline.removePoint();
+	updateEverything();
 	emit someDataChanged();
 }
 
@@ -383,12 +395,14 @@ void PieceEditorWidget :: pieceControlsTabChanged(int tab)
 	{
 		piece->setTemplateType(PieceTemplate::CUSTOM);
 		pieceEditorDescriptionLabel->setText("Piece customizer.");
+		updateEverything();
 		emit someDataChanged();
 	}
 }
 
 void PieceEditorWidget :: childWidgetDataChanged()
 {
+	updateEverything();
 	emit someDataChanged();
 }
 
@@ -434,18 +448,21 @@ void PieceEditorWidget :: updateLibraryWidgetPixmaps(PieceLibraryWidget* w)
 void PieceEditorWidget :: setPickupParameter(int param, int value)
 {
 	piece->pickup->setParameter(param, value);
+	updateEverything();
 	emit someDataChanged();
 }
 
 void PieceEditorWidget :: setPieceTemplateType(enum PieceTemplate::Type _type)
 {
 	piece->setTemplateType(_type);
+	updateEverything();
 	emit someDataChanged();
 }
 
 void PieceEditorWidget :: setPickupTemplateType(enum PickupTemplate::Type _type)
 {
 	piece->pickup->setTemplateType(_type);
+	updateEverything();
 	emit someDataChanged();
 }
 
@@ -455,7 +472,7 @@ void PieceEditorWidget :: setPiece(Piece* _piece)
 	pickupViewWidget->setPickup(piece->pickup);
 	twistWidget->setTwist(&(piece->twist));
 	pieceCustomizeViewWidget->setPiece(piece);
-	emit someDataChanged();	
+	updateEverything();
 }
 
 Piece* PieceEditorWidget :: getPiece()

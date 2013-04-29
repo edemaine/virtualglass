@@ -236,7 +236,7 @@ void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 
 	setMinMaxCasingRadii(&min, &max);	
 	plan->setCasingThickness(MIN(MAX(radius, min), max), draggedCasingIndex);
-
+	updateEverything();
 	emit someDataChanged();
 }
 
@@ -417,6 +417,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 
 	subplansHighlighted.clear();
 	casingsHighlighted.clear();
+	updateEverything();
 	emit someDataChanged();
 }
 

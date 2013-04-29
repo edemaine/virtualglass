@@ -36,6 +36,8 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 	setupLayout();
 	setupThreading();
 	setupConnections();
+
+	seedTemplates();
 }
 
 void PullPlanEditorWidget :: resetPullPlan()
@@ -284,6 +286,7 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
 			// as they're no longer working on a custom template
 			controlsTab->setCurrentIndex(0);
 			plan->setTemplateType(ptlw->type);	
+			updateEverything();
 			emit someDataChanged();
 		}
 	}
@@ -300,6 +303,7 @@ void PullPlanEditorWidget :: controlsTabChanged(int tab)
 	{
 		plan->setTemplateType(PullTemplate::CUSTOM);				
 		descriptionLabel->setText("Cane customizer - select and drag shapes around to customize cane layout.");
+		updateEverything();
 		emit someDataChanged();
 	}
 }
@@ -307,24 +311,28 @@ void PullPlanEditorWidget :: controlsTabChanged(int tab)
 void PullPlanEditorWidget :: circleCasingButtonPressed()
 {
 	plan->setOutermostCasingShape(CIRCLE_SHAPE);
-	emit someDataChanged(); 
+	updateEverything();
+	emit someDataChanged();
 }
 
 void PullPlanEditorWidget :: squareCasingButtonPressed()
 {
 	plan->setOutermostCasingShape(SQUARE_SHAPE);
+	updateEverything();
 	emit someDataChanged();
 }
 
 void PullPlanEditorWidget :: removeCasingButtonPressed()
 {
 	plan->removeCasing();
+	updateEverything();
 	emit someDataChanged();
 }
 
 void PullPlanEditorWidget :: addCasingButtonPressed()
 {
 	plan->addCasing(plan->getOutermostCasingShape());
+	updateEverything();
 	emit someDataChanged();
 }
 
@@ -350,8 +358,6 @@ void PullPlanEditorWidget :: addSquareButtonPressed()
 
 void PullPlanEditorWidget :: setupConnections()
 {
-	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
-
 	// editor controls
 	connect(circleCasingPushButton, SIGNAL(clicked()), this, SLOT(circleCasingButtonPressed()));
 	connect(squareCasingPushButton, SIGNAL(clicked()), this, SLOT(squareCasingButtonPressed()));
@@ -386,6 +392,7 @@ void PullPlanEditorWidget :: countSpinChanged(int)
 	if (count != static_cast<unsigned int>(countSpin->value()))
 	{
 		plan->setCount(countSpin->value());
+		updateEverything();
 		emit someDataChanged();
 	}
 }
@@ -420,7 +427,7 @@ void PullPlanEditorWidget :: setPullPlan(PullPlan* _plan)
 	twistWidget->setTwist(&(plan->twist));
 	viewWidget->setPullPlan(plan);
 	customizeViewWidget->setPullPlan(plan);
-	emit someDataChanged();	
+	updateEverything();
 }
 
 PullPlan* PullPlanEditorWidget :: getPullPlan()

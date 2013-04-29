@@ -42,13 +42,11 @@ class PullPlanEditorWidget : public QWidget
 		void mousePressEvent(QMouseEvent*);
 		void writePlanToPLYFile(QString& filename);
 		void writePlanToOBJFile(QString& filename);
+		void updateEverything();
 
 	signals:
 		void someDataChanged();
 		void showMessage(const QString& message, unsigned int timeout);
-
-	public slots:
-		void updateEverything();
 
 	private slots:
 		void circleCasingButtonPressed();

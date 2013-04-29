@@ -30,6 +30,7 @@ class ColorEditorWidget : public QWidget
 		ColorEditorWidget(QWidget* parent=0);
 		void resetGlassColor();
 		void setGlassColor(GlassColor* _color);
+		void updateEverything();
 		GlassColor* getGlassColor();
 
 	signals:
@@ -38,8 +39,7 @@ class ColorEditorWidget : public QWidget
 	protected:
 		void mousePressEvent(QMouseEvent* event);
 
-	public slots:
-		void updateEverything();
+	private slots:
 		void alphaSliderPositionChanged(int);
 		void collectionComboBoxChanged(int);		
 

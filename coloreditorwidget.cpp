@@ -44,7 +44,7 @@ GlassColor* ColorEditorWidget :: getGlassColor()
 void ColorEditorWidget :: setGlassColor(GlassColor* _glassColor) 
 {
 	glassColor = _glassColor;
-	emit someDataChanged();
+	updateEverything();
 }
 
 
@@ -123,7 +123,6 @@ void ColorEditorWidget :: setupLayout()
 
 void ColorEditorWidget :: setupConnections()
 {
-	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 	connect(collectionComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(collectionComboBoxChanged(int)));
 	connect(alphaSlider, SIGNAL(valueChanged(int)), this, SLOT(alphaSliderPositionChanged(int)));
 }
@@ -176,26 +175,28 @@ void ColorEditorWidget :: loadCollection(QString fileName)
 
 void ColorEditorWidget :: alphaSliderPositionChanged(int)
 {
-	if (alphaSlider->sliderPosition() != (int) (glassColor->getColor().a * 255))
-	{
-		Color c = glassColor->getColor();
-		c.a = (255 - alphaSlider->sliderPosition()) / 255.0;
-		glassColor->setColor(c);
-		emit someDataChanged();
-	} 
+	if (alphaSlider->sliderPosition() == static_cast<int>(glassColor->getColor().a * 255))
+		return;
+
+	Color c = glassColor->getColor();
+	c.a = (255 - alphaSlider->sliderPosition()) / 255.0;
+	glassColor->setColor(c);
+	updateEverything();
+	emit someDataChanged();
 }
 
 void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 {
 	PureColorLibraryWidget* pclw = dynamic_cast<PureColorLibraryWidget*>(childAt(event->pos()));
-	if (pclw != NULL)
-	{
-		glassColor->setColor(pclw->getColor());
-		glassColor->setShortName(pclw->getShortName());
-		glassColor->setLongName(pclw->getLongName());
-		this->alphaSlider->setSliderPosition(255 - int(glassColor->getColor().a * 255));
-		emit someDataChanged();	
-	}
+	if (pclw == NULL)
+		return;
+
+	glassColor->setColor(pclw->getColor());
+	glassColor->setShortName(pclw->getShortName());
+	glassColor->setLongName(pclw->getLongName());
+	this->alphaSlider->setSliderPosition(255 - int(glassColor->getColor().a * 255));
+	updateEverything();
+	emit someDataChanged();	
 }
 
 void ColorEditorWidget :: updateEverything()

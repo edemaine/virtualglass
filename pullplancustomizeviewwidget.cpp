@@ -217,6 +217,7 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 						(adjustedX(event->pos().x()) - mouseStartingLoc.x)/(squareSize/2.0 - 10);
 					plan->subs[subplansSelected[i]].location.y += 
 						(adjustedY(event->pos().y()) - mouseStartingLoc.y)/(squareSize/2.0 - 10);
+					updateEverything();
 					emit someDataChanged();
 				}
 				mouseStartingLoc.x=(adjustedX(event->pos().x()));
@@ -249,6 +250,7 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 				{
 					plan->subs[subplansSelected[i]].diameter *= proportion;
 				}
+				updateEverything();
 				emit someDataChanged();
 			}
 			else
@@ -280,6 +282,7 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 						+ ((plan->subs[subplansSelected[i]].location.y 
 							- (center_y - 10 - drawSize/2)/double(drawSize/2.0))*no_proportion);
 				}
+				updateEverything();
 				emit someDataChanged();
 			}
 			break;
@@ -407,6 +410,7 @@ void PullPlanCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent* event)
 	
 	mouseStartingLoc.x = (adjustedX(event->pos().x()));
 	mouseStartingLoc.y = (adjustedY(event->pos().y()));
+	updateEverything();
 	emit someDataChanged();
 	boundActiveBox();
 	updateIndexes(event->pos());
@@ -427,6 +431,7 @@ void PullPlanCustomizeViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 	mouseStartingLoc.x=(adjustedX(event->pos().x()));
 	mouseStartingLoc.y=(adjustedY(event->pos().y()));
 	boundActiveBox();
+	updateEverything();
 	emit someDataChanged();
 	update();
 }
@@ -720,6 +725,7 @@ void PullPlanCustomizeViewWidget :: copySelectionPressed()
 	{
 		subplansSelected.push_back(i);
 	}
+	updateEverything();
 	emit someDataChanged();
 	boundActiveBox();
 	update();
@@ -741,6 +747,7 @@ void PullPlanCustomizeViewWidget :: deleteSelectionPressed()
 	hoveringIndex = -1;
 	activeBoxIndex = -1;
 	activeControlPoint = -1;
+	updateEverything();
 	emit someDataChanged();
 	boundActiveBox();
 	update();
@@ -762,6 +769,7 @@ void PullPlanCustomizeViewWidget :: addCirclePressed()
 		SubpullTemplate(new PullPlan(PullTemplate::BASE_CIRCLE), CIRCLE_SHAPE, p, diameter));
 	subplansSelected.clear();
 	subplansSelected.push_back(0);
+	updateEverything();
 	emit someDataChanged();
 	boundActiveBox();
 	update();
@@ -783,6 +791,7 @@ void PullPlanCustomizeViewWidget :: addSquarePressed()
 		SubpullTemplate(new PullPlan(PullTemplate::BASE_SQUARE), SQUARE_SHAPE, p, diameter));
 	subplansSelected.clear();
 	subplansSelected.push_back(0);
+	updateEverything();
 	emit someDataChanged();
 	boundActiveBox();
 	update();

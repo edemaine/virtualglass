@@ -52,7 +52,6 @@ MainWindow :: MainWindow()
 	setupStatusBar();
 	setupConnections();
 	setWindowTitle(windowTitle());
-	setupViews();
 
 	// do the finishing touches to put the GUI in fresh state
 	setViewMode(EMPTY_VIEW_MODE);
@@ -78,24 +77,20 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 		case COLORBAR_VIEW_MODE:
 			copyGlassColorButton->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
-			colorEditorWidget->updateEverything();
 			break;
 		case PULLPLAN_VIEW_MODE:
 			copyPullPlanButton->setEnabled(true);
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
-			pullPlanEditorWidget->updateEverything();
 			break;
 		case PIECE_VIEW_MODE:
 			copyPieceButton->setEnabled(true);
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
-			pieceEditorWidget->updateEverything();
 			break;
 	}
-	updateLibrary();
 }
 
 QString MainWindow :: windowTitle()
@@ -122,17 +117,6 @@ void MainWindow :: setupStatusBar()
 void MainWindow :: showStatusMessage(const QString& message, unsigned int timeout)
 {
 	statusBar()->showMessage(message, timeout * 1000);
-}
-
-void MainWindow :: setupViews()
-{
-	// Load pull template types
-	setViewMode(PULLPLAN_VIEW_MODE);
-	pullPlanEditorWidget->seedTemplates();
-
-	// Load pickup and piece template types
-	setViewMode(PIECE_VIEW_MODE);
-	pieceEditorWidget->seedTemplates();
 }
 
 void MainWindow :: unhighlightAllLibraryWidgets()
@@ -197,7 +181,8 @@ void MainWindow :: deleteCurrentEditingObject()
 
 			colorEditorWidget->setGlassColor(dynamic_cast<GlassColorLibraryWidget*>(colorBarLibraryLayout->itemAt(
 					MIN(colorBarLibraryLayout->count()-1, i))->widget())->glassColor);
-			emit someDataChanged();
+			updateLibrary();
+			setDirtyBit(true);
 			break;
 		}
 		case PULLPLAN_VIEW_MODE:
@@ -230,7 +215,8 @@ void MainWindow :: deleteCurrentEditingObject()
 
 			pullPlanEditorWidget->setPullPlan(dynamic_cast<PullPlanLibraryWidget*>(pullPlanLibraryLayout->itemAt(
 					MIN(pullPlanLibraryLayout->count()-1, i))->widget())->pullPlan);
-			emit someDataChanged();
+			updateLibrary();
+			setDirtyBit(true);
 			break;
 		}
 		case PIECE_VIEW_MODE:
@@ -255,7 +241,8 @@ void MainWindow :: deleteCurrentEditingObject()
 
 			pieceEditorWidget->setPiece(dynamic_cast<PieceLibraryWidget*>(pieceLibraryLayout->itemAt(
 					MIN(pieceLibraryLayout->count()-1, i))->widget())->piece);
-			emit someDataChanged();
+			updateLibrary();
+			setDirtyBit(true);
 			break;
 		}
 	}
@@ -292,6 +279,8 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 		setViewMode(PIECE_VIEW_MODE);
 		pieceEditorWidget->setPiece(plw->piece);
 	}
+
+	updateLibrary();
 }
 
 
@@ -353,19 +342,20 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 
 void MainWindow :: setupConnections()
 {
-	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
-
 	connect(newGlassColorButton, SIGNAL(pressed()), this, SLOT(newGlassColor()));
 	connect(copyGlassColorButton, SIGNAL(pressed()), this, SLOT(copyGlassColor()));
-	connect(colorEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+	connect(colorEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateLibrary()));
+	connect(colorEditorWidget, SIGNAL(someDataChanged()), this, SLOT(setDirtyBitTrue()));
 
 	connect(newPullPlanButton, SIGNAL(pressed()), this, SLOT(newPullPlan()));
 	connect(copyPullPlanButton, SIGNAL(pressed()), this, SLOT(copyPullPlan()));
-	connect(pullPlanEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+	connect(pullPlanEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateLibrary()));
+	connect(pullPlanEditorWidget, SIGNAL(someDataChanged()), this, SLOT(setDirtyBitTrue()));
 
 	connect(newPieceButton, SIGNAL(pressed()), this, SLOT(newPiece()));
 	connect(copyPieceButton, SIGNAL(pressed()), this, SLOT(copyPiece()));
-	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateLibrary()));
+	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(setDirtyBitTrue()));
 
 	// the file menu stuff
 	connect(newFileAction, SIGNAL(triggered()), this, SLOT(newFileActionTriggered()));
@@ -390,8 +380,10 @@ void MainWindow :: setupConnections()
 	connect(depthPeelAction, SIGNAL(triggered()), this, SLOT(depthPeelActionTriggered()));
 
 	// status bar stuff
-	connect(pullPlanEditorWidget, SIGNAL(showMessage(const QString&, unsigned int)), this, SLOT(showStatusMessage(const QString&, unsigned int)));
-	connect(pieceEditorWidget, SIGNAL(showMessage(const QString&, unsigned int)), this, SLOT(showStatusMessage(const QString&, unsigned int)));
+	connect(pullPlanEditorWidget, SIGNAL(showMessage(const QString&, unsigned int)), 
+		this, SLOT(showStatusMessage(const QString&, unsigned int)));
+	connect(pieceEditorWidget, SIGNAL(showMessage(const QString&, unsigned int)), 
+		this, SLOT(showStatusMessage(const QString&, unsigned int)));
 }
 
 void MainWindow :: depthPeelActionTriggered()
@@ -505,6 +497,11 @@ void MainWindow :: randomComplexPieceExampleActionTriggered()
 
 	setViewMode(PIECE_VIEW_MODE);
 	pieceEditorWidget->setPiece(randomP);
+}
+
+void MainWindow :: setDirtyBitTrue()
+{
+	setDirtyBit(true);
 }
 
 void MainWindow :: setDirtyBit(bool v)
@@ -659,6 +656,7 @@ void MainWindow :: setupColorEditor()
 	// Setup data objects - the current plan and library widget for this plan
 	colorEditorWidget = new ColorEditorWidget(editorStack);
 	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(colorEditorWidget->getGlassColor(), this));
+	colorEditorWidget->updateEverything();
 }
 
 void MainWindow :: setupPullPlanEditor()
@@ -666,6 +664,7 @@ void MainWindow :: setupPullPlanEditor()
 	// Setup data objects - the current plan and library widget for this plan
 	pullPlanEditorWidget = new PullPlanEditorWidget(editorStack);
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(pullPlanEditorWidget->getPullPlan(), this));
+	pullPlanEditorWidget->updateEverything();
 }
 
 void MainWindow :: setupPieceEditor()
@@ -673,6 +672,7 @@ void MainWindow :: setupPieceEditor()
 	// Setup data objects - the current plan and library widget for this plan
 	pieceEditorWidget = new PieceEditorWidget(editorStack);
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(pieceEditorWidget->getPiece(), this));
+	pieceEditorWidget->updateEverything();
 }
 
 void MainWindow :: newPiece()
@@ -721,24 +721,6 @@ void MainWindow :: copyPullPlan()
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(newEditorPlan, this));
 	setViewMode(PULLPLAN_VIEW_MODE);
 	pullPlanEditorWidget->setPullPlan(newEditorPlan);
-}
-
-void MainWindow :: updateEverything()
-{
-	setDirtyBit(true); // why are we updating? something probably changed...
-	switch (editorStack->currentIndex())
-	{
-		case COLORBAR_VIEW_MODE:
-			colorEditorWidget->updateEverything();
-			break;
-		case PULLPLAN_VIEW_MODE:
-			pullPlanEditorWidget->updateEverything();
-			break;
-		case PIECE_VIEW_MODE:
-			pieceEditorWidget->updateEverything();
-			break;
-	}
-	updateLibrary();
 }
 
 // returns whether the pull plan is a dependancy of something in the library
