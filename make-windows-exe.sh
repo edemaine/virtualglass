@@ -49,7 +49,7 @@ echo "Putting everything in $DEST"
 rm -rf $DEST
 mkdir $DEST
 cp $BUILDBIN/virtualglass.exe $DEST 
-cp $SRC/COPYRIGHT.txt $DEST
+cp ./COPYRIGHT.txt $DEST
 cp $MINGWBIN/libgcc_s_dw2-1.dll $DEST
 cp $MINGWBIN/mingwm10.dll $DEST
 cp $QTBIN/QtCore4.dll $DEST

@@ -17,7 +17,7 @@ unix:!macx {
 	# Libraries
 	LIBS += -lGLU
 
-	# Just in case, because our C++ files are named .c
+	# Just in case, because our header files are named .h
 	QMAKE_CC = g++
 	QMAKE_CXX = g++
 
@@ -35,7 +35,7 @@ unix:!macx {
 
 # Mac OS X
 macx {
-	# Just in case, because our C++ files are named .c
+	# Just in case, because our header files are named .h
 	QMAKE_CC = g++
 	QMAKE_CXX = g++
 
@@ -53,7 +53,7 @@ macx {
 
 # Windows using MinGW 
 win32:!*-msvc-* {
-	# Just in case, because our C++ files are named .c
+	# Just in case, because our header files are named .h
 	QMAKE_CC = g++
 	QMAKE_CXX = g++
 
@@ -67,6 +67,7 @@ win32:!*-msvc-* {
 }
 
 # Windows using Visual Studio
+# This is out-of-date and probably needs to be fixed (as of r962).
 win32:*-msvc* {
 	# The 4640 and 4350 warnings disabled above may hide YAML bugs
 	# The 4701 is disabled because of a mis-detection in vector.hpp.
