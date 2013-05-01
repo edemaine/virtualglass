@@ -116,16 +116,17 @@ void PeelRenderer::render(Geometry const & geometry)
 {
 	assert(QGLContext::currentContext() == expectedGLContext);
 
+	glEnable(GL_MULTISAMPLE);
+
 	GlassOpenGL::errors("(before depth peeling)");
 	//viewport is {x,y,w,h} in window.
 	//We're querying here to get the width and height.
 	GLint viewport[4] = {0,0,0,0};
 	glGetIntegerv(GL_VIEWPORT, viewport);
-	if (viewport[2] != GLint(bufferSize.x) || viewport[3] != GLint(bufferSize.y)) {
-
+	if (viewport[2] != GLint(bufferSize.x) || viewport[3] != GLint(bufferSize.y)) 
+	{
 		bufferSize.x = viewport[2];
 		bufferSize.y = viewport[3];
-		std::cerr << "(re-)Allocating RenderThread peel textures for " << bufferSize << "." << std::endl;
 
 		//Since the buffer has changed size, (re-)init textures:
 		if (colorTex == 0) {
@@ -161,13 +162,10 @@ void PeelRenderer::render(Geometry const & geometry)
 		GlassOpenGL::errors("(depth peeling setup)");
 	}
 
-	if (bufferSize.x == 0 || bufferSize.y == 0) {
-		//nothing to render.
-		return;
-	}
-	if (buffer == 0) {
+	if (bufferSize.x == 0 || bufferSize.y == 0) return;
+
+	if (buffer == 0) 
 		glGenFramebuffers(1, &buffer);
-	}
 
 	if (peelProgram == 0) {
 		const char *peel_frag =
@@ -212,40 +210,41 @@ void PeelRenderer::render(Geometry const & geometry)
 
 	//Render depth layers, front-to-back, up to MaxPasses layers:
 	const unsigned int MaxPasses = 20;
-	for (unsigned int pass = 0; pass < MaxPasses; ++pass) {
-		//---------- setup framebuffer ----------
+	for (unsigned int pass = 0; pass < MaxPasses; ++pass) 
+	{
+		//---------- setup framebuffer we put peelings into ----------
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, buffer);
 		glPushAttrib(GL_VIEWPORT_BIT);
 		glViewport(0, 0, bufferSize.x, bufferSize.y);
 
-		//Set up the proper depth-n-such attachments:
+		// Set up the proper depth-n-such attachments:
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE_ARB, colorTex, 0);
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_RECTANGLE_ARB, depthTex, 0);
 
-		{ //check:
-			GLenum ret = glCheckFramebufferStatus( GL_DRAW_FRAMEBUFFER );
-			if (ret != GL_FRAMEBUFFER_COMPLETE) {
-				std::cerr << "WARNING: FRAMEBUFFER not complete!" << std::endl;
-			}
-		}
+		if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) 
+			std::cerr << "WARNING: FRAMEBUFFER not complete!" << std::endl;
 		GlassOpenGL::errors("(depth framebuffer setup)");
 
-		//clear the framebuffer:
+		// Clear the framebuffer
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f); 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//Set up peeling program to reject (close) stuff we've already rendered
-		if (pass == 0) {
+		//Set up program to reject (close) stuff we've already rendered
+		if (pass == 0) 
 			glUseProgramObjectARB(nopeelProgram);
-		} else {
+		else 
+		{
 			glUseProgramObjectARB(peelProgram);
 			glBindTexture(GL_TEXTURE_RECTANGLE_ARB, prevDepthTex);
 		}
 
-		if (pass + 1 < MaxPasses) {
+		if (pass < MaxPasses - 1) 
+		{
 			glEnable(GL_DEPTH_TEST);
 			glDisable(GL_BLEND);
-		} else {
+		} 
+		else 
+		{
 			//If we've peeled all we can peel, just render in some order and
 			//hope for the best:
 			glDisable(GL_DEPTH_TEST);
@@ -253,13 +252,11 @@ void PeelRenderer::render(Geometry const & geometry)
 			glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
 		}
 
-		bool do_query = (pass != 0);
+		bool do_query = (pass > 0);
 
 		//When actually peeling, remember how many fragments were used:
-		if (do_query) {
+		if (do_query) 
 			glBeginQueryARB(GL_SAMPLES_PASSED_ARB, query);
-		}
-
 
 		//---------- draw scene --------
 
@@ -279,32 +276,31 @@ void PeelRenderer::render(Geometry const & geometry)
 			glDrawElements(GL_TRIANGLES, g->triangle_size * 3,
 				GL_UNSIGNED_INT, &(geometry.triangles[g->triangle_begin].v1));
 		}
-
-		//--------------------------
-
+		
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_NORMAL_ARRAY);
 
-		if (do_query) {
-			glEndQueryARB(GL_SAMPLES_PASSED_ARB);
-		}
+		//--------------------------
 
-		//Done drawing scene; detach framebuffer:
+		if (do_query) 
+			glEndQueryARB(GL_SAMPLES_PASSED_ARB);
+
+		//Done drawing scene, change drawing framebuffer to visible one
 		glPopAttrib();
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, base_draw_framebuffer); //detach framebuffer
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, base_draw_framebuffer); 
 		GlassOpenGL::errors("(depth framebuffer render)");
 
 		glUseProgramObjectARB(0);
 		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 
-		if (do_query) {
+		//Check whether fragements were passed, break out if no more fragments
+		if (do_query) 
+		{
 			GLuint count = 0;
 			glGetQueryObjectuivARB(query, GL_QUERY_RESULT_ARB, &count);
 
-			//if we're no longer rendering any fragments, skip the pixel copy:
-			if (count == 0) {
+			if (count == 0) 
 				break;
-			}
 		}
 
 		//swap out depth textures, now that we've rendered a new one:
@@ -312,23 +308,16 @@ void PeelRenderer::render(Geometry const & geometry)
 
 		//Copy pixels over to visible framebuffer:
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, buffer);
-
-		//copy pixels to screen:
 		glWindowPos2iARB(0,0);
-		if (pass == 0) {
-			//First pass, we copy:
+		if (pass == 0) 
 			glDisable(GL_BLEND);
-		} else {
-			//subsequent passes get added in:
+		else 
+		{
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
 		}
-
 		glDisable(GL_DEPTH_TEST);
-		//TODO: possibly use alpha test here to save some fill?
-		glCopyPixels(0,0,bufferSize.x,bufferSize.y,GL_COLOR);
-
-		glDisable(GL_BLEND);
+		glCopyPixels(0, 0, bufferSize.x, bufferSize.y, GL_COLOR);
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, base_read_framebuffer);
 
@@ -341,7 +330,6 @@ void PeelRenderer::render(Geometry const & geometry)
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
-
 	glDisable(GL_LIGHTING);
 
 	glMatrixMode(GL_PROJECTION);
@@ -366,3 +354,5 @@ void PeelRenderer::render(Geometry const & geometry)
 
 	glEnable(GL_LIGHTING);
 }
+
+

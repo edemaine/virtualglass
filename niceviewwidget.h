@@ -42,7 +42,6 @@ class NiceViewWidget : public QGLWidget
 		float lookAtLoc[3];
 		float theta, phi, rho;
 		int mouseLocX, mouseLocY;
-		QGLFramebufferObject *selectBuffer;
 		bool initializeGLCalled;
 		PeelRenderer *peelRenderer;
 
