@@ -14,6 +14,7 @@
 #include <QHBoxLayout>
 #include <QScrollArea>
 #include <QStatusBar>
+#include <QToolButton>
 
 #include "constants.h"
 #include "dependancy.h"
@@ -45,6 +46,7 @@ MainWindow :: MainWindow()
 
 	// allocate ALL the memory
 	centralLayout = new QHBoxLayout(centralWidget);
+	//setupToolbar();
 	setupLibrary();
 	setupEditors();
 	setupMenus();
@@ -91,6 +93,9 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			saveSelectedAsFileAction->setEnabled(true);
 			break;
 	}
+	// zero out any status messages, as (currently, r957) they only pertain
+	// to rendering of 3D views and so are view mode-specific.
+	statusBar()->clearMessage();
 }
 
 QString MainWindow :: windowTitle()
@@ -259,10 +264,6 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(childAt(event->pos()));
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
 	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
-
-	// zero out any status messages, as (currently, r957) they only pertain
-	// to rendering of 3D views and so are view mode-specific.
-	statusBar()->clearMessage();
 
 	if (cblw != NULL)
 	{
@@ -526,6 +527,19 @@ void MainWindow :: setupSaveFile()
 	// if you try to save to a file named [unsaved], there will be no mercy.
 	dirtyBit = false;
 	saveFilename = "[unsaved]"; 
+}
+
+void MainWindow :: setupToolbar()
+{
+	QWidget* toolbarMasterWidget = new QWidget(centralWidget);
+	centralLayout->addWidget(toolbarMasterWidget);
+	QVBoxLayout* toolbarLayout = new QVBoxLayout(toolbarMasterWidget);
+	
+	QToolButton* startButton = new QToolButton(toolbarMasterWidget);
+	startButton->setFixedSize(100, 100);
+	startButton->setIconSize(QSize(100, 100));
+	startButton->setIcon(QPixmap::fromImage(QImage(":/images/pickuptemplate1.png")));
+	toolbarLayout->addWidget(startButton);
 }
 
 void MainWindow :: setupLibrary()

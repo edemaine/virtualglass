@@ -18,6 +18,7 @@ class QStackedWidget;
 class QSpinBox;
 class QSlider;
 class QPushButton;
+class QScrollArea;
 
 class PieceGeometryThread;
 class TwistWidget;	
@@ -43,9 +44,13 @@ class PieceEditorWidget : public QWidget
 		void setPieceTemplateType(enum PieceTemplate::Type t);
 		void setPickupTemplateType(enum PickupTemplate::Type t);
 		void setPickupParameter(int param, int value);
-		void mousePressEvent(QMouseEvent*);
 		void writePieceToPLYFile(QString& filename);
 		void writePieceToOBJFile(QString& filename);
+
+	protected:
+		void mousePressEvent(QMouseEvent*);
+		void mouseMoveEvent(QMouseEvent*);
+		void mouseReleaseEvent(QMouseEvent*);
 
 	signals:
 		void someDataChanged();
@@ -98,9 +103,16 @@ class PieceEditorWidget : public QWidget
 		QTabWidget* pieceControlsTab;
 		TwistWidget* twistWidget;
 		QLabel* pieceEditorDescriptionLabel;
+		QScrollArea* pickupTemplateLibraryScrollArea;
+		QScrollArea* pieceTemplateLibraryScrollArea;
 	
 		QHBoxLayout* pickupTemplateLibraryLayout;
 		QHBoxLayout* pieceTemplateLibraryLayout;
+
+		bool isDragging;
+		bool dragIsPickup;
+		QPoint dragStartPosition;
+		QPoint lastDragPosition;
 
 		void setupLayout();
 		void setupThreading();

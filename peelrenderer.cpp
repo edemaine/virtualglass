@@ -116,8 +116,6 @@ void PeelRenderer::render(Geometry const & geometry)
 {
 	assert(QGLContext::currentContext() == expectedGLContext);
 
-	glEnable(GL_MULTISAMPLE);
-
 	GlassOpenGL::errors("(before depth peeling)");
 	//viewport is {x,y,w,h} in window.
 	//We're querying here to get the width and height.

@@ -28,7 +28,7 @@ unix:!macx {
 	QMAKE_LFLAGS_RELEASE += -static-libgcc
 
 	# All those compile flags
-        QMAKE_CXXFLAGS += -Wall -Werror -Wno-unused-parameter -Wno-deprecated
+        QMAKE_CXXFLAGS += -Wall -Wextra -Werror -Wno-unused-parameter -Wno-deprecated
 	QMAKE_CXXFLAGS_RELEASE += -static-libgcc
 	QMAKE_CXXFLAGS_DEBUG += -g
 }
@@ -44,7 +44,7 @@ macx {
 	QMAKE_INFO_PLIST = virtualglass.Info.plist
 
 	# All those compile flags 
-        QMAKE_CXXFLAGS += -Wall -Werror -Wno-unused-parameter -Wno-deprecated -DUNORDERED_MAP_WORKAROUND
+        QMAKE_CXXFLAGS += -Wall -Wextra -Werror -Wno-unused-parameter -Wno-deprecated -DUNORDERED_MAP_WORKAROUND
 
 	# Unclear what these are linking statically
 	QMAKE_LFLAGS_RELEASE += -static-libgcc
@@ -61,7 +61,7 @@ win32:!*-msvc-* {
 	QMAKE_LFLAGS_RELEASE += -static-libgcc
 
 	# All those compile flags  
-	QMAKE_CXXFLAGS += -Wall -Werror -Wno-unused-parameter -Wno-deprecated -std=gnu++0x
+	QMAKE_CXXFLAGS += -Wall -Wextra -Werror -Wno-unused-parameter -Wno-deprecated -std=gnu++0x
 	QMAKE_CFLAGS_RELEASE += -static-libgcc
 	QMAKE_CXXFLAGS_DEBUG += -g
 }

@@ -26,6 +26,7 @@ class QLabel;
 class QTabWidget;
 class QSpinBox;
 class QHBoxLayout;
+class QScrollArea;
 
 class PullPlanEditorWidget : public QWidget
 {
@@ -39,10 +40,14 @@ class PullPlanEditorWidget : public QWidget
 		PullPlan* getPullPlan();
 		void setPullPlan(PullPlan* p);
 		void seedTemplates();
-		void mousePressEvent(QMouseEvent*);
 		void writePlanToPLYFile(QString& filename);
 		void writePlanToOBJFile(QString& filename);
 		void updateEverything();
+
+	protected:
+		void mousePressEvent(QMouseEvent* event);
+		void mouseMoveEvent(QMouseEvent* event);
+		void mouseReleaseEvent(QMouseEvent* event);
 
 	signals:
 		void someDataChanged();
@@ -98,6 +103,11 @@ class PullPlanEditorWidget : public QWidget
 		QLabel* descriptionLabel;
 		NiceViewWidget* niceViewWidget;
 		QTabWidget* controlsTab;
+		QScrollArea* pullTemplateLibraryScrollArea;
+
+		bool isDragging;
+		QPoint dragStartPosition;
+		QPoint lastDragPosition;
 
 		void setupLayout();
 		void setupThreading();

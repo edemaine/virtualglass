@@ -38,6 +38,8 @@ class ColorEditorWidget : public QWidget
 
 	protected:
 		void mousePressEvent(QMouseEvent* event);
+		void mouseMoveEvent(QMouseEvent* event);
+		void mouseReleaseEvent(QMouseEvent* event);
 
 	private slots:
 		void alphaSliderPositionChanged(int);
@@ -53,6 +55,10 @@ class ColorEditorWidget : public QWidget
 		vector<QVBoxLayout*> colorLibraryLayouts;
 		QStackedWidget* collectionStack;
 		int prevCollection;
+
+		bool isDragging;
+		QPoint dragStartPosition;
+		QPoint lastDragPosition;
 
 		void setupLayout();
 		void setupConnections();

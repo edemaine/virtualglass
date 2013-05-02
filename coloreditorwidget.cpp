@@ -1,11 +1,15 @@
 
+#include <algorithm>
+
 #include <QComboBox>
 #include <QStackedWidget>
 #include <QFileDialog>
 #include <QMouseEvent>
 #include <QHBoxLayout>
 #include <QScrollArea>
-#include <algorithm>
+#include <QApplication>
+#include <QMouseEvent>
+#include <QScrollBar>
 
 #include "pullplan.h"
 #include "niceviewwidget.h"
@@ -187,6 +191,41 @@ void ColorEditorWidget :: alphaSliderPositionChanged(int)
 
 void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 {
+	if (event->button() == Qt::LeftButton && collectionStack->geometry().contains(event->pos()))
+	{
+		isDragging = true;
+		lastDragPosition = dragStartPosition = event->pos();
+	}
+	else
+		isDragging = false;
+}
+
+void ColorEditorWidget :: mouseMoveEvent(QMouseEvent* event)
+{
+        // If the left mouse button isn't down
+        if ((event->buttons() & Qt::LeftButton) == 0)
+        {
+                isDragging = false;
+                return;
+        }
+
+	if (!isDragging || (event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
+		return;
+
+	int movement = event->pos().y() - lastDragPosition.y(); 
+
+	QScrollArea* currentScrollArea = dynamic_cast<QScrollArea*>(collectionStack->currentWidget());
+	currentScrollArea->verticalScrollBar()->setValue(currentScrollArea->verticalScrollBar()->value() - movement);	
+	
+	lastDragPosition = event->pos();
+}
+
+void ColorEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
+{
+	// If this is a drag and not the end of a click, don't process (dropEvent will do it instead)
+	if (isDragging && (event->pos() - dragStartPosition).manhattanLength() > QApplication::startDragDistance())
+		return;
+	
 	PureColorLibraryWidget* pclw = dynamic_cast<PureColorLibraryWidget*>(childAt(event->pos()));
 	if (pclw == NULL)
 		return;

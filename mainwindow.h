@@ -35,14 +35,14 @@ class MainWindow : public QMainWindow
 
 	public:
 		MainWindow();
-		void mousePressEvent(QMouseEvent* event);
-		void mouseReleaseEvent(QMouseEvent* event);
-		void mouseMoveEvent(QMouseEvent* event);
 		void keyPressEvent(QKeyEvent* e);
 		QString windowTitle();
 		void openFile(QString filename, bool add);
 
 	protected:
+		void mousePressEvent(QMouseEvent* event);
+		void mouseReleaseEvent(QMouseEvent* event);
+		void mouseMoveEvent(QMouseEvent* event);
 		void closeEvent(QCloseEvent *event);
 		void contextMenuEvent(QContextMenuEvent *event);
 
@@ -60,6 +60,7 @@ class MainWindow : public QMainWindow
 		};
 
 		// Methods
+		void setupToolbar();
 		void setupLibrary();
 		void setupEditors();
 		void setupEmptyPaneEditor();

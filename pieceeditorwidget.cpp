@@ -11,6 +11,8 @@
 #include <QMouseEvent>
 #include <QPushButton>
 #include <QTimer>
+#include <QApplication>
+#include <QScrollBar>
 
 #include "pickupplaneditorviewwidget.h"
 #include "piece.h"
@@ -178,6 +180,80 @@ void PieceEditorWidget :: pickupParameterSpinBoxChanged(int)
 	}
 }
 
+void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
+{
+	if (event->button() == Qt::LeftButton && pickupTemplateLibraryScrollArea->geometry().contains(event->pos()))
+	{
+		isDragging = true;
+		lastDragPosition = dragStartPosition = event->pos();
+		dragIsPickup = true;
+	}
+	else if (event->button() == Qt::LeftButton && pieceTemplateLibraryScrollArea->geometry().contains(event->pos()))
+	{
+		isDragging = true;
+		lastDragPosition = dragStartPosition = event->pos();
+		dragIsPickup = false;
+	}
+	else
+		isDragging = false;
+}
+
+void PieceEditorWidget :: mouseMoveEvent(QMouseEvent* event)
+{
+	// If the left mouse button isn't down
+	if ((event->buttons() & Qt::LeftButton) == 0)
+	{
+		isDragging = false;
+		return;
+	}
+
+	if (!isDragging || (event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
+		return;
+
+	int movement = event->pos().x() - lastDragPosition.x();
+
+	QScrollArea* draggedScrollArea;
+	if (dragIsPickup)
+		draggedScrollArea = pickupTemplateLibraryScrollArea;
+	else
+		draggedScrollArea = pieceTemplateLibraryScrollArea;
+	draggedScrollArea->horizontalScrollBar()->setValue(draggedScrollArea->horizontalScrollBar()->value() - movement);
+
+	lastDragPosition = event->pos();
+}
+
+void PieceEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
+{
+	// If this is a drag and not the end of a click, don't process (dropEvent will do it instead)
+	if (isDragging && (event->pos() - dragStartPosition).manhattanLength() > QApplication::startDragDistance())
+		return;
+
+	PickupTemplateLibraryWidget* pktlw = dynamic_cast<PickupTemplateLibraryWidget*>(childAt(event->pos()));
+	PieceTemplateLibraryWidget* ptlw = dynamic_cast<PieceTemplateLibraryWidget*>(childAt(event->pos()));
+
+	if (pktlw != NULL)
+	{
+		if (pktlw->type != piece->pickup->getTemplateType())
+		{
+			piece->pickup->setTemplateType(pktlw->type);
+			updateEverything();
+			emit someDataChanged();
+		}
+	}
+	else if (ptlw != NULL)
+	{
+		if (ptlw->type == PieceTemplate::CUSTOM)
+			pieceControlsTab->setCurrentIndex(1);
+		else
+		{
+			pieceControlsTab->setCurrentIndex(0);
+			piece->setTemplateType(ptlw->type);
+			updateEverything();
+			emit someDataChanged();
+		}
+	}
+}
+
 void PieceEditorWidget :: pickupParameterSliderChanged(int)
 {
 	bool pieceChanged = false;
@@ -237,7 +313,7 @@ void PieceEditorWidget :: setupLayout()
 	pickupTemplateLibraryLayout->setContentsMargins(10, 10, 10, 10);
 	pickupTemplateLibraryWidget->setLayout(pickupTemplateLibraryLayout);
 
-	QScrollArea* pickupTemplateLibraryScrollArea = new QScrollArea(this);
+	pickupTemplateLibraryScrollArea = new QScrollArea(this);
 	pickupTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
 	pickupTemplateLibraryScrollArea->setWidget(pickupTemplateLibraryWidget);
 	pickupTemplateLibraryScrollArea->setWidgetResizable(true);
@@ -252,7 +328,7 @@ void PieceEditorWidget :: setupLayout()
 	pieceTemplateLibraryLayout->setContentsMargins(10, 10, 10, 10);
 	pieceTemplateLibraryWidget->setLayout(pieceTemplateLibraryLayout);
 
-	QScrollArea* pieceTemplateLibraryScrollArea = new QScrollArea(this);
+	pieceTemplateLibraryScrollArea = new QScrollArea(this);
 	pieceTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
 	pieceTemplateLibraryScrollArea->setWidget(pieceTemplateLibraryWidget);
 	pieceTemplateLibraryScrollArea->setWidgetResizable(true);
@@ -327,34 +403,6 @@ void PieceEditorWidget :: setupLayout()
 	editorLayout->addWidget(pieceEditorDescriptionLabel, 3, 1);
 
 	editorLayout->setRowStretch(0, 10);
-}
-
-void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
-{
-	PickupTemplateLibraryWidget* pktlw = dynamic_cast<PickupTemplateLibraryWidget*>(childAt(event->pos()));
-	PieceTemplateLibraryWidget* ptlw = dynamic_cast<PieceTemplateLibraryWidget*>(childAt(event->pos()));
-
-	if (pktlw != NULL)
-	{
-		if (pktlw->type != piece->pickup->getTemplateType())
-		{
-			piece->pickup->setTemplateType(pktlw->type);
-			updateEverything();
-			emit someDataChanged();
-		}
-	}
-	else if (ptlw != NULL)
-	{
-		if (ptlw->type == PieceTemplate::CUSTOM)
-			pieceControlsTab->setCurrentIndex(1);
-		else
-		{
-			pieceControlsTab->setCurrentIndex(0);
-			piece->setTemplateType(ptlw->type);
-			updateEverything();
-			emit someDataChanged();
-		}
-	}
 }
 
 

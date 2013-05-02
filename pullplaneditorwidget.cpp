@@ -6,6 +6,8 @@
 #include <QStackedWidget>
 #include <QScrollArea>
 #include <QTimer>
+#include <QApplication>
+#include <QScrollBar>
 
 #include "pullplan.h"
 #include "geometry.h"
@@ -167,7 +169,7 @@ void PullPlanEditorWidget :: setupLayout()
 	templateLibraryLayout->setContentsMargins(10, 10, 10, 10);
 	templateLibraryWidget->setLayout(templateLibraryLayout);
 
-	QScrollArea* pullTemplateLibraryScrollArea = new QScrollArea(this);
+	pullTemplateLibraryScrollArea = new QScrollArea(this);
 	pullTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
 	pullTemplateLibraryScrollArea->setWidget(templateLibraryWidget);
 	pullTemplateLibraryScrollArea->setWidgetResizable(true);
@@ -271,28 +273,6 @@ void PullPlanEditorWidget :: setupLayout()
 	editorLayout->setRowStretch(0, 10);
 }
 
-void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
-{
-	PullTemplateLibraryWidget* ptlw = dynamic_cast<PullTemplateLibraryWidget*>(childAt(event->pos()));
-
-	if (ptlw != NULL)
-	{
-		if (ptlw->type == PullTemplate::CUSTOM)
-		{
-			// simulate user pressing customize tab
-			controlsTab->setCurrentIndex(1);
-		}
-		else
-		{
-			// put the user back in fill and case mode,
-			// as they're no longer working on a custom template
-			controlsTab->setCurrentIndex(0);
-			plan->setTemplateType(ptlw->type);	
-			updateEverything();
-			emit someDataChanged();
-		}
-	}
-}
 
 void PullPlanEditorWidget :: controlsTabChanged(int tab)
 {
@@ -356,6 +336,63 @@ void PullPlanEditorWidget :: addCircleButtonPressed()
 void PullPlanEditorWidget :: addSquareButtonPressed()
 {
 	customizeViewWidget->addSquarePressed();
+}
+	
+void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
+{
+	if (event->button() == Qt::LeftButton && pullTemplateLibraryScrollArea->geometry().contains(event->pos()))
+	{
+		isDragging = true;
+		lastDragPosition = dragStartPosition = event->pos();
+	}
+	else
+		isDragging = false;
+}
+
+void PullPlanEditorWidget :: mouseMoveEvent(QMouseEvent* event)
+{
+	// If the left mouse button isn't down
+	if ((event->buttons() & Qt::LeftButton) == 0)
+	{
+		isDragging = false;
+		return;
+	}
+
+	if (!isDragging || (event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
+		return;
+
+	int movement = event->pos().x() - lastDragPosition.x();
+
+	pullTemplateLibraryScrollArea->horizontalScrollBar()->setValue(pullTemplateLibraryScrollArea->horizontalScrollBar()->value() - movement);
+
+	lastDragPosition = event->pos();
+}
+
+void PullPlanEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
+{
+	// If this is a drag and not the end of a click, don't process (dropEvent will do it instead)
+	if (isDragging && (event->pos() - dragStartPosition).manhattanLength() > QApplication::startDragDistance())
+		return;
+
+	PullTemplateLibraryWidget* ptlw = dynamic_cast<PullTemplateLibraryWidget*>(childAt(event->pos()));
+
+	if (ptlw == NULL)
+		return;
+
+	if (ptlw->type == PullTemplate::CUSTOM)
+	{
+		// simulate user pressing customize tab
+		controlsTab->setCurrentIndex(1);
+	}
+	else
+	{
+		// put the user back in fill and case mode,
+		// as they're no longer working on a custom template
+		controlsTab->setCurrentIndex(0);
+		plan->setTemplateType(ptlw->type);	
+		updateEverything();
+		emit someDataChanged();
+	}
 }
 
 void PullPlanEditorWidget :: setupConnections()
