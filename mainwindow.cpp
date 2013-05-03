@@ -337,6 +337,7 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	QDrag *drag = new QDrag(this);
 	drag->setMimeData(mimeData);
 	drag->setPixmap(pixmap);
+	drag->setHotSpot(QPoint(50, 100));
 
 	drag->exec(Qt::CopyAction);
 }
