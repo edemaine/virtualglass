@@ -112,6 +112,7 @@ void PickupPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 		QDrag *drag = new QDrag(this);
 		drag->setMimeData(mimeData);
 		drag->setPixmap(*(plplw.getDragPixmap()));
+		drag->setHotSpot(QPoint(50, 100));
 
 		drag->exec(Qt::CopyAction);
 	}
