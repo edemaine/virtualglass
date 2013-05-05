@@ -535,11 +535,14 @@ void MainWindow :: setupToolbar()
 	QWidget* toolbarMasterWidget = new QWidget(centralWidget);
 	centralLayout->addWidget(toolbarMasterWidget);
 	QVBoxLayout* toolbarLayout = new QVBoxLayout(toolbarMasterWidget);
-	
+	toolbarMasterWidget->setLayout(toolbarLayout);	
+
 	QToolButton* startButton = new QToolButton(toolbarMasterWidget);
-	startButton->setFixedSize(100, 100);
-	startButton->setIconSize(QSize(100, 100));
-	startButton->setIcon(QPixmap::fromImage(QImage(":/images/pickuptemplate1.png")));
+	startButton->setFixedSize(100, 50);
+	startButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+	startButton->setText("New Color");
+	//startButton->setIconSize(QSize(100, 50));
+	//startButton->setIcon(QPixmap::fromImage(QImage(":/images/pickuptemplate1.png")));
 	toolbarLayout->addWidget(startButton);
 }
 

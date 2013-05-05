@@ -187,12 +187,14 @@ void PieceEditorWidget :: mousePressEvent(QMouseEvent* event)
 		isDragging = true;
 		lastDragPosition = dragStartPosition = event->pos();
 		dragIsPickup = true;
+		maxDragDistance = 0;
 	}
 	else if (event->button() == Qt::LeftButton && pieceTemplateLibraryScrollArea->geometry().contains(event->pos()))
 	{
 		isDragging = true;
 		lastDragPosition = dragStartPosition = event->pos();
 		dragIsPickup = false;
+		maxDragDistance = 0;
 	}
 	else
 		isDragging = false;
@@ -207,10 +209,12 @@ void PieceEditorWidget :: mouseMoveEvent(QMouseEvent* event)
 		return;
 	}
 
-	if (!isDragging || (event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
+	if (!isDragging || fabs(event->pos().x() - dragStartPosition.x()) < QApplication::startDragDistance())
 		return;
 
 	int movement = event->pos().x() - lastDragPosition.x();
+
+	maxDragDistance = MAX(maxDragDistance, fabs(event->pos().x() - dragStartPosition.x()));
 
 	QScrollArea* draggedScrollArea;
 	if (dragIsPickup)
@@ -224,8 +228,8 @@ void PieceEditorWidget :: mouseMoveEvent(QMouseEvent* event)
 
 void PieceEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 {
-	// If this is a drag and not the end of a click, don't process (dropEvent will do it instead)
-	if (isDragging && (event->pos() - dragStartPosition).manhattanLength() > QApplication::startDragDistance())
+	// If not dragging or dragging cause a scroll
+	if (!isDragging || (isDragging && maxDragDistance >= QApplication::startDragDistance()))
 		return;
 
 	PickupTemplateLibraryWidget* pktlw = dynamic_cast<PickupTemplateLibraryWidget*>(childAt(event->pos()));

@@ -10,6 +10,7 @@
 #include "geometry.h"
 #include "shape.h"
 #include "mesh.h"
+#include "constants.h"
 
 class PullPlan;
 class PullPlanEditorViewWidget;
@@ -108,6 +109,7 @@ class PullPlanEditorWidget : public QWidget
 		bool isDragging;
 		QPoint dragStartPosition;
 		QPoint lastDragPosition;
+		int maxDragDistance;
 
 		void setupLayout();
 		void setupThreading();

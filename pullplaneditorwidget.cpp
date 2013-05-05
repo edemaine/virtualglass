@@ -226,7 +226,7 @@ void PullPlanEditorWidget :: setupLayout()
 	QWidget* tab2Widget = new QWidget(controlsTab);
 	QVBoxLayout* tab2Layout = new QVBoxLayout(tab2Widget);
 	tab2Widget->setLayout(tab2Layout);
-	controlsTab->addTab(tab2Widget, "Customize Layout");
+	controlsTab->addTab(tab2Widget, "Customize");
 
 	QWidget* customControlsWidget = new QWidget(tab2Widget);
 	QHBoxLayout* customControlsLayout = new QHBoxLayout(customControlsWidget);
@@ -344,6 +344,7 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
 	{
 		isDragging = true;
 		lastDragPosition = dragStartPosition = event->pos();
+		maxDragDistance = 0;
 	}
 	else
 		isDragging = false;
@@ -358,20 +359,22 @@ void PullPlanEditorWidget :: mouseMoveEvent(QMouseEvent* event)
 		return;
 	}
 
-	if (!isDragging || (event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
+	if (!isDragging || fabs(event->pos().x() - dragStartPosition.x()) < QApplication::startDragDistance())
 		return;
 
 	int movement = event->pos().x() - lastDragPosition.x();
 
-	pullTemplateLibraryScrollArea->horizontalScrollBar()->setValue(pullTemplateLibraryScrollArea->horizontalScrollBar()->value() - movement);
+	maxDragDistance = MAX(maxDragDistance, fabs(event->pos().x() - dragStartPosition.x()));
+	pullTemplateLibraryScrollArea->horizontalScrollBar()->setValue(
+		pullTemplateLibraryScrollArea->horizontalScrollBar()->value() - movement);
 
 	lastDragPosition = event->pos();
 }
 
 void PullPlanEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 {
-	// If this is a drag and not the end of a click, don't process (dropEvent will do it instead)
-	if (isDragging && (event->pos() - dragStartPosition).manhattanLength() > QApplication::startDragDistance())
+	// If not dragging or dragging caused a scroll
+	if (!isDragging || (isDragging && maxDragDistance >= QApplication::startDragDistance()))
 		return;
 
 	PullTemplateLibraryWidget* ptlw = dynamic_cast<PullTemplateLibraryWidget*>(childAt(event->pos()));

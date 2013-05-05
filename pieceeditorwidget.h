@@ -5,9 +5,11 @@
 #include <QWidget>
 #include <QMutex>
 #include <QWaitCondition>
+
 #include "pickuptemplate.h"
 #include "piecetemplate.h"
 #include "geometry.h"
+#include "constants.h"
 
 class QLabel;
 class QGridLayout;
@@ -113,6 +115,7 @@ class PieceEditorWidget : public QWidget
 		bool dragIsPickup;
 		QPoint dragStartPosition;
 		QPoint lastDragPosition;
+		int maxDragDistance;
 
 		void setupLayout();
 		void setupThreading();

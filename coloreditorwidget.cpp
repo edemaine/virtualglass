@@ -121,6 +121,11 @@ void ColorEditorWidget :: setupLayout()
 	// Add 3D view	
 	editorLayout->addWidget(niceViewWidget, 0, 1, 4, 1);
 
+	// Little description for the editor
+	descriptionLabel = new QLabel("3D view of color.", this);
+	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	editorLayout->addWidget(descriptionLabel, 4, 1);
+
 	// Set relative areas used
 	editorLayout->setColumnStretch(1, 1);
 }
@@ -195,6 +200,7 @@ void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 	{
 		isDragging = true;
 		lastDragPosition = dragStartPosition = event->pos();
+		maxDragDistance = 0;
 	}
 	else
 		isDragging = false;
@@ -209,11 +215,12 @@ void ColorEditorWidget :: mouseMoveEvent(QMouseEvent* event)
                 return;
         }
 
-	if (!isDragging || (event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
+	if (!isDragging || fabs(event->pos().y() - dragStartPosition.y()) < QApplication::startDragDistance())
 		return;
 
 	int movement = event->pos().y() - lastDragPosition.y(); 
 
+        maxDragDistance = MAX(maxDragDistance, fabs(event->pos().y() - dragStartPosition.y()));
 	QScrollArea* currentScrollArea = dynamic_cast<QScrollArea*>(collectionStack->currentWidget());
 	currentScrollArea->verticalScrollBar()->setValue(currentScrollArea->verticalScrollBar()->value() - movement);	
 	
@@ -222,8 +229,8 @@ void ColorEditorWidget :: mouseMoveEvent(QMouseEvent* event)
 
 void ColorEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 {
-	// If this is a drag and not the end of a click, don't process (dropEvent will do it instead)
-	if (isDragging && (event->pos() - dragStartPosition).manhattanLength() > QApplication::startDragDistance())
+	// If not dragging or dragging caused a scroll
+	if (!isDragging || (isDragging && maxDragDistance >= QApplication::startDragDistance()))
 		return;
 	
 	PureColorLibraryWidget* pclw = dynamic_cast<PureColorLibraryWidget*>(childAt(event->pos()));

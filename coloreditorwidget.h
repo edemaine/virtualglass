@@ -8,6 +8,7 @@
 #include <string>
 
 #include "geometry.h"
+#include "constants.h"
 
 class GlassColor;
 class PullPlan;
@@ -59,6 +60,7 @@ class ColorEditorWidget : public QWidget
 		bool isDragging;
 		QPoint dragStartPosition;
 		QPoint lastDragPosition;
+		int maxDragDistance;
 
 		void setupLayout();
 		void setupConnections();
