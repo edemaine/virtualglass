@@ -215,15 +215,13 @@ void ColorEditorWidget :: mouseMoveEvent(QMouseEvent* event)
                 return;
         }
 
-	if (!isDragging || fabs(event->pos().y() - dragStartPosition.y()) < QApplication::startDragDistance())
+        maxDragDistance = MAX(maxDragDistance, fabs(event->pos().y() - dragStartPosition.y()));
+	if (!isDragging || maxDragDistance < QApplication::startDragDistance())
 		return;
 
 	int movement = event->pos().y() - lastDragPosition.y(); 
-
-        maxDragDistance = MAX(maxDragDistance, fabs(event->pos().y() - dragStartPosition.y()));
 	QScrollArea* currentScrollArea = dynamic_cast<QScrollArea*>(collectionStack->currentWidget());
 	currentScrollArea->verticalScrollBar()->setValue(currentScrollArea->verticalScrollBar()->value() - movement);	
-	
 	lastDragPosition = event->pos();
 }
 

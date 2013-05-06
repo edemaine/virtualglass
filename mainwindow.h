@@ -17,6 +17,7 @@ class QPushButton;
 class QMenu;
 class QAction;
 class QActionGroup;
+class QScrollArea;
 
 class GlassColor;
 class PullPlan;
@@ -89,16 +90,11 @@ class MainWindow : public QMainWindow
 		void addToLibrary(vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces);
 
 		// Variables
-		bool dirtyBit;
-		QString saveFilename;
-		QLabel* whatToDoLabel;
-		NiceViewWidget* colorBarNiceViewWidget;
+		QScrollArea* libraryScrollArea;
 		QVBoxLayout* colorBarLibraryLayout;
 		QVBoxLayout* pullPlanLibraryLayout;
 		QVBoxLayout* pieceLibraryLayout;
-		bool isDragging;
-		QPoint dragStartPosition;
-		QStackedWidget* editorStack; //editorStack.currentIndex() gives with mode
+		QStackedWidget* editorStack; //editorStack.currentIndex() gives which mode
 		QWidget* emptyEditorPage;
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
@@ -130,6 +126,14 @@ class MainWindow : public QMainWindow
 		QAction *exitAction;
 		QMenu *perfMenu;
 		QAction *depthPeelAction;
+
+		bool isDragging;
+		QPoint dragStartPosition;
+		QPoint lastDragPosition;
+		int maxDragDistance;
+
+		bool dirtyBit;
+		QString saveFilename;
 
 	private slots:
 		void setDirtyBitTrue();

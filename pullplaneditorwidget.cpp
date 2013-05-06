@@ -359,15 +359,13 @@ void PullPlanEditorWidget :: mouseMoveEvent(QMouseEvent* event)
 		return;
 	}
 
-	if (!isDragging || fabs(event->pos().x() - dragStartPosition.x()) < QApplication::startDragDistance())
+	maxDragDistance = MAX(maxDragDistance, fabs(event->pos().x() - dragStartPosition.x()));
+	if (!isDragging || maxDragDistance < QApplication::startDragDistance())
 		return;
 
 	int movement = event->pos().x() - lastDragPosition.x();
-
-	maxDragDistance = MAX(maxDragDistance, fabs(event->pos().x() - dragStartPosition.x()));
 	pullTemplateLibraryScrollArea->horizontalScrollBar()->setValue(
 		pullTemplateLibraryScrollArea->horizontalScrollBar()->value() - movement);
-
 	lastDragPosition = event->pos();
 }
 

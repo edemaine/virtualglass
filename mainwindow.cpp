@@ -15,6 +15,7 @@
 #include <QScrollArea>
 #include <QStatusBar>
 #include <QToolButton>
+#include <QScrollBar>
 
 #include "constants.h"
 #include "dependancy.h"
@@ -254,11 +255,85 @@ void MainWindow :: deleteCurrentEditingObject()
 
 }
 
+void MainWindow :: mousePressEvent(QMouseEvent* event)
+{
+	if (event->button() == Qt::LeftButton && libraryScrollArea->geometry().contains(event->pos()))
+	{
+		isDragging = true;
+		lastDragPosition = dragStartPosition = event->pos();
+		maxDragDistance = 0;
+	}
+	else
+		isDragging = false;
+}
+
+void MainWindow :: mouseMoveEvent(QMouseEvent* event)
+{
+	// If the left mouse button isn't down
+	if ((event->buttons() & Qt::LeftButton) == 0)
+	{
+		isDragging = false;
+		return;
+	}
+
+	int totalXMovement = fabs(event->pos().x() - dragStartPosition.x());
+	int totalYMovement = fabs(event->pos().y() - dragStartPosition.y());
+	if (!isDragging || MAX(totalXMovement, totalYMovement) < QApplication::startDragDistance())
+		return;
+
+	// If this is the first time you've exceeded the threshold for movement
+	// and the movement starts a drag
+	if (maxDragDistance < QApplication::startDragDistance() && totalXMovement >= totalYMovement)
+	{
+		GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(childAt(event->pos()));
+		PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
+
+		char buf[500];
+		QPixmap pixmap;
+
+		if (cblw != NULL)
+		{
+			GlassMime::encode(buf, cblw, GlassMime::COLORLIBRARY_MIME);
+			pixmap = *cblw->getDragPixmap();
+		}
+		else if (plplw != NULL)
+		{
+			GlassMime::encode(buf, plplw->pullPlan, GlassMime::PULLPLAN_MIME);
+			pixmap = *plplw->getDragPixmap();
+		}
+		else
+			return;
+
+		QByteArray pointerData(buf);
+		QMimeData* mimeData = new QMimeData;
+		mimeData->setText(pointerData);
+
+		QDrag *drag = new QDrag(this);
+		drag->setMimeData(mimeData);
+		drag->setPixmap(pixmap);
+		drag->setHotSpot(QPoint(50, 100));
+
+		drag->exec(Qt::CopyAction);
+
+		// no longer a drag in the library (becomes a QDrag, i.e. a drag in program)	
+		isDragging = false; 
+	}
+	// Otherwise  
+	else 
+	{
+		int movement = event->pos().y() - lastDragPosition.y();
+		libraryScrollArea->verticalScrollBar()->setValue(
+			libraryScrollArea->verticalScrollBar()->value() - movement);
+		lastDragPosition = event->pos();
+
+		maxDragDistance = MAX(maxDragDistance, totalYMovement);
+	}
+}
+
 void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 {
-	// If this is a drag and not the end of a click, don't process (dropEvent will do it instead)
-	if (isDragging && (event->pos() - dragStartPosition).manhattanLength() 
-		> QApplication::startDragDistance()) 
+	// If this is a drop and not the end of a click, don't process (dropEvent() will do it instead)
+	if (!isDragging || (isDragging && maxDragDistance >= QApplication::startDragDistance()))
 		return;
 
 	GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(childAt(event->pos()));
@@ -284,63 +359,6 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	updateLibrary();
 }
 
-
-void MainWindow :: mousePressEvent(QMouseEvent* event)
-{
-	GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(childAt(event->pos()));
-	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
-
-	if (event->button() == Qt::LeftButton && (cblw != NULL || plplw != NULL))
-	{
-		isDragging = true;
-		this->dragStartPosition = event->pos();
-	}
-	else
-		isDragging = false;
-}
-
-void MainWindow :: mouseMoveEvent(QMouseEvent* event)
-{
-	// If the left mouse button isn't down
-	if ((event->buttons() & Qt::LeftButton) == 0)
-	{
-		isDragging = false;
-		return;
-	}
-
-	if (!isDragging || (event->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
-		return;
-
-	GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(childAt(event->pos()));
-	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
-
-	char buf[500];
-	QPixmap pixmap;
-
-	if (cblw != NULL)
-	{
-		GlassMime::encode(buf, cblw, GlassMime::COLORLIBRARY_MIME);
-		pixmap = *cblw->getDragPixmap();
-	}
-	else if (plplw != NULL)
-	{
-		GlassMime::encode(buf, plplw->pullPlan, GlassMime::PULLPLAN_MIME);
-		pixmap = *plplw->getDragPixmap();
-	}
-	else
-		return;
-
-	QByteArray pointerData(buf);
-	QMimeData* mimeData = new QMimeData;
-	mimeData->setText(pointerData);
-
-	QDrag *drag = new QDrag(this);
-	drag->setMimeData(mimeData);
-	drag->setPixmap(pixmap);
-	drag->setHotSpot(QPoint(50, 100));
-
-	drag->exec(Qt::CopyAction);
-}
 
 void MainWindow :: setupConnections()
 {
@@ -555,7 +573,7 @@ void MainWindow :: setupLibrary()
 	libraryAreaLayout->setSpacing(10);
 	bigOleLibraryWidget->setLayout(libraryAreaLayout);
 
-	QScrollArea* libraryScrollArea = new QScrollArea(bigOleLibraryWidget);
+	libraryScrollArea = new QScrollArea(bigOleLibraryWidget);
 	libraryAreaLayout->addWidget(libraryScrollArea, 1);
 	libraryScrollArea->setBackgroundRole(QPalette::Dark);
 	libraryScrollArea->setWidgetResizable(true);
@@ -668,7 +686,7 @@ void MainWindow :: setupEmptyPaneEditor()
 	emptyEditorPage = new QWidget(editorStack);
 	QHBoxLayout* editorLayout = new QHBoxLayout(emptyEditorPage);
 	emptyEditorPage->setLayout(editorLayout);
-	whatToDoLabel = new QLabel("Click a library item at left to edit/view.", emptyEditorPage);
+	QLabel* whatToDoLabel = new QLabel("Click a library item at left to edit/view.", emptyEditorPage);
 	whatToDoLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	editorLayout->addWidget(whatToDoLabel, 0);
 }
