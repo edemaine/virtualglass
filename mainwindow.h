@@ -46,6 +46,7 @@ class MainWindow : public QMainWindow
 		void mouseMoveEvent(QMouseEvent* event);
 		void closeEvent(QCloseEvent *event);
 		void contextMenuEvent(QContextMenuEvent *event);
+		bool eventFilter(QObject* obj, QEvent* event);
 
 	signals:
 		void someDataChanged();
@@ -74,6 +75,7 @@ class MainWindow : public QMainWindow
 		void setupSaveFile();
 		void initializeRandomPiece();
 		void deleteCurrentEditingObject();
+		void moveCurrentEditingObject(int d);
 		void setViewMode(enum ViewMode m);
 		void clearLibrary();
 		void unhighlightAllLibraryWidgets();

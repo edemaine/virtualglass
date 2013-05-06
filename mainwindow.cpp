@@ -145,16 +145,89 @@ void MainWindow :: unhighlightAllLibraryWidgets()
 	}
 }
 
-void MainWindow :: keyPressEvent(QKeyEvent* e)
+void MainWindow :: keyPressEvent(QKeyEvent* event)
 {
-	if (e->key() == Qt::Key_Backspace || e->key() == Qt::Key_Delete)
-		deleteCurrentEditingObject();
+	switch (event->key())
+	{
+		case Qt::Key_Backspace:
+		case Qt::Key_Delete:
+			deleteCurrentEditingObject();
+			event->accept();
+			return;
+	}
+}
+
+bool MainWindow :: eventFilter(QObject* obj, QEvent* event)
+{
+	if (obj == libraryScrollArea && event->type() == QEvent::KeyPress)
+	{
+		switch (dynamic_cast<QKeyEvent*>(event)->key())
+		{
+			case Qt::Key_Up:
+				moveCurrentEditingObject(1);
+				event->accept();
+				return true;
+			case Qt::Key_Down:	
+				moveCurrentEditingObject(-1);
+				event->accept();
+				return true;
+		}
+	}
+	return false;
+}
+
+void MainWindow :: moveCurrentEditingObject(int d)
+{
+	switch (editorStack->currentIndex())
+	{
+		case COLORBAR_VIEW_MODE:
+			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
+			{
+				QLayoutItem* w = colorBarLibraryLayout->itemAt(i);
+				GlassColor* gc = dynamic_cast<GlassColorLibraryWidget*>(w->widget())->glassColor;
+				if (gc == colorEditorWidget->getGlassColor())
+				{
+					w = colorBarLibraryLayout->takeAt(i);
+					colorBarLibraryLayout->insertWidget(
+						MIN(MAX(i+d, 0), colorBarLibraryLayout->count()), w->widget()); 
+					return;
+				}
+			}	
+			return;	
+		case PULLPLAN_VIEW_MODE:
+			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
+			{
+				QLayoutItem* w = pullPlanLibraryLayout->itemAt(i);
+				PullPlan* p = dynamic_cast<PullPlanLibraryWidget*>(w->widget())->pullPlan;
+				if (p == pullPlanEditorWidget->getPullPlan())
+				{
+					w = pullPlanLibraryLayout->takeAt(i);
+					pullPlanLibraryLayout->insertWidget(
+						MIN(MAX(i+d, 0), pullPlanLibraryLayout->count()), w->widget()); 
+					return;
+				}
+			}
+			return;	
+		case PIECE_VIEW_MODE:
+			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
+			{
+				QLayoutItem* w = pieceLibraryLayout->itemAt(i);
+				Piece* p = dynamic_cast<PieceLibraryWidget*>(w->widget())->piece;
+				if (p == pieceEditorWidget->getPiece())
+				{
+					w = pieceLibraryLayout->takeAt(i);
+					pieceLibraryLayout->insertWidget(
+						MIN(MAX(i+d, 0), pieceLibraryLayout->count()), w->widget()); 
+					return;
+				}
+			}
+			return;	
+	}
+
 }
 
 void MainWindow :: deleteCurrentEditingObject()
 {
-	QLayoutItem* w;
-
 	switch (editorStack->currentIndex())
 	{
 		case COLORBAR_VIEW_MODE:
@@ -165,7 +238,7 @@ void MainWindow :: deleteCurrentEditingObject()
 			int i;
 			for (i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
-				w = colorBarLibraryLayout->itemAt(i);
+				QLayoutItem* w = colorBarLibraryLayout->itemAt(i);
 				GlassColor* gc = dynamic_cast<GlassColorLibraryWidget*>(w->widget())->glassColor;
 				if (gc == colorEditorWidget->getGlassColor())
 				{
@@ -199,7 +272,7 @@ void MainWindow :: deleteCurrentEditingObject()
 			int i;
 			for (i = 0; i < pullPlanLibraryLayout->count(); ++i)
 			{
-				w = pullPlanLibraryLayout->itemAt(i);
+				QLayoutItem* w = pullPlanLibraryLayout->itemAt(i);
 				PullPlan* p = dynamic_cast<PullPlanLibraryWidget*>(w->widget())->pullPlan;
 				if (p == pullPlanEditorWidget->getPullPlan())
 				{
@@ -233,7 +306,7 @@ void MainWindow :: deleteCurrentEditingObject()
 			int i;
 			for (i = 0; i < pieceLibraryLayout->count(); ++i)
 			{
-				w = pieceLibraryLayout->itemAt(i);
+				QLayoutItem* w = pieceLibraryLayout->itemAt(i);
 				Piece* p = dynamic_cast<PieceLibraryWidget*>(w->widget())->piece;
 				if (p == pieceEditorWidget->getPiece())
 				{
@@ -564,6 +637,7 @@ void MainWindow :: setupToolbar()
 	toolbarLayout->addWidget(startButton);
 }
 
+
 void MainWindow :: setupLibrary()
 {
 	QWidget* bigOleLibraryWidget = new QWidget(centralWidget);
@@ -574,6 +648,9 @@ void MainWindow :: setupLibrary()
 	bigOleLibraryWidget->setLayout(libraryAreaLayout);
 
 	libraryScrollArea = new QScrollArea(bigOleLibraryWidget);
+	// Filter out up/down arrow key events for moving library objects around.
+	// See eventFilter() for details. 
+	libraryScrollArea->installEventFilter(this);	
 	libraryAreaLayout->addWidget(libraryScrollArea, 1);
 	libraryScrollArea->setBackgroundRole(QPalette::Dark);
 	libraryScrollArea->setWidgetResizable(true);
