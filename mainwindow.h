@@ -18,6 +18,7 @@ class QMenu;
 class QAction;
 class QActionGroup;
 class QScrollArea;
+class QToolButton;
 
 class GlassColor;
 class PullPlan;
@@ -65,7 +66,6 @@ class MainWindow : public QMainWindow
 		void setupToolbar();
 		void setupLibrary();
 		void setupEditors();
-		void setupEmptyPaneEditor();
 		void setupColorEditor();
 		void setupPullPlanEditor();
 		void setupPieceEditor();
@@ -110,6 +110,9 @@ class MainWindow : public QMainWindow
 		QPushButton* copyPullPlanButton;
 		QPushButton* copyPieceButton;
 		QPushButton* mergeButton;
+
+		QToolButton* newFileButton;
+	
 		QMenu *examplesMenu;
 		QAction *randomSimpleCaneAction;
 		QAction *randomSimplePieceAction;

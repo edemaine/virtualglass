@@ -299,6 +299,7 @@ void PieceEditorWidget :: setupLayout()
 {
 	QGridLayout* editorLayout = new QGridLayout(this);
 	this->setLayout(editorLayout);
+	editorLayout->setContentsMargins(0, 0, 0, 0);
 
 	// two 3D views in the first row (and stretched to take up all the slack space 
 	editorLayout->addWidget(pickupViewWidget, 0, 0); 

@@ -155,6 +155,7 @@ void PullPlanEditorWidget :: setupLayout()
 	// and 3D view in the right column 
 	QGridLayout* editorLayout = new QGridLayout(this);
 	this->setLayout(editorLayout);
+	editorLayout->setContentsMargins(0, 0, 0, 0);
 
 	// build pair of editor views: regular and custom
 	viewEditorStack = new QStackedWidget(this);
@@ -173,7 +174,7 @@ void PullPlanEditorWidget :: setupLayout()
 	pullTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
 	pullTemplateLibraryScrollArea->setWidget(templateLibraryWidget);
 	pullTemplateLibraryScrollArea->setWidgetResizable(true);
-	pullTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	pullTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pullTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pullTemplateLibraryScrollArea->setFixedHeight(140);
 	editorLayout->addWidget(pullTemplateLibraryScrollArea, 1, 0);

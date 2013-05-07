@@ -47,7 +47,7 @@ MainWindow :: MainWindow()
 
 	// allocate ALL the memory
 	centralLayout = new QHBoxLayout(centralWidget);
-	//setupToolbar();
+	setupToolbar();
 	setupLibrary();
 	setupEditors();
 	setupMenus();
@@ -330,7 +330,12 @@ void MainWindow :: deleteCurrentEditingObject()
 
 void MainWindow :: mousePressEvent(QMouseEvent* event)
 {
-	if (event->button() == Qt::LeftButton && libraryScrollArea->geometry().contains(event->pos()))
+	// bounding box for the geometry of the libraryScrollArea relative to libraryMasterWidget
+	QRect scrollAreaRect = libraryScrollArea->geometry();
+	// bounding box for the geometry of the libraryScrollArea relative to MainWindow
+	scrollAreaRect.moveTopLeft(libraryScrollArea->parentWidget()->pos());
+	
+	if (event->button() == Qt::LeftButton && scrollAreaRect.contains(event->pos()))
 	{
 		isDragging = true;
 		lastDragPosition = dragStartPosition = event->pos();
@@ -449,6 +454,9 @@ void MainWindow :: setupConnections()
 	connect(copyPieceButton, SIGNAL(pressed()), this, SLOT(copyPiece()));
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateLibrary()));
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(setDirtyBitTrue()));
+
+	// toolbar stuff
+	connect(newFileButton, SIGNAL(pressed()), this, SLOT(newFileActionTriggered()));
 
 	// the file menu stuff
 	connect(newFileAction, SIGNAL(triggered()), this, SLOT(newFileActionTriggered()));
@@ -625,33 +633,35 @@ void MainWindow :: setupToolbar()
 {
 	QWidget* toolbarMasterWidget = new QWidget(centralWidget);
 	centralLayout->addWidget(toolbarMasterWidget);
+
 	QVBoxLayout* toolbarLayout = new QVBoxLayout(toolbarMasterWidget);
 	toolbarMasterWidget->setLayout(toolbarLayout);	
+	toolbarLayout->setContentsMargins(0, 0, 0, 0);
 
-	QToolButton* startButton = new QToolButton(toolbarMasterWidget);
-	startButton->setFixedSize(100, 50);
-	startButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
-	startButton->setText("New Color");
-	//startButton->setIconSize(QSize(100, 50));
-	//startButton->setIcon(QPixmap::fromImage(QImage(":/images/pickuptemplate1.png")));
-	toolbarLayout->addWidget(startButton);
+	newFileButton = new QToolButton(toolbarMasterWidget);
+	newFileButton->setFixedSize(50, 50);
+	newFileButton->setText("New File");
+	//newFileButton->setIconSize(QSize(45, 45));
+	//newFileButton->setIcon(QPixmap::fromImage(QImage(":/virtualglass.png")));
+	toolbarLayout->addWidget(newFileButton);
+
+	toolbarLayout->addStretch(1);
 }
-
 
 void MainWindow :: setupLibrary()
 {
-	QWidget* bigOleLibraryWidget = new QWidget(centralWidget);
-	centralLayout->addWidget(bigOleLibraryWidget);
+	QWidget* libraryMasterWidget = new QWidget(centralWidget);
+	centralLayout->addWidget(libraryMasterWidget);
 
-	QVBoxLayout* libraryAreaLayout = new QVBoxLayout(bigOleLibraryWidget);
-	libraryAreaLayout->setSpacing(10);
-	bigOleLibraryWidget->setLayout(libraryAreaLayout);
+	QVBoxLayout* libraryAreaLayout = new QVBoxLayout(libraryMasterWidget);
+	libraryMasterWidget->setLayout(libraryAreaLayout);
+	libraryAreaLayout->setContentsMargins(0, 0, 0, 0);
 
-	libraryScrollArea = new QScrollArea(bigOleLibraryWidget);
+	libraryScrollArea = new QScrollArea(libraryMasterWidget);
+	libraryAreaLayout->addWidget(libraryScrollArea, 1);
 	// Filter out up/down arrow key events for moving library objects around.
 	// See eventFilter() for details. 
 	libraryScrollArea->installEventFilter(this);	
-	libraryAreaLayout->addWidget(libraryScrollArea, 1);
 	libraryScrollArea->setBackgroundRole(QPalette::Dark);
 	libraryScrollArea->setWidgetResizable(true);
 	libraryScrollArea->setFixedWidth(370);
@@ -689,25 +699,28 @@ void MainWindow :: setupLibrary()
 	superlibraryLayout->addLayout(pieceLibraryLayout, 2, 2, Qt::AlignTop);
 
 	// make three qlabels for a legend
-	QGridLayout* legendLayout = new QGridLayout(libraryWidget);
-	QLabel* l1 = new QLabel("Used By Selected");
-	l1->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	l1->setStyleSheet("border: 2px dashed " + QColor(0, 139, 69, 255).name() + ";");
-	QLabel* l2 = new QLabel("Selected");
-	l2->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	l2->setStyleSheet("border: 2px solid " + QColor(0, 0, 255, 255).name() + ";");
-	QLabel* l3 = new QLabel("Uses Selected");
-	l3->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	l3->setStyleSheet("border: 2px dotted " + QColor(200, 100, 0, 255).name() + ";");
-	legendLayout->addWidget(l1,0,1);
-	legendLayout->addWidget(l2,0,2);
-	legendLayout->addWidget(l3,0,3);
-	libraryAreaLayout->addLayout(legendLayout, 0);
+	QWidget* legendWidget = new QWidget(libraryMasterWidget);
+	libraryAreaLayout->addWidget(legendWidget);
 
-	QLabel* descriptionLabel = new QLabel("Library - click to edit or drag to add.",
-		libraryWidget);
-	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	libraryAreaLayout->addWidget(descriptionLabel, 0);
+	QGridLayout* legendLayout = new QGridLayout(legendWidget);
+	legendWidget->setLayout(legendLayout);
+	legendLayout->setColumnStretch(0, 1);
+	legendLayout->setColumnStretch(1, 1);
+	legendLayout->setColumnStretch(2, 1);
+
+	QLabel* l1 = new QLabel("Used By Selected", legendWidget);
+	l1->setStyleSheet("border: 2px dashed " + QColor(0, 139, 69, 255).name() + ";");
+	legendLayout->addWidget(l1, 0, 0, Qt::AlignCenter);
+	QLabel* l2 = new QLabel("    Selected    ", legendWidget);
+	l2->setStyleSheet("border: 2px solid " + QColor(0, 0, 255, 255).name() + ";");
+	legendLayout->addWidget(l2, 0, 1, Qt::AlignCenter);
+	QLabel* l3 = new QLabel(" Uses  Selected ", legendWidget);
+	l3->setStyleSheet("border: 2px dotted " + QColor(200, 100, 0, 255).name() + ";");
+	legendLayout->addWidget(l3, 0, 2, Qt::AlignCenter);
+
+	QLabel* descriptionLabel = new QLabel("Library - click to edit or drag to add.", legendWidget);
+	descriptionLabel->setAlignment(Qt::AlignCenter);
+	libraryAreaLayout->addWidget(descriptionLabel);
 }
 
 void MainWindow :: clearLibrary()
@@ -745,9 +758,13 @@ void MainWindow :: setupEditors()
 	// The order that the editors are added to the stacked widget
 	// must match their order values in the enum EditorGUI::Mode
 	// in mainwindow.h
-	setupEmptyPaneEditor();
-	editorStack->addWidget(emptyEditorPage);
 
+	// "null" editor 
+	QLabel* whatToDoLabel = new QLabel("Click a library item at left to edit/view.", editorStack);
+	whatToDoLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	editorStack->addWidget(whatToDoLabel);
+
+	// real editors
 	setupColorEditor();
 	editorStack->addWidget(colorEditorWidget);
 
@@ -756,16 +773,6 @@ void MainWindow :: setupEditors()
 
 	setupPieceEditor();
 	editorStack->addWidget(pieceEditorWidget);
-}
-
-void MainWindow :: setupEmptyPaneEditor()
-{
-	emptyEditorPage = new QWidget(editorStack);
-	QHBoxLayout* editorLayout = new QHBoxLayout(emptyEditorPage);
-	emptyEditorPage->setLayout(editorLayout);
-	QLabel* whatToDoLabel = new QLabel("Click a library item at left to edit/view.", emptyEditorPage);
-	whatToDoLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	editorLayout->addWidget(whatToDoLabel, 0);
 }
 
 void MainWindow :: setupColorEditor()

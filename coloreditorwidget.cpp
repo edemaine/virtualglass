@@ -80,6 +80,7 @@ void ColorEditorWidget :: setupLayout()
 {
 	QGridLayout* editorLayout = new QGridLayout(this);
 	this->setLayout(editorLayout);
+	editorLayout->setContentsMargins(0, 0, 0, 0);
 
 	// Setup collection menu
 	QWidget* colMenuWidget = new QWidget(this); 
@@ -115,7 +116,7 @@ void ColorEditorWidget :: setupLayout()
 
 	// Little description for the editor
 	QLabel* descriptionLabel = new QLabel("Color editor.", this);
-	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	descriptionLabel->setAlignment(Qt::AlignCenter);
 	editorLayout->addWidget(descriptionLabel, 4, 0);
 
 	// Add 3D view	
