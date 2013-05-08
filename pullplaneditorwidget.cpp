@@ -156,6 +156,7 @@ void PullPlanEditorWidget :: setupLayout()
 	QGridLayout* editorLayout = new QGridLayout(this);
 	this->setLayout(editorLayout);
 	editorLayout->setContentsMargins(0, 0, 0, 0);
+	editorLayout->setSpacing(10);
 
 	// build pair of editor views: regular and custom
 	viewEditorStack = new QStackedWidget(this);
@@ -404,10 +405,10 @@ void PullPlanEditorWidget :: setupConnections()
 	connect(squareCasingPushButton, SIGNAL(clicked()), this, SLOT(squareCasingButtonPressed()));
 	connect(addCasingButton, SIGNAL(clicked()), this, SLOT(addCasingButtonPressed()));
 	connect(removeCasingButton, SIGNAL(clicked()), this, SLOT(removeCasingButtonPressed()));
-	connect(copySelectedButton, SIGNAL(pressed()), this, SLOT(copySelectedButtonPressed()));
-	connect(deleteSelectedButton, SIGNAL(pressed()), this, SLOT(deleteSelectedButtonPressed()));
-	connect(addCircleButton, SIGNAL(pressed()), this, SLOT(addCircleButtonPressed()));
-	connect(addSquareButton, SIGNAL(pressed()), this, SLOT(addSquareButtonPressed()));
+	connect(copySelectedButton, SIGNAL(clicked()), this, SLOT(copySelectedButtonPressed()));
+	connect(deleteSelectedButton, SIGNAL(clicked()), this, SLOT(deleteSelectedButtonPressed()));
+	connect(addCircleButton, SIGNAL(clicked()), this, SLOT(addCircleButtonPressed()));
+	connect(addSquareButton, SIGNAL(clicked()), this, SLOT(addSquareButtonPressed()));
 	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(countSpin, SIGNAL(valueChanged(int)), this, SLOT(countSpinChanged(int)));
 	connect(controlsTab, SIGNAL(currentChanged(int)), this, SLOT(controlsTabChanged(int)));

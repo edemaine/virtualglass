@@ -90,6 +90,12 @@ class MainWindow : public QMainWindow
 		void getDependantLibraryContents(Piece* piece, vector<GlassColor*>& colors, vector<PullPlan*>& plans,
 			vector<Piece*>& pieces);
 		void addToLibrary(vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces);
+		void newGlassColor();
+		void newPullPlan();
+		void newPiece();
+		void copyGlassColor();
+		void copyPullPlan();
+		void copyPiece();
 
 		// Variables
 		QScrollArea* libraryScrollArea;
@@ -103,15 +109,14 @@ class MainWindow : public QMainWindow
 		ColorEditorWidget* colorEditorWidget;
 		PullPlanEditorWidget* pullPlanEditorWidget;
 		PieceEditorWidget* pieceEditorWidget;
-		QPushButton* newGlassColorButton;
-		QPushButton* newPullPlanButton;
-		QPushButton* newPieceButton;
-		QPushButton* copyGlassColorButton;
-		QPushButton* copyPullPlanButton;
-		QPushButton* copyPieceButton;
-		QPushButton* mergeButton;
 
-		QToolButton* newFileButton;
+		QPushButton* newObjectButton;
+		QPushButton* copyObjectButton;
+		QPushButton* deleteObjectButton;
+
+		QPushButton* newFileButton;
+		QPushButton* openFileButton;
+		QPushButton* saveFileButton;
 	
 		QMenu *examplesMenu;
 		QAction *randomSimpleCaneAction;
@@ -152,12 +157,9 @@ class MainWindow : public QMainWindow
 		void exportPLYActionTriggered();
 		void exportOBJActionTriggered();
 		void updateLibrary();
-		void newGlassColor();
-		void newPullPlan();
-		void newPiece();
-		void copyGlassColor();
-		void copyPullPlan();
-		void copyPiece();
+		void newObject();
+		void copyObject();
+		void deleteObject();
 		void randomSimpleCaneExampleActionTriggered();
 		void randomSimplePieceExampleActionTriggered();
 		void randomComplexCaneExampleActionTriggered();

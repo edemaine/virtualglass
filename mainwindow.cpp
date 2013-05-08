@@ -66,29 +66,36 @@ MainWindow :: MainWindow()
 void MainWindow :: setViewMode(enum ViewMode _mode)
 {
 	editorStack->setCurrentIndex(_mode);
-	copyGlassColorButton->setEnabled(false);
-	copyPullPlanButton->setEnabled(false);
-	copyPieceButton->setEnabled(false);
-	exportPLYFileAction->setEnabled(false);
-	exportOBJFileAction->setEnabled(false);
-	saveSelectedAsFileAction->setEnabled(false);
 	switch (_mode)
 	{
 		case EMPTY_VIEW_MODE:
-			// leave all copy and export buttons disabled
+			newObjectButton->setEnabled(false);
+			copyObjectButton->setEnabled(false);
+			deleteObjectButton->setEnabled(false);
+			exportPLYFileAction->setEnabled(false);
+			exportOBJFileAction->setEnabled(false);
+			saveSelectedAsFileAction->setEnabled(false);
 			break;
 		case COLORBAR_VIEW_MODE:
-			copyGlassColorButton->setEnabled(true);
+			newObjectButton->setEnabled(true);
+			copyObjectButton->setEnabled(true);
+			deleteObjectButton->setEnabled(true);
+			exportPLYFileAction->setEnabled(false);
+			exportOBJFileAction->setEnabled(false);
 			saveSelectedAsFileAction->setEnabled(true);
 			break;
 		case PULLPLAN_VIEW_MODE:
-			copyPullPlanButton->setEnabled(true);
+			newObjectButton->setEnabled(true);
+			copyObjectButton->setEnabled(true);
+			deleteObjectButton->setEnabled(true);
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
 			break;
 		case PIECE_VIEW_MODE:
-			copyPieceButton->setEnabled(true);
+			newObjectButton->setEnabled(true);
+			copyObjectButton->setEnabled(true);
+			deleteObjectButton->setEnabled(true);
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
@@ -440,23 +447,23 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 
 void MainWindow :: setupConnections()
 {
-	connect(newGlassColorButton, SIGNAL(pressed()), this, SLOT(newGlassColor()));
-	connect(copyGlassColorButton, SIGNAL(pressed()), this, SLOT(copyGlassColor()));
 	connect(colorEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateLibrary()));
 	connect(colorEditorWidget, SIGNAL(someDataChanged()), this, SLOT(setDirtyBitTrue()));
 
-	connect(newPullPlanButton, SIGNAL(pressed()), this, SLOT(newPullPlan()));
-	connect(copyPullPlanButton, SIGNAL(pressed()), this, SLOT(copyPullPlan()));
 	connect(pullPlanEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateLibrary()));
 	connect(pullPlanEditorWidget, SIGNAL(someDataChanged()), this, SLOT(setDirtyBitTrue()));
 
-	connect(newPieceButton, SIGNAL(pressed()), this, SLOT(newPiece()));
-	connect(copyPieceButton, SIGNAL(pressed()), this, SLOT(copyPiece()));
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateLibrary()));
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(setDirtyBitTrue()));
 
 	// toolbar stuff
-	connect(newFileButton, SIGNAL(pressed()), this, SLOT(newFileActionTriggered()));
+	connect(newObjectButton, SIGNAL(clicked()), this, SLOT(newObject()));
+	connect(copyObjectButton, SIGNAL(clicked()), this, SLOT(copyObject()));
+	connect(deleteObjectButton, SIGNAL(clicked()), this, SLOT(deleteObject()));
+
+	connect(newFileButton, SIGNAL(clicked()), this, SLOT(newFileActionTriggered()));
+	connect(openFileButton, SIGNAL(clicked()), this, SLOT(openFileActionTriggered()));
+	connect(saveFileButton, SIGNAL(clicked()), this, SLOT(saveAllFileActionTriggered()));
 
 	// the file menu stuff
 	connect(newFileAction, SIGNAL(triggered()), this, SLOT(newFileActionTriggered()));
@@ -633,19 +640,53 @@ void MainWindow :: setupToolbar()
 {
 	QWidget* toolbarMasterWidget = new QWidget(centralWidget);
 	centralLayout->addWidget(toolbarMasterWidget);
+	centralLayout->setSpacing(10);
 
 	QVBoxLayout* toolbarLayout = new QVBoxLayout(toolbarMasterWidget);
 	toolbarMasterWidget->setLayout(toolbarLayout);	
-	toolbarLayout->setContentsMargins(0, 0, 0, 0);
+	toolbarLayout->setSpacing(20);
 
-	newFileButton = new QToolButton(toolbarMasterWidget);
-	newFileButton->setFixedSize(50, 50);
-	newFileButton->setText("New File");
-	//newFileButton->setIconSize(QSize(45, 45));
-	//newFileButton->setIcon(QPixmap::fromImage(QImage(":/virtualglass.png")));
+	vector<QPushButton*> toolbarButtons; // keep a running list of all the buttons
+
+	newObjectButton = new QPushButton("New", toolbarMasterWidget);
+	toolbarLayout->addWidget(newObjectButton);
+	toolbarButtons.push_back(newObjectButton);
+
+	copyObjectButton = new QPushButton("Copy", toolbarMasterWidget);
+	toolbarLayout->addWidget(copyObjectButton);
+	toolbarButtons.push_back(copyObjectButton);
+
+	deleteObjectButton = new QPushButton("Delete", toolbarMasterWidget);
+	toolbarLayout->addWidget(deleteObjectButton);
+	toolbarButtons.push_back(deleteObjectButton);
+
+	toolbarLayout->addSpacing(100);
+
+	// example for using a picture instead of text:
+	// newFileButton->setIconSize(QSize(45, 45));
+	// newFileButton->setIcon(QPixmap::fromImage(QImage(":/virtualglass.png")));
+	newFileButton = new QPushButton("New File", toolbarMasterWidget);
 	toolbarLayout->addWidget(newFileButton);
+	toolbarButtons.push_back(newFileButton);
+	
+	openFileButton = new QPushButton("Open File", toolbarMasterWidget);
+	toolbarLayout->addWidget(openFileButton);
+	toolbarButtons.push_back(openFileButton);
+	
+	saveFileButton = new QPushButton("Save File", toolbarMasterWidget);
+	toolbarLayout->addWidget(saveFileButton);
+	toolbarButtons.push_back(saveFileButton);
 
 	toolbarLayout->addStretch(1);
+
+	// apply common style to the buttons
+	for (unsigned int i = 0; i < toolbarButtons.size(); ++i)
+	{
+		//toolbarButtons[i]->setFixedSize(100, 100);
+		//toolbarButtons[i]->setStyleSheet("QPushButton{border: none; background-color: " 
+		//	+ QColor(200, 200, 200).name() + ";} QPushButton:pressed{ background-color: " 
+		//	+ QColor(0, 0, 255).name() + ";}"); 
+	}
 }
 
 void MainWindow :: setupLibrary()
@@ -664,39 +705,31 @@ void MainWindow :: setupLibrary()
 	libraryScrollArea->installEventFilter(this);	
 	libraryScrollArea->setBackgroundRole(QPalette::Dark);
 	libraryScrollArea->setWidgetResizable(true);
-	libraryScrollArea->setFixedWidth(370);
+	libraryScrollArea->setFixedWidth(340);
 	libraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	libraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	libraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	QWidget* libraryWidget = new QWidget(libraryScrollArea);
 	libraryScrollArea->setWidget(libraryWidget);
 
+	// TODO: refactor library to only use one layout
 	QGridLayout* superlibraryLayout = new QGridLayout(libraryWidget);
 	libraryWidget->setLayout(superlibraryLayout);
-
-	newGlassColorButton = new QPushButton("New Color", libraryWidget);
-	newPullPlanButton = new QPushButton("New Cane", libraryWidget);
-	newPieceButton = new QPushButton("New Piece", libraryWidget);
-	superlibraryLayout->addWidget(newGlassColorButton, 0, 0);
-	superlibraryLayout->addWidget(newPullPlanButton, 0, 1);
-	superlibraryLayout->addWidget(newPieceButton, 0, 2);
-
-	copyGlassColorButton = new QPushButton("Copy Color", libraryWidget);
-	copyPullPlanButton = new QPushButton("Copy Cane", libraryWidget);
-	copyPieceButton = new QPushButton("Copy Piece", libraryWidget);
-	superlibraryLayout->addWidget(copyGlassColorButton, 1, 0);
-	superlibraryLayout->addWidget(copyPullPlanButton, 1, 1);
-	superlibraryLayout->addWidget(copyPieceButton, 1, 2);
+	superlibraryLayout->setSpacing(1);
+	superlibraryLayout->setContentsMargins(0, 9, 0, 9);
 
 	colorBarLibraryLayout = new QVBoxLayout(libraryWidget);
+	colorBarLibraryLayout->setSpacing(10);
 	colorBarLibraryLayout->setDirection(QBoxLayout::BottomToTop);
 	pullPlanLibraryLayout = new QVBoxLayout(libraryWidget);
+	pullPlanLibraryLayout->setSpacing(10);
 	pullPlanLibraryLayout->setDirection(QBoxLayout::BottomToTop);
 	pieceLibraryLayout = new QVBoxLayout(libraryWidget);
+	pieceLibraryLayout->setSpacing(10);
 	pieceLibraryLayout->setDirection(QBoxLayout::BottomToTop);
-	superlibraryLayout->addLayout(colorBarLibraryLayout, 2, 0, Qt::AlignTop);
-	superlibraryLayout->addLayout(pullPlanLibraryLayout, 2, 1, Qt::AlignTop);
-	superlibraryLayout->addLayout(pieceLibraryLayout, 2, 2, Qt::AlignTop);
+	superlibraryLayout->addLayout(colorBarLibraryLayout, 0, 0, Qt::AlignTop);
+	superlibraryLayout->addLayout(pullPlanLibraryLayout, 0, 1, Qt::AlignTop);
+	superlibraryLayout->addLayout(pieceLibraryLayout, 0, 2, Qt::AlignTop);
 
 	// make three qlabels for a legend
 	QWidget* legendWidget = new QWidget(libraryMasterWidget);
@@ -707,14 +740,15 @@ void MainWindow :: setupLibrary()
 	legendLayout->setColumnStretch(0, 1);
 	legendLayout->setColumnStretch(1, 1);
 	legendLayout->setColumnStretch(2, 1);
+	legendLayout->setContentsMargins(9, 10, 9, 10); // hack to make legend height same as normal
 
 	QLabel* l1 = new QLabel("Used By Selected", legendWidget);
 	l1->setStyleSheet("border: 2px dashed " + QColor(0, 139, 69, 255).name() + ";");
 	legendLayout->addWidget(l1, 0, 0, Qt::AlignCenter);
-	QLabel* l2 = new QLabel("    Selected    ", legendWidget);
+	QLabel* l2 = new QLabel("  Selected  ", legendWidget);
 	l2->setStyleSheet("border: 2px solid " + QColor(0, 0, 255, 255).name() + ";");
 	legendLayout->addWidget(l2, 0, 1, Qt::AlignCenter);
-	QLabel* l3 = new QLabel(" Uses  Selected ", legendWidget);
+	QLabel* l3 = new QLabel("Uses Selected", legendWidget);
 	l3->setStyleSheet("border: 2px dotted " + QColor(200, 100, 0, 255).name() + ";");
 	legendLayout->addWidget(l3, 0, 2, Qt::AlignCenter);
 
@@ -799,6 +833,50 @@ void MainWindow :: setupPieceEditor()
 	pieceEditorWidget->updateEverything();
 }
 
+void MainWindow :: newObject()
+{
+	switch (editorStack->currentIndex())
+	{
+		case COLORBAR_VIEW_MODE:
+			newGlassColor();
+			break;
+		case PULLPLAN_VIEW_MODE:
+			newPullPlan();
+			break;
+		case PIECE_VIEW_MODE:
+			newPiece();
+			break;
+	}
+}
+
+void MainWindow :: copyObject()
+{
+	switch (editorStack->currentIndex())
+	{
+		case COLORBAR_VIEW_MODE:
+			copyGlassColor();
+			break;
+		case PULLPLAN_VIEW_MODE:
+			copyPullPlan();
+			break;
+		case PIECE_VIEW_MODE:
+			copyPiece();
+			break;
+	}
+}
+
+void MainWindow :: deleteObject()
+{
+	switch (editorStack->currentIndex())
+	{
+		case COLORBAR_VIEW_MODE:
+		case PULLPLAN_VIEW_MODE:
+		case PIECE_VIEW_MODE:
+			deleteCurrentEditingObject();
+			break;
+	}
+}
+
 void MainWindow :: newPiece()
 {
 	Piece* newEditorPiece = new Piece(PieceTemplate::TUMBLER);
@@ -812,7 +890,6 @@ void MainWindow :: copyPiece()
 {
 	Piece* newEditorPiece = pieceEditorWidget->getPiece()->copy();
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(newEditorPiece, this));
-	setViewMode(PIECE_VIEW_MODE);
 	pieceEditorWidget->setPiece(newEditorPiece);
 	updateLibrary();
 }
@@ -830,7 +907,6 @@ void MainWindow :: copyGlassColor()
 {
 	GlassColor* newEditorGlassColor = colorEditorWidget->getGlassColor()->copy();
 	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(newEditorGlassColor, this));
-	setViewMode(COLORBAR_VIEW_MODE);
 	colorEditorWidget->setGlassColor(newEditorGlassColor);
 	updateLibrary();
 }
@@ -848,7 +924,6 @@ void MainWindow :: copyPullPlan()
 {
 	PullPlan *newEditorPlan = pullPlanEditorWidget->getPullPlan()->copy();
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(newEditorPlan, this));
-	setViewMode(PULLPLAN_VIEW_MODE);
 	pullPlanEditorWidget->setPullPlan(newEditorPlan);
 	updateLibrary();
 }

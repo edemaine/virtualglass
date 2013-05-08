@@ -300,6 +300,7 @@ void PieceEditorWidget :: setupLayout()
 	QGridLayout* editorLayout = new QGridLayout(this);
 	this->setLayout(editorLayout);
 	editorLayout->setContentsMargins(0, 0, 0, 0);
+	editorLayout->setSpacing(10);
 
 	// two 3D views in the first row (and stretched to take up all the slack space 
 	editorLayout->addWidget(pickupViewWidget, 0, 0); 
@@ -319,7 +320,7 @@ void PieceEditorWidget :: setupLayout()
 	pickupTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
 	pickupTemplateLibraryScrollArea->setWidget(pickupTemplateLibraryWidget);
 	pickupTemplateLibraryScrollArea->setWidgetResizable(true);
-	pickupTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	pickupTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pickupTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pickupTemplateLibraryScrollArea->setFixedHeight(140);
 	editorLayout->addWidget(pickupTemplateLibraryScrollArea, 1, 0);
@@ -334,7 +335,7 @@ void PieceEditorWidget :: setupLayout()
 	pieceTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
 	pieceTemplateLibraryScrollArea->setWidget(pieceTemplateLibraryWidget);
 	pieceTemplateLibraryScrollArea->setWidgetResizable(true);
-	pieceTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	pieceTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pieceTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pieceTemplateLibraryScrollArea->setFixedHeight(140);
 	editorLayout->addWidget(pieceTemplateLibraryScrollArea, 1, 1);
