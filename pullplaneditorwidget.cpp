@@ -25,6 +25,7 @@
 #include "pullplancrosssectionrender.h"
 #include "globalbackgroundcolor.h"
 #include "globalgraphicssetting.h"
+#include "constants.h"
 
 PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -84,6 +85,10 @@ void PullPlanEditorWidget :: updateEverything()
 
 	countSpin->setValue(plan->getCount());
 	countLabel->setEnabled(plan->getTemplateType() != PullTemplate::CUSTOM);
+#ifdef TOUCH_SCREEN
+	countMinusButton->setEnabled(plan->getCount() > MIN_PULLPLAN_COUNT_PARAMETER_VALUE);
+	countPlusButton->setEnabled(plan->getCount() < MAX_PULLPLAN_COUNT_PARAMETER_VALUE);
+#endif
 	countSpin->setEnabled(plan->getTemplateType() != PullTemplate::CUSTOM);
 
 	twistWidget->updateEverything();
@@ -175,7 +180,11 @@ void PullPlanEditorWidget :: setupLayout()
 	pullTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
 	pullTemplateLibraryScrollArea->setWidget(templateLibraryWidget);
 	pullTemplateLibraryScrollArea->setWidgetResizable(true);
+#ifdef TOUCH_SCREEN
 	pullTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+#else
+	pullTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+#endif
 	pullTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pullTemplateLibraryScrollArea->setFixedHeight(140);
 	editorLayout->addWidget(pullTemplateLibraryScrollArea, 1, 0);
@@ -211,11 +220,24 @@ void PullPlanEditorWidget :: setupLayout()
 	casingLayout->addWidget(removeCasingButton);
 
 	countLabel = new QLabel("Count:", casingWidget);
+#ifdef TOUCH_SCREEN
+	countMinusButton = new QPushButton("-", casingWidget);
+	countPlusButton = new QPushButton("+", casingWidget);
+#endif
 	countSpin = new QSpinBox(casingWidget);
-	countSpin->setRange(0, 30);
+#ifdef TOUCH_SCREEN
+	countSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
+#endif
+	countSpin->setRange(MIN_PULLPLAN_COUNT_PARAMETER_VALUE, MAX_PULLPLAN_COUNT_PARAMETER_VALUE);
 	casingLayout->addStretch(1);
 	casingLayout->addWidget(countLabel);
+#ifdef TOUCH_SCREEN
+	casingLayout->addWidget(countMinusButton);
+#endif
 	casingLayout->addWidget(countSpin);
+#ifdef TOUCH_SCREEN
+	casingLayout->addWidget(countPlusButton);
+#endif
 
 	twistWidget = new TwistWidget(&(plan->twist), 10, tab1Widget);
 
@@ -270,7 +292,7 @@ void PullPlanEditorWidget :: setupLayout()
 
 	// vertically, the editor view that the user manipulates/interacts with 
 	// takes up all extra space
-	// controls are compressed as much as possible 
+	// controls are comclicked as much as possible 
 	// (they are ugly and don't require much precision)
 	editorLayout->setRowStretch(0, 10);
 }
@@ -292,52 +314,52 @@ void PullPlanEditorWidget :: controlsTabChanged(int tab)
 	}
 }
 
-void PullPlanEditorWidget :: circleCasingButtonPressed()
+void PullPlanEditorWidget :: circleCasingButtonClicked()
 {
 	plan->setOutermostCasingShape(CIRCLE_SHAPE);
 	updateEverything();
 	emit someDataChanged();
 }
 
-void PullPlanEditorWidget :: squareCasingButtonPressed()
+void PullPlanEditorWidget :: squareCasingButtonClicked()
 {
 	plan->setOutermostCasingShape(SQUARE_SHAPE);
 	updateEverything();
 	emit someDataChanged();
 }
 
-void PullPlanEditorWidget :: removeCasingButtonPressed()
+void PullPlanEditorWidget :: removeCasingButtonClicked()
 {
 	plan->removeCasing();
 	updateEverything();
 	emit someDataChanged();
 }
 
-void PullPlanEditorWidget :: addCasingButtonPressed()
+void PullPlanEditorWidget :: addCasingButtonClicked()
 {
 	plan->addCasing(plan->getOutermostCasingShape());
 	updateEverything();
 	emit someDataChanged();
 }
 
-void PullPlanEditorWidget :: copySelectedButtonPressed()
+void PullPlanEditorWidget :: copySelectedButtonClicked()
 {
-	customizeViewWidget->copySelectionPressed();
+	customizeViewWidget->copySelectionClicked();
 }
 
-void PullPlanEditorWidget :: deleteSelectedButtonPressed()
+void PullPlanEditorWidget :: deleteSelectedButtonClicked()
 {
-	customizeViewWidget->deleteSelectionPressed();
+	customizeViewWidget->deleteSelectionClicked();
 }
 
-void PullPlanEditorWidget :: addCircleButtonPressed()
+void PullPlanEditorWidget :: addCircleButtonClicked()
 {
-	customizeViewWidget->addCirclePressed();
+	customizeViewWidget->addCircleClicked();
 }
 
-void PullPlanEditorWidget :: addSquareButtonPressed()
+void PullPlanEditorWidget :: addSquareButtonClicked()
 {
-	customizeViewWidget->addSquarePressed();
+	customizeViewWidget->addSquareClicked();
 }
 	
 void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
@@ -401,15 +423,19 @@ void PullPlanEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 void PullPlanEditorWidget :: setupConnections()
 {
 	// editor controls
-	connect(circleCasingPushButton, SIGNAL(clicked()), this, SLOT(circleCasingButtonPressed()));
-	connect(squareCasingPushButton, SIGNAL(clicked()), this, SLOT(squareCasingButtonPressed()));
-	connect(addCasingButton, SIGNAL(clicked()), this, SLOT(addCasingButtonPressed()));
-	connect(removeCasingButton, SIGNAL(clicked()), this, SLOT(removeCasingButtonPressed()));
-	connect(copySelectedButton, SIGNAL(clicked()), this, SLOT(copySelectedButtonPressed()));
-	connect(deleteSelectedButton, SIGNAL(clicked()), this, SLOT(deleteSelectedButtonPressed()));
-	connect(addCircleButton, SIGNAL(clicked()), this, SLOT(addCircleButtonPressed()));
-	connect(addSquareButton, SIGNAL(clicked()), this, SLOT(addSquareButtonPressed()));
+	connect(circleCasingPushButton, SIGNAL(clicked()), this, SLOT(circleCasingButtonClicked()));
+	connect(squareCasingPushButton, SIGNAL(clicked()), this, SLOT(squareCasingButtonClicked()));
+	connect(addCasingButton, SIGNAL(clicked()), this, SLOT(addCasingButtonClicked()));
+	connect(removeCasingButton, SIGNAL(clicked()), this, SLOT(removeCasingButtonClicked()));
+	connect(copySelectedButton, SIGNAL(clicked()), this, SLOT(copySelectedButtonClicked()));
+	connect(deleteSelectedButton, SIGNAL(clicked()), this, SLOT(deleteSelectedButtonClicked()));
+	connect(addCircleButton, SIGNAL(clicked()), this, SLOT(addCircleButtonClicked()));
+	connect(addSquareButton, SIGNAL(clicked()), this, SLOT(addSquareButtonClicked()));
 	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
+#ifdef TOUCH_SCREEN
+	connect(countMinusButton, SIGNAL(clicked()), this, SLOT(countMinusButtonClicked()));
+	connect(countPlusButton, SIGNAL(clicked()), this, SLOT(countPlusButtonClicked()));
+#endif
 	connect(countSpin, SIGNAL(valueChanged(int)), this, SLOT(countSpinChanged(int)));
 	connect(controlsTab, SIGNAL(currentChanged(int)), this, SLOT(controlsTabChanged(int)));
 
@@ -426,6 +452,30 @@ void PullPlanEditorWidget :: childWidgetDataChanged()
 {
 	updateEverything();
 	emit someDataChanged();
+}
+
+void PullPlanEditorWidget :: countMinusButtonClicked()
+{
+#ifdef TOUCH_SCREEN
+	if (plan->getCount() > MIN_PULLPLAN_COUNT_PARAMETER_VALUE)
+	{
+		plan->setCount(plan->getCount() - 1);
+		updateEverything();
+		emit someDataChanged();
+	}	
+#endif
+}
+
+void PullPlanEditorWidget :: countPlusButtonClicked()
+{
+#ifdef TOUCH_SCREEN
+	if (plan->getCount() < MAX_PULLPLAN_COUNT_PARAMETER_VALUE)
+	{
+		plan->setCount(plan->getCount() + 1);
+		updateEverything();
+		emit someDataChanged();
+	}	
+#endif
 }
 
 void PullPlanEditorWidget :: countSpinChanged(int)

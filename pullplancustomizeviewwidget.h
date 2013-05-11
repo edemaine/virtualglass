@@ -24,10 +24,10 @@ class PullPlanCustomizeViewWidget : public QWidget
 		PullPlanCustomizeViewWidget(PullPlan* plan, QWidget* parent=0);
 		void setPullPlan(PullPlan* plan);
 		void revertAndClose();
-		void addCirclePressed();
-		void addSquarePressed();
-		void copySelectionPressed();
-		void deleteSelectionPressed();
+		void addCircleClicked();
+		void addSquareClicked();
+		void copySelectionClicked();
+		void deleteSelectionClicked();
 		void updateEverything();
 
 	signals:

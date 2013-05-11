@@ -27,6 +27,7 @@
 #include "piececrosssectionrender.h"
 #include "globalbackgroundcolor.h"
 #include "globalgraphicssetting.h"
+#include "constants.h"
 
 PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -320,7 +321,11 @@ void PieceEditorWidget :: setupLayout()
 	pickupTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
 	pickupTemplateLibraryScrollArea->setWidget(pickupTemplateLibraryWidget);
 	pickupTemplateLibraryScrollArea->setWidgetResizable(true);
+#ifdef TOUCH_SCREEN
 	pickupTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+#else
+	pickupTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+#endif
 	pickupTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pickupTemplateLibraryScrollArea->setFixedHeight(140);
 	editorLayout->addWidget(pickupTemplateLibraryScrollArea, 1, 0);
@@ -335,7 +340,11 @@ void PieceEditorWidget :: setupLayout()
 	pieceTemplateLibraryScrollArea->setBackgroundRole(QPalette::Dark);
 	pieceTemplateLibraryScrollArea->setWidget(pieceTemplateLibraryWidget);
 	pieceTemplateLibraryScrollArea->setWidgetResizable(true);
+#ifdef TOUCH_SCREEN
 	pieceTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+#else 
+	pieceTemplateLibraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+#endif
 	pieceTemplateLibraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	pieceTemplateLibraryScrollArea->setFixedHeight(140);
 	editorLayout->addWidget(pieceTemplateLibraryScrollArea, 1, 1);

@@ -16,6 +16,7 @@
 #include <QStatusBar>
 #include <QToolButton>
 #include <QScrollBar>
+#include <QSizePolicy>
 
 #include "constants.h"
 #include "dependancy.h"
@@ -93,9 +94,11 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			saveSelectedAsFileAction->setEnabled(true);
 			break;
 		case PIECE_VIEW_MODE:
+#ifdef TOUCH_SCREEN
 			newObjectButton->setEnabled(true);
 			copyObjectButton->setEnabled(true);
 			deleteObjectButton->setEnabled(true);
+#endif
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
@@ -456,15 +459,15 @@ void MainWindow :: setupConnections()
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateLibrary()));
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(setDirtyBitTrue()));
 
-	// toolbar stuff
 	connect(newObjectButton, SIGNAL(clicked()), this, SLOT(newObject()));
 	connect(copyObjectButton, SIGNAL(clicked()), this, SLOT(copyObject()));
 	connect(deleteObjectButton, SIGNAL(clicked()), this, SLOT(deleteObject()));
 
+#ifdef TOUCH_SCREEN
 	connect(newFileButton, SIGNAL(clicked()), this, SLOT(newFileActionTriggered()));
 	connect(openFileButton, SIGNAL(clicked()), this, SLOT(openFileActionTriggered()));
 	connect(saveFileButton, SIGNAL(clicked()), this, SLOT(saveAllFileActionTriggered()));
-
+#endif
 	// the file menu stuff
 	connect(newFileAction, SIGNAL(triggered()), this, SLOT(newFileActionTriggered()));
 	connect(openFileAction, SIGNAL(triggered()), this, SLOT(openFileActionTriggered()));
@@ -638,6 +641,7 @@ void MainWindow :: setupSaveFile()
 
 void MainWindow :: setupToolbar()
 {
+#ifdef TOUCH_SCREEN
 	QWidget* toolbarMasterWidget = new QWidget(centralWidget);
 	centralLayout->addWidget(toolbarMasterWidget);
 	centralLayout->setSpacing(10);
@@ -687,6 +691,7 @@ void MainWindow :: setupToolbar()
 		//	+ QColor(200, 200, 200).name() + ";} QPushButton:pressed{ background-color: " 
 		//	+ QColor(0, 0, 255).name() + ";}"); 
 	}
+#endif
 }
 
 void MainWindow :: setupLibrary()
@@ -705,18 +710,35 @@ void MainWindow :: setupLibrary()
 	libraryScrollArea->installEventFilter(this);	
 	libraryScrollArea->setBackgroundRole(QPalette::Dark);
 	libraryScrollArea->setWidgetResizable(true);
+#ifdef TOUCH_SCREEN
 	libraryScrollArea->setFixedWidth(340);
+#else
+	libraryScrollArea->setFixedWidth(370);
+#endif
 	libraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+#ifdef TOUCH_SCREEN
 	libraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
+#else
+	libraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+#endif
 	QWidget* libraryWidget = new QWidget(libraryScrollArea);
 	libraryScrollArea->setWidget(libraryWidget);
 
 	// TODO: refactor library to only use one layout
 	QGridLayout* superlibraryLayout = new QGridLayout(libraryWidget);
 	libraryWidget->setLayout(superlibraryLayout);
-	superlibraryLayout->setSpacing(1);
 	superlibraryLayout->setContentsMargins(0, 9, 0, 9);
+
+#ifndef TOUCH_SCREEN
+	newObjectButton = new QPushButton("New", libraryWidget);
+	superlibraryLayout->addWidget(newObjectButton, 0, 0);
+
+	copyObjectButton = new QPushButton("Copy", libraryWidget);
+	superlibraryLayout->addWidget(copyObjectButton, 0, 1);
+
+	deleteObjectButton = new QPushButton("Delete", libraryWidget);
+	superlibraryLayout->addWidget(deleteObjectButton, 0, 2);
+#endif
 
 	colorBarLibraryLayout = new QVBoxLayout(libraryWidget);
 	colorBarLibraryLayout->setSpacing(10);
@@ -727,9 +749,9 @@ void MainWindow :: setupLibrary()
 	pieceLibraryLayout = new QVBoxLayout(libraryWidget);
 	pieceLibraryLayout->setSpacing(10);
 	pieceLibraryLayout->setDirection(QBoxLayout::BottomToTop);
-	superlibraryLayout->addLayout(colorBarLibraryLayout, 0, 0, Qt::AlignTop);
-	superlibraryLayout->addLayout(pullPlanLibraryLayout, 0, 1, Qt::AlignTop);
-	superlibraryLayout->addLayout(pieceLibraryLayout, 0, 2, Qt::AlignTop);
+	superlibraryLayout->addLayout(colorBarLibraryLayout, 1, 0, Qt::AlignTop);
+	superlibraryLayout->addLayout(pullPlanLibraryLayout, 1, 1, Qt::AlignTop);
+	superlibraryLayout->addLayout(pieceLibraryLayout, 1, 2, Qt::AlignTop);
 
 	// make three qlabels for a legend
 	QWidget* legendWidget = new QWidget(libraryMasterWidget);

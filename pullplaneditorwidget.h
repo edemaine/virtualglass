@@ -29,6 +29,9 @@ class QSpinBox;
 class QHBoxLayout;
 class QScrollArea;
 
+#define MIN_PULLPLAN_COUNT_PARAMETER_VALUE 0
+#define MAX_PULLPLAN_COUNT_PARAMETER_VALUE 30
+
 class PullPlanEditorWidget : public QWidget
 {
 	Q_OBJECT
@@ -55,15 +58,17 @@ class PullPlanEditorWidget : public QWidget
 		void showMessage(const QString& message, unsigned int timeout);
 
 	private slots:
-		void circleCasingButtonPressed();
-		void squareCasingButtonPressed();
-		void addCasingButtonPressed();
-		void removeCasingButtonPressed();
-		void addCircleButtonPressed();
-		void addSquareButtonPressed();
-		void copySelectedButtonPressed();
-		void deleteSelectedButtonPressed();
+		void circleCasingButtonClicked();
+		void squareCasingButtonClicked();
+		void addCasingButtonClicked();
+		void removeCasingButtonClicked();
+		void addCircleButtonClicked();
+		void addSquareButtonClicked();
+		void copySelectedButtonClicked();
+		void deleteSelectedButtonClicked();
 		void childWidgetDataChanged();
+		void countMinusButtonClicked();
+		void countPlusButtonClicked();
 		void countSpinChanged(int);
 		void controlsTabChanged(int);
 		void geometryThreadFinishedMesh(bool completed, unsigned int quality);
@@ -88,8 +93,12 @@ class PullPlanEditorWidget : public QWidget
 		PullPlanEditorViewWidget* viewWidget;	
 		PullPlanCustomizeViewWidget* customizeViewWidget;	
 		TwistWidget* twistWidget;
+
 		QLabel* countLabel;
+		QPushButton* countMinusButton;	
 		QSpinBox* countSpin;
+		QPushButton* countPlusButton;	
+
 		QHBoxLayout* templateLibraryLayout;
 		QPushButton* addCasingButton;
 		QPushButton* removeCasingButton;

@@ -20,6 +20,7 @@
 #include "coloreditorwidget.h"
 #include "glassfileio.h"
 #include "globalgraphicssetting.h"
+#include "constants.h"
 
 ColorEditorWidget :: ColorEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -81,6 +82,7 @@ void ColorEditorWidget :: setupLayout()
 	QGridLayout* editorLayout = new QGridLayout(this);
 	this->setLayout(editorLayout);
 	editorLayout->setContentsMargins(0, 0, 0, 0);
+	editorLayout->setSpacing(10);
 
 	// Setup collection menu
 	QWidget* colMenuWidget = new QWidget(this); 
@@ -162,9 +164,17 @@ void ColorEditorWidget :: loadCollection(QString fileName)
 	collectionStack->addWidget(listScrollArea); // add this to the layout
 	listScrollArea->setBackgroundRole(QPalette::Dark);
 	listScrollArea->setWidgetResizable(true);
+#ifdef TOUCH_SCREEN
 	listScrollArea->setFixedWidth(322);
+#else 
+	listScrollArea->setFixedWidth(336);
+#endif
 	listScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+#ifdef TOUCH_SCREEN
 	listScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+#else
+	listScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+#endif
 	QWidget* colorLibraryWidget = new QWidget(listScrollArea);
 	listScrollArea->setWidget(colorLibraryWidget);
 	QVBoxLayout* listLayout = new QVBoxLayout(colorLibraryWidget);
@@ -209,14 +219,14 @@ void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
 
 void ColorEditorWidget :: mouseMoveEvent(QMouseEvent* event)
 {
-        // If the left mouse button isn't down
-        if ((event->buttons() & Qt::LeftButton) == 0)
-        {
-                isDragging = false;
-                return;
-        }
+	// If the left mouse button isn't down
+	if ((event->buttons() & Qt::LeftButton) == 0)
+	{
+		isDragging = false;
+		return;
+	}
 
-        maxDragDistance = MAX(maxDragDistance, fabs(event->pos().y() - dragStartPosition.y()));
+	maxDragDistance = MAX(maxDragDistance, fabs(event->pos().y() - dragStartPosition.y()));
 	if (!isDragging || maxDragDistance < QApplication::startDragDistance())
 		return;
 

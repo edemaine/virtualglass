@@ -440,7 +440,7 @@ void PullPlanCustomizeViewWidget :: keyPressEvent(QKeyEvent* event)
 {
 	if (event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Delete)
 	{
-		deleteSelectionPressed();
+		deleteSelectionClicked();
 	}
 }
 
@@ -700,7 +700,7 @@ void PullPlanCustomizeViewWidget :: revertAndClose()
 	//revertAllChanges();
 }
 
-void PullPlanCustomizeViewWidget :: copySelectionPressed()
+void PullPlanCustomizeViewWidget :: copySelectionClicked()
 {
 	if (subplansSelected.size() == 0)
 		return;
@@ -731,7 +731,7 @@ void PullPlanCustomizeViewWidget :: copySelectionPressed()
 	update();
 }
 
-void PullPlanCustomizeViewWidget :: deleteSelectionPressed()
+void PullPlanCustomizeViewWidget :: deleteSelectionClicked()
 {
 	for (unsigned int i = 0; i < subplansSelected.size(); i++)
 	{
@@ -753,7 +753,7 @@ void PullPlanCustomizeViewWidget :: deleteSelectionPressed()
 	update();
 }
 
-void PullPlanCustomizeViewWidget :: addCirclePressed()
+void PullPlanCustomizeViewWidget :: addCircleClicked()
 {
 	Point2D p = make_vector(0.0f, 0.0f);
 	float diameter = 0;
@@ -775,7 +775,7 @@ void PullPlanCustomizeViewWidget :: addCirclePressed()
 	update();
 }
 
-void PullPlanCustomizeViewWidget :: addSquarePressed()
+void PullPlanCustomizeViewWidget :: addSquareClicked()
 {
 	Point2D p = make_vector(0.0f, 0.0f);
 	float diameter = 0;
