@@ -164,17 +164,11 @@ void ColorEditorWidget :: loadCollection(QString fileName)
 	collectionStack->addWidget(listScrollArea); // add this to the layout
 	listScrollArea->setBackgroundRole(QPalette::Dark);
 	listScrollArea->setWidgetResizable(true);
-#ifdef TOUCH_SCREEN
-	listScrollArea->setFixedWidth(322);
-#else 
 	listScrollArea->setFixedWidth(336);
-#endif
+
 	listScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-#ifdef TOUCH_SCREEN
-	listScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-#else
 	listScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-#endif
+
 	QWidget* colorLibraryWidget = new QWidget(listScrollArea);
 	listScrollArea->setWidget(colorLibraryWidget);
 	QVBoxLayout* listLayout = new QVBoxLayout(colorLibraryWidget);

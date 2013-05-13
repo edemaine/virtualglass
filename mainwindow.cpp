@@ -17,6 +17,7 @@
 #include <QToolButton>
 #include <QScrollBar>
 #include <QSizePolicy>
+#include <QToolBar>
 
 #include "constants.h"
 #include "dependancy.h"
@@ -94,11 +95,9 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			saveSelectedAsFileAction->setEnabled(true);
 			break;
 		case PIECE_VIEW_MODE:
-#ifdef TOUCH_SCREEN
 			newObjectButton->setEnabled(true);
 			copyObjectButton->setEnabled(true);
 			deleteObjectButton->setEnabled(true);
-#endif
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
@@ -463,11 +462,6 @@ void MainWindow :: setupConnections()
 	connect(copyObjectButton, SIGNAL(clicked()), this, SLOT(copyObject()));
 	connect(deleteObjectButton, SIGNAL(clicked()), this, SLOT(deleteObject()));
 
-#ifdef TOUCH_SCREEN
-	connect(newFileButton, SIGNAL(clicked()), this, SLOT(newFileActionTriggered()));
-	connect(openFileButton, SIGNAL(clicked()), this, SLOT(openFileActionTriggered()));
-	connect(saveFileButton, SIGNAL(clicked()), this, SLOT(saveAllFileActionTriggered()));
-#endif
 	// the file menu stuff
 	connect(newFileAction, SIGNAL(triggered()), this, SLOT(newFileActionTriggered()));
 	connect(openFileAction, SIGNAL(triggered()), this, SLOT(openFileActionTriggered()));
@@ -641,57 +635,7 @@ void MainWindow :: setupSaveFile()
 
 void MainWindow :: setupToolbar()
 {
-#ifdef TOUCH_SCREEN
-	QWidget* toolbarMasterWidget = new QWidget(centralWidget);
-	centralLayout->addWidget(toolbarMasterWidget);
-	centralLayout->setSpacing(10);
 
-	QVBoxLayout* toolbarLayout = new QVBoxLayout(toolbarMasterWidget);
-	toolbarMasterWidget->setLayout(toolbarLayout);	
-	toolbarLayout->setSpacing(20);
-
-	vector<QPushButton*> toolbarButtons; // keep a running list of all the buttons
-
-	newObjectButton = new QPushButton("New", toolbarMasterWidget);
-	toolbarLayout->addWidget(newObjectButton);
-	toolbarButtons.push_back(newObjectButton);
-
-	copyObjectButton = new QPushButton("Copy", toolbarMasterWidget);
-	toolbarLayout->addWidget(copyObjectButton);
-	toolbarButtons.push_back(copyObjectButton);
-
-	deleteObjectButton = new QPushButton("Delete", toolbarMasterWidget);
-	toolbarLayout->addWidget(deleteObjectButton);
-	toolbarButtons.push_back(deleteObjectButton);
-
-	toolbarLayout->addSpacing(100);
-
-	// example for using a picture instead of text:
-	// newFileButton->setIconSize(QSize(45, 45));
-	// newFileButton->setIcon(QPixmap::fromImage(QImage(":/virtualglass.png")));
-	newFileButton = new QPushButton("New File", toolbarMasterWidget);
-	toolbarLayout->addWidget(newFileButton);
-	toolbarButtons.push_back(newFileButton);
-	
-	openFileButton = new QPushButton("Open File", toolbarMasterWidget);
-	toolbarLayout->addWidget(openFileButton);
-	toolbarButtons.push_back(openFileButton);
-	
-	saveFileButton = new QPushButton("Save File", toolbarMasterWidget);
-	toolbarLayout->addWidget(saveFileButton);
-	toolbarButtons.push_back(saveFileButton);
-
-	toolbarLayout->addStretch(1);
-
-	// apply common style to the buttons
-	for (unsigned int i = 0; i < toolbarButtons.size(); ++i)
-	{
-		//toolbarButtons[i]->setFixedSize(100, 100);
-		//toolbarButtons[i]->setStyleSheet("QPushButton{border: none; background-color: " 
-		//	+ QColor(200, 200, 200).name() + ";} QPushButton:pressed{ background-color: " 
-		//	+ QColor(0, 0, 255).name() + ";}"); 
-	}
-#endif
 }
 
 void MainWindow :: setupLibrary()
@@ -710,17 +654,10 @@ void MainWindow :: setupLibrary()
 	libraryScrollArea->installEventFilter(this);	
 	libraryScrollArea->setBackgroundRole(QPalette::Dark);
 	libraryScrollArea->setWidgetResizable(true);
-#ifdef TOUCH_SCREEN
-	libraryScrollArea->setFixedWidth(340);
-#else
 	libraryScrollArea->setFixedWidth(370);
-#endif
 	libraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-#ifdef TOUCH_SCREEN
-	libraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-#else
 	libraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-#endif
+
 	QWidget* libraryWidget = new QWidget(libraryScrollArea);
 	libraryScrollArea->setWidget(libraryWidget);
 
@@ -729,7 +666,6 @@ void MainWindow :: setupLibrary()
 	libraryWidget->setLayout(superlibraryLayout);
 	superlibraryLayout->setContentsMargins(0, 9, 0, 9);
 
-#ifndef TOUCH_SCREEN
 	newObjectButton = new QPushButton("New", libraryWidget);
 	superlibraryLayout->addWidget(newObjectButton, 0, 0);
 
@@ -738,7 +674,6 @@ void MainWindow :: setupLibrary()
 
 	deleteObjectButton = new QPushButton("Delete", libraryWidget);
 	superlibraryLayout->addWidget(deleteObjectButton, 0, 2);
-#endif
 
 	colorBarLibraryLayout = new QVBoxLayout(libraryWidget);
 	colorBarLibraryLayout->setSpacing(10);

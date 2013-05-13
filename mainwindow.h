@@ -114,10 +114,6 @@ class MainWindow : public QMainWindow
 		QPushButton* copyObjectButton;
 		QPushButton* deleteObjectButton;
 
-		QPushButton* newFileButton;
-		QPushButton* openFileButton;
-		QPushButton* saveFileButton;
-	
 		QMenu *examplesMenu;
 		QAction *randomSimpleCaneAction;
 		QAction *randomSimplePieceAction;

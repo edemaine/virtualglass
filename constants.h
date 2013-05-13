@@ -2,9 +2,6 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-// Compile flags
-//#define TOUCH_SCREEN
-
 // Numeric constants
 const float PI = 3.14159265358979323846;
 const float TWO_PI = 6.2831853071795862;
