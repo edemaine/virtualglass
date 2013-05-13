@@ -41,7 +41,7 @@ namespace MeshInternal
 	float finalRadius(vector<ancestor>& ancestors);
 	float totalTwist(vector<ancestor>& ancestors);
 	unsigned int computeAxialResolution(float length, float twist, unsigned int quality);
-	unsigned int computeAngularResolution(float diameter, unsigned int quality);
+	unsigned int computeAngularResolution(float diameter, unsigned int quality, enum GeometricShape shape);
 	void meshBaseCasing(Geometry* g, vector<ancestor>& ancestors, 
 		Color c, enum GeometricShape outerShape, enum GeometricShape innerShape, 
 		float length, float outerRadius, float innerRadius, float twist, unsigned int quality, bool ensureVisible);

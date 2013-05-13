@@ -333,7 +333,7 @@ void PieceEditorWidget :: setupLayout()
 	pickupControlsTab->addTab(pickupParamWidget, "Fill and Case");
 
 	// below the tabs goes a labeled descriptor (changes depending on view)
-	QLabel* pickupEditorDescriptionLabel = new QLabel("Pickup editor - drag color or canes in.", this);
+	QLabel* pickupEditorDescriptionLabel = new QLabel("Pickup editor - drag in color or canes", this);
 	pickupEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	editorLayout->addWidget(pickupEditorDescriptionLabel, 3, 0);
 
@@ -377,7 +377,7 @@ void PieceEditorWidget :: setupLayout()
 
 
 	// below the tabs goes a labeled descriptor (changes depending on view)
-	pieceEditorDescriptionLabel = new QLabel("Piece editor.", this);
+	pieceEditorDescriptionLabel = new QLabel("Piece editor", this);
 	pieceEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	editorLayout->addWidget(pieceEditorDescriptionLabel, 3, 1);
 

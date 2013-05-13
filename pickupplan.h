@@ -42,7 +42,6 @@ class PickupPlan
 		enum PickupTemplate::Type type;
 		vector<TemplateParameter> parameters;
 		unsigned int vertices;
-		bool viewAll;
 };
 
 PickupPlan *deep_copy(const PickupPlan *);

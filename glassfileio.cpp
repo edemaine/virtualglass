@@ -801,7 +801,7 @@ PickupPlan* readPickup(string pickupname, Json::Value& root,
 	{
 		string subpullname = root[pickupname]["Subcanes"].getMemberNames()[i];
 		unsigned int subIndex = root[pickupname]["Subcanes"][subpullname]["Index"].asUInt();
-	
+
 		pickup->subs[subIndex].plan = safeCaneMap(caneMap,
 			root[pickupname]["Subcanes"][subpullname]["Cane pointer"].asUInt());
 		pickup->subs[subIndex].length = root[pickupname]["Subcanes"][subpullname]["Length"].asFloat();

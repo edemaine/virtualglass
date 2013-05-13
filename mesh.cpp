@@ -417,12 +417,19 @@ void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float lengt
 // 5 gives something decent with mild artifacts
 // 1 gives something really ugly but low triangle count
 // 10 gives something with no artifacts
-unsigned int computeAngularResolution(float radius, unsigned int quality)
+unsigned int computeAngularResolution(float radius, unsigned int quality, enum GeometricShape shape)
 {
 	// standard "full" cane radius is 1.0
 	// this function should return a multiple of 4
 	unsigned int r = radius * 6 * quality;
-	return MIN(MAX((r / 4) * 4, 4), 20); 
+	switch (shape)
+	{
+		case CIRCLE_SHAPE:
+			return MIN(MAX((r / 4) * 4, 8), 20); 
+		case SQUARE_SHAPE:
+		default:
+			return MIN(MAX((r / 4) * 4, 4), 20); 
+	}
 }
 
 unsigned int computeAxialResolution(float length, float twist, unsigned int quality)
@@ -467,7 +474,10 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 	if (color.a < 0.001)
 		return;
 	
-	unsigned int angularResolution = computeAngularResolution(finalRadius(ancestors) * outerRadius, quality);
+	unsigned int angularResolution = 
+		MAX(computeAngularResolution(finalRadius(ancestors) * outerRadius, quality, outerShape),
+		computeAngularResolution(finalRadius(ancestors) * outerRadius, quality, innerShape));
+	
 	unsigned int axialResolution = computeAxialResolution(length, totalTwist(ancestors) + twist, quality);
 	
 	uint32_t first_vert = geometry->vertices.size();
@@ -560,7 +570,7 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors,
 	if (color.a < 0.01)
 		return;
 
-	unsigned int angularResolution = computeAngularResolution(finalRadius(ancestors) * radius, quality);
+	unsigned int angularResolution = computeAngularResolution(finalRadius(ancestors) * radius, quality, shape);
 	unsigned int axialResolution = computeAxialResolution(length, totalTwist(ancestors) + twist, quality);
 
 	uint32_t first_vert = geometry->vertices.size();

@@ -9,13 +9,15 @@
 #include "pickupplan.h"
 #include "pieceeditorwidget.h"
 
-PickupPlan :: PickupPlan(enum PickupTemplate::Type _type) {
+PickupPlan :: PickupPlan(enum PickupTemplate::Type _type) 
+{
 	vertices = 0;
 	casingGlassColor = underlayGlassColor = overlayGlassColor = GlobalGlass::color();
 	setTemplateType(_type, true);
 }
 
-PickupPlan* PickupPlan :: copy() const {
+PickupPlan* PickupPlan :: copy() const 
+{
 	
 	PickupPlan* c = new PickupPlan(type);
 
@@ -61,13 +63,14 @@ void PickupPlan :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
 	}
 }
 
-void PickupPlan :: updateSubs() {
-
+void PickupPlan :: updateSubs() 
+{
 	vector<SubpickupTemplate> newSubs;
 
 	Point3D p;
 	float width, length;
-	switch (this->type) {
+	switch (this->type) 
+	{
 		case PickupTemplate::MURRINE:
 			width = 2.0 / MAX(parameters[0].value, 1);
 			length = parameters[1].value*0.005 + 0.005;
@@ -122,22 +125,23 @@ void PickupPlan :: updateSubs() {
 			}
 			break;
 		case PickupTemplate::RETICELLO_VERTICAL_HORIZONTAL:
-			p.x = p.y = p.z = 0.0;
-			width = 2.0 / MAX(parameters[0].value, 1);
-			for (int i = 0; i < parameters[0].value-1; ++i) {
-				p.x = -1.0 + width / 2 + width * i;
-				p.y = -1.0;
-				p.z = 0.0;
-				pushNewSubplan(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 2.0, width-0.0001, SQUARE_SHAPE);
-				p.x = -1.0;
-				p.y = 1.0 - (1.5 * width + width * i);
-				p.z = -width/2;
-				pushNewSubplan(&newSubs, p, HORIZONTAL_PICKUP_CANE_ORIENTATION, 2.0, width-0.0001, SQUARE_SHAPE);
-			}
-			p.x = -1.0 + width / 2 + width * (parameters[0].value-1);
-			p.y = -1.0;
-			p.z = 0.0;
-			pushNewSubplan(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 2.0, width-0.0001, SQUARE_SHAPE);
+                        p.x = p.y = p.z = 0.0;
+                        width = 2.0 / MAX(parameters[0].value, 1);
+                        for (int i = 0; i < parameters[0].value/2; ++i)
+                        {
+                                p.x = -1.0 + width / 2 + width * i;
+                                p.y = -1.0;
+                                pushNewSubplan(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0, width-0.0001, SQUARE_SHAPE);
+                                p.y = 0.0;
+                                pushNewSubplan(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0, width-0.0001, SQUARE_SHAPE);
+                        }
+                        for (int i = 0; i < parameters[0].value; ++i)
+                        {
+				p.x = 0.0 - width / 2 * (parameters[0].value % 2);
+                                p.y = -1.0 + width / 2 + width * i;                                
+				pushNewSubplan(&newSubs, p, HORIZONTAL_PICKUP_CANE_ORIENTATION, 
+					1.0 + width / 2 * (parameters[0].value % 2), width-0.0001, SQUARE_SHAPE);
+                        }
 			break;
 		case PickupTemplate::VERTICAL:
 			p.x = p.y = p.z = 0.0;

@@ -261,7 +261,7 @@ void PullPlanEditorWidget :: setupLayout()
 
 
 	// below the tabs goes a labeled descriptor (changes depending on view)
-	descriptionLabel = new QLabel("Cane editor - drag color or other canes in.", this);
+	descriptionLabel = new QLabel("Cane editor - drag in color or canes", this);
 	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	editorLayout->addWidget(descriptionLabel, 3, 0);
 
@@ -271,7 +271,7 @@ void PullPlanEditorWidget :: setupLayout()
 
 	// now add the 3D view and its label
 	editorLayout->addWidget(niceViewWidget, 0, 1, 3, 1);
-	QLabel* niceViewDescriptionLabel = new QLabel("3D view of cane.", this);
+	QLabel* niceViewDescriptionLabel = new QLabel("3D view of cane", this);
 	niceViewDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	editorLayout->addWidget(niceViewDescriptionLabel, 3, 1);
 

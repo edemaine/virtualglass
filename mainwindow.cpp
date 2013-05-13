@@ -757,7 +757,7 @@ void MainWindow :: setupLibrary()
 	l3->setStyleSheet("border: 2px dotted " + QColor(200, 100, 0, 255).name() + ";");
 	legendLayout->addWidget(l3, 0, 2, Qt::AlignCenter);
 
-	QLabel* descriptionLabel = new QLabel("Library - click to edit or drag to add.", legendWidget);
+	QLabel* descriptionLabel = new QLabel("Library - click to edit or drag to add", legendWidget);
 	descriptionLabel->setAlignment(Qt::AlignCenter);
 	libraryAreaLayout->addWidget(descriptionLabel);
 }
