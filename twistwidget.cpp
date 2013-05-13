@@ -1,10 +1,12 @@
 
-#include "twistwidget.h"
 #include <cstdio>
 #include <QDoubleSpinBox>
 #include <QSlider>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPushButton>
+
+#include "twistwidget.h"
 
 TwistWidget :: TwistWidget(float* _twist, unsigned int _range, QWidget* parent) : QWidget(parent)
 {
@@ -17,12 +19,19 @@ TwistWidget :: TwistWidget(float* _twist, unsigned int _range, QWidget* parent) 
 	QLabel* nameLabel = new QLabel("Twist:", this);
 	layout->addWidget(nameLabel);
 
+	minus = new QPushButton("-", this);
+	layout->addWidget(minus);
+
 	spin = new QDoubleSpinBox(this);
+	spin->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	int neg_range = -1 * static_cast<int>(range);
 	spin->setRange(neg_range, range);
 	spin->setSingleStep(0.1);
 	spin->setDecimals(1);
 	layout->addWidget(spin, 1);
+
+	plus = new QPushButton("+", this);
+	layout->addWidget(plus);
 
 	char buf[20];
 	snprintf(buf, 15, "%d.0", neg_range);
@@ -42,6 +51,8 @@ TwistWidget :: TwistWidget(float* _twist, unsigned int _range, QWidget* parent) 
 
 	connect(slider, SIGNAL(valueChanged(int)), this, SLOT(sliderValueChanged(int)));	
 	connect(spin, SIGNAL(valueChanged(double)), this, SLOT(spinValueChanged(double)));	
+	connect(minus, SIGNAL(clicked()), this, SLOT(minusClicked()));
+	connect(plus, SIGNAL(clicked()), this, SLOT(plusClicked()));
 
 	updateEverything();
 }
@@ -54,6 +65,8 @@ void TwistWidget :: updateEverything()
 	spin->blockSignals(true);
 	spin->setValue(*(this->twist));
 	spin->blockSignals(false);
+	minus->setEnabled(*(this->twist) > spin->minimum() + 0.1);
+	plus->setEnabled(*(this->twist) < spin->maximum() - 0.1);
 }
 
 void TwistWidget :: spinValueChanged(double v)
@@ -61,6 +74,26 @@ void TwistWidget :: spinValueChanged(double v)
 	*(this->twist) = v;
 	updateEverything();
 	emit valueChanged();
+}
+
+void TwistWidget :: minusClicked()
+{
+	if (*(this->twist) > spin->minimum() + 0.1)
+	{
+		*(this->twist) -= 0.1;
+		updateEverything();
+		emit valueChanged();
+	} 
+}
+
+void TwistWidget :: plusClicked()
+{
+	if (*(this->twist) < spin->maximum() - 0.1)
+	{
+		*(this->twist) += 0.1;
+		updateEverything();
+		emit valueChanged();
+	} 
 }
 
 void TwistWidget :: sliderValueChanged(int v)

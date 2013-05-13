@@ -7,6 +7,7 @@
 
 class QDoubleSpinBox;
 class QSlider;
+class QPushButton;
 
 class TwistWidget : public QWidget
 {
@@ -25,8 +26,12 @@ class TwistWidget : public QWidget
 	private slots:
 		void sliderValueChanged(int);
 		void spinValueChanged(double);
+		void minusClicked();
+		void plusClicked();
 
 	private:
+		QPushButton* minus;
+		QPushButton* plus;
 		QDoubleSpinBox* spin;
 		QSlider* slider;
 		float* twist;

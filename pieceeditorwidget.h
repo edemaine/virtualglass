@@ -64,8 +64,9 @@ class PieceEditorWidget : public QWidget
 	private slots:
 		void pieceControlsTabChanged(int);
 		void childWidgetDataChanged();
-		void pickupParameterSpinBoxChanged(int);
-		void pickupParameterSliderChanged(int);
+		void pickupCountMinusButtonClicked();
+		void pickupCountSpinBoxChanged(int);
+		void pickupCountPlusButtonClicked();
 		void geometryThreadFinishedMesh(bool completed, unsigned int quality);
 		void addControlPointButtonClicked();
 		void removeControlPointButtonClicked();
@@ -97,10 +98,11 @@ class PieceEditorWidget : public QWidget
 
 		QPushButton* addControlPointButton;
 		QPushButton* removeControlPointButton;
-		vector<QStackedWidget*> pickupParamStacks;
-		vector<QLabel*> pickupParamLabels;
-		vector<QSpinBox*> pickupParamSpinBoxes;
-		vector<QSlider*> pickupParamSliders;
+
+		QPushButton* pickupCountMinusButton;
+		QSpinBox* pickupCountSpinBox;
+		QPushButton* pickupCountPlusButton;
+
 		QTabWidget* pickupControlsTab;
 		QTabWidget* pieceControlsTab;
 		TwistWidget* twistWidget;
@@ -120,7 +122,6 @@ class PieceEditorWidget : public QWidget
 		void setupLayout();
 		void setupThreading();
 		void setupConnections();
-		void addPickupParam(QVBoxLayout* pickupParamLayout);
 };
 
 #endif

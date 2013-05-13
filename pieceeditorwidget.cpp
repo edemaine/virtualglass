@@ -73,29 +73,15 @@ void PieceEditorWidget :: updateEverything()
 
 	pickupViewWidget->updateEverything();
 
-	unsigned int i = 0;
-	for (; i < piece->pickup->getParameterCount(); ++i)
-	{
-		// get parameter info
-		TemplateParameter tp;
-		piece->pickup->getParameter(i, &tp);
-		pickupParamLabels[i]->setText(tp.name.c_str());
+	TemplateParameter tp;
+	piece->pickup->getParameter(0, &tp);
+	pickupCountSpinBox->blockSignals(true);
+	pickupCountSpinBox->setRange(tp.lowerLimit, tp.upperLimit);
+	pickupCountSpinBox->setValue(tp.value);
+	pickupCountSpinBox->blockSignals(false);
 
-		pickupParamSpinBoxes[i]->blockSignals(true);
-		pickupParamSliders[i]->blockSignals(true);
-		pickupParamSpinBoxes[i]->setRange(tp.lowerLimit, tp.upperLimit);
-		pickupParamSpinBoxes[i]->setValue(tp.value);
-		pickupParamSliders[i]->setRange(tp.lowerLimit, tp.upperLimit);
-		pickupParamSliders[i]->setValue(tp.value);
-		pickupParamSpinBoxes[i]->blockSignals(false);
-		pickupParamSliders[i]->blockSignals(false);
-
-		pickupParamStacks[i]->setCurrentIndex(0); // show
-	}
-	for (; i < pickupParamStacks.size(); ++i)
-	{
-		pickupParamStacks[i]->setCurrentIndex(1); // hide
-	}
+	pickupCountMinusButton->setEnabled(tp.value > tp.lowerLimit);
+	pickupCountPlusButton->setEnabled(tp.value < tp.upperLimit);
 
 	// update piece stuff
 	pieceCustomizeViewWidget->updateEverything();	
@@ -161,21 +147,38 @@ void PieceEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned in
 		emit showMessage("Piece is too complex to render completely.", 5);
 }
 
-void PieceEditorWidget :: pickupParameterSpinBoxChanged(int)
+void PieceEditorWidget :: pickupCountMinusButtonClicked()
 {
-	bool pieceChanged = false;
-	for (unsigned int i = 0; i < piece->pickup->getParameterCount(); ++i)
+	TemplateParameter tp;
+	piece->pickup->getParameter(0, &tp);
+	if (tp.value > tp.lowerLimit)
 	{
-		TemplateParameter tp;
-		piece->pickup->getParameter(i, &tp);
-		if (tp.value != pickupParamSpinBoxes[i]->value())
-		{
-			piece->pickup->setParameter(i, pickupParamSpinBoxes[i]->value());
-			pieceChanged = true;
-		}
+		piece->pickup->setParameter(0, tp.value - 1);
+		updateEverything();
+		emit someDataChanged();
 	}
-	if (pieceChanged)
+}
+
+void PieceEditorWidget :: pickupCountPlusButtonClicked()
+{
+	TemplateParameter tp;
+	piece->pickup->getParameter(0, &tp);
+	if (tp.value < tp.upperLimit)
 	{
+		piece->pickup->setParameter(0, tp.value + 1);
+		updateEverything();
+		emit someDataChanged();
+	}
+}
+
+
+void PieceEditorWidget :: pickupCountSpinBoxChanged(int)
+{
+	TemplateParameter tp;
+	piece->pickup->getParameter(0, &tp);
+	if (tp.value != pickupCountSpinBox->value())
+	{
+		piece->pickup->setParameter(0, pickupCountSpinBox->value());
 		updateEverything();
 		emit someDataChanged();
 	}
@@ -256,46 +259,6 @@ void PieceEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 	}
 }
 
-void PieceEditorWidget :: pickupParameterSliderChanged(int)
-{
-	bool pieceChanged = false;
-	for (unsigned int i = 0; i < piece->pickup->getParameterCount(); ++i)
-	{
-		TemplateParameter tp;
-		piece->pickup->getParameter(i, &tp);
-		if (tp.value != pickupParamSliders[i]->value())
-		{
-			piece->pickup->setParameter(i, pickupParamSliders[i]->value());
-			pieceChanged = true;
-		}
-	}
-	if (pieceChanged)
-	{
-		updateEverything();
-		emit someDataChanged();
-	}
-}
-
-void PieceEditorWidget :: addPickupParam(QVBoxLayout* pickupParamLayout)
-{
-	pickupParamStacks.push_back(new QStackedWidget(this));
-	QWidget* pickupParameterWidget = new QWidget(pickupParamStacks.back());
-	QLabel* pickupParameterLabel = new QLabel("???");
-	pickupParamLabels.push_back(pickupParameterLabel);
-	QSpinBox* pickupParameterSpinBox = new QSpinBox(pickupParameterWidget);
-	pickupParamSpinBoxes.push_back(pickupParameterSpinBox);
-	QSlider* pickupParameterSlider = new QSlider(Qt::Horizontal, pickupParameterWidget);
-	pickupParamSliders.push_back(pickupParameterSlider);
-	QHBoxLayout* pickupParameterLayout = new QHBoxLayout(pickupParameterWidget);
-	pickupParameterWidget->setLayout(pickupParameterLayout);
-	pickupParameterLayout->addWidget(pickupParameterLabel);
-	pickupParameterLayout->addWidget(pickupParameterSpinBox);
-	pickupParameterLayout->addWidget(pickupParameterSlider);
-	pickupParamStacks.back()->addWidget(pickupParameterWidget);
-	pickupParamStacks.back()->addWidget(new QWidget(pickupParamStacks.back()));
-	pickupParamLayout->addWidget(pickupParamStacks.back());
-}
-
 void PieceEditorWidget :: setupLayout()
 {
 	QGridLayout* editorLayout = new QGridLayout(this);
@@ -349,12 +312,24 @@ void PieceEditorWidget :: setupLayout()
 	pickupControlsTab = new QTabWidget(this);
 	editorLayout->addWidget(pickupControlsTab, 2, 0);
 
-
 	QWidget* pickupParamWidget = new QWidget(pickupControlsTab);
-	QVBoxLayout* pickupParamLayout = new QVBoxLayout(pickupParamWidget);
+	QGridLayout* pickupParamLayout = new QGridLayout(pickupParamWidget);
 	pickupParamWidget->setLayout(pickupParamLayout);
-	addPickupParam(pickupParamLayout);
-	addPickupParam(pickupParamLayout);
+	
+	pickupParamLayout->addWidget(new QLabel("Count:", pickupParamWidget), 0, 0);
+	
+	pickupCountMinusButton = new QPushButton("-", pickupParamWidget);
+	pickupParamLayout->addWidget(pickupCountMinusButton, 0, 1);
+
+	pickupCountSpinBox = new QSpinBox(pickupParamWidget);
+	pickupCountSpinBox->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	pickupParamLayout->addWidget(pickupCountSpinBox, 0, 2);
+
+	pickupCountPlusButton = new QPushButton("+", pickupParamWidget);
+	pickupParamLayout->addWidget(pickupCountPlusButton, 0, 3);
+
+	pickupParamLayout->setColumnStretch(4, 1);
+
 	pickupControlsTab->addTab(pickupParamWidget, "Fill and Case");
 
 	// below the tabs goes a labeled descriptor (changes depending on view)
@@ -421,21 +396,20 @@ void PieceEditorWidget :: setupThreading()
 
 void PieceEditorWidget :: setupConnections()
 {
-	for (unsigned int i = 0; i < pickupParamSpinBoxes.size(); ++i)
-	{
-		connect(pickupParamSpinBoxes[i], SIGNAL(valueChanged(int)),
-			this, SLOT(pickupParameterSpinBoxChanged(int)));
-	}
-	for (unsigned int i = 0; i < pickupParamSliders.size(); ++i)
-	{
-		connect(pickupParamSliders[i], SIGNAL(valueChanged(int)),
-			this, SLOT(pickupParameterSliderChanged(int)));
-	}
+	// pickup controls
+	connect(pickupCountMinusButton, SIGNAL(clicked()), this, SLOT(pickupCountMinusButtonClicked()));
+	connect(pickupCountSpinBox, SIGNAL(valueChanged(int)), this, SLOT(pickupCountSpinBoxChanged(int)));
+	connect(pickupCountPlusButton, SIGNAL(clicked()), this, SLOT(pickupCountPlusButtonClicked()));
+
+	// custom piece controls
 	connect(addControlPointButton, SIGNAL(clicked()), this, SLOT(addControlPointButtonClicked()));
 	connect(removeControlPointButton, SIGNAL(clicked()), this, SLOT(removeControlPointButtonClicked()));
 	
+	// threaded rendering
 	connect(geometryThread, SIGNAL(finishedMesh(bool, unsigned int)), 
 		this, SLOT(geometryThreadFinishedMesh(bool, unsigned int)));
+
+	// subwidget communication
 	connect(pickupViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(pieceCustomizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));

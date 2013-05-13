@@ -108,7 +108,7 @@ void ColorEditorWidget :: setupLayout()
 	// Add alpha (transparency) adjuster
 	QWidget* alphaWidget = new QWidget(this);
 	QHBoxLayout* alphaLayout = new QHBoxLayout(alphaWidget);
-	alphaLayout->addWidget(new QLabel("Transparency", alphaWidget), 0);
+	alphaLayout->addWidget(new QLabel("Transparency:", alphaWidget), 0);
 	alphaLayout->addWidget(new QLabel("0%", alphaWidget));
 	alphaSlider = new QSlider(Qt::Horizontal, alphaWidget);
 	alphaSlider->setRange(0, 255);
