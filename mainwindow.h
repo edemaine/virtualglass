@@ -110,6 +110,12 @@ class MainWindow : public QMainWindow
 		PullPlanEditorWidget* pullPlanEditorWidget;
 		PieceEditorWidget* pieceEditorWidget;
 
+		QToolButton* newFileButton;
+		QToolButton* openFileButton;
+		QToolButton* saveFileButton;
+		QToolButton* exampleCaneButton;
+		QToolButton* examplePieceButton;
+
 		QPushButton* newObjectButton;
 		QPushButton* copyObjectButton;
 		QPushButton* deleteObjectButton;

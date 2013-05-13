@@ -458,6 +458,12 @@ void MainWindow :: setupConnections()
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateLibrary()));
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(setDirtyBitTrue()));
 
+	connect(newFileButton, SIGNAL(clicked()), this, SLOT(newFileActionTriggered()));
+	connect(openFileButton, SIGNAL(clicked()), this, SLOT(openFileActionTriggered()));
+	connect(saveFileButton, SIGNAL(clicked()), this, SLOT(saveAllFileActionTriggered()));
+	connect(exampleCaneButton, SIGNAL(clicked()), this, SLOT(randomComplexCaneExampleActionTriggered()));
+	connect(examplePieceButton, SIGNAL(clicked()), this, SLOT(randomComplexPieceExampleActionTriggered()));
+
 	connect(newObjectButton, SIGNAL(clicked()), this, SLOT(newObject()));
 	connect(copyObjectButton, SIGNAL(clicked()), this, SLOT(copyObject()));
 	connect(deleteObjectButton, SIGNAL(clicked()), this, SLOT(deleteObject()));
@@ -534,6 +540,7 @@ void MainWindow :: randomSimpleCaneExampleActionTriggered()
 	PullPlan* randomPP = randomSimplePullPlan(CIRCLE_SHAPE, randomGC);
 
 	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(randomGC, this));
+	setDirtyBit(true);
 
 	PullPlanLibraryWidget* pplw = new PullPlanLibraryWidget(randomPP, this);
 	pullPlanLibraryLayout->addWidget(pplw);
@@ -552,6 +559,8 @@ void MainWindow :: randomComplexCaneExampleActionTriggered()
 
 	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(randomGC, this));
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(randomComplexPP, this));
+	setDirtyBit(true);
+
 	// add simple plans only if they are used
 	// memory leak! as unused ones never appear in library
 	if (randomComplexPP->hasDependencyOn(randomCPP))
@@ -572,6 +581,7 @@ void MainWindow :: randomSimplePieceExampleActionTriggered()
 
 	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(randomGC, this));
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(randomSPP, this));
+	setDirtyBit(true);
 
 	PieceLibraryWidget* plw = new PieceLibraryWidget(randomP, this);
 	pieceLibraryLayout->addWidget(plw);
@@ -602,6 +612,7 @@ void MainWindow :: randomComplexPieceExampleActionTriggered()
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(randomComplexPP1, this));
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(randomComplexPP2, this));
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(randomP, this));
+	setDirtyBit(true);
 
 	setViewMode(PIECE_VIEW_MODE);
 	pieceEditorWidget->setPiece(randomP);
@@ -635,7 +646,44 @@ void MainWindow :: setupSaveFile()
 
 void MainWindow :: setupToolbar()
 {
+	QWidget* toolbarMasterWidget = new QWidget(centralWidget);
+	centralLayout->addWidget(toolbarMasterWidget);
 
+	QVBoxLayout* toolbarLayout = new QVBoxLayout(toolbarMasterWidget);
+	toolbarMasterWidget->setLayout(toolbarLayout);
+	toolbarLayout->setContentsMargins(0, 0, 0, 0);
+
+	const int icon_size = 70;
+
+	newFileButton = new QToolButton(toolbarMasterWidget);
+	newFileButton->setFixedSize(icon_size, icon_size);
+	newFileButton->setText("New file");
+	newFileButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+	toolbarLayout->addWidget(newFileButton);
+
+	openFileButton = new QToolButton(toolbarMasterWidget);
+	openFileButton->setFixedSize(icon_size, icon_size);
+	openFileButton->setText("Open file");
+	toolbarLayout->addWidget(openFileButton);
+
+	saveFileButton = new QToolButton(toolbarMasterWidget);
+	saveFileButton->setFixedSize(icon_size, icon_size);
+	saveFileButton->setText("Save");
+	toolbarLayout->addWidget(saveFileButton);
+	
+	toolbarLayout->addSpacing(icon_size);
+
+	exampleCaneButton = new QToolButton(toolbarMasterWidget);
+	exampleCaneButton->setFixedSize(icon_size, icon_size);
+	exampleCaneButton->setText("Random\ncane");
+	toolbarLayout->addWidget(exampleCaneButton);
+
+	examplePieceButton = new QToolButton(toolbarMasterWidget);
+	examplePieceButton->setFixedSize(icon_size, icon_size);
+	examplePieceButton->setText("Random\npiece");
+	toolbarLayout->addWidget(examplePieceButton);
+
+	toolbarLayout->addStretch(1);
 }
 
 void MainWindow :: setupLibrary()
