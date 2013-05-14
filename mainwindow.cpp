@@ -18,6 +18,8 @@
 #include <QScrollBar>
 #include <QSizePolicy>
 #include <QToolBar>
+#include <QInputDialog>
+#include <QLineEdit>
 
 #include "constants.h"
 #include "dependancy.h"
@@ -461,6 +463,7 @@ void MainWindow :: setupConnections()
 	connect(newFileButton, SIGNAL(clicked()), this, SLOT(newFileActionTriggered()));
 	connect(openFileButton, SIGNAL(clicked()), this, SLOT(openFileActionTriggered()));
 	connect(saveFileButton, SIGNAL(clicked()), this, SLOT(saveAllFileActionTriggered()));
+	connect(shareFileButton, SIGNAL(clicked()), this, SLOT(shareFileActionTriggered()));
 	connect(exampleCaneButton, SIGNAL(clicked()), this, SLOT(randomComplexCaneExampleActionTriggered()));
 	connect(examplePieceButton, SIGNAL(clicked()), this, SLOT(randomComplexPieceExampleActionTriggered()));
 
@@ -670,6 +673,11 @@ void MainWindow :: setupToolbar()
 	saveFileButton->setFixedSize(icon_size, icon_size);
 	saveFileButton->setText("Save");
 	toolbarLayout->addWidget(saveFileButton);
+	
+	shareFileButton = new QToolButton(toolbarMasterWidget);
+	shareFileButton->setFixedSize(icon_size, icon_size);
+	shareFileButton->setText("Share");
+	toolbarLayout->addWidget(shareFileButton);
 	
 	toolbarLayout->addSpacing(icon_size);
 
@@ -1619,6 +1627,57 @@ void MainWindow::addFileActionTriggered()
 	// try to read in the files....ALL OF THEM
 	for (int i = 0; i < userSpecifiedFilenames.size(); ++i)
 		openFile(userSpecifiedFilenames[i], true);
+}
+
+void MainWindow::shareFileActionTriggered()
+{
+	bool ok;
+	QString userSpecifiedAddress = QInputDialog::getText(this, "Email your design", "Email address:", 
+		QLineEdit::Normal, "friend@internet.com", &ok);
+	
+	// Check for basic validity
+	if (!ok || userSpecifiedAddress.isEmpty()) 
+		return;
+
+	// Check for email address validity?
+	if (!userSpecifiedAddress.contains("@"))
+	{
+		QMessageBox::warning(this, "Invalid email address", "The address " + userSpecifiedAddress + " is invalid.");
+		return;	
+	}
+
+	
+	// Step 1. Grab selected object and dependancies and write them to a temp file
+	vector<GlassColor*> colors;
+	vector<PullPlan*> plans;
+	vector<Piece*> pieces;
+	switch (editorStack->currentIndex())
+	{
+		case EMPTY_VIEW_MODE:
+			return; // nothing to save
+		case COLORBAR_VIEW_MODE:
+			getDependantLibraryContents(colorEditorWidget->getGlassColor(), colors, plans);
+			break;
+		case PULLPLAN_VIEW_MODE:
+			getDependantLibraryContents(pullPlanEditorWidget->getPullPlan(), colors, plans);
+			break;
+		case PIECE_VIEW_MODE:
+			getDependantLibraryContents(pieceEditorWidget->getPiece(), colors, plans, pieces);
+			break;
+	}
+	writeGlassFile("./tmp.glass", colors, plans, pieces);	
+
+
+	// Step 2. Try to send the email
+	// TODO: Erik will make magic happen here
+	bool success = true;
+
+
+	// Step 3. Report a success/error message?	
+	if (success)
+		QMessageBox::information(this, "Email sent!", "Your design has been sent to " + userSpecifiedAddress + ".");
+	else
+		QMessageBox::warning(this, "Email failed", "Failed to send your design to " + userSpecifiedAddress + ".");
 }
 
 void MainWindow::saveAllFileActionTriggered()

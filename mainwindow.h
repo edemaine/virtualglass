@@ -113,6 +113,7 @@ class MainWindow : public QMainWindow
 		QToolButton* newFileButton;
 		QToolButton* openFileButton;
 		QToolButton* saveFileButton;
+		QToolButton* shareFileButton;
 		QToolButton* exampleCaneButton;
 		QToolButton* examplePieceButton;
 
@@ -155,6 +156,7 @@ class MainWindow : public QMainWindow
 		void saveAllFileActionTriggered();
 		void saveAllAsFileActionTriggered();
 		void saveSelectedAsFileActionTriggered();
+		void shareFileActionTriggered();
 		void importSVGActionTriggered();
 		void exportPLYActionTriggered();
 		void exportOBJActionTriggered();
