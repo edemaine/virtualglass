@@ -1,4 +1,8 @@
 #!/bin/sh
+## Run this after any 'svn commit' but before compiling/building the software.
+## It creates a version.txt file which is included as a Qt resource
+## and ultimately shown on the titlebar.
+
 if ! svnversion
 then
   ## Abort if svnversion fails (e.g. wrong version of Subversion)

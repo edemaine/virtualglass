@@ -151,6 +151,7 @@ HEADERS += vgapp.h \
 	piececrosssectionrender.h \
 	globalbackgroundcolor.h \
 	glassopengl.h \
+	email.h \
 
 SOURCES += main.cpp \ 
 	vgapp.cpp \
@@ -209,4 +210,5 @@ SOURCES += main.cpp \
 	pullplancrosssectionrender.cpp \
 	piececrosssectionrender.cpp \
 	glassopengl.cpp \
+	email.cpp \
 

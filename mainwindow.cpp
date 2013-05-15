@@ -23,6 +23,7 @@
 
 #include "constants.h"
 #include "dependancy.h"
+#include "email.h"
 #include "niceviewwidget.h"
 #include "piecelibrarywidget.h"
 #include "pullplanlibrarywidget.h"
@@ -1671,7 +1672,9 @@ void MainWindow::shareFileActionTriggered()
 	// Step 2. Try to send the email
 	// TODO: Erik will make magic happen here
 	bool success = true;
-
+    Email *email = new Email(userSpecifiedAddress, QString("shared design"));
+    email->attachGlass("./tmp.glass");
+	email->send();
 
 	// Step 3. Report a success/error message?	
 	if (success)
