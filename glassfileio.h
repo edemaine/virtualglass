@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 #include <jsoncpp/include/json/json.h>
+
 #include "shape.h"
 #include "pulltemplate.h"
 #include "pickuptemplate.h"
@@ -32,6 +33,7 @@ bool readGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPla
 namespace GlassFileIOInternal
 {
 	void writeJsonToFile(QString& filename, Json::Value& root);
+	void writeJsonToBuffer(QBuffer& buffer, Json::Value& root);
 
 	void writeDocumentation(string& filename, Json::Value& root);
 

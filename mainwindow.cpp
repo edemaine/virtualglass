@@ -1,4 +1,6 @@
 
+#include <QImageWriter>
+#include <QImage>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDir>
@@ -20,6 +22,7 @@
 #include <QToolBar>
 #include <QInputDialog>
 #include <QLineEdit>
+#include <QBuffer>
 
 #include "constants.h"
 #include "dependancy.h"
@@ -80,6 +83,7 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			exportPLYFileAction->setEnabled(false);
 			exportOBJFileAction->setEnabled(false);
 			saveSelectedAsFileAction->setEnabled(false);
+			shareFileButton->setEnabled(false);
 			break;
 		case COLORBAR_VIEW_MODE:
 			newObjectButton->setEnabled(true);
@@ -88,6 +92,7 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			exportPLYFileAction->setEnabled(false);
 			exportOBJFileAction->setEnabled(false);
 			saveSelectedAsFileAction->setEnabled(true);
+			shareFileButton->setEnabled(true);
 			break;
 		case PULLPLAN_VIEW_MODE:
 			newObjectButton->setEnabled(true);
@@ -96,6 +101,7 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
+			shareFileButton->setEnabled(true);
 			break;
 		case PIECE_VIEW_MODE:
 			newObjectButton->setEnabled(true);
@@ -104,6 +110,7 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
+			shareFileButton->setEnabled(true);
 			break;
 	}
 	// zero out any status messages, as (currently, r957) they only pertain
@@ -1643,7 +1650,7 @@ void MainWindow::shareFileActionTriggered()
 	// Check for email address validity?
 	if (!userSpecifiedAddress.contains("@"))
 	{
-		QMessageBox::warning(this, "Invalid email address", "The address " + userSpecifiedAddress + " is invalid.");
+		QMessageBox::warning(this, "Invalid email address", userSpecifiedAddress + " is an invalid email address.");
 		return;	
 	}
 
@@ -1666,22 +1673,30 @@ void MainWindow::shareFileActionTriggered()
 			getDependantLibraryContents(pieceEditorWidget->getPiece(), colors, plans, pieces);
 			break;
 	}
-	writeGlassFile("./tmp.glass", colors, plans, pieces);	
+	QBuffer glassFileBuffer;
+	writeGlassFile(glassFileBuffer, colors, plans, pieces);	
 
 
-	// Step 2. Try to send the email
+	// Step 2. Grab a screenshot and write it to the buffer
+	QImage screenshot = QPixmap::grabWindow(this->winId()).toImage();
+	QBuffer screenshotFileBuffer;
+	QImageWriter screenshotWriter(&screenshotFileBuffer, "png");
+	screenshotWriter.write(screenshot);
+
+
+	// Step 3. Try to send the email
 	// TODO: Erik will make magic happen here
-	bool success = true;
-	Email *email = new Email(userSpecifiedAddress, QString("shared design"));
-	email->attachGlass("./tmp.glass");
-	email->attachImage("./tmp.glass", "glassmage");
+	Email *email = new Email(userSpecifiedAddress, QString("Shared VirtualGlass design"));
+	email->attachGlass(glassFileBuffer);
+	email->attachImage(screenshotFileBuffer, "png");
 	email->send();
 
-	// Step 3. Report a success/error message?	
-	if (success)
-		QMessageBox::information(this, "Email sent!", "Your design has been sent to " + userSpecifiedAddress + ".");
-	else
-		QMessageBox::warning(this, "Email failed", "Failed to send your design to " + userSpecifiedAddress + ".");
+
+	// Step 4. Report a success/error message?	
+	//if (success)
+	//	QMessageBox::information(this, "Email sent!", "Your design has been sent to " + userSpecifiedAddress + ".");
+	//else
+	//	QMessageBox::warning(this, "Email failed", "Failed to send your design to " + userSpecifiedAddress + ".");
 }
 
 void MainWindow::saveAllFileActionTriggered()

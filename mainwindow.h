@@ -103,7 +103,6 @@ class MainWindow : public QMainWindow
 		QVBoxLayout* pullPlanLibraryLayout;
 		QVBoxLayout* pieceLibraryLayout;
 		QStackedWidget* editorStack; //editorStack.currentIndex() gives which mode
-		QWidget* emptyEditorPage;
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
 		ColorEditorWidget* colorEditorWidget;

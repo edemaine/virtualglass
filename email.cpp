@@ -1,4 +1,8 @@
+
 #include <iostream>
+
+#include <QBuffer>
+
 #include "email.h"
 
 // SMTP code based on https://github.com/nicholassmith/Qt-SMTP
@@ -52,27 +56,26 @@ Email::Email(QString to, QString subject)
 	message += "--VirtualGlassBoundary\r\n";
 }
 
-void Email::attachGlass(QString filename)
+void Email::attachGlass(QBuffer& buffer)
 {
-	QFile file(filename);
-	file.open(QIODevice::ReadOnly | QIODevice::Text);
-	message += "Content-Type: application/glass; name=\"share.glass\"\r\n";
+	buffer.open(QIODevice::ReadOnly | QIODevice::Text);
+	message += "Content-Type: application/glass; name=\"shared.glass\"\r\n";
 	message += "Content-Transfer-Encoding: 8bit\r\n";
-	message += "Content-Disposition: attachment; filename=\"share.glass\"\r\n";
+	message += "Content-Disposition: attachment; filename=\"shared.glass\"\r\n";
 	message += "\r\n";
-	message += file.readAll();
+	message += buffer.readAll();
 	message += "--VirtualGlassBoundary\r\n";
+	buffer.close();
 }
 
-void Email::attachImage(QString filename, QString contentType)
+void Email::attachImage(QBuffer& buffer, QString contentType)
 {
-	QFile file(filename);
-	file.open(QIODevice::ReadOnly | QIODevice::Text);
+	buffer.open(QIODevice::ReadOnly); 
 	message += "Content-Type: image/" + contentType + "\r\n";
 	message += "Content-Transfer-Encoding: base64\r\n";
 	message += "Content-Disposition: inline\r\n";
 	message += "\r\n";  // done at beginning of loop
-	QString base64 = file.readAll().toBase64();
+	QString base64 = buffer.readAll().toBase64();
 	for (int i = 0; i < base64.length(); i++) 
 	{
 		message += base64[i].toAscii();
@@ -82,7 +85,7 @@ void Email::attachImage(QString filename, QString contentType)
 	if (base64.length() > 0 && base64.length() % 76 != 0)
 		message += "\r\n";
 	message += "--VirtualGlassBoundary\r\n";
-	file.close();
+	buffer.close();
 }
 
 void Email::send()

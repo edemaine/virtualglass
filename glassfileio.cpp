@@ -98,8 +98,7 @@ bool writeGlassFile(QBuffer& buffer, vector<GlassColor*>& colors, vector<PullPla
 	GlassFileIOInternal::writeCanes(root["Canes"], canes, colors);
 	GlassFileIOInternal::writePieces(root["Pieces"], pieces, canes, colors);
 
-	Json::StyledWriter writer;
-	buffer.write(writer.write(root).c_str());
+	GlassFileIOInternal::writeJsonToBuffer(buffer, root);
 
 	return true; // successlol
 }
@@ -143,6 +142,18 @@ bool readGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPla
 
 namespace GlassFileIOInternal
 {
+
+void writeJsonToBuffer(QBuffer& buffer, Json::Value& root)
+{
+	// convert it to text using json library
+	Json::StyledWriter writer;
+	string outputText = writer.write(root);
+
+	// open a savefile and write the string to it
+	buffer.open(QIODevice::WriteOnly | QIODevice::Text);
+	buffer.write(outputText.c_str());
+	buffer.close();
+}
 
 void writeJsonToFile(QString& filename, Json::Value& root)
 {

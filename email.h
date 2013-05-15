@@ -7,6 +7,8 @@
 #include <QByteArray>
 #include <QSslSocket>
 
+class QBuffer;
+
 // Email delivery service.
 
 class Email : public QObject
@@ -15,8 +17,8 @@ class Email : public QObject
 
 	public:
 		Email(QString to, QString subject);
-		void attachGlass(QString filename);
-		void attachImage(QString filename, QString contentType);
+		void attachGlass(QBuffer& buffer);
+		void attachImage(QBuffer& filename, QString contentType);
 		void send();
 
 		static const QString subjectPrefix;

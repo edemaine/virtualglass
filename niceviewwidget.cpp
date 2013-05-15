@@ -96,6 +96,9 @@ void NiceViewWidget :: initializePeel()
 
 void NiceViewWidget :: initializeGL()
 {
+	if (initializeGLCalled)
+		return;
+
 	initializeGLCalled = true;
 
 	GlassOpenGL::initialize();
