@@ -16,8 +16,8 @@ class Email : public QObject
 
 	public:
 		Email(QString to, QString subject);
-        void attachGlass(QString filename);
-        void attachImage(QString filename);
+		void attachGlass(QString filename);
+		void attachImage(QString filename, QString contentType);
 		void send();
 
 		static const QString smtpServer;

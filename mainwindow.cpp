@@ -1674,6 +1674,7 @@ void MainWindow::shareFileActionTriggered()
 	bool success = true;
     Email *email = new Email(userSpecifiedAddress, QString("shared design"));
     email->attachGlass("./tmp.glass");
+    email->attachImage("./tmp.glass", "glassmage");
 	email->send();
 
 	// Step 3. Report a success/error message?	
