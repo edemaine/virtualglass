@@ -2,7 +2,7 @@
 TEMPLATE = app
 DEPENDPATH += .
 INCLUDEPATH += . glew/ jsoncpp/include/
-QT += opengl
+QT += opengl network
 RESOURCES = virtualglass.qrc
 DEFINES += GLEW_MX
 

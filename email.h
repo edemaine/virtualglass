@@ -5,8 +5,7 @@
 #include <QFile>
 #include <QString>
 #include <QByteArray>
-#include <QBuffer>
-#include <QDataStream>
+#include <QSslSocket>
 
 // Email delivery service.
 
@@ -20,14 +19,24 @@ class Email : public QObject
 		void attachImage(QString filename, QString contentType);
 		void send();
 
-		static const QString smtpServer;
 		static const QString subjectPrefix;
 		static const QString from;
+
+	signals:
+		void success(QString to);
+		void failure(QString error);
+
+	private slots:
+		void socketReadyRead();
+		void socketErrorReceived(QAbstractSocket::SocketError error);
+		void socketDisconnected();
 
 	private:
 		QString to;
 		QString subject;
-        QByteArray message;
+		QByteArray message;
+		QSslSocket socket;
+		enum {Init, Helo, From, To1, To2, Data, Body, Quit} state;
 };
 
 #endif

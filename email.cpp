@@ -1,12 +1,25 @@
 #include <iostream>
 #include "email.h"
 
-const QString Email::smtpServer("smtp.virtualglass.org");
+// SMTP code based on https://github.com/nicholassmith/Qt-SMTP
+// by Nicholas Smith, 2012 (MIT License)
+
 const QString Email::subjectPrefix("VirtualGlass ");
 const QString Email::from("feedback@virtualglass.org");
 
-Email::Email(QString to, QString subject) : to (to), subject (subject)
+const char *smtpServer = "smtp.virtualglass.org";
+const int smtpPort = 465;
+const char *HELO = "HELO GUI.VirtualGlass.org\r\n";
+
+Email::Email(QString to, QString subject)
+    : to (to), subject (subject), socket (this)
 {
+    connect(&socket, SIGNAL(readyRead()), this, SLOT(socketReadyRead()));
+    //connect(&socket, SIGNAL(connected()), this, SLOT(socketConnected()));
+    connect(&socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketErrorReceived(QAbstractSocket::SocketError)));
+    //connect(&socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
+    connect(&socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
+
     message += "From: " + from.toAscii() + "\r\n";
     message += "To: " + to.toAscii() + "\r\n";
     message += "Cc: " + from.toAscii() + "\r\n";
@@ -73,9 +86,103 @@ void Email::attachImage(QString filename, QString contentType)
 
 void Email::send()
 {
-    //follow https://github.com/nicholassmith/Qt-SMTP
+/*
     QFile file("./tmp.msg");
     file.open(QIODevice::WriteOnly);
     file.write(message);
     file.close();
+*/
+
+    state = Init;
+    socket.connectToHost(smtpServer, smtpPort);
+}
+
+void Email::socketReadyRead()
+{
+    QString received;
+    do
+    {
+        received = socket.readLine();
+        qDebug() << "SMTP: " << received;
+    }
+    while (socket.canReadLine() && received[3] != ' ');
+    //received.truncate(3);
+
+    switch (state) {
+        case Init:
+            if (received[0] != '2')
+                emit failure("SMTP opening: " + received);
+            else {
+                socket.write(HELO);
+                state = Helo;
+            }
+            break;
+        case Helo:
+            if (received[0] != '2')
+                emit failure("SMTP HELO response: " + received);
+            else {
+                socket.write("MAIL FROM: <" + from.toAscii() + ">\r\n");
+                state = From;
+            }
+            break;
+        case From:
+            if (received[0] != '2')
+                emit failure("SMTP MAIL FROM response: " + received);
+            else {
+                socket.write("RCPT TO: <" + to.toAscii() + ">\r\n");
+                state = To1;
+            }
+            break;
+        case To1:
+            if (received[0] != '2')
+                emit failure("SMTP MAIL TO response: " + received);
+            else {
+                socket.write("RCPT TO: <" + from.toAscii() + ">\r\n");
+                state = To2;
+            }
+            break;
+        case To2:
+            if (received[0] != '2')
+                emit failure("SMTP MAIL TO response: " + received);
+            else {
+                socket.write("DATA\r\n");
+                state = Data;
+            }
+            break;
+        case Data:
+            if (received[0] != '3')
+                emit failure("SMTP DATA response: " + received);
+            else {
+                socket.write(message + ".\r\n");
+                state = Body;
+            }
+            break;
+        case Body:
+            if (received[0] != '2')
+                emit failure("SMTP body response: " + received);
+            else {
+                socket.write("QUIT\r\n");
+                state = Quit;
+            }
+            break;
+        case Quit:
+            // Ignore QUIT failure -- can close socket anyway.
+            //if (received[0] != '2')
+            //    emit failure("SMTP QUIT response: " + received);
+            socket.close();
+            break;
+    }
+}
+
+void Email::socketErrorReceived(QAbstractSocket::SocketError error)
+{
+    emit failure("SMTP socket error: " + error);
+}
+
+void Email::socketDisconnected()
+{
+    if (state == Quit)
+        emit success(to);
+    else
+        emit failure("SMTP closed connection");
 }
