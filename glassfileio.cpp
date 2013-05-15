@@ -5,8 +5,10 @@
 #include <vector>
 #include <string>
 #include <cstdio> // for sscanf
+
 #include <QTextStream>
 #include <QFile>
+#include <QBuffer>
 
 #include "glasscolor.h"
 #include "pullplan.h"
@@ -82,6 +84,23 @@ bool writeGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPl
 
 	GlassFileIOInternal::writeJsonToFile(filename, root);
 	
+	return true; // successlol
+}
+
+bool writeGlassFile(QBuffer& buffer, vector<GlassColor*>& colors, vector<PullPlan*>& canes, vector<Piece*>& pieces)
+{
+	// produce the json tree representation
+	Json::Value root;
+	string docFilename(":/glassfile_inline_doc.txt"); 
+	GlassFileIOInternal::writeDocumentation(docFilename, root);
+	GlassFileIOInternal::writeBuildInformation(root); 
+	GlassFileIOInternal::writeColors(root["Colors"], colors);
+	GlassFileIOInternal::writeCanes(root["Canes"], canes, colors);
+	GlassFileIOInternal::writePieces(root["Pieces"], pieces, canes, colors);
+
+	Json::StyledWriter writer;
+	buffer.write(writer.write(root).c_str());
+
 	return true; // successlol
 }
 

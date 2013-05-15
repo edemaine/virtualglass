@@ -12,6 +12,7 @@
 #include "subpickuptemplate.h"
 
 class QString;
+class QBuffer;
 class GlassColor;
 class PullPlan;
 class PickupPlan;
@@ -25,6 +26,7 @@ using std::string;
 bool writeColorFile(QString filename, QString collectionName, vector<GlassColor*>& colors); 
 bool readColorFile(QString filename, QString& collectionName, vector<GlassColor*>& colors); 
 bool writeGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, vector<Piece*>& pieces);
+bool writeGlassFile(QBuffer& buffer, vector<GlassColor*>& colors, vector<PullPlan*>& canes, vector<Piece*>& pieces);
 bool readGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPlan*>& canes, vector<Piece*>& pieces);
 
 namespace GlassFileIOInternal
