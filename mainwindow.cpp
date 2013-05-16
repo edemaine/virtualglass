@@ -66,8 +66,9 @@ MainWindow :: MainWindow()
 
 	// do the finishing touches to put the GUI in fresh state
 	setViewMode(EMPTY_VIEW_MODE);
-	show();
 	setDirtyBit(false);
+
+	showMaximized();
 }
 
 
@@ -493,6 +494,10 @@ void MainWindow :: setupConnections()
 	connect(saveSelectedAsFileAction, SIGNAL(triggered()), this, SLOT(saveSelectedAsFileActionTriggered()));
 	connect(exitAction, SIGNAL(triggered()), this, SLOT(attemptToQuit()));
 
+	// the view menu stuff
+	connect(fullscreenViewAction, SIGNAL(triggered()), this, SLOT(fullscreenViewActionTriggered()));
+	connect(nonfullscreenViewAction, SIGNAL(triggered()), this, SLOT(nonfullscreenViewActionTriggered()));
+
 	// the examples menu stuff
 	connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
 	connect(randomSimplePieceAction, SIGNAL(triggered()), this, SLOT(randomSimplePieceExampleActionTriggered()));
@@ -510,6 +515,16 @@ void MainWindow :: setupConnections()
 		this, SLOT(showStatusMessage(const QString&, unsigned int)));
 	connect(email, SIGNAL(showMessage(const QString&, unsigned int)), 
 		this, SLOT(showStatusMessage(const QString&, unsigned int)));
+}
+
+void MainWindow :: fullscreenViewActionTriggered()
+{
+	showFullScreen();
+}
+
+void MainWindow :: nonfullscreenViewActionTriggered()
+{
+	showMaximized();
 }
 
 void MainWindow :: depthPeelActionTriggered()
@@ -1247,6 +1262,15 @@ void MainWindow::setupMenus()
 	fileMenu->addAction(exportOBJFileAction); 
 	fileMenu->addSeparator();
 	fileMenu->addAction(exitAction);
+
+	//Fullscreen
+	fullscreenViewAction = new QAction("Fullscreen", this);
+	nonfullscreenViewAction = new QAction("Normal", this);
+
+	// View menu;
+	viewMenu = menuBar()->addMenu("View");
+	viewMenu->addAction(fullscreenViewAction);	
+	viewMenu->addAction(nonfullscreenViewAction);	
 
 	//examples:random:simple cane
 	randomSimpleCaneAction = new QAction("&Simple Cane", this);

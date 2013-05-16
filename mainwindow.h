@@ -121,6 +121,9 @@ class MainWindow : public QMainWindow
 		QPushButton* copyObjectButton;
 		QPushButton* deleteObjectButton;
 
+		QMenu* viewMenu;
+		QAction *fullscreenViewAction;
+		QAction *nonfullscreenViewAction;
 		QMenu *examplesMenu;
 		QAction *randomSimpleCaneAction;
 		QAction *randomSimplePieceAction;
@@ -151,6 +154,8 @@ class MainWindow : public QMainWindow
 		Email* email;
 
 	private slots:
+		void nonfullscreenViewActionTriggered();
+		void fullscreenViewActionTriggered();
 		void setDirtyBitTrue();
 		void newFileActionTriggered();
 		void openFileActionTriggered();
