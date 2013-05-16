@@ -1,6 +1,4 @@
 
-#include <iostream>
-
 #include <QBuffer>
 
 #include "email.h"
@@ -15,14 +13,22 @@ const char *smtpServer = "smtp.virtualglass.org";
 const int smtpPort = 465;
 const char *HELO = "HELO GUI.VirtualGlass.org\r\n";
 
-Email::Email(QString to, QString subject)
-    : to (to), subject (subject), socket (this)
+Email::Email() : socket (this)
 {
 	connect(&socket, SIGNAL(readyRead()), this, SLOT(socketReadyRead()));
-	//connect(&socket, SIGNAL(connected()), this, SLOT(socketConnected()));
-	connect(&socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketErrorReceived(QAbstractSocket::SocketError)));
-	//connect(&socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
+	connect(&socket, SIGNAL(error(QAbstractSocket::SocketError)), 
+		this, SLOT(socketErrorReceived(QAbstractSocket::SocketError)));
 	connect(&socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
+}
+
+void Email::send(QString to, QString subject, QBuffer& glassFile, QBuffer& imageFile, QString imageType)
+{
+	// kill any previous send() that didn't finish
+	socket.abort();
+	message.clear();
+
+	this->to = to;
+	this->subject = subject;	
 
 	message += "From: " + from.toAscii() + "\r\n";
 	message += "To: " + to.toAscii() + "\r\n";
@@ -36,7 +42,6 @@ Email::Email(QString to, QString subject)
 	message += "Content-Type: text/plain; format=flowed\r\n";
 	message += "Content-Disposition: inline\r\n";
 	message += "\r\n";
-	//          1234567890123456789012345678901234567890123456789012345678901234567890123456
 	message += "A VirtualGlass designer (probably you) has shared an example of \r\n";
 	message += "computer-aided design of blown glass.  You will find attached an image of \r\n";
 	message += "the design, along with the .glass file which you can open in the \r\n";
@@ -52,30 +57,24 @@ Email::Email(QString to, QString subject)
 	message += "For more information, and to download the freely available VirtualGlass \r\n";
 	message += "software, visit http://virtualglass.org/\r\n";
 	message += "\r\n";
-	message += "- the Virtual Glass team\r\n";
+	message += "- the VirtualGlass team\r\n";
 	message += "--VirtualGlassBoundary\r\n";
-}
 
-void Email::attachGlass(QBuffer& buffer)
-{
-	buffer.open(QIODevice::ReadOnly | QIODevice::Text);
-	message += "Content-Type: application/glass; name=\"shared.glass\"\r\n";
+	glassFile.open(QIODevice::ReadOnly | QIODevice::Text);
+	message += "Content-Type: application/glass; name=\"shared-design.glass\"\r\n";
 	message += "Content-Transfer-Encoding: 8bit\r\n";
-	message += "Content-Disposition: attachment; filename=\"shared.glass\"\r\n";
+	message += "Content-Disposition: attachment; filename=\"shared-design.glass\"\r\n";
 	message += "\r\n";
-	message += buffer.readAll();
+	message += glassFile.readAll();
 	message += "--VirtualGlassBoundary\r\n";
-	buffer.close();
-}
+	glassFile.close();
 
-void Email::attachImage(QBuffer& buffer, QString contentType)
-{
-	buffer.open(QIODevice::ReadOnly); 
-	message += "Content-Type: image/" + contentType + "\r\n";
+	imageFile.open(QIODevice::ReadOnly); 
+	message += "Content-Type: image/" + imageType + "\r\n";
 	message += "Content-Transfer-Encoding: base64\r\n";
 	message += "Content-Disposition: inline\r\n";
 	message += "\r\n";  // done at beginning of loop
-	QString base64 = buffer.readAll().toBase64();
+	QString base64 = imageFile.readAll().toBase64();
 	for (int i = 0; i < base64.length(); i++) 
 	{
 		message += base64[i].toAscii();
@@ -85,11 +84,8 @@ void Email::attachImage(QBuffer& buffer, QString contentType)
 	if (base64.length() > 0 && base64.length() % 76 != 0)
 		message += "\r\n";
 	message += "--VirtualGlassBoundary\r\n";
-	buffer.close();
-}
+	imageFile.close();
 
-void Email::send()
-{
 	state = Init;
 	socket.connectToHost(smtpServer, smtpPort);
 }

@@ -24,6 +24,7 @@ class GlassColor;
 class PullPlan;
 class PickupPlan;
 class Piece;
+class Email;
 class NiceViewWidget;
 class PullPlanEditorWidget;
 class ColorEditorWidget;
@@ -147,6 +148,8 @@ class MainWindow : public QMainWindow
 		bool dirtyBit;
 		QString saveFilename;
 
+		Email* email;
+
 	private slots:
 		void setDirtyBitTrue();
 		void newFileActionTriggered();
@@ -170,6 +173,8 @@ class MainWindow : public QMainWindow
 		void depthPeelActionTriggered();
 		void attemptToQuit();
 		void showStatusMessage(const QString& message, unsigned int timeout);
+		void emailSuccess(QString to);
+		void emailFailure(QString error);
 };
 
 #endif

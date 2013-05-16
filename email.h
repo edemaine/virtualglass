@@ -1,3 +1,4 @@
+
 #ifndef EMAIL_H
 #define EMAIL_H
 
@@ -16,10 +17,8 @@ class Email : public QObject
 	Q_OBJECT
 
 	public:
-		Email(QString to, QString subject);
-		void attachGlass(QBuffer& buffer);
-		void attachImage(QBuffer& filename, QString contentType);
-		void send();
+		Email();
+		void send(QString to, QString subject, QBuffer& glassFile, QBuffer& image, QString imageType);
 
 		static const QString subjectPrefix;
 		static const QString from;

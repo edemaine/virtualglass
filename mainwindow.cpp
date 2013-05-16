@@ -472,6 +472,8 @@ void MainWindow :: setupConnections()
 	connect(openFileButton, SIGNAL(clicked()), this, SLOT(openFileActionTriggered()));
 	connect(saveFileButton, SIGNAL(clicked()), this, SLOT(saveAllFileActionTriggered()));
 	connect(shareFileButton, SIGNAL(clicked()), this, SLOT(shareFileActionTriggered()));
+	connect(email, SIGNAL(success(QString)), this, SLOT(emailSuccess(QString)));
+	connect(email, SIGNAL(failure(QString)), this, SLOT(emailFailure(QString)));
 	connect(exampleCaneButton, SIGNAL(clicked()), this, SLOT(randomComplexCaneExampleActionTriggered()));
 	connect(examplePieceButton, SIGNAL(clicked()), this, SLOT(randomComplexPieceExampleActionTriggered()));
 
@@ -655,6 +657,7 @@ void MainWindow :: setupSaveFile()
 	saveFilename = "[unsaved]"; 
 }
 
+
 void MainWindow :: setupToolbar()
 {
 	QWidget* toolbarMasterWidget = new QWidget(centralWidget);
@@ -686,6 +689,7 @@ void MainWindow :: setupToolbar()
 	shareFileButton->setFixedSize(icon_size, icon_size);
 	shareFileButton->setText("Share");
 	toolbarLayout->addWidget(shareFileButton);
+	email = new Email();
 	
 	toolbarLayout->addSpacing(icon_size);
 
@@ -1637,6 +1641,16 @@ void MainWindow::addFileActionTriggered()
 		openFile(userSpecifiedFilenames[i], true);
 }
 
+void MainWindow :: emailSuccess(QString to)
+{
+	QMessageBox::information(this, "Email success", "Message successfully sent to " + to + ".");
+}
+
+void MainWindow :: emailFailure(QString error)
+{
+	QMessageBox::warning(this, "Email failed", "Failed to send message: " + error + ".");
+}
+
 void MainWindow::shareFileActionTriggered()
 {
 	bool ok;
@@ -1686,17 +1700,9 @@ void MainWindow::shareFileActionTriggered()
 
 	// Step 3. Try to send the email
 	// TODO: Erik will make magic happen here
-	Email *email = new Email(userSpecifiedAddress, QString("Shared VirtualGlass design"));
-	email->attachGlass(glassFileBuffer);
-	email->attachImage(screenshotFileBuffer, "png");
-	email->send();
+	email->send(userSpecifiedAddress, QString("Shared VirtualGlass design"), glassFileBuffer, screenshotFileBuffer, "png");
 
 
-	// Step 4. Report a success/error message?	
-	//if (success)
-	//	QMessageBox::information(this, "Email sent!", "Your design has been sent to " + userSpecifiedAddress + ".");
-	//else
-	//	QMessageBox::warning(this, "Email failed", "Failed to send your design to " + userSpecifiedAddress + ".");
 }
 
 void MainWindow::saveAllFileActionTriggered()
