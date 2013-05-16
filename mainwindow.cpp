@@ -48,6 +48,8 @@
 #include "globalgraphicssetting.h"
 #include "globaldepthpeelingsetting.h"
 
+#define MUSEUM
+
 MainWindow :: MainWindow()
 {
 	centralWidget = new QWidget(this);
@@ -470,13 +472,17 @@ void MainWindow :: setupConnections()
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(setDirtyBitTrue()));
 
 	connect(newFileButton, SIGNAL(clicked()), this, SLOT(newFileActionTriggered()));
+#ifndef MUSEUM
 	connect(openFileButton, SIGNAL(clicked()), this, SLOT(openFileActionTriggered()));
 	connect(saveFileButton, SIGNAL(clicked()), this, SLOT(saveAllFileActionTriggered()));
+#endif
 	connect(shareFileButton, SIGNAL(clicked()), this, SLOT(shareFileActionTriggered()));
 	connect(email, SIGNAL(success(QString)), this, SLOT(emailSuccess(QString)));
 	connect(email, SIGNAL(failure(QString)), this, SLOT(emailFailure(QString)));
+#ifndef MUSEUM
 	connect(exampleCaneButton, SIGNAL(clicked()), this, SLOT(randomComplexCaneExampleActionTriggered()));
 	connect(examplePieceButton, SIGNAL(clicked()), this, SLOT(randomComplexPieceExampleActionTriggered()));
+#endif
 
 	connect(newObjectButton, SIGNAL(clicked()), this, SLOT(newObject()));
 	connect(copyObjectButton, SIGNAL(clicked()), this, SLOT(copyObject()));
@@ -688,10 +694,11 @@ void MainWindow :: setupToolbar()
 
 	newFileButton = new QToolButton(toolbarMasterWidget);
 	newFileButton->setFixedSize(icon_size, icon_size);
-	newFileButton->setText("New");
+	newFileButton->setText("Clear");
 	newFileButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 	toolbarLayout->addWidget(newFileButton);
 
+#ifndef MUSEUM
 	openFileButton = new QToolButton(toolbarMasterWidget);
 	openFileButton->setFixedSize(icon_size, icon_size);
 	openFileButton->setText("Open");
@@ -701,13 +708,14 @@ void MainWindow :: setupToolbar()
 	saveFileButton->setFixedSize(icon_size, icon_size);
 	saveFileButton->setText("Save");
 	toolbarLayout->addWidget(saveFileButton);
-	
+#endif
 	shareFileButton = new QToolButton(toolbarMasterWidget);
 	shareFileButton->setFixedSize(icon_size, icon_size);
 	shareFileButton->setText("Email");
 	toolbarLayout->addWidget(shareFileButton);
 	email = new Email();
-	
+
+#ifndef MUSEUM 
 	toolbarLayout->addSpacing(icon_size);
 
 	exampleCaneButton = new QToolButton(toolbarMasterWidget);
@@ -719,6 +727,7 @@ void MainWindow :: setupToolbar()
 	examplePieceButton->setFixedSize(icon_size, icon_size);
 	examplePieceButton->setText("Random\npiece");
 	toolbarLayout->addWidget(examplePieceButton);
+#endif
 
 	toolbarLayout->addStretch(1);
 }
