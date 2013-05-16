@@ -142,9 +142,9 @@ void PieceEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned in
 		return;
 	QString result;
 	if (completed)
-		emit showMessage("Piece rendered successfully.", 5);
+		emit showMessage("Piece rendered successfully.", 3);
 	else
-		emit showMessage("Piece is too complex to render completely.", 5);
+		emit showMessage("Piece is too complex to render completely.", 3);
 }
 
 void PieceEditorWidget :: pickupCountMinusButtonClicked()

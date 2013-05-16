@@ -19,6 +19,7 @@ class Email : public QObject
 	public:
 		Email();
 		void send(QString to, QString subject, QBuffer& glassFile, QBuffer& image, QString imageType);
+		bool sending();
 
 		static const QString subjectPrefix;
 		static const QString from;
@@ -26,7 +27,8 @@ class Email : public QObject
 	signals:
 		void success(QString to);
 		void failure(QString error);
-
+		void showMessage(const QString& message, unsigned int timeout);
+	
 	private slots:
 		void socketReadyRead();
 		void socketErrorReceived(QAbstractSocket::SocketError error);

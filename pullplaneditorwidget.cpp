@@ -147,9 +147,9 @@ void PullPlanEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned
 		return;
 	QString result;
 	if (completed)
-		emit showMessage("Cane rendered successfully.", 5);
+		emit showMessage("Cane rendered successfully.", 3);
 	else
-		emit showMessage("Cane is too complex to render completely.", 5);
+		emit showMessage("Cane is too complex to render completely.", 3);
 }
 
 void PullPlanEditorWidget :: setupLayout()

@@ -123,7 +123,7 @@ bool readGlassFile(QString filename, vector<GlassColor*>& colors, vector<PullPla
 	unsigned int revision;
 	string date;
 	GlassFileIOInternal::readBuildInformation(root, revision, date);
-	if (0 < revision && revision < 893) // if you got a valid number and it's not current
+	if (0 < revision && revision < 943) // if you got a valid number and it's not current
 		return false;
 
 	map<unsigned int, GlassColor*> colorMap;

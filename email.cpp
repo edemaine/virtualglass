@@ -15,17 +15,28 @@ const char *HELO = "HELO GUI.VirtualGlass.org\r\n";
 
 Email::Email() : socket (this)
 {
+	// Setup asynchronous socket communication
 	connect(&socket, SIGNAL(readyRead()), this, SLOT(socketReadyRead()));
 	connect(&socket, SIGNAL(error(QAbstractSocket::SocketError)), 
 		this, SLOT(socketErrorReceived(QAbstractSocket::SocketError)));
 	connect(&socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
+
+	// Initialize state to "I don't want to talk to the socket at all"
+	state = Quit;
+}
+
+bool Email::sending()
+{
+	return state != Quit;
 }
 
 void Email::send(QString to, QString subject, QBuffer& glassFile, QBuffer& imageFile, QString imageType)
 {
 	// kill any previous send() that didn't finish
-	socket.abort();
-	message.clear();
+	if (sending())
+		return;
+
+	message.clear();	
 
 	this->to = to;
 	this->subject = subject;	
@@ -70,7 +81,7 @@ void Email::send(QString to, QString subject, QBuffer& glassFile, QBuffer& image
 	glassFile.close();
 
 	imageFile.open(QIODevice::ReadOnly); 
-	message += "Content-Type: image/" + imageType + "\r\n";
+	message += "Content-Type: image/" + imageType + "; name=\"shared-design.png\"\r\n";
 	message += "Content-Transfer-Encoding: base64\r\n";
 	message += "Content-Disposition: inline\r\n";
 	message += "\r\n";  // done at beginning of loop
@@ -86,12 +97,15 @@ void Email::send(QString to, QString subject, QBuffer& glassFile, QBuffer& image
 	message += "--VirtualGlassBoundary\r\n";
 	imageFile.close();
 
+	emit showMessage("Connecting to email server...", 3); 
 	state = Init;
 	socket.connectToHost(smtpServer, smtpPort);
 }
 
 void Email::socketReadyRead()
 {
+	emit showMessage("Talking to email server...", 3); 
+
 	QString received;
 	do
 	{
@@ -103,7 +117,10 @@ void Email::socketReadyRead()
 	{
 		case Init:
 			if (received[0] != '2')
+			{
+				state = Quit;
 				emit failure("SMTP opening: " + received);
+			}
 			else 
 			{
 				socket.write(HELO);
@@ -112,7 +129,10 @@ void Email::socketReadyRead()
 			break;
 		case Helo:
 			if (received[0] != '2')
+			{
+				state = Quit;
 				emit failure("SMTP HELO response: " + received);
+			}
 			else 
 			{
 				socket.write("MAIL FROM: <" + from.toAscii() + ">\r\n");
@@ -121,7 +141,10 @@ void Email::socketReadyRead()
 			break;
 		case From:
 			if (received[0] != '2')
-			emit failure("SMTP MAIL FROM response: " + received);
+			{
+				state = Quit;
+				emit failure("SMTP MAIL FROM response: " + received);
+			}
 			else 
 			{
 				socket.write("RCPT TO: <" + to.toAscii() + ">\r\n");
@@ -130,7 +153,10 @@ void Email::socketReadyRead()
 			break;
 		case To1:
 			if (received[0] != '2')
+			{
+				state = Quit;
 				emit failure("SMTP MAIL TO response: " + received);
+			}
 			else 
 			{
 				socket.write("RCPT TO: <" + from.toAscii() + ">\r\n");
@@ -139,7 +165,10 @@ void Email::socketReadyRead()
 			break;
 		case To2:
 			if (received[0] != '2')
+			{
+				state = Quit;
 				emit failure("SMTP MAIL TO response: " + received);
+			}
 			else 
 			{
 				socket.write("DATA\r\n");
@@ -148,7 +177,10 @@ void Email::socketReadyRead()
 			break;
 		case Data:
 			if (received[0] != '3')
+			{
+				state = Quit;
 				emit failure("SMTP DATA response: " + received);
+			}
 			else 
 			{
 				socket.write(message + ".\r\n");
@@ -157,7 +189,10 @@ void Email::socketReadyRead()
 			break;
 		case Body:
 			if (received[0] != '2')
+			{
+				state = Quit;
 				emit failure("SMTP body response: " + received);
+			}
 			else 
 			{
 				socket.write("QUIT\r\n");
@@ -175,6 +210,7 @@ void Email::socketReadyRead()
 
 void Email::socketErrorReceived(QAbstractSocket::SocketError error)
 {
+	state = Quit;
 	emit failure("SMTP socket error: " + error);
 }
 
@@ -183,5 +219,8 @@ void Email::socketDisconnected()
 	if (state == Quit)
 		emit success(to);
 	else
+	{
+		state = Quit;
 		emit failure("SMTP closed connection");
+	}
 }

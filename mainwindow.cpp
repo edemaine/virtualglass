@@ -92,7 +92,7 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			exportPLYFileAction->setEnabled(false);
 			exportOBJFileAction->setEnabled(false);
 			saveSelectedAsFileAction->setEnabled(true);
-			shareFileButton->setEnabled(true);
+			shareFileButton->setEnabled(!email->sending());
 			break;
 		case PULLPLAN_VIEW_MODE:
 			newObjectButton->setEnabled(true);
@@ -101,7 +101,7 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
-			shareFileButton->setEnabled(true);
+			shareFileButton->setEnabled(!email->sending());
 			break;
 		case PIECE_VIEW_MODE:
 			newObjectButton->setEnabled(true);
@@ -110,7 +110,7 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
-			shareFileButton->setEnabled(true);
+			shareFileButton->setEnabled(!email->sending());
 			break;
 	}
 	// zero out any status messages, as (currently, r957) they only pertain
@@ -507,6 +507,8 @@ void MainWindow :: setupConnections()
 	connect(pullPlanEditorWidget, SIGNAL(showMessage(const QString&, unsigned int)), 
 		this, SLOT(showStatusMessage(const QString&, unsigned int)));
 	connect(pieceEditorWidget, SIGNAL(showMessage(const QString&, unsigned int)), 
+		this, SLOT(showStatusMessage(const QString&, unsigned int)));
+	connect(email, SIGNAL(showMessage(const QString&, unsigned int)), 
 		this, SLOT(showStatusMessage(const QString&, unsigned int)));
 }
 
@@ -1643,11 +1645,15 @@ void MainWindow::addFileActionTriggered()
 
 void MainWindow :: emailSuccess(QString to)
 {
+	shareFileButton->setEnabled(!email->sending());
+	showStatusMessage("Email sent successfully.", 3);	
 	QMessageBox::information(this, "Email success", "Message successfully sent to " + to + ".");
 }
 
 void MainWindow :: emailFailure(QString error)
 {
+	shareFileButton->setEnabled(!email->sending());
+	showStatusMessage("Email failed.", 3);	
 	QMessageBox::warning(this, "Email failed", "Failed to send message: " + error + ".");
 }
 
@@ -1699,10 +1705,9 @@ void MainWindow::shareFileActionTriggered()
 
 
 	// Step 3. Try to send the email
-	// TODO: Erik will make magic happen here
-	email->send(userSpecifiedAddress, QString("Shared VirtualGlass design"), glassFileBuffer, screenshotFileBuffer, "png");
-
-
+	shareFileButton->setEnabled(false);	
+	showStatusMessage("Sending email...", 3);	
+	email->send(userSpecifiedAddress, QString("shared design"), glassFileBuffer, screenshotFileBuffer, "png");
 }
 
 void MainWindow::saveAllFileActionTriggered()
