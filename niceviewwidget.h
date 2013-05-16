@@ -30,10 +30,7 @@ class NiceViewWidget : public QGLWidget
 		void destructPeel();
 		void paintGL();
 		void resizeGL(int width, int height);
-		void mousePressEvent(QMouseEvent* e);
-		void mouseReleaseEvent(QMouseEvent* e);
-		void mouseMoveEvent(QMouseEvent* e);
-		void wheelEvent(QWheelEvent* e);
+		bool event(QEvent* e);
 
 	private:
 		bool leftMouseDown;

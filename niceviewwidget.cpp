@@ -18,6 +18,8 @@
 NiceViewWidget :: NiceViewWidget(enum CameraMode cameraMode, QWidget *parent) 
 	: QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer | QGL::SampleBuffers), parent), peelRenderer(NULL)
 {
+	this->setAttribute(Qt::WA_AcceptTouchEvents);
+
 	leftMouseDown = false;
 
 	geometry = NULL;
@@ -175,27 +177,125 @@ void NiceViewWidget :: setGLMatrices()
 		  0.0, 0.0, 1.0);
 }
 
-/*
-Currently catches all mouse press events
-(left and right buttons, etc.).
-*/
-void NiceViewWidget :: mousePressEvent(QMouseEvent* e)
+
+bool NiceViewWidget :: event(QEvent* event)
 {
-	// In pickup plan mode, user does not move camera location, zoom, etc.
-	// The widget is a passive `display' widget only, with an interactive layer
-	// on top of it (PickupPlanEditorViewWidget), which we pass the event up to.
-	if (cameraMode == PICKUPPLAN_CAMERA_MODE)
+	switch (event->type())
 	{
-		e->ignore(); 
-		return;
+		case QEvent::MouseButtonPress:
+		{
+			QMouseEvent* e = dynamic_cast<QMouseEvent*>(event);
+			
+			// In pickup plan mode, user does not move camera location, zoom, etc.
+			// The widget is a passive `display' widget only, with an interactive layer
+			// on top of it (PickupPlanEditorViewWidget), which we pass the event up to.
+			if (cameraMode == PICKUPPLAN_CAMERA_MODE)
+			{
+				e->ignore(); 
+				return true; 	
+			}
+
+			// Update instance variables for mouse location
+			mouseLocX = e->x();
+			mouseLocY = e->y();
+
+			if (e->button() == Qt::LeftButton)
+				leftMouseDown = true;
+			return true;
+		}
+		case QEvent::MouseMove:
+		{
+			QMouseEvent* e = dynamic_cast<QMouseEvent*>(event);
+
+			float relX, relY;
+			int oldMouseLocX, oldMouseLocY;
+
+			// Calculate how much mouse moved
+			oldMouseLocX = mouseLocX;
+			mouseLocX = e->x();
+			relX = (mouseLocX - oldMouseLocX) / static_cast<float>(this->width());
+			oldMouseLocY = mouseLocY;
+			mouseLocY = e->y();
+			relY = (mouseLocY - oldMouseLocY) / static_cast<float>(this->height());
+
+			if (cameraMode == PICKUPPLAN_CAMERA_MODE)
+				return true;
+
+			if (leftMouseDown)
+			{
+				theta -= (relX * 100.0 * PI / 180.0);
+				if (cameraMode == PIECE_CAMERA_MODE)
+					phi = MIN(PI-0.0001, MAX(0.0001, phi - (relY * 100.0 * PI / 180.0)));
+				update();
+			}
+			
+			return true;
+		}	
+		case QEvent::MouseButtonRelease:
+		{
+			QMouseEvent* e = dynamic_cast<QMouseEvent*>(event);
+
+			if (e->button() == Qt::LeftButton)
+				leftMouseDown = false;
+
+			return true;
+		}	
+		case QEvent::Wheel:
+		{
+			QWheelEvent* e = dynamic_cast<QWheelEvent*>(event);
+
+			switch (cameraMode)
+			{
+				case PULLPLAN_CAMERA_MODE:
+					if (e->delta() > 0)
+						rho *= 0.8;
+					else if (e->delta() < 0)
+					{
+						if (rho*1.2 > 11.0)
+							rho=11.0;
+						else
+							rho *= 1.2;
+					}
+					break;
+				case PICKUPPLAN_CAMERA_MODE:
+					break;	
+				case PIECE_CAMERA_MODE:
+				default:
+					if (e->delta() > 0)
+						rho *= 0.8;
+					else if (e->delta() < 0)
+						rho *= 1.2;
+					break;
+			}
+			update();	
+
+			return true;
+		}
+		case QEvent::TouchBegin:
+		case QEvent::TouchUpdate:
+		case QEvent::TouchEnd:
+		{
+			// this code comes largely from the Qt example at 
+			// https://qt-project.org/doc/qt-4.8/touch-pinchzoom-graphicsview-cpp.html
+			QTouchEvent* e = dynamic_cast<QTouchEvent*>(event);
+			QList<QTouchEvent::TouchPoint> touchPoints = e->touchPoints();
+			if (touchPoints.count() == 2) 
+			{
+				// determine scale factor
+				const QTouchEvent::TouchPoint& tp1 = touchPoints.first();
+				const QTouchEvent::TouchPoint& tp2 = touchPoints.last();
+				rho *= QLineF(tp1.pos(), tp2.pos()).length() / QLineF(tp1.startPos(), tp2.startPos()).length();
+				//if (e->touchPointStates() & Qt::TouchPointReleased) 
+				//{
+				//	totalScaleFactor *= currentScaleFactor;
+				//	currentScaleFactor = 1;
+				//}
+			}
+			return true;
+		}
+		default:
+			return QGLWidget::event(event);
 	}
-
-	// Update instance variables for mouse location
-	mouseLocX = e->x();
-	mouseLocY = e->y();
-
-	if (e->button() == Qt::LeftButton)
-		leftMouseDown = true;
 }
 
 void NiceViewWidget :: setGeometry(Geometry* g)
@@ -211,66 +311,6 @@ Vector3f NiceViewWidget :: eyePosition()
 	loc.y = lookAtLoc[1] + rho*sin(phi)*sin(theta);
 	loc.z = lookAtLoc[2] + rho*cos(phi);
 	return loc;
-}
-
-void NiceViewWidget :: mouseReleaseEvent(QMouseEvent* e)
-{
-	if (e->button() == Qt::LeftButton)
-		leftMouseDown = false;
-}
-
-void NiceViewWidget :: mouseMoveEvent(QMouseEvent* e)
-{
-	float relX, relY;
-	int oldMouseLocX, oldMouseLocY;
-
-	// Calculate how much mouse moved
-	oldMouseLocX = mouseLocX;
-	mouseLocX = e->x();
-	relX = (mouseLocX - oldMouseLocX) / static_cast<float>(this->width());
-	oldMouseLocY = mouseLocY;
-	mouseLocY = e->y();
-	relY = (mouseLocY - oldMouseLocY) / static_cast<float>(this->height());
-
-	if (cameraMode == PICKUPPLAN_CAMERA_MODE)
-		return;
-
-	if (leftMouseDown)
-	{
-		theta -= (relX * 100.0 * PI / 180.0);
-		if (cameraMode == PIECE_CAMERA_MODE)
-			phi = MIN(PI-0.0001, MAX(0.0001, phi - (relY * 100.0 * PI / 180.0)));
-		update();
-	}
-
-}
-
-void NiceViewWidget :: wheelEvent(QWheelEvent *e)
-{
-	switch (cameraMode)
-	{
-		case PULLPLAN_CAMERA_MODE:
-			if (e->delta() > 0)
-				rho *= 0.8;
-			else if (e->delta() < 0)
-			{
-				if (rho*1.2 > 11.0)
-					rho=11.0;
-				else
-					rho *= 1.2;
-			}
-			break;
-		case PICKUPPLAN_CAMERA_MODE:
-			return;
-		case PIECE_CAMERA_MODE:
-		default:
-			if (e->delta() > 0)
-				rho *= 0.8;
-			else if (e->delta() < 0)
-				rho *= 1.2;
-			break;
-	}
-	update();	
 }
 
 
