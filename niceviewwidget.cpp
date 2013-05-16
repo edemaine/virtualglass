@@ -282,8 +282,8 @@ bool NiceViewWidget :: event(QEvent* event)
 			if (touchPoints.count() == 2) 
 			{
 				// determine scale factor
-				const QTouchEvent::TouchPoint& tp1 = touchPoints.first();
-				const QTouchEvent::TouchPoint& tp2 = touchPoints.last();
+				QTouchEvent::TouchPoint& tp1 = touchPoints.first();
+				QTouchEvent::TouchPoint& tp2 = touchPoints.last();
 				rho *= QLineF(tp1.pos(), tp2.pos()).length() / QLineF(tp1.startPos(), tp2.startPos()).length();
 				//if (e->touchPointStates() & Qt::TouchPointReleased) 
 				//{

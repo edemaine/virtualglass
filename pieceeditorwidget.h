@@ -48,6 +48,7 @@ class PieceEditorWidget : public QWidget
 		void setPickupParameter(int param, int value);
 		void writePieceToPLYFile(QString& filename);
 		void writePieceToOBJFile(QString& filename);
+		NiceViewWidget* pieceNiceViewWidget;
 
 	protected:
 		void mousePressEvent(QMouseEvent*);
@@ -92,7 +93,6 @@ class PieceEditorWidget : public QWidget
 		Piece* piece;
 
 		PickupPlanEditorViewWidget* pickupViewWidget;	
-		NiceViewWidget* pieceNiceViewWidget;
 		PieceCustomizeViewWidget* pieceCustomizeViewWidget;
 		QStackedWidget* pieceViewStack;
 

@@ -1698,7 +1698,21 @@ void MainWindow::shareFileActionTriggered()
 
 
 	// Step 2. Grab a screenshot and write it to the buffer
-	QImage screenshot = QPixmap::grabWindow(this->winId()).toImage();
+	QImage screenshot;
+	switch (editorStack->currentIndex())
+	{
+		case EMPTY_VIEW_MODE:
+			return; // nothing to save
+		case COLORBAR_VIEW_MODE:
+			screenshot = colorEditorWidget->niceViewWidget->grabFrameBuffer();
+			break;
+		case PULLPLAN_VIEW_MODE:
+			screenshot = pullPlanEditorWidget->niceViewWidget->grabFrameBuffer();
+			break;
+		case PIECE_VIEW_MODE:
+			screenshot = pieceEditorWidget->pieceNiceViewWidget->grabFrameBuffer();
+			break;
+	}
 	QBuffer screenshotFileBuffer;
 	QImageWriter screenshotWriter(&screenshotFileBuffer, "png");
 	screenshotWriter.write(screenshot);

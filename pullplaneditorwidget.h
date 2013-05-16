@@ -47,6 +47,7 @@ class PullPlanEditorWidget : public QWidget
 		void writePlanToPLYFile(QString& filename);
 		void writePlanToOBJFile(QString& filename);
 		void updateEverything();
+		NiceViewWidget* niceViewWidget;
 
 	protected:
 		void mousePressEvent(QMouseEvent* event);
@@ -111,7 +112,6 @@ class PullPlanEditorWidget : public QWidget
 		QPushButton* deleteSelectedButton;
 		QStackedWidget* viewEditorStack;
 		QLabel* descriptionLabel;
-		NiceViewWidget* niceViewWidget;
 		QTabWidget* controlsTab;
 		QScrollArea* pullTemplateLibraryScrollArea;
 
