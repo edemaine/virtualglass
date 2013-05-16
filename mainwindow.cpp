@@ -688,13 +688,13 @@ void MainWindow :: setupToolbar()
 
 	newFileButton = new QToolButton(toolbarMasterWidget);
 	newFileButton->setFixedSize(icon_size, icon_size);
-	newFileButton->setText("New file");
+	newFileButton->setText("New");
 	newFileButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 	toolbarLayout->addWidget(newFileButton);
 
 	openFileButton = new QToolButton(toolbarMasterWidget);
 	openFileButton->setFixedSize(icon_size, icon_size);
-	openFileButton->setText("Open file");
+	openFileButton->setText("Open");
 	toolbarLayout->addWidget(openFileButton);
 
 	saveFileButton = new QToolButton(toolbarMasterWidget);
@@ -704,7 +704,7 @@ void MainWindow :: setupToolbar()
 	
 	shareFileButton = new QToolButton(toolbarMasterWidget);
 	shareFileButton->setFixedSize(icon_size, icon_size);
-	shareFileButton->setText("Share");
+	shareFileButton->setText("Email");
 	toolbarLayout->addWidget(shareFileButton);
 	email = new Email();
 	

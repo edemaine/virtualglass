@@ -12,15 +12,26 @@
 // http://qt-project.org/doc/qt-4.8/qfileopenevent.html
 VGApp :: VGApp(int& argc, char **argv ) : QApplication(argc, argv)
 {
-	firstOpenRequest = true;
 	mainWindow = new MainWindow();
+	
 	// hopefully this catches command line opens on some platforms (Win? Linux?)
+	firstOpenRequest = true;
+	bool fullscreen = false;
 	for (int i = 1; i < argc; ++i)
 	{
-		mainWindow->openFile(QString(argv[i]), !firstOpenRequest);
-		firstOpenRequest = false;
+		if (QString(argv[i]) == QString("-fullscreen"))
+			fullscreen = true;
+		else
+		{
+			mainWindow->openFile(QString(argv[i]), !firstOpenRequest);
+			firstOpenRequest = false;
+		}
 	}
-	mainWindow->showMaximized();
+
+	if (fullscreen)
+		mainWindow->showFullScreen();
+	else	
+		mainWindow->showMaximized();
 }
 
 VGApp::~VGApp()
