@@ -91,9 +91,6 @@ class MainWindow : public QMainWindow
 		void getDependantLibraryContents(Piece* piece, vector<GlassColor*>& colors, vector<PullPlan*>& plans,
 			vector<Piece*>& pieces);
 		void addToLibrary(vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces);
-		void newGlassColor();
-		void newPullPlan();
-		void newPiece();
 		void copyGlassColor();
 		void copyPullPlan();
 		void copyPiece();
@@ -114,12 +111,12 @@ class MainWindow : public QMainWindow
 		QToolButton* openFileButton;
 		QToolButton* saveFileButton;
 		QToolButton* shareFileButton;
-		QToolButton* exampleCaneButton;
-		QToolButton* examplePieceButton;
+		QToolButton* copyObjectButton;
+		QToolButton* deleteObjectButton;
 
-		QPushButton* newObjectButton;
-		QPushButton* copyObjectButton;
-		QPushButton* deleteObjectButton;
+		QPushButton* newGlassColorButton;
+		QPushButton* newPullPlanButton;
+		QPushButton* newPieceButton;
 
 		QMenu* viewMenu;
 		QAction *fullscreenViewAction;
@@ -154,9 +151,13 @@ class MainWindow : public QMainWindow
 		Email* email;
 
 	private slots:
+
+		void setDirtyBitTrue();
+		void attemptToQuit();
+
+		// menu slots
 		void nonfullscreenViewActionTriggered();
 		void fullscreenViewActionTriggered();
-		void setDirtyBitTrue();
 		void newFileActionTriggered();
 		void openFileActionTriggered();
 		void addFileActionTriggered();
@@ -167,16 +168,23 @@ class MainWindow : public QMainWindow
 		void importSVGActionTriggered();
 		void exportPLYActionTriggered();
 		void exportOBJActionTriggered();
-		void updateLibrary();
-		void newObject();
-		void copyObject();
-		void deleteObject();
 		void randomSimpleCaneExampleActionTriggered();
 		void randomSimplePieceExampleActionTriggered();
 		void randomComplexCaneExampleActionTriggered();
 		void randomComplexPieceExampleActionTriggered();
 		void depthPeelActionTriggered();
-		void attemptToQuit();
+
+		// library slots
+		void newGlassColorButtonClicked();
+		void newPullPlanButtonClicked();
+		void newPieceButtonClicked();
+		void updateLibrary();
+
+		// Toolbar slots
+		void copyObjectButtonClicked();
+		void deleteObjectButtonClicked();
+
+		// Status bar slots
 		void showStatusMessage(const QString& message, unsigned int timeout);
 		void emailSuccess(QString to);
 		void emailFailure(QString error);

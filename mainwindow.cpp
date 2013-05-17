@@ -48,6 +48,7 @@
 #include "globalgraphicssetting.h"
 #include "globaldepthpeelingsetting.h"
 
+// Comment out to enable VirtualGlass: Home edition
 #define MUSEUM
 
 MainWindow :: MainWindow()
@@ -80,9 +81,10 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 	switch (_mode)
 	{
 		case EMPTY_VIEW_MODE:
-			newObjectButton->setEnabled(false);
 			copyObjectButton->setEnabled(false);
+			copyObjectButton->setText("Copy");
 			deleteObjectButton->setEnabled(false);
+			deleteObjectButton->setText("Delete");
 #ifndef MUSEUM
 			exportPLYFileAction->setEnabled(false);
 			exportOBJFileAction->setEnabled(false);
@@ -91,9 +93,10 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			shareFileButton->setEnabled(false);
 			break;
 		case COLORBAR_VIEW_MODE:
-			newObjectButton->setEnabled(true);
 			copyObjectButton->setEnabled(true);
+			copyObjectButton->setText("Copy\nColor");
 			deleteObjectButton->setEnabled(true);
+			deleteObjectButton->setText("Delete\nColor");
 #ifndef MUSEUM
 			exportPLYFileAction->setEnabled(false);
 			exportOBJFileAction->setEnabled(false);
@@ -103,9 +106,10 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			break;
 		case PULLPLAN_VIEW_MODE:
 			pullPlanEditorWidget->reset3DCamera();
-			newObjectButton->setEnabled(true);
 			copyObjectButton->setEnabled(true);
+			copyObjectButton->setText("Copy\nCane");
 			deleteObjectButton->setEnabled(true);
+			deleteObjectButton->setText("Delete\nCane");
 #ifndef MUSEUM
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
@@ -115,9 +119,10 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			break;
 		case PIECE_VIEW_MODE:
 			pieceEditorWidget->reset3DCamera();
-			newObjectButton->setEnabled(true);
 			copyObjectButton->setEnabled(true);
+			copyObjectButton->setText("Copy\nPiece");
 			deleteObjectButton->setEnabled(true);
+			deleteObjectButton->setText("Delete\nPiece");
 #ifndef MUSEUM
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
@@ -266,9 +271,6 @@ void MainWindow :: deleteCurrentEditingObject()
 	{
 		case COLORBAR_VIEW_MODE:
 		{
-			if (colorBarLibraryLayout->count() == 1)
-				return;
-
 			int i;
 			for (i = 0; i < colorBarLibraryLayout->count(); ++i)
 			{
@@ -292,17 +294,22 @@ void MainWindow :: deleteCurrentEditingObject()
 				}
 			}
 
-			colorEditorWidget->setGlassColor(dynamic_cast<GlassColorLibraryWidget*>(colorBarLibraryLayout->itemAt(
-					MIN(colorBarLibraryLayout->count()-1, i))->widget())->glassColor);
+			if (colorBarLibraryLayout->count() == 0)
+			{
+				setViewMode(EMPTY_VIEW_MODE);
+			}
+			else
+			{
+				colorEditorWidget->setGlassColor(
+					dynamic_cast<GlassColorLibraryWidget*>(colorBarLibraryLayout->itemAt(
+						MIN(colorBarLibraryLayout->count()-1, i))->widget())->glassColor);
+			}
 			updateLibrary();
 			setDirtyBit(true);
 			break;
 		}
 		case PULLPLAN_VIEW_MODE:
 		{
-			if (pullPlanLibraryLayout->count() == 1)
-				return;
-
 			int i;
 			for (i = 0; i < pullPlanLibraryLayout->count(); ++i)
 			{
@@ -326,8 +333,16 @@ void MainWindow :: deleteCurrentEditingObject()
 				}
 			}
 
-			pullPlanEditorWidget->setPullPlan(dynamic_cast<PullPlanLibraryWidget*>(pullPlanLibraryLayout->itemAt(
-					MIN(pullPlanLibraryLayout->count()-1, i))->widget())->pullPlan);
+			if (pullPlanLibraryLayout->count() == 0)
+			{
+				setViewMode(EMPTY_VIEW_MODE);
+			}
+			else
+			{
+				pullPlanEditorWidget->setPullPlan(
+					dynamic_cast<PullPlanLibraryWidget*>(pullPlanLibraryLayout->itemAt(
+						MIN(pullPlanLibraryLayout->count()-1, i))->widget())->pullPlan);
+			}
 			updateLibrary();
 			setDirtyBit(true);
 			break;
@@ -352,8 +367,16 @@ void MainWindow :: deleteCurrentEditingObject()
 				}
 			}
 
-			pieceEditorWidget->setPiece(dynamic_cast<PieceLibraryWidget*>(pieceLibraryLayout->itemAt(
-					MIN(pieceLibraryLayout->count()-1, i))->widget())->piece);
+			if (pieceLibraryLayout->count() == 0)
+			{
+				setViewMode(EMPTY_VIEW_MODE);
+			}
+			else
+			{
+				pieceEditorWidget->setPiece(
+					dynamic_cast<PieceLibraryWidget*>(pieceLibraryLayout->itemAt(
+						MIN(pieceLibraryLayout->count()-1, i))->widget())->piece);
+			}
 			updateLibrary();
 			setDirtyBit(true);
 			break;
@@ -474,6 +497,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 
 void MainWindow :: setupConnections()
 {
+	// Editor "stuff changing" communication
 	connect(colorEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateLibrary()));
 	connect(colorEditorWidget, SIGNAL(someDataChanged()), this, SLOT(setDirtyBitTrue()));
 
@@ -483,6 +507,7 @@ void MainWindow :: setupConnections()
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(updateLibrary()));
 	connect(pieceEditorWidget, SIGNAL(someDataChanged()), this, SLOT(setDirtyBitTrue()));
 
+	// Toolbar stuff
 	connect(newFileButton, SIGNAL(clicked()), this, SLOT(newFileActionTriggered()));
 #ifndef MUSEUM
 	connect(openFileButton, SIGNAL(clicked()), this, SLOT(openFileActionTriggered()));
@@ -491,16 +516,17 @@ void MainWindow :: setupConnections()
 	connect(shareFileButton, SIGNAL(clicked()), this, SLOT(shareFileActionTriggered()));
 	connect(email, SIGNAL(success(QString)), this, SLOT(emailSuccess(QString)));
 	connect(email, SIGNAL(failure(QString)), this, SLOT(emailFailure(QString)));
-#ifndef MUSEUM
-	connect(exampleCaneButton, SIGNAL(clicked()), this, SLOT(randomComplexCaneExampleActionTriggered()));
-	connect(examplePieceButton, SIGNAL(clicked()), this, SLOT(randomComplexPieceExampleActionTriggered()));
-#endif
+	connect(copyObjectButton, SIGNAL(clicked()), this, SLOT(copyObjectButtonClicked()));
+	connect(deleteObjectButton, SIGNAL(clicked()), this, SLOT(deleteObjectButtonClicked()));
 
-	connect(newObjectButton, SIGNAL(clicked()), this, SLOT(newObject()));
-	connect(copyObjectButton, SIGNAL(clicked()), this, SLOT(copyObject()));
-	connect(deleteObjectButton, SIGNAL(clicked()), this, SLOT(deleteObject()));
+	// Library stuff
+	connect(newGlassColorButton, SIGNAL(clicked()), this, SLOT(newGlassColorButtonClicked()));
+	connect(newPullPlanButton, SIGNAL(clicked()), this, SLOT(newPullPlanButtonClicked()));
+	connect(newPieceButton, SIGNAL(clicked()), this, SLOT(newPieceButtonClicked()));
+
+	// Menu stuff
 #ifndef MUSEUM
-	// the file menu stuff
+	// file menu 
 	connect(newFileAction, SIGNAL(triggered()), this, SLOT(newFileActionTriggered()));
 	connect(openFileAction, SIGNAL(triggered()), this, SLOT(openFileActionTriggered()));
 	connect(addFileAction, SIGNAL(triggered()), this, SLOT(addFileActionTriggered()));
@@ -512,11 +538,11 @@ void MainWindow :: setupConnections()
 	connect(saveSelectedAsFileAction, SIGNAL(triggered()), this, SLOT(saveSelectedAsFileActionTriggered()));
 	connect(exitAction, SIGNAL(triggered()), this, SLOT(attemptToQuit()));
 
-	// the view menu stuff
+	// view menu 
 	connect(fullscreenViewAction, SIGNAL(triggered()), this, SLOT(fullscreenViewActionTriggered()));
 	connect(nonfullscreenViewAction, SIGNAL(triggered()), this, SLOT(nonfullscreenViewActionTriggered()));
 
-	// the examples menu stuff
+	// examples menu
 	connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
 	connect(randomSimplePieceAction, SIGNAL(triggered()), this, SLOT(randomSimplePieceExampleActionTriggered()));
 
@@ -727,19 +753,17 @@ void MainWindow :: setupToolbar()
 	toolbarLayout->addWidget(shareFileButton);
 	email = new Email();
 
-#ifndef MUSEUM 
 	toolbarLayout->addSpacing(icon_size);
 
-	exampleCaneButton = new QToolButton(toolbarMasterWidget);
-	exampleCaneButton->setFixedSize(icon_size, icon_size);
-	exampleCaneButton->setText("Random\ncane");
-	toolbarLayout->addWidget(exampleCaneButton);
+	copyObjectButton = new QToolButton(toolbarMasterWidget);
+	copyObjectButton->setFixedSize(icon_size, icon_size);
+	copyObjectButton->setText("???");
+	toolbarLayout->addWidget(copyObjectButton);
 
-	examplePieceButton = new QToolButton(toolbarMasterWidget);
-	examplePieceButton->setFixedSize(icon_size, icon_size);
-	examplePieceButton->setText("Random\npiece");
-	toolbarLayout->addWidget(examplePieceButton);
-#endif
+	deleteObjectButton = new QToolButton(toolbarMasterWidget);
+	deleteObjectButton->setFixedSize(icon_size, icon_size);
+	deleteObjectButton->setText("???");
+	toolbarLayout->addWidget(deleteObjectButton);
 
 	toolbarLayout->addStretch(1);
 }
@@ -760,7 +784,7 @@ void MainWindow :: setupLibrary()
 	libraryScrollArea->installEventFilter(this);	
 	libraryScrollArea->setBackgroundRole(QPalette::Dark);
 	libraryScrollArea->setWidgetResizable(true);
-	libraryScrollArea->setFixedWidth(370);
+	libraryScrollArea->setFixedWidth(356);
 	libraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	libraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
@@ -770,16 +794,20 @@ void MainWindow :: setupLibrary()
 	// TODO: refactor library to only use one layout
 	QGridLayout* superlibraryLayout = new QGridLayout(libraryWidget);
 	libraryWidget->setLayout(superlibraryLayout);
-	superlibraryLayout->setContentsMargins(0, 9, 0, 9);
+	superlibraryLayout->setContentsMargins(10, 10, 10, 10);
+	superlibraryLayout->setSpacing(10);
 
-	newObjectButton = new QPushButton("New", libraryWidget);
-	superlibraryLayout->addWidget(newObjectButton, 0, 0);
+	superlibraryLayout->addItem(new QSpacerItem(100, 0), 0, 0);
+	newGlassColorButton = new QPushButton("New Color", libraryWidget);
+	superlibraryLayout->addWidget(newGlassColorButton, 1, 0);
 
-	copyObjectButton = new QPushButton("Copy", libraryWidget);
-	superlibraryLayout->addWidget(copyObjectButton, 0, 1);
+	superlibraryLayout->addItem(new QSpacerItem(100, 0), 0, 1);
+	newPullPlanButton = new QPushButton("New Cane", libraryWidget);
+	superlibraryLayout->addWidget(newPullPlanButton, 1, 1);
 
-	deleteObjectButton = new QPushButton("Delete", libraryWidget);
-	superlibraryLayout->addWidget(deleteObjectButton, 0, 2);
+	superlibraryLayout->addItem(new QSpacerItem(100, 0), 0, 2);
+	newPieceButton = new QPushButton("New Piece", libraryWidget);
+	superlibraryLayout->addWidget(newPieceButton, 1, 2);
 
 	colorBarLibraryLayout = new QVBoxLayout(libraryWidget);
 	colorBarLibraryLayout->setSpacing(10);
@@ -790,9 +818,11 @@ void MainWindow :: setupLibrary()
 	pieceLibraryLayout = new QVBoxLayout(libraryWidget);
 	pieceLibraryLayout->setSpacing(10);
 	pieceLibraryLayout->setDirection(QBoxLayout::BottomToTop);
-	superlibraryLayout->addLayout(colorBarLibraryLayout, 1, 0, Qt::AlignTop);
-	superlibraryLayout->addLayout(pullPlanLibraryLayout, 1, 1, Qt::AlignTop);
-	superlibraryLayout->addLayout(pieceLibraryLayout, 1, 2, Qt::AlignTop);
+	superlibraryLayout->addLayout(colorBarLibraryLayout, 2, 0, Qt::AlignTop);
+	superlibraryLayout->addLayout(pullPlanLibraryLayout, 2, 1, Qt::AlignTop);
+	superlibraryLayout->addLayout(pieceLibraryLayout, 2, 2, Qt::AlignTop);
+	
+	superlibraryLayout->setColumnStretch(3, 1);
 
 	// make three qlabels for a legend
 	QWidget* legendWidget = new QWidget(libraryMasterWidget);
@@ -822,7 +852,7 @@ void MainWindow :: setupLibrary()
 
 void MainWindow :: clearLibrary()
 {
-	// kind of a memory leak here, as we delete
+	// TODO: fix the memory leak here, as we delete
 	// all of the library objects but none of the glass objects they represent
 	// the non-trivial part is just the editors and their "current editing object"
 	QLayoutItem* w;
@@ -896,23 +926,7 @@ void MainWindow :: setupPieceEditor()
 	pieceEditorWidget->updateEverything();
 }
 
-void MainWindow :: newObject()
-{
-	switch (editorStack->currentIndex())
-	{
-		case COLORBAR_VIEW_MODE:
-			newGlassColor();
-			break;
-		case PULLPLAN_VIEW_MODE:
-			newPullPlan();
-			break;
-		case PIECE_VIEW_MODE:
-			newPiece();
-			break;
-	}
-}
-
-void MainWindow :: copyObject()
+void MainWindow :: copyObjectButtonClicked()
 {
 	switch (editorStack->currentIndex())
 	{
@@ -928,7 +942,7 @@ void MainWindow :: copyObject()
 	}
 }
 
-void MainWindow :: deleteObject()
+void MainWindow :: deleteObjectButtonClicked()
 {
 	switch (editorStack->currentIndex())
 	{
@@ -940,24 +954,7 @@ void MainWindow :: deleteObject()
 	}
 }
 
-void MainWindow :: newPiece()
-{
-	Piece* newEditorPiece = new Piece(PieceTemplate::TUMBLER);
-	pieceLibraryLayout->addWidget(new PieceLibraryWidget(newEditorPiece, this));
-	setViewMode(PIECE_VIEW_MODE);
-	pieceEditorWidget->setPiece(newEditorPiece);
-	updateLibrary();
-}
-
-void MainWindow :: copyPiece()
-{
-	Piece* newEditorPiece = pieceEditorWidget->getPiece()->copy();
-	pieceLibraryLayout->addWidget(new PieceLibraryWidget(newEditorPiece, this));
-	pieceEditorWidget->setPiece(newEditorPiece);
-	updateLibrary();
-}
-
-void MainWindow :: newGlassColor()
+void MainWindow :: newGlassColorButtonClicked()
 {
 	GlassColor* newGlassColor = new GlassColor();
 	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(newGlassColor, this));
@@ -974,7 +971,7 @@ void MainWindow :: copyGlassColor()
 	updateLibrary();
 }
 
-void MainWindow :: newPullPlan()
+void MainWindow :: newPullPlanButtonClicked()
 {
 	PullPlan *newEditorPlan = new PullPlan(PullTemplate::HORIZONTAL_LINE_CIRCLE);
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(newEditorPlan, this));
@@ -988,6 +985,23 @@ void MainWindow :: copyPullPlan()
 	PullPlan *newEditorPlan = pullPlanEditorWidget->getPullPlan()->copy();
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(newEditorPlan, this));
 	pullPlanEditorWidget->setPullPlan(newEditorPlan);
+	updateLibrary();
+}
+
+void MainWindow :: newPieceButtonClicked()
+{
+	Piece* newEditorPiece = new Piece(PieceTemplate::TUMBLER);
+	pieceLibraryLayout->addWidget(new PieceLibraryWidget(newEditorPiece, this));
+	setViewMode(PIECE_VIEW_MODE);
+	pieceEditorWidget->setPiece(newEditorPiece);
+	updateLibrary();
+}
+
+void MainWindow :: copyPiece()
+{
+	Piece* newEditorPiece = pieceEditorWidget->getPiece()->copy();
+	pieceLibraryLayout->addWidget(new PieceLibraryWidget(newEditorPiece, this));
+	pieceEditorWidget->setPiece(newEditorPiece);
 	updateLibrary();
 }
 
