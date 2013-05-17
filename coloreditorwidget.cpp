@@ -26,7 +26,7 @@ ColorEditorWidget :: ColorEditorWidget(QWidget* parent) : QWidget(parent)
 {
 	resetGlassColor();
 
-	niceViewWidget = new NiceViewWidget(NiceViewWidget::PULLPLAN_CAMERA_MODE, this);
+	niceViewWidget = new NiceViewWidget(NiceViewWidget::GLASSCOLOR_CAMERA_MODE, this);
 	niceViewWidget->setGeometry(&geometry);
 
 	setupLayout();

@@ -43,6 +43,16 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 	seedTemplates();
 }
 
+QImage PullPlanEditorWidget :: getPullPlanImage()
+{
+	return niceViewWidget->grabFrameBuffer();
+}
+
+void PullPlanEditorWidget :: reset3DCamera()
+{
+	niceViewWidget->resetCamera();
+}
+
 void PullPlanEditorWidget :: resetPullPlan()
 {
 	plan = new PullPlan(PullTemplate::HORIZONTAL_LINE_CIRCLE);

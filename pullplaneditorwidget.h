@@ -21,6 +21,7 @@ class PullTemplateLibraryWidget;
 class PullPlanGeometryThread;
 class TwistWidget;
 
+class QImage;
 class QPushButton;
 class QStackedWidget;
 class QLabel;
@@ -47,7 +48,8 @@ class PullPlanEditorWidget : public QWidget
 		void writePlanToPLYFile(QString& filename);
 		void writePlanToOBJFile(QString& filename);
 		void updateEverything();
-		NiceViewWidget* niceViewWidget;
+		QImage getPullPlanImage();
+		void reset3DCamera();
 
 	protected:
 		void mousePressEvent(QMouseEvent* event);
@@ -93,6 +95,7 @@ class PullPlanEditorWidget : public QWidget
 		PullPlan* plan;
 		PullPlanEditorViewWidget* viewWidget;	
 		PullPlanCustomizeViewWidget* customizeViewWidget;	
+		NiceViewWidget* niceViewWidget;
 		TwistWidget* twistWidget;
 
 		QLabel* countLabel;

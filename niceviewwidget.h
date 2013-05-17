@@ -14,6 +14,7 @@ class NiceViewWidget : public QGLWidget
 	public:
 		enum CameraMode
 		{
+			GLASSCOLOR_CAMERA_MODE,
 			PULLPLAN_CAMERA_MODE,
 			PICKUPPLAN_CAMERA_MODE,
 			PIECE_CAMERA_MODE 
@@ -23,6 +24,7 @@ class NiceViewWidget : public QGLWidget
 		virtual ~NiceViewWidget();
 		Vector3f eyePosition();
 		void setGeometry(Geometry* g);
+		void resetCamera();
 
 	protected:
 		void initializeGL();

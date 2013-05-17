@@ -45,6 +45,16 @@ PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 	seedTemplates();
 }
 
+QImage PieceEditorWidget :: getPieceImage()
+{
+	return pieceNiceViewWidget->grabFrameBuffer();
+}
+
+void PieceEditorWidget :: reset3DCamera()
+{
+	pieceNiceViewWidget->resetCamera();
+}	
+
 void PieceEditorWidget :: resetPiece()
 {
 	piece = new Piece(PieceTemplate::TUMBLER);

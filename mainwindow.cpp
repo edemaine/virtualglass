@@ -83,36 +83,46 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			newObjectButton->setEnabled(false);
 			copyObjectButton->setEnabled(false);
 			deleteObjectButton->setEnabled(false);
+#ifndef MUSEUM
 			exportPLYFileAction->setEnabled(false);
 			exportOBJFileAction->setEnabled(false);
 			saveSelectedAsFileAction->setEnabled(false);
+#endif
 			shareFileButton->setEnabled(false);
 			break;
 		case COLORBAR_VIEW_MODE:
 			newObjectButton->setEnabled(true);
 			copyObjectButton->setEnabled(true);
 			deleteObjectButton->setEnabled(true);
+#ifndef MUSEUM
 			exportPLYFileAction->setEnabled(false);
 			exportOBJFileAction->setEnabled(false);
 			saveSelectedAsFileAction->setEnabled(true);
-			shareFileButton->setEnabled(!email->sending());
+#endif
+			shareFileButton->setEnabled(false);
 			break;
 		case PULLPLAN_VIEW_MODE:
+			pullPlanEditorWidget->reset3DCamera();
 			newObjectButton->setEnabled(true);
 			copyObjectButton->setEnabled(true);
 			deleteObjectButton->setEnabled(true);
+#ifndef MUSEUM
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
+#endif
 			shareFileButton->setEnabled(!email->sending());
 			break;
 		case PIECE_VIEW_MODE:
+			pieceEditorWidget->reset3DCamera();
 			newObjectButton->setEnabled(true);
 			copyObjectButton->setEnabled(true);
 			deleteObjectButton->setEnabled(true);
+#ifndef MUSEUM
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
+#endif
 			shareFileButton->setEnabled(!email->sending());
 			break;
 	}
@@ -131,9 +141,11 @@ QString MainWindow :: windowTitle()
 		QString date = in.readLine();
 		title += " (r" + revision + ")";
 	}
+#ifndef MUSEUM
 	if (dirtyBit)
 		title += " *";
 	title += " " + saveFilename;
+#endif
 	return title;
 }
 
@@ -487,7 +499,7 @@ void MainWindow :: setupConnections()
 	connect(newObjectButton, SIGNAL(clicked()), this, SLOT(newObject()));
 	connect(copyObjectButton, SIGNAL(clicked()), this, SLOT(copyObject()));
 	connect(deleteObjectButton, SIGNAL(clicked()), this, SLOT(deleteObject()));
-
+#ifndef MUSEUM
 	// the file menu stuff
 	connect(newFileAction, SIGNAL(triggered()), this, SLOT(newFileActionTriggered()));
 	connect(openFileAction, SIGNAL(triggered()), this, SLOT(openFileActionTriggered()));
@@ -513,7 +525,7 @@ void MainWindow :: setupConnections()
 
 	// the performance menu stuff
 	connect(depthPeelAction, SIGNAL(triggered()), this, SLOT(depthPeelActionTriggered()));
-
+#endif
 	// status bar stuff
 	connect(pullPlanEditorWidget, SIGNAL(showMessage(const QString&, unsigned int)), 
 		this, SLOT(showStatusMessage(const QString&, unsigned int)));
@@ -1211,6 +1223,7 @@ void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 
 void MainWindow::setupMenus()
 {
+#ifndef MUSEUM
 	//new
 	newFileAction = new QAction("&New", this);
 	newFileAction->setShortcuts(QKeySequence::New);
@@ -1314,6 +1327,7 @@ void MainWindow::setupMenus()
 	// Performance menu
 	perfMenu = menuBar()->addMenu("Performance");
 	perfMenu->addAction(depthPeelAction);
+#endif
 }
 
 void MainWindow::exportOBJActionTriggered()
@@ -1503,11 +1517,26 @@ void MainWindow::newFileActionTriggered()
 	{
 		QMessageBox msgBox;
 		msgBox.setText("The glass library has been modified.");
+#ifdef MUSEUM
+		msgBox.setInformativeText("Are you sure you want to clear the library?");
+		msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+#else
 		msgBox.setInformativeText("Do you want to save your changes?");
 		msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 		msgBox.setDefaultButton(QMessageBox::Save);
+#endif
 		int returnValue = msgBox.exec();
 
+
+#ifdef MUSEUM
+		switch (returnValue)
+		{
+			case QMessageBox::Cancel:
+				return;
+			case QMessageBox::Yes:
+				break;
+		}
+#else
 		switch (returnValue)
 		{
 			case QMessageBox::Cancel:
@@ -1518,6 +1547,7 @@ void MainWindow::newFileActionTriggered()
 			case QMessageBox::Discard:
 				break;
 		}
+#endif
 	}
 
 	// reset the system:
@@ -1678,20 +1708,43 @@ void MainWindow::addFileActionTriggered()
 
 void MainWindow :: emailSuccess(QString to)
 {
-	shareFileButton->setEnabled(!email->sending());
 	showStatusMessage("Email sent successfully.", 3);	
 	QMessageBox::information(this, "Email success", "Message successfully sent to " + to + ".");
+	switch (editorStack->currentIndex())
+	{
+		case PULLPLAN_VIEW_MODE:
+		case PIECE_VIEW_MODE:
+			shareFileButton->setEnabled(!email->sending());
+			break;
+		default:
+			shareFileButton->setEnabled(false);
+	}
 }
 
 void MainWindow :: emailFailure(QString error)
 {
-	shareFileButton->setEnabled(!email->sending());
 	showStatusMessage("Email failed.", 3);	
 	QMessageBox::warning(this, "Email failed", "Failed to send message: " + error + ".");
+	switch (editorStack->currentIndex())
+	{
+		case PULLPLAN_VIEW_MODE:
+		case PIECE_VIEW_MODE:
+			shareFileButton->setEnabled(!email->sending());
+			break;
+		default:
+			shareFileButton->setEnabled(false);
+	}
 }
 
 void MainWindow::shareFileActionTriggered()
 {
+	switch (editorStack->currentIndex())
+	{
+		case EMPTY_VIEW_MODE:
+		case COLORBAR_VIEW_MODE:
+			return;
+	}
+
 	bool ok;
 	QString userSpecifiedAddress = QInputDialog::getText(this, "Email your design", "Email address:", 
 		QLineEdit::Normal, "friend@internet.com", &ok);
@@ -1714,11 +1767,6 @@ void MainWindow::shareFileActionTriggered()
 	vector<Piece*> pieces;
 	switch (editorStack->currentIndex())
 	{
-		case EMPTY_VIEW_MODE:
-			return; // nothing to save
-		case COLORBAR_VIEW_MODE:
-			getDependantLibraryContents(colorEditorWidget->getGlassColor(), colors, plans);
-			break;
 		case PULLPLAN_VIEW_MODE:
 			getDependantLibraryContents(pullPlanEditorWidget->getPullPlan(), colors, plans);
 			break;
@@ -1734,16 +1782,11 @@ void MainWindow::shareFileActionTriggered()
 	QImage screenshot;
 	switch (editorStack->currentIndex())
 	{
-		case EMPTY_VIEW_MODE:
-			return; // nothing to save
-		case COLORBAR_VIEW_MODE:
-			screenshot = colorEditorWidget->niceViewWidget->grabFrameBuffer();
-			break;
 		case PULLPLAN_VIEW_MODE:
-			screenshot = pullPlanEditorWidget->niceViewWidget->grabFrameBuffer();
+			screenshot = pullPlanEditorWidget->getPullPlanImage();
 			break;
 		case PIECE_VIEW_MODE:
-			screenshot = pieceEditorWidget->pieceNiceViewWidget->grabFrameBuffer();
+			screenshot = pieceEditorWidget->getPieceImage();
 			break;
 	}
 	QBuffer screenshotFileBuffer;
@@ -1799,6 +1842,9 @@ void MainWindow::saveAllAsFileActionTriggered()
 
 void MainWindow::saveSelectedAsFileActionTriggered()
 {
+	if (editorStack->currentIndex() == EMPTY_VIEW_MODE)
+		return;
+
 	// get a filename from the user, suggesting "untitled.glass".
 	QString userSpecifiedFilename = QFileDialog::getSaveFileName(this, "Save as...", 
 		"untitled.glass", "VirtualGlass glass file (*.glass)");
@@ -1815,8 +1861,6 @@ void MainWindow::saveSelectedAsFileActionTriggered()
 	vector<Piece*> pieces;
 	switch (editorStack->currentIndex())
 	{
-		case EMPTY_VIEW_MODE:
-			return; // nothing to save
 		case COLORBAR_VIEW_MODE:
 			getDependantLibraryContents(colorEditorWidget->getGlassColor(), colors, plans);
 			break;

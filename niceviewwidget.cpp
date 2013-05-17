@@ -16,17 +16,47 @@
 #include "glassopengl.h"
 
 NiceViewWidget :: NiceViewWidget(enum CameraMode cameraMode, QWidget *parent) 
-	: QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer | QGL::SampleBuffers), parent), peelRenderer(NULL)
+	: QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer | QGL::SampleBuffers), parent), 
+		peelRenderer(NULL)
 {
-	this->setAttribute(Qt::WA_AcceptTouchEvents);
-
 	leftMouseDown = false;
+	mouseLocX = 0;
+	mouseLocY = 0;
+
+	this->setAttribute(Qt::WA_AcceptTouchEvents);
+	this->cameraMode = cameraMode;
+	resetCamera();
 
 	geometry = NULL;
-	this->cameraMode = cameraMode;
+	initializeGLCalled = false;
+}
 
+NiceViewWidget :: ~NiceViewWidget()
+{
+	//Deallocate all the depth peeling resources we may have created:
+	makeCurrent();
+
+	if (peelRenderer) 
+	{
+		GLEWContext *ctx = peelRenderer->glewContext;
+		delete peelRenderer;
+		peelRenderer = NULL;
+		delete ctx;
+	}
+}
+
+void NiceViewWidget :: resetCamera()
+{
 	switch (cameraMode)
 	{
+		case GLASSCOLOR_CAMERA_MODE:
+			theta = -PI/2.0;
+			phi = PI/2;
+			rho = 11.0; 
+			lookAtLoc[0] = 0.0;
+			lookAtLoc[1] = 0.0;
+			lookAtLoc[2] = 5.0;
+			break;
 		case PULLPLAN_CAMERA_MODE:
 			theta = -PI/2.0;
 			phi = PI/2;
@@ -51,25 +81,6 @@ NiceViewWidget :: NiceViewWidget(enum CameraMode cameraMode, QWidget *parent)
 			lookAtLoc[1] = 0.0;
 			lookAtLoc[2] = 0.0;
 			break;
-	}
-
-	mouseLocX = 0;
-	mouseLocY = 0;
-
-	initializeGLCalled = false;
-}
-
-NiceViewWidget :: ~NiceViewWidget()
-{
-	//Deallocate all the depth peeling resources we may have created:
-	makeCurrent();
-
-	if (peelRenderer) 
-	{
-		GLEWContext *ctx = peelRenderer->glewContext;
-		delete peelRenderer;
-		peelRenderer = NULL;
-		delete ctx;
 	}
 }
 
@@ -160,6 +171,7 @@ void NiceViewWidget :: setGLMatrices()
 		case PIECE_CAMERA_MODE:
 			gluPerspective(45.0, w / h, 0.1, 100.0);
 			break;
+		case GLASSCOLOR_CAMERA_MODE:
 		case PULLPLAN_CAMERA_MODE:
 		case PICKUPPLAN_CAMERA_MODE:
 			float a = h / w;
@@ -184,16 +196,16 @@ bool NiceViewWidget :: event(QEvent* event)
 	{
 		case QEvent::MouseButtonPress:
 		{
-			QMouseEvent* e = dynamic_cast<QMouseEvent*>(event);
-			
 			// In pickup plan mode, user does not move camera location, zoom, etc.
 			// The widget is a passive `display' widget only, with an interactive layer
 			// on top of it (PickupPlanEditorViewWidget), which we pass the event up to.
 			if (cameraMode == PICKUPPLAN_CAMERA_MODE)
 			{
-				e->ignore(); 
+				event->ignore(); 
 				return true; 	
 			}
+
+			QMouseEvent* e = dynamic_cast<QMouseEvent*>(event);
 
 			// Update instance variables for mouse location
 			mouseLocX = e->x();
@@ -201,10 +213,14 @@ bool NiceViewWidget :: event(QEvent* event)
 
 			if (e->button() == Qt::LeftButton)
 				leftMouseDown = true;
+
 			return true;
 		}
 		case QEvent::MouseMove:
 		{
+			if (cameraMode == PICKUPPLAN_CAMERA_MODE)
+				return true;
+
 			QMouseEvent* e = dynamic_cast<QMouseEvent*>(event);
 
 			float relX, relY;
@@ -217,9 +233,6 @@ bool NiceViewWidget :: event(QEvent* event)
 			oldMouseLocY = mouseLocY;
 			mouseLocY = e->y();
 			relY = (mouseLocY - oldMouseLocY) / static_cast<float>(this->height());
-
-			if (cameraMode == PICKUPPLAN_CAMERA_MODE)
-				return true;
 
 			if (leftMouseDown)
 			{
@@ -257,8 +270,9 @@ bool NiceViewWidget :: event(QEvent* event)
 							rho *= 1.2;
 					}
 					break;
+				case GLASSCOLOR_CAMERA_MODE:
 				case PICKUPPLAN_CAMERA_MODE:
-					break;	
+					return true;	
 				case PIECE_CAMERA_MODE:
 				default:
 					if (e->delta() > 0)
@@ -275,6 +289,9 @@ bool NiceViewWidget :: event(QEvent* event)
 		case QEvent::TouchUpdate:
 		case QEvent::TouchEnd:
 		{
+			if (cameraMode == PICKUPPLAN_CAMERA_MODE || cameraMode == GLASSCOLOR_CAMERA_MODE)
+				return true;
+
 			// this code comes largely from the Qt example at 
 			// https://qt-project.org/doc/qt-4.8/touch-pinchzoom-graphicsview-cpp.html
 			QTouchEvent* e = dynamic_cast<QTouchEvent*>(event);

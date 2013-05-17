@@ -21,6 +21,7 @@ class QSpinBox;
 class QSlider;
 class QPushButton;
 class QScrollArea;
+class QImage;
 
 class PieceGeometryThread;
 class TwistWidget;	
@@ -48,7 +49,8 @@ class PieceEditorWidget : public QWidget
 		void setPickupParameter(int param, int value);
 		void writePieceToPLYFile(QString& filename);
 		void writePieceToOBJFile(QString& filename);
-		NiceViewWidget* pieceNiceViewWidget;
+		void reset3DCamera();
+		QImage getPieceImage();
 
 	protected:
 		void mousePressEvent(QMouseEvent*);
@@ -94,6 +96,7 @@ class PieceEditorWidget : public QWidget
 
 		PickupPlanEditorViewWidget* pickupViewWidget;	
 		PieceCustomizeViewWidget* pieceCustomizeViewWidget;
+		NiceViewWidget* pieceNiceViewWidget;
 		QStackedWidget* pieceViewStack;
 
 		QPushButton* addControlPointButton;
