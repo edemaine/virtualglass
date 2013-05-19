@@ -1198,6 +1198,8 @@ void MainWindow::closeEvent(QCloseEvent * event)
 
 void MainWindow::attemptToQuit()
 {
+
+#ifndef MUSEUM
 	if (!dirtyBit)
 	{
 		QCoreApplication::exit();
@@ -1225,6 +1227,7 @@ void MainWindow::attemptToQuit()
 		case QMessageBox::Discard:
 			break;
 	}
+#endif
 
 	QCoreApplication::exit();
 }
