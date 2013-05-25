@@ -98,12 +98,12 @@ void ColorEditorWidget :: setupLayout()
 	// Setup stack of collection libraries
 	collectionStack = new QStackedWidget(this);
 	editorLayout->addWidget(collectionStack, 2, 0);
-	loadCollection(":/reichenbach-opaque-colors.vgc");
-	loadCollection(":/reichenbach-transparent-colors.vgc");
-	loadCollection(":/kugler-opaque-colors.vgc");
-	loadCollection(":/kugler-transparent-colors.vgc");
-	loadCollection(":/gaffer-opaque-colors.vgc");
-	loadCollection(":/gaffer-transparent-colors.vgc");
+	loadCollection(":/vgc/reichenbach-opaque-colors.vgc");
+	loadCollection(":/vgc/reichenbach-transparent-colors.vgc");
+	loadCollection(":/vgc/kugler-opaque-colors.vgc");
+	loadCollection(":/vgc/kugler-transparent-colors.vgc");
+	loadCollection(":/vgc/gaffer-opaque-colors.vgc");
+	loadCollection(":/vgc/gaffer-transparent-colors.vgc");
 
 	// Add alpha (transparency) adjuster
 	QWidget* alphaWidget = new QWidget(this);

@@ -10,7 +10,7 @@ rm -rf ./VirtualGlass.app/
 make clean
 make
 # copy our custom OS config file for file type associations, etc.
-cp ./virtualglass.Info.plist ./virtualglass.app/Contents/Info.plist
+cp ./Info.plist ./virtualglass.app/Contents/Info.plist
 # rename the app
 mv ./virtualglass.app/ ./VirtualGlass.app/ 
 # fix libraries

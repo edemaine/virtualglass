@@ -84,7 +84,6 @@ HEADERS += vgapp.h \
 	glew/glew.h \
 	glew/glxew.h \
 	glew/wglew.h \
-	bubble.h \
 	jsoncpp/include/json/autolink.h \
         jsoncpp/include/json/config.h \
         jsoncpp/include/json/features.h \
@@ -198,7 +197,6 @@ SOURCES += main.cpp \
         jsoncpp/src/lib_json/json_value.cpp \
 	jsoncpp/src/lib_json/json_writer.cpp \
         SVG.cpp \
-        bubble.cpp \
 	glassfileio.cpp \
 	piecegeometrythread.cpp \
 	pullplangeometrythread.cpp \

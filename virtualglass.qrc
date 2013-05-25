@@ -10,18 +10,18 @@
         <file>images/pickuptemplate7.png</file>
         <file>images/pickuptemplate8.png</file>
         <file>images/pulltemplate_custom.png</file>
-        <file>reichenbach-opaque-colors.vgc</file>
-        <file>reichenbach-transparent-colors.vgc</file>
-        <file>gaffer-opaque-colors.vgc</file>
-        <file>gaffer-transparent-colors.vgc</file>
-        <file>kugler-opaque-colors.vgc</file>
-        <file>kugler-transparent-colors.vgc</file>
+        <file>images/virtualglass.png</file>
+	<file>images/circle_icon.png</file>
+	<file>images/square_icon.png</file>
+        <file>vgc/reichenbach-opaque-colors.vgc</file>
+        <file>vgc/reichenbach-transparent-colors.vgc</file>
+        <file>vgc/gaffer-opaque-colors.vgc</file>
+        <file>vgc/gaffer-transparent-colors.vgc</file>
+        <file>vgc/kugler-opaque-colors.vgc</file>
+        <file>vgc/kugler-transparent-colors.vgc</file>
         <file>COPYRIGHT.txt</file>
         <file>version.txt</file>
 	<file>colorfile_inline_doc.txt</file>
 	<file>glassfile_inline_doc.txt</file>
-        <file>virtualglass.png</file>
-	<file>images/circle_icon.png</file>
-	<file>images/square_icon.png</file>
     </qresource>
 </RCC>
