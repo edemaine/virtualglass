@@ -48,9 +48,6 @@
 #include "globalgraphicssetting.h"
 #include "globaldepthpeelingsetting.h"
 
-// Comment out to enable VirtualGlass: Home edition
-#define MUSEUM
-
 MainWindow :: MainWindow()
 {
 	centralWidget = new QWidget(this);
@@ -85,11 +82,9 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			copyObjectButton->setText("Copy");
 			deleteObjectButton->setEnabled(false);
 			deleteObjectButton->setText("Delete");
-#ifndef MUSEUM
 			exportPLYFileAction->setEnabled(false);
 			exportOBJFileAction->setEnabled(false);
 			saveSelectedAsFileAction->setEnabled(false);
-#endif
 			shareFileButton->setEnabled(false);
 			break;
 		case COLORBAR_VIEW_MODE:
@@ -97,11 +92,9 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			copyObjectButton->setText("Copy\nColor");
 			deleteObjectButton->setEnabled(true);
 			deleteObjectButton->setText("Delete\nColor");
-#ifndef MUSEUM
 			exportPLYFileAction->setEnabled(false);
 			exportOBJFileAction->setEnabled(false);
 			saveSelectedAsFileAction->setEnabled(true);
-#endif
 			shareFileButton->setEnabled(false);
 			break;
 		case PULLPLAN_VIEW_MODE:
@@ -110,11 +103,9 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			copyObjectButton->setText("Copy\nCane");
 			deleteObjectButton->setEnabled(true);
 			deleteObjectButton->setText("Delete\nCane");
-#ifndef MUSEUM
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
-#endif
 			shareFileButton->setEnabled(!email->sending());
 			break;
 		case PIECE_VIEW_MODE:
@@ -123,11 +114,9 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			copyObjectButton->setText("Copy\nPiece");
 			deleteObjectButton->setEnabled(true);
 			deleteObjectButton->setText("Delete\nPiece");
-#ifndef MUSEUM
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
-#endif
 			shareFileButton->setEnabled(!email->sending());
 			break;
 	}
@@ -146,11 +135,10 @@ QString MainWindow :: windowTitle()
 		QString date = in.readLine();
 		title += " (r" + revision + ")";
 	}
-#ifndef MUSEUM
 	if (dirtyBit)
 		title += " *";
 	title += " " + saveFilename;
-#endif
+
 	return title;
 }
 
@@ -509,10 +497,8 @@ void MainWindow :: setupConnections()
 
 	// Toolbar stuff
 	connect(newFileButton, SIGNAL(clicked()), this, SLOT(newFileActionTriggered()));
-#ifndef MUSEUM
 	connect(openFileButton, SIGNAL(clicked()), this, SLOT(openFileActionTriggered()));
 	connect(saveFileButton, SIGNAL(clicked()), this, SLOT(saveAllFileActionTriggered()));
-#endif
 	connect(shareFileButton, SIGNAL(clicked()), this, SLOT(shareFileActionTriggered()));
 	connect(email, SIGNAL(success(QString)), this, SLOT(emailSuccess(QString)));
 	connect(email, SIGNAL(failure(QString)), this, SLOT(emailFailure(QString)));
@@ -525,7 +511,7 @@ void MainWindow :: setupConnections()
 	connect(newPieceButton, SIGNAL(clicked()), this, SLOT(newPieceButtonClicked()));
 
 	// Menu stuff
-#ifndef MUSEUM
+
 	// file menu 
 	connect(newFileAction, SIGNAL(triggered()), this, SLOT(newFileActionTriggered()));
 	connect(openFileAction, SIGNAL(triggered()), this, SLOT(openFileActionTriggered()));
@@ -551,7 +537,7 @@ void MainWindow :: setupConnections()
 
 	// the performance menu stuff
 	connect(depthPeelAction, SIGNAL(triggered()), this, SLOT(depthPeelActionTriggered()));
-#endif
+
 	// status bar stuff
 	connect(pullPlanEditorWidget, SIGNAL(showMessage(const QString&, unsigned int)), 
 		this, SLOT(showStatusMessage(const QString&, unsigned int)));
@@ -736,7 +722,6 @@ void MainWindow :: setupToolbar()
 	newFileButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 	toolbarLayout->addWidget(newFileButton);
 
-#ifndef MUSEUM
 	openFileButton = new QToolButton(toolbarMasterWidget);
 	openFileButton->setFixedSize(icon_size, icon_size);
 	openFileButton->setText("Open");
@@ -746,7 +731,7 @@ void MainWindow :: setupToolbar()
 	saveFileButton->setFixedSize(icon_size, icon_size);
 	saveFileButton->setText("Save");
 	toolbarLayout->addWidget(saveFileButton);
-#endif
+
 	shareFileButton = new QToolButton(toolbarMasterWidget);
 	shareFileButton->setFixedSize(icon_size, icon_size);
 	shareFileButton->setText("Email");
@@ -1198,8 +1183,6 @@ void MainWindow::closeEvent(QCloseEvent * event)
 
 void MainWindow::attemptToQuit()
 {
-
-#ifndef MUSEUM
 	if (!dirtyBit)
 	{
 		QCoreApplication::exit();
@@ -1227,7 +1210,6 @@ void MainWindow::attemptToQuit()
 		case QMessageBox::Discard:
 			break;
 	}
-#endif
 
 	QCoreApplication::exit();
 }
@@ -1240,7 +1222,6 @@ void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 
 void MainWindow::setupMenus()
 {
-#ifndef MUSEUM
 	//new
 	newFileAction = new QAction("&New", this);
 	newFileAction->setShortcuts(QKeySequence::New);
@@ -1344,7 +1325,6 @@ void MainWindow::setupMenus()
 	// Performance menu
 	perfMenu = menuBar()->addMenu("Performance");
 	perfMenu->addAction(depthPeelAction);
-#endif
 }
 
 void MainWindow::exportOBJActionTriggered()
@@ -1534,26 +1514,12 @@ void MainWindow::newFileActionTriggered()
 	{
 		QMessageBox msgBox;
 		msgBox.setText("The glass library has been modified.");
-#ifdef MUSEUM
-		msgBox.setInformativeText("Are you sure you want to clear the library?");
-		msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
-#else
 		msgBox.setInformativeText("Do you want to save your changes?");
 		msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 		msgBox.setDefaultButton(QMessageBox::Save);
-#endif
+
 		int returnValue = msgBox.exec();
 
-
-#ifdef MUSEUM
-		switch (returnValue)
-		{
-			case QMessageBox::Cancel:
-				return;
-			case QMessageBox::Yes:
-				break;
-		}
-#else
 		switch (returnValue)
 		{
 			case QMessageBox::Cancel:
@@ -1564,7 +1530,6 @@ void MainWindow::newFileActionTriggered()
 			case QMessageBox::Discard:
 				break;
 		}
-#endif
 	}
 
 	// reset the system:

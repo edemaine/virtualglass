@@ -41,7 +41,7 @@ macx {
 
 	# Mac-specific icons and plist (file-type associations, etc.)
 	ICON = virtualglass.icns
-	QMAKE_INFO_PLIST = virtualglass.Info.plist
+	QMAKE_INFO_PLIST = Info.plist
 
 	# All those compile flags 
         QMAKE_CXXFLAGS += -Wall -Wextra -Werror -Wno-unused-parameter -Wno-deprecated -DUNORDERED_MAP_WORKAROUND
