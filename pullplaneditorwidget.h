@@ -70,8 +70,6 @@ class PullPlanEditorWidget : public QWidget
 		void copySelectedButtonClicked();
 		void deleteSelectedButtonClicked();
 		void childWidgetDataChanged();
-		void countMinusButtonClicked();
-		void countPlusButtonClicked();
 		void countSpinChanged(int);
 		void controlsTabChanged(int);
 		void geometryThreadFinishedMesh(bool completed, unsigned int quality);
@@ -99,9 +97,7 @@ class PullPlanEditorWidget : public QWidget
 		TwistWidget* twistWidget;
 
 		QLabel* countLabel;
-		QPushButton* countMinusButton;	
 		QSpinBox* countSpin;
-		QPushButton* countPlusButton;	
 
 		QHBoxLayout* templateLibraryLayout;
 		QPushButton* addCasingButton;
@@ -114,7 +110,6 @@ class PullPlanEditorWidget : public QWidget
 		QPushButton* copySelectedButton;
 		QPushButton* deleteSelectedButton;
 		QStackedWidget* viewEditorStack;
-		QLabel* descriptionLabel;
 		QTabWidget* controlsTab;
 		QScrollArea* pullTemplateLibraryScrollArea;
 

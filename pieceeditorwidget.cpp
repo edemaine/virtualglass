@@ -90,9 +90,6 @@ void PieceEditorWidget :: updateEverything()
 	pickupCountSpinBox->setValue(tp.value);
 	pickupCountSpinBox->blockSignals(false);
 
-	pickupCountMinusButton->setEnabled(tp.value > tp.lowerLimit);
-	pickupCountPlusButton->setEnabled(tp.value < tp.upperLimit);
-
 	// update piece stuff
 	pieceCustomizeViewWidget->updateEverything();	
 
@@ -156,31 +153,6 @@ void PieceEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned in
 	else
 		emit showMessage("Piece is too complex to render completely.", 3);
 }
-
-void PieceEditorWidget :: pickupCountMinusButtonClicked()
-{
-	TemplateParameter tp;
-	piece->pickup->getParameter(0, &tp);
-	if (tp.value > tp.lowerLimit)
-	{
-		piece->pickup->setParameter(0, tp.value - 1);
-		updateEverything();
-		emit someDataChanged();
-	}
-}
-
-void PieceEditorWidget :: pickupCountPlusButtonClicked()
-{
-	TemplateParameter tp;
-	piece->pickup->getParameter(0, &tp);
-	if (tp.value < tp.upperLimit)
-	{
-		piece->pickup->setParameter(0, tp.value + 1);
-		updateEverything();
-		emit someDataChanged();
-	}
-}
-
 
 void PieceEditorWidget :: pickupCountSpinBoxChanged(int)
 {
@@ -328,25 +300,12 @@ void PieceEditorWidget :: setupLayout()
 	
 	pickupParamLayout->addWidget(new QLabel("Count:", pickupParamWidget), 0, 0);
 	
-	pickupCountMinusButton = new QPushButton("-", pickupParamWidget);
-	pickupParamLayout->addWidget(pickupCountMinusButton, 0, 1);
-
 	pickupCountSpinBox = new QSpinBox(pickupParamWidget);
-	pickupCountSpinBox->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	pickupParamLayout->addWidget(pickupCountSpinBox, 0, 2);
-
-	pickupCountPlusButton = new QPushButton("+", pickupParamWidget);
-	pickupParamLayout->addWidget(pickupCountPlusButton, 0, 3);
 
 	pickupParamLayout->setColumnStretch(4, 1);
 
 	pickupControlsTab->addTab(pickupParamWidget, "Fill and Case");
-
-	// below the tabs goes a labeled descriptor (changes depending on view)
-	QLabel* pickupEditorDescriptionLabel = new QLabel("Pickup editor - drag in color or canes", this);
-	pickupEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	editorLayout->addWidget(pickupEditorDescriptionLabel, 3, 0);
-
 
 	
 	// Piece parameter layout 
@@ -385,12 +344,6 @@ void PieceEditorWidget :: setupLayout()
 	tab2Layout->addWidget(customPieceControlsWidget);
 	tab2Layout->addStretch(1);	
 
-
-	// below the tabs goes a labeled descriptor (changes depending on view)
-	pieceEditorDescriptionLabel = new QLabel("Piece editor", this);
-	pieceEditorDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	editorLayout->addWidget(pieceEditorDescriptionLabel, 3, 1);
-
 	editorLayout->setRowStretch(0, 10);
 }
 
@@ -407,9 +360,7 @@ void PieceEditorWidget :: setupThreading()
 void PieceEditorWidget :: setupConnections()
 {
 	// pickup controls
-	connect(pickupCountMinusButton, SIGNAL(clicked()), this, SLOT(pickupCountMinusButtonClicked()));
 	connect(pickupCountSpinBox, SIGNAL(valueChanged(int)), this, SLOT(pickupCountSpinBoxChanged(int)));
-	connect(pickupCountPlusButton, SIGNAL(clicked()), this, SLOT(pickupCountPlusButtonClicked()));
 
 	// custom piece controls
 	connect(addControlPointButton, SIGNAL(clicked()), this, SLOT(addControlPointButtonClicked()));
@@ -445,12 +396,9 @@ void PieceEditorWidget :: pieceControlsTabChanged(int tab)
 	// change the view to match the tab
 	pieceViewStack->setCurrentIndex(tab);
 
-	if (tab == 0) // Twist mode
-		pieceEditorDescriptionLabel->setText("Piece editor.");
-	else // customize mode
+	if (tab != 0) // customize mode
 	{
 		piece->setTemplateType(PieceTemplate::CUSTOM);
-		pieceEditorDescriptionLabel->setText("Piece customizer.");
 		updateEverything();
 		emit someDataChanged();
 	}

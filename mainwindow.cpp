@@ -375,15 +375,14 @@ void MainWindow :: deleteCurrentEditingObject()
 
 void MainWindow :: mousePressEvent(QMouseEvent* event)
 {
-	// bounding box for the geometry of the libraryScrollArea relative to libraryMasterWidget
-	QRect scrollAreaRect = libraryScrollArea->geometry();
-	// bounding box for the geometry of the libraryScrollArea relative to MainWindow
-	scrollAreaRect.moveTopLeft(libraryScrollArea->parentWidget()->pos());
+	GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(childAt(event->pos()));
+	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
+	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
 	
-	if (event->button() == Qt::LeftButton && scrollAreaRect.contains(event->pos()))
+	if (event->button() == Qt::LeftButton && (cblw != NULL || plplw != NULL || plw != NULL))
 	{
 		isDragging = true;
-		lastDragPosition = dragStartPosition = event->pos();
+		dragStartPosition = event->pos();
 		maxDragDistance = 0;
 	}
 	else
@@ -404,9 +403,8 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	if (!isDragging || MAX(totalXMovement, totalYMovement) < QApplication::startDragDistance())
 		return;
 
-	// If this is the first time you've exceeded the threshold for movement
-	// and the movement starts a drag
-	if (maxDragDistance < QApplication::startDragDistance() && totalXMovement >= totalYMovement)
+	// If this is the first time you've exceeded the threshold for movement, the movement starts a drag
+	if (maxDragDistance < QApplication::startDragDistance())
 	{
 		GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(childAt(event->pos()));
 		PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
@@ -440,16 +438,6 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 
 		// no longer a drag in the library (becomes a QDrag, i.e. a drag in program)	
 		isDragging = false; 
-	}
-	// Otherwise  
-	else 
-	{
-		int movement = event->pos().y() - lastDragPosition.y();
-		libraryScrollArea->verticalScrollBar()->setValue(
-			libraryScrollArea->verticalScrollBar()->value() - movement);
-		lastDragPosition = event->pos();
-
-		maxDragDistance = MAX(maxDragDistance, totalYMovement);
 	}
 }
 
@@ -718,7 +706,7 @@ void MainWindow :: setupToolbar()
 
 	newFileButton = new QToolButton(toolbarMasterWidget);
 	newFileButton->setFixedSize(icon_size, icon_size);
-	newFileButton->setText("Clear");
+	newFileButton->setText("New");
 	newFileButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 	toolbarLayout->addWidget(newFileButton);
 
@@ -830,7 +818,7 @@ void MainWindow :: setupLibrary()
 	l3->setStyleSheet("border: 2px dotted " + QColor(200, 100, 0, 255).name() + ";");
 	legendLayout->addWidget(l3, 0, 2, Qt::AlignCenter);
 
-	QLabel* descriptionLabel = new QLabel("Library - click to edit or drag to add", legendWidget);
+	QLabel* descriptionLabel = new QLabel("Click to edit or drag to add", legendWidget);
 	descriptionLabel->setAlignment(Qt::AlignCenter);
 	libraryAreaLayout->addWidget(descriptionLabel);
 }

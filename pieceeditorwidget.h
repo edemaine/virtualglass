@@ -11,7 +11,6 @@
 #include "geometry.h"
 #include "constants.h"
 
-class QLabel;
 class QGridLayout;
 class QVBoxLayout;
 class QHBoxLayout;
@@ -67,9 +66,7 @@ class PieceEditorWidget : public QWidget
 	private slots:
 		void pieceControlsTabChanged(int);
 		void childWidgetDataChanged();
-		void pickupCountMinusButtonClicked();
 		void pickupCountSpinBoxChanged(int);
-		void pickupCountPlusButtonClicked();
 		void geometryThreadFinishedMesh(bool completed, unsigned int quality);
 		void addControlPointButtonClicked();
 		void removeControlPointButtonClicked();
@@ -102,14 +99,11 @@ class PieceEditorWidget : public QWidget
 		QPushButton* addControlPointButton;
 		QPushButton* removeControlPointButton;
 
-		QPushButton* pickupCountMinusButton;
 		QSpinBox* pickupCountSpinBox;
-		QPushButton* pickupCountPlusButton;
 
 		QTabWidget* pickupControlsTab;
 		QTabWidget* pieceControlsTab;
 		TwistWidget* twistWidget;
-		QLabel* pieceEditorDescriptionLabel;
 		QScrollArea* pickupTemplateLibraryScrollArea;
 		QScrollArea* pieceTemplateLibraryScrollArea;
 	

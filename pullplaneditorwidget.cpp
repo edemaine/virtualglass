@@ -95,8 +95,6 @@ void PullPlanEditorWidget :: updateEverything()
 
 	countSpin->setValue(plan->getCount());
 	countLabel->setEnabled(plan->getTemplateType() != PullTemplate::CUSTOM);
-	countMinusButton->setEnabled(plan->getCount() > MIN_PULLPLAN_COUNT_PARAMETER_VALUE);
-	countPlusButton->setEnabled(plan->getCount() < MAX_PULLPLAN_COUNT_PARAMETER_VALUE);
 	countSpin->setEnabled(plan->getTemplateType() != PullTemplate::CUSTOM);
 
 	twistWidget->updateEverything();
@@ -226,18 +224,11 @@ void PullPlanEditorWidget :: setupLayout()
 	casingLayout->addWidget(removeCasingButton);
 
 	countLabel = new QLabel("Count:", casingWidget);
-	countMinusButton = new QPushButton("-", casingWidget);
-	countPlusButton = new QPushButton("+", casingWidget);
 	countSpin = new QSpinBox(casingWidget);
-	countSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
-
 	countSpin->setRange(MIN_PULLPLAN_COUNT_PARAMETER_VALUE, MAX_PULLPLAN_COUNT_PARAMETER_VALUE);
 	casingLayout->addStretch(1);
 	casingLayout->addWidget(countLabel);
-	casingLayout->addWidget(countMinusButton);
-	
 	casingLayout->addWidget(countSpin);
-	casingLayout->addWidget(countPlusButton);
 
 	twistWidget = new TwistWidget(&(plan->twist), 10, tab1Widget);
 
@@ -270,20 +261,11 @@ void PullPlanEditorWidget :: setupLayout()
 	tab2Layout->addStretch(1);
 
 
-	// below the tabs goes a labeled descriptor (changes depending on view)
-	descriptionLabel = new QLabel("Cane editor - drag in color or canes", this);
-	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	editorLayout->addWidget(descriptionLabel, 3, 0);
+	// now add the 3D view 
+	editorLayout->addWidget(niceViewWidget, 0, 1, 3, 1);
 
 	// at this point the editor GUI elements are done
 
-
-
-	// now add the 3D view and its label
-	editorLayout->addWidget(niceViewWidget, 0, 1, 3, 1);
-	QLabel* niceViewDescriptionLabel = new QLabel("3D view of cane", this);
-	niceViewDescriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	editorLayout->addWidget(niceViewDescriptionLabel, 3, 1);
 
 	// set proportions of the various parts: 
 	// horizontally, 60% is the editor, 40% is the 3D view
@@ -303,12 +285,9 @@ void PullPlanEditorWidget :: controlsTabChanged(int tab)
 	// change the blueprint view to match the tab
 	viewEditorStack->setCurrentIndex(tab); 
 
-	if (tab == 0) // Fill and case mode
-		descriptionLabel->setText("Cane editor - drag color or other canes in.");
-	else // customize mode
+	if (tab != 0) // customize mode	
 	{
 		plan->setTemplateType(PullTemplate::CUSTOM);				
-		descriptionLabel->setText("Cane customizer - select and drag shapes around to customize cane layout.");
 		updateEverything();
 		emit someDataChanged();
 	}
@@ -432,8 +411,6 @@ void PullPlanEditorWidget :: setupConnections()
 	connect(addCircleButton, SIGNAL(clicked()), this, SLOT(addCircleButtonClicked()));
 	connect(addSquareButton, SIGNAL(clicked()), this, SLOT(addSquareButtonClicked()));
 	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
-	connect(countMinusButton, SIGNAL(clicked()), this, SLOT(countMinusButtonClicked()));
-	connect(countPlusButton, SIGNAL(clicked()), this, SLOT(countPlusButtonClicked()));
 	connect(countSpin, SIGNAL(valueChanged(int)), this, SLOT(countSpinChanged(int)));
 	connect(controlsTab, SIGNAL(currentChanged(int)), this, SLOT(controlsTabChanged(int)));
 
@@ -450,26 +427,6 @@ void PullPlanEditorWidget :: childWidgetDataChanged()
 {
 	updateEverything();
 	emit someDataChanged();
-}
-
-void PullPlanEditorWidget :: countMinusButtonClicked()
-{
-	if (plan->getCount() > MIN_PULLPLAN_COUNT_PARAMETER_VALUE)
-	{
-		plan->setCount(plan->getCount() - 1);
-		updateEverything();
-		emit someDataChanged();
-	}
-}
-
-void PullPlanEditorWidget :: countPlusButtonClicked()
-{
-	if (plan->getCount() < MAX_PULLPLAN_COUNT_PARAMETER_VALUE)
-	{
-		plan->setCount(plan->getCount() + 1);
-		updateEverything();
-		emit someDataChanged();
-	}	
 }
 
 void PullPlanEditorWidget :: countSpinChanged(int)

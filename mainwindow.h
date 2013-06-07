@@ -142,7 +142,6 @@ class MainWindow : public QMainWindow
 
 		bool isDragging;
 		QPoint dragStartPosition;
-		QPoint lastDragPosition;
 		int maxDragDistance;
 
 		bool dirtyBit;

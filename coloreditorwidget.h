@@ -3,9 +3,10 @@
 #define COLOREDITORWIDGET_H
 
 #include <vector>
+#include <string>
+
 #include <QWidget>
 #include <QString>
-#include <string>
 
 #include "geometry.h"
 #include "constants.h"

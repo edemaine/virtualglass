@@ -116,18 +116,8 @@ void ColorEditorWidget :: setupLayout()
 	alphaLayout->addWidget(new QLabel("100%", alphaWidget));
 	editorLayout->addWidget(alphaWidget, 3, 0);
 
-	// Little description for the editor
-	QLabel* descriptionLabel = new QLabel("Color editor", this);
-	descriptionLabel->setAlignment(Qt::AlignCenter);
-	editorLayout->addWidget(descriptionLabel, 4, 0);
-
 	// Add 3D view	
 	editorLayout->addWidget(niceViewWidget, 0, 1, 4, 1);
-
-	// Little description for the editor
-	descriptionLabel = new QLabel("3D view of color", this);
-	descriptionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	editorLayout->addWidget(descriptionLabel, 4, 1);
 
 	// Set relative areas used
 	editorLayout->setColumnStretch(1, 1);
