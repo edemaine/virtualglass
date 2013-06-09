@@ -79,7 +79,6 @@ class MainWindow : public QMainWindow
 		void moveCurrentEditingObject(int d);
 		void setViewMode(enum ViewMode m);
 		void clearLibrary();
-		void unhighlightAllLibraryWidgets();
 		bool glassColorIsDependancy(GlassColor* color);
 		bool pullPlanIsDependancy(PullPlan* plan);
 		void updateWindowTitle();

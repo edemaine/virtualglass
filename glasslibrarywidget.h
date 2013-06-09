@@ -10,13 +10,12 @@ class GlassLibraryWidget : public QLabel
 {
 	public:
 		GlassLibraryWidget(QWidget* parent);
-		void setDependancy(bool hasDependancy, enum Dependancy _d=IS_DEPENDANCY);
+		void setDependancy(enum Dependancy _d=IS_DEPENDANCY);
 
 	protected:
 		void updateStyleSheet();
 
 	private:
-		bool hasDependancy;
 		enum Dependancy dependancy;
 };
 

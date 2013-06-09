@@ -152,26 +152,6 @@ void MainWindow :: showStatusMessage(const QString& message, unsigned int timeou
 	statusBar()->showMessage(message, timeout * 1000);
 }
 
-void MainWindow :: unhighlightAllLibraryWidgets()
-{
-	QLayoutItem* w;
-	for (int j = 0; j < colorBarLibraryLayout->count(); ++j)
-	{
-		w = colorBarLibraryLayout->itemAt(j);
-		static_cast<GlassColorLibraryWidget*>(w->widget())->setDependancy(false);
-	}
-	for (int j = 0; j < pullPlanLibraryLayout->count(); ++j)
-	{
-		w = pullPlanLibraryLayout->itemAt(j);
-		static_cast<PullPlanLibraryWidget*>(w->widget())->setDependancy(false);
-	}
-	for (int j = 0; j < pieceLibraryLayout->count(); ++j)
-	{
-		w = pieceLibraryLayout->itemAt(j);
-		static_cast<PieceLibraryWidget*>(w->widget())->setDependancy(false);
-	}
-}
-
 void MainWindow :: keyPressEvent(QKeyEvent* event)
 {
 	switch (event->key())
@@ -1045,8 +1025,6 @@ bool MainWindow :: pullPlanIsDependancy(PullPlan* plan)
 
 void MainWindow :: updateLibrary()
 {
-	unhighlightAllLibraryWidgets();
-
 	switch (editorStack->currentIndex())
 	{
 		case COLORBAR_VIEW_MODE:
@@ -1058,8 +1036,10 @@ void MainWindow :: updateLibrary()
 				if (colorEditorWidget->getGlassColor() == cblw->glassColor)
 				{
 					cblw->updatePixmaps();
-					cblw->setDependancy(true, IS_DEPENDANCY);
+					cblw->setDependancy(IS_DEPENDANCY);
 				}
+				else
+					cblw->setDependancy(NO_DEPENDANCY);
 			}
 
 			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
@@ -1069,8 +1049,10 @@ void MainWindow :: updateLibrary()
 				if (pplw->pullPlan->hasDependencyOn(colorEditorWidget->getGlassColor()))
 				{
 					pplw->updatePixmaps();
-					pplw->setDependancy(true, USES_DEPENDANCY);
+					pplw->setDependancy(USES_DEPENDANCY);
 				}
+				else
+					pplw->setDependancy(NO_DEPENDANCY);
 			}
 
 			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
@@ -1080,8 +1062,10 @@ void MainWindow :: updateLibrary()
 				if (plw->piece->hasDependencyOn(colorEditorWidget->getGlassColor()))
 				{
 					plw->updatePixmap();
-					plw->setDependancy(true, USES_DEPENDANCY);
+					plw->setDependancy(USES_DEPENDANCY);
 				}
+				else
+					plw->setDependancy(NO_DEPENDANCY);
 			}
 
 			break;
@@ -1093,7 +1077,9 @@ void MainWindow :: updateLibrary()
 				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 				if (pullPlanEditorWidget->getPullPlan()->hasDependencyOn(cblw->glassColor))
-					cblw->setDependancy(true, USEDBY_DEPENDANCY);
+					cblw->setDependancy(USEDBY_DEPENDANCY);
+				else
+					cblw->setDependancy(NO_DEPENDANCY);
 			}
 			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 			{
@@ -1106,17 +1092,19 @@ void MainWindow :: updateLibrary()
 				if (pullPlanEditorWidget->getPullPlan() == pplw->pullPlan)
 				{
 					pplw->updatePixmaps();
-					pplw->setDependancy(true, IS_DEPENDANCY);
+					pplw->setDependancy(IS_DEPENDANCY);
 				}
 				else if (pullPlanEditorWidget->getPullPlan()->hasDependencyOn(pplw->pullPlan))
 				{
-					pplw->setDependancy(true, USEDBY_DEPENDANCY);
+					pplw->setDependancy(USEDBY_DEPENDANCY);
 				}
 				else if (pplw->pullPlan->hasDependencyOn(pullPlanEditorWidget->getPullPlan()))
 				{
 					pplw->updatePixmaps();
-					pplw->setDependancy(true, USES_DEPENDANCY);
+					pplw->setDependancy(USES_DEPENDANCY);
 				}
+				else
+					pplw->setDependancy(NO_DEPENDANCY);
 			}
 			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
 			{
@@ -1125,8 +1113,10 @@ void MainWindow :: updateLibrary()
 				if (plw->piece->hasDependencyOn(pullPlanEditorWidget->getPullPlan()))
 				{
 					plw->updatePixmap();
-					plw->setDependancy(true, USES_DEPENDANCY);
+					plw->setDependancy(USES_DEPENDANCY);
 				}
+				else
+					plw->setDependancy(NO_DEPENDANCY);
 			}
 
 			break;
@@ -1138,14 +1128,18 @@ void MainWindow :: updateLibrary()
 				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
 				if (pieceEditorWidget->getPiece()->hasDependencyOn(cblw->glassColor))
-					cblw->setDependancy(true, USEDBY_DEPENDANCY);
+					cblw->setDependancy(USEDBY_DEPENDANCY);
+				else
+					cblw->setDependancy(NO_DEPENDANCY);
 			}
 			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 			{
 				PullPlanLibraryWidget* pplw = dynamic_cast<PullPlanLibraryWidget*>(
 					dynamic_cast<QWidgetItem*>(pullPlanLibraryLayout->itemAt(i))->widget());
 				if (pieceEditorWidget->getPiece()->hasDependencyOn(pplw->pullPlan))
-					pplw->setDependancy(true, USEDBY_DEPENDANCY);
+					pplw->setDependancy(USEDBY_DEPENDANCY);
+				else
+					pplw->setDependancy(NO_DEPENDANCY);
 			}
 			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
 			{
@@ -1154,8 +1148,10 @@ void MainWindow :: updateLibrary()
 				if (plw->piece == pieceEditorWidget->getPiece())
 				{
 					plw->updatePixmap();
-					plw->setDependancy(true, IS_DEPENDANCY);
+					plw->setDependancy(IS_DEPENDANCY);
 				}
+				else
+					plw->setDependancy(NO_DEPENDANCY);
 			}
 
 			break;
