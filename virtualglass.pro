@@ -51,6 +51,11 @@ macx {
 	QMAKE_CXXFLAGS_RELEASE += -static-libgcc
 }
 
+# Windows in general
+win32 {
+	RC_FILE = virtualglass.rc
+}
+
 # Windows using MinGW 
 win32:!*-msvc-* {
 	# Just in case, because our header files are named .h
