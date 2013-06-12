@@ -44,6 +44,7 @@ qmake -spec win32-g++ -config release
 # Now package up DLLs and .exe into a new directory
 VERSION=`head -1 ./version.txt | tail -1`
 DEST="./VirtualGlassR$VERSION/"
+ZIP="VirtualGlass-windows-r$VERSION.zip"
 
 echo "Putting everything in $DEST"
 rm -rf $DEST
@@ -52,7 +53,12 @@ cp $BUILDBIN/virtualglass.exe $DEST
 cp ./COPYRIGHT.txt $DEST
 cp $MINGWBIN/libgcc_s_dw2-1.dll $DEST
 cp $MINGWBIN/mingwm10.dll $DEST
+cp $MINGWBIN/libexpat-1.dll $DEST
+cp $MINGWBIN/libstdc++-6.dll $DEST
 cp $QTBIN/QtCore4.dll $DEST
 cp $QTBIN/QtGui4.dll $DEST
 cp $QTBIN/QtOpenGL4.dll $DEST  
+cp $QTBIN/QtNetwork4.dll $DEST  
 
+zip -r $ZIP $DEST
+ls -l $ZIP
