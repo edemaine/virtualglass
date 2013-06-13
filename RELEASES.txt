@@ -1,4 +1,12 @@
 
+***** Revision r1017 *****
+
+-A new toolbar along the library gives quick access to common operations.
+-Emailing your creations from inside VirtualGlass is now possible using the Email button in the toolbar. The recipient receives an image of your cane or piece along with the .glass file, allowing them to modify and use your designs on their computer.
+
+-Various bug fixes. 
+
+
 ***** Revision r952 *****
 
 -Save and load is here! Options in the "File" menu allow saving your glass library or individual objects to glass files (*.glass), as well as load and edit saved glass files. Files are saved in a well-known, human-readable format (JSON) allowing programmatic editing of the files.
