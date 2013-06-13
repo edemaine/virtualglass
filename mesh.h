@@ -52,7 +52,7 @@ namespace MeshInternal
 	void getTemplatePoints(vector<Point2D>& points, unsigned int angularResolution, 
 		enum GeometricShape shape, float radius);
 
-	void applySubplanTransforms(Vertex& v, vector<ancestor>& ancestors, bool isRotInvar);
+	void applySubplanTransforms(Vertex& v, vector<ancestor>& ancestors);
 	void applySubplanTransform(Vertex& v, Point2D location);
 	void applyResizeTransform(Vertex& v, float scale);
 	void applyTwistTransform(Vertex& v, float twist);

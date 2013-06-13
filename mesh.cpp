@@ -170,14 +170,12 @@ void applyPieceTransform(Geometry* geometry, Piece* piece)
 		applyPieceTransform(geometry->vertices[i], piece->twist, piece->spline);
 }
 
-void applySubplanTransforms(Vertex& v, vector<ancestor>& ancestors, bool isRotInvar)
+void applySubplanTransforms(Vertex& v, vector<ancestor>& ancestors)
 {
 	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
 	{
 		ancestor& a = ancestors[i];
 		SubpullTemplate& subTemp = a.parent->subs[a.child];
-		if (isRotInvar)
-			applyTwistTransform(v, -a.parent->twist);
 		applyResizeTransform(v, subTemp.diameter / 2.0);
 		applySubplanTransform(v, subTemp.location);
 		applyTwistTransform(v, a.parent->twist);
@@ -537,22 +535,9 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 	assert(geometry->valid());
 
 	// Actually do the transformations on the basic canonical cylinder mesh
-	bool isRotInvar = (outerShape == CIRCLE_SHAPE);
-	if (!isRotInvar)
-	{
-		for (uint32_t v = outerPointsBottomStart; v < innerPointsBottomStart; ++v)
-			applyTwistTransform(geometry->vertices[v], twist);
-	}
-	isRotInvar = (innerShape == CIRCLE_SHAPE);
-	if (!isRotInvar)
-	{
-		for (uint32_t v = innerPointsBottomStart; v < geometry->vertices.size(); ++v)
-			applyTwistTransform(geometry->vertices[v], twist);
-	}
-	isRotInvar = (outerShape == CIRCLE_SHAPE && innerShape == CIRCLE_SHAPE);
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
-		applySubplanTransforms(geometry->vertices[v], ancestors, isRotInvar);
+		applySubplanTransforms(geometry->vertices[v], ancestors);
 	}
 
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
@@ -666,12 +651,10 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors,
 	assert(geometry->valid());
 
 	// Actually do the transformations on the basic canonical cylinder mesh
-	bool isRotInvar = (shape == CIRCLE_SHAPE);
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
-		if (!isRotInvar)
-			applyTwistTransform(geometry->vertices[v], twist);
-		applySubplanTransforms(geometry->vertices[v], ancestors, isRotInvar);
+		applyTwistTransform(geometry->vertices[v], twist);
+		applySubplanTransforms(geometry->vertices[v], ancestors);
 	}
 
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
