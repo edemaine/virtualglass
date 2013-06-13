@@ -537,6 +537,7 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 	// Actually do the transformations on the basic canonical cylinder mesh
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
+		applyTwistTransform(geometry->vertices[v], twist);
 		applySubplanTransforms(geometry->vertices[v], ancestors);
 	}
 
