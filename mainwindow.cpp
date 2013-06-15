@@ -779,6 +779,7 @@ void MainWindow :: setupLibrary()
 
 	// make three qlabels for a legend
 	QWidget* legendWidget = new QWidget(libraryMasterWidget);
+	legendWidget->setMinimumHeight(80); // to match alphaWidget in ColorEditorWidget
 	libraryAreaLayout->addWidget(legendWidget);
 
 	QGridLayout* legendLayout = new QGridLayout(legendWidget);
@@ -798,9 +799,8 @@ void MainWindow :: setupLibrary()
 	l3->setStyleSheet("border: 2px dotted " + QColor(200, 100, 0, 255).name() + ";");
 	legendLayout->addWidget(l3, 0, 2, Qt::AlignCenter);
 
-	QLabel* descriptionLabel = new QLabel("Click to edit or drag to add", legendWidget);
-	descriptionLabel->setAlignment(Qt::AlignCenter);
-	libraryAreaLayout->addWidget(descriptionLabel);
+	QLabel* descriptionLabel = new QLabel("Library - click to edit or drag to add.", legendWidget);
+	legendLayout->addWidget(descriptionLabel, 1, 0, 1, 3, Qt::AlignCenter);
 }
 
 void MainWindow :: clearLibrary()

@@ -107,6 +107,9 @@ void ColorEditorWidget :: setupLayout()
 
 	// Add alpha (transparency) adjuster
 	QWidget* alphaWidget = new QWidget(this);
+	alphaWidget->setMinimumHeight(80); // to match legendWidget in MainWindow	
+	editorLayout->addWidget(alphaWidget, 3, 0);
+
 	QHBoxLayout* alphaLayout = new QHBoxLayout(alphaWidget);
 	alphaLayout->addWidget(new QLabel("Transparency:", alphaWidget), 0);
 	alphaLayout->addWidget(new QLabel("0%", alphaWidget));
@@ -114,7 +117,6 @@ void ColorEditorWidget :: setupLayout()
 	alphaSlider->setRange(0, 255);
 	alphaLayout->addWidget(alphaSlider, 1);
 	alphaLayout->addWidget(new QLabel("100%", alphaWidget));
-	editorLayout->addWidget(alphaWidget, 3, 0);
 
 	// Add 3D view	
 	editorLayout->addWidget(niceViewWidget, 0, 1, 4, 1);
