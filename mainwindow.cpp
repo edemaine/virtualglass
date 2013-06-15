@@ -317,9 +317,6 @@ void MainWindow :: deleteCurrentEditingObject()
 		}
 		case PIECE_VIEW_MODE:
 		{
-			if (pieceLibraryLayout->count() == 1)
-				return;
-
 			int i;
 			for (i = 0; i < pieceLibraryLayout->count(); ++i)
 			{
@@ -358,7 +355,7 @@ void MainWindow :: mousePressEvent(QMouseEvent* event)
 	GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(childAt(event->pos()));
 	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
 	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
-	
+
 	if (event->button() == Qt::LeftButton && (cblw != NULL || plplw != NULL || plw != NULL))
 	{
 		isDragging = true;
@@ -435,19 +432,21 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 	{
 		setViewMode(COLORBAR_VIEW_MODE);
 		colorEditorWidget->setGlassColor(cblw->glassColor);
+		updateLibrary();
 	}
 	else if (plplw != NULL)
 	{
 		setViewMode(PULLPLAN_VIEW_MODE);
 		pullPlanEditorWidget->setPullPlan(plplw->pullPlan);
+		updateLibrary();
 	}
 	else if (plw != NULL)
 	{
 		setViewMode(PIECE_VIEW_MODE);
 		pieceEditorWidget->setPiece(plw->piece);
+		updateLibrary();
 	}
 
-	updateLibrary();
 }
 
 
@@ -913,6 +912,7 @@ void MainWindow :: newGlassColorButtonClicked()
 	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(newGlassColor, this));
 	setViewMode(COLORBAR_VIEW_MODE);
 	colorEditorWidget->setGlassColor(newGlassColor);
+	setDirtyBit(true);
 	updateLibrary();
 }
 
@@ -921,6 +921,7 @@ void MainWindow :: copyGlassColor()
 	GlassColor* newEditorGlassColor = colorEditorWidget->getGlassColor()->copy();
 	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(newEditorGlassColor, this));
 	colorEditorWidget->setGlassColor(newEditorGlassColor);
+	setDirtyBit(true);
 	updateLibrary();
 }
 
@@ -930,6 +931,7 @@ void MainWindow :: newPullPlanButtonClicked()
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(newEditorPlan, this));
 	setViewMode(PULLPLAN_VIEW_MODE);
 	pullPlanEditorWidget->setPullPlan(newEditorPlan);
+	setDirtyBit(true);
 	updateLibrary();
 }
 
@@ -938,6 +940,7 @@ void MainWindow :: copyPullPlan()
 	PullPlan *newEditorPlan = pullPlanEditorWidget->getPullPlan()->copy();
 	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(newEditorPlan, this));
 	pullPlanEditorWidget->setPullPlan(newEditorPlan);
+	setDirtyBit(true);
 	updateLibrary();
 }
 
@@ -947,6 +950,7 @@ void MainWindow :: newPieceButtonClicked()
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(newEditorPiece, this));
 	setViewMode(PIECE_VIEW_MODE);
 	pieceEditorWidget->setPiece(newEditorPiece);
+	setDirtyBit(true);
 	updateLibrary();
 }
 
@@ -955,6 +959,7 @@ void MainWindow :: copyPiece()
 	Piece* newEditorPiece = pieceEditorWidget->getPiece()->copy();
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(newEditorPiece, this));
 	pieceEditorWidget->setPiece(newEditorPiece);
+	setDirtyBit(true);
 	updateLibrary();
 }
 
