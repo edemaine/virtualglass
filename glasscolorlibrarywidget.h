@@ -9,7 +9,7 @@ class PullPlan;
 class GlassColorLibraryWidget : public AsyncRenderWidget
 {
 	public:
-		GlassColorLibraryWidget(GlassColor* _color, QWidget* _parent=NULL,
+		GlassColorLibraryWidget(GlassColor* _color, QWidget* _parent,
 			PullPlan* _circlePlan=NULL, PullPlan* _squarePlan=NULL);
 		const QPixmap *getDragPixmap();
 		void updatePixmaps();

@@ -12,6 +12,7 @@
 #include "glasscolorlibrarywidget.h"
 #include "pullplaneditorviewwidget.h"
 #include "globalbackgroundcolor.h"
+#include "pullplancrosssectionrender.h"
 
 PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
 {
@@ -86,21 +87,23 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	PullPlan* selectedSubplan = getSubplanAt(mouseLoc);
 	if (selectedSubplan != NULL)
 	{
-		enum GlassMime::Type type = GlassMime::PULLPLAN_MIME;
-		PullPlanLibraryWidget plplw(selectedSubplan);		
-		QPixmap pixmap = *(plplw.getDragPixmap());
-
 	        char buf[500];
-		GlassMime::encode(buf, selectedSubplan, type);
+		GlassMime::encode(buf, selectedSubplan, GlassMime::PULLPLAN_MIME);
 		QByteArray pointerData(buf);
 		QMimeData* mimeData = new QMimeData;
 		mimeData->setText(pointerData);
 
 		QDrag *drag = new QDrag(this);
 		drag->setMimeData(mimeData);
-		drag->setPixmap(pixmap);
-		drag->setHotSpot(QPoint(50, 100));
 
+		QPixmap pixmap(100, 100);
+		pixmap.fill(Qt::transparent);
+		QPainter painter(&pixmap);
+		PullPlanCrossSectionRender::render(&painter, 100, selectedSubplan);
+		painter.end();
+		drag->setPixmap(pixmap);
+
+		drag->setHotSpot(QPoint(50, 100));
 		drag->exec(Qt::CopyAction);
 
 		return;

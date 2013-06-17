@@ -35,7 +35,7 @@ class AsyncRenderWidget : public GlassLibraryWidget
 	Q_OBJECT
 
 	public:
-		AsyncRenderWidget(QWidget *parent=NULL);
+		AsyncRenderWidget(QWidget* parent);
 		virtual ~AsyncRenderWidget();
 
 		//The AsyncRenderWidget now owns the 'RenderData' instance and will delete it:

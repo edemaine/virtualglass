@@ -75,23 +75,16 @@ MainWindow :: MainWindow()
 void MainWindow :: setViewMode(enum ViewMode _mode)
 {
 	editorStack->setCurrentIndex(_mode);
+
 	switch (_mode)
 	{
 		case EMPTY_VIEW_MODE:
-			copyObjectButton->setEnabled(false);
-			copyObjectButton->setText("Copy");
-			deleteObjectButton->setEnabled(false);
-			deleteObjectButton->setText("Delete");
 			exportPLYFileAction->setEnabled(false);
 			exportOBJFileAction->setEnabled(false);
 			saveSelectedAsFileAction->setEnabled(false);
 			shareFileButton->setEnabled(false);
 			break;
 		case COLORBAR_VIEW_MODE:
-			copyObjectButton->setEnabled(true);
-			copyObjectButton->setText("Copy\nColor");
-			deleteObjectButton->setEnabled(true);
-			deleteObjectButton->setText("Delete\nColor");
 			exportPLYFileAction->setEnabled(false);
 			exportOBJFileAction->setEnabled(false);
 			saveSelectedAsFileAction->setEnabled(true);
@@ -99,10 +92,6 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			break;
 		case PULLPLAN_VIEW_MODE:
 			pullPlanEditorWidget->reset3DCamera();
-			copyObjectButton->setEnabled(true);
-			copyObjectButton->setText("Copy\nCane");
-			deleteObjectButton->setEnabled(true);
-			deleteObjectButton->setText("Delete\nCane");
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
@@ -110,10 +99,6 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			break;
 		case PIECE_VIEW_MODE:
 			pieceEditorWidget->reset3DCamera();
-			copyObjectButton->setEnabled(true);
-			copyObjectButton->setText("Copy\nPiece");
-			deleteObjectButton->setEnabled(true);
-			deleteObjectButton->setText("Delete\nPiece");
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
 			saveSelectedAsFileAction->setEnabled(true);
@@ -233,119 +218,123 @@ void MainWindow :: moveCurrentEditingObject(int d)
 
 }
 
+void MainWindow :: deleteCurrentPiece()
+{
+	Piece* currentPiece = pieceEditorWidget->getPiece();
+
+	for (int i = 0; i < pieceLibraryLayout->count(); ++i)
+	{
+		QLayoutItem* oldCur = pieceLibraryLayout->itemAt(i);
+		if (currentPiece != dynamic_cast<PieceLibraryWidget*>(oldCur->widget())->piece)
+			continue;
+
+		oldCur = pieceLibraryLayout->takeAt(i);
+		// this is a memory leak, as the pull plan is never deleted
+		delete oldCur->widget();
+		delete oldCur;
+		setDirtyBit(true);
+
+		if (pieceLibraryLayout->count() == 0)
+		{
+			setViewMode(EMPTY_VIEW_MODE);
+			return;
+		}
+
+		QLayoutItem* newCur = pieceLibraryLayout->itemAt(MAX(i-1, 0));
+		pieceEditorWidget->setPiece(dynamic_cast<PieceLibraryWidget*>(newCur->widget())->piece);		
+		updateLibrary();
+		return;	
+	}
+}
+
+
+
+void MainWindow :: deleteCurrentPullPlan()
+{
+	PullPlan* currentPlan = pullPlanEditorWidget->getPullPlan();
+
+	if (pullPlanIsDependancy(currentPlan))
+	{
+		QMessageBox::warning(this, "Delete failed", 
+			"This cane cannot be deleted:\nother objects use it.");
+		return;
+	}
+
+	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
+	{
+		QLayoutItem* oldCur = pullPlanLibraryLayout->itemAt(i);
+		if (currentPlan != dynamic_cast<PullPlanLibraryWidget*>(oldCur->widget())->pullPlan)
+			continue;
+
+		oldCur = pullPlanLibraryLayout->takeAt(i);
+		// this is a memory leak, as the pull plan is never deleted
+		delete oldCur->widget();
+		delete oldCur;
+		setDirtyBit(true);
+
+		if (pullPlanLibraryLayout->count() == 0)
+		{
+			setViewMode(EMPTY_VIEW_MODE);
+			return;
+		}
+
+		QLayoutItem* newCur = pullPlanLibraryLayout->itemAt(MAX(i-1, 0));
+		pullPlanEditorWidget->setPullPlan(dynamic_cast<PullPlanLibraryWidget*>(newCur->widget())->pullPlan);		
+		updateLibrary();
+		return;	
+	}
+}
+
+void MainWindow :: deleteCurrentGlassColor()
+{
+	GlassColor* currentColor = colorEditorWidget->getGlassColor();
+
+	if (glassColorIsDependancy(currentColor))
+	{
+		QMessageBox::warning(this, "Delete failed", 
+			"This color cannot be deleted:\nother objects use it.");
+		return;
+	}
+
+	for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
+	{
+		QLayoutItem* oldCur = colorBarLibraryLayout->itemAt(i);
+		if (currentColor != dynamic_cast<GlassColorLibraryWidget*>(oldCur->widget())->glassColor)
+			continue;
+
+		oldCur = colorBarLibraryLayout->takeAt(i);
+		// this is a memory leak, as the glass color is never deleted
+		delete oldCur->widget();
+		delete oldCur;
+		setDirtyBit(true);
+
+		if (colorBarLibraryLayout->count() == 0)
+		{
+			setViewMode(EMPTY_VIEW_MODE);
+			return;
+		}
+
+		QLayoutItem* newCur = colorBarLibraryLayout->itemAt(MAX(i-1, 0));
+		colorEditorWidget->setGlassColor(dynamic_cast<GlassColorLibraryWidget*>(newCur->widget())->glassColor);		
+		updateLibrary();
+		return;	
+	}
+}
+
+
 void MainWindow :: deleteCurrentEditingObject()
 {
 	switch (editorStack->currentIndex())
 	{
 		case COLORBAR_VIEW_MODE:
-		{
-			int i;
-			for (i = 0; i < colorBarLibraryLayout->count(); ++i)
-			{
-				QLayoutItem* w = colorBarLibraryLayout->itemAt(i);
-				GlassColor* gc = dynamic_cast<GlassColorLibraryWidget*>(w->widget())->glassColor;
-				if (gc == colorEditorWidget->getGlassColor())
-				{
-					if (glassColorIsDependancy(gc))
-					{
-						QMessageBox::warning(this, "Delete failed", 
-							"This color cannot be deleted:\nother objects use it.");
-					}
-					else
-					{
-						// this may be a memory leak, the library widget is never explicitly deleted
-						w = colorBarLibraryLayout->takeAt(i);
-						delete w->widget();
-						delete w;
-					}
-					break;
-				}
-			}
-
-			if (colorBarLibraryLayout->count() == 0)
-			{
-				setViewMode(EMPTY_VIEW_MODE);
-			}
-			else
-			{
-				colorEditorWidget->setGlassColor(
-					dynamic_cast<GlassColorLibraryWidget*>(colorBarLibraryLayout->itemAt(
-						MIN(colorBarLibraryLayout->count()-1, i))->widget())->glassColor);
-			}
-			updateLibrary();
-			setDirtyBit(true);
+			deleteCurrentGlassColor();			
 			break;
-		}
 		case PULLPLAN_VIEW_MODE:
-		{
-			int i;
-			for (i = 0; i < pullPlanLibraryLayout->count(); ++i)
-			{
-				QLayoutItem* w = pullPlanLibraryLayout->itemAt(i);
-				PullPlan* p = dynamic_cast<PullPlanLibraryWidget*>(w->widget())->pullPlan;
-				if (p == pullPlanEditorWidget->getPullPlan())
-				{
-					if (pullPlanIsDependancy(p))
-					{
-						QMessageBox::warning(this, "Delete failed", 
-							"This cane cannot be deleted:\nother objects use it.");
-					}
-					else
-					{
-						// this may be a memory leak, the library widget is never explicitly deleted
-						w = pullPlanLibraryLayout->takeAt(i);
-						delete w->widget();
-						delete w;
-					}
-					break;
-				}
-			}
-
-			if (pullPlanLibraryLayout->count() == 0)
-			{
-				setViewMode(EMPTY_VIEW_MODE);
-			}
-			else
-			{
-				pullPlanEditorWidget->setPullPlan(
-					dynamic_cast<PullPlanLibraryWidget*>(pullPlanLibraryLayout->itemAt(
-						MIN(pullPlanLibraryLayout->count()-1, i))->widget())->pullPlan);
-			}
-			updateLibrary();
-			setDirtyBit(true);
+			deleteCurrentPullPlan();			
 			break;
-		}
 		case PIECE_VIEW_MODE:
-		{
-			int i;
-			for (i = 0; i < pieceLibraryLayout->count(); ++i)
-			{
-				QLayoutItem* w = pieceLibraryLayout->itemAt(i);
-				Piece* p = dynamic_cast<PieceLibraryWidget*>(w->widget())->piece;
-				if (p == pieceEditorWidget->getPiece())
-				{
-					// this may be a memory leak, the library widget is never explicitly deleted
-					w = pieceLibraryLayout->takeAt(i);
-					delete w->widget();
-					delete w;
-					break;
-				}
-			}
-
-			if (pieceLibraryLayout->count() == 0)
-			{
-				setViewMode(EMPTY_VIEW_MODE);
-			}
-			else
-			{
-				pieceEditorWidget->setPiece(
-					dynamic_cast<PieceLibraryWidget*>(pieceLibraryLayout->itemAt(
-						MIN(pieceLibraryLayout->count()-1, i))->widget())->piece);
-			}
-			updateLibrary();
-			setDirtyBit(true);
+			deleteCurrentPiece();			
 			break;
-		}
 	}
 
 }
@@ -418,15 +407,175 @@ void MainWindow :: mouseMoveEvent(QMouseEvent* event)
 	}
 }
 
-void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
+bool MainWindow::findLibraryWidgetData(GlassLibraryWidget* lw, int* type, QVBoxLayout** layout, int* index)
 {
-	// If this is a drop and not the end of a click, don't process (dropEvent() will do it instead)
-	if (!isDragging || (isDragging && maxDragDistance >= QApplication::startDragDistance()))
+	GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(lw);
+	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(lw);
+	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(lw);
+
+	if (cblw != NULL)
+	{
+		if (cblw->glassColor != colorEditorWidget->getGlassColor())
+		{
+			setEditorLibraryWidget(lw);
+			return false;
+		}
+		*type = 1;
+	}
+	else if (plplw != NULL)
+	{
+		if (plplw->pullPlan != pullPlanEditorWidget->getPullPlan())
+		{
+			setEditorLibraryWidget(lw);
+			return false;
+		}
+		*type = 2;
+	}
+	else if (plw != NULL)
+	{
+		if (plw->piece != pieceEditorWidget->getPiece())
+		{
+			setEditorLibraryWidget(lw);
+			return false;
+		}
+		*type = 3;
+	}
+	else
+		return false;	
+
+	*layout = NULL;
+	switch (*type)
+	{
+		case 1:
+			*layout = colorBarLibraryLayout;
+			break;
+		case 2:
+			*layout = pullPlanLibraryLayout;
+			break;
+		case 3:
+			*layout = pieceLibraryLayout;
+			break;
+	}
+	
+	QLayoutItem* cur;
+	for (*index = 0; *index < (*layout)->count(); ++(*index))
+	{
+		cur = (*layout)->itemAt((*index));
+		if (cur->widget() == lw)
+		{
+			break;
+		}
+	}
+
+	return true;
+} 
+
+void MainWindow::copyLibraryWidget(GlassLibraryWidget* lw)
+{
+	int typeCase;
+	QVBoxLayout* layout;
+	int index;
+
+	if (!findLibraryWidgetData(lw, &typeCase, &layout, &index))
+		return;
+	
+	switch (typeCase)
+	{
+		case 1:	
+		{
+			GlassColor* newEditorGlassColor = colorEditorWidget->getGlassColor()->copy();
+			colorBarLibraryLayout->insertWidget(index, new GlassColorLibraryWidget(newEditorGlassColor, this));
+			colorEditorWidget->setGlassColor(newEditorGlassColor);
+			break;
+		}
+		case 2:
+		{
+			PullPlan *newEditorPlan = pullPlanEditorWidget->getPullPlan()->copy();
+			pullPlanLibraryLayout->insertWidget(index, new PullPlanLibraryWidget(newEditorPlan, this));
+			pullPlanEditorWidget->setPullPlan(newEditorPlan);
+			break;
+		}
+		case 3:
+		{
+			Piece* newEditorPiece = pieceEditorWidget->getPiece()->copy();
+			pieceLibraryLayout->insertWidget(index, new PieceLibraryWidget(newEditorPiece, this));
+			pieceEditorWidget->setPiece(newEditorPiece);
+			break;
+		}
+	}
+	updateLibrary();
+
+	setDirtyBit(true);
+}
+
+bool MainWindow::hasNoDependancies(GlassLibraryWidget* lw)
+{
+	GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(lw);
+	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(lw);
+
+	if (cblw != NULL)
+		return !glassColorIsDependancy(cblw->glassColor);
+	else if (plplw != NULL)
+		return !pullPlanIsDependancy(plplw->pullPlan);
+	else
+		return true;
+}
+
+
+void MainWindow::deleteLibraryWidget(GlassLibraryWidget* lw)
+{
+	int typeCase;
+	QVBoxLayout* layout;
+	int index;
+
+	if (!findLibraryWidgetData(lw, &typeCase, &layout, &index))
 		return;
 
-	GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(childAt(event->pos()));
-	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(childAt(event->pos()));
-	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(childAt(event->pos()));
+	if (layout->count() > 1)
+	{
+		int r = (index == 0) ? 1 : index-1;
+		switch (typeCase)
+		{
+			case 1:
+			{
+				GlassColor* replacement = dynamic_cast<GlassColorLibraryWidget*>(
+					dynamic_cast<QWidgetItem*>(layout->itemAt(r))->widget())->glassColor;
+				colorEditorWidget->setGlassColor(replacement);
+				break;	
+			}
+			case 2:
+			{
+				PullPlan* replacement = dynamic_cast<PullPlanLibraryWidget*>(
+					dynamic_cast<QWidgetItem*>(layout->itemAt(r))->widget())->pullPlan;
+				pullPlanEditorWidget->setPullPlan(replacement);
+				break;	
+			}
+			case 3:
+			{
+				Piece* replacement = dynamic_cast<PieceLibraryWidget*>(
+					dynamic_cast<QWidgetItem*>(layout->itemAt(r))->widget())->piece;
+				pieceEditorWidget->setPiece(replacement);
+				break;	
+			}
+		}
+	}
+	else
+		setViewMode(EMPTY_VIEW_MODE);
+
+	QLayoutItem* cur = layout->takeAt(index);
+	cur->widget()->moveToThread(QApplication::instance()->thread());
+	cur->widget()->deleteLater();
+	delete cur;
+	updateLibrary();
+
+	setDirtyBit(true);
+}
+
+void MainWindow::setEditorLibraryWidget(GlassLibraryWidget* w)
+{
+	GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(w);
+	PullPlanLibraryWidget* plplw = dynamic_cast<PullPlanLibraryWidget*>(w);
+	PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(w);
 
 	if (cblw != NULL)
 	{
@@ -446,9 +595,7 @@ void MainWindow :: mouseReleaseEvent(QMouseEvent* event)
 		pieceEditorWidget->setPiece(plw->piece);
 		updateLibrary();
 	}
-
 }
-
 
 void MainWindow :: setupConnections()
 {
@@ -469,8 +616,6 @@ void MainWindow :: setupConnections()
 	connect(shareFileButton, SIGNAL(clicked()), this, SLOT(shareFileActionTriggered()));
 	connect(email, SIGNAL(success(QString)), this, SLOT(emailSuccess(QString)));
 	connect(email, SIGNAL(failure(QString)), this, SLOT(emailFailure(QString)));
-	connect(copyObjectButton, SIGNAL(clicked()), this, SLOT(copyObjectButtonClicked()));
-	connect(deleteObjectButton, SIGNAL(clicked()), this, SLOT(deleteObjectButtonClicked()));
 
 	// Library stuff
 	connect(newGlassColorButton, SIGNAL(clicked()), this, SLOT(newGlassColorButtonClicked()));
@@ -705,18 +850,6 @@ void MainWindow :: setupToolbar()
 	toolbarLayout->addWidget(shareFileButton);
 	email = new Email();
 
-	toolbarLayout->addSpacing(icon_size);
-
-	copyObjectButton = new QToolButton(toolbarMasterWidget);
-	copyObjectButton->setFixedSize(icon_size, icon_size);
-	copyObjectButton->setText("???");
-	toolbarLayout->addWidget(copyObjectButton);
-
-	deleteObjectButton = new QToolButton(toolbarMasterWidget);
-	deleteObjectButton->setFixedSize(icon_size, icon_size);
-	deleteObjectButton->setText("???");
-	toolbarLayout->addWidget(deleteObjectButton);
-
 	toolbarLayout->addStretch(1);
 }
 
@@ -878,49 +1011,12 @@ void MainWindow :: setupPieceEditor()
 	pieceEditorWidget->updateEverything();
 }
 
-void MainWindow :: copyObjectButtonClicked()
-{
-	switch (editorStack->currentIndex())
-	{
-		case COLORBAR_VIEW_MODE:
-			copyGlassColor();
-			break;
-		case PULLPLAN_VIEW_MODE:
-			copyPullPlan();
-			break;
-		case PIECE_VIEW_MODE:
-			copyPiece();
-			break;
-	}
-}
-
-void MainWindow :: deleteObjectButtonClicked()
-{
-	switch (editorStack->currentIndex())
-	{
-		case COLORBAR_VIEW_MODE:
-		case PULLPLAN_VIEW_MODE:
-		case PIECE_VIEW_MODE:
-			deleteCurrentEditingObject();
-			break;
-	}
-}
-
 void MainWindow :: newGlassColorButtonClicked()
 {
 	GlassColor* newGlassColor = new GlassColor();
 	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(newGlassColor, this));
 	setViewMode(COLORBAR_VIEW_MODE);
 	colorEditorWidget->setGlassColor(newGlassColor);
-	setDirtyBit(true);
-	updateLibrary();
-}
-
-void MainWindow :: copyGlassColor()
-{
-	GlassColor* newEditorGlassColor = colorEditorWidget->getGlassColor()->copy();
-	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(newEditorGlassColor, this));
-	colorEditorWidget->setGlassColor(newEditorGlassColor);
 	setDirtyBit(true);
 	updateLibrary();
 }
@@ -935,29 +1031,11 @@ void MainWindow :: newPullPlanButtonClicked()
 	updateLibrary();
 }
 
-void MainWindow :: copyPullPlan()
-{
-	PullPlan *newEditorPlan = pullPlanEditorWidget->getPullPlan()->copy();
-	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(newEditorPlan, this));
-	pullPlanEditorWidget->setPullPlan(newEditorPlan);
-	setDirtyBit(true);
-	updateLibrary();
-}
-
 void MainWindow :: newPieceButtonClicked()
 {
 	Piece* newEditorPiece = new Piece(PieceTemplate::TUMBLER);
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(newEditorPiece, this));
 	setViewMode(PIECE_VIEW_MODE);
-	pieceEditorWidget->setPiece(newEditorPiece);
-	setDirtyBit(true);
-	updateLibrary();
-}
-
-void MainWindow :: copyPiece()
-{
-	Piece* newEditorPiece = pieceEditorWidget->getPiece()->copy();
-	pieceLibraryLayout->addWidget(new PieceLibraryWidget(newEditorPiece, this));
 	pieceEditorWidget->setPiece(newEditorPiece);
 	setDirtyBit(true);
 	updateLibrary();

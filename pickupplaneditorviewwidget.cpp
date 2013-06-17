@@ -8,6 +8,7 @@
 #include "niceviewwidget.h"
 #include "glassmime.h"
 #include "glasscolor.h"
+#include "pullplancrosssectionrender.h"
 
 PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWidget* parent) : QWidget(parent)
 {
@@ -101,8 +102,6 @@ void PickupPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	getSubplanAt(x, y, &subplan, &subplanIndex);
 	if (subplan != NULL)
 	{
-		PullPlanLibraryWidget plplw(subplan);
-
 		char buf[500];
 		sprintf(buf, "%p %d", subplan, GlassMime::PULLPLAN_MIME);
 		QByteArray pointerData(buf);
@@ -111,9 +110,15 @@ void PickupPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 
 		QDrag *drag = new QDrag(this);
 		drag->setMimeData(mimeData);
-		drag->setPixmap(*(plplw.getDragPixmap()));
-		drag->setHotSpot(QPoint(50, 100));
 
+		QPixmap pixmap(100, 100);
+		pixmap.fill(Qt::transparent);
+		QPainter painter(&pixmap);
+		PullPlanCrossSectionRender::render(&painter, 100, subplan);
+		painter.end();
+		drag->setPixmap(pixmap);
+
+		drag->setHotSpot(QPoint(50, 100));
 		drag->exec(Qt::CopyAction);
 	}
 }

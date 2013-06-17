@@ -10,7 +10,7 @@ class QWidget;
 class PieceLibraryWidget : public AsyncRenderWidget
 {
 	public:
-		PieceLibraryWidget(Piece* _piece, QWidget* parent=0);
+		PieceLibraryWidget(Piece* _piece, QWidget* parent);
 		Piece* piece;
 		void updatePixmap();
 		void updateEyePosition(Vector3f eyePosition);

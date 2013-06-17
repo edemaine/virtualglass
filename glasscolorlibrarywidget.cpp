@@ -23,9 +23,12 @@ GlassColorLibraryWidget :: GlassColorLibraryWidget(GlassColor* _glassColor, QWid
 void GlassColorLibraryWidget :: paintEvent(QPaintEvent *event)
 {
 	AsyncRenderWidget::paintEvent(event);
-	QPainter painter(this);
+
+	QPainter painter;
+	painter.begin(this);
 	painter.setPen(QPen(Qt::black));
-	painter.drawText(rect().adjusted(5, 0, 0, -2), Qt::AlignBottom | Qt::AlignLeft, glassColor->getShortName().c_str());
+	painter.drawText(rect().adjusted(3, 0, 3, 0), Qt::AlignBottom | Qt::AlignLeft, glassColor->getShortName().c_str());
+	painter.end();
 }
 
 void GlassColorLibraryWidget :: updateDragPixmap()

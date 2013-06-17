@@ -29,6 +29,10 @@ class NiceViewWidget;
 class PullPlanEditorWidget;
 class ColorEditorWidget;
 class PieceEditorWidget;
+class GlassColorLibraryWidget;
+class PullPlanLibraryWidget;
+class PieceLibraryWidget;
+class GlassLibraryWidget;
 
 using std::vector;
 
@@ -41,10 +45,13 @@ class MainWindow : public QMainWindow
 		void keyPressEvent(QKeyEvent* e);
 		QString windowTitle();
 		void openFile(QString filename, bool add);
+		void copyLibraryWidget(GlassLibraryWidget* w);
+		void deleteLibraryWidget(GlassLibraryWidget* w);
+		void setEditorLibraryWidget(GlassLibraryWidget* w);
+		bool hasNoDependancies(GlassLibraryWidget* w);
 
 	protected:
 		void mousePressEvent(QMouseEvent* event);
-		void mouseReleaseEvent(QMouseEvent* event);
 		void mouseMoveEvent(QMouseEvent* event);
 		void closeEvent(QCloseEvent *event);
 		void contextMenuEvent(QContextMenuEvent *event);
@@ -75,6 +82,9 @@ class MainWindow : public QMainWindow
 		void setupStatusBar();
 		void setupSaveFile();
 		void initializeRandomPiece();
+		void deleteCurrentGlassColor();
+		void deleteCurrentPullPlan();
+		void deleteCurrentPiece();
 		void deleteCurrentEditingObject();
 		void moveCurrentEditingObject(int d);
 		void setViewMode(enum ViewMode m);
@@ -90,9 +100,7 @@ class MainWindow : public QMainWindow
 		void getDependantLibraryContents(Piece* piece, vector<GlassColor*>& colors, vector<PullPlan*>& plans,
 			vector<Piece*>& pieces);
 		void addToLibrary(vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces);
-		void copyGlassColor();
-		void copyPullPlan();
-		void copyPiece();
+		bool findLibraryWidgetData(GlassLibraryWidget* lw, int* type, QVBoxLayout** layout, int* index);
 
 		// Variables
 		QScrollArea* libraryScrollArea;
@@ -110,8 +118,6 @@ class MainWindow : public QMainWindow
 		QToolButton* openFileButton;
 		QToolButton* saveFileButton;
 		QToolButton* shareFileButton;
-		QToolButton* copyObjectButton;
-		QToolButton* deleteObjectButton;
 
 		QPushButton* newGlassColorButton;
 		QPushButton* newPullPlanButton;
@@ -177,10 +183,6 @@ class MainWindow : public QMainWindow
 		void newPullPlanButtonClicked();
 		void newPieceButtonClicked();
 		void updateLibrary();
-
-		// Toolbar slots
-		void copyObjectButtonClicked();
-		void deleteObjectButtonClicked();
 
 		// Status bar slots
 		void showStatusMessage(const QString& message, unsigned int timeout);
