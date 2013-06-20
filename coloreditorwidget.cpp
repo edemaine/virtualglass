@@ -52,7 +52,6 @@ void ColorEditorWidget :: setGlassColor(GlassColor* _color)
 	updateEverything();
 }
 
-
 void ColorEditorWidget :: collectionComboBoxChanged(int _index)
 {
 	if (_index < collectionComboBox->count() - 1) // if it's not the ``Add collection...'' one
@@ -156,7 +155,7 @@ void ColorEditorWidget :: loadCollection(QString fileName)
 	collectionStack->addWidget(listScrollArea); // add this to the layout
 	listScrollArea->setBackgroundRole(QPalette::Dark);
 	listScrollArea->setWidgetResizable(true);
-	listScrollArea->setFixedWidth(336);
+	listScrollArea->setFixedWidth(338);
 
 	listScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	listScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);

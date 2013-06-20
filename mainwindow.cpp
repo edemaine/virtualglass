@@ -637,7 +637,7 @@ void MainWindow :: setupConnections()
 
 	// view menu 
 	connect(fullscreenViewAction, SIGNAL(triggered()), this, SLOT(fullscreenViewActionTriggered()));
-	connect(nonfullscreenViewAction, SIGNAL(triggered()), this, SLOT(nonfullscreenViewActionTriggered()));
+	connect(windowedViewAction, SIGNAL(triggered()), this, SLOT(windowedViewActionTriggered()));
 
 	// examples menu
 	connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
@@ -661,11 +661,15 @@ void MainWindow :: setupConnections()
 void MainWindow :: fullscreenViewActionTriggered()
 {
 	showFullScreen();
+	fullscreenViewAction->setChecked(true);
+	windowedViewAction->setChecked(false);
 }
 
-void MainWindow :: nonfullscreenViewActionTriggered()
+void MainWindow :: windowedViewActionTriggered()
 {
 	showMaximized();
+	fullscreenViewAction->setChecked(false);
+	windowedViewAction->setChecked(true);
 }
 
 void MainWindow :: depthPeelActionTriggered()
@@ -859,7 +863,7 @@ void MainWindow :: setupLibrary()
 	libraryScrollArea->installEventFilter(this);	
 	libraryScrollArea->setBackgroundRole(QPalette::Dark);
 	libraryScrollArea->setWidgetResizable(true);
-	libraryScrollArea->setFixedWidth(356);
+	libraryScrollArea->setFixedWidth(358);
 	libraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	libraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
@@ -1340,14 +1344,18 @@ void MainWindow::setupMenus()
 	fileMenu->addSeparator();
 	fileMenu->addAction(exitAction);
 
-	//Fullscreen
-	fullscreenViewAction = new QAction("Fullscreen", this);
-	nonfullscreenViewAction = new QAction("Normal", this);
+	// Fullscreen/windowed stuff
+	fullscreenViewAction = new QAction("Full Screen", this);
+	fullscreenViewAction->setCheckable(true);
+	fullscreenViewAction->setChecked(false); 
+	windowedViewAction = new QAction("Windowed", this);
+	windowedViewAction->setCheckable(true);
+	windowedViewAction->setChecked(true); // start true b/c of showMaximized() call in constructor
 
 	// View menu;
 	viewMenu = menuBar()->addMenu("View");
 	viewMenu->addAction(fullscreenViewAction);	
-	viewMenu->addAction(nonfullscreenViewAction);	
+	viewMenu->addAction(windowedViewAction);	
 
 	//examples:random:simple cane
 	randomSimpleCaneAction = new QAction("&Simple Cane", this);

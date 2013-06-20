@@ -124,7 +124,7 @@ class MainWindow : public QMainWindow
 
 		QMenu* viewMenu;
 		QAction *fullscreenViewAction;
-		QAction *nonfullscreenViewAction;
+		QAction *windowedViewAction;
 		QMenu *examplesMenu;
 		QAction *randomSimpleCaneAction;
 		QAction *randomSimplePieceAction;
@@ -159,7 +159,7 @@ class MainWindow : public QMainWindow
 		void attemptToQuit();
 
 		// menu slots
-		void nonfullscreenViewActionTriggered();
+		void windowedViewActionTriggered();
 		void fullscreenViewActionTriggered();
 		void newFileActionTriggered();
 		void openFileActionTriggered();
