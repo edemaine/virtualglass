@@ -71,7 +71,6 @@ class MainWindow : public QMainWindow
 		};
 
 		// Methods
-		void setupToolbar();
 		void setupLibrary();
 		void setupEditors();
 		void setupColorEditor();
@@ -114,10 +113,10 @@ class MainWindow : public QMainWindow
 		PullPlanEditorWidget* pullPlanEditorWidget;
 		PieceEditorWidget* pieceEditorWidget;
 
-		QToolButton* newFileButton;
-		QToolButton* openFileButton;
-		QToolButton* saveFileButton;
-		QToolButton* shareFileButton;
+		QPushButton* newFileButton;
+		QPushButton* openFileButton;
+		QPushButton* saveFileButton;
+		QPushButton* shareFileButton;
 
 		QPushButton* newGlassColorButton;
 		QPushButton* newPullPlanButton;

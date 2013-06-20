@@ -55,7 +55,6 @@ MainWindow :: MainWindow()
 
 	// allocate ALL the memory
 	centralLayout = new QHBoxLayout(centralWidget);
-	setupToolbar();
 	setupLibrary();
 	setupEditors();
 	setupMenus();
@@ -816,43 +815,6 @@ void MainWindow :: setupSaveFile()
 	saveFilename = "[unsaved]"; 
 }
 
-
-void MainWindow :: setupToolbar()
-{
-	QWidget* toolbarMasterWidget = new QWidget(centralWidget);
-	centralLayout->addWidget(toolbarMasterWidget);
-
-	QVBoxLayout* toolbarLayout = new QVBoxLayout(toolbarMasterWidget);
-	toolbarMasterWidget->setLayout(toolbarLayout);
-	toolbarLayout->setContentsMargins(0, 0, 0, 0);
-
-	const int icon_size = 70;
-
-	newFileButton = new QToolButton(toolbarMasterWidget);
-	newFileButton->setFixedSize(icon_size, icon_size);
-	newFileButton->setText("New");
-	newFileButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-	toolbarLayout->addWidget(newFileButton);
-
-	openFileButton = new QToolButton(toolbarMasterWidget);
-	openFileButton->setFixedSize(icon_size, icon_size);
-	openFileButton->setText("Open");
-	toolbarLayout->addWidget(openFileButton);
-
-	saveFileButton = new QToolButton(toolbarMasterWidget);
-	saveFileButton->setFixedSize(icon_size, icon_size);
-	saveFileButton->setText("Save");
-	toolbarLayout->addWidget(saveFileButton);
-
-	shareFileButton = new QToolButton(toolbarMasterWidget);
-	shareFileButton->setFixedSize(icon_size, icon_size);
-	shareFileButton->setText("Email");
-	toolbarLayout->addWidget(shareFileButton);
-	email = new Email();
-
-	toolbarLayout->addStretch(1);
-}
-
 void MainWindow :: setupLibrary()
 {
 	QWidget* libraryMasterWidget = new QWidget(centralWidget);
@@ -862,6 +824,34 @@ void MainWindow :: setupLibrary()
 	libraryMasterWidget->setLayout(libraryAreaLayout);
 	libraryAreaLayout->setContentsMargins(0, 0, 0, 0);
 
+	// Toolbar stuff
+
+	QWidget* toolbarMasterWidget = new QWidget(libraryMasterWidget);
+	libraryAreaLayout->addWidget(toolbarMasterWidget);
+
+	QHBoxLayout* toolbarLayout = new QHBoxLayout(toolbarMasterWidget);
+	toolbarMasterWidget->setLayout(toolbarLayout);
+	toolbarLayout->setContentsMargins(0, 0, 0, 0);
+
+	newFileButton = new QPushButton(toolbarMasterWidget);
+	newFileButton->setText("New");
+	toolbarLayout->addWidget(newFileButton);
+
+	openFileButton = new QPushButton(toolbarMasterWidget);
+	openFileButton->setText("Open");
+	toolbarLayout->addWidget(openFileButton);
+
+	saveFileButton = new QPushButton(toolbarMasterWidget);
+	saveFileButton->setText("Save");
+	toolbarLayout->addWidget(saveFileButton);
+
+	shareFileButton = new QPushButton(toolbarMasterWidget);
+	shareFileButton->setText("Email");
+	toolbarLayout->addWidget(shareFileButton);
+	email = new Email();
+
+	// The actual library
+	
 	libraryScrollArea = new QScrollArea(libraryMasterWidget);
 	libraryAreaLayout->addWidget(libraryScrollArea, 1);
 	// Filter out up/down arrow key events for moving library objects around.
