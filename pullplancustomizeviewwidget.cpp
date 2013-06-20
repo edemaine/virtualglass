@@ -547,12 +547,12 @@ void PullPlanCustomizeViewWidget :: drawSubplan(Point2D upperLeft, float drawWid
 	// Fill the subplan area with some `cleared out' color
 	painter->setBrush(GlobalBackgroundColor::qcolor);
 	painter->setPen(Qt::NoPen);
-	paintShape(upperLeft, drawWidth, plan->getOutermostCasingShape(), painter);
+	paintShape(upperLeft, drawWidth, plan->outermostCasingShape(), painter);
 
 	// Do casing colors outermost to innermost to get concentric rings of each casing's color
 	// Skip outermost casing (that is done by your parent) and innermost (that is the `invisible'
 	// casing for you to resize your subcanes)
-	for (unsigned int i = plan->getCasingCount() - 1; i < plan->getCasingCount(); --i)
+	for (unsigned int i = plan->casingCount() - 1; i < plan->casingCount(); --i)
 	{
 		float casingWidth = drawWidth * plan->getCasingThickness(i);
 		float casingHeight = drawHeight * plan->getCasingThickness(i);
@@ -565,7 +565,7 @@ void PullPlanCustomizeViewWidget :: drawSubplan(Point2D upperLeft, float drawWid
 		painter->setPen(Qt::NoPen); // Will draw boundary after all filling is done
 		paintShape(casingUpperLeft, casingWidth, plan->getCasingShape(i), painter);
 
-		Color casingColor = plan->getCasingColor(i)->getColor();
+		Color casingColor = plan->getCasingColor(i)->color();
 		QColor qc(255*casingColor.r, 255*casingColor.g, 255*casingColor.b, 255*casingColor.a);
 		painter->setBrush(qc);
 		setBoundaryPainter(painter, outermostLevel, outermostLevel);
@@ -681,7 +681,7 @@ void PullPlanCustomizeViewWidget :: paintEvent(QPaintEvent *event)
 
 	painter.setBrush(Qt::NoBrush);
 	setBoundaryPainter(&painter, true, true);
-	paintShape(drawUpperLeft, squareSize - 20, plan->getOutermostCasingShape(), &painter);
+	paintShape(drawUpperLeft, squareSize - 20, plan->outermostCasingShape(), &painter);
 
 	drawSubplan(drawUpperLeft, squareSize - 20, squareSize - 20, plan, true, &painter);
 

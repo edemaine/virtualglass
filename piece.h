@@ -18,7 +18,7 @@ class Piece
 		Piece(enum PieceTemplate::Type t);
 
 		void setTemplateType(enum PieceTemplate::Type t, bool force=false);
-		enum PieceTemplate::Type getTemplateType();
+		enum PieceTemplate::Type templateType();
 
 		Piece* copy() const;
 		PickupPlan* pickup;

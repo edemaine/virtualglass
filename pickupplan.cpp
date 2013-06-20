@@ -11,7 +11,6 @@
 
 PickupPlan :: PickupPlan(enum PickupTemplate::Type _type) 
 {
-	vertices = 0;
 	casingGlassColor = underlayGlassColor = overlayGlassColor = GlobalGlass::color();
 	setTemplateType(_type, true);
 }
@@ -36,16 +35,6 @@ PickupPlan* PickupPlan :: copy() const
 	c->underlayGlassColor = underlayGlassColor;
 
 	return c;
-}
-
-void PickupPlan :: setVertices(unsigned int verts)
-{
-	this->vertices = verts;
-}
-
-unsigned int PickupPlan :: getVertices()
-{
-	return this->vertices;
 }
 
 void PickupPlan :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
@@ -257,12 +246,12 @@ void PickupPlan :: setTemplateType(enum PickupTemplate::Type _type, bool force) 
 	updateSubs();
 }
 
-enum PickupTemplate::Type PickupPlan :: getTemplateType() {
-
-	return this->type;
+enum PickupTemplate::Type PickupPlan :: templateType() 
+{
+	return type;
 }
 
-unsigned int PickupPlan :: getParameterCount()
+unsigned int PickupPlan :: parameterCount()
 {
 	return parameters.size();
 }

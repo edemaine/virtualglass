@@ -12,16 +12,16 @@ using std::string;
 class PureColorLibraryWidget : public QLabel
 {
 	public:
-		PureColorLibraryWidget(GlassColor* color, QWidget* parent=0);
-		GlassColor* getGlassColorCopy();
-		Color getColor();
-		string getShortName();
-		string getLongName();
+		PureColorLibraryWidget(GlassColor* _color, QWidget* parent=0);
+		GlassColor* glassColorCopy();
+		Color color();
+		string shortName();
+		string longName();
 		void setSelected(bool s);
 
 	private:
 		void renderPixmap();
-		GlassColor* color;
+		GlassColor* _color;
 		bool isSelected;
 };
 

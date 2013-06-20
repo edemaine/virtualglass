@@ -4,14 +4,14 @@
 #include "purecolorlibrarywidget.h"
 #include "glasscolor.h"
 
-PureColorLibraryWidget :: PureColorLibraryWidget(GlassColor* _color, QWidget* parent): QLabel(parent)
+PureColorLibraryWidget :: PureColorLibraryWidget(GlassColor* __color, QWidget* parent): QLabel(parent)
 {
 	setFixedSize(300, 40);
 	setScaledContents(true);
 	setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
 	isSelected = false;
-	this->color = _color;
+	this->_color = __color;
 
 	renderPixmap();
 }
@@ -30,10 +30,10 @@ void PureColorLibraryWidget :: renderPixmap()
 	QPixmap pixmap(300, 40);
 	QPainter painter(&pixmap);
 	painter.fillRect(pixmap.rect(), QBrush(Qt::white));
-	Color c = color->getColor();
+	Color c = _color->color();
 	painter.fillRect(QRect(10, 10, 20, 20), QBrush(QColor(255*c.r, 255*c.g, 255*c.b, 255*c.a)));
 	painter.drawRect(QRect(10, 10, 20, 20));
-	painter.drawText(QPointF(40, 25), color->getLongName().c_str());
+	painter.drawText(QPointF(40, 25), _color->longName().c_str());
 
 	// do highlighting if selected
 	if (isSelected)
@@ -50,23 +50,23 @@ void PureColorLibraryWidget :: renderPixmap()
 	setPixmap(pixmap);
 }
 
-GlassColor* PureColorLibraryWidget :: getGlassColorCopy()
+GlassColor* PureColorLibraryWidget :: glassColorCopy()
 {
-	return deep_copy(color);
+	return deep_copy(_color);
 }
 
-Color PureColorLibraryWidget :: getColor()
+Color PureColorLibraryWidget :: color()
 {
-	return color->getColor();
+	return _color->color();
 }
 
-string PureColorLibraryWidget :: getShortName()
+string PureColorLibraryWidget :: shortName()
 {
-	return color->getShortName();
+	return _color->shortName();
 }
 
-string PureColorLibraryWidget :: getLongName()
+string PureColorLibraryWidget :: longName()
 {
-	return color->getLongName();
+	return _color->longName();
 }
 

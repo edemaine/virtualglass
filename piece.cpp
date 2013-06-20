@@ -136,7 +136,7 @@ void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
 
 }
 
-enum PieceTemplate::Type Piece :: getTemplateType()
+enum PieceTemplate::Type Piece :: templateType()
 {
 	return type;
 }

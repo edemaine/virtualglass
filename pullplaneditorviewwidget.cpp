@@ -73,7 +73,7 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	Point2D mouseLoc = mouseToCaneCoords(event->pos().x(), event->pos().y());
 
 	// Check for casing resize
-	for (unsigned int i = 0; i < plan->getCasingCount() - 1; ++i) 
+	for (unsigned int i = 0; i < plan->casingCount() - 1; ++i) 
 	{
 		if (isOnCasing(i, mouseLoc))
 		{
@@ -118,7 +118,7 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 		QPixmap _pixmap(200, 200);
 		_pixmap.fill(Qt::transparent);
 		QPainter painter(&_pixmap);
-		Color c = selectedColor->getColor();
+		Color c = selectedColor->color();
 		QColor qc(255*c.r, 255*c.g, 255*c.b, MAX(255*c.a, 30));
 		painter.setBrush(qc);
 		painter.setPen(Qt::NoPen);
@@ -145,7 +145,7 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 
 int PullPlanEditorViewWidget :: getCasingIndexAt(Point2D loc)
 {
-	for (unsigned int i = 0; i < plan->getCasingCount(); ++i) 
+	for (unsigned int i = 0; i < plan->casingCount(); ++i) 
 	{
 		if (getShapeRadius(plan->getCasingShape(i), loc) < plan->getCasingThickness(i))
 			return i;
@@ -293,7 +293,7 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEv
 		case GlassMime::COLORLIBRARY_MIME:
 		{
 			GlassColorLibraryWidget* draggedLibraryColor = reinterpret_cast<GlassColorLibraryWidget*>(ptr);
-			highlightColor = draggedLibraryColor->glassColor->getColor();
+			highlightColor = draggedLibraryColor->glassColor->color();
 			int subplanIndexUnderMouse = getSubplanIndexAt(mouseLoc);
 			if (subplanIndexUnderMouse != -1)
 			{
@@ -317,7 +317,7 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEv
 				break;
 			if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
 			{
-				for (unsigned int i = 0; i < plan->getCasingCount(); ++i)
+				for (unsigned int i = 0; i < plan->casingCount(); ++i)
 					casingsHighlighted.insert(i);
 			}
 			else
@@ -327,13 +327,13 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEv
 		case GlassMime::COLOR_MIME:
 		{
 			GlassColor* draggedColor = reinterpret_cast<GlassColor*>(ptr);
-			highlightColor = draggedColor->getColor();
+			highlightColor = draggedColor->color();
 			int casingIndexUnderMouse = getCasingIndexAt(mouseLoc);
 			if (casingIndexUnderMouse == -1)
 				break;
 			if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
 			{
-				for (unsigned int i = 0; i < plan->getCasingCount(); ++i)
+				for (unsigned int i = 0; i < plan->casingCount(); ++i)
 					casingsHighlighted.insert(i);
 			}
 			else
@@ -349,13 +349,13 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEv
 			int subplanIndexUnderMouse = getSubplanIndexAt(mouseLoc);
 			if (subplanIndexUnderMouse == -1)
 				break;
-			if (draggedPlan->getOutermostCasingShape() != plan->subs[subplanIndexUnderMouse].shape)
+			if (draggedPlan->outermostCasingShape() != plan->subs[subplanIndexUnderMouse].shape)
 				break;
 			if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
 			{
 				for (unsigned int i = 0; i < plan->subs.size(); ++i)
 				{
-					if (draggedPlan->getOutermostCasingShape() == plan->subs[i].shape)
+					if (draggedPlan->outermostCasingShape() == plan->subs[i].shape)
 						subplansHighlighted.insert(i);
 				}
 			}
@@ -413,7 +413,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			for (set<unsigned int>::iterator it = subplansHighlighted.begin(); it != subplansHighlighted.end(); ++it)
 			{
 				SubpullTemplate& sub = plan->subs[*it];
-				if (sub.shape == draggedPlan->getOutermostCasingShape())
+				if (sub.shape == draggedPlan->outermostCasingShape())
 					sub.plan = draggedPlan;	
 			}
 			break;
@@ -479,19 +479,19 @@ void PullPlanEditorViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth,
 	// Fill the subplan area with some `cleared out' color
 	painter->setBrush(GlobalBackgroundColor::qcolor);
 	painter->setPen(Qt::NoPen);
-	paintShape(upperLeft, drawWidth, plan->getOutermostCasingShape(), painter);
+	paintShape(upperLeft, drawWidth, plan->outermostCasingShape(), painter);
 
 	if (highlightThis)
 	{
 		painter->setBrush(QColor(255*highlightColor.r, 255*highlightColor.g, 255*highlightColor.b,
 			255*highlightColor.a));
 		painter->setPen(Qt::NoPen);
-		paintShape(upperLeft, drawWidth, plan->getOutermostCasingShape(), painter);
+		paintShape(upperLeft, drawWidth, plan->outermostCasingShape(), painter);
 		return;
 	}
 
 	// Do casing colors outermost to innermost to get concentric rings of each casing's color
-	for (unsigned int i = plan->getCasingCount() - 1; i < plan->getCasingCount(); --i) 
+	for (unsigned int i = plan->casingCount() - 1; i < plan->casingCount(); --i) 
 	{
 		float casingWidth = drawWidth * plan->getCasingThickness(i);
 		float casingHeight = drawHeight * plan->getCasingThickness(i);
@@ -512,7 +512,7 @@ void PullPlanEditorViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth,
 		}
 		else
 		{
-			Color c = plan->getCasingColor(i)->getColor();
+			Color c = plan->getCasingColor(i)->color();
 			QColor qc(255*c.r, 255*c.g, 255*c.b, 255*c.a);
 			painter->setBrush(qc);
 		}
@@ -555,7 +555,7 @@ void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
 
 	painter.setBrush(Qt::NoBrush);
 	setBoundaryPainter(&painter, true);
-	paintShape(upperLeft, squareSize - 20, plan->getOutermostCasingShape(), &painter);
+	paintShape(upperLeft, squareSize - 20, plan->outermostCasingShape(), &painter);
 
 	painter.end();
 }

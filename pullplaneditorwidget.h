@@ -42,13 +42,13 @@ class PullPlanEditorWidget : public QWidget
 	public:
 		PullPlanEditorWidget(QWidget* parent=0);
 		void resetPullPlan();
-		PullPlan* getPullPlan();
+		PullPlan* pullPlan();
 		void setPullPlan(PullPlan* p);
 		void seedTemplates();
 		void writePlanToPLYFile(QString& filename);
 		void writePlanToOBJFile(QString& filename);
 		void updateEverything();
-		QImage getPullPlanImage();
+		QImage pullPlanImage();
 		void reset3DCamera();
 
 	protected:

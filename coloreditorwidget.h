@@ -33,7 +33,7 @@ class ColorEditorWidget : public QWidget
 		void resetGlassColor();
 		void setGlassColor(GlassColor* _color);
 		void updateEverything();
-		GlassColor* getGlassColor();
+		GlassColor* glassColor();
 		NiceViewWidget* niceViewWidget;
 
 	signals:
@@ -50,7 +50,7 @@ class ColorEditorWidget : public QWidget
 
 	private:
 		Geometry geometry;
-		GlassColor* glassColor;	
+		GlassColor* color;	
 		QComboBox* collectionComboBox;
 		QGridLayout* editorLayout;
 		QSlider* alphaSlider;
@@ -66,7 +66,6 @@ class ColorEditorWidget : public QWidget
 		void setupLayout();
 		void setupConnections();
 		void loadCollection(QString fileName);
-		static string getShortColorName(string colorName);
 };
 
 

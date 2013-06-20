@@ -84,7 +84,7 @@ PickupPlan* randomPickup(PullPlan* pullPlan1, PullPlan* pullPlan2)
 
 	// set parameters
 	TemplateParameter p;
-	for (unsigned int i = 0; i < pickup->getParameterCount(); ++i)
+	for (unsigned int i = 0; i < pickup->parameterCount(); ++i)
 	{
 		pickup->getParameter(i, &p);
 		// not setting to upper intervals of parameter values for efficiency reasons 

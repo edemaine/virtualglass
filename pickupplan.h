@@ -20,13 +20,11 @@ class PickupPlan
 		PickupPlan();
 
 		void setTemplateType(enum PickupTemplate::Type t, bool force=false);
-		enum PickupTemplate::Type getTemplateType();
+		enum PickupTemplate::Type templateType();
 
-		unsigned int getParameterCount();
+		unsigned int parameterCount();
 		void getParameter(unsigned int index, TemplateParameter* dest);
 		void setParameter(unsigned int index, int value);
-		void setVertices(unsigned int);
-		unsigned int getVertices();
 
 		PickupPlan* copy() const;
 
@@ -41,7 +39,6 @@ class PickupPlan
 			enum PickupCaneOrientation ori, float length, float width, enum GeometricShape s); 
 		enum PickupTemplate::Type type;
 		vector<TemplateParameter> parameters;
-		unsigned int vertices;
 };
 
 PickupPlan *deep_copy(const PickupPlan *);

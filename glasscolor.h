@@ -10,23 +10,23 @@ class GlassColor
 {
 	public:
 		GlassColor();
-		GlassColor(Color _color, string _shortName, string _longName);
+		GlassColor(Color __color, string __shortName, string __longName);
 
-		Color getColor();
+		Color color();
 		void setColor(Color _color);
 
-		string getShortName();
+		string shortName();
 		void setShortName(string _name);
 
-		string getLongName();
+		string longName();
 		void setLongName(string _name);
 
 		GlassColor* copy() const;
 
 	private:
-		Color color;
-		string shortName;	
-		string longName;	
+		Color _color;
+		string _shortName;	
+		string _longName;	
 };
 
 GlassColor* deep_copy(const GlassColor* _gc);

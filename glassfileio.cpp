@@ -470,10 +470,10 @@ void readBuildInformation(Json::Value& root, unsigned int& revision, string& dat
 void writeColor(Json::Value& root, GlassColor* color, unsigned int colorIndex)
 {
 	string colorname = idAndNameToString(colorIndex, "Color");
-	Color c = color->getColor();
+	Color c = color->color();
 
-	root[colorname]["Short name"] = color->getShortName();
-	root[colorname]["Long name"] = color->getLongName();
+	root[colorname]["Short name"] = color->shortName();
+	root[colorname]["Long name"] = color->longName();
 	root[colorname]["R"] = c.r;
 	root[colorname]["G"] = c.g;
 	root[colorname]["B"] = c.b;
@@ -570,12 +570,12 @@ void writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<Pu
 	string canename = idAndNameToString(caneIndex, "Cane");
 	
 	// write singletons: pull template, twist
-	root[canename]["Pull template"] = pullTemplateToString(cane->getTemplateType());
+	root[canename]["Pull template"] = pullTemplateToString(cane->templateType());
 	root[canename]["Twist"] = cane->twist;
 
 	// write casings	
 	root[canename]["Casings"];
-	for (unsigned int i = 0; i < cane->getCasingCount(); ++i)
+	for (unsigned int i = 0; i < cane->casingCount(); ++i)
 	{
 		string casingName = idAndNameToString(i, "Casing");
 		root[canename]["Casings"][casingName]["Index"] = i;
@@ -585,7 +585,7 @@ void writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<Pu
 	}
 
 	// write pull template parameters
-	root[canename]["Count"] = cane->getCount();
+	root[canename]["Count"] = cane->count();
 
 	// loop over subpulls
 	root[canename]["Subcanes"];
@@ -650,7 +650,7 @@ void readCaneSubcanes(Json::Value& root, PullPlan* cane, map<unsigned int, PullP
 {
 	// if the cane's template type is custom, then it is impossible to know how many subcanes it has
 	// so we make an initial pass over the subcanes just to build an initial list of the correct size
-	if (cane->getTemplateType() == PullTemplate::CUSTOM)
+	if (cane->templateType() == PullTemplate::CUSTOM)
 	{
 		Point2D location;
 		for (unsigned int i = 0; i < root["Subcanes"].getMemberNames().size(); ++i)
@@ -769,14 +769,14 @@ void writePickup(Json::Value& root, PickupPlan* pickup, unsigned int pickupIndex
 	string pickupname = idAndNameToString(pickupIndex, "Pickup");
 
 	// write singletons: casing color, overlay color, underlay color, pickup template
-	root[pickupname]["Pickup template"] = pickupTemplateToString(pickup->getTemplateType()); 
+	root[pickupname]["Pickup template"] = pickupTemplateToString(pickup->templateType()); 
 	root[pickupname]["Casing color pointer"] = colorMap[pickup->casingGlassColor]; 
 	root[pickupname]["Overlay color pointer"] = colorMap[pickup->overlayGlassColor];
 	root[pickupname]["Underlay color pointer"] = colorMap[pickup->underlayGlassColor];
 		
 	// write pickup template parameters
 	root[pickupname]["Pickup template parameters"];
-	for (unsigned int i = 0; i < pickup->getParameterCount(); ++i)
+	for (unsigned int i = 0; i < pickup->parameterCount(); ++i)
 	{
 		TemplateParameter tmpParam;
 		pickup->getParameter(i, &tmpParam);
@@ -868,7 +868,7 @@ void writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<Pu
 	string piecename = idAndNameToString(pieceIndex, "Piece");
 
 	// write singletons: piece template, twist
-	root[piecename]["Piece template"] = pieceTemplateToString(piece->getTemplateType());
+	root[piecename]["Piece template"] = pieceTemplateToString(piece->templateType());
 	root[piecename]["Twist"] = piece->twist;
 
 	// write piece template parameters

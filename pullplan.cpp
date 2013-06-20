@@ -29,8 +29,8 @@ PullPlan :: PullPlan(PullTemplate::Type _templateType)
 	// initialize casings and subplans to something simple
 	casings.push_back(Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
 	casings[0].shape = CIRCLE_SHAPE;
-	count = 0;
-	this->templateType = PullTemplate::BASE_CIRCLE;
+	this->_count = 0;
+	this->type = PullTemplate::BASE_CIRCLE;
 
 	// now initialize for real
 	setTemplateType(_templateType);
@@ -70,19 +70,19 @@ bool PullPlan :: hasDependencyOn(GlassColor* glassColor) {
 	return childrenAreDependent;
 }
 
-void PullPlan :: setTemplateType(PullTemplate::Type templateType) 
+void PullPlan :: setTemplateType(PullTemplate::Type _templateType) 
 {
-	if (templateType == this->templateType)
+	if (_templateType == this->type)
 		return;
 
 	// if you're switching to a template where count matters, and it's a funky value,
 	// set it to something more reasonable
-	if (this->count < 2 && templateHasSubplans(templateType))
-		this->count = 7;
+	if (this->_count < 2 && templateHasSubplans(_templateType))
+		this->_count = 7;
 
-	this->templateType = templateType;
+	this->type = _templateType;
 
-	switch (templateType) 
+	switch (_templateType) 
 	{
 		case PullTemplate::BASE_CIRCLE:
 			casings[0].shape = CIRCLE_SHAPE;
@@ -137,8 +137,8 @@ void PullPlan :: setOutermostCasingColor(GlassColor* gc)
 	this->casings[casings.size()-1].glassColor = gc;
 }
 
-GlassColor* PullPlan :: getOutermostCasingColor() {
-
+GlassColor* PullPlan :: outermostCasingColor() 
+{
 	return this->casings[casings.size()-1].glassColor;
 }
 
@@ -154,24 +154,24 @@ bool PullPlan :: hasMinimumCasingCount() {
 }	
 		
 
-unsigned int PullPlan :: getCasingCount() {
+unsigned int PullPlan :: casingCount() {
 
 	return this->casings.size();
 }
 
-enum PullTemplate::Type PullPlan :: getTemplateType() {
-
-	return this->templateType;
+enum PullTemplate::Type PullPlan :: templateType() 
+{
+	return this->type;
 }
 
-unsigned int PullPlan :: getCount()
+unsigned int PullPlan :: count()
 {
-	return this->count;
+	return this->_count;
 }
 
-void PullPlan :: setCount(unsigned int _count)
+void PullPlan :: setCount(unsigned int __count)
 {
-	this->count = _count;
+	this->_count = __count;
 	resetSubs(false);
 }
 
@@ -220,7 +220,7 @@ void PullPlan :: addCasing(enum GeometricShape _shape) {
 	}
 	
 	// if casing addition is circle around a square, rescale everything down a bit more
-	if (_shape == CIRCLE_SHAPE && getOutermostCasingShape() == SQUARE_SHAPE) {		
+	if (_shape == CIRCLE_SHAPE && outermostCasingShape() == SQUARE_SHAPE) {		
 		for (unsigned int i = 0; i < casings.size(); ++i) {
 			casings[i].thickness *= 1 / SQRT_TWO;
 		}
@@ -228,7 +228,7 @@ void PullPlan :: addCasing(enum GeometricShape _shape) {
 
 	// add the new casing
 	casings.push_back(Casing(1.0, _shape, GlobalGlass::color()));
-	if (this->getOutermostCasingShape() != CIRCLE_SHAPE)
+	if (this->outermostCasingShape() != CIRCLE_SHAPE)
 		this->twist = 0.0;
 
 	// update subpulls by rescaling them according to innermost casing rescaling
@@ -256,7 +256,7 @@ void PullPlan :: setCasingThickness(float t, unsigned int index) {
 
 void PullPlan :: setOutermostCasingShape(enum GeometricShape _shape) 
 {
-	if (_shape == getOutermostCasingShape()) 
+	if (_shape == outermostCasingShape()) 
 		return;
 
 	if (this->casings.size() > 1) 
@@ -276,15 +276,15 @@ void PullPlan :: setOutermostCasingShape(enum GeometricShape _shape)
 		// "I am this shape" (e.g. BASE_*), then changing casing shape should
 		// change template type implicitly, since a a BASE_CIRCLE consisting of 
 		// a single SQUARE_SHAPE casing makes no sense
-		if (this->templateType == PullTemplate::BASE_CIRCLE && _shape == SQUARE_SHAPE)
+		if (this->type == PullTemplate::BASE_CIRCLE && _shape == SQUARE_SHAPE)
 			this->setTemplateType(PullTemplate::BASE_SQUARE);
-		else if (this->templateType == PullTemplate::BASE_SQUARE && _shape == CIRCLE_SHAPE)
+		else if (this->type == PullTemplate::BASE_SQUARE && _shape == CIRCLE_SHAPE)
 			this->setTemplateType(PullTemplate::BASE_CIRCLE);
 	}
 
 	// DO THE CHANGE
 	casings[casings.size()-1].shape = _shape;
-	if (this->getOutermostCasingShape() != CIRCLE_SHAPE)
+	if (this->outermostCasingShape() != CIRCLE_SHAPE)
 		this->twist = 0.0;
 
 	resetSubs(false);
@@ -295,7 +295,7 @@ float PullPlan :: getCasingThickness(unsigned int index)
 	return this->casings[index].thickness;
 }
 
-enum GeometricShape PullPlan :: getOutermostCasingShape() 
+enum GeometricShape PullPlan :: outermostCasingShape() 
 {
 	return this->casings[casings.size()-1].shape;
 }
@@ -348,16 +348,16 @@ void PullPlan :: resetSubs(bool hardReset)
 
 	vector<SubpullTemplate> newSubs;
 	
-	switch (templateType) 
+	switch (type) 
 	{
 		case PullTemplate::BASE_CIRCLE:
 		case PullTemplate::BASE_SQUARE:
 			break;
 		case PullTemplate::HORIZONTAL_LINE_CIRCLE:
 		{
-			for (unsigned int i = 0; i < this->count; ++i) 
+			for (unsigned int i = 0; i < this->_count; ++i) 
 			{
-				float littleRadius = (2 * radius / this->count) / 2;
+				float littleRadius = (2 * radius / this->_count) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
 				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0);
 			}
@@ -366,9 +366,9 @@ void PullPlan :: resetSubs(bool hardReset)
 		case PullTemplate::HORIZONTAL_LINE_SQUARE:
 		{
 			radius *= 0.9;
-			for (unsigned int i = 0; i < this->count; ++i) 
+			for (unsigned int i = 0; i < this->_count; ++i) 
 			{
-				float littleRadius = (2 * radius / this->count) / 2;
+				float littleRadius = (2 * radius / this->_count) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
 				pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, littleRadius * 2.0);
 			}
@@ -376,10 +376,10 @@ void PullPlan :: resetSubs(bool hardReset)
 		}
 		case PullTemplate::SURROUNDING_CIRCLE:
 		{
-			if (count == 0)
+			if (this->_count == 0)
 				break;
 
-			unsigned int littleCount = MAX(this->count-1, 3);
+			unsigned int littleCount = MAX(this->_count-1, 3);
 			float theta = TWO_PI / littleCount;
 			float k = sin(theta/2) / (1 + sin(theta/2));
 			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, (1 - 2 * k) * 2 * radius);
@@ -395,11 +395,11 @@ void PullPlan :: resetSubs(bool hardReset)
 		case PullTemplate::CROSS:
 		case PullTemplate::TRIPOD:
 		{
-			if (this->count == 0)
+			if (this->_count == 0)
 				break;
 
-			unsigned int wings = 3 + static_cast<int>(this->templateType == PullTemplate::CROSS);
-			unsigned int sideCount = (this->count + 1) / wings; 
+			unsigned int wings = 3 + static_cast<int>(this->type == PullTemplate::CROSS);
+			unsigned int sideCount = (this->_count + 1) / wings; 
 			float littleRadius = (radius / (sideCount + 0.5)) / 2.0;
 	
 			p.x = p.y = 0.0;
@@ -418,14 +418,14 @@ void PullPlan :: resetSubs(bool hardReset)
 		case PullTemplate::SQUARE_OF_CIRCLES:
 		case PullTemplate::SQUARE_OF_SQUARES:
 		{
-			if (this->count == 0)
+			if (this->_count == 0)
 				break;
 
 			if (this->casings[0].shape == CIRCLE_SHAPE)
 				radius *= 1 / SQRT_TWO;
 
 			unsigned int sideCount = 0;
-			while (sideCount * sideCount < this->count)
+			while (sideCount * sideCount < this->_count)
 				++sideCount;
 			float littleRadius = radius / sideCount;
 
@@ -440,7 +440,7 @@ void PullPlan :: resetSubs(bool hardReset)
 					j = s;
 					p.x = -radius + littleRadius + 2 * littleRadius * i;
 					p.y = -radius + littleRadius + 2 * littleRadius * j;
-					if (this->templateType == PullTemplate::SQUARE_OF_CIRCLES)
+					if (this->type == PullTemplate::SQUARE_OF_CIRCLES)
 						pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 					else
 						pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius);
@@ -450,7 +450,7 @@ void PullPlan :: resetSubs(bool hardReset)
 					i = s;
 					p.x = -radius + littleRadius + 2 * littleRadius * i;
 					p.y = -radius + littleRadius + 2 * littleRadius * j;
-					if (this->templateType == PullTemplate::SQUARE_OF_CIRCLES)
+					if (this->type == PullTemplate::SQUARE_OF_CIRCLES)
 						pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 					else
 						pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius);
@@ -461,11 +461,11 @@ void PullPlan :: resetSubs(bool hardReset)
 		}
 		case PullTemplate::SURROUNDING_SQUARE:
 		{
-			if (count == 0)
+			if (this->_count == 0)
 				break;
 
 			// (1-8) : 2, (9-12) : 3, (13-16) : 4
-			unsigned int sideCount = (MAX(this->count, 5) + 3) / 4; 
+			unsigned int sideCount = (MAX(this->_count, 5) + 3) / 4; 
 
 			if (this->casings[0].shape == CIRCLE_SHAPE)
 				radius *= 1 / SQRT_TWO;
@@ -523,11 +523,11 @@ void PullPlan :: resetSubs(bool hardReset)
 PullPlan* PullPlan :: copy() const 
 {
 
-	PullPlan* c = new PullPlan(templateType);
+	PullPlan* c = new PullPlan(type);
 
 	c->casings = casings;
 	c->twist = twist;
-	c->count = count;
+	c->_count = _count;
 	// need to copy SubpullTemplate list in the case that it's a custom
 	// template, in which case the only record of the subpull
 	// location, shape, size, etc. is the SubpullTemplate list

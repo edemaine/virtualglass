@@ -33,10 +33,10 @@ PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 {
 	resetPiece();
 
-	this->pickupViewWidget = new PickupPlanEditorViewWidget(piece->pickup, this);	
+	this->pickupViewWidget = new PickupPlanEditorViewWidget(_piece->pickup, this);	
 	this->pieceNiceViewWidget = new NiceViewWidget(NiceViewWidget::PIECE_CAMERA_MODE, this);
 	pieceNiceViewWidget->setGeometry(&geometry);
-	this->pieceCustomizeViewWidget = new PieceCustomizeViewWidget(piece, this);
+	this->pieceCustomizeViewWidget = new PieceCustomizeViewWidget(_piece, this);
 
 	setupLayout();
 	setupThreading();
@@ -45,7 +45,7 @@ PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 	seedTemplates();
 }
 
-QImage PieceEditorWidget :: getPieceImage()
+QImage PieceEditorWidget :: pieceImage()
 {
 	return pieceNiceViewWidget->grabFrameBuffer();
 }
@@ -57,7 +57,7 @@ void PieceEditorWidget :: reset3DCamera()
 
 void PieceEditorWidget :: resetPiece()
 {
-	piece = new Piece(PieceTemplate::TUMBLER);
+	_piece = new Piece(PieceTemplate::TUMBLER);
 }
 
 void PieceEditorWidget :: writePieceToOBJFile(QString& filename)
@@ -78,13 +78,13 @@ void PieceEditorWidget :: updateEverything()
 	{
 		pktlw = dynamic_cast<PickupTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget());
-		pktlw->setHighlighted(pktlw->type == piece->pickup->getTemplateType());
+		pktlw->setHighlighted(pktlw->type == _piece->pickup->templateType());
 	}
 
 	pickupViewWidget->updateEverything();
 
 	TemplateParameter tp;
-	piece->pickup->getParameter(0, &tp);
+	_piece->pickup->getParameter(0, &tp);
 	pickupCountSpinBox->blockSignals(true);
 	pickupCountSpinBox->setRange(tp.lowerLimit, tp.upperLimit);
 	pickupCountSpinBox->setValue(tp.value);
@@ -98,12 +98,12 @@ void PieceEditorWidget :: updateEverything()
 	{
 		ptlw = dynamic_cast<PieceTemplateLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(pieceTemplateLibraryLayout->itemAt(i))->widget());
-		ptlw->setHighlighted(ptlw->type == piece->getTemplateType());
+		ptlw->setHighlighted(ptlw->type == _piece->templateType());
 	}
 	
 	tempPieceMutex.lock();
 	deep_delete(tempPiece);
-	tempPiece = deep_copy(piece);
+	tempPiece = deep_copy(_piece);
 	tempPieceDirty = true;
 	tempPieceMutex.unlock();
 
@@ -157,10 +157,10 @@ void PieceEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned in
 void PieceEditorWidget :: pickupCountSpinBoxChanged(int)
 {
 	TemplateParameter tp;
-	piece->pickup->getParameter(0, &tp);
+	_piece->pickup->getParameter(0, &tp);
 	if (tp.value != pickupCountSpinBox->value())
 	{
-		piece->pickup->setParameter(0, pickupCountSpinBox->value());
+		_piece->pickup->setParameter(0, pickupCountSpinBox->value());
 		updateEverything();
 		emit someDataChanged();
 	}
@@ -220,9 +220,9 @@ void PieceEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 
 	if (pktlw != NULL)
 	{
-		if (pktlw->type != piece->pickup->getTemplateType())
+		if (pktlw->type != _piece->pickup->templateType())
 		{
-			piece->pickup->setTemplateType(pktlw->type);
+			_piece->pickup->setTemplateType(pktlw->type);
 			updateEverything();
 			emit someDataChanged();
 		}
@@ -234,7 +234,7 @@ void PieceEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 		else
 		{
 			pieceControlsTab->setCurrentIndex(0);
-			piece->setTemplateType(ptlw->type);
+			_piece->setTemplateType(ptlw->type);
 			updateEverything();
 			emit someDataChanged();
 		}
@@ -319,7 +319,7 @@ void PieceEditorWidget :: setupLayout()
 	tab1Widget->setLayout(tab1Layout); 
 	pieceControlsTab->addTab(tab1Widget, "Twist");
 
-	twistWidget = new TwistWidget(&(piece->twist), 3.0, pieceControlsTab);
+	twistWidget = new TwistWidget(&(_piece->twist), 3.0, pieceControlsTab);
 	tab1Layout->addWidget(twistWidget, 0);
 	tab1Layout->addStretch(10);
 
@@ -351,7 +351,7 @@ void PieceEditorWidget :: setupLayout()
 void PieceEditorWidget :: setupThreading()
 {
 	geometryDirty = false;
-	tempPiece = deep_copy(piece);
+	tempPiece = deep_copy(_piece);
 	tempPieceDirty = true;
 	geometryThread = new PieceGeometryThread(this);
 	geometryThread->start();	
@@ -379,14 +379,14 @@ void PieceEditorWidget :: setupConnections()
 
 void PieceEditorWidget :: addControlPointButtonClicked()
 {
-	piece->spline.addPoint(Point2D(make_vector(0.0f, 0.0f)));
+	_piece->spline.addPoint(Point2D(make_vector(0.0f, 0.0f)));
 	updateEverything();
 	emit someDataChanged();
 }
 
 void PieceEditorWidget :: removeControlPointButtonClicked()
 {
-	piece->spline.removePoint();
+	_piece->spline.removePoint();
 	updateEverything();
 	emit someDataChanged();
 }
@@ -398,7 +398,7 @@ void PieceEditorWidget :: pieceControlsTabChanged(int tab)
 
 	if (tab != 0) // customize mode
 	{
-		piece->setTemplateType(PieceTemplate::CUSTOM);
+		_piece->setTemplateType(PieceTemplate::CUSTOM);
 		updateEverything();
 		emit someDataChanged();
 	}
@@ -425,13 +425,13 @@ void PieceEditorWidget :: seedTemplates()
 	for (int i = PieceTemplate::firstSeedTemplate(); i <= PieceTemplate::lastSeedTemplate(); ++i)
 	{
 		PieceTemplate::Type t = static_cast<PieceTemplate::Type>(i);
-		Piece piece(t);
+		Piece dummyPiece(t);
 
 		QPixmap templatePixmap(100, 100);
 		templatePixmap.fill(GlobalBackgroundColor::qcolor);
 
 		QPainter painter(&templatePixmap);
-		PieceCrossSectionRender::render(&painter, 100, &piece);
+		PieceCrossSectionRender::render(&painter, 100, &dummyPiece);
 		painter.end();
 
 		PieceTemplateLibraryWidget *ptlw = new PieceTemplateLibraryWidget(templatePixmap, t);
@@ -451,38 +451,38 @@ void PieceEditorWidget :: updateLibraryWidgetPixmaps(PieceLibraryWidget* w)
 
 void PieceEditorWidget :: setPickupParameter(int param, int value)
 {
-	piece->pickup->setParameter(param, value);
+	_piece->pickup->setParameter(param, value);
 	updateEverything();
 	emit someDataChanged();
 }
 
 void PieceEditorWidget :: setPieceTemplateType(enum PieceTemplate::Type _type)
 {
-	piece->setTemplateType(_type);
+	_piece->setTemplateType(_type);
 	updateEverything();
 	emit someDataChanged();
 }
 
 void PieceEditorWidget :: setPickupTemplateType(enum PickupTemplate::Type _type)
 {
-	piece->pickup->setTemplateType(_type);
+	_piece->pickup->setTemplateType(_type);
 	updateEverything();
 	emit someDataChanged();
 }
 
-void PieceEditorWidget :: setPiece(Piece* _piece)
+void PieceEditorWidget :: setPiece(Piece* __piece)
 {
-	piece = _piece;
+	_piece = __piece;
 	pieceControlsTab->setCurrentIndex(0);
 	updateEverything();
-	pickupViewWidget->setPickup(piece->pickup);
-	twistWidget->setTwist(&(piece->twist));
-	pieceCustomizeViewWidget->setPiece(piece);
+	pickupViewWidget->setPickup(_piece->pickup);
+	twistWidget->setTwist(&(_piece->twist));
+	pieceCustomizeViewWidget->setPiece(_piece);
 }
 
-Piece* PieceEditorWidget :: getPiece()
+Piece* PieceEditorWidget :: piece()
 {
-	return piece;
+	return _piece;
 }
 
 

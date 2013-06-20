@@ -39,7 +39,7 @@ class PieceEditorWidget : public QWidget
 	public:
 		PieceEditorWidget(QWidget* parent=0);
 		void resetPiece();
-		Piece* getPiece();
+		Piece* piece();
 		void updateLibraryWidgetPixmaps(PieceLibraryWidget* w);
 		void seedTemplates();
 		void setPiece(Piece* p);
@@ -49,7 +49,7 @@ class PieceEditorWidget : public QWidget
 		void writePieceToPLYFile(QString& filename);
 		void writePieceToOBJFile(QString& filename);
 		void reset3DCamera();
-		QImage getPieceImage();
+		QImage pieceImage();
 
 	protected:
 		void mousePressEvent(QMouseEvent*);
@@ -89,7 +89,7 @@ class PieceEditorWidget : public QWidget
 
 		Geometry geometry;
 
-		Piece* piece;
+		Piece* _piece;
 
 		PickupPlanEditorViewWidget* pickupViewWidget;	
 		PieceCustomizeViewWidget* pieceCustomizeViewWidget;

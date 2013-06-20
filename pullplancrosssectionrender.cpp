@@ -50,10 +50,10 @@ void drawSubplan(float x, float y, float drawWidth, float drawHeight,
 {
 	painter->setBrush(GlobalBackgroundColor::qcolor);
 	painter->setPen(Qt::NoPen);
-	paintShape(x, y, drawWidth, plan->getOutermostCasingShape(), painter);
+	paintShape(x, y, drawWidth, plan->outermostCasingShape(), painter);
 
 	// Do casing colors outermost to innermost to get concentric rings of each casing's color
-	for (unsigned int i = plan->getCasingCount() - 1; i < plan->getCasingCount(); --i) 
+	for (unsigned int i = plan->casingCount() - 1; i < plan->casingCount(); --i) 
 	{
 		int casingWidth = drawWidth * plan->getCasingThickness(i);
 		int casingHeight = drawHeight * plan->getCasingThickness(i);
@@ -66,7 +66,7 @@ void drawSubplan(float x, float y, float drawWidth, float drawHeight,
 		paintShape(casingX, casingY, casingWidth, plan->getCasingShape(i), painter);
 		
 		// Fill with actual casing color (highlighting white or some other color)
-		Color c = plan->getCasingColor(i)->getColor();
+		Color c = plan->getCasingColor(i)->color();
 		QColor qc(255*c.r, 255*c.g, 255*c.b, 255*c.a);
 		painter->setBrush(qc);
 
@@ -100,7 +100,7 @@ void render(QPainter* painter, int size, PullPlan* plan)
 	drawSubplan(5, 5, size - 10, size - 10, plan, true, painter);
 	painter->setBrush(Qt::NoBrush);
 	setBoundaryPainter(painter, true);
-	paintShape(5, 5, size - 10, plan->getOutermostCasingShape(), painter);
+	paintShape(5, 5, size - 10, plan->outermostCasingShape(), painter);
 }
 
 } // end namespace

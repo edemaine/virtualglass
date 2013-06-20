@@ -43,7 +43,7 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 	seedTemplates();
 }
 
-QImage PullPlanEditorWidget :: getPullPlanImage()
+QImage PullPlanEditorWidget :: pullPlanImage()
 {
 	return niceViewWidget->grabFrameBuffer();
 }
@@ -80,7 +80,7 @@ void PullPlanEditorWidget :: setupThreading()
 void PullPlanEditorWidget :: updateEverything()
 {
 	// set casing buttons
-	switch (plan->getOutermostCasingShape())
+	switch (plan->outermostCasingShape())
 	{
 		case CIRCLE_SHAPE:
 			circleCasingPushButton->setDown(true);
@@ -93,12 +93,12 @@ void PullPlanEditorWidget :: updateEverything()
 	}
 	removeCasingButton->setEnabled(!plan->hasMinimumCasingCount());
 
-	countSpin->setValue(plan->getCount());
-	countLabel->setEnabled(plan->getTemplateType() != PullTemplate::CUSTOM);
-	countSpin->setEnabled(plan->getTemplateType() != PullTemplate::CUSTOM);
+	countSpin->setValue(plan->count());
+	countLabel->setEnabled(plan->templateType() != PullTemplate::CUSTOM);
+	countSpin->setEnabled(plan->templateType() != PullTemplate::CUSTOM);
 
 	twistWidget->updateEverything();
-	twistWidget->setEnabled(plan->getOutermostCasingShape() == CIRCLE_SHAPE);
+	twistWidget->setEnabled(plan->outermostCasingShape() == CIRCLE_SHAPE);
 	
 	tempPullPlanMutex.lock();
 	deep_delete(tempPullPlan);
@@ -116,7 +116,7 @@ void PullPlanEditorWidget :: updateEverything()
 	{
 		ptlw = dynamic_cast<PullTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(templateLibraryLayout->itemAt(i))->widget());
-		ptlw->setHighlighted(ptlw->type == plan->getTemplateType());
+		ptlw->setHighlighted(ptlw->type == plan->templateType());
 	}
 
 	viewWidget->updateEverything();
@@ -316,7 +316,7 @@ void PullPlanEditorWidget :: removeCasingButtonClicked()
 
 void PullPlanEditorWidget :: addCasingButtonClicked()
 {
-	plan->addCasing(plan->getOutermostCasingShape());
+	plan->addCasing(plan->outermostCasingShape());
 	updateEverything();
 	emit someDataChanged();
 }
@@ -432,7 +432,7 @@ void PullPlanEditorWidget :: childWidgetDataChanged()
 void PullPlanEditorWidget :: countSpinChanged(int)
 {
 	// update template
-	unsigned int count = plan->getCount();
+	unsigned int count = plan->count();
 	if (count != static_cast<unsigned int>(countSpin->value()))
 	{
 		plan->setCount(countSpin->value());
@@ -475,7 +475,7 @@ void PullPlanEditorWidget :: setPullPlan(PullPlan* _plan)
 	customizeViewWidget->setPullPlan(plan);
 }
 
-PullPlan* PullPlanEditorWidget :: getPullPlan()
+PullPlan* PullPlanEditorWidget :: pullPlan()
 {
 	return plan;
 }

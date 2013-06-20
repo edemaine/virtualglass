@@ -22,9 +22,9 @@ class PullPlan
 		PullPlan(enum PullTemplate::Type t);
 
 		void setTemplateType(enum PullTemplate::Type t);
-		enum PullTemplate::Type getTemplateType();
+		enum PullTemplate::Type templateType();
 
-		unsigned int getCount();
+		unsigned int count();
 		void setCount(unsigned int count);
 
 		void setCasingThickness(float t, unsigned int index);
@@ -32,18 +32,18 @@ class PullPlan
 
 		void setOutermostCasingShape(enum GeometricShape s);
 		enum GeometricShape getCasingShape(unsigned int index);
-		enum GeometricShape getOutermostCasingShape();
+		enum GeometricShape outermostCasingShape();
 
 		void setCasingColor(GlassColor* gc, unsigned int index);
 		void setOutermostCasingColor(GlassColor* gc);
 		GlassColor* getCasingColor(unsigned int index);
-		GlassColor* getOutermostCasingColor();
+		GlassColor* outermostCasingColor();
 
 		float twist;
 
 		void addCasing(enum GeometricShape s);
 		void removeCasing();
-		unsigned int getCasingCount(); 
+		unsigned int casingCount(); 
 		bool hasMinimumCasingCount();
 
 		PullPlan* copy() const;
@@ -54,9 +54,9 @@ class PullPlan
 		bool hasDependencyOn(PullPlan* pullPlan);
 
 	private:
-		enum PullTemplate::Type templateType;
+		enum PullTemplate::Type type;
 		vector<Casing> casings;
-		unsigned int count;
+		unsigned int _count;
 
 		// Methods
 		void initializeTemplate();

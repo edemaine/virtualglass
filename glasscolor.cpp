@@ -7,54 +7,54 @@ GlassColor :: GlassColor()
 	Color c;
 	c.r = c.g = c.b = 1.0;
 	c.a = 0.0;
-	color = c;
-	shortName = "R-100"; 
-	longName = "R-100 Lead Crystal (Clear)";
+	_color = c;
+	_shortName = "R-100"; 
+	_longName = "R-100 Lead Crystal (Clear)";
 }
 
-GlassColor :: GlassColor(Color _color, string _shortname, string _longname)
+GlassColor :: GlassColor(Color __color, string __shortName, string __longName)
 {
-	setColor(_color);
-	setShortName(_shortname);
-	setLongName(_longname);
+	setColor(__color);
+	setShortName(__shortName);
+	setLongName(__longName);
 }
 
-void GlassColor :: setColor(Color _color) 
+void GlassColor :: setColor(Color __color) 
 {
-	color = _color;
+	_color = __color;
 }
 
-Color GlassColor :: getColor()
+Color GlassColor :: color()
 {
-	return color;
+	return _color;
 }
 
 void GlassColor :: setShortName(string _name)
 {
-	shortName = _name;
+	_shortName = _name;
 }
 
 void GlassColor :: setLongName(string _name)
 {
-	longName = _name;
+	_longName = _name;
 }
 
-string GlassColor :: getShortName()
+string GlassColor :: shortName()
 {
-	return shortName;
+	return _shortName;
 }
 
-string GlassColor :: getLongName()
+string GlassColor :: longName()
 {
-	return longName;
+	return _longName;
 }
 
 GlassColor* GlassColor :: copy() const
 {
 	GlassColor* newGlassColor = new GlassColor();
-	newGlassColor->color = color;
-	newGlassColor->shortName = shortName;
-	newGlassColor->longName = longName;
+	newGlassColor->_color = _color;
+	newGlassColor->_shortName = _shortName;
+	newGlassColor->_longName = _longName;
 	return newGlassColor;
 }
 
