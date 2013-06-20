@@ -18,7 +18,7 @@ GlassColor* randomGlassColor()
 	vector<GlassColor*> colors;
 	QString collectionName;
 
-	if(!readColorFile(":/reichenbach-opaque-colors.vgc", collectionName, colors))
+	if(!readColorFile(":/vgc/reichenbach-opaque-colors.vgc", collectionName, colors))
 		return GlobalGlass::color();
 	
 	unsigned int choice = qrand() % colors.size();
