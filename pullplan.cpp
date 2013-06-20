@@ -137,25 +137,26 @@ void PullPlan :: setOutermostCasingColor(GlassColor* gc)
 	this->casings[casings.size()-1].glassColor = gc;
 }
 
-GlassColor* PullPlan :: outermostCasingColor() 
+const GlassColor* PullPlan :: outermostCasingColor() 
 {
 	return this->casings[casings.size()-1].glassColor;
 }
 
-GlassColor* PullPlan :: getCasingColor(unsigned int index) {
-
+const GlassColor* PullPlan :: getCasingColor(unsigned int index) 
+{
 	if (index >= this->casings.size())
 		return NULL;
 	return this->casings[index].glassColor;
 }
 
-bool PullPlan :: hasMinimumCasingCount() {
+bool PullPlan :: hasMinimumCasingCount() 
+{
 	return (this->casings.size() < 2);
 }	
 		
 
-unsigned int PullPlan :: casingCount() {
-
+unsigned int PullPlan :: casingCount() 
+{
 	return this->casings.size();
 }
 
@@ -220,7 +221,7 @@ void PullPlan :: addCasing(enum GeometricShape _shape) {
 	}
 	
 	// if casing addition is circle around a square, rescale everything down a bit more
-	if (_shape == CIRCLE_SHAPE && outermostCasingShape() == SQUARE_SHAPE) {		
+	if (_shape == CIRCLE_SHAPE && this->outermostCasingShape() == SQUARE_SHAPE) {		
 		for (unsigned int i = 0; i < casings.size(); ++i) {
 			casings[i].thickness *= 1 / SQRT_TWO;
 		}
@@ -256,7 +257,7 @@ void PullPlan :: setCasingThickness(float t, unsigned int index) {
 
 void PullPlan :: setOutermostCasingShape(enum GeometricShape _shape) 
 {
-	if (_shape == outermostCasingShape()) 
+	if (_shape == this->outermostCasingShape()) 
 		return;
 
 	if (this->casings.size() > 1) 

@@ -113,7 +113,7 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	int selectedCasingIndex = getCasingIndexAt(mouseLoc);
 	if (selectedCasingIndex != -1)
 	{
-		GlassColor* selectedColor = plan->getCasingColor(static_cast<unsigned int>(selectedCasingIndex)); 
+		const GlassColor* selectedColor = plan->getCasingColor(static_cast<unsigned int>(selectedCasingIndex)); 
 
 		QPixmap _pixmap(200, 200);
 		_pixmap.fill(Qt::transparent);

@@ -67,8 +67,8 @@ namespace GlassFileIOInternal
 	void writeColors(Json::Value& root, vector<GlassColor*>& colors);
 	void readColors(Json::Value& root, map<unsigned int, GlassColor*>& colorMap, vector<GlassColor*>& readColors);
 
-	void writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<PullPlan*, unsigned int>& caneMap, 
-		map<GlassColor*, unsigned int>& colorMap);
+	void writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<const PullPlan*, unsigned int>& caneMap, 
+		map<const GlassColor*, unsigned int>& colorMap);
 	PullPlan* readCane(string canename, Json::Value& root, map<unsigned int, GlassColor*>& colorMap);
 
 	void writeCanes(Json::Value& root, vector<PullPlan*>& canes, vector<GlassColor*>& colors);

@@ -4,7 +4,7 @@
 
 namespace GlassMime
 {
-	void encode(char* mimeData, void* ptr, enum Type type)
+	void encode(char* mimeData, const void* ptr, enum Type type)
 	{
 		sprintf(mimeData, "%p %d", ptr, type);
 	}

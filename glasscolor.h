@@ -12,13 +12,13 @@ class GlassColor
 		GlassColor();
 		GlassColor(Color __color, string __shortName, string __longName);
 
-		Color color();
+		const Color color() const;
 		void setColor(Color _color);
 
-		string shortName();
+		const string shortName() const;
 		void setShortName(string _name);
 
-		string longName();
+		const string longName() const;
 		void setLongName(string _name);
 
 		GlassColor* copy() const;

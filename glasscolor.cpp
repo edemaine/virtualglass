@@ -24,7 +24,7 @@ void GlassColor :: setColor(Color __color)
 	_color = __color;
 }
 
-Color GlassColor :: color()
+const Color GlassColor :: color() const
 {
 	return _color;
 }
@@ -39,12 +39,12 @@ void GlassColor :: setLongName(string _name)
 	_longName = _name;
 }
 
-string GlassColor :: shortName()
+const string GlassColor :: shortName() const
 {
 	return _shortName;
 }
 
-string GlassColor :: longName()
+const string GlassColor :: longName() const
 {
 	return _longName;
 }

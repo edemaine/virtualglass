@@ -564,8 +564,8 @@ cane
 */
 
 // write
-void writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<PullPlan*, unsigned int>& caneMap, 
-	map<GlassColor*, unsigned int>& colorMap)
+void writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<const PullPlan*, unsigned int>& caneMap, 
+	map<const GlassColor*, unsigned int>& colorMap)
 {
 	string canename = idAndNameToString(caneIndex, "Cane");
 	
@@ -674,13 +674,13 @@ void readCaneSubcanes(Json::Value& root, PullPlan* cane, map<unsigned int, PullP
 void writeCanes(Json::Value& root, vector<PullPlan*>& canes, vector<GlassColor*>& colors)
 {
 	// generate color map
-	map<GlassColor*, unsigned int> colorMap;
+	map<const GlassColor*, unsigned int> colorMap;
 	colorMap[GlobalGlass::color()] = 0;
 	for (unsigned int i = 0; i < colors.size(); ++i)
 		colorMap[colors[i]] = i+1;
 
 	// generate pull plan map
-	map<PullPlan*, unsigned int> caneMap;
+	map<const PullPlan*, unsigned int> caneMap;
 	caneMap[GlobalGlass::circlePlan()] = 0;
 	caneMap[GlobalGlass::squarePlan()] = 1;
 	for (unsigned int i = 0; i < canes.size(); ++i)

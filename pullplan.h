@@ -36,8 +36,8 @@ class PullPlan
 
 		void setCasingColor(GlassColor* gc, unsigned int index);
 		void setOutermostCasingColor(GlassColor* gc);
-		GlassColor* getCasingColor(unsigned int index);
-		GlassColor* outermostCasingColor();
+		const GlassColor* getCasingColor(unsigned int index);
+		const GlassColor* outermostCasingColor();
 
 		float twist;
 
