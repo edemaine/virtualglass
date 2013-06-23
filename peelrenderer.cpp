@@ -1,5 +1,6 @@
 
 #include <stdexcept>
+
 #include "constants.h"
 #include "geometry.h"
 #include "peelrenderer.h"

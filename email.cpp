@@ -208,10 +208,10 @@ void Email::socketReadyRead()
 	}
 }
 
-void Email::socketErrorReceived(QAbstractSocket::SocketError error)
+void Email::socketErrorReceived(QAbstractSocket::SocketError)
 {
 	state = Quit;
-	emit failure("SMTP socket error: " + error);
+	emit failure("SMTP socket error: " + socket.errorString());
 }
 
 void Email::socketDisconnected()

@@ -14,7 +14,7 @@ Vertex :: Vertex(Point3D const &_position, Point3D const &_normal = make_vector(
 {
 }
 
-Triangle :: Triangle(uint32_t _v1 = -1U, uint32_t _v2 = -1U, uint32_t _v3 = -1U) : v1(_v1), v2(_v2), v3(_v3) 
+Triangle :: Triangle(uint32_t _v1, uint32_t _v2, uint32_t _v3) : v1(_v1), v2(_v2), v3(_v3) 
 {
 }
 

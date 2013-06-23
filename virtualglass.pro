@@ -17,7 +17,6 @@ unix:!macx {
 	# Libraries
 	LIBS += -lGLU
 
-	# Just in case, because our header files are named .h
 	QMAKE_CC = g++
 	QMAKE_CXX = g++
 
@@ -35,10 +34,11 @@ unix:!macx {
 
 # Mac OS X
 macx {
-	# Just in case, because our header files are named .h
-	QMAKE_CC = g++
-	QMAKE_CXX = g++
+	QMAKE_CC = clang
+	QMAKE_CXX = clang++
 
+	QMAKE_CXXFLAGS += -std=c++11
+	
 	# Mac-specific icons and plist (file-type associations, etc.)
 	ICON = virtualglass.icns
 	QMAKE_INFO_PLIST = Info.plist
@@ -58,7 +58,6 @@ win32 {
 
 # Windows using MinGW 
 win32:!*-msvc-* {
-	# Just in case, because our header files are named .h
 	QMAKE_CC = g++
 	QMAKE_CXX = g++
 
