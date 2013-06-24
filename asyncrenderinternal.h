@@ -15,13 +15,8 @@ using std::deque;
 using std::vector;
 using std::make_pair;
 
-#ifdef UNORDERED_MAP_WORKAROUND
 #include <tr1/unordered_map>
 using std::tr1::unordered_map;
-#else
-#include <unordered_map>
-using std::unordered_map;
-#endif
 
 class Geometry;
 class QImage;

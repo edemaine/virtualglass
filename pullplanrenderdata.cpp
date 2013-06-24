@@ -8,17 +8,10 @@
 #include "pullplanrenderdata.h"
 #include "globalgraphicssetting.h"
 
-#ifdef UNORDERED_MAP_WORKAROUND
 #include <tr1/unordered_map>
 #include <tr1/unordered_set>
 using std::tr1::unordered_map;
 using std::tr1::unordered_set;
-#else
-#include <unordered_map>
-#include <unordered_set>
-using std::unordered_map;
-using std::unordered_set;
-#endif
 
 using std::pair;
 using std::make_pair;

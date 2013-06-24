@@ -34,21 +34,22 @@ unix:!macx {
 
 # Mac OS X
 macx {
-	QMAKE_CC = clang
-	QMAKE_CXX = clang++
+	QMAKE_CC = gcc
+	QMAKE_CXX = g++
+	# QMAKE_CC = clang
+	# QMAKE_CXX = clang++
 
-	QMAKE_CXXFLAGS += -std=c++11
-	
 	# Mac-specific icons and plist (file-type associations, etc.)
 	ICON = virtualglass.icns
 	QMAKE_INFO_PLIST = Info.plist
 
 	# All those compile flags 
-        QMAKE_CXXFLAGS += -Wall -Wextra -Werror -Wno-unused-parameter -Wno-deprecated -DUNORDERED_MAP_WORKAROUND
+        QMAKE_CFLAGS += -Wall -Wextra -Werror -Wno-unused-parameter
+        QMAKE_CXXFLAGS += -Wall -Wextra -Werror -Wno-unused-parameter -Wno-deprecated 
 
-	# Unclear what these are linking statically
-	QMAKE_LFLAGS_RELEASE += -static-libgcc
-	QMAKE_CXXFLAGS_RELEASE += -static-libgcc
+	# To get rid of template compilation error
+	QMAKE_CFLAGS += -mmacosx-version-min=10.7
+	QMAKE_CXXFLAGS += -mmacosx-version-min=10.7
 }
 
 # Windows in general
