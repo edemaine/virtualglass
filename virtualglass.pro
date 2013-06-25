@@ -36,20 +36,18 @@ unix:!macx {
 macx {
 	QMAKE_CC = gcc
 	QMAKE_CXX = g++
-	# QMAKE_CC = clang
-	# QMAKE_CXX = clang++
 
 	# Mac-specific icons and plist (file-type associations, etc.)
 	ICON = virtualglass.icns
 	QMAKE_INFO_PLIST = Info.plist
 
 	# All those compile flags 
-        QMAKE_CFLAGS += -Wall -Wextra -Werror -Wno-unused-parameter
-        QMAKE_CXXFLAGS += -Wall -Wextra -Werror -Wno-unused-parameter -Wno-deprecated 
+        QMAKE_CFLAGS += -Wall -Wextra -Werror 
+        QMAKE_CXXFLAGS += -Wall -Wextra -Werror 
 
 	# To get rid of template compilation error
-	QMAKE_CFLAGS += -mmacosx-version-min=10.7
-	QMAKE_CXXFLAGS += -mmacosx-version-min=10.7
+	QMAKE_CFLAGS += -mmacosx-version-min=10.6
+	QMAKE_CXXFLAGS += -mmacosx-version-min=10.6
 }
 
 # Windows in general
