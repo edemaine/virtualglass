@@ -84,15 +84,10 @@ void ColorEditorWidget :: setupLayout()
 	editorLayout->setSpacing(10);
 
 	// Setup collection menu
-	QWidget* colMenuWidget = new QWidget(this); 
-	QHBoxLayout* colMenuLayout = new QHBoxLayout(colMenuWidget);
-	colMenuWidget->setLayout(colMenuLayout);
-	colMenuLayout->addWidget(new QLabel("Collection:", colMenuWidget));
-	collectionComboBox = new QComboBox(colMenuWidget);
+	collectionComboBox = new QComboBox(this);
 	collectionComboBox->setDuplicatesEnabled(true);
 	collectionComboBox->addItem("Add collection...");
-	colMenuLayout->addWidget(collectionComboBox, 1);
-	editorLayout->addWidget(colMenuWidget, 0, 0);
+	editorLayout->addWidget(collectionComboBox, 0, 0);
 	
 	// Setup stack of collection libraries
 	collectionStack = new QStackedWidget(this);
@@ -106,7 +101,7 @@ void ColorEditorWidget :: setupLayout()
 
 	// Add alpha (transparency) adjuster
 	QWidget* alphaWidget = new QWidget(this);
-	alphaWidget->setMinimumHeight(80); // to match legendWidget in MainWindow	
+	alphaWidget->setMinimumHeight(50); // to match legendWidget in MainWindow	
 	editorLayout->addWidget(alphaWidget, 3, 0);
 
 	QHBoxLayout* alphaLayout = new QHBoxLayout(alphaWidget);

@@ -19,10 +19,12 @@ class PickupPlanEditorViewWidget : public QWidget
 	public:
 		PickupPlanEditorViewWidget(PickupPlan* pickup, QWidget* parent=0);
 		void setPickup(PickupPlan* p);
-		void updateEverything();
-	
+
 	signals:
 		void someDataChanged();
+
+	public slots:
+		void updateEverything();
 
 	protected:
 		void mousePressEvent(QMouseEvent* event);

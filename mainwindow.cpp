@@ -905,7 +905,7 @@ void MainWindow :: setupLibrary()
 
 	// make three qlabels for a legend
 	QWidget* legendWidget = new QWidget(libraryMasterWidget);
-	legendWidget->setMinimumHeight(80); // to match alphaWidget in ColorEditorWidget
+	legendWidget->setMinimumHeight(50); // to match alphaWidget in ColorEditorWidget
 	libraryAreaLayout->addWidget(legendWidget);
 
 	QGridLayout* legendLayout = new QGridLayout(legendWidget);
@@ -913,7 +913,7 @@ void MainWindow :: setupLibrary()
 	legendLayout->setColumnStretch(0, 1);
 	legendLayout->setColumnStretch(1, 1);
 	legendLayout->setColumnStretch(2, 1);
-	legendLayout->setContentsMargins(9, 10, 9, 10); // hack to make legend height same as normal
+	legendLayout->setContentsMargins(0, 0, 0, 0);
 
 	QLabel* l1 = new QLabel("Used By Selected", legendWidget);
 	l1->setStyleSheet("border: 2px dashed " + QColor(0, 139, 69, 255).name() + ";");

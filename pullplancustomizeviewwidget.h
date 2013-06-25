@@ -28,11 +28,14 @@ class PullPlanCustomizeViewWidget : public QWidget
 		void addSquareClicked();
 		void copySelectionClicked();
 		void deleteSelectionClicked();
-		void updateEverything();
-
+	
 	signals:
 		void someDataChanged();
 		void pullPlanChanged(PullPlan* p);
+
+	public slots:
+		void updateEverything();
+
 
 	protected:
 		void dropEvent(QDropEvent* de);

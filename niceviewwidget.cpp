@@ -144,6 +144,7 @@ void NiceViewWidget :: resizeGL(int width, int height)
 		{
 			rho *= height;
 			rho /= width;
+			rho = MAX(MIN(rho, max_rho), min_rho);
 		}
 	}
 
@@ -261,13 +262,13 @@ bool NiceViewWidget :: event(QEvent* event)
 			{
 				case PULLPLAN_CAMERA_MODE:
 					if (e->delta() > 0)
-						rho *= 0.8;
+						rho = MAX(MIN(rho - rho_step, max_rho), min_rho);
 					else if (e->delta() < 0)
 					{
-						if (rho*1.2 > 11.0)
-							rho=11.0;
+						if (rho + rho_step > 11.0)
+							rho = 11.0;
 						else
-							rho *= 1.2;
+							rho = MIN(rho + rho_step, 11.0);
 					}
 					break;
 				case GLASSCOLOR_CAMERA_MODE:
@@ -276,9 +277,9 @@ bool NiceViewWidget :: event(QEvent* event)
 				case PIECE_CAMERA_MODE:
 				default:
 					if (e->delta() > 0)
-						rho *= 0.8;
+						rho = MAX(rho - rho_step, min_rho);
 					else if (e->delta() < 0)
-						rho *= 1.2;
+						rho = MIN(rho + rho_step, max_rho);
 					break;
 			}
 			update();	
@@ -302,11 +303,7 @@ bool NiceViewWidget :: event(QEvent* event)
 				QTouchEvent::TouchPoint& tp1 = touchPoints.first();
 				QTouchEvent::TouchPoint& tp2 = touchPoints.last();
 				rho *= QLineF(tp1.lastPos(), tp2.lastPos()).length() / QLineF(tp1.pos(), tp2.pos()).length();
-				//if (e->touchPointStates() & Qt::TouchPointReleased) 
-				//{
-				//	totalScaleFactor *= currentScaleFactor;
-				//	currentScaleFactor = 1;
-				//}
+				rho = MAX(MIN(rho, max_rho), min_rho);
 			}
 			return true;
 		}
