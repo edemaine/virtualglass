@@ -165,7 +165,7 @@ void ColorEditorWidget :: loadCollection(QString fileName)
 
 	for (unsigned int i = 0; i < colors.size(); ++i)
 	{
-		PureColorLibraryWidget* pclw = new PureColorLibraryWidget(colors[i], this);
+		PureColorLibraryWidget* pclw = new PureColorLibraryWidget(colors[i], this, colorLibraryWidget);
 		listLayout->addWidget(pclw);
 		// memory leak here because GlassColor objects are now forgotten about
 	}
@@ -185,50 +185,11 @@ void ColorEditorWidget :: alphaSliderPositionChanged(int)
 	emit someDataChanged();
 }
 
-void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
+void ColorEditorWidget :: setGlassColorProperties(GlassColor* color)
 {
-	if (event->button() == Qt::LeftButton && collectionStack->geometry().contains(event->pos()))
-	{
-		isDragging = true;
-		lastDragPosition = dragStartPosition = event->pos();
-		maxDragDistance = 0;
-	}
-	else
-		isDragging = false;
-}
-
-void ColorEditorWidget :: mouseMoveEvent(QMouseEvent* event)
-{
-	// If the left mouse button isn't down
-	if ((event->buttons() & Qt::LeftButton) == 0)
-	{
-		isDragging = false;
-		return;
-	}
-
-	maxDragDistance = MAX(maxDragDistance, fabs(event->pos().y() - dragStartPosition.y()));
-	if (!isDragging || maxDragDistance < QApplication::startDragDistance())
-		return;
-
-	int movement = event->pos().y() - lastDragPosition.y(); 
-	QScrollArea* currentScrollArea = dynamic_cast<QScrollArea*>(collectionStack->currentWidget());
-	currentScrollArea->verticalScrollBar()->setValue(currentScrollArea->verticalScrollBar()->value() - movement);	
-	lastDragPosition = event->pos();
-}
-
-void ColorEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
-{
-	// If not dragging or dragging caused a scroll
-	if (!isDragging || (isDragging && maxDragDistance >= QApplication::startDragDistance()))
-		return;
-	
-	PureColorLibraryWidget* pclw = dynamic_cast<PureColorLibraryWidget*>(childAt(event->pos()));
-	if (pclw == NULL)
-		return;
-
-	color->setColor(pclw->color());
-	color->setShortName(pclw->shortName());
-	color->setLongName(pclw->longName());
+	this->color->setColor(color->color());
+	this->color->setShortName(color->shortName());
+	this->color->setLongName(color->longName());
 	this->alphaSlider->setSliderPosition(255 - int(color->color().a * 255));
 	updateEverything();
 	emit someDataChanged();	

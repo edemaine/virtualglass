@@ -89,7 +89,6 @@ void GlassLibraryWidget::paintEvent(QPaintEvent* event)
 			painter.drawLine(100-6, 10, 100-16, 10);
 		}
         }
-
         painter.end();
 }
 
