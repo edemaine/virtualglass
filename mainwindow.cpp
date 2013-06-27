@@ -1109,6 +1109,28 @@ void MainWindow :: updateLibrary()
 {
 	switch (editorStack->currentIndex())
 	{
+		case EMPTY_VIEW_MODE:
+		{
+			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
+			{
+				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(
+					dynamic_cast<QWidgetItem *>(colorBarLibraryLayout->itemAt(i))->widget());
+				cblw->setDependancy(NO_DEPENDANCY);
+			}
+			for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
+			{
+				PullPlanLibraryWidget* pplw = dynamic_cast<PullPlanLibraryWidget*>(
+					dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
+				pplw->setDependancy(NO_DEPENDANCY);
+			}
+			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
+			{
+				PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(
+					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
+				plw->setDependancy(NO_DEPENDANCY);
+			}
+			break;
+		}
 		case COLORBAR_VIEW_MODE:
 		{
 			for (int i = 0; i < colorBarLibraryLayout->count(); ++i)
