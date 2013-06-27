@@ -6,8 +6,8 @@
 #include "pullplanlibrarywidget.h"
 #include "pullplancrosssectionrender.h"
 
-PullPlanLibraryWidget :: PullPlanLibraryWidget(PullPlan *_pullPlan, QWidget* _parent) 
-	: AsyncRenderWidget(_parent), pullPlan(_pullPlan)
+PullPlanLibraryWidget :: PullPlanLibraryWidget(PullPlan *_pullPlan, MainWindow *_window) 
+	: AsyncRenderWidget(_window), pullPlan(_pullPlan)
 {
 	setFixedSize(100, 100);
 	updatePixmaps();

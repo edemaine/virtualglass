@@ -6,8 +6,8 @@
 #include "pulltemplate.h"
 #include "pullplan.h"
 
-GlassColorLibraryWidget :: GlassColorLibraryWidget(GlassColor* _glassColor, QWidget* _parent, 
-	PullPlan* _circlePlan, PullPlan* _squarePlan) : AsyncRenderWidget(_parent), glassColor(_glassColor), 
+GlassColorLibraryWidget :: GlassColorLibraryWidget(GlassColor* _glassColor, MainWindow* _window, 
+	PullPlan* _circlePlan, PullPlan* _squarePlan) : AsyncRenderWidget(_window), glassColor(_glassColor), 
 	circlePlan(_circlePlan), squarePlan(_squarePlan) 
 {
 	setFixedSize(100, 100);

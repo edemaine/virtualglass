@@ -2,7 +2,8 @@
 
 #include "piecelibrarywidget.h"
 
-PieceLibraryWidget :: PieceLibraryWidget(Piece* _piece, QWidget* _parent): AsyncRenderWidget(_parent), piece(_piece)
+PieceLibraryWidget :: PieceLibraryWidget(Piece* _piece, MainWindow* _window)
+	: AsyncRenderWidget(_window), piece(_piece)
 {
 	setFixedSize(100, 100);
 	eyePosition.x = -16.0;

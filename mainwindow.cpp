@@ -483,21 +483,24 @@ void MainWindow::copyLibraryWidget(GlassLibraryWidget* lw)
 		case 1:	
 		{
 			GlassColor* newEditorGlassColor = colorEditorWidget->glassColor()->copy();
-			colorBarLibraryLayout->insertWidget(index, new GlassColorLibraryWidget(newEditorGlassColor, this));
+			colorBarLibraryLayout->insertWidget(index, 
+				new GlassColorLibraryWidget(newEditorGlassColor, this));
 			colorEditorWidget->setGlassColor(newEditorGlassColor);
 			break;
 		}
 		case 2:
 		{
 			PullPlan *newEditorPlan = pullPlanEditorWidget->pullPlan()->copy();
-			pullPlanLibraryLayout->insertWidget(index, new PullPlanLibraryWidget(newEditorPlan, this));
+			pullPlanLibraryLayout->insertWidget(index, 
+				new PullPlanLibraryWidget(newEditorPlan, this));
 			pullPlanEditorWidget->setPullPlan(newEditorPlan);
 			break;
 		}
 		case 3:
 		{
 			Piece* newEditorPiece = pieceEditorWidget->piece()->copy();
-			pieceLibraryLayout->insertWidget(index, new PieceLibraryWidget(newEditorPiece, this));
+			pieceLibraryLayout->insertWidget(index, 
+				new PieceLibraryWidget(newEditorPiece, this));
 			pieceEditorWidget->setPiece(newEditorPiece);
 			break;
 		}
@@ -985,7 +988,8 @@ void MainWindow :: setupColorEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
 	colorEditorWidget = new ColorEditorWidget(editorStack);
-	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(colorEditorWidget->glassColor(), this));
+	colorBarLibraryLayout->addWidget(
+		new GlassColorLibraryWidget(colorEditorWidget->glassColor(), this));
 	colorEditorWidget->updateEverything();
 }
 
@@ -993,7 +997,8 @@ void MainWindow :: setupPullPlanEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
 	pullPlanEditorWidget = new PullPlanEditorWidget(editorStack);
-	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(pullPlanEditorWidget->pullPlan(), this));
+	pullPlanLibraryLayout->addWidget(
+		new PullPlanLibraryWidget(pullPlanEditorWidget->pullPlan(), this));
 	pullPlanEditorWidget->updateEverything();
 }
 
@@ -1608,9 +1613,12 @@ void MainWindow::newFileActionTriggered()
 	clearLibrary();
 
 	// 3. add the three new guys from the editors into the library 
-	colorBarLibraryLayout->addWidget(new GlassColorLibraryWidget(colorEditorWidget->glassColor(), this));
-	pullPlanLibraryLayout->addWidget(new PullPlanLibraryWidget(pullPlanEditorWidget->pullPlan(), this));
-	pieceLibraryLayout->addWidget(new PieceLibraryWidget(pieceEditorWidget->piece(), this)); 
+	colorBarLibraryLayout->addWidget(
+		new GlassColorLibraryWidget(colorEditorWidget->glassColor(), this));
+	pullPlanLibraryLayout->addWidget(
+		new PullPlanLibraryWidget(pullPlanEditorWidget->pullPlan(), this));
+	pieceLibraryLayout->addWidget(
+		new PieceLibraryWidget(pieceEditorWidget->piece(), this)); 
 
 	// 4. go back to empty view mode
 	setViewMode(EMPTY_VIEW_MODE);

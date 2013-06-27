@@ -6,8 +6,9 @@
 #include "globalbackgroundcolor.h"
 #include "mainwindow.h"
 
-GlassLibraryWidget :: GlassLibraryWidget(QWidget* _parent) : QLabel(_parent)
+GlassLibraryWidget :: GlassLibraryWidget(MainWindow* _window) : QLabel(_window)
 {
+	this->window = _window;
 	setDependancy(NO_DEPENDANCY);
 }
 
@@ -57,14 +58,13 @@ int GlassLibraryWidget::hitValue(QPoint p)
 
 void GlassLibraryWidget::mouseReleaseEvent(QMouseEvent* event)
 {
-	MainWindow* m = static_cast<MainWindow*>(this->window());
         int v = hitValue(event->pos());
         if (v > 0)
-                m->copyLibraryWidget(this);
+                this->window->copyLibraryWidget(this);
         else if (v < 0)
-                m->deleteLibraryWidget(this);
+                this->window->deleteLibraryWidget(this);
         else
-		m->setEditorLibraryWidget(this);
+		this->window->setEditorLibraryWidget(this);
 }
 
 void GlassLibraryWidget::paintEvent(QPaintEvent* event)
@@ -82,7 +82,7 @@ void GlassLibraryWidget::paintEvent(QPaintEvent* event)
                 painter.drawLine(10, 5, 10, 15);
                 painter.drawLine(5, 10, 15, 10); 
                 
-		if (static_cast<MainWindow*>(this->window())->hasNoDependancies(this))
+		if (this->window->hasNoDependancies(this))
 		{
 			color.setRgb(255, 255, 255);
 			painter.fillRect(100-3-15, 3, 15, 15, color);

@@ -9,7 +9,8 @@
 
 using namespace AsyncRenderInternal;
 
-AsyncRenderWidget::AsyncRenderWidget(QWidget *_parent) : GlassLibraryWidget(_parent), id(0) {
+AsyncRenderWidget::AsyncRenderWidget(MainWindow *_window) 
+	: GlassLibraryWidget(_window), id(0) {
 	Controller::controller().registerWidget(this);
 }
 
