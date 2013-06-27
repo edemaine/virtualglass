@@ -165,8 +165,10 @@ void ColorEditorWidget :: loadCollection(QString fileName)
 
 	for (unsigned int i = 0; i < colors.size(); ++i)
 	{
-		PureColorLibraryWidget* pclw = new PureColorLibraryWidget(colors[i], this, colorLibraryWidget);
+		PureColorLibraryWidget* pclw = new PureColorLibraryWidget(colors[i], colorLibraryWidget);
 		listLayout->addWidget(pclw);
+		connect(pclw, SIGNAL(colorSelected(GlassColor*)), 
+			this, SLOT(setColorProperties(GlassColor*)));
 		// memory leak here because GlassColor objects are now forgotten about
 	}
 
@@ -185,7 +187,7 @@ void ColorEditorWidget :: alphaSliderPositionChanged(int)
 	emit someDataChanged();
 }
 
-void ColorEditorWidget :: setGlassColorProperties(GlassColor* color)
+void ColorEditorWidget :: setColorProperties(GlassColor* color)
 {
 	this->color->setColor(color->color());
 	this->color->setShortName(color->shortName());

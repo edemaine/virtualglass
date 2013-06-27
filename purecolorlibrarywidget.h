@@ -14,13 +14,18 @@ using std::string;
 
 class PureColorLibraryWidget : public QLabel
 {
+	Q_OBJECT
+
 	public:
-		PureColorLibraryWidget(GlassColor* _color, ColorEditorWidget* editor, QWidget* parent);
+		PureColorLibraryWidget(GlassColor* _color, QWidget* parent);
 		GlassColor* glassColorCopy();
 		Color color();
 		string shortName();
 		string longName();
 		void setSelected(bool s);
+
+	signals:
+		void colorSelected(GlassColor*);
 
 	protected:
 		void mousePressEvent(QMouseEvent* e);
@@ -30,7 +35,6 @@ class PureColorLibraryWidget : public QLabel
 	private:
 		bool clickDown;
 		void renderPixmap();
-		ColorEditorWidget* editor;
 		GlassColor* _color;
 		bool isSelected;
 		QLabel* swatch;

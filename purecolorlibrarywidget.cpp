@@ -8,10 +8,9 @@
 #include "glasscolor.h"
 
 PureColorLibraryWidget :: PureColorLibraryWidget(GlassColor* __color, 
-	ColorEditorWidget* editor, QWidget* parent): QLabel(parent)
+	QWidget* parent): QLabel(parent)
 {
 	setFixedSize(300, 40);
-	this->editor = editor;
 	this->_color = __color;
 	isSelected = false;
 
@@ -55,7 +54,7 @@ void PureColorLibraryWidget :: mouseMoveEvent(QMouseEvent* event)
 void PureColorLibraryWidget :: mouseReleaseEvent(QMouseEvent* event)
 {
 	if (clickDown)
-		this->editor->setGlassColorProperties(this->_color);	
+		emit colorSelected(this->_color);
 	else
 		event->ignore();
 	clickDown = false;

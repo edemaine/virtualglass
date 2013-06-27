@@ -33,12 +33,14 @@ class ColorEditorWidget : public QWidget
 		void resetGlassColor();
 		void setGlassColor(GlassColor* _color);
 		void updateEverything();
-		void setGlassColorProperties(GlassColor* color);
 		GlassColor* glassColor();
 		NiceViewWidget* niceViewWidget;
 
 	signals:
 		void someDataChanged();
+
+	public slots:
+		void setColorProperties(GlassColor* color);
 
 	private slots:
 		void alphaSliderPositionChanged(int);
