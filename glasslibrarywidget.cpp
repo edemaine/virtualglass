@@ -1,7 +1,11 @@
 
 #include <QPainter>
 #include <QMouseEvent>
+#include <QApplication>
 
+#include "glassmime.h"
+#include "glasscolorlibrarywidget.h"
+#include "pullplanlibrarywidget.h"
 #include "glasslibrarywidget.h"
 #include "globalbackgroundcolor.h"
 #include "mainwindow.h"
@@ -56,15 +60,71 @@ int GlassLibraryWidget::hitValue(QPoint p)
 		return 0;
 }
 
-void GlassLibraryWidget::mouseReleaseEvent(QMouseEvent* event)
+void GlassLibraryWidget::mousePressEvent(QMouseEvent* event)
 {
-        int v = hitValue(event->pos());
-        if (v > 0)
-                this->window->copyLibraryWidget(this);
-        else if (v < 0)
-                this->window->deleteLibraryWidget(this);
-        else
-		this->window->setEditorLibraryWidget(this);
+        if (event->button() == Qt::LeftButton)
+        {
+                clickDown = true;
+                clickDownPos = event->pos();
+        }	
+}
+
+void GlassLibraryWidget::mouseMoveEvent(QMouseEvent* event)
+{
+        if ((event->pos() - clickDownPos).manhattanLength() > QApplication::startDragDistance()
+                || !this->rect().contains(event->pos()))
+	{
+		char buf[500];
+		QPixmap pixmap;
+
+		GlassMime::Type type;
+		GlassColorLibraryWidget* gclw;
+		PullPlanLibraryWidget* pplw;
+		if ((gclw = dynamic_cast<GlassColorLibraryWidget*>(this)))
+		{
+			type = GlassMime::COLORLIBRARY_MIME;
+			pixmap = *(gclw->getDragPixmap());
+		} 
+		else if ((pplw = dynamic_cast<PullPlanLibraryWidget*>(this)))
+		{
+			type = GlassMime::PULLPLAN_MIME;
+			pixmap = *(pplw->getDragPixmap());
+		}
+		else
+		{
+			clickDown = false;
+			return;
+		}
+
+		GlassMime::encode(buf, this, type);
+
+                QByteArray pointerData(buf);
+                QMimeData* mimeData = new QMimeData;
+                mimeData->setText(pointerData);
+
+                QDrag *drag = new QDrag(this);
+                drag->setMimeData(mimeData);
+                drag->setPixmap(pixmap);
+                drag->setHotSpot(QPoint(50, 100));
+
+                drag->exec(Qt::CopyAction);
+	}
+}
+
+void GlassLibraryWidget::mouseReleaseEvent(QMouseEvent*)
+{
+	if (clickDown)
+	{
+		int v = hitValue(clickDownPos);
+		if (v > 0)
+			this->window->copyLibraryWidget(this);
+		else if (v < 0)
+			this->window->deleteLibraryWidget(this);
+		else
+			this->window->setEditorLibraryWidget(this);
+	}
+
+	clickDown = false;
 }
 
 void GlassLibraryWidget::paintEvent(QPaintEvent* event)

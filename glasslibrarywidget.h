@@ -17,13 +17,19 @@ class GlassLibraryWidget : public QLabel
 		GlassLibraryWidget(MainWindow* window);
 		void setDependancy(enum Dependancy _d=IS_DEPENDANCY);
 		virtual void paintEvent(QPaintEvent* event);		
-		void mouseReleaseEvent(QMouseEvent* event);
 
 	protected:
+		void mousePressEvent(QMouseEvent* event);
+		void mouseMoveEvent(QMouseEvent* event);
+		void mouseReleaseEvent(QMouseEvent* event);
+
+	private:
 		enum Dependancy dependancy;
 		void updateStyleSheet();
 		int hitValue(QPoint hit);
 		MainWindow* window;
+		bool clickDown;
+		QPoint clickDownPos;
 };
 
 #endif 

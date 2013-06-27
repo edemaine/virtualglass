@@ -34,9 +34,12 @@ class PureColorLibraryWidget : public QLabel
 
 	private:
 		bool clickDown;
+		QPoint clickDownPos;
+
+		bool isSelected;
+
 		void renderPixmap();
 		GlassColor* _color;
-		bool isSelected;
 		QLabel* swatch;
 };
 

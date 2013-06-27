@@ -51,8 +51,6 @@ class MainWindow : public QMainWindow
 		bool hasNoDependancies(GlassLibraryWidget* w);
 
 	protected:
-		void mousePressEvent(QMouseEvent* event);
-		void mouseMoveEvent(QMouseEvent* event);
 		void closeEvent(QCloseEvent *event);
 		void contextMenuEvent(QContextMenuEvent *event);
 		bool eventFilter(QObject* obj, QEvent* event);

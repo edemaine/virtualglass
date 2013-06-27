@@ -3,6 +3,7 @@
 #include <QPen>
 #include <QHBoxLayout>
 #include <QMouseEvent>
+#include <QApplication>
 
 #include "purecolorlibrarywidget.h"
 #include "glasscolor.h"
@@ -37,14 +38,19 @@ PureColorLibraryWidget :: PureColorLibraryWidget(GlassColor* __color,
 	clickDown = false;
 }
 
-void PureColorLibraryWidget :: mousePressEvent(QMouseEvent*)
+void PureColorLibraryWidget :: mousePressEvent(QMouseEvent* event)
 {
-	clickDown = true;
+	if (event->button() == Qt::LeftButton)
+	{
+		clickDown = true;
+		clickDownPos = event->pos();
+	}
 }
 
 void PureColorLibraryWidget :: mouseMoveEvent(QMouseEvent* event)
 {
-	if (!this->rect().contains(event->pos()))
+	if ((event->pos() - clickDownPos).manhattanLength() > QApplication::startDragDistance()
+		|| !this->rect().contains(event->pos()))
 	{
 		clickDown = false;
 		event->ignore();
