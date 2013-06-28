@@ -6,11 +6,11 @@ namespace GlassMime
 {
 	enum Type
 	{
-		COLORLIBRARY_MIME,
+		COLOR_LIBRARY_MIME,
 		COLOR_MIME,
-		PULLPLANLIBRARY_MIME,
+		PULLPLAN_LIBRARY_MIME,
 		PULLPLAN_MIME,
-		PIECELIBRARY_MIME,
+		PIECE_LIBRARY_MIME,
 	};
 
 	void encode(char* mimeData, const void* ptr, enum Type type);

@@ -178,10 +178,10 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	GlassMime::decode(event->mimeData()->text().toAscii().constData(), &droppedObject, &type);
 	switch (type)
 	{
-		case GlassMime::COLORLIBRARY_MIME:
+		case GlassMime::COLOR_LIBRARY_MIME:
 			droppedPlan = reinterpret_cast<GlassColorLibraryWidget*>(droppedObject)->circlePlan;
 			break;
-		case GlassMime::PULLPLANLIBRARY_MIME:
+		case GlassMime::PULLPLAN_LIBRARY_MIME:
 			droppedPlan = reinterpret_cast<PullPlanLibraryWidget*>(droppedObject)->pullPlan;
 			break;
 		case GlassMime::PULLPLAN_MIME:
