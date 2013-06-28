@@ -40,7 +40,7 @@ bool PullPlanLibraryWidget :: isDraggable()
 
 GlassMime::Type PullPlanLibraryWidget :: mimeType()
 {
-	return GlassMime::PULLPLAN_MIME;
+	return GlassMime::PULLPLANLIBRARY_MIME;
 }
 
 void PullPlanLibraryWidget :: updateDragPixmap()

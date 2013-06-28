@@ -292,7 +292,8 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEv
 	{
 		case GlassMime::COLORLIBRARY_MIME:
 		{
-			GlassColorLibraryWidget* draggedLibraryColor = reinterpret_cast<GlassColorLibraryWidget*>(ptr);
+			GlassColorLibraryWidget* draggedLibraryColor 
+				= reinterpret_cast<GlassColorLibraryWidget*>(ptr);
 			highlightColor = draggedLibraryColor->glassColor->color();
 			int subplanIndexUnderMouse = getSubplanIndexAt(mouseLoc);
 			if (subplanIndexUnderMouse != -1)
@@ -341,8 +342,13 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEv
 			break;
 		}
 		case GlassMime::PULLPLAN_MIME:
+		case GlassMime::PULLPLANLIBRARY_MIME:
 		{
-			PullPlan* draggedPlan = reinterpret_cast<PullPlan*>(ptr);
+			PullPlan* draggedPlan;
+			if (type == GlassMime::PULLPLAN_MIME)
+				draggedPlan = reinterpret_cast<PullPlan*>(ptr);
+			else 
+				draggedPlan = reinterpret_cast<PullPlanLibraryWidget*>(ptr)->pullPlan;
 			highlightColor.r = highlightColor.g = highlightColor.b = highlightColor.a = 1.0;
 			if (draggedPlan->hasDependencyOn(plan))
 				break;
@@ -410,8 +416,13 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			break;
 		}
 		case GlassMime::PULLPLAN_MIME:
+		case GlassMime::PULLPLANLIBRARY_MIME: 
 		{
-			PullPlan* draggedPlan = reinterpret_cast<PullPlan*>(ptr);
+			PullPlan* draggedPlan;
+			if (type == GlassMime::PULLPLAN_MIME)
+				draggedPlan = reinterpret_cast<PullPlan*>(ptr);
+			else
+				draggedPlan = reinterpret_cast<PullPlanLibraryWidget*>(ptr)->pullPlan;
 			for (set<unsigned int>::iterator it = subplansHighlighted.begin(); it != subplansHighlighted.end(); ++it)
 			{
 				SubpullTemplate& sub = plan->subs[*it];

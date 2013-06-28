@@ -8,8 +8,9 @@ namespace GlassMime
 	{
 		COLORLIBRARY_MIME,
 		COLOR_MIME,
+		PULLPLANLIBRARY_MIME,
 		PULLPLAN_MIME,
-		PIECE_MIME,
+		PIECELIBRARY_MIME,
 	};
 
 	void encode(char* mimeData, const void* ptr, enum Type type);

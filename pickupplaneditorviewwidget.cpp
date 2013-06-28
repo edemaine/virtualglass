@@ -181,6 +181,9 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		case GlassMime::COLORLIBRARY_MIME:
 			droppedPlan = reinterpret_cast<GlassColorLibraryWidget*>(droppedObject)->circlePlan;
 			break;
+		case GlassMime::PULLPLANLIBRARY_MIME:
+			droppedPlan = reinterpret_cast<PullPlanLibraryWidget*>(droppedObject)->pullPlan;
+			break;
 		case GlassMime::PULLPLAN_MIME:
 			droppedPlan = reinterpret_cast<PullPlan*>(droppedObject);
 			break;
