@@ -363,6 +363,8 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEv
 				subplansHighlighted.insert(subplanIndexUnderMouse);
 			break;
 		}
+		default:
+			break;
 	}	
 }
 
@@ -418,6 +420,8 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			}
 			break;
 		}
+		default:
+			break;
 	}
 
 	subplansHighlighted.clear();

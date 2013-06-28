@@ -53,6 +53,16 @@ const QPixmap* GlassColorLibraryWidget :: getDragPixmap()
 	return &(this->dragPixmap);
 }
 
+bool GlassColorLibraryWidget :: isDraggable()
+{
+	return true;
+}
+
+GlassMime::Type GlassColorLibraryWidget :: mimeType()
+{
+	return GlassMime::COLORLIBRARY_MIME;
+}
+
 void GlassColorLibraryWidget :: updatePixmaps()
 {
 	updateDragPixmap();

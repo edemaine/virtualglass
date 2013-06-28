@@ -4,6 +4,7 @@
 #include <QPoint>
 #include <QLabel>
 
+#include "glassmime.h"
 #include "dependancy.h" 
 
 class QWidget;
@@ -16,7 +17,10 @@ class GlassLibraryWidget : public QLabel
 	public:
 		GlassLibraryWidget(MainWindow* window);
 		void setDependancy(enum Dependancy _d=IS_DEPENDANCY);
-		virtual void paintEvent(QPaintEvent* event);		
+		void paintEvent(QPaintEvent* event);		
+		virtual const QPixmap* getDragPixmap() = 0;
+		virtual bool isDraggable() = 0;
+		virtual GlassMime::Type mimeType() = 0;
 
 	protected:
 		void mousePressEvent(QMouseEvent* event);

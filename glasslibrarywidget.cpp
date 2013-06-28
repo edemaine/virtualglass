@@ -16,6 +16,16 @@ GlassLibraryWidget :: GlassLibraryWidget(MainWindow* _window) : QLabel(_window)
 	setDependancy(NO_DEPENDANCY);
 }
 
+const QPixmap* GlassLibraryWidget :: getDragPixmap()
+{
+	return pixmap();
+}
+
+bool GlassLibraryWidget :: isDraggable()
+{
+	return false;
+}
+
 void GlassLibraryWidget :: updateStyleSheet() 
 {
 	QColor color;
@@ -77,26 +87,13 @@ void GlassLibraryWidget::mouseMoveEvent(QMouseEvent* event)
 		char buf[500];
 		QPixmap pixmap;
 
-		GlassMime::Type type;
-		GlassColorLibraryWidget* gclw;
-		PullPlanLibraryWidget* pplw;
-		if ((gclw = dynamic_cast<GlassColorLibraryWidget*>(this)))
-		{
-			type = GlassMime::COLORLIBRARY_MIME;
-			pixmap = *(gclw->getDragPixmap());
-		} 
-		else if ((pplw = dynamic_cast<PullPlanLibraryWidget*>(this)))
-		{
-			type = GlassMime::PULLPLAN_MIME;
-			pixmap = *(pplw->getDragPixmap());
-		}
-		else
+		if (!this->isDraggable())
 		{
 			clickDown = false;
 			return;
 		}
 
-		GlassMime::encode(buf, this, type);
+		GlassMime::encode(buf, this, this->mimeType());
 
                 QByteArray pointerData(buf);
                 QMimeData* mimeData = new QMimeData;
@@ -104,7 +101,7 @@ void GlassLibraryWidget::mouseMoveEvent(QMouseEvent* event)
 
                 QDrag *drag = new QDrag(this);
                 drag->setMimeData(mimeData);
-                drag->setPixmap(pixmap);
+                drag->setPixmap(*(this->getDragPixmap()));
                 drag->setHotSpot(QPoint(50, 100));
 
                 drag->exec(Qt::CopyAction);

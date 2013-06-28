@@ -1,5 +1,5 @@
 
-
+#include "glassmime.h"
 #include "pullplan.h"
 #include "glasscolor.h"
 #include "pullplanrenderdata.h"
@@ -31,6 +31,16 @@ void PullPlanLibraryWidget :: updatePixmaps()
 const QPixmap* PullPlanLibraryWidget :: getDragPixmap()
 {
 	return &(this->dragPixmap);
+}
+
+bool PullPlanLibraryWidget :: isDraggable()
+{
+	return true;
+}
+
+GlassMime::Type PullPlanLibraryWidget :: mimeType()
+{
+	return GlassMime::PULLPLAN_MIME;
 }
 
 void PullPlanLibraryWidget :: updateDragPixmap()

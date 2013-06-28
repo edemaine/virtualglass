@@ -184,9 +184,8 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		case GlassMime::PULLPLAN_MIME:
 			droppedPlan = reinterpret_cast<PullPlan*>(droppedObject);
 			break;
-		case GlassMime::COLOR_MIME:
-			// we don't serve this kind here...how would this even happen?
-			break;
+		default:
+			return;
 	}
 
 	// otherwise it's a pull plan, and we do some complicated things now

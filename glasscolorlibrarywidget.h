@@ -12,6 +12,9 @@ class GlassColorLibraryWidget : public AsyncRenderWidget
 		GlassColorLibraryWidget(GlassColor* _color, MainWindow* _window,
 			PullPlan* _circlePlan=NULL, PullPlan* _squarePlan=NULL);
 		const QPixmap *getDragPixmap();
+		bool isDraggable();
+		GlassMime::Type mimeType();
+
 		void updatePixmaps();
 		virtual void paintEvent(QPaintEvent *); //to overlay color name
 		GlassColor* glassColor;

@@ -12,6 +12,8 @@ class PullPlanLibraryWidget : public AsyncRenderWidget
 		PullPlanLibraryWidget(PullPlan *_plan, MainWindow* _window);
 		PullPlan *pullPlan;
 		const QPixmap *getDragPixmap();
+		bool isDraggable();
+		GlassMime::Type mimeType();
 		void updatePixmaps();
 
 	private:

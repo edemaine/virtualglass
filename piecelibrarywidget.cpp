@@ -29,3 +29,18 @@ void PieceLibraryWidget :: updatePixmap()
 	setScene(camera, new PieceRenderData(piece));
 }
 
+const QPixmap* PieceLibraryWidget :: getDragPixmap()
+{
+	return pixmap();
+}
+
+bool PieceLibraryWidget :: isDraggable()
+{
+	return false;
+}
+
+GlassMime::Type PieceLibraryWidget :: mimeType()
+{
+	return GlassMime::PIECE_MIME;
+}
+
