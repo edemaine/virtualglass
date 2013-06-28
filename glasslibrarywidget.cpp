@@ -16,7 +16,7 @@ GlassLibraryWidget :: GlassLibraryWidget(MainWindow* _window) : QLabel(_window)
 	setDependancy(NO_DEPENDANCY);
 }
 
-const QPixmap* GlassLibraryWidget :: getDragPixmap()
+const QPixmap* GlassLibraryWidget :: dragPixmap()
 {
 	return pixmap();
 }
@@ -101,7 +101,7 @@ void GlassLibraryWidget::mouseMoveEvent(QMouseEvent* event)
 
                 QDrag *drag = new QDrag(this);
                 drag->setMimeData(mimeData);
-                drag->setPixmap(*(this->getDragPixmap()));
+                drag->setPixmap(*(this->dragPixmap()));
                 drag->setHotSpot(QPoint(50, 100));
 
                 drag->exec(Qt::CopyAction);

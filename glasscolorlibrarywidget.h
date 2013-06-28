@@ -11,7 +11,7 @@ class GlassColorLibraryWidget : public AsyncRenderWidget
 	public:
 		GlassColorLibraryWidget(GlassColor* _color, MainWindow* _window,
 			PullPlan* _circlePlan=NULL, PullPlan* _squarePlan=NULL);
-		const QPixmap *getDragPixmap();
+		const QPixmap *dragPixmap();
 		bool isDraggable();
 		GlassMime::Type mimeType();
 
@@ -22,7 +22,7 @@ class GlassColorLibraryWidget : public AsyncRenderWidget
 		PullPlan* squarePlan;
 
 	private:
-		QPixmap dragPixmap;
+		QPixmap _dragPixmap;
 		void updateDragPixmap();
 };
 

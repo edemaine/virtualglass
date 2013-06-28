@@ -28,9 +28,9 @@ void PullPlanLibraryWidget :: updatePixmaps()
 	setScene(camera, new PullPlanRenderData(pullPlan));
 }
 
-const QPixmap* PullPlanLibraryWidget :: getDragPixmap()
+const QPixmap* PullPlanLibraryWidget :: dragPixmap()
 {
-	return &(this->dragPixmap);
+	return &(this->_dragPixmap);
 }
 
 bool PullPlanLibraryWidget :: isDraggable()
@@ -52,7 +52,7 @@ void PullPlanLibraryWidget :: updateDragPixmap()
 	PullPlanCrossSectionRender::render(&painter, 100, pullPlan);
 	painter.end();
 
-	dragPixmap = _pixmap;
+	_dragPixmap = _pixmap;
 }
 
 

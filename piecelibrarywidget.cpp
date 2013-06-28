@@ -29,7 +29,7 @@ void PieceLibraryWidget :: updatePixmap()
 	setScene(camera, new PieceRenderData(piece));
 }
 
-const QPixmap* PieceLibraryWidget :: getDragPixmap()
+const QPixmap* PieceLibraryWidget :: dragPixmap()
 {
 	return pixmap();
 }

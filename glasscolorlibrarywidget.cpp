@@ -45,12 +45,12 @@ void GlassColorLibraryWidget :: updateDragPixmap()
 	painter.drawEllipse(10, 10, 180, 180);
 	painter.end();
 
-	dragPixmap = _pixmap.scaled(100, 100);
+	_dragPixmap = _pixmap.scaled(100, 100);
 }
 
-const QPixmap* GlassColorLibraryWidget :: getDragPixmap()
+const QPixmap* GlassColorLibraryWidget :: dragPixmap()
 {
-	return &(this->dragPixmap);
+	return &(this->_dragPixmap);
 }
 
 bool GlassColorLibraryWidget :: isDraggable()

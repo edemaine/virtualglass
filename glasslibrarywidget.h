@@ -18,7 +18,7 @@ class GlassLibraryWidget : public QLabel
 		GlassLibraryWidget(MainWindow* window);
 		void setDependancy(enum Dependancy _d=IS_DEPENDANCY);
 		void paintEvent(QPaintEvent* event);		
-		virtual const QPixmap* getDragPixmap() = 0;
+		virtual const QPixmap* dragPixmap() = 0;
 		virtual bool isDraggable() = 0;
 		virtual GlassMime::Type mimeType() = 0;
 

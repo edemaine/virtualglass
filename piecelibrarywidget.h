@@ -12,7 +12,7 @@ class PieceLibraryWidget : public AsyncRenderWidget
 	public:
 		PieceLibraryWidget(Piece* _piece, MainWindow* _window);
 		Piece* piece;
-		const QPixmap* getDragPixmap();
+		const QPixmap* dragPixmap();
 		bool isDraggable();
 		GlassMime::Type mimeType();
 		void updatePixmap();
