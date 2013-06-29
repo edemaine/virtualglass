@@ -60,7 +60,7 @@ void generateMesh(GlassColor* gc, Geometry* geometry, unsigned int quality)
 	dummyPlan.setOutermostCasingColor(gc);
 
 	geometry->clear();
-	vector<ancestor> ancestors;
+	vector<Ancestor> ancestors;
 	recurseMesh(&dummyPlan, geometry, ancestors, 2.0, quality, true, clock() + CLOCKS_PER_SEC * 20);
 	geometry->compute_normals_from_triangles();
 }
@@ -170,11 +170,11 @@ void applyPieceTransform(Geometry* geometry, Piece* piece)
 		applyPieceTransform(geometry->vertices[i], piece->twist, piece->spline);
 }
 
-void applySubplanTransforms(Vertex& v, vector<ancestor>& ancestors)
+void applySubplanTransforms(Vertex& v, vector<Ancestor>& ancestors)
 {
 	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
 	{
-		ancestor& a = ancestors[i];
+		Ancestor& a = ancestors[i];
 		SubpullTemplate& subTemp = a.parent->subs[a.child];
 		applyResizeTransform(v, subTemp.diameter / 2.0);
 		applySubplanTransform(v, subTemp.location);
@@ -214,12 +214,9 @@ void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickn
 		{
 			Point3D p;
 			p.xy = points[j];
-			if (i == 0)
-				p.z = -5.001;
-			else
-				p.z = -5.001 + 10.002 * i / (slabResolution-1);
-			Point3D n;
+			p.z = (i == 0) ? -5.001 : -5.001 + 10.002 * i / (slabResolution-1);
 			//This is a terrible normal estimate, but I guess it gets re-estimated anyway.
+			Point3D n;
 			n.x = p.x;
 			n.y = p.y;
 			n.z = 0.0f;
@@ -381,12 +378,10 @@ void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float lengt
 		{
 			Point3D p;
 			p.xy = points[j];
-			if (i == 0)
-				p.z = 0.0;
-			else
-				p.z = 5.0 * length * i / (axialResolution-1);
-			Point3D n;
+			p.z = (i == 0) ? 0.0 : 5.0 * length * i / (axialResolution-1);
+
 			//This is a terrible normal estimate, but I guess it gets re-estimated anyway.
+			Point3D n;
 			n.x = p.x;
 			n.y = p.y;
 			n.z = 0.0f;
@@ -438,7 +433,7 @@ unsigned int computeAxialResolution(float length, float twist, unsigned int qual
 	return MIN(MAX(rawRes, quality * 5), 100);
 }
 
-float totalTwist(vector<ancestor>& ancestors)
+float totalTwist(vector<Ancestor>& ancestors)
 {
 	float twist = 0.0;
 	
@@ -450,7 +445,7 @@ float totalTwist(vector<ancestor>& ancestors)
 	return twist;
 }
 
-float finalRadius(vector<ancestor>& ancestors)
+float finalRadius(vector<Ancestor>& ancestors)
 {
 	float radius = 1.0; 
 
@@ -462,34 +457,35 @@ float finalRadius(vector<ancestor>& ancestors)
 	return radius;
 }
 
-void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color, 
-	enum GeometricShape outerShape, enum GeometricShape innerShape, float length, float outerRadius, 
-	float innerRadius, float twist, unsigned int quality, bool ensureVisible)
+void meshBaseCasing(Geometry* geometry, vector<Ancestor>& ancestors, struct Casing casing,
+	unsigned int quality, bool ensureVisible)
 {
 	if (ensureVisible)
-		color.a = MAX(color.a, 0.1);
+		casing.color.a = MAX(casing.color.a, 0.1);
 	// don't render casing that's extremely clear
-	if (color.a < 0.001)
+	if (casing.color.a < 0.001)
 		return;
 	
 	unsigned int angularResolution = 
-		MAX(computeAngularResolution(finalRadius(ancestors) * outerRadius, quality, outerShape),
-		computeAngularResolution(finalRadius(ancestors) * outerRadius, quality, innerShape));
+		MAX(computeAngularResolution(finalRadius(ancestors) * casing.outerRadius, quality, casing.outerShape),
+		computeAngularResolution(finalRadius(ancestors) * casing.outerRadius, quality, casing.innerShape));
 	
-	unsigned int axialResolution = computeAxialResolution(length, totalTwist(ancestors) + twist, quality);
+	unsigned int axialResolution = computeAxialResolution(casing.length, 
+		totalTwist(ancestors) + casing.twist, quality);
 	
 	uint32_t first_vert = geometry->vertices.size();
 	uint32_t first_triangle = geometry->triangles.size();
 
 	// assuming meshCylinderWall vertices end with the top row  
 	unsigned int outerPointsBottomStart = geometry->vertices.size();
-	meshCylinderWall(geometry, outerShape, length, outerRadius, angularResolution, axialResolution);
+	meshCylinderWall(geometry, casing.outerShape, casing.length, casing.outerRadius, 
+		angularResolution, axialResolution);
 	unsigned int outerPointsTopStart = geometry->vertices.size() - angularResolution;
 
 	// add vertices for bottom edge of inner shape 
 	unsigned int innerPointsBottomStart = geometry->vertices.size();
 	vector<Point2D> points;
-	getTemplatePoints(points, angularResolution, innerShape, innerRadius);
+	getTemplatePoints(points, angularResolution, casing.innerShape, casing.innerRadius);
 	for (unsigned int j = 0; j < points.size(); ++j)
 	{
 		Point3D p;
@@ -507,7 +503,7 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 	{
 		Point3D p;
 		p.xy = points[j];
-		p.z = 5.0 * length;
+		p.z = 5.0 * casing.length;
 		Point3D n;
 		n.x = p.x;
 		n.y = p.y;
@@ -537,36 +533,37 @@ void meshBaseCasing(Geometry* geometry, vector<ancestor>& ancestors, Color color
 	// Actually do the transformations on the basic canonical cylinder mesh
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
-		applyTwistTransform(geometry->vertices[v], twist);
+		applyTwistTransform(geometry->vertices[v], casing.twist);
 		applySubplanTransforms(geometry->vertices[v], ancestors);
 	}
 
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, color));
+		first_vert, geometry->vertices.size() - first_vert, casing.color));
 }
 
 // The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
-void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors, 
-	Color color, enum GeometricShape shape, float length, float radius, float twist, 
+void meshBaseCane(Geometry* geometry, vector<Ancestor>& ancestors, struct Cane cane,
 	unsigned int quality, bool ensureVisible)
 {
 	// cull out geometry that's extremely clear
 	if (ensureVisible)
-		color.a = MAX(color.a, 0.1);
-	if (color.a < 0.01)
+		cane.color.a = MAX(cane.color.a, 0.1);
+	if (cane.color.a < 0.01)
 		return;
 
-	unsigned int angularResolution = computeAngularResolution(finalRadius(ancestors) * radius, quality, shape);
-	unsigned int axialResolution = computeAxialResolution(length, totalTwist(ancestors) + twist, quality);
+	unsigned int angularResolution = computeAngularResolution(finalRadius(ancestors) * cane.radius, 
+		quality, cane.shape);
+	unsigned int axialResolution = computeAxialResolution(cane.length, 
+		totalTwist(ancestors) + cane.twist, quality);
 
 	uint32_t first_vert = geometry->vertices.size();
 	uint32_t first_triangle = geometry->triangles.size();
 
-	meshCylinderWall(geometry, shape, length, radius, angularResolution, axialResolution);
+	meshCylinderWall(geometry, cane.shape, cane.length, cane.radius, angularResolution, axialResolution);
 
 	// now mesh top and bottom
 	vector<Point2D> points;
-	getTemplatePoints(points, angularResolution, shape, radius);
+	getTemplatePoints(points, angularResolution, cane.shape, cane.radius);
 
 	// Build top and bottom triangles (two concentric rings) 
 	vector< Vector3ui > layer1Tris;
@@ -594,21 +591,9 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors,
 	*/
 	for (int side = 0; side <= 1; ++side) 
 	{
-		float z;
-		int o1, o2;
-
-		if (side)
-		{
-			o1 = 1;
-			o2 = 2;
-			z = 5.0 * length;
-		}
-		else
-		{
-			o1 = 2;
-			o2 = 1;
-			z = 0.0;
-		}
+		int o1 = side ? 1 : 2;
+		int o2 = side ? 2 : 1;
+		float z = side ? 5.0 * cane.length : 0.0;
 
 		Point3D n;
 		n.x = 0.0; 
@@ -632,7 +617,8 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors,
 		}
 		for (unsigned int j = 0; j < layer1Tris.size(); ++j)
 		{
-			geometry->triangles.push_back(Triangle(base + layer1Tris[j].c[0], base + layer1Tris[j].c[o1], base + layer1Tris[j].c[o2]));
+			geometry->triangles.push_back(Triangle(base + layer1Tris[j].c[0], 
+				base + layer1Tris[j].c[o1], base + layer1Tris[j].c[o2]));
 		}
 
 		// throw down second layer of points and triangles (outer ring layer)
@@ -654,19 +640,19 @@ void meshBaseCane(Geometry* geometry, vector<ancestor>& ancestors,
 	// Actually do the transformations on the basic canonical cylinder mesh
 	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 	{
-		applyTwistTransform(geometry->vertices[v], twist);
+		applyTwistTransform(geometry->vertices[v], cane.twist);
 		applySubplanTransforms(geometry->vertices[v], ancestors);
 	}
 
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
-		first_vert, geometry->vertices.size() - first_vert, color));
+		first_vert, geometry->vertices.size() - first_vert, cane.color));
 }
 
 void generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality, clock_t end)
 {
 	geometry->clear();
 
-	vector<ancestor> ancestors;
+	vector<Ancestor> ancestors;
 	recurseMesh(plan, geometry, ancestors, 2.0, quality, true, end);			
 
 	// Make skinnier to more closely mimic the canes found in pickups
@@ -685,7 +671,7 @@ void generateMesh(PickupPlan* pickup, Geometry *geometry, bool isTopLevel, unsig
 	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
 	{
 		uint32_t startVert = geometry->vertices.size();
-		vector<ancestor> ancestors;
+		vector<Ancestor> ancestors;
 		recurseMesh(pickup->subs[i].plan, geometry, ancestors, pickup->subs[i].length, quality, isTopLevel, end);
 		for (unsigned int j = startVert; j < geometry->vertices.size(); ++j)
 		{
@@ -698,14 +684,14 @@ void generateMesh(PickupPlan* pickup, Geometry *geometry, bool isTopLevel, unsig
 // since canes can be nested, recurseMesh() processes these nestings recursively.
 // keeping a running stack of ancestors nodes in the dependancy DAG
 // and applying them when a leaf node is encountered.
-void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors, float length, 
+void recurseMesh(PullPlan* plan, Geometry *geometry, vector<Ancestor>& ancestors, float length, 
 	unsigned int quality, bool isTopLevel, clock_t end)
 {
 	if (plan == NULL || clock() > end)
 		return;
 
 	// Recurse through to children 
-	ancestor me = {plan, 0};
+	Ancestor me = {plan, 0};
 	for (unsigned int i = 0; i < plan->subs.size(); ++i)
 	{
 		me.child = i;
@@ -744,16 +730,25 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<ancestor>& ancestors
 		{
 			// punting on actually doing this geometry right and just making it a cylinder
 			// (that intersects its subcanes)
-			meshBaseCane(geometry, ancestors, plan->getCasingColor(colorIntervalStart)->color(), 
-				plan->getCasingShape(i), length-0.001, plan->getCasingThickness(i), plan->twist, 
-				quality, ensureVisible && outermostLayer);
+			struct Cane cane;
+			cane.color = plan->getCasingColor(colorIntervalStart)->color();
+			cane.shape = plan->getCasingShape(i);
+			cane.length = length-0.001;
+			cane.radius = plan->getCasingThickness(i);
+			cane.twist = plan->twist;
+			meshBaseCane(geometry, ancestors, cane, quality, ensureVisible && outermostLayer);
 		}
 		else
 		{
-			meshBaseCasing(geometry, ancestors, plan->getCasingColor(colorIntervalStart)->color(), 
-				plan->getCasingShape(i), plan->getCasingShape(colorIntervalStart-1), length,
-				plan->getCasingThickness(i), plan->getCasingThickness(colorIntervalStart-1)+0.01, 
-				plan->twist, quality, ensureVisible && outermostLayer);
+			struct Casing casing;
+			casing.color = plan->getCasingColor(colorIntervalStart)->color(), 
+			casing.outerShape = plan->getCasingShape(i); 
+			casing.innerShape = plan->getCasingShape(colorIntervalStart-1);
+			casing.length = length; 
+			casing.outerRadius = plan->getCasingThickness(i);
+			casing.innerRadius = plan->getCasingThickness(colorIntervalStart-1)+0.01; 
+			casing.twist = plan->twist;
+			meshBaseCasing(geometry, ancestors, casing, quality, ensureVisible && outermostLayer);
 		}
 	}
 }
