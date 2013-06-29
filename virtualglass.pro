@@ -95,6 +95,7 @@ HEADERS += vgapp.h \
         jsoncpp/include/json/reader.h \
         jsoncpp/include/json/value.h \
         jsoncpp/include/json/writer.h \
+	undoredo.h \
         primitives.h \
         constants.h \
         Vector.hpp \
@@ -158,6 +159,7 @@ HEADERS += vgapp.h \
 SOURCES += main.cpp \ 
 	vgapp.cpp \
 	glew/glew.c \
+	undoredo.cpp \
 	glasslibrarywidget.cpp \
 	randomglass.cpp \
 	templateparameter.cpp \

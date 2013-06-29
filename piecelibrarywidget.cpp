@@ -41,6 +41,6 @@ bool PieceLibraryWidget :: isDraggable()
 
 GlassMime::Type PieceLibraryWidget :: mimeType()
 {
-	return GlassMime::PIECELIBRARY_MIME;
+	return GlassMime::PIECE_LIBRARY_MIME;
 }
 

@@ -120,14 +120,6 @@ class MainWindow : public QMainWindow
 		QPushButton* newPullPlanButton;
 		QPushButton* newPieceButton;
 
-		QMenu* viewMenu;
-		QAction *fullscreenViewAction;
-		QAction *windowedViewAction;
-		QMenu *examplesMenu;
-		QAction *randomSimpleCaneAction;
-		QAction *randomSimplePieceAction;
-		QAction *randomComplexCaneAction;
-		QAction *randomComplexPieceAction;
 		QMenu *fileMenu;
 		QAction *newFileAction;
 		QAction *openFileAction;
@@ -139,6 +131,21 @@ class MainWindow : public QMainWindow
 		QAction *saveAllAsFileAction;
 		QAction *saveSelectedAsFileAction;
 		QAction *exitAction;
+
+		QMenu* editMenu;
+		QAction* undoAction;
+		QAction* redoAction;
+
+		QMenu* viewMenu;
+		QAction *fullscreenViewAction;
+		QAction *windowedViewAction;
+
+		QMenu *examplesMenu;
+		QAction *randomSimpleCaneAction;
+		QAction *randomSimplePieceAction;
+		QAction *randomComplexCaneAction;
+		QAction *randomComplexPieceAction;
+
 		QMenu *perfMenu;
 		QAction *depthPeelAction;
 
@@ -157,8 +164,6 @@ class MainWindow : public QMainWindow
 		void attemptToQuit();
 
 		// menu slots
-		void windowedViewActionTriggered();
-		void fullscreenViewActionTriggered();
 		void newFileActionTriggered();
 		void openFileActionTriggered();
 		void addFileActionTriggered();
@@ -169,6 +174,10 @@ class MainWindow : public QMainWindow
 		void importSVGActionTriggered();
 		void exportPLYActionTriggered();
 		void exportOBJActionTriggered();
+		void undoActionTriggered();
+		void redoActionTriggered();
+		void windowedViewActionTriggered();
+		void fullscreenViewActionTriggered();
 		void randomSimpleCaneExampleActionTriggered();
 		void randomSimplePieceExampleActionTriggered();
 		void randomComplexCaneExampleActionTriggered();

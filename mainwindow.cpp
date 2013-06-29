@@ -556,9 +556,7 @@ void MainWindow :: setupConnections()
 	connect(newPullPlanButton, SIGNAL(clicked()), this, SLOT(newPullPlanButtonClicked()));
 	connect(newPieceButton, SIGNAL(clicked()), this, SLOT(newPieceButtonClicked()));
 
-	// Menu stuff
-
-	// file menu 
+	// File menu stuff
 	connect(newFileAction, SIGNAL(triggered()), this, SLOT(newFileActionTriggered()));
 	connect(openFileAction, SIGNAL(triggered()), this, SLOT(openFileActionTriggered()));
 	connect(addFileAction, SIGNAL(triggered()), this, SLOT(addFileActionTriggered()));
@@ -570,27 +568,41 @@ void MainWindow :: setupConnections()
 	connect(saveSelectedAsFileAction, SIGNAL(triggered()), this, SLOT(saveSelectedAsFileActionTriggered()));
 	connect(exitAction, SIGNAL(triggered()), this, SLOT(attemptToQuit()));
 
-	// view menu 
+	// Edit menu stuff
+	connect(undoAction, SIGNAL(triggered()), this, SLOT(undoActionTriggered()));
+	connect(redoAction, SIGNAL(triggered()), this, SLOT(redoActionTriggered()));
+	
+	// View menu stuff
 	connect(fullscreenViewAction, SIGNAL(triggered()), this, SLOT(fullscreenViewActionTriggered()));
 	connect(windowedViewAction, SIGNAL(triggered()), this, SLOT(windowedViewActionTriggered()));
 
-	// examples menu
+	// Examples menu stuff
 	connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
 	connect(randomSimplePieceAction, SIGNAL(triggered()), this, SLOT(randomSimplePieceExampleActionTriggered()));
 
 	connect(randomComplexCaneAction, SIGNAL(triggered()), this, SLOT(randomComplexCaneExampleActionTriggered()));
 	connect(randomComplexPieceAction, SIGNAL(triggered()), this, SLOT(randomComplexPieceExampleActionTriggered()));
 
-	// the performance menu stuff
+	// Performance menu stuff
 	connect(depthPeelAction, SIGNAL(triggered()), this, SLOT(depthPeelActionTriggered()));
 
-	// status bar stuff
+	// Status bar stuff
 	connect(pullPlanEditorWidget, SIGNAL(showMessage(const QString&, unsigned int)), 
 		this, SLOT(showStatusMessage(const QString&, unsigned int)));
 	connect(pieceEditorWidget, SIGNAL(showMessage(const QString&, unsigned int)), 
 		this, SLOT(showStatusMessage(const QString&, unsigned int)));
 	connect(email, SIGNAL(showMessage(const QString&, unsigned int)), 
 		this, SLOT(showStatusMessage(const QString&, unsigned int)));
+}
+
+void MainWindow :: undoActionTriggered()
+{
+	this->showStatusMessage("undo", 1);
+}
+
+void MainWindow :: redoActionTriggered()
+{
+	this->showStatusMessage("redo", 1);
 }
 
 void MainWindow :: fullscreenViewActionTriggered()
@@ -1242,112 +1254,112 @@ void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 
 void MainWindow::setupMenus()
 {
-	//new
-	newFileAction = new QAction("&New", this);
+	// File menu
+	fileMenu = menuBar()->addMenu("File"); 
+	
+	newFileAction = new QAction("New", this);
 	newFileAction->setShortcuts(QKeySequence::New);
 	newFileAction->setToolTip("Open a new empty file.");
-
-	//open
-	openFileAction = new QAction("&Open", this);
+	fileMenu->addAction(newFileAction); 
+	
+	openFileAction = new QAction("Open", this);
 	openFileAction->setShortcuts(QKeySequence::Open);
 	openFileAction->setToolTip("Open an existing file.");
-
-	//add
-	addFileAction = new QAction("&Add", this);
+	fileMenu->addAction(openFileAction); 
+	
+	addFileAction = new QAction("Add", this);
 	addFileAction->setToolTip("Add an existing file.");
-
-	//import svg cane
-	importSVGFileAction = new QAction("&Import cane from .svg", this);
-	importSVGFileAction->setToolTip("Import cane cross section from .svg file.");
-
-	//export ply object
-	exportPLYFileAction = new QAction("&Export glass to .ply", this);
-	exportPLYFileAction->setToolTip("Export cane or piece");
+	fileMenu->addAction(addFileAction); 
 	
-	//export obj object
-	exportOBJFileAction = new QAction("&Export glass to .obj", this);
-	exportOBJFileAction->setToolTip("Export cane or piece");
+	fileMenu->addSeparator();
 	
-	//save
-	saveAllFileAction = new QAction("&Save", this);
+	saveAllFileAction = new QAction("Save", this);
 	saveAllFileAction->setShortcuts(QKeySequence::Save);
 	saveAllFileAction->setToolTip("Save library to file.");
+	fileMenu->addAction(saveAllFileAction); 
 
-	//saveAllAs
-	saveAllAsFileAction = new QAction("Save &As", this);
+	saveAllAsFileAction = new QAction("Save As", this);
 	saveAllAsFileAction->setShortcuts(QKeySequence::SaveAs);
 	saveAllAsFileAction->setToolTip("Save library to file.");
+	fileMenu->addAction(saveAllAsFileAction); 
 
-	//saveSelectedAs
 	saveSelectedAsFileAction = new QAction("Save Selected As", this);
 	saveSelectedAsFileAction->setToolTip("Save selected object to file.");
+	fileMenu->addAction(saveSelectedAsFileAction); 
 
-	//exit
-	exitAction = new QAction(tr("Q&uit"), this);
+	importSVGFileAction = new QAction("Import cane from .svg", this);
+	importSVGFileAction->setToolTip("Import cane cross section from .svg file.");
+	fileMenu->addAction(importSVGFileAction); 
+
+	exportPLYFileAction = new QAction("Export glass to .ply", this);
+	exportPLYFileAction->setToolTip("Export cane or piece");
+	fileMenu->addAction(exportPLYFileAction); 
+
+	exportOBJFileAction = new QAction("Export glass to .obj", this);
+	exportOBJFileAction->setToolTip("Export cane or piece");
+	fileMenu->addAction(exportOBJFileAction); 
+
+	fileMenu->addSeparator();
+
+	exitAction = new QAction(tr("Quit"), this);
 	exitAction->setShortcuts(QKeySequence::Quit);
 	exitAction->setToolTip("Quit");
-
-	//File menu
-	fileMenu = menuBar()->addMenu(tr("&File")); 
-	fileMenu->addAction(newFileAction); 
-	fileMenu->addAction(openFileAction); 
-	fileMenu->addAction(addFileAction); 
-	fileMenu->addSeparator();
-	fileMenu->addAction(saveAllFileAction); 
-	fileMenu->addAction(saveAllAsFileAction); 
-	fileMenu->addAction(saveSelectedAsFileAction); 
-	fileMenu->addSeparator();
-	fileMenu->addAction(importSVGFileAction); 
-	fileMenu->addAction(exportPLYFileAction); 
-	fileMenu->addAction(exportOBJFileAction); 
-	fileMenu->addSeparator();
 	fileMenu->addAction(exitAction);
 
-	// Fullscreen/windowed stuff
+	// Edit menu
+	editMenu = menuBar()->addMenu("Edit");
+
+	undoAction = new QAction("Undo", this);	
+	undoAction->setShortcuts(QKeySequence::Undo);
+	undoAction->setToolTip("Undo");
+	editMenu->addAction(undoAction);
+
+	redoAction = new QAction("Redo", this);	
+	redoAction->setShortcuts(QKeySequence::Redo);
+	redoAction->setToolTip("Redo");
+	editMenu->addAction(redoAction);
+
+	// View menu
+	viewMenu = menuBar()->addMenu("View");
+
 	fullscreenViewAction = new QAction("Full Screen", this);
 	fullscreenViewAction->setCheckable(true);
 	fullscreenViewAction->setChecked(false); 
+	viewMenu->addAction(fullscreenViewAction);	
+
 	windowedViewAction = new QAction("Windowed", this);
 	windowedViewAction->setCheckable(true);
 	windowedViewAction->setChecked(true); // start true b/c of showMaximized() call in constructor
-
-	// View menu;
-	viewMenu = menuBar()->addMenu("View");
-	viewMenu->addAction(fullscreenViewAction);	
 	viewMenu->addAction(windowedViewAction);	
 
-	//examples:random:simple cane
-	randomSimpleCaneAction = new QAction("&Simple Cane", this);
+	// Examples menu
+	examplesMenu = menuBar()->addMenu("Examples"); 
+
+	randomSimpleCaneAction = new QAction("Simple Cane", this);
 	randomSimpleCaneAction->setToolTip("Randomly generate a simple example cane.");
-
-	//examples:random:simple piece
-	randomSimplePieceAction = new QAction("&Simple Piece", this);
-	randomSimplePieceAction->setToolTip("Randomly generate a simple example piece.");
-
-	//examples:random:complex cane
-	randomComplexCaneAction = new QAction("&Complex Cane", this);
-	randomComplexCaneAction->setToolTip("Ranomly generate a complex example cane.");
-
-	//examples:random:complex piece
-	randomComplexPieceAction = new QAction("&Complex Piece", this);
-	randomComplexPieceAction->setToolTip("Randomly generate a complex example piece.");
-
-	// Examples menu and Examples:Random menu
-	examplesMenu = menuBar()->addMenu("&Examples"); //create menu for cane/piece examples
 	examplesMenu->addAction(randomSimpleCaneAction);
+
+	randomComplexCaneAction = new QAction("Complex Cane", this);
+	randomComplexCaneAction->setToolTip("Ranomly generate a complex example cane.");
 	examplesMenu->addAction(randomComplexCaneAction);
+
 	examplesMenu->addSeparator();
+
+	randomSimplePieceAction = new QAction("Simple Piece", this);
+	randomSimplePieceAction->setToolTip("Randomly generate a simple example piece.");
 	examplesMenu->addAction(randomSimplePieceAction);
+
+	randomComplexPieceAction = new QAction("Complex Piece", this);
+	randomComplexPieceAction->setToolTip("Randomly generate a complex example piece.");
 	examplesMenu->addAction(randomComplexPieceAction);
 
-	// toggle depth peeling
+	// Performance menu
+	perfMenu = menuBar()->addMenu("Performance");
+
 	depthPeelAction = new QAction("GPU Transparency", this);
 	depthPeelAction->setCheckable(true);
 	depthPeelAction->setChecked(GlobalDepthPeelingSetting::enabled());
 	depthPeelAction->setToolTip(tr("Toggle transparency in 3D views. Turn off for better framerate."));
-
-	// Performance menu
-	perfMenu = menuBar()->addMenu("Performance");
 	perfMenu->addAction(depthPeelAction);
 }
 

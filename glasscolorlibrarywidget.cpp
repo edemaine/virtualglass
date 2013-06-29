@@ -60,7 +60,7 @@ bool GlassColorLibraryWidget :: isDraggable()
 
 GlassMime::Type GlassColorLibraryWidget :: mimeType()
 {
-	return GlassMime::COLORLIBRARY_MIME;
+	return GlassMime::COLOR_LIBRARY_MIME;
 }
 
 void GlassColorLibraryWidget :: updatePixmaps()
