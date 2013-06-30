@@ -79,9 +79,6 @@ class MainWindow : public QMainWindow
 		void setupStatusBar();
 		void setupSaveFile();
 		void initializeRandomPiece();
-		void deleteCurrentGlassColor();
-		void deleteCurrentPullPlan();
-		void deleteCurrentPiece();
 		void deleteCurrentEditingObject();
 		void moveCurrentEditingObject(int d);
 		void setViewMode(enum ViewMode m);
@@ -101,13 +98,13 @@ class MainWindow : public QMainWindow
 
 		// Variables
 		QScrollArea* libraryScrollArea;
-		QVBoxLayout* colorBarLibraryLayout;
+		QVBoxLayout* glassColorLibraryLayout;
 		QVBoxLayout* pullPlanLibraryLayout;
 		QVBoxLayout* pieceLibraryLayout;
 		QStackedWidget* editorStack; //editorStack.currentIndex() gives which mode
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
-		ColorEditorWidget* colorEditorWidget;
+		ColorEditorWidget* glassColorEditorWidget;
 		PullPlanEditorWidget* pullPlanEditorWidget;
 		PieceEditorWidget* pieceEditorWidget;
 
