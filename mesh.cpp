@@ -170,16 +170,12 @@ void applyPieceTransform(Geometry* geometry, Piece* piece)
 		applyPieceTransform(geometry->vertices[i], piece->twist, piece->spline);
 }
 
-void applySubplanTransforms(Vertex& v, vector<Ancestor>& ancestors)
+void applyPlanTransform(Vertex& v, Ancestor a)
 {
-	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
-	{
-		Ancestor& a = ancestors[i];
-		SubpullTemplate& subTemp = a.parent->subs[a.child];
-		applyResizeTransform(v, subTemp.diameter / 2.0);
-		applySubplanTransform(v, subTemp.location);
-		applyTwistTransform(v, a.parent->twist);
-	}
+	SubpullTemplate& subTemp = a.parent->subs[a.child];
+	applyResizeTransform(v, subTemp.diameter / 2.0);
+	applySubplanTransform(v, subTemp.location);
+	applyTwistTransform(v, a.parent->twist);
 }
 
 void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickness)
@@ -530,12 +526,20 @@ void meshBaseCasing(Geometry* geometry, vector<Ancestor>& ancestors, struct Casi
 
 	assert(geometry->valid());
 
-	// Actually do the transformations on the basic canonical cylinder mesh
-	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
+	// Apply glass transformations on the canonical cylinder mesh
+	if (casing.outerShape == CIRCLE_SHAPE && casing.innerShape == CIRCLE_SHAPE)
 	{
+		// If the cane is invariant to twist, apply a negating pretwist
+		// to minimize artifacts
+		float total_twist = totalTwist(ancestors) + casing.twist;
+		for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
+			applyTwistTransform(geometry->vertices[v], -total_twist);
+	}	
+	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 		applyTwistTransform(geometry->vertices[v], casing.twist);
-		applySubplanTransforms(geometry->vertices[v], ancestors);
-	}
+	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
+		for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
+			applyPlanTransform(geometry->vertices[v], ancestors[i]);
 
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
 		first_vert, geometry->vertices.size() - first_vert, casing.color));
@@ -637,12 +641,20 @@ void meshBaseCane(Geometry* geometry, vector<Ancestor>& ancestors, struct Cane c
 	}
 	assert(geometry->valid());
 
-	// Actually do the transformations on the basic canonical cylinder mesh
-	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
+	// Apply glass transformations on the canonical cylinder mesh
+	if (cane.shape == CIRCLE_SHAPE)
 	{
+		// If the cane is invariant to twist, apply a negating pretwist
+		// to minimize artifacts
+		float total_twist = totalTwist(ancestors) + cane.twist;
+		for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
+			applyTwistTransform(geometry->vertices[v], -total_twist);
+	}	
+	for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
 		applyTwistTransform(geometry->vertices[v], cane.twist);
-		applySubplanTransforms(geometry->vertices[v], ancestors);
-	}
+	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
+		for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
+			applyPlanTransform(geometry->vertices[v], ancestors[i]);
 
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
 		first_vert, geometry->vertices.size() - first_vert, cane.color));

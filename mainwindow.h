@@ -18,7 +18,6 @@ class QMenu;
 class QAction;
 class QActionGroup;
 class QScrollArea;
-class QToolButton;
 
 class GlassColor;
 class PullPlan;
@@ -59,7 +58,6 @@ class MainWindow : public QMainWindow
 		void someDataChanged();
 
 	private:
-		// enums
 		enum ViewMode
 		{
 			EMPTY_VIEW_MODE=0, // must start at 0 to match usage as QStackedWidget index
@@ -69,6 +67,7 @@ class MainWindow : public QMainWindow
 		};
 
 		// Methods
+		void setViewMode(enum ViewMode m);
 		void setupLibrary();
 		void setupEditors();
 		void setupColorEditor();
@@ -81,18 +80,20 @@ class MainWindow : public QMainWindow
 		void initializeRandomPiece();
 		void deleteCurrentEditingObject();
 		void moveCurrentEditingObject(int d);
-		void setViewMode(enum ViewMode m);
 		void clearLibrary();
 		bool glassColorIsDependancy(GlassColor* color);
 		bool pullPlanIsDependancy(PullPlan* plan);
 		void updateWindowTitle();
 		void setDirtyBit(bool v);
 		void setSaveFilename(QString filename);
-		void getLibraryContents(vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces);
-		void getDependantLibraryContents(GlassColor* color, vector<GlassColor*>& colors, vector<PullPlan*>& plans);
-		void getDependantLibraryContents(PullPlan* plan, vector<GlassColor*>& colors, vector<PullPlan*>& plans);
-		void getDependantLibraryContents(Piece* piece, vector<GlassColor*>& colors, vector<PullPlan*>& plans,
-			vector<Piece*>& pieces);
+		void getLibraryContents(vector<GlassColor*>& colors, 
+			vector<PullPlan*>& plans, vector<Piece*>& pieces);
+		void getDependantLibraryContents(GlassColor* color, 
+			vector<GlassColor*>& colors, vector<PullPlan*>& plans);
+		void getDependantLibraryContents(PullPlan* plan, 
+			vector<GlassColor*>& colors, vector<PullPlan*>& plans);
+		void getDependantLibraryContents(Piece* piece, 
+			vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces);
 		void addToLibrary(vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces);
 		bool findLibraryWidgetData(GlassLibraryWidget* lw, int* type, QVBoxLayout** layout, int* index);
 

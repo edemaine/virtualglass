@@ -73,10 +73,10 @@ namespace MeshInternal
 	void getTemplatePoints(vector<Point2D>& points, unsigned int angularResolution, 
 		enum GeometricShape shape, float radius);
 
-	void applySubplanTransforms(Vertex& v, vector<Ancestor>& ancestors);
 	void applySubplanTransform(Vertex& v, Point2D location);
 	void applyResizeTransform(Vertex& v, float scale);
 	void applyTwistTransform(Vertex& v, float twist);
+	void applyPlanTransform(Vertex& v, Ancestor a);
 
 	void applyPickupTransform(Vertex& p, SubpickupTemplate& spt);
 	void meshPickupCasingSlab(Geometry* g, Color c, float y, float thickness);

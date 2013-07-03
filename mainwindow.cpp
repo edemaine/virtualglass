@@ -24,6 +24,7 @@
 #include <QLineEdit>
 #include <QBuffer>
 
+#include "undoredo.h"
 #include "constants.h"
 #include "dependancy.h"
 #include "email.h"
@@ -69,7 +70,6 @@ MainWindow :: MainWindow()
 
 	showMaximized();
 }
-
 
 void MainWindow :: setViewMode(enum ViewMode _mode)
 {
@@ -274,7 +274,7 @@ bool MainWindow::findLibraryWidgetData(GlassLibraryWidget* lw, int* type, QVBoxL
 			setEditorLibraryWidget(lw);
 			return false;
 		}
-		*type = 1;
+		*type = COLORBAR_VIEW_MODE;
 	}
 	else if (plplw != NULL)
 	{
@@ -283,7 +283,7 @@ bool MainWindow::findLibraryWidgetData(GlassLibraryWidget* lw, int* type, QVBoxL
 			setEditorLibraryWidget(lw);
 			return false;
 		}
-		*type = 2;
+		*type = PULLPLAN_VIEW_MODE;
 	}
 	else if (plw != NULL)
 	{
@@ -292,7 +292,7 @@ bool MainWindow::findLibraryWidgetData(GlassLibraryWidget* lw, int* type, QVBoxL
 			setEditorLibraryWidget(lw);
 			return false;
 		}
-		*type = 3;
+		*type = PIECE_VIEW_MODE;
 	}
 	else
 		return false;	
@@ -300,13 +300,13 @@ bool MainWindow::findLibraryWidgetData(GlassLibraryWidget* lw, int* type, QVBoxL
 	*layout = NULL;
 	switch (*type)
 	{
-		case 1:
+		case COLORBAR_VIEW_MODE:
 			*layout = glassColorLibraryLayout;
 			break;
-		case 2:
+		case PULLPLAN_VIEW_MODE:
 			*layout = pullPlanLibraryLayout;
 			break;
-		case 3:
+		case PIECE_VIEW_MODE:
 			*layout = pieceLibraryLayout;
 			break;
 	}
@@ -335,7 +335,7 @@ void MainWindow::copyLibraryWidget(GlassLibraryWidget* lw)
 	
 	switch (typeCase)
 	{
-		case 1:	
+		case COLORBAR_VIEW_MODE:	
 		{
 			GlassColor* newEditorGlassColor = glassColorEditorWidget->glassColor()->copy();
 			glassColorLibraryLayout->insertWidget(index, 
@@ -343,7 +343,7 @@ void MainWindow::copyLibraryWidget(GlassLibraryWidget* lw)
 			glassColorEditorWidget->setGlassColor(newEditorGlassColor);
 			break;
 		}
-		case 2:
+		case PULLPLAN_VIEW_MODE:
 		{
 			PullPlan *newEditorPlan = pullPlanEditorWidget->pullPlan()->copy();
 			pullPlanLibraryLayout->insertWidget(index, 
@@ -351,7 +351,7 @@ void MainWindow::copyLibraryWidget(GlassLibraryWidget* lw)
 			pullPlanEditorWidget->setPullPlan(newEditorPlan);
 			break;
 		}
-		case 3:
+		case PIECE_VIEW_MODE:
 		{
 			Piece* newEditorPiece = pieceEditorWidget->piece()->copy();
 			pieceLibraryLayout->insertWidget(index, 
@@ -400,21 +400,21 @@ void MainWindow::deleteLibraryWidget(GlassLibraryWidget* lw)
 		int r = (index == 0) ? 1 : index-1;
 		switch (typeCase)
 		{
-			case 1:
+			case COLORBAR_VIEW_MODE:
 			{
 				GlassColor* replacement = dynamic_cast<GlassColorLibraryWidget*>(
 					dynamic_cast<QWidgetItem*>(layout->itemAt(r))->widget())->glassColor;
 				glassColorEditorWidget->setGlassColor(replacement);
 				break;	
 			}
-			case 2:
+			case PULLPLAN_VIEW_MODE:
 			{
 				PullPlan* replacement = dynamic_cast<PullPlanLibraryWidget*>(
 					dynamic_cast<QWidgetItem*>(layout->itemAt(r))->widget())->pullPlan;
 				pullPlanEditorWidget->setPullPlan(replacement);
 				break;	
 			}
-			case 3:
+			case PIECE_VIEW_MODE:
 			{
 				Piece* replacement = dynamic_cast<PieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem*>(layout->itemAt(r))->widget())->piece;
