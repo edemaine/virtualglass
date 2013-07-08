@@ -24,7 +24,6 @@
 #include <QLineEdit>
 #include <QBuffer>
 
-#include "undoredo.h"
 #include "constants.h"
 #include "dependancy.h"
 #include "email.h"
@@ -528,12 +527,26 @@ void MainWindow :: setupConnections()
 
 void MainWindow :: undoActionTriggered()
 {
-	this->showStatusMessage("undo", 1);
+	switch (editorStack->currentIndex())
+	{
+		case COLORBAR_VIEW_MODE:
+		{
+			glassColorEditorWidget->undo();
+			break;
+		}
+	}
 }
 
 void MainWindow :: redoActionTriggered()
 {
-	this->showStatusMessage("redo", 1);
+	switch (editorStack->currentIndex())
+	{
+		case COLORBAR_VIEW_MODE:
+		{
+			glassColorEditorWidget->redo();
+			break;
+		}
+	}
 }
 
 void MainWindow :: fullscreenViewActionTriggered()
@@ -986,6 +999,8 @@ void MainWindow :: updateLibrary()
 	{
 		case EMPTY_VIEW_MODE:
 		{
+			undoAction->setEnabled(false);
+			redoAction->setEnabled(false);
 			for (int i = 0; i < glassColorLibraryLayout->count(); ++i)
 			{
 				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(
@@ -1008,6 +1023,8 @@ void MainWindow :: updateLibrary()
 		}
 		case COLORBAR_VIEW_MODE:
 		{
+			undoAction->setEnabled(glassColorEditorWidget->canUndo());
+			redoAction->setEnabled(glassColorEditorWidget->canRedo());
 			for (int i = 0; i < glassColorLibraryLayout->count(); ++i)
 			{
 				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(
@@ -1051,6 +1068,8 @@ void MainWindow :: updateLibrary()
 		}
 		case PULLPLAN_VIEW_MODE:
 		{
+			undoAction->setEnabled(false);
+			redoAction->setEnabled(false);
 			for (int i = 0; i < glassColorLibraryLayout->count(); ++i)
 			{
 				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(
@@ -1102,6 +1121,8 @@ void MainWindow :: updateLibrary()
 		}
 		case PIECE_VIEW_MODE:
 		{
+			undoAction->setEnabled(false);
+			redoAction->setEnabled(false);
 			for (int i = 0; i < glassColorLibraryLayout->count(); ++i)
 			{
 				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(

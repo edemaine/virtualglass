@@ -35,6 +35,10 @@ class ColorEditorWidget : public QWidget
 		void updateEverything();
 		GlassColor* glassColor();
 		NiceViewWidget* niceViewWidget;
+		void undo();
+		void redo();
+		bool canUndo();
+		bool canRedo();
 
 	signals:
 		void someDataChanged();
@@ -44,6 +48,7 @@ class ColorEditorWidget : public QWidget
 
 	private slots:
 		void alphaSliderPositionChanged(int);
+		void alphaSliderChangeEnded();
 		void collectionComboBoxChanged(int);		
 
 	private:

@@ -123,6 +123,7 @@ void ColorEditorWidget :: setupConnections()
 {
 	connect(collectionComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(collectionComboBoxChanged(int)));
 	connect(alphaSlider, SIGNAL(valueChanged(int)), this, SLOT(alphaSliderPositionChanged(int)));
+	connect(alphaSlider, SIGNAL(sliderReleased()), this, SLOT(alphaSliderChangeEnded()));
 }
 
 bool compareGlassColors(GlassColor* c1, GlassColor* c2)
@@ -175,6 +176,11 @@ void ColorEditorWidget :: loadCollection(QString fileName)
 	listLayout->addStretch(1);
 }
 
+void ColorEditorWidget :: alphaSliderChangeEnded()
+{
+	this->color->saveState();
+}
+
 void ColorEditorWidget :: alphaSliderPositionChanged(int)
 {
 	if (alphaSlider->sliderPosition() == static_cast<int>(color->color().a * 255))
@@ -187,12 +193,39 @@ void ColorEditorWidget :: alphaSliderPositionChanged(int)
 	emit someDataChanged();
 }
 
+bool ColorEditorWidget :: canUndo()
+{
+	return this->color->canUndo();
+}
+
+bool ColorEditorWidget :: canRedo()
+{
+	return this->color->canRedo();
+}
+
+void ColorEditorWidget :: undo()
+{
+	this->color->undo();
+	
+	updateEverything();
+	emit someDataChanged();	
+}
+
+void ColorEditorWidget :: redo()
+{
+	this->color->redo();
+	
+	updateEverything();
+	emit someDataChanged();	
+}
+
 void ColorEditorWidget :: setColorProperties(GlassColor* color)
 {
 	this->color->setColor(color->color());
 	this->color->setShortName(color->shortName());
 	this->color->setLongName(color->longName());
-	this->alphaSlider->setSliderPosition(255 - int(color->color().a * 255));
+	this->color->saveState();
+
 	updateEverything();
 	emit someDataChanged();	
 }

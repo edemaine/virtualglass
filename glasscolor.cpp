@@ -7,56 +7,92 @@ GlassColor :: GlassColor()
 	Color c;
 	c.r = c.g = c.b = 1.0;
 	c.a = 0.0;
-	_color = c;
-	_shortName = "R-100"; 
-	_longName = "R-100 Lead Crystal (Clear)";
+	this->state.color = c;
+	this->state.shortName = "R-100"; 
+	this->state.longName = "R-100 Lead Crystal (Clear)";
+	
+	undoStack.push(this->state);
 }
 
-GlassColor :: GlassColor(Color __color, string __shortName, string __longName)
+GlassColor :: GlassColor(Color color, string shortName, string longName)
 {
-	setColor(__color);
-	setShortName(__shortName);
-	setLongName(__longName);
+	setColor(color);
+	setShortName(shortName);
+	setLongName(longName);
 }
 
-void GlassColor :: setColor(Color __color) 
+void GlassColor :: setColor(Color color) 
 {
-	_color = __color;
+	this->state.color = color;
 }
 
 const Color GlassColor :: color() const
 {
-	return _color;
+	return this->state.color;
 }
 
-void GlassColor :: setShortName(string _name)
+void GlassColor :: setShortName(string name)
 {
-	_shortName = _name;
+	this->state.shortName = name;
 }
 
-void GlassColor :: setLongName(string _name)
+void GlassColor :: setLongName(string name)
 {
-	_longName = _name;
+	this->state.longName = name;
 }
 
 const string GlassColor :: shortName() const
 {
-	return _shortName;
+	return this->state.shortName;
 }
 
 const string GlassColor :: longName() const
 {
-	return _longName;
+	return this->state.longName;
 }
 
 GlassColor* GlassColor :: copy() const
 {
 	GlassColor* newGlassColor = new GlassColor();
-	newGlassColor->_color = _color;
-	newGlassColor->_shortName = _shortName;
-	newGlassColor->_longName = _longName;
+	newGlassColor->state = this->state;
 	return newGlassColor;
 }
+
+void GlassColor :: undo()
+{
+	if (!canUndo())
+		return;
+	redoStack.push(undoStack.top());
+	undoStack.pop();
+	this->state = undoStack.top();
+}
+
+void GlassColor :: redo()
+{
+	if (!canRedo())
+		return;
+	undoStack.push(redoStack.top());
+	redoStack.pop();
+	this->state = undoStack.top();
+}
+
+bool GlassColor :: canUndo()
+{
+        return (undoStack.size() >= 2);
+}
+
+bool GlassColor :: canRedo()
+{
+        return (redoStack.size() > 0);
+}
+
+void GlassColor :: saveState()
+{
+	undoStack.push(this->state);
+	while (redoStack.size() > 0)
+		redoStack.pop();	
+}
+
 
 GlassColor* deep_copy(const GlassColor* _gc)
 {
@@ -64,3 +100,12 @@ GlassColor* deep_copy(const GlassColor* _gc)
 	// Note: color and name aren't subobjects, they're unique to this glass color object
 	return _gc->copy();
 }
+
+void deep_delete(GlassColor* _gc)
+{
+	delete _gc;
+}
+
+
+
+
