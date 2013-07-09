@@ -530,10 +530,11 @@ void MainWindow :: undoActionTriggered()
 	switch (editorStack->currentIndex())
 	{
 		case COLORBAR_VIEW_MODE:
-		{
 			glassColorEditorWidget->undo();
 			break;
-		}
+		case PULLPLAN_VIEW_MODE:
+			pullPlanEditorWidget->undo();
+			break;
 	}
 }
 
@@ -542,10 +543,11 @@ void MainWindow :: redoActionTriggered()
 	switch (editorStack->currentIndex())
 	{
 		case COLORBAR_VIEW_MODE:
-		{
 			glassColorEditorWidget->redo();
 			break;
-		}
+		case PULLPLAN_VIEW_MODE:
+			pullPlanEditorWidget->redo();
+			break;
 	}
 }
 
@@ -1068,8 +1070,8 @@ void MainWindow :: updateLibrary()
 		}
 		case PULLPLAN_VIEW_MODE:
 		{
-			undoAction->setEnabled(false);
-			redoAction->setEnabled(false);
+			undoAction->setEnabled(pullPlanEditorWidget->canUndo());
+			redoAction->setEnabled(pullPlanEditorWidget->canRedo());
 			for (int i = 0; i < glassColorLibraryLayout->count(); ++i)
 			{
 				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(

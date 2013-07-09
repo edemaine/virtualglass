@@ -19,12 +19,14 @@ class TwistWidget : public QWidget
 
 	signals:
 		void valueChanged();
+		void valueChangeEnded();
 
 	public slots:
 		void updateEverything();
 
 	private slots:
 		void sliderValueChanged(int);
+		void sliderChangeEnded();
 		void spinValueChanged(double);
 
 	private:

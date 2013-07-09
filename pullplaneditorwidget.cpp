@@ -58,6 +58,36 @@ void PullPlanEditorWidget :: resetPullPlan()
 	plan = new PullPlan(PullTemplate::HORIZONTAL_LINE_CIRCLE);
 }
 
+bool PullPlanEditorWidget :: canUndo()
+{
+        return this->plan->canUndo();
+}
+
+bool PullPlanEditorWidget :: canRedo()
+{
+        return this->plan->canRedo();
+}
+
+void PullPlanEditorWidget :: undo()
+{
+        this->plan->undo();
+
+	if (this->plan->templateType() != PullTemplate::CUSTOM)
+		controlsTab->setCurrentIndex(0);
+	updateEverything();
+        emit someDataChanged();
+}
+
+void PullPlanEditorWidget :: redo()
+{
+        this->plan->redo();
+
+	if (this->plan->templateType() != PullTemplate::CUSTOM)
+		controlsTab->setCurrentIndex(0);
+        updateEverything();
+        emit someDataChanged();
+}
+
 void PullPlanEditorWidget :: writePlanToOBJFile(QString& filename)
 {
 	geometry.save_obj_file(filename.toStdString());
@@ -230,7 +260,7 @@ void PullPlanEditorWidget :: setupLayout()
 	casingLayout->addWidget(countLabel);
 	casingLayout->addWidget(countSpin);
 
-	twistWidget = new TwistWidget(&(plan->twist), 10, tab1Widget);
+	twistWidget = new TwistWidget(plan->twistPtr(), 10, tab1Widget);
 
 	tab1Layout->addWidget(casingWidget);
 	tab1Layout->addWidget(twistWidget);
@@ -287,7 +317,10 @@ void PullPlanEditorWidget :: controlsTabChanged(int tab)
 
 	if (tab != 0) // customize mode	
 	{
+		PullTemplate::Type oldType = plan->templateType();
 		plan->setTemplateType(PullTemplate::CUSTOM);				
+		if (oldType != PullTemplate::CUSTOM)
+			plan->saveState();
 		updateEverything();
 		emit someDataChanged();
 	}
@@ -296,6 +329,7 @@ void PullPlanEditorWidget :: controlsTabChanged(int tab)
 void PullPlanEditorWidget :: circleCasingButtonClicked()
 {
 	plan->setOutermostCasingShape(CIRCLE_SHAPE);
+	plan->saveState();
 	updateEverything();
 	emit someDataChanged();
 }
@@ -303,6 +337,7 @@ void PullPlanEditorWidget :: circleCasingButtonClicked()
 void PullPlanEditorWidget :: squareCasingButtonClicked()
 {
 	plan->setOutermostCasingShape(SQUARE_SHAPE);
+	plan->saveState();
 	updateEverything();
 	emit someDataChanged();
 }
@@ -310,6 +345,7 @@ void PullPlanEditorWidget :: squareCasingButtonClicked()
 void PullPlanEditorWidget :: removeCasingButtonClicked()
 {
 	plan->removeCasing();
+	plan->saveState();
 	updateEverything();
 	emit someDataChanged();
 }
@@ -317,6 +353,7 @@ void PullPlanEditorWidget :: removeCasingButtonClicked()
 void PullPlanEditorWidget :: addCasingButtonClicked()
 {
 	plan->addCasing(plan->outermostCasingShape());
+	plan->saveState();
 	updateEverything();
 	emit someDataChanged();
 }
@@ -394,6 +431,7 @@ void PullPlanEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 		// as they're no longer working on a custom template
 		controlsTab->setCurrentIndex(0);
 		plan->setTemplateType(ptlw->type);	
+		plan->saveState();
 		updateEverything();
 		emit someDataChanged();
 	}
@@ -411,6 +449,7 @@ void PullPlanEditorWidget :: setupConnections()
 	connect(addCircleButton, SIGNAL(clicked()), this, SLOT(addCircleButtonClicked()));
 	connect(addSquareButton, SIGNAL(clicked()), this, SLOT(addSquareButtonClicked()));
 	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
+	connect(twistWidget, SIGNAL(valueChangeEnded()), this, SLOT(twistEnded()));
 	connect(countSpin, SIGNAL(valueChanged(int)), this, SLOT(countSpinChanged(int)));
 	connect(controlsTab, SIGNAL(currentChanged(int)), this, SLOT(controlsTabChanged(int)));
 
@@ -421,6 +460,11 @@ void PullPlanEditorWidget :: setupConnections()
 	// render thread	
 	connect(geometryThread, SIGNAL(finishedMesh(bool, unsigned int)), 
 		this, SLOT(geometryThreadFinishedMesh(bool, unsigned int)));
+}
+	
+void PullPlanEditorWidget :: twistEnded()
+{
+	plan->saveState();
 }
 
 void PullPlanEditorWidget :: childWidgetDataChanged()
@@ -436,6 +480,7 @@ void PullPlanEditorWidget :: countSpinChanged(int)
 	if (count != static_cast<unsigned int>(countSpin->value()))
 	{
 		plan->setCount(countSpin->value());
+		plan->saveState();
 		updateEverything();
 		emit someDataChanged();
 	}
@@ -470,7 +515,7 @@ void PullPlanEditorWidget :: setPullPlan(PullPlan* _plan)
 	plan = _plan;
 	controlsTab->setCurrentIndex(0);
 	updateEverything();
-	twistWidget->setTwist(&(plan->twist));
+	twistWidget->setTwist(plan->twistPtr());
 	viewWidget->setPullPlan(plan);
 	customizeViewWidget->setPullPlan(plan);
 }

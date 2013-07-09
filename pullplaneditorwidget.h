@@ -51,6 +51,11 @@ class PullPlanEditorWidget : public QWidget
 		QImage pullPlanImage();
 		void reset3DCamera();
 
+		void undo();
+		void redo();
+		bool canUndo();
+		bool canRedo();
+
 	protected:
 		void mousePressEvent(QMouseEvent* event);
 		void mouseMoveEvent(QMouseEvent* event);
@@ -70,6 +75,7 @@ class PullPlanEditorWidget : public QWidget
 		void copySelectedButtonClicked();
 		void deleteSelectedButtonClicked();
 		void childWidgetDataChanged();
+		void twistEnded();
 		void countSpinChanged(int);
 		void controlsTabChanged(int);
 		void geometryThreadFinishedMesh(bool completed, unsigned int quality);

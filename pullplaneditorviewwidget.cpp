@@ -157,9 +157,9 @@ int PullPlanEditorViewWidget :: getCasingIndexAt(Point2D loc)
 int PullPlanEditorViewWidget :: getSubplanIndexAt(Point2D loc)
 {
 	// Recursively call drawing on subplans
-	for (unsigned int i = 0; i < plan->subs.size(); ++i)
+	for (unsigned int i = 0; i < plan->subpullCount(); ++i)
 	{
-		SubpullTemplate& sub = plan->subs[i];
+		SubpullTemplate sub = plan->getSubpullTemplate(i);
 		Point2D delta;
 		delta.x = loc.x - sub.location.x;
 		delta.y = loc.y - sub.location.y;
@@ -175,7 +175,7 @@ PullPlan* PullPlanEditorViewWidget :: getSubplanAt(Point2D loc)
 	int subplanIndex = getSubplanIndexAt(loc);
 	if (subplanIndex == -1)
 		return NULL;
-	return plan->subs[subplanIndex].plan;
+	return plan->getSubpullTemplate(subplanIndex).plan;
 }
 
 void PullPlanEditorViewWidget :: setMinMaxCasingRadii(float* min, float* max)
@@ -248,6 +248,9 @@ void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 void PullPlanEditorViewWidget :: mouseReleaseEvent(QMouseEvent*)
 {
 	isDraggingCasing = false;
+	plan->saveState();
+	updateEverything();
+	emit someDataChanged();
 }
 
 void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
@@ -305,7 +308,7 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEv
 				// lets you notice that the shift key is down earlier, i.e. during the drag, which is the only time you care anyway.
 				if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
 				{
-					for (unsigned int i = 0; i < plan->subs.size(); ++i)
+					for (unsigned int i = 0; i < plan->subpullCount(); ++i)
 						subplansHighlighted.insert(i);
 				}
 				else
@@ -355,13 +358,13 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEv
 			int subplanIndexUnderMouse = getSubplanIndexAt(mouseLoc);
 			if (subplanIndexUnderMouse == -1)
 				break;
-			if (draggedPlan->outermostCasingShape() != plan->subs[subplanIndexUnderMouse].shape)
+			if (draggedPlan->outermostCasingShape() != plan->getSubpullTemplate(subplanIndexUnderMouse).shape)
 				break;
 			if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
 			{
-				for (unsigned int i = 0; i < plan->subs.size(); ++i)
+				for (unsigned int i = 0; i < plan->subpullCount(); ++i)
 				{
-					if (draggedPlan->outermostCasingShape() == plan->subs[i].shape)
+					if (draggedPlan->outermostCasingShape() == plan->getSubpullTemplate(i).shape)
 						subplansHighlighted.insert(i);
 				}
 			}
@@ -393,7 +396,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			GlassColorLibraryWidget* draggedLibraryColor = reinterpret_cast<GlassColorLibraryWidget*>(ptr);
 			for (set<unsigned int>::iterator it = subplansHighlighted.begin(); it != subplansHighlighted.end(); ++it)
 			{
-				SubpullTemplate& sub = plan->subs[*it];
+				SubpullTemplate sub = plan->getSubpullTemplate(*it);
 				switch (sub.shape)
 				{
 					case CIRCLE_SHAPE:
@@ -403,6 +406,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 						sub.plan = draggedLibraryColor->squarePlan;
 						break;
 				}
+				plan->setSubpullTemplate(sub, *it);
 			}
 			for (set<unsigned int>::iterator it = casingsHighlighted.begin(); it != casingsHighlighted.end(); ++it)
 				plan->setCasingColor(draggedLibraryColor->glassColor, *it);
@@ -425,9 +429,12 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 				draggedPlan = reinterpret_cast<PullPlanLibraryWidget*>(ptr)->pullPlan;
 			for (set<unsigned int>::iterator it = subplansHighlighted.begin(); it != subplansHighlighted.end(); ++it)
 			{
-				SubpullTemplate& sub = plan->subs[*it];
+				SubpullTemplate sub = plan->getSubpullTemplate(*it);
 				if (sub.shape == draggedPlan->outermostCasingShape())
+				{
 					sub.plan = draggedPlan;	
+					plan->setSubpullTemplate(sub, *it);
+				}
 			}
 			break;
 		}
@@ -437,6 +444,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 
 	subplansHighlighted.clear();
 	casingsHighlighted.clear();
+	plan->saveState();
 	updateEverything();
 	emit someDataChanged();
 }
@@ -537,22 +545,22 @@ void PullPlanEditorViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth,
 	}
 
 	// Recursively call drawing on subplans
-	for (unsigned int i = plan->subs.size()-1; i < plan->subs.size(); --i)
+	for (unsigned int i = plan->subpullCount()-1; i < plan->subpullCount(); --i)
 	{
-		SubpullTemplate* sub = &(plan->subs[i]);
+		SubpullTemplate sub = plan->getSubpullTemplate(i);
 
 		Point2D subUpperLeft;
-		subUpperLeft.x = upperLeft.x + (sub->location.x - sub->diameter/2.0) * drawWidth/2 + drawWidth/2;
-		subUpperLeft.y = upperLeft.y + (sub->location.y - sub->diameter/2.0) * drawWidth/2 + drawHeight/2;
-		float rWidth = sub->diameter * drawWidth/2;
-		float rHeight = sub->diameter * drawHeight/2;
+		subUpperLeft.x = upperLeft.x + (sub.location.x - sub.diameter/2.0) * drawWidth/2 + drawWidth/2;
+		subUpperLeft.y = upperLeft.y + (sub.location.y - sub.diameter/2.0) * drawWidth/2 + drawHeight/2;
+		float rWidth = sub.diameter * drawWidth/2;
+		float rHeight = sub.diameter * drawHeight/2;
 
-		drawSubplan(subUpperLeft, rWidth, rHeight, plan->subs[i].plan, 
+		drawSubplan(subUpperLeft, rWidth, rHeight, sub.plan, 
 			outermostLevel && subplansHighlighted.find(i) != subplansHighlighted.end(), false, painter);
 		
 		painter->setBrush(Qt::NoBrush);
 		setBoundaryPainter(painter, outermostLevel); 
-		paintShape(subUpperLeft, rWidth, plan->subs[i].shape, painter);
+		paintShape(subUpperLeft, rWidth, sub.shape, painter);
 	}
 }
 

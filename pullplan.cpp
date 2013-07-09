@@ -17,16 +17,53 @@ using std::make_pair;
 PullPlan :: PullPlan(PullTemplate::Type _templateType)
 {
 	// setup default twist
-	twist = 0;
+	this->state.twist = 0;
 
 	// initialize casings and subplans to something simple
-	casings.push_back(Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
-	casings[0].shape = CIRCLE_SHAPE;
-	this->_count = 0;
-	this->type = PullTemplate::BASE_CIRCLE;
+	this->state.casings.push_back(Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
+	this->state.casings[0].shape = CIRCLE_SHAPE;
+	this->state.count = 0;
+	this->state.type = PullTemplate::BASE_CIRCLE;
 
 	// now initialize for real
 	setTemplateType(_templateType);
+
+	undoStack.push(this->state);
+}
+
+void PullPlan :: undo()
+{
+	if (!canUndo())
+		return;
+	redoStack.push(undoStack.top());
+	undoStack.pop();
+        this->state = undoStack.top();
+}
+
+void PullPlan :: redo()
+{
+	if (!canRedo())
+		return;
+	undoStack.push(redoStack.top());
+	redoStack.pop();
+	this->state = undoStack.top();
+}
+
+bool PullPlan :: canUndo()
+{
+	return (undoStack.size() >= 2);
+}
+
+bool PullPlan :: canRedo()
+{
+	return (redoStack.size() > 0);
+}
+
+void PullPlan :: saveState()
+{
+	undoStack.push(this->state);
+	while (redoStack.size() > 0)
+		redoStack.pop();
 }
 
 bool PullPlan :: hasDependencyOn(PullPlan* plan) 
@@ -35,46 +72,40 @@ bool PullPlan :: hasDependencyOn(PullPlan* plan)
 		return true;
 
 	bool childrenAreDependent = false;
-	for (unsigned int i = 0; i < subs.size(); ++i) {
-		if (subs[i].plan->hasDependencyOn(plan)) {
-			childrenAreDependent = true;
-			break;
-		}
-	}
+	for (unsigned int i = 0; i < this->state.subs.size(); ++i) 
+		childrenAreDependent = (childrenAreDependent || this->state.subs[i].plan->hasDependencyOn(plan)); 
 
 	return childrenAreDependent;
 }
 
-bool PullPlan :: hasDependencyOn(GlassColor* glassColor) {
-
-	for (unsigned int i = 0; i < casings.size(); ++i) {
-		if (this->casings[i].glassColor == glassColor)
+bool PullPlan :: hasDependencyOn(GlassColor* glassColor) 
+{
+	for (unsigned int i = 0; i < this->state.casings.size(); ++i) 
+	{
+		if (this->state.casings[i].glassColor == glassColor)
 			return true;
 	} 
 
 	bool childrenAreDependent = false;
-	for (unsigned int i = 0; i < subs.size(); ++i) {
-		if (subs[i].plan->hasDependencyOn(glassColor)) {
-			childrenAreDependent = true;
-			break;
-		}
-	}
+	for (unsigned int i = 0; i < this->state.subs.size(); ++i) 
+		childrenAreDependent = (childrenAreDependent || this->state.subs[i].plan->hasDependencyOn(glassColor)); 
 
 	return childrenAreDependent;
 }
 
 void PullPlan :: setTemplateType(PullTemplate::Type _templateType) 
 {
-	if (_templateType == this->type)
+	if (_templateType == this->state.type)
 		return;
 
 	// if you're switching to a template where count matters, and it's a funky value,
 	// set it to something more reasonable
-	if (this->_count < 2 && templateHasSubplans(_templateType))
-		this->_count = 7;
+	if (this->state.count < 2 && templateHasSubplans(_templateType))
+		this->state.count = 7;
 
-	this->type = _templateType;
+	this->state.type = _templateType;
 
+	vector<Casing> &casings = this->state.casings;
 	switch (_templateType) 
 	{
 		case PullTemplate::BASE_CIRCLE:
@@ -82,7 +113,7 @@ void PullPlan :: setTemplateType(PullTemplate::Type _templateType)
 			break;
 		case PullTemplate::BASE_SQUARE:
 			casings[0].shape = SQUARE_SHAPE;
-			twist = 0.0;
+			this->state.twist = 0.0;
 			if (casings.size() > 1) 
 				casings[0].thickness = MIN(casings[0].thickness, 0.9 * 1 / SQRT_TWO * casings[1].thickness);
 			break;
@@ -102,7 +133,7 @@ void PullPlan :: setTemplateType(PullTemplate::Type _templateType)
 		case PullTemplate::SQUARE_OF_SQUARES:
 		case PullTemplate::SQUARE_OF_CIRCLES:
 			casings[0].shape = SQUARE_SHAPE;
-			twist = 0.0;
+			this->state.twist = 0.0;
 			if (casings.size() > 1)
 				casings[0].thickness = MIN(casings[0].thickness, 0.9 * 1 / SQRT_TWO * casings[1].thickness);
 			break;
@@ -119,58 +150,62 @@ void PullPlan :: setTemplateType(PullTemplate::Type _templateType)
 	resetSubs(true);
 }
 
-void PullPlan :: setCasingColor(GlassColor* gc, unsigned int index) {
-	if (index >= this->casings.size())
+void PullPlan :: setCasingColor(GlassColor* gc, unsigned int index) 
+{
+	if (index >= this->state.casings.size())
 		return;
-	this->casings[index].glassColor = gc;
+	this->state.casings[index].glassColor = gc;
 }
 
 void PullPlan :: setOutermostCasingColor(GlassColor* gc) 
 {
-	this->casings[casings.size()-1].glassColor = gc;
+	int last = this->state.casings.size()-1;
+	this->state.casings[last].glassColor = gc;
 }
 
 const GlassColor* PullPlan :: outermostCasingColor() 
 {
-	return this->casings[casings.size()-1].glassColor;
+	int last = this->state.casings.size()-1;
+	return this->state.casings[last].glassColor;
 }
 
 const GlassColor* PullPlan :: getCasingColor(unsigned int index) 
 {
-	if (index >= this->casings.size())
+	if (index >= this->state.casings.size())
 		return NULL;
-	return this->casings[index].glassColor;
+	return this->state.casings[index].glassColor;
 }
 
 bool PullPlan :: hasMinimumCasingCount() 
 {
-	return (this->casings.size() < 2);
+	return (this->state.casings.size() < 2);
 }	
 		
-
 unsigned int PullPlan :: casingCount() 
 {
-	return this->casings.size();
+	return this->state.casings.size();
 }
 
-enum PullTemplate::Type PullPlan :: templateType() 
+enum PullTemplate::Type PullPlan :: templateType() const 
 {
-	return this->type;
+	return this->state.type;
 }
 
 unsigned int PullPlan :: count()
 {
-	return this->_count;
+	return this->state.count;
 }
 
-void PullPlan :: setCount(unsigned int __count)
+void PullPlan :: setCount(unsigned int _count)
 {
-	this->_count = __count;
+	this->state.count = _count;
 	resetSubs(false);
 }
 
 void PullPlan :: removeCasing() 
 {
+	vector<Casing>& casings = this->state.casings;
+
 	int count = casings.size();
 	if (count < 2) 
 		return;
@@ -191,12 +226,14 @@ void PullPlan :: removeCasing()
 	}
 
 	// rescale subcanes
-	for (unsigned int i = 0; i < subs.size(); ++i)
-		subs[i].rescale(casings[0].thickness / oldInnermostCasingThickness);
+	for (unsigned int i = 0; i < this->state.subs.size(); ++i)
+		this->state.subs[i].rescale(casings[0].thickness / oldInnermostCasingThickness);
 }
 
 
-void PullPlan :: addCasing(enum GeometricShape _shape) {
+void PullPlan :: addCasing(enum GeometricShape _shape) 
+{
+	vector<Casing>& casings = this->state.casings;
 
 	// rescale casings
 	float oldInnermostCasingThickness = casings[0].thickness;
@@ -214,54 +251,60 @@ void PullPlan :: addCasing(enum GeometricShape _shape) {
 	}
 	
 	// if casing addition is circle around a square, rescale everything down a bit more
-	if (_shape == CIRCLE_SHAPE && this->outermostCasingShape() == SQUARE_SHAPE) {		
-		for (unsigned int i = 0; i < casings.size(); ++i) {
+	if (_shape == CIRCLE_SHAPE && this->outermostCasingShape() == SQUARE_SHAPE) 
+	{		
+		for (unsigned int i = 0; i < casings.size(); ++i) 
 			casings[i].thickness *= 1 / SQRT_TWO;
-		}
 	}
 
 	// add the new casing
 	casings.push_back(Casing(1.0, _shape, GlobalGlass::color()));
 	if (this->outermostCasingShape() != CIRCLE_SHAPE)
-		this->twist = 0.0;
+		this->state.twist = 0.0;
 
 	// update subpulls by rescaling them according to innermost casing rescaling
-	for (unsigned int i = 0; i < subs.size(); ++i) 
-		subs[i].rescale(casings[0].thickness / oldInnermostCasingThickness);
+	for (unsigned int i = 0; i < this->state.subs.size(); ++i) 
+		this->state.subs[i].rescale(casings[0].thickness / oldInnermostCasingThickness);
 }
 
-void PullPlan :: setCasingThickness(float t, unsigned int index) {
+void PullPlan :: setCasingThickness(float t, unsigned int index) 
+{
+	vector<Casing> &casings = this->state.casings;	
+
 	// this currently doesn't enforce any overlapping issues with
 	// differently-shaped casings. It assumes they are being set 
 	// to valid relative sizes.
 	if (index >= casings.size()-1)
 		return;
 	// if innermost casing, scale subcanes with changing casing thickness
-	if (index == 0) {
+	if (index == 0) 
+	{
 		float scaleRatio = t / casings[0].thickness;
 		casings[0].thickness = t;
-		for (unsigned int i = 0; i < subs.size(); ++i) 
-			subs[i].rescale(scaleRatio);
+		for (unsigned int i = 0; i < this->state.subs.size(); ++i) 
+			this->state.subs[i].rescale(scaleRatio);
 	}
 	// otherwise just change the casing
 	else
-		this->casings[index].thickness = t;
+		this->state.casings[index].thickness = t;
 }
 
 void PullPlan :: setOutermostCasingShape(enum GeometricShape _shape) 
 {
+	vector<Casing> &casings = this->state.casings;	
+
 	if (_shape == this->outermostCasingShape()) 
 		return;
 
-	if (this->casings.size() > 1) 
+	if (casings.size() > 1) 
 	{
 		// if we're moving from square to circle and the interior casing is square and
 		// would collide with the new casing shape, scale everything down to make room
-		if (_shape == CIRCLE_SHAPE && this->casings[this->casings.size()-2].shape == SQUARE_SHAPE
-			&& this->casings[this->casings.size()-2].thickness > 1 / SQRT_TWO) 
+		if (_shape == CIRCLE_SHAPE && casings[casings.size()-2].shape == SQUARE_SHAPE
+			&& casings[casings.size()-2].thickness > 1 / SQRT_TWO) 
 		{ 
 			for (unsigned int i = 0; i < casings.size() - 1; ++i) 
-				this->casings[i].thickness *= 1 / SQRT_TWO;
+				casings[i].thickness *= 1 / SQRT_TWO;
 		}
 	}
 	else 
@@ -270,45 +313,47 @@ void PullPlan :: setOutermostCasingShape(enum GeometricShape _shape)
 		// "I am this shape" (e.g. BASE_*), then changing casing shape should
 		// change template type implicitly, since a a BASE_CIRCLE consisting of 
 		// a single SQUARE_SHAPE casing makes no sense
-		if (this->type == PullTemplate::BASE_CIRCLE && _shape == SQUARE_SHAPE)
+		if (this->state.type == PullTemplate::BASE_CIRCLE && _shape == SQUARE_SHAPE)
 			this->setTemplateType(PullTemplate::BASE_SQUARE);
-		else if (this->type == PullTemplate::BASE_SQUARE && _shape == CIRCLE_SHAPE)
+		else if (this->state.type == PullTemplate::BASE_SQUARE && _shape == CIRCLE_SHAPE)
 			this->setTemplateType(PullTemplate::BASE_CIRCLE);
 	}
 
 	// DO THE CHANGE
 	casings[casings.size()-1].shape = _shape;
 	if (this->outermostCasingShape() != CIRCLE_SHAPE)
-		this->twist = 0.0;
+		this->state.twist = 0.0;
 
 	resetSubs(false);
 }
 
 float PullPlan :: getCasingThickness(unsigned int index) 
 {
-	return this->casings[index].thickness;
+	return this->state.casings[index].thickness;
 }
 
 enum GeometricShape PullPlan :: outermostCasingShape() 
 {
-	return this->casings[casings.size()-1].shape;
+	int last = this->state.casings.size()-1;
+	return this->state.casings[last].shape;
 }
 
 enum GeometricShape PullPlan :: getCasingShape(unsigned int index) 
 {
-	return this->casings[index].shape;
+	return this->state.casings[index].shape;
 }
 
 void PullPlan :: pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs,
 	enum GeometricShape _shape, Point2D p, float diameter) 
 {
-	PullPlan* plan = 0;
+	PullPlan* plan = NULL;
 
 	// if it's not a hard reset and there are still old subplans to use and the next one matches shape
 	// with the shape we want to have, then use it
-	if (!hardReset && newSubs->size() < subs.size() && _shape == subs[newSubs->size()].shape) 
+	if (!hardReset && newSubs->size() < this->state.subs.size() 
+		&& _shape == this->state.subs[newSubs->size()].shape) 
 	{
-		plan = subs[newSubs->size()].plan;
+		plan = this->state.subs[newSubs->size()].plan;
 	}
 	else // otherwise just use whichever filler subplan matches the shape
 	{
@@ -338,20 +383,20 @@ void PullPlan :: pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs
 void PullPlan :: resetSubs(bool hardReset)
 {
 	Point2D p = make_vector(0.0f, 0.0f);
-	float radius = casings[0].thickness;
+	float radius = this->state.casings[0].thickness;
 
 	vector<SubpullTemplate> newSubs;
 	
-	switch (type) 
+	switch (this->state.type) 
 	{
 		case PullTemplate::BASE_CIRCLE:
 		case PullTemplate::BASE_SQUARE:
 			break;
 		case PullTemplate::HORIZONTAL_LINE_CIRCLE:
 		{
-			for (unsigned int i = 0; i < this->_count; ++i) 
+			for (unsigned int i = 0; i < this->state.count; ++i) 
 			{
-				float littleRadius = (2 * radius / this->_count) / 2;
+				float littleRadius = (2 * radius / this->state.count) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
 				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0);
 			}
@@ -360,9 +405,9 @@ void PullPlan :: resetSubs(bool hardReset)
 		case PullTemplate::HORIZONTAL_LINE_SQUARE:
 		{
 			radius *= 0.9;
-			for (unsigned int i = 0; i < this->_count; ++i) 
+			for (unsigned int i = 0; i < this->state.count; ++i) 
 			{
-				float littleRadius = (2 * radius / this->_count) / 2;
+				float littleRadius = (2 * radius / this->state.count) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
 				pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, littleRadius * 2.0);
 			}
@@ -370,10 +415,10 @@ void PullPlan :: resetSubs(bool hardReset)
 		}
 		case PullTemplate::SURROUNDING_CIRCLE:
 		{
-			if (this->_count == 0)
+			if (this->state.count == 0)
 				break;
 
-			unsigned int littleCount = MAX(this->_count-1, 3);
+			unsigned int littleCount = MAX(this->state.count-1, 3);
 			float theta = TWO_PI / littleCount;
 			float k = sin(theta/2) / (1 + sin(theta/2));
 			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, (1 - 2 * k) * 2 * radius);
@@ -389,11 +434,11 @@ void PullPlan :: resetSubs(bool hardReset)
 		case PullTemplate::CROSS:
 		case PullTemplate::TRIPOD:
 		{
-			if (this->_count == 0)
+			if (this->state.count == 0)
 				break;
 
-			unsigned int wings = 3 + static_cast<int>(this->type == PullTemplate::CROSS);
-			unsigned int sideCount = (this->_count + 1) / wings; 
+			unsigned int wings = 3 + static_cast<int>(this->state.type == PullTemplate::CROSS);
+			unsigned int sideCount = (this->state.count + 1) / wings; 
 			float littleRadius = (radius / (sideCount + 0.5)) / 2.0;
 	
 			p.x = p.y = 0.0;
@@ -412,14 +457,14 @@ void PullPlan :: resetSubs(bool hardReset)
 		case PullTemplate::SQUARE_OF_CIRCLES:
 		case PullTemplate::SQUARE_OF_SQUARES:
 		{
-			if (this->_count == 0)
+			if (this->state.count == 0)
 				break;
 
-			if (this->casings[0].shape == CIRCLE_SHAPE)
+			if (this->state.casings[0].shape == CIRCLE_SHAPE)
 				radius *= 1 / SQRT_TWO;
 
 			unsigned int sideCount = 0;
-			while (sideCount * sideCount < this->_count)
+			while (sideCount * sideCount < this->state.count)
 				++sideCount;
 			float littleRadius = radius / sideCount;
 
@@ -434,7 +479,7 @@ void PullPlan :: resetSubs(bool hardReset)
 					j = s;
 					p.x = -radius + littleRadius + 2 * littleRadius * i;
 					p.y = -radius + littleRadius + 2 * littleRadius * j;
-					if (this->type == PullTemplate::SQUARE_OF_CIRCLES)
+					if (this->state.type == PullTemplate::SQUARE_OF_CIRCLES)
 						pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 					else
 						pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius);
@@ -444,7 +489,7 @@ void PullPlan :: resetSubs(bool hardReset)
 					i = s;
 					p.x = -radius + littleRadius + 2 * littleRadius * i;
 					p.y = -radius + littleRadius + 2 * littleRadius * j;
-					if (this->type == PullTemplate::SQUARE_OF_CIRCLES)
+					if (this->state.type == PullTemplate::SQUARE_OF_CIRCLES)
 						pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 					else
 						pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius);
@@ -455,13 +500,13 @@ void PullPlan :: resetSubs(bool hardReset)
 		}
 		case PullTemplate::SURROUNDING_SQUARE:
 		{
-			if (this->_count == 0)
+			if (this->state.count == 0)
 				break;
 
 			// (1-8) : 2, (9-12) : 3, (13-16) : 4
-			unsigned int sideCount = (MAX(this->_count, 5) + 3) / 4; 
+			unsigned int sideCount = (MAX(this->state.count, 5) + 3) / 4; 
 
-			if (this->casings[0].shape == CIRCLE_SHAPE)
+			if (this->state.casings[0].shape == CIRCLE_SHAPE)
 				radius *= 1 / SQRT_TWO;
 
 			float littleRadius = radius / (sideCount + 1);
@@ -497,84 +542,117 @@ void PullPlan :: resetSubs(bool hardReset)
 		}
 		case PullTemplate::CUSTOM:
 		{
-			for (unsigned int i = 0; i < subs.size(); i++)
+			for (unsigned int i = 0; i < this->state.subs.size(); i++)
 			{
-				p.x = subs[i].location.x * radius;
-				p.y = subs[i].location.y * radius;
+				p.x = this->state.subs[i].location.x * radius;
+				p.y = this->state.subs[i].location.y * radius;
 				// never do a hard reset of custom, because 
 				// it's a `soft' template change from a rigid one 
 				// to a custom one, so mapping from old cane locations/subcanes
 				// to new ones is direct and very natural
-				pushNewSubpull(false, &newSubs, subs[i].shape, subs[i].location, subs[i].diameter);
+				pushNewSubpull(false, &newSubs, this->state.subs[i].shape, this->state.subs[i].location, 
+					this->state.subs[i].diameter);
 			}
 			break;
 		}
 	}
 
-	subs = newSubs;
+	this->state.subs = newSubs;
+}
+
+SubpullTemplate PullPlan :: getSubpullTemplate(unsigned int index)
+{
+	return this->state.subs[index];
+}
+
+void PullPlan :: setSubpullTemplate(SubpullTemplate t, unsigned int index)
+{
+	this->state.subs[index] = t;
+}
+
+void PullPlan :: addSubpullTemplate(SubpullTemplate t)
+{
+	this->state.subs.push_back(t);
+}
+
+void PullPlan :: removeSubpullTemplate(unsigned int index)
+{
+	this->state.subs.erase(this->state.subs.begin() + index);
+}
+
+unsigned int PullPlan :: subpullCount()
+{
+	return this->state.subs.size();
+}
+
+float PullPlan :: twist()
+{
+	return this->state.twist;
+}
+
+void PullPlan :: setTwist(float t)
+{
+	this->state.twist = t;
+}
+
+float* PullPlan :: twistPtr()
+{
+	return &(this->state.twist);
 }
 
 PullPlan* PullPlan :: copy() const 
 {
-
-	PullPlan* c = new PullPlan(type);
-
-	c->casings = casings;
-	c->twist = twist;
-	c->_count = _count;
-	// need to copy SubpullTemplate list in the case that it's a custom
-	// template, in which case the only record of the subpull
-	// location, shape, size, etc. is the SubpullTemplate list
-	c->subs.clear();
-	for (unsigned int i = 0; i < subs.size(); ++i)
-	{
-		c->subs.push_back(subs[i]);
-	}
-		
-	assert(c->subs.size() == subs.size());
-	for (unsigned int i = 0; i < subs.size(); ++i) {
-		c->subs[i].plan = subs[i].plan;
-	}
-
+	PullPlan* c = new PullPlan(this->state.type);
+	c->state = this->state;
 	return c;
 }
 
-PullPlan *deep_copy(const PullPlan *_plan) {
-	unordered_map< const PullPlan *, PullPlan * > copies;
+PullPlan *deep_copy(const PullPlan *_plan) 
+{
+	unordered_map<const PullPlan*, PullPlan*> copies;
 	PullPlan *plan = _plan->copy();
 	copies.insert(make_pair(_plan, plan));
 
-	vector< PullPlan * > to_update;
+	vector<PullPlan*> to_update;
 	to_update.push_back(plan);
 	//update sub-templates to point to copies as well:
-	while (!to_update.empty()) {
+	while (!to_update.empty()) 
+	{
 		PullPlan *t = to_update.back();
 		to_update.pop_back();
-		for (vector< SubpullTemplate >::iterator s = t->subs.begin(); s != t->subs.end(); ++s) {
-			unordered_map< const PullPlan *, PullPlan * >::iterator f = copies.find(s->plan);
-			if (f == copies.end()) {
-				f = copies.insert(make_pair(s->plan, s->plan->copy())).first;
+		for (unsigned int i = 0; i < t->subpullCount(); ++i)
+		{
+			SubpullTemplate s = t->getSubpullTemplate(i);
+			unordered_map<const PullPlan*, PullPlan*>::iterator f = copies.find(s.plan);
+			if (f == copies.end()) 
+			{
+				f = copies.insert(make_pair(s.plan, s.plan->copy())).first;
 				to_update.push_back(f->second);
 			}
-			s->plan = f->second;
+			s.plan = f->second;
+			t->setSubpullTemplate(s, i);
 		}
 	}
 	return plan;
 }
 
-void deep_delete(PullPlan *plan) {
+void deep_delete(PullPlan *plan) 
+{
 	//Because pull plans don't delete their children (which is right):
-	unordered_set< PullPlan * > marked;
-	vector< PullPlan * > to_delete;
+	unordered_set<PullPlan*> marked;
+	vector<PullPlan*> to_delete;
 	to_delete.push_back(plan);
-	while (!to_delete.empty()) {
+	while (!to_delete.empty()) 
+	{
 		PullPlan *t = to_delete.back();
 		to_delete.pop_back();
-		for (vector< SubpullTemplate >::iterator s = t->subs.begin(); s != t->subs.end(); ++s) {
-			if (marked.insert(s->plan).second) {
-				to_delete.push_back(s->plan);
-			}
-			s->plan = NULL;
+		for (unsigned int i = 0; i < t->subpullCount(); ++i)
+		{
+			SubpullTemplate s = t->getSubpullTemplate(i);
+			if (marked.insert(s.plan).second) 
+				to_delete.push_back(s.plan);
+			s.plan = NULL;
+			t->setSubpullTemplate(s, i);
 		}
 		delete t;
 	}

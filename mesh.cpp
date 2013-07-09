@@ -172,10 +172,10 @@ void applyPieceTransform(Geometry* geometry, Piece* piece)
 
 void applyPlanTransform(Vertex& v, Ancestor a)
 {
-	SubpullTemplate& subTemp = a.parent->subs[a.child];
+	SubpullTemplate subTemp = a.parent->getSubpullTemplate(a.child);
 	applyResizeTransform(v, subTemp.diameter / 2.0);
 	applySubplanTransform(v, subTemp.location);
-	applyTwistTransform(v, a.parent->twist);
+	applyTwistTransform(v, a.parent->twist());
 }
 
 void meshPickupCasingSlab(Geometry* geometry, Color color, float y, float thickness)
@@ -435,7 +435,7 @@ float totalTwist(vector<Ancestor>& ancestors)
 	
 	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
 	{
-		twist += ancestors[i].parent->twist;
+		twist += ancestors[i].parent->twist();
 	}
 
 	return twist;
@@ -447,7 +447,7 @@ float finalRadius(vector<Ancestor>& ancestors)
 
 	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
 	{
-		radius *= (ancestors[i].parent->subs[ancestors[i].child].diameter * 0.5); 
+		radius *= (ancestors[i].parent->getSubpullTemplate(ancestors[i].child).diameter * 0.5); 
 	}
 
 	return radius;
@@ -704,11 +704,11 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<Ancestor>& ancestors
 
 	// Recurse through to children 
 	Ancestor me = {plan, 0};
-	for (unsigned int i = 0; i < plan->subs.size(); ++i)
+	for (unsigned int i = 0; i < plan->subpullCount(); ++i)
 	{
 		me.child = i;
 		ancestors.push_back(me);
-		recurseMesh(plan->subs[i].plan, geometry, ancestors, length, quality, false, end);
+		recurseMesh(plan->getSubpullTemplate(i).plan, geometry, ancestors, length, quality, false, end);
 		ancestors.pop_back();
 	}
 
@@ -743,11 +743,11 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<Ancestor>& ancestors
 			// punting on actually doing this geometry right and just making it a cylinder
 			// (that intersects its subcanes)
 			struct Cane cane;
-			cane.color = plan->getCasingColor(colorIntervalStart)->color();
+			cane.color = plan->getCasingColor(0)->color();
 			cane.shape = plan->getCasingShape(i);
 			cane.length = length-0.001;
 			cane.radius = plan->getCasingThickness(i);
-			cane.twist = plan->twist;
+			cane.twist = plan->twist();
 			meshBaseCane(geometry, ancestors, cane, quality, ensureVisible && outermostLayer);
 		}
 		else
@@ -759,7 +759,7 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<Ancestor>& ancestors
 			casing.length = length; 
 			casing.outerRadius = plan->getCasingThickness(i);
 			casing.innerRadius = plan->getCasingThickness(colorIntervalStart-1)+0.01; 
-			casing.twist = plan->twist;
+			casing.twist = plan->twist();
 			meshBaseCasing(geometry, ancestors, casing, quality, ensureVisible && outermostLayer);
 		}
 	}

@@ -75,21 +75,21 @@ void drawSubplan(float x, float y, float drawWidth, float drawHeight,
 	}
 
 	// Recursively call drawing on subplans
-	for (unsigned int i = plan->subs.size()-1; i < plan->subs.size(); --i)
+	for (unsigned int i = plan->subpullCount()-1; i < plan->subpullCount(); --i)
 	{
-		SubpullTemplate* sub = &(plan->subs[i]);
+		SubpullTemplate sub = plan->getSubpullTemplate(i);
 
-		float rX = x + (sub->location.x - sub->diameter/2.0) * drawWidth/2 + drawWidth/2;
-		float rY = y + (sub->location.y - sub->diameter/2.0) * drawWidth/2 + drawHeight/2;
-		float rWidth = sub->diameter * drawWidth/2;
-		float rHeight = sub->diameter * drawHeight/2;
+		float rX = x + (sub.location.x - sub.diameter/2.0) * drawWidth/2 + drawWidth/2;
+		float rY = y + (sub.location.y - sub.diameter/2.0) * drawWidth/2 + drawHeight/2;
+		float rWidth = sub.diameter * drawWidth/2;
+		float rHeight = sub.diameter * drawHeight/2;
 
-		drawSubplan(rX, rY, rWidth, rHeight, plan->subs[i].plan, 
+		drawSubplan(rX, rY, rWidth, rHeight, sub.plan, 
 			false, painter);
 
 		painter->setBrush(Qt::NoBrush);
 		setBoundaryPainter(painter, outermostLevel); 
-		paintShape(rX, rY, rWidth, plan->subs[i].shape, painter);
+		paintShape(rX, rY, rWidth, sub.shape, painter);
 	}
 }
 

@@ -56,21 +56,23 @@ PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimp
 	PullPlan* plan = new PullPlan(static_cast<PullTemplate::Type>(randomTemplateNumber));
 	
 	// set parameters
-	plan->twist = 0.0;
+	plan->setTwist(0.0);
 	plan->setCount(qrand() % 10 + 2);
 
 	// set subplans
-	for (unsigned int i = 0; i < plan->subs.size(); ++i)
+	for (unsigned int i = 0; i < plan->subpullCount(); ++i)
 	{
-		switch (plan->subs[i].shape)
+		SubpullTemplate t = plan->getSubpullTemplate(i);
+		switch (t.shape)
 		{
 			case CIRCLE_SHAPE:
-				plan->subs[i].plan = circleSimplePlan;
+				t.plan = circleSimplePlan;
 				break;
 			case SQUARE_SHAPE:
-				plan->subs[i].plan = squareSimplePlan;
+				t.plan = squareSimplePlan;
 				break;
 		}
+		plan->setSubpullTemplate(t, i);
 	}
 
 	return plan;

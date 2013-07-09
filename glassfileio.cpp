@@ -571,7 +571,7 @@ void writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<co
 	
 	// write singletons: pull template, twist
 	root[canename]["Pull template"] = pullTemplateToString(cane->templateType());
-	root[canename]["Twist"] = cane->twist;
+	root[canename]["Twist"] = cane->twist();
 
 	// write casings	
 	root[canename]["Casings"];
@@ -589,15 +589,16 @@ void writeCane(Json::Value& root, PullPlan* cane, unsigned int caneIndex, map<co
 
 	// loop over subpulls
 	root[canename]["Subcanes"];
-	for (unsigned int i = 0; i < cane->subs.size(); ++i)
+	for (unsigned int i = 0; i < cane->subpullCount(); ++i)
 	{
 		string subpullName = idAndNameToString(i, "Subcane");
 		root[canename]["Subcanes"][subpullName]["Index"] = i;
-		root[canename]["Subcanes"][subpullName]["Cane pointer"] = caneMap[cane->subs[i].plan];
-		root[canename]["Subcanes"][subpullName]["Diameter"] = cane->subs[i].diameter;
-		root[canename]["Subcanes"][subpullName]["Shape"] = geometricShapeToString(cane->subs[i].shape);
-		root[canename]["Subcanes"][subpullName]["X"] = cane->subs[i].location.x;
-		root[canename]["Subcanes"][subpullName]["Y"] = cane->subs[i].location.y;
+		SubpullTemplate sub = cane->getSubpullTemplate(i);
+		root[canename]["Subcanes"][subpullName]["Cane pointer"] = caneMap[sub.plan];
+		root[canename]["Subcanes"][subpullName]["Diameter"] = sub.diameter;
+		root[canename]["Subcanes"][subpullName]["Shape"] = geometricShapeToString(sub.shape);
+		root[canename]["Subcanes"][subpullName]["X"] = sub.location.x;
+		root[canename]["Subcanes"][subpullName]["Y"] = sub.location.y;
 	}
 }
 
@@ -607,7 +608,7 @@ PullPlan* readCane(string canename, Json::Value& root, map<unsigned int, GlassCo
 {
 	// read singletons: pull template, twist
 	PullPlan* cane = new PullPlan(stringToPullTemplate(root[canename]["Pull template"].asString()));
-	cane->twist = root[canename]["Twist"].asFloat();
+	cane->setTwist(root[canename]["Twist"].asFloat());
 
 	// make a temporary list of casings that can be modified freely, unlike those stashed inside
 	// a cane, which have constraints due to collision, etc.
@@ -654,7 +655,7 @@ void readCaneSubcanes(Json::Value& root, PullPlan* cane, map<unsigned int, PullP
 	{
 		Point2D location;
 		for (unsigned int i = 0; i < root["Subcanes"].getMemberNames().size(); ++i)
-			cane->subs.push_back(SubpullTemplate(cane, CIRCLE_SHAPE, location, 1.0));
+			cane->addSubpullTemplate(SubpullTemplate(cane, CIRCLE_SHAPE, location, 1.0));
 	}
 
 	for (unsigned int i = 0; i < root["Subcanes"].getMemberNames().size(); ++i)
@@ -662,11 +663,13 @@ void readCaneSubcanes(Json::Value& root, PullPlan* cane, map<unsigned int, PullP
 		string subpullname = root["Subcanes"].getMemberNames()[i];
 		unsigned int subpullIndex = root["Subcanes"][subpullname]["Index"].asUInt();
 
-		cane->subs[subpullIndex].plan = safeCaneMap(caneMap, root["Subcanes"][subpullname]["Cane pointer"].asUInt());
-		cane->subs[subpullIndex].diameter = root["Subcanes"][subpullname]["Diameter"].asFloat();
-		cane->subs[subpullIndex].shape = stringToGeometricShape(root["Subcanes"][subpullname]["Shape"].asString());
-		cane->subs[subpullIndex].location.x = root["Subcanes"][subpullname]["X"].asFloat();
-		cane->subs[subpullIndex].location.y = root["Subcanes"][subpullname]["Y"].asFloat();
+		SubpullTemplate sub = cane->getSubpullTemplate(subpullIndex);
+		sub.plan = safeCaneMap(caneMap, root["Subcanes"][subpullname]["Cane pointer"].asUInt());
+		sub.diameter = root["Subcanes"][subpullname]["Diameter"].asFloat();
+		sub.shape = stringToGeometricShape(root["Subcanes"][subpullname]["Shape"].asString());
+		sub.location.x = root["Subcanes"][subpullname]["X"].asFloat();
+		sub.location.y = root["Subcanes"][subpullname]["Y"].asFloat();
+		cane->setSubpullTemplate(sub, subpullIndex);
 	}
 }
 

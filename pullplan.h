@@ -4,6 +4,8 @@
 #define PULLPLAN_H
 
 #include <vector>
+#include <stack>
+
 #include "pulltemplate.h"
 #include "shape.h"
 #include "primitives.h"
@@ -12,6 +14,7 @@
 #include "templateparameter.h"
 
 using std::vector;
+using std::stack;
 
 class PullPlan;
 class GlassColor;
@@ -22,10 +25,10 @@ class PullPlan
 		PullPlan(enum PullTemplate::Type t);
 
 		void setTemplateType(enum PullTemplate::Type t);
-		enum PullTemplate::Type templateType();
+		enum PullTemplate::Type templateType() const;
 
-		unsigned int count();
 		void setCount(unsigned int count);
+		unsigned int count();
 
 		void setCasingThickness(float t, unsigned int index);
 		float getCasingThickness(unsigned int index);
@@ -39,7 +42,9 @@ class PullPlan
 		const GlassColor* getCasingColor(unsigned int index);
 		const GlassColor* outermostCasingColor();
 
-		float twist;
+		float twist();
+		void setTwist(float t);
+		float* twistPtr();
 
 		void addCasing(enum GeometricShape s);
 		void removeCasing();
@@ -48,15 +53,34 @@ class PullPlan
 
 		PullPlan* copy() const;
 
-		vector<SubpullTemplate> subs;
+		SubpullTemplate getSubpullTemplate(unsigned int index);
+		void setSubpullTemplate(SubpullTemplate t, unsigned int index);	
+		void addSubpullTemplate(SubpullTemplate t);
+		void removeSubpullTemplate(unsigned int index);
+		unsigned int subpullCount();	
 
 		bool hasDependencyOn(GlassColor* color);
 		bool hasDependencyOn(PullPlan* pullPlan);
 
+		void undo();
+		void redo();
+		bool canUndo();
+		bool canRedo();
+		void saveState();
+
 	private:
-		enum PullTemplate::Type type;
-		vector<Casing> casings;
-		unsigned int _count;
+		struct State
+		{
+			enum PullTemplate::Type type;
+			vector<Casing> casings;
+			unsigned int count;
+			float twist;
+			vector<SubpullTemplate> subs;
+		};	
+
+		stack<struct State> undoStack;
+		stack<struct State> redoStack;
+		struct State state;
 
 		// Methods
 		void initializeTemplate();

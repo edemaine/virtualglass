@@ -43,6 +43,7 @@ TwistWidget :: TwistWidget(float* _twist, unsigned int _range, QWidget* parent) 
 	layout->addWidget(rightLabel);	
 
 	connect(slider, SIGNAL(valueChanged(int)), this, SLOT(sliderValueChanged(int)));	
+	connect(slider, SIGNAL(sliderReleased()), this, SLOT(sliderChangeEnded()));	
 	connect(spin, SIGNAL(valueChanged(double)), this, SLOT(spinValueChanged(double)));	
 
 	updateEverything();
@@ -58,11 +59,17 @@ void TwistWidget :: updateEverything()
 	spin->blockSignals(false);
 }
 
+void TwistWidget :: sliderChangeEnded()
+{
+	emit valueChangeEnded();
+}
+
 void TwistWidget :: spinValueChanged(double v)
 {
 	*(this->twist) = v;
 	updateEverything();
 	emit valueChanged();
+	emit valueChangeEnded();
 }
 
 void TwistWidget :: sliderValueChanged(int v)
