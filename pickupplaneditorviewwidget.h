@@ -2,12 +2,13 @@
 #ifndef PICKUPPLANEDITORVIEWWIDGET_H
 #define PICKUPPLANEDITORVIEWWIDGET_H
 
-#include "pickupplan.h"
+#include <QWidget>
+
 #include "mesh.h"
 #include "geometry.h"
-#include "pickupplan.h"
-#include "pullplanlibrarywidget.h"
 
+class Piece;
+class PullPlan;
 class NiceViewWidget;
 
 class PickupPlanEditorViewWidget : public QWidget
@@ -17,8 +18,8 @@ class PickupPlanEditorViewWidget : public QWidget
 	friend class PieceEditorWidget;
 
 	public:
-		PickupPlanEditorViewWidget(PickupPlan* pickup, QWidget* parent=0);
-		void setPickup(PickupPlan* p);
+		PickupPlanEditorViewWidget(Piece* piece, QWidget* parent=0);
+		void setPiece(Piece* p);
 
 	signals:
 		void someDataChanged();
@@ -35,7 +36,7 @@ class PickupPlanEditorViewWidget : public QWidget
 	private:
 		Geometry geometry;
 		NiceViewWidget* niceViewWidget;
-		PickupPlan* pickup;
+		Piece* piece;
 		float ulX, ulY, squareSize;
 
 		void setupConnections();

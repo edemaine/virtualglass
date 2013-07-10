@@ -2,6 +2,7 @@
 #include <QMouseEvent>
 #include <QVBoxLayout>
 
+#include "piece.h"
 #include "pickupplaneditorviewwidget.h"
 #include "glasscolorlibrarywidget.h"
 #include "pullplanlibrarywidget.h"
@@ -10,11 +11,11 @@
 #include "glasscolor.h"
 #include "pullplancrosssectionrender.h"
 
-PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(PickupPlan* pickup, QWidget* parent) : QWidget(parent)
+PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(Piece* piece, QWidget* parent) : QWidget(parent)
 {
 	setAcceptDrops(true);
 	setMinimumSize(200, 200);
-	this->pickup = pickup;
+	this->piece = piece;
 	this->niceViewWidget = new NiceViewWidget(NiceViewWidget::PICKUPPLAN_CAMERA_MODE, this);
 	this->niceViewWidget->setGeometry(&geometry);
 
@@ -35,9 +36,9 @@ void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** sub
 {
 	int hitIndex = -1;
 	float hitDepth = -100.0;
-	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
+	for (unsigned int i = 0; i < this->piece->pickup->subpickupCount(); ++i)
 	{
-		SubpickupTemplate sp = pickup->getSubpickupTemplate(i);
+		SubpickupTemplate sp = this->piece->pickup->getSubpickupTemplate(i);
 		Point2D ll, ur;
 		ll = ur = make_vector<float>(0.0f, 0.0f);
 
@@ -82,7 +83,7 @@ void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** sub
 	if (hitIndex != -1)
 	{
 		*subplanIndex = hitIndex;
-		*subplan = pickup->getSubpickupTemplate(hitIndex).plan;
+		*subplan = this->piece->pickup->getSubpickupTemplate(hitIndex).plan;
 	}
 	else
 	{
@@ -204,18 +205,18 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		event->accept();
 		if ((event->keyboardModifiers() & Qt::ShiftModifier))
 		{
-			for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
+			for (unsigned int i = 0; i < this->piece->pickup->subpickupCount(); ++i)
 			{
-				SubpickupTemplate t = pickup->getSubpickupTemplate(i);
+				SubpickupTemplate t = this->piece->pickup->getSubpickupTemplate(i);
 				t.plan = droppedPlan;
-				pickup->setSubpickupTemplate(t, i);
+				this->piece->pickup->setSubpickupTemplate(t, i);
 			}
 		}
 		else
 		{
-			SubpickupTemplate t = pickup->getSubpickupTemplate(subplanIndex);
+			SubpickupTemplate t = this->piece->pickup->getSubpickupTemplate(subplanIndex);
 			t.plan = droppedPlan;
-			pickup->setSubpickupTemplate(t, subplanIndex);
+			this->piece->pickup->setSubpickupTemplate(t, subplanIndex);
 		}
 		emit someDataChanged();
 	}
@@ -225,9 +226,9 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	}
 }
 
-void PickupPlanEditorViewWidget :: setPickup(PickupPlan* _pickup)
+void PickupPlanEditorViewWidget :: setPiece(Piece* _piece)
 {
-	pickup = _pickup;
+	this->piece = _piece;
 	updateEverything();
 }
 

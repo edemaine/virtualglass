@@ -33,7 +33,7 @@ PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 {
 	resetPiece();
 
-	this->pickupViewWidget = new PickupPlanEditorViewWidget(_piece->pickup, this);	
+	this->pickupViewWidget = new PickupPlanEditorViewWidget(_piece, this);	
 	this->pieceNiceViewWidget = new NiceViewWidget(NiceViewWidget::PIECE_CAMERA_MODE, this);
 	pieceNiceViewWidget->setGeometry(&geometry);
 	this->pieceCustomizeViewWidget = new PieceCustomizeViewWidget(_piece, this);
@@ -479,7 +479,7 @@ void PieceEditorWidget :: setPiece(Piece* __piece)
 	_piece = __piece;
 	pieceControlsTab->setCurrentIndex(0);
 	updateEverything();
-	pickupViewWidget->setPickup(_piece->pickup);
+	pickupViewWidget->setPiece(_piece);
 	twistWidget->setTwist(_piece->twistPtr());
 	pieceCustomizeViewWidget->setPiece(_piece);
 }
