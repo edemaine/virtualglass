@@ -319,7 +319,7 @@ void PieceEditorWidget :: setupLayout()
 	tab1Widget->setLayout(tab1Layout); 
 	pieceControlsTab->addTab(tab1Widget, "Twist");
 
-	twistWidget = new TwistWidget(&(_piece->twist), 3.0, pieceControlsTab);
+	twistWidget = new TwistWidget(_piece->twistPtr(), 3.0, pieceControlsTab);
 	tab1Layout->addWidget(twistWidget, 0);
 	tab1Layout->addStretch(10);
 
@@ -379,14 +379,18 @@ void PieceEditorWidget :: setupConnections()
 
 void PieceEditorWidget :: addControlPointButtonClicked()
 {
-	_piece->spline.addPoint(Point2D(make_vector(0.0f, 0.0f)));
+	Spline spline = _piece->spline();
+	spline.addPoint(Point2D(make_vector(0.0f, 0.0f)));
+	_piece->setSpline(spline);
 	updateEverything();
 	emit someDataChanged();
 }
 
 void PieceEditorWidget :: removeControlPointButtonClicked()
 {
-	_piece->spline.removePoint();
+	Spline spline = _piece->spline();
+	spline.removePoint();
+	_piece->setSpline(spline);
 	updateEverything();
 	emit someDataChanged();
 }
@@ -476,7 +480,7 @@ void PieceEditorWidget :: setPiece(Piece* __piece)
 	pieceControlsTab->setCurrentIndex(0);
 	updateEverything();
 	pickupViewWidget->setPickup(_piece->pickup);
-	twistWidget->setTwist(&(_piece->twist));
+	twistWidget->setTwist(_piece->twistPtr());
 	pieceCustomizeViewWidget->setPiece(_piece);
 }
 

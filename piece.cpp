@@ -3,10 +3,35 @@
 
 Piece :: Piece(enum PieceTemplate::Type _type)
 {
-	twist = 0.0;
+	this->state.twist = 0.0;
 	setTemplateType(_type, true);
 	// initialize the piece's pickup to be something boring and base
 	this->pickup = new PickupPlan(PickupTemplate::VERTICAL);
+}
+
+void Piece::setSpline(Spline s)
+{
+	this->state.spline = s;
+}
+
+Spline Piece::spline()
+{
+	return this->state.spline;
+}
+
+void Piece :: setTwist(float t)
+{
+	this->state.twist = t;
+}
+
+float Piece :: twist()
+{
+	return this->state.twist;
+}
+
+float* Piece :: twistPtr()
+{
+	return &(this->state.twist);
 }
 
 bool Piece :: hasDependencyOn(PullPlan* plan)
@@ -51,10 +76,8 @@ but does not include the pull plans used.
 */
 Piece* Piece :: copy() const
 {
-	Piece* c = new Piece(type);
-
-	c->twist = this->twist;
-	c->spline = this->spline;
+	Piece* c = new Piece(this->state.type);
+	c->state = this->state;
 	c->pickup = this->pickup->copy();
 	
 	return c;
@@ -62,12 +85,13 @@ Piece* Piece :: copy() const
 
 void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
 {
-	if (!force && this->type == _type)
+	if (!force && this->state.type == _type)
 		return;
 
-	this->type = _type;
+	Spline &spline = this->state.spline;
 
-	switch (this->type)
+	this->state.type = _type;
+	switch (this->state.type)
 	{
 		case PieceTemplate::TUMBLER:
 			while (spline.controlPoints().size() < 4)
@@ -138,10 +162,11 @@ void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
 
 enum PieceTemplate::Type Piece :: templateType()
 {
-	return type;
+	return this->state.type;
 }
 
-Piece *deep_copy(const Piece *_piece) {
+Piece *deep_copy(const Piece *_piece) 
+{
 	assert(_piece);
 	Piece *piece = _piece->copy();
 	//Replace pickup with a deep copy:

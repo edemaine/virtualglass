@@ -11,7 +11,7 @@ namespace PieceCrossSectionRender
 void render(QPainter* painter, int targetSize, Piece* piece)
 {
 	painter->setRenderHint(QPainter::Antialiasing);
-	Spline& spline = piece->spline;
+	Spline spline = piece->spline();
 
 	// Drawing renders a viewSize x viewSize box centered at (0, 0)
 	// and scale to the input pixel dimension (int size).

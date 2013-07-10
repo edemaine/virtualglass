@@ -157,18 +157,20 @@ void casePiece(Geometry* geometry, Piece* piece)
 	// mesh the slab and apply the casing
 	unsigned int verticesStart = geometry->vertices.size();
 	meshPickupCasingSlab(geometry, piece->pickup->casingGlassColor()->color(), 0.0, thickness);
+	Spline spline = piece->spline();
 	for (uint32_t i = verticesStart; i < geometry->vertices.size(); ++i)
-		applyPieceTransform(geometry->vertices[i], 0.0 /* NO TWIST */, piece->spline);
+		applyPieceTransform(geometry->vertices[i], 0.0 /* NO TWIST */, spline);
 
 	//for now we don't do these, but the intent is to reintroduce soon
-	//meshPickupCasingSlab(geometry, pickup->underlayGlassColor->getColor(), thickness + 0.1, 0.05);
-	//meshPickupCasingSlab(geometry, pickup->overlayGlassColor->getColor(), -(thickness + 0.1), 0.05);
+	//meshPickupCasingSlab(geometry, pickup->underlayGlassColor()->getColor(), thickness + 0.1, 0.05);
+	//meshPickupCasingSlab(geometry, pickup->overlayGlassColor()->getColor(), -(thickness + 0.1), 0.05);
 }
 
 void applyPieceTransform(Geometry* geometry, Piece* piece)
 {
+	Spline spline = piece->spline();
 	for (uint32_t i = 0; i < geometry->vertices.size(); ++i)
-		applyPieceTransform(geometry->vertices[i], piece->twist, piece->spline);
+		applyPieceTransform(geometry->vertices[i], piece->twist(), spline);
 }
 
 void applyPlanTransform(Vertex& v, Ancestor a)

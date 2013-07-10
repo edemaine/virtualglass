@@ -872,16 +872,17 @@ void writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<Pu
 
 	// write singletons: piece template, twist
 	root[piecename]["Piece template"] = pieceTemplateToString(piece->templateType());
-	root[piecename]["Twist"] = piece->twist;
+	root[piecename]["Twist"] = piece->twist();
 
 	// write piece template parameters
 	root[piecename]["Piece spline control points"];
-	for (unsigned int i = 0; i < piece->spline.controlPoints().size(); ++i)
+	Spline spline = piece->spline();
+	for (unsigned int i = 0; i < spline.controlPoints().size(); ++i)
 	{
 		string paramName = idAndNameToString(i, "PieceSplineCtrlPt");
 		root[piecename]["Piece spline control points"][paramName]["Index"] = i;
-		root[piecename]["Piece spline control points"][paramName]["X"] = piece->spline.controlPoints()[i].x;
-		root[piecename]["Piece spline control points"][paramName]["Y"] = piece->spline.controlPoints()[i].y;
+		root[piecename]["Piece spline control points"][paramName]["X"] = spline.controlPoints()[i].x;
+		root[piecename]["Piece spline control points"][paramName]["Y"] = spline.controlPoints()[i].y;
 	}
 
 	// write pickups (currently only one)
@@ -893,11 +894,13 @@ Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, PullPlan
 {
 	// read singletons: piece template
 	Piece* piece = new Piece(stringToPieceTemplate(root[piecename]["Piece template"].asString()));
-	piece->twist = root[piecename]["Twist"].asFloat();
+	piece->setTwist(root[piecename]["Twist"].asFloat());
 
 	// read piece template parameters
-	for (unsigned int i = piece->spline.controlPoints().size(); i < root[piecename]["Piece spline control points"].getMemberNames().size(); ++i)
-		piece->spline.addPoint(Point2D()); // pad spline to be big enough for all the parameters
+	Spline spline = piece->spline();
+	for (unsigned int i = spline.controlPoints().size(); 
+		i < root[piecename]["Piece spline control points"].getMemberNames().size(); ++i)
+		spline.addPoint(Point2D()); // pad spline to be big enough for all the parameters
 	for (unsigned int i = 0; i < root[piecename]["Piece spline control points"].getMemberNames().size(); ++i)
 	{
 		string paramname = root[piecename]["Piece spline control points"].getMemberNames()[i];
@@ -906,8 +909,9 @@ Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, PullPlan
 		Point2D paramValue;
 		paramValue.x = root[piecename]["Piece spline control points"][paramname]["X"].asFloat();	
 		paramValue.y = root[piecename]["Piece spline control points"][paramname]["Y"].asFloat();	
-		piece->spline.set(paramIndex, paramValue);
+		spline.set(paramIndex, paramValue);
 	}
+	piece->setSpline(spline);
 
 	// read pickups (currently only one)
 	for (unsigned int i = 0; i < root[piecename]["Pickups"].getMemberNames().size(); ++i)

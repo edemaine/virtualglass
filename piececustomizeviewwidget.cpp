@@ -96,7 +96,7 @@ float PieceCustomizeViewWidget :: adjustedScale(float rawScale)
 
 Point2D PieceCustomizeViewWidget :: controlPointRawLocation(unsigned int index)
 {
-	Point2D cp = piece->spline.controlPoints()[index];
+	Point2D cp = piece->spline().controlPoints()[index];
 
 	Point2D p;
 	p.x = rawX(zoom/2 - cp.x);
@@ -113,7 +113,7 @@ void PieceCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 	mouse.y = event->pos().y();
 	
 	// check and see if it's on a control point
-	for (unsigned int i = 0; i < piece->spline.controlPoints().size(); ++i)
+	for (unsigned int i = 0; i < piece->spline().controlPoints().size(); ++i)
 	{
 		Point2D p = controlPointRawLocation(i);
 		if (fabs(mouse.x - p.x) + fabs(mouse.y - p.y) < 4 * MAX(squareSize / 100, 1))
@@ -134,16 +134,20 @@ void PieceCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 	if (draggedControlPointIndex == 0)
 	{
 		// only adjust Y
-		Point2D p = piece->spline.controlPoints()[0];
+		Spline spline = piece->spline();
+		Point2D p = spline.controlPoints()[0];
 		p.y = center - adjustedY(event->pos().y());
-		piece->spline.set(0, p);
+		spline.set(0, p);
+		piece->setSpline(spline);
 	}
 	else
 	{
 		Point2D p;
 		p.x = center - adjustedX(event->pos().x());
 		p.y = center - adjustedY(event->pos().y());
-		piece->spline.set(draggedControlPointIndex, p);
+		Spline spline = piece->spline();
+		spline.set(draggedControlPointIndex, p);
+		piece->setSpline(spline);
 	}
 	emit someDataChanged();
 }
@@ -168,7 +172,7 @@ void PieceCustomizeViewWidget :: setPiece(Piece* _piece)
 void PieceCustomizeViewWidget :: drawPiece()
 {
 	// draw the spline
-	Spline& spline = piece->spline;
+	Spline spline = piece->spline();
 
 	// note that pixels are specified from upper left, so many Ys
 	// are inverted. we assume a canvas of size zoom x zoom

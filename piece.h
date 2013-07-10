@@ -19,18 +19,29 @@ class Piece
 
 		void setTemplateType(enum PieceTemplate::Type t, bool force=false);
 		enum PieceTemplate::Type templateType();
-
 		Piece* copy() const;
-		PickupPlan* pickup;
+
 		bool hasDependencyOn(GlassColor* c);
 		bool hasDependencyOn(PullPlan* p);
-	
-		float twist;
-		Spline spline;
+
+		void setTwist(float t);
+		float twist();
+		float* twistPtr();
+
+		PickupPlan* pickup;
+
+		void setSpline(Spline s);
+		Spline spline();
 	
 	private:
-		// Variables
-		enum PieceTemplate::Type type;
+		struct State
+		{
+			float twist;
+			enum PieceTemplate::Type type;
+			Spline spline;
+		};	
+
+		struct State state;		
 };
 
 Piece *deep_copy(const Piece *);
