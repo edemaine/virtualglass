@@ -148,14 +148,15 @@ void casePiece(Geometry* geometry, Piece* piece)
 {
 	// base thickness of casing off of representative (first) cane in pickup
 	float thickness;
-	if (piece->pickup->subs[0].orientation == MURRINE_PICKUP_CANE_ORIENTATION)
-		thickness = piece->pickup->subs[0].length*2.5;	
+	SubpickupTemplate firstTemp = piece->pickup->getSubpickupTemplate(0);
+	if (firstTemp.orientation == MURRINE_PICKUP_CANE_ORIENTATION)
+		thickness = firstTemp.length*2.5;	
 	else
-		thickness = piece->pickup->subs[0].width*2.5;
+		thickness = firstTemp.width*2.5;
 	
 	// mesh the slab and apply the casing
 	unsigned int verticesStart = geometry->vertices.size();
-	meshPickupCasingSlab(geometry, piece->pickup->casingGlassColor->color(), 0.0, thickness);
+	meshPickupCasingSlab(geometry, piece->pickup->casingGlassColor()->color(), 0.0, thickness);
 	for (uint32_t i = verticesStart; i < geometry->vertices.size(); ++i)
 		applyPieceTransform(geometry->vertices[i], 0.0 /* NO TWIST */, piece->spline);
 
@@ -680,14 +681,15 @@ void generateMesh(PickupPlan* pickup, Geometry *geometry, bool isTopLevel, unsig
 		return;
 
 	geometry->clear();
-	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
+	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
 	{
-		uint32_t startVert = geometry->vertices.size();
 		vector<Ancestor> ancestors;
-		recurseMesh(pickup->subs[i].plan, geometry, ancestors, pickup->subs[i].length, quality, isTopLevel, end);
+		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
+		uint32_t startVert = geometry->vertices.size();
+		recurseMesh(t.plan, geometry, ancestors, t.length, quality, isTopLevel, end);
 		for (unsigned int j = startVert; j < geometry->vertices.size(); ++j)
 		{
-			applyPickupTransform(geometry->vertices[j], pickup->subs[i]); 
+			applyPickupTransform(geometry->vertices[j], t);
 		}
 	}
 }

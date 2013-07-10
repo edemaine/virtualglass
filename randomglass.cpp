@@ -94,16 +94,20 @@ PickupPlan* randomPickup(PullPlan* pullPlan1, PullPlan* pullPlan2)
 	}	
 
 	// set subplans
-	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
+	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
 	{
-		pickup->subs[i].plan = pullPlan1;
+		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
+		t.plan = pullPlan1;
+		pickup->setSubpickupTemplate(t, i);
 	}
 	// if a second plan is provided, alternate with the first one
 	if (pullPlan2 != NULL)
 	{
-		for (unsigned int i = 0; i < pickup->subs.size(); i+=2)
+		for (unsigned int i = 0; i < pickup->subpickupCount(); i+=2)
 		{
-			pickup->subs[i].plan = pullPlan2;
+			SubpickupTemplate t = pickup->getSubpickupTemplate(i);
+			t.plan = pullPlan2;
+			pickup->setSubpickupTemplate(t, i);
 		}
 	}
 

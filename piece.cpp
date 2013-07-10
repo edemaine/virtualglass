@@ -13,9 +13,9 @@ bool Piece :: hasDependencyOn(PullPlan* plan)
 {
 	bool pickupPlansDependOn = false;
 
-	for (unsigned int i = 0; i < this->pickup->subs.size(); ++i)
+	for (unsigned int i = 0; i < this->pickup->subpickupCount(); ++i)
 	{
-		if (this->pickup->subs[i].plan->hasDependencyOn(plan))
+		if (this->pickup->getSubpickupTemplate(i).plan->hasDependencyOn(plan))
 		{
 			pickupPlansDependOn = true;
 			break;
@@ -29,16 +29,16 @@ bool Piece :: hasDependencyOn(GlassColor* glassColor)
 {
 	bool pickupPlansDependOn = false;
 
-	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
+	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
 	{
-		if (pickup->subs[i].plan->hasDependencyOn(glassColor))
+		if (pickup->getSubpickupTemplate(i).plan->hasDependencyOn(glassColor))
 		{
 			pickupPlansDependOn = true;		
 			break;
 		}
 	}
 	
-	if (pickup->overlayGlassColor == glassColor || pickup->underlayGlassColor == glassColor)
+	if (pickup->overlayGlassColor() == glassColor || pickup->underlayGlassColor() == glassColor)
 		pickupPlansDependOn = true;
 
 	return pickupPlansDependOn;

@@ -11,38 +11,70 @@
 
 PickupPlan :: PickupPlan(enum PickupTemplate::Type _type) 
 {
-	casingGlassColor = underlayGlassColor = overlayGlassColor = GlobalGlass::color();
+	this->state.casingGlassColor = GlobalGlass::color();
+	this->state.underlayGlassColor = GlobalGlass::color();
+	this->state.overlayGlassColor = GlobalGlass::color();
 	setTemplateType(_type, true);
 }
 
 PickupPlan* PickupPlan :: copy() const 
 {
-	
 	PickupPlan* c = new PickupPlan(type);
-
-	for (unsigned int i = 0; i < parameters.size(); ++i)
-	{
-		c->parameters[i] = parameters[i];
-	}
-	c->updateSubs();
-
-	for (unsigned int i = 0; i < subs.size(); ++i)
-	{
-		c->subs[i].plan = subs[i].plan;
-	}
-
-	c->overlayGlassColor = overlayGlassColor;
-	c->underlayGlassColor = underlayGlassColor;
-
+	c->state = this->state;
 	return c;
 }
 
-void PickupPlan :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
-	Point3D location, enum PickupCaneOrientation ori, float length, float width, enum GeometricShape shape) {
+SubpickupTemplate PickupPlan::getSubpickupTemplate(unsigned int index)
+{
+	return this->state.subs[index];
+}
 
-	if (newSubs->size() < subs.size())
+void PickupPlan::setSubpickupTemplate(SubpickupTemplate t, unsigned int index)
+{
+	this->state.subs[index] = t;
+}
+
+unsigned int PickupPlan::subpickupCount()
+{
+	return this->state.subs.size();
+}
+
+GlassColor* PickupPlan::overlayGlassColor()
+{
+	return this->state.overlayGlassColor;
+}
+
+GlassColor* PickupPlan::underlayGlassColor()
+{
+	return this->state.underlayGlassColor;
+}
+
+GlassColor* PickupPlan::casingGlassColor()
+{
+	return this->state.casingGlassColor;
+}
+
+void PickupPlan::setOverlayGlassColor(GlassColor* c)
+{
+	this->state.overlayGlassColor = c;
+}
+
+void PickupPlan::setUnderlayGlassColor(GlassColor* c)
+{
+	this->state.underlayGlassColor = c;
+}
+
+void PickupPlan::setCasingGlassColor(GlassColor* c)
+{
+	this->state.casingGlassColor = c;
+}
+
+void PickupPlan :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
+	Point3D location, enum PickupCaneOrientation ori, float length, float width, enum GeometricShape shape) 
+{
+	if (newSubs->size() < this->state.subs.size())
 	{
-		newSubs->push_back(SubpickupTemplate(subs[newSubs->size()].plan,
+		newSubs->push_back(SubpickupTemplate(this->state.subs[newSubs->size()].plan,
 			location, ori, length, width, shape));
 	}
 	else // you've run out of existing subplans copy from
@@ -55,6 +87,8 @@ void PickupPlan :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
 void PickupPlan :: updateSubs() 
 {
 	vector<SubpickupTemplate> newSubs;
+
+	vector<TemplateParameter> &parameters = this->state.parameters;
 
 	Point3D p;
 	float width, length;
@@ -202,17 +236,18 @@ void PickupPlan :: updateSubs()
 		}
 	}
 
-	subs = newSubs;
+	this->state.subs = newSubs;
 }
 
 
-void PickupPlan :: setTemplateType(enum PickupTemplate::Type _type, bool force) {
-
+void PickupPlan :: setTemplateType(enum PickupTemplate::Type _type, bool force) 
+{
 	if (!force && type == _type)
 		return;
 
+	vector<TemplateParameter> &parameters = this->state.parameters;
+	
 	this->type = _type;
-
 	parameters.clear();
 	switch (type) {
 		case PickupTemplate::VERTICALS_AND_HORIZONTALS:
@@ -242,7 +277,7 @@ void PickupPlan :: setTemplateType(enum PickupTemplate::Type _type, bool force) 
 			break;
 	}
 
-	subs.clear(); // don't carry over any of the current stuff
+	this->state.subs.clear(); // don't carry over any of the current stuff
 	updateSubs();
 }
 
@@ -253,28 +288,31 @@ enum PickupTemplate::Type PickupPlan :: templateType()
 
 unsigned int PickupPlan :: parameterCount()
 {
-	return parameters.size();
+	return this->state.parameters.size();
 }
 
 void PickupPlan :: getParameter(unsigned int _index, TemplateParameter* dest)
 {
-	assert(_index < parameters.size());
-	*dest = parameters[_index];
+	assert(_index < this->state.parameters.size());
+	*dest = this->state.parameters[_index];
 }
 
 void PickupPlan :: setParameter(unsigned int _index, int _value)
 {
-	assert(_index < parameters.size());
-	parameters[_index].value = _value;
+	assert(_index < this->state.parameters.size());
+	this->state.parameters[_index].value = _value;
 	updateSubs();
 }
 
-
-PickupPlan *deep_copy(const PickupPlan *_pickup) {
+PickupPlan *deep_copy(const PickupPlan *_pickup) 
+{
 	assert(_pickup);
 	PickupPlan *pickup = _pickup->copy();
-	for (vector< SubpickupTemplate >::iterator s = pickup->subs.begin(); s != pickup->subs.end(); ++s) {
-		s->plan = deep_copy(s->plan);
+	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
+	{
+		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
+		t.plan = deep_copy(t.plan);
+		pickup->setSubpickupTemplate(t, i);
 	}
 	return pickup;
 }
@@ -282,9 +320,12 @@ PickupPlan *deep_copy(const PickupPlan *_pickup) {
 void deep_delete(PickupPlan *pickup)
 {
 	assert(pickup);
-	for (vector< SubpickupTemplate >::iterator s = pickup->subs.begin(); s != pickup->subs.end(); ++s) {
-		delete s->plan;
-		s->plan = NULL;
+	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
+	{
+		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
+		delete t.plan;
+		t.plan = NULL;
+		pickup->setSubpickupTemplate(t, i);
 	}
 	delete pickup;
 }

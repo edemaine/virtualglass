@@ -35,31 +35,31 @@ void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** sub
 {
 	int hitIndex = -1;
 	float hitDepth = -100.0;
-	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
+	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
 	{
-		SubpickupTemplate* sp = &(pickup->subs[i]);
+		SubpickupTemplate sp = pickup->getSubpickupTemplate(i);
 		Point2D ll, ur;
 		ll = ur = make_vector<float>(0.0f, 0.0f);
 
-		switch (sp->orientation)
+		switch (sp.orientation)
 		{
 			case HORIZONTAL_PICKUP_CANE_ORIENTATION:
-				ll.x = sp->location.x;
-				ll.y = sp->location.y - sp->width/2;
-				ur.x = sp->location.x + sp->length;	
-				ur.y = sp->location.y + sp->width/2;	
+				ll.x = sp.location.x;
+				ll.y = sp.location.y - sp.width/2;
+				ur.x = sp.location.x + sp.length;	
+				ur.y = sp.location.y + sp.width/2;	
 				break;		
 			case VERTICAL_PICKUP_CANE_ORIENTATION:
-				ll.x = sp->location.x - sp->width/2;	
-				ll.y = sp->location.y;	
-				ur.x = sp->location.x + sp->width/2;	
-				ur.y = sp->location.y + sp->length;	
+				ll.x = sp.location.x - sp.width/2;	
+				ll.y = sp.location.y;	
+				ur.x = sp.location.x + sp.width/2;	
+				ur.y = sp.location.y + sp.length;	
 				break;		
 			case MURRINE_PICKUP_CANE_ORIENTATION:
-				ll.x = sp->location.x - sp->width/2;	
-				ll.y = sp->location.y - sp->width/2;	
-				ur.x = sp->location.x + sp->width/2;	
-				ur.y = sp->location.y + sp->width/2;	
+				ll.x = sp.location.x - sp.width/2;	
+				ll.y = sp.location.y - sp.width/2;	
+				ur.x = sp.location.x + sp.width/2;	
+				ur.y = sp.location.y + sp.width/2;	
 				break;
 		}
 
@@ -69,12 +69,12 @@ void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** sub
 			if (hitIndex == -1)
 			{
 				hitIndex = i;
-				hitDepth = pickup->subs[i].location.z;
+				hitDepth = sp.location.z;
 			}
-			else if (hitDepth > pickup->subs[i].location.z)
+			else if (hitDepth > sp.location.z)
 			{
 				hitIndex = i;
-				hitDepth = pickup->subs[i].location.z;
+				hitDepth = sp.location.z;
 			}
 		}
 	}
@@ -82,7 +82,7 @@ void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** sub
 	if (hitIndex != -1)
 	{
 		*subplanIndex = hitIndex;
-		*subplan = pickup->subs[hitIndex].plan;
+		*subplan = pickup->getSubpickupTemplate(hitIndex).plan;
 	}
 	else
 	{
@@ -204,13 +204,19 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		event->accept();
 		if ((event->keyboardModifiers() & Qt::ShiftModifier))
 		{
-			for (unsigned int i = 0; i < pickup->subs.size(); ++i)
+			for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
 			{
-				pickup->subs[i].plan = droppedPlan;
+				SubpickupTemplate t = pickup->getSubpickupTemplate(i);
+				t.plan = droppedPlan;
+				pickup->setSubpickupTemplate(t, i);
 			}
 		}
 		else
-			pickup->subs[subplanIndex].plan = droppedPlan;
+		{
+			SubpickupTemplate t = pickup->getSubpickupTemplate(subplanIndex);
+			t.plan = droppedPlan;
+			pickup->setSubpickupTemplate(t, subplanIndex);
+		}
 		emit someDataChanged();
 	}
 	else

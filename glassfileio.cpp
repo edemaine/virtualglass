@@ -773,9 +773,9 @@ void writePickup(Json::Value& root, PickupPlan* pickup, unsigned int pickupIndex
 
 	// write singletons: casing color, overlay color, underlay color, pickup template
 	root[pickupname]["Pickup template"] = pickupTemplateToString(pickup->templateType()); 
-	root[pickupname]["Casing color pointer"] = colorMap[pickup->casingGlassColor]; 
-	root[pickupname]["Overlay color pointer"] = colorMap[pickup->overlayGlassColor];
-	root[pickupname]["Underlay color pointer"] = colorMap[pickup->underlayGlassColor];
+	root[pickupname]["Casing color pointer"] = colorMap[pickup->casingGlassColor()]; 
+	root[pickupname]["Overlay color pointer"] = colorMap[pickup->overlayGlassColor()];
+	root[pickupname]["Underlay color pointer"] = colorMap[pickup->underlayGlassColor()];
 		
 	// write pickup template parameters
 	root[pickupname]["Pickup template parameters"];
@@ -794,18 +794,19 @@ void writePickup(Json::Value& root, PickupPlan* pickup, unsigned int pickupIndex
 
 	// write subpulls
 	root[pickupname]["Subcanes"];
-	for (unsigned int i = 0; i < pickup->subs.size(); ++i)
+	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
 	{
 		string subpullName = idAndNameToString(i, "Subcane");
 		root[pickupname]["Subcanes"][subpullName]["Index"] = i;
-		root[pickupname]["Subcanes"][subpullName]["Cane pointer"] = caneMap[pickup->subs[i].plan];
-		root[pickupname]["Subcanes"][subpullName]["Length"] = pickup->subs[i].length;
-		root[pickupname]["Subcanes"][subpullName]["Width"] = pickup->subs[i].width;
-		root[pickupname]["Subcanes"][subpullName]["Orientation"] = orientationToString(pickup->subs[i].orientation);
-		root[pickupname]["Subcanes"][subpullName]["Shape"] = geometricShapeToString(pickup->subs[i].shape);
-		root[pickupname]["Subcanes"][subpullName]["X"] = pickup->subs[i].location.x;
-		root[pickupname]["Subcanes"][subpullName]["Y"] = pickup->subs[i].location.y;
-		root[pickupname]["Subcanes"][subpullName]["Z"] = pickup->subs[i].location.z;
+		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
+		root[pickupname]["Subcanes"][subpullName]["Cane pointer"] = caneMap[t.plan];
+		root[pickupname]["Subcanes"][subpullName]["Length"] = t.length;
+		root[pickupname]["Subcanes"][subpullName]["Width"] = t.width;
+		root[pickupname]["Subcanes"][subpullName]["Orientation"] = orientationToString(t.orientation);
+		root[pickupname]["Subcanes"][subpullName]["Shape"] = geometricShapeToString(t.shape);
+		root[pickupname]["Subcanes"][subpullName]["X"] = t.location.x;
+		root[pickupname]["Subcanes"][subpullName]["Y"] = t.location.y;
+		root[pickupname]["Subcanes"][subpullName]["Z"] = t.location.z;
 	}
 }
 
@@ -814,9 +815,9 @@ PickupPlan* readPickup(string pickupname, Json::Value& root,
 {
 	// read singletons: casing color, overlay color, underlay color, pickup template
 	PickupPlan* pickup = new PickupPlan(stringToPickupTemplate(root[pickupname]["Pickup template"].asString()));
-	pickup->casingGlassColor = safeColorMap(colorMap, root[pickupname]["Casing color pointer"].asUInt());
-	pickup->overlayGlassColor = safeColorMap(colorMap, root[pickupname]["Overlay color pointer"].asUInt());
-	pickup->underlayGlassColor = safeColorMap(colorMap, root[pickupname]["Underlay color pointer"].asUInt());
+	pickup->setCasingGlassColor(safeColorMap(colorMap, root[pickupname]["Casing color pointer"].asUInt()));
+	pickup->setOverlayGlassColor(safeColorMap(colorMap, root[pickupname]["Overlay color pointer"].asUInt()));
+	pickup->setUnderlayGlassColor(safeColorMap(colorMap, root[pickupname]["Underlay color pointer"].asUInt()));
 
 	// read pickup template parameters
 	for (unsigned int i = 0; i < root[pickupname]["Pickup template parameters"].getMemberNames().size(); ++i)
@@ -835,17 +836,16 @@ PickupPlan* readPickup(string pickupname, Json::Value& root,
 		string subpullname = root[pickupname]["Subcanes"].getMemberNames()[i];
 		unsigned int subIndex = root[pickupname]["Subcanes"][subpullname]["Index"].asUInt();
 
-		pickup->subs[subIndex].plan = safeCaneMap(caneMap,
-			root[pickupname]["Subcanes"][subpullname]["Cane pointer"].asUInt());
-		pickup->subs[subIndex].length = root[pickupname]["Subcanes"][subpullname]["Length"].asFloat();
-		pickup->subs[subIndex].width = root[pickupname]["Subcanes"][subpullname]["Width"].asFloat();
-		pickup->subs[subIndex].orientation 
-			= stringToOrientation(root[pickupname]["Subcanes"][subpullname]["Orientation"].asString());
-		pickup->subs[subIndex].shape 
-			= stringToGeometricShape(root[pickupname]["Subcanes"][subpullname]["Shape"].asString());
-		pickup->subs[subIndex].location.x = root[pickupname]["Subcanes"][subpullname]["X"].asFloat();
-		pickup->subs[subIndex].location.y = root[pickupname]["Subcanes"][subpullname]["Y"].asFloat();
-		pickup->subs[subIndex].location.z = root[pickupname]["Subcanes"][subpullname]["Z"].asFloat();
+		SubpickupTemplate t = pickup->getSubpickupTemplate(subIndex);
+		t.plan = safeCaneMap(caneMap, root[pickupname]["Subcanes"][subpullname]["Cane pointer"].asUInt());
+		t.length = root[pickupname]["Subcanes"][subpullname]["Length"].asFloat();
+		t.width = root[pickupname]["Subcanes"][subpullname]["Width"].asFloat();
+		t.orientation = stringToOrientation(root[pickupname]["Subcanes"][subpullname]["Orientation"].asString());
+		t.shape = stringToGeometricShape(root[pickupname]["Subcanes"][subpullname]["Shape"].asString());
+		t.location.x = root[pickupname]["Subcanes"][subpullname]["X"].asFloat();
+		t.location.y = root[pickupname]["Subcanes"][subpullname]["Y"].asFloat();
+		t.location.z = root[pickupname]["Subcanes"][subpullname]["Z"].asFloat();
+		pickup->setSubpickupTemplate(t, subIndex);
 	}
 
 	return pickup;
