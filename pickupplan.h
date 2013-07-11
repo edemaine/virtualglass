@@ -49,6 +49,7 @@ class PickupPlan
 			GlassColor* casingGlassColor;
 			vector<SubpickupTemplate> subs;
 			vector<TemplateParameter> parameters;
+			enum PickupTemplate::Type type;
 		};	
 
 		struct State state;
@@ -56,7 +57,6 @@ class PickupPlan
 		void updateSubs();
 		void pushNewSubplan(vector<SubpickupTemplate>* newSubs, Point3D location,
 			enum PickupCaneOrientation ori, float length, float width, enum GeometricShape s); 
-		enum PickupTemplate::Type type;
 };
 
 PickupPlan *deep_copy(const PickupPlan *);

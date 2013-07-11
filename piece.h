@@ -30,10 +30,11 @@ class Piece
 		float twist();
 		float* twistPtr();
 
+		void setPickupPlan(PickupPlan* p);
+		PickupPlan* pickupPlan() const;
+
 		void setSpline(Spline s);
 		Spline spline();
-
-		PickupPlan* pickup;
 
 		void undo();
 		void redo();
@@ -42,6 +43,7 @@ class Piece
 		void saveState();		
 	
 	private:
+		PickupPlan* pickup;
 
 		struct State
 		{
@@ -50,6 +52,7 @@ class Piece
 			Spline spline;
 		};	
 
+		void clearStateStacks();
 		stack<struct State> undoStackPiece;
 		stack<struct PickupPlan::State> undoStackPickup;
 		stack<struct State> redoStackPiece;

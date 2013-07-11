@@ -36,9 +36,9 @@ void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** sub
 {
 	int hitIndex = -1;
 	float hitDepth = -100.0;
-	for (unsigned int i = 0; i < this->piece->pickup->subpickupCount(); ++i)
+	for (unsigned int i = 0; i < this->piece->pickupPlan()->subpickupCount(); ++i)
 	{
-		SubpickupTemplate sp = this->piece->pickup->getSubpickupTemplate(i);
+		SubpickupTemplate sp = this->piece->pickupPlan()->getSubpickupTemplate(i);
 		Point2D ll, ur;
 		ll = ur = make_vector<float>(0.0f, 0.0f);
 
@@ -83,7 +83,7 @@ void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** sub
 	if (hitIndex != -1)
 	{
 		*subplanIndex = hitIndex;
-		*subplan = this->piece->pickup->getSubpickupTemplate(hitIndex).plan;
+		*subplan = this->piece->pickupPlan()->getSubpickupTemplate(hitIndex).plan;
 	}
 	else
 	{
@@ -205,19 +205,20 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 		event->accept();
 		if ((event->keyboardModifiers() & Qt::ShiftModifier))
 		{
-			for (unsigned int i = 0; i < this->piece->pickup->subpickupCount(); ++i)
+			for (unsigned int i = 0; i < this->piece->pickupPlan()->subpickupCount(); ++i)
 			{
-				SubpickupTemplate t = this->piece->pickup->getSubpickupTemplate(i);
+				SubpickupTemplate t = this->piece->pickupPlan()->getSubpickupTemplate(i);
 				t.plan = droppedPlan;
-				this->piece->pickup->setSubpickupTemplate(t, i);
+				this->piece->pickupPlan()->setSubpickupTemplate(t, i);
 			}
 		}
 		else
 		{
-			SubpickupTemplate t = this->piece->pickup->getSubpickupTemplate(subplanIndex);
+			SubpickupTemplate t = this->piece->pickupPlan()->getSubpickupTemplate(subplanIndex);
 			t.plan = droppedPlan;
-			this->piece->pickup->setSubpickupTemplate(t, subplanIndex);
+			this->piece->pickupPlan()->setSubpickupTemplate(t, subplanIndex);
 		}
+		piece->saveState();
 		emit someDataChanged();
 	}
 	else

@@ -886,7 +886,7 @@ void writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<Pu
 	}
 
 	// write pickups (currently only one)
-	writePickup(root[piecename]["Pickups"], piece->pickup, 0, caneMap, colorMap);
+	writePickup(root[piecename]["Pickups"], piece->pickupPlan(), 0, caneMap, colorMap);
 }
 
 Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, PullPlan*>& caneMap, 
@@ -917,7 +917,7 @@ Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, PullPlan
 	for (unsigned int i = 0; i < root[piecename]["Pickups"].getMemberNames().size(); ++i)
 	{
 		string pickupname = root[piecename]["Pickups"].getMemberNames()[i];
-		piece->pickup/*s[i]*/ = readPickup(pickupname, root[piecename]["Pickups"], caneMap, colorMap);
+		piece->setPickupPlan(readPickup(pickupname, root[piecename]["Pickups"], caneMap, colorMap));
 	}
 
 	return piece;

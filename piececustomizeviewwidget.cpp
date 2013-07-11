@@ -154,7 +154,11 @@ void PieceCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 
 void PieceCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent*)
 {
-	isDraggingControlPoint = false;
+	if (isDraggingControlPoint)
+	{
+		piece->saveState();
+		isDraggingControlPoint = false;
+	}
 }
 
 void PieceCustomizeViewWidget :: updateEverything()

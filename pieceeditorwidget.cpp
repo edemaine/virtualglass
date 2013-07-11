@@ -59,6 +59,8 @@ void PieceEditorWidget :: undo()
 {
 	this->_piece->undo();
 
+	if (this->_piece->templateType() != PieceTemplate::CUSTOM)
+		pieceControlsTab->setCurrentIndex(0);
 	updateEverything();
 	emit someDataChanged();
 }
@@ -67,6 +69,8 @@ void PieceEditorWidget :: redo()
 {
 	this->_piece->redo();
 
+	if (this->_piece->templateType() != PieceTemplate::CUSTOM)
+		pieceControlsTab->setCurrentIndex(0);
 	updateEverything();
 	emit someDataChanged();
 }
@@ -104,13 +108,13 @@ void PieceEditorWidget :: updateEverything()
 	{
 		pktlw = dynamic_cast<PickupTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget());
-		pktlw->setHighlighted(pktlw->type == _piece->pickup->templateType());
+		pktlw->setHighlighted(pktlw->type == _piece->pickupPlan()->templateType());
 	}
 
 	pickupViewWidget->updateEverything();
 
 	TemplateParameter tp;
-	_piece->pickup->getParameter(0, &tp);
+	_piece->pickupPlan()->getParameter(0, &tp);
 	pickupCountSpinBox->blockSignals(true);
 	pickupCountSpinBox->setRange(tp.lowerLimit, tp.upperLimit);
 	pickupCountSpinBox->setValue(tp.value);
@@ -126,6 +130,8 @@ void PieceEditorWidget :: updateEverything()
 			dynamic_cast<QWidgetItem *>(pieceTemplateLibraryLayout->itemAt(i))->widget());
 		ptlw->setHighlighted(ptlw->type == _piece->templateType());
 	}
+
+	twistWidget->updateEverything();
 	
 	tempPieceMutex.lock();
 	deep_delete(tempPiece);
@@ -183,10 +189,11 @@ void PieceEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned in
 void PieceEditorWidget :: pickupCountSpinBoxChanged(int)
 {
 	TemplateParameter tp;
-	_piece->pickup->getParameter(0, &tp);
+	_piece->pickupPlan()->getParameter(0, &tp);
 	if (tp.value != pickupCountSpinBox->value())
 	{
-		_piece->pickup->setParameter(0, pickupCountSpinBox->value());
+		_piece->pickupPlan()->setParameter(0, pickupCountSpinBox->value());
+		_piece->saveState();
 		updateEverything();
 		emit someDataChanged();
 	}
@@ -246,9 +253,10 @@ void PieceEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 
 	if (pktlw != NULL)
 	{
-		if (pktlw->type != _piece->pickup->templateType())
+		if (pktlw->type != _piece->pickupPlan()->templateType())
 		{
-			_piece->pickup->setTemplateType(pktlw->type);
+			_piece->pickupPlan()->setTemplateType(pktlw->type);
+			_piece->saveState();
 			updateEverything();
 			emit someDataChanged();
 		}
@@ -261,6 +269,7 @@ void PieceEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 		{
 			pieceControlsTab->setCurrentIndex(0);
 			_piece->setTemplateType(ptlw->type);
+			_piece->saveState();
 			updateEverything();
 			emit someDataChanged();
 		}
@@ -399,8 +408,14 @@ void PieceEditorWidget :: setupConnections()
 	// subwidget communication
 	connect(pickupViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
+	connect(twistWidget, SIGNAL(valueChangeEnded()), this, SLOT(twistEnded()));
 	connect(pieceCustomizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(pieceControlsTab, SIGNAL(currentChanged(int)), this, SLOT(pieceControlsTabChanged(int)));
+}
+
+void PieceEditorWidget :: twistEnded()
+{
+	this->_piece->saveState();
 }
 
 void PieceEditorWidget :: addControlPointButtonClicked()
@@ -408,6 +423,7 @@ void PieceEditorWidget :: addControlPointButtonClicked()
 	Spline spline = _piece->spline();
 	spline.addPoint(Point2D(make_vector(0.0f, 0.0f)));
 	_piece->setSpline(spline);
+	_piece->saveState();
 	updateEverything();
 	emit someDataChanged();
 }
@@ -417,6 +433,7 @@ void PieceEditorWidget :: removeControlPointButtonClicked()
 	Spline spline = _piece->spline();
 	spline.removePoint();
 	_piece->setSpline(spline);
+	_piece->saveState();
 	updateEverything();
 	emit someDataChanged();
 }
@@ -429,6 +446,7 @@ void PieceEditorWidget :: pieceControlsTabChanged(int tab)
 	if (tab != 0) // customize mode
 	{
 		_piece->setTemplateType(PieceTemplate::CUSTOM);
+		_piece->saveState();
 		updateEverything();
 		emit someDataChanged();
 	}
@@ -481,7 +499,8 @@ void PieceEditorWidget :: updateLibraryWidgetPixmaps(PieceLibraryWidget* w)
 
 void PieceEditorWidget :: setPickupParameter(int param, int value)
 {
-	_piece->pickup->setParameter(param, value);
+	_piece->pickupPlan()->setParameter(param, value);
+	_piece->saveState();
 	updateEverything();
 	emit someDataChanged();
 }
@@ -489,13 +508,15 @@ void PieceEditorWidget :: setPickupParameter(int param, int value)
 void PieceEditorWidget :: setPieceTemplateType(enum PieceTemplate::Type _type)
 {
 	_piece->setTemplateType(_type);
+	_piece->saveState();
 	updateEverything();
 	emit someDataChanged();
 }
 
 void PieceEditorWidget :: setPickupTemplateType(enum PickupTemplate::Type _type)
 {
-	_piece->pickup->setTemplateType(_type);
+	_piece->pickupPlan()->setTemplateType(_type);
+	_piece->saveState();
 	updateEverything();
 	emit someDataChanged();
 }

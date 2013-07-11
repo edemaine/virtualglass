@@ -70,6 +70,7 @@ class PieceEditorWidget : public QWidget
 	private slots:
 		void pieceControlsTabChanged(int);
 		void childWidgetDataChanged();
+		void twistEnded();
 		void pickupCountSpinBoxChanged(int);
 		void geometryThreadFinishedMesh(bool completed, unsigned int quality);
 		void addControlPointButtonClicked();

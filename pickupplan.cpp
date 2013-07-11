@@ -19,7 +19,7 @@ PickupPlan :: PickupPlan(enum PickupTemplate::Type _type)
 
 PickupPlan* PickupPlan :: copy() const 
 {
-	PickupPlan* c = new PickupPlan(type);
+	PickupPlan* c = new PickupPlan(this->state.type);
 	c->state = this->state;
 	return c;
 }
@@ -92,7 +92,7 @@ void PickupPlan :: updateSubs()
 
 	Point3D p;
 	float width, length;
-	switch (this->type) 
+	switch (this->state.type) 
 	{
 		case PickupTemplate::MURRINE:
 			width = 2.0 / MAX(parameters[0].value, 1);
@@ -242,14 +242,15 @@ void PickupPlan :: updateSubs()
 
 void PickupPlan :: setTemplateType(enum PickupTemplate::Type _type, bool force) 
 {
-	if (!force && type == _type)
+	if (!force && this->state.type == _type)
 		return;
 
 	vector<TemplateParameter> &parameters = this->state.parameters;
 	
-	this->type = _type;
+	this->state.type = _type;
 	parameters.clear();
-	switch (type) {
+	switch (this->state.type) 
+	{
 		case PickupTemplate::VERTICALS_AND_HORIZONTALS:
 			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 30));
 			break;
@@ -283,7 +284,7 @@ void PickupPlan :: setTemplateType(enum PickupTemplate::Type _type, bool force)
 
 enum PickupTemplate::Type PickupPlan :: templateType() 
 {
-	return type;
+	return this->state.type;
 }
 
 unsigned int PickupPlan :: parameterCount()

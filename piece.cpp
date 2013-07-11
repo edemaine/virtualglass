@@ -7,6 +7,32 @@ Piece :: Piece(enum PieceTemplate::Type _type)
 	setTemplateType(_type, true);
 	// initialize the piece's pickup to be something boring and base
 	this->pickup = new PickupPlan(PickupTemplate::VERTICAL);
+
+	undoStackPiece.push(this->state);
+	undoStackPickup.push(this->pickup->state);
+}
+
+void Piece::setPickupPlan(PickupPlan* pickup)
+{
+	this->pickup = pickup;
+	clearStateStacks();
+}
+
+PickupPlan* Piece::pickupPlan() const
+{
+	return this->pickup;
+}
+
+void Piece::clearStateStacks()
+{
+	while (undoStackPiece.size() > 1)
+		undoStackPiece.pop();
+	while (undoStackPickup.size() > 1)
+		undoStackPickup.pop();
+	while (redoStackPiece.size() > 0)
+		redoStackPiece.pop();
+	while (redoStackPickup.size() > 0)
+		redoStackPickup.pop();
 }
 
 void Piece :: undo()
@@ -45,6 +71,8 @@ bool Piece :: canRedo()
 
 void Piece :: saveState()
 {
+	assert(undoStackPiece.size() == undoStackPickup.size());
+	assert(redoStackPiece.size() == redoStackPickup.size());
         undoStackPiece.push(this->state);
         undoStackPickup.push(this->pickup->state);
         while (redoStackPiece.size() > 0)
@@ -215,15 +243,15 @@ Piece *deep_copy(const Piece *_piece)
 	assert(_piece);
 	Piece *piece = _piece->copy();
 	//Replace pickup with a deep copy:
-	delete piece->pickup;
-	piece->pickup = deep_copy(_piece->pickup);
+	delete piece->pickupPlan();
+	piece->setPickupPlan(deep_copy(_piece->pickupPlan()));
 	return piece;
 }
 
 void deep_delete(Piece *piece) 
 {
 	assert(piece);
-	deep_delete(piece->pickup);
-	piece->pickup = NULL;
+	deep_delete(piece->pickupPlan());
+	piece->setPickupPlan(NULL);
 	delete piece;
 }

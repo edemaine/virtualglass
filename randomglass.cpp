@@ -122,7 +122,7 @@ Piece* randomPiece(PickupPlan* pickup)
 	Piece* piece = new Piece(static_cast<PieceTemplate::Type>(randomTemplateNumber));
 
 	// set pickup
-	piece->pickup = pickup;
+	piece->setPickupPlan(pickup);
 
 	return piece;
 }
