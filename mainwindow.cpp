@@ -535,6 +535,9 @@ void MainWindow :: undoActionTriggered()
 		case PULLPLAN_VIEW_MODE:
 			pullPlanEditorWidget->undo();
 			break;
+		case PIECE_VIEW_MODE:
+			pieceEditorWidget->undo();
+			break;
 	}
 }
 
@@ -547,6 +550,9 @@ void MainWindow :: redoActionTriggered()
 			break;
 		case PULLPLAN_VIEW_MODE:
 			pullPlanEditorWidget->redo();
+			break;
+		case PIECE_VIEW_MODE:
+			pieceEditorWidget->redo();
 			break;
 	}
 }
@@ -1123,8 +1129,8 @@ void MainWindow :: updateLibrary()
 		}
 		case PIECE_VIEW_MODE:
 		{
-			undoAction->setEnabled(false);
-			redoAction->setEnabled(false);
+			undoAction->setEnabled(pieceEditorWidget->canUndo());
+			redoAction->setEnabled(pieceEditorWidget->canRedo());
 			for (int i = 0; i < glassColorLibraryLayout->count(); ++i)
 			{
 				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(

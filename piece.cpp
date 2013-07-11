@@ -9,6 +9,51 @@ Piece :: Piece(enum PieceTemplate::Type _type)
 	this->pickup = new PickupPlan(PickupTemplate::VERTICAL);
 }
 
+void Piece :: undo()
+{
+	if (!canUndo())
+		return;
+        redoStackPiece.push(undoStackPiece.top());
+        redoStackPickup.push(undoStackPickup.top());
+        undoStackPiece.pop();
+        undoStackPickup.pop();
+        this->state = undoStackPiece.top();
+	this->pickup->state = undoStackPickup.top();
+}
+
+void Piece :: redo()
+{
+        if (!canRedo())
+                return;
+        undoStackPiece.push(redoStackPiece.top());
+        undoStackPickup.push(redoStackPickup.top());
+        redoStackPiece.pop();
+        redoStackPickup.pop();
+        this->state = undoStackPiece.top();
+        this->pickup->state = undoStackPickup.top();
+}
+
+bool Piece :: canUndo()
+{
+        return (undoStackPiece.size() >= 2);
+}
+
+bool Piece :: canRedo()
+{
+        return (redoStackPiece.size() > 0);
+}
+
+void Piece :: saveState()
+{
+        undoStackPiece.push(this->state);
+        undoStackPickup.push(this->pickup->state);
+        while (redoStackPiece.size() > 0)
+	{
+                redoStackPiece.pop();
+                redoStackPickup.pop();
+	}
+}
+
 void Piece::setSpline(Spline s)
 {
 	this->state.spline = s;
@@ -175,7 +220,8 @@ Piece *deep_copy(const Piece *_piece)
 	return piece;
 }
 
-void deep_delete(Piece *piece) {
+void deep_delete(Piece *piece) 
+{
 	assert(piece);
 	deep_delete(piece->pickup);
 	piece->pickup = NULL;

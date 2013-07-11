@@ -45,6 +45,32 @@ PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 	seedTemplates();
 }
 
+bool PieceEditorWidget :: canUndo()
+{
+	return this->_piece->canUndo();
+}
+
+bool PieceEditorWidget :: canRedo()
+{
+	return this->_piece->canRedo();
+}
+
+void PieceEditorWidget :: undo()
+{
+	this->_piece->undo();
+
+	updateEverything();
+	emit someDataChanged();
+}
+
+void PieceEditorWidget :: redo()
+{
+	this->_piece->redo();
+
+	updateEverything();
+	emit someDataChanged();
+}
+
 QImage PieceEditorWidget :: pieceImage()
 {
 	return pieceNiceViewWidget->grabFrameBuffer();

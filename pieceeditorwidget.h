@@ -50,6 +50,10 @@ class PieceEditorWidget : public QWidget
 		void writePieceToOBJFile(QString& filename);
 		void reset3DCamera();
 		QImage pieceImage();
+		void undo();
+		void redo();
+		bool canUndo();
+		bool canRedo();
 
 	protected:
 		void mousePressEvent(QMouseEvent*);

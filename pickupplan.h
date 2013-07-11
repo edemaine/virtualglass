@@ -15,6 +15,8 @@ using std::vector;
 
 class PickupPlan
 {
+	friend class Piece;
+
 	public:
 		PickupPlan(enum PickupTemplate::Type t);
 		PickupPlan();
