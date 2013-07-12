@@ -43,6 +43,19 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 	seedTemplates();
 }
 
+bool PullPlanEditorWidget :: eventFilter(QObject* obj, QEvent* event)
+{
+	// Goal is to stop the count spin from eating undo/redo commands
+	// for its own text editing purpose. These events should instead
+	// go up the chain to our own undo/redo implementation.
+	if (obj == countSpin && event->type() == QEvent::ShortcutOverride)
+	{
+		event->ignore();
+		return true;
+	}
+	return false;
+}
+
 QImage PullPlanEditorWidget :: pullPlanImage()
 {
 	return niceViewWidget->grabFrameBuffer();
@@ -256,6 +269,7 @@ void PullPlanEditorWidget :: setupLayout()
 	countLabel = new QLabel("Count:", casingWidget);
 	countSpin = new QSpinBox(casingWidget);
 	countSpin->setRange(MIN_PULLPLAN_COUNT_PARAMETER_VALUE, MAX_PULLPLAN_COUNT_PARAMETER_VALUE);
+	countSpin->installEventFilter(this);
 	casingLayout->addStretch(1);
 	casingLayout->addWidget(countLabel);
 	casingLayout->addWidget(countSpin);

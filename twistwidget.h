@@ -17,6 +17,9 @@ class TwistWidget : public QWidget
 		TwistWidget(float* twist, unsigned int range, QWidget* parent=0);
 		void setTwist(float* twist);
 
+	protected:
+		bool eventFilter(QObject* obj, QEvent* event);
+
 	signals:
 		void valueChanged();
 		void valueChangeEnded();

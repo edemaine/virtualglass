@@ -1269,13 +1269,13 @@ void MainWindow::setupMenus()
 	// Edit menu
 	editMenu = menuBar()->addMenu("Edit");
 
-	undoAction = new QAction("Undo", this);	
-	undoAction->setShortcuts(QKeySequence::Undo);
+	undoAction = new QAction("&Undo", this);	
+	undoAction->setShortcut(QKeySequence::Undo);
 	undoAction->setToolTip("Undo");
 	editMenu->addAction(undoAction);
 
-	redoAction = new QAction("Redo", this);	
-	redoAction->setShortcuts(QKeySequence::Redo);
+	redoAction = new QAction("&Redo", this);	
+	redoAction->setShortcut(QKeySequence::Redo);
 	redoAction->setToolTip("Redo");
 	editMenu->addAction(redoAction);
 

@@ -56,6 +56,7 @@ class PieceEditorWidget : public QWidget
 		bool canRedo();
 
 	protected:
+		bool eventFilter(QObject* obj, QEvent* event);
 		void mousePressEvent(QMouseEvent*);
 		void mouseMoveEvent(QMouseEvent*);
 		void mouseReleaseEvent(QMouseEvent*);
@@ -71,7 +72,7 @@ class PieceEditorWidget : public QWidget
 		void pieceControlsTabChanged(int);
 		void childWidgetDataChanged();
 		void twistEnded();
-		void pickupCountSpinBoxChanged(int);
+		void pickupCountSpinChanged(int);
 		void geometryThreadFinishedMesh(bool completed, unsigned int quality);
 		void addControlPointButtonClicked();
 		void removeControlPointButtonClicked();
@@ -104,7 +105,7 @@ class PieceEditorWidget : public QWidget
 		QPushButton* addControlPointButton;
 		QPushButton* removeControlPointButton;
 
-		QSpinBox* pickupCountSpinBox;
+		QSpinBox* pickupCountSpin;
 
 		QTabWidget* pickupControlsTab;
 		QTabWidget* pieceControlsTab;

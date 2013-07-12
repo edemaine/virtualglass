@@ -1,10 +1,12 @@
 
-#include <cstdio>
 #include <QDoubleSpinBox>
 #include <QSlider>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <QEvent>
+
+#include <cstdio>
 
 #include "twistwidget.h"
 
@@ -24,6 +26,7 @@ TwistWidget :: TwistWidget(float* _twist, unsigned int _range, QWidget* parent) 
 	spin->setRange(neg_range, range);
 	spin->setSingleStep(0.1);
 	spin->setDecimals(1);
+	spin->installEventFilter(this);
 	layout->addWidget(spin, 1);
 
 	char buf[20];
@@ -47,6 +50,19 @@ TwistWidget :: TwistWidget(float* _twist, unsigned int _range, QWidget* parent) 
 	connect(spin, SIGNAL(valueChanged(double)), this, SLOT(spinValueChanged(double)));	
 
 	updateEverything();
+}
+
+bool TwistWidget :: eventFilter(QObject* obj, QEvent* event)
+{
+	// Goal is to stop the spinboxes from eating undo/redo commands
+	// for their own text editing purpose. These events should instead
+	// go up the chain to our own undo/redo implementation.
+	if (obj == spin && event->type() == QEvent::ShortcutOverride)
+	{
+		event->ignore();
+		return true;
+	}
+	return false;
 }
 
 void TwistWidget :: updateEverything()

@@ -57,6 +57,7 @@ class PullPlanEditorWidget : public QWidget
 		bool canRedo();
 
 	protected:
+		bool eventFilter(QObject* obj, QEvent* event);
 		void mousePressEvent(QMouseEvent* event);
 		void mouseMoveEvent(QMouseEvent* event);
 		void mouseReleaseEvent(QMouseEvent* event);

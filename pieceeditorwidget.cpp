@@ -45,6 +45,19 @@ PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 	seedTemplates();
 }
 
+bool PieceEditorWidget :: eventFilter(QObject* obj, QEvent* event)
+{
+	// Goal is to stop the spinboxes from eating undo/redo commands
+	// for their own text editing purpose. These events should instead
+	// go up the chain to our own undo/redo implementation.
+	if (obj == pickupCountSpin && event->type() == QEvent::ShortcutOverride)
+	{
+		event->ignore();
+		return true;
+	}
+	return false;
+}
+
 bool PieceEditorWidget :: canUndo()
 {
 	return this->_piece->canUndo();
@@ -115,10 +128,10 @@ void PieceEditorWidget :: updateEverything()
 
 	TemplateParameter tp;
 	_piece->pickupPlan()->getParameter(0, &tp);
-	pickupCountSpinBox->blockSignals(true);
-	pickupCountSpinBox->setRange(tp.lowerLimit, tp.upperLimit);
-	pickupCountSpinBox->setValue(tp.value);
-	pickupCountSpinBox->blockSignals(false);
+	pickupCountSpin->blockSignals(true);
+	pickupCountSpin->setRange(tp.lowerLimit, tp.upperLimit);
+	pickupCountSpin->setValue(tp.value);
+	pickupCountSpin->blockSignals(false);
 
 	// update piece stuff
 	pieceCustomizeViewWidget->updateEverything();	
@@ -186,13 +199,13 @@ void PieceEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned in
 		emit showMessage("Piece is too complex to render completely.", 3);
 }
 
-void PieceEditorWidget :: pickupCountSpinBoxChanged(int)
+void PieceEditorWidget :: pickupCountSpinChanged(int)
 {
 	TemplateParameter tp;
 	_piece->pickupPlan()->getParameter(0, &tp);
-	if (tp.value != pickupCountSpinBox->value())
+	if (tp.value != pickupCountSpin->value())
 	{
-		_piece->pickupPlan()->setParameter(0, pickupCountSpinBox->value());
+		_piece->pickupPlan()->setParameter(0, pickupCountSpin->value());
 		_piece->saveState();
 		updateEverything();
 		emit someDataChanged();
@@ -335,8 +348,10 @@ void PieceEditorWidget :: setupLayout()
 	
 	pickupParamLayout->addWidget(new QLabel("Count:", pickupParamWidget), 0, 0);
 	
-	pickupCountSpinBox = new QSpinBox(pickupParamWidget);
-	pickupParamLayout->addWidget(pickupCountSpinBox, 0, 2);
+	pickupCountSpin = new QSpinBox(pickupParamWidget);
+	pickupCountSpin->installEventFilter(this);
+	pickupParamLayout->addWidget(pickupCountSpin, 0, 2);
+	
 
 	pickupParamLayout->setColumnStretch(4, 1);
 
@@ -395,7 +410,7 @@ void PieceEditorWidget :: setupThreading()
 void PieceEditorWidget :: setupConnections()
 {
 	// pickup controls
-	connect(pickupCountSpinBox, SIGNAL(valueChanged(int)), this, SLOT(pickupCountSpinBoxChanged(int)));
+	connect(pickupCountSpin, SIGNAL(valueChanged(int)), this, SLOT(pickupCountSpinChanged(int)));
 
 	// custom piece controls
 	connect(addControlPointButton, SIGNAL(clicked()), this, SLOT(addControlPointButtonClicked()));
