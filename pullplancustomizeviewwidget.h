@@ -23,7 +23,6 @@ class PullPlanCustomizeViewWidget : public QWidget
 	public:
 		PullPlanCustomizeViewWidget(PullPlan* plan, QWidget* parent=0);
 		void setPullPlan(PullPlan* plan);
-		void revertAndClose();
 		void addCircleClicked();
 		void addSquareClicked();
 		void copySelectionClicked();
@@ -36,13 +35,10 @@ class PullPlanCustomizeViewWidget : public QWidget
 	public slots:
 		void updateEverything();
 
-
 	protected:
-		void dropEvent(QDropEvent* de);
-		void dragMoveEvent(QDragMoveEvent* dme);
 		void paintEvent(QPaintEvent *event);
-		void mouseMoveEvent(QMouseEvent* event);
 		void mousePressEvent(QMouseEvent* event);
+		void mouseMoveEvent(QMouseEvent* event);
 		void mouseReleaseEvent(QMouseEvent* event);
 		void resizeEvent(QResizeEvent* event);
 		void keyPressEvent(QKeyEvent* event);
@@ -66,25 +62,25 @@ class PullPlanCustomizeViewWidget : public QWidget
 		bool isValidMovePosition(QMouseEvent* event);
 		void boundActiveBox();
 		void updateIndexes(QPoint pos);
-
+		void deleteSelection();
+		void copySelection();
+	
 		GUIMode mode;
 		PullPlan* plan;
 		PullPlan* hoveringPlan;
 		int hoveringIndex;
 		int activeBoxIndex;
 		Point2D mouseStartingLoc;
-		QPoint* clickedLoc;
+		Point2D clickedLoc;
 		bool clickMoved;
 		vector<unsigned int> subplansSelected;
-		int activeBox_xmin;
-		int activeBox_ymin;
-		int activeBox_xmax;
-		int activeBox_ymax;
+		Point2D activeBoxLL;
+		Point2D activeBoxUR;
 		int activeControlPoint;
 		Point2D drawUpperLeft;
 		float squareSize;
 
-		int BOUNDING_BOX_SPACE;
+		int boundingBoxSpace;
 
 	public slots:
 		void setCustomTemplate();
