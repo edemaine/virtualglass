@@ -10,7 +10,6 @@
 #include <QAction>
 #include <QPushButton>
 #include <QMouseEvent>
-#include <QDrag>
 #include <QTextStream>
 #include <QApplication>
 #include <QHBoxLayout>

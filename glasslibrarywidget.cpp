@@ -102,7 +102,7 @@ void GlassLibraryWidget::mouseMoveEvent(QMouseEvent* event)
                 QDrag *drag = new QDrag(this);
                 drag->setMimeData(mimeData);
                 drag->setPixmap(*(this->dragPixmap()));
-                drag->setHotSpot(QPoint(50, 100));
+                drag->setHotSpot(QPoint(50, 50));
 
                 drag->exec(Qt::CopyAction);
 	}

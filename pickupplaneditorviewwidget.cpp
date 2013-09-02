@@ -119,7 +119,7 @@ void PickupPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 		painter.end();
 		drag->setPixmap(pixmap);
 
-		drag->setHotSpot(QPoint(50, 100));
+		drag->setHotSpot(QPoint(50, 50));
 		drag->exec(Qt::CopyAction);
 	}
 }
