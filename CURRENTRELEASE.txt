@@ -1,9 +1,9 @@
 
-***** Revision r1022 *****
+***** Revision r1061 *****
 
--A new toolbar along the library gives quick access to common operations.
+-Undo/redo functionality has been added! This functionality saves all your changes to every color, cane, and piece, so mistakes can be easily undone and exploration of new designs is risk-free.
 
--Emailing your creations from inside VirtualGlass is now possible using the Email button in the toolbar. The recipient receives an image of your cane or piece along with the .glass file, allowing them to modify and use your designs on their computer.
+-The toolbar has been removed. Copying and deletion of colors, canes, and pieces can now be performed by clicking on a library object's "+" and "-". File operations such as "New File", "Open File", and "Save File" have been relegated to the File Menu.
 
 -Various bug fixes.
 
