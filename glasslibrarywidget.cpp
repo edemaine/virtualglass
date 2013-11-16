@@ -2,6 +2,8 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QApplication>
+#include <QMimeData>
+#include <QDrag>
 
 #include "glassmime.h"
 #include "glasscolorlibrarywidget.h"

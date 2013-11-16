@@ -41,23 +41,27 @@ void Email::send(QString to, QString subject, QBuffer& glassFile, QBuffer& image
 	this->to = to;
 	this->subject = subject;	
 
-	message += "From: " + from.toAscii() + "\r\n";
-	message += "To: " + to.toAscii() + "\r\n";
-	message += "Cc: " + from.toAscii() + "\r\n";
-	message += "Subject: " + subjectPrefix + subject.toAscii() + "\r\n";
+	message += "From: " + from.toLatin1() + "\r\n";
+	message += "To: " + to.toLatin1() + "\r\n";
+	message += "Cc: " + from.toLatin1() + "\r\n";
+	message += "Subject: " + subjectPrefix.toLatin1() + subject.toLatin1() + "\r\n";
+
 	message += "Content-Type: multipart/mixed; boundary=VirtualGlassBoundary\r\n";
 	message += "MIME-Version: 1.0\r\n";
 	message += "\r\n";
+
 	message += "This is a VirtualGlass message with multiple parts in MIME format.\r\n";
 	message += "--VirtualGlassBoundary\r\n";
 	message += "Content-Type: text/plain; format=flowed\r\n";
 	message += "Content-Disposition: inline\r\n";
 	message += "\r\n";
+
 	message += "A VirtualGlass designer (probably you) has shared an example of \r\n";
 	message += "computer-aided design of blown glass.  You will find attached an image of \r\n";
 	message += "the design, along with the .glass file which you can open in the \r\n";
 	message += "VirtualGlass software.\r\n";
 	message += "\r\n";
+
 	message += "The VirtualGlass software lets anyone, with any or no glass experience, \r\n";
 	message += "design and visualize glass cane, and to get a sense of what that cane will \r\n";
 	message += "look like on a blown piece, all on your computer (without lifting a blow \r\n";
@@ -65,9 +69,11 @@ void Email::send(QString to, QString subject, QBuffer& glassFile, QBuffer& image
 	message += "new cane designs, and settle on a nice-looking design before going through \r\n";
 	message += "the effort of making it.\r\n";
 	message += "\r\n";
+
 	message += "For more information, and to download the freely available VirtualGlass \r\n";
 	message += "software, visit http://virtualglass.org/\r\n";
 	message += "\r\n";
+
 	message += "- the VirtualGlass team\r\n";
 	message += "--VirtualGlassBoundary\r\n";
 
@@ -85,10 +91,10 @@ void Email::send(QString to, QString subject, QBuffer& glassFile, QBuffer& image
 	message += "Content-Transfer-Encoding: base64\r\n";
 	message += "Content-Disposition: inline\r\n";
 	message += "\r\n";  // done at beginning of loop
-	QString base64 = imageFile.readAll().toBase64();
+	QByteArray base64 = imageFile.readAll().toBase64();
 	for (int i = 0; i < base64.length(); i++) 
 	{
-		message += base64[i].toAscii();
+		message += base64[i]; 
 		if (i % 76 == 75)
 			message += "\r\n";
 	}
@@ -135,7 +141,7 @@ void Email::socketReadyRead()
 			}
 			else 
 			{
-				socket.write("MAIL FROM: <" + from.toAscii() + ">\r\n");
+				socket.write("MAIL FROM: <" + from.toLatin1() + ">\r\n");
 				state = From;
 			}
 			break;
@@ -147,7 +153,7 @@ void Email::socketReadyRead()
 			}
 			else 
 			{
-				socket.write("RCPT TO: <" + to.toAscii() + ">\r\n");
+				socket.write("RCPT TO: <" + to.toLatin1() + ">\r\n");
 				state = To1;
 			}
 			break;
@@ -159,7 +165,7 @@ void Email::socketReadyRead()
 			}
 			else 
 			{
-				socket.write("RCPT TO: <" + from.toAscii() + ">\r\n");
+				socket.write("RCPT TO: <" + from.toLatin1() + ">\r\n");
 				state = To2;
 			}
 			break;

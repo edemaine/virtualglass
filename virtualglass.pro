@@ -1,3 +1,9 @@
+# Project file for VirtualGlass
+
+# A workaround needed for Qt 5.2.0-beta1 for bugs:
+# https://bugreports.qt-project.org/browse/QTBUG-31340
+# https://bugreports.qt-project.org/browse/QTBUG-30586
+#cache()
 
 TEMPLATE = app
 DEPENDPATH += .
@@ -34,20 +40,20 @@ unix:!macx {
 
 # Mac OS X
 macx {
-	QMAKE_CC = gcc
-	QMAKE_CXX = g++
+	QMAKE_CC = clang
+	QMAKE_CXX = clang++
 
 	# Mac-specific icons and plist (file-type associations, etc.)
 	ICON = virtualglass.icns
 	QMAKE_INFO_PLIST = Info.plist
 
 	# All those compile flags 
-        QMAKE_CFLAGS += -Wall -Wextra -Werror 
-        QMAKE_CXXFLAGS += -Wall -Wextra -Werror 
+        #QMAKE_CFLAGS += -Wall -Wextra -Werror 
+        #QMAKE_CXXFLAGS += -Wall -Wextra -Werror 
 
 	# To get rid of template compilation error
-	QMAKE_CFLAGS += -mmacosx-version-min=10.6
-	QMAKE_CXXFLAGS += -mmacosx-version-min=10.6
+	#QMAKE_CFLAGS += -mmacosx-version-min=10.6
+	#QMAKE_CXXFLAGS += -mmacosx-version-min=10.6
 }
 
 # Windows in general

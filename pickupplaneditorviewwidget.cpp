@@ -1,6 +1,8 @@
 
 #include <QMouseEvent>
 #include <QVBoxLayout>
+#include <QMimeData>
+#include <QDrag>
 
 #include "piece.h"
 #include "pickupplaneditorviewwidget.h"
@@ -176,7 +178,7 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	PullPlan* droppedPlan = 0;
 	enum GlassMime::Type type;
 
-	GlassMime::decode(event->mimeData()->text().toAscii().constData(), &droppedObject, &type);
+	GlassMime::decode(event->mimeData()->text().toStdString().c_str(), &droppedObject, &type);
 	switch (type)
 	{
 		case GlassMime::COLOR_LIBRARY_MIME:

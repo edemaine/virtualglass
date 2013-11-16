@@ -3,6 +3,8 @@
 #include <QMouseEvent>
 #include <QDragEnterEvent>
 #include <QPainter>
+#include <QMimeData>
+#include <QDrag>
 
 #include "constants.h"
 #include "glasscolor.h"
@@ -290,7 +292,7 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEv
 	// determine highlighted subplan or casing
 	void* ptr;
 	enum GlassMime::Type type;
-	GlassMime::decode(event->mimeData()->text().toAscii().constData(), &ptr, &type);
+	GlassMime::decode(event->mimeData()->text().toStdString().c_str(), &ptr, &type);
 	switch (type)
 	{
 		case GlassMime::COLOR_LIBRARY_MIME:
@@ -387,7 +389,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 
 	void* ptr;
 	enum GlassMime::Type type;
-	GlassMime::decode(event->mimeData()->text().toAscii().constData(), &ptr, &type);
+	GlassMime::decode(event->mimeData()->text().toStdString().c_str(), &ptr, &type);
 
 	switch (type)
 	{
