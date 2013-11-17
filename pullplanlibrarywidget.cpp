@@ -2,7 +2,7 @@
 #include "glassmime.h"
 #include "pullplan.h"
 #include "glasscolor.h"
-#include "pullplanrenderdata.h"
+#include "canerenderdata.h"
 #include "pullplanlibrarywidget.h"
 #include "canecrosssectionrender.h"
 
@@ -25,7 +25,7 @@ void PullPlanLibraryWidget :: updatePixmaps()
 	camera.up = make_vector(0.0f, 0.0f, 1.0f);
 	camera.isPerspective = false;
 	camera.size = make_vector(300U, 300U);
-	setScene(camera, new PullPlanRenderData(pullPlan));
+	setScene(camera, new CaneRenderData(pullPlan));
 }
 
 const QPixmap* PullPlanLibraryWidget :: dragPixmap()

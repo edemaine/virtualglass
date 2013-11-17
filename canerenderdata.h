@@ -1,5 +1,6 @@
-#ifndef PULLPLANRENDERDATA_HPP
-#define PULLPLANRENDERDATA_HPP
+
+#ifndef CANERENDERDATA_HPP
+#define CANERENDERDATA_HPP
 
 #include "asyncrenderinternal.h"
 
@@ -7,11 +8,11 @@ class GlassColor;
 class PullPlan;
 class Geometry;
 
-class PullPlanRenderData : public RenderData
+class CaneRenderData : public RenderData
 {
 	public:
-		PullPlanRenderData(PullPlan const *_plan);
-		virtual ~PullPlanRenderData();
+		CaneRenderData(PullPlan const *_plan);
+		virtual ~CaneRenderData();
 		virtual Geometry *getGeometry();
 	protected:
 		PullPlan *plan;

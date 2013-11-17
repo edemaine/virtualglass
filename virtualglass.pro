@@ -135,7 +135,7 @@ HEADERS += vgapp.h \
 	asyncrenderwidget.h \
 	asyncrenderinternal.h \
 	asyncrenderthread.h \
-	pullplanrenderdata.h \
+	canerenderdata.h \
 	piecerenderdata.h \
 	pullplanlibrarywidget.h \
 	glasscolorlibrarywidget.h \
@@ -195,7 +195,7 @@ SOURCES += main.cpp \
 	asyncrenderwidget.cpp \
 	asyncrenderinternal.cpp \
 	asyncrenderthread.cpp \
-	pullplanrenderdata.cpp \
+	canerenderdata.cpp \
 	piecerenderdata.cpp \
 	pullplanlibrarywidget.cpp \
 	glasscolorlibrarywidget.cpp \

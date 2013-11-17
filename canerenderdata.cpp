@@ -5,7 +5,7 @@
 #include "pullplan.h"
 #include "geometry.h"
 #include "mesh.h"
-#include "pullplanrenderdata.h"
+#include "canerenderdata.h"
 #include "globalgraphicssetting.h"
 
 #include <tr1/unordered_map>
@@ -17,17 +17,17 @@ using std::pair;
 using std::make_pair;
 using std::vector;
 
-PullPlanRenderData::PullPlanRenderData(PullPlan const *_plan) : plan(deep_copy(_plan)) 
+CaneRenderData::CaneRenderData(PullPlan const *_plan) : plan(deep_copy(_plan)) 
 {
 }
 
-PullPlanRenderData::~PullPlanRenderData() 
+CaneRenderData::~CaneRenderData() 
 {
 	deep_delete(plan);
 	plan = NULL;
 }
 
-Geometry *PullPlanRenderData::getGeometry() 
+Geometry *CaneRenderData::getGeometry() 
 {
 	Geometry *geom = new Geometry();
 	generateMesh(plan, geom, GlobalGraphicsSetting::HIGH);

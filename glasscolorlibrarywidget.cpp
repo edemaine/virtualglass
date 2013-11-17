@@ -1,7 +1,7 @@
 
 #include "constants.h"
 #include "glasscolor.h"
-#include "pullplanrenderdata.h"
+#include "canerenderdata.h"
 #include "glasscolorlibrarywidget.h"
 #include "pulltemplate.h"
 #include "pullplan.h"
