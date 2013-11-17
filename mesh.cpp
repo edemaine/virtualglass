@@ -4,7 +4,7 @@
 #include "mesh.h"
 #include "constants.h"
 #include "glasscolor.h"
-#include "pullplan.h"
+#include "cane.h"
 #include "pickup.h"
 #include "piece.h"
 #include "subpulltemplate.h"
@@ -43,7 +43,7 @@ bool generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometr
 	return completedPickup && completedPiece;		
 }
 
-bool generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality)
+bool generateMesh(Cane* plan, Geometry* geometry, unsigned int quality)
 {
 	clock_t start = clock();
 	clock_t end = start + CLOCKS_PER_SEC * 20;
@@ -56,7 +56,7 @@ bool generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality)
 // So we totally assume it finishes and no time completion data is measured or returned.
 void generateMesh(GlassColor* gc, Geometry* geometry, unsigned int quality)
 {
-	PullPlan dummyPlan(PullTemplate::BASE_CIRCLE);
+	Cane dummyPlan(PullTemplate::BASE_CIRCLE);
 	dummyPlan.setOutermostCasingColor(gc);
 
 	geometry->clear();
@@ -456,7 +456,7 @@ float finalRadius(vector<Ancestor>& ancestors)
 	return radius;
 }
 
-void meshBaseCasing(Geometry* geometry, vector<Ancestor>& ancestors, struct Casing casing,
+void meshBaseCasing(Geometry* geometry, vector<Ancestor>& ancestors, struct CasingData casing,
 	unsigned int quality, bool ensureVisible)
 {
 	if (ensureVisible)
@@ -549,7 +549,7 @@ void meshBaseCasing(Geometry* geometry, vector<Ancestor>& ancestors, struct Casi
 }
 
 // The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
-void meshBaseCane(Geometry* geometry, vector<Ancestor>& ancestors, struct Cane cane,
+void meshBaseCane(Geometry* geometry, vector<Ancestor>& ancestors, struct CaneData cane,
 	unsigned int quality, bool ensureVisible)
 {
 	// cull out geometry that's extremely clear
@@ -663,7 +663,7 @@ void meshBaseCane(Geometry* geometry, vector<Ancestor>& ancestors, struct Cane c
 		first_vert, geometry->vertices.size() - first_vert, cane.color));
 }
 
-void generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality, clock_t end)
+void generateMesh(Cane* plan, Geometry* geometry, unsigned int quality, clock_t end)
 {
 	geometry->clear();
 
@@ -700,7 +700,7 @@ void generateMesh(Pickup* pickup, Geometry *geometry, bool isTopLevel, unsigned 
 // since canes can be nested, recurseMesh() processes these nestings recursively.
 // keeping a running stack of ancestors nodes in the dependancy DAG
 // and applying them when a leaf node is encountered.
-void recurseMesh(PullPlan* plan, Geometry *geometry, vector<Ancestor>& ancestors, float length, 
+void recurseMesh(Cane* plan, Geometry *geometry, vector<Ancestor>& ancestors, float length, 
 	unsigned int quality, bool isTopLevel, clock_t end)
 {
 	if (plan == NULL || clock() > end)
@@ -746,7 +746,7 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<Ancestor>& ancestors
 		{
 			// punting on actually doing this geometry right and just making it a cylinder
 			// (that intersects its subcanes)
-			struct Cane cane;
+			struct CaneData cane;
 			cane.color = plan->getCasingColor(0)->color();
 			cane.shape = plan->getCasingShape(i);
 			cane.length = length-0.001;
@@ -756,7 +756,7 @@ void recurseMesh(PullPlan* plan, Geometry *geometry, vector<Ancestor>& ancestors
 		}
 		else
 		{
-			struct Casing casing;
+			struct CasingData casing;
 			casing.color = plan->getCasingColor(colorIntervalStart)->color(), 
 			casing.outerShape = plan->getCasingShape(i); 
 			casing.innerShape = plan->getCasingShape(colorIntervalStart-1);

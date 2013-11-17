@@ -4,18 +4,18 @@
 #include "canerenderdata.h"
 #include "glasscolorlibrarywidget.h"
 #include "pulltemplate.h"
-#include "pullplan.h"
+#include "cane.h"
 
 GlassColorLibraryWidget :: GlassColorLibraryWidget(GlassColor* _glassColor, MainWindow* _window, 
-	PullPlan* _circlePlan, PullPlan* _squarePlan) : AsyncRenderWidget(_window), glassColor(_glassColor), 
+	Cane* _circlePlan, Cane* _squarePlan) : AsyncRenderWidget(_window), glassColor(_glassColor), 
 	circlePlan(_circlePlan), squarePlan(_squarePlan) 
 {
 	setFixedSize(100, 100);
 	if (_circlePlan == NULL)
-		circlePlan = new PullPlan(PullTemplate::BASE_CIRCLE);
+		circlePlan = new Cane(PullTemplate::BASE_CIRCLE);
 	circlePlan->setOutermostCasingColor(_glassColor);
 	if (_squarePlan == NULL)
-		squarePlan = new PullPlan(PullTemplate::BASE_SQUARE);
+		squarePlan = new Cane(PullTemplate::BASE_SQUARE);
 	squarePlan->setOutermostCasingColor(_glassColor);
 	updatePixmaps();
 }

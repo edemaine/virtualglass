@@ -8,7 +8,7 @@
 #include "shape.h"
 
 class GlassColor;
-class PullPlan;
+class Cane;
 class CaneLibraryWidget;
 class GlassColorLibraryWidget;
 
@@ -19,10 +19,10 @@ class CaneEditorViewWidget : public QWidget
 	Q_OBJECT
 
 	public:
-		CaneEditorViewWidget(PullPlan* plan, QWidget* parent=0);
-		void setPullPlan(PullPlan* plan);
+		CaneEditorViewWidget(Cane* plan, QWidget* parent=0);
+		void setCane(Cane* plan);
 		QRect usedRect();
-		static QPixmap renderPullPlan(PullPlan* plan);
+		static QPixmap renderCane(Cane* plan);
 	
 	signals:
 		void someDataChanged();
@@ -41,18 +41,18 @@ class CaneEditorViewWidget : public QWidget
 	private:
 		void paintShape(Point2D upperLeft, float size, enum GeometricShape s, QPainter* p);
 		void setBoundaryPainter(QPainter* painter, bool outermostLevel);
-		void drawSubplan(Point2D upperLeft, float width, float height, PullPlan* plan, 
+		void drawSubplan(Point2D upperLeft, float width, float height, Cane* plan, 
 			bool highlightThis, bool outermostLevel, QPainter* painter);
 		void updateHighlightedSubplansAndCasings(QDragMoveEvent* event);
 		bool isOnCasing(int casingIndex, Point2D loc);
 		float getShapeRadius(enum GeometricShape s, Point2D loc);
 		void setMinMaxCasingRadii(float* min, float* max);
-		PullPlan* getSubplanAt(Point2D loc);
+		Cane* getSubplanAt(Point2D loc);
 		int getSubplanIndexAt(Point2D loc);
 		int getCasingIndexAt(Point2D loc);
 		Point2D mouseToCaneCoords(float x, float y);
 
-		PullPlan* plan;
+		Cane* plan;
 
 		bool isDraggingCasing;
 		unsigned int draggedCasingIndex;

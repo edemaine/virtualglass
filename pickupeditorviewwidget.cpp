@@ -34,7 +34,7 @@ void PickupEditorViewWidget :: setupConnections()
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }
 
-void PickupEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** subplan, int* subplanIndex)
+void PickupEditorViewWidget :: getSubplanAt(float x, float y, Cane** subplan, int* subplanIndex)
 {
 	int hitIndex = -1;
 	float hitDepth = -100.0;
@@ -101,7 +101,7 @@ void PickupEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
 
 	int subplanIndex;
-	PullPlan* subplan;
+	Cane* subplan;
 	getSubplanAt(x, y, &subplan, &subplanIndex);
 	if (subplan != NULL)
 	{
@@ -175,7 +175,7 @@ void PickupEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 {
 	void* droppedObject;
-	PullPlan* droppedPlan = 0;
+	Cane* droppedPlan = 0;
 	enum GlassMime::Type type;
 
 	GlassMime::decode(event->mimeData()->text().toStdString().c_str(), &droppedObject, &type);
@@ -188,7 +188,7 @@ void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 			droppedPlan = reinterpret_cast<CaneLibraryWidget*>(droppedObject)->pullPlan;
 			break;
 		case GlassMime::PULLPLAN_MIME:
-			droppedPlan = reinterpret_cast<PullPlan*>(droppedObject);
+			droppedPlan = reinterpret_cast<Cane*>(droppedObject);
 			break;
 		default:
 			return;
@@ -199,7 +199,7 @@ void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 	float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
 
 	int subplanIndex;
-	PullPlan* subplan;	
+	Cane* subplan;	
 	getSubplanAt(x, y, &subplan, &subplanIndex); 	
 	
 	if (subplan != NULL)

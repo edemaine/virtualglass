@@ -3,8 +3,9 @@
 #define SUBPICKUPTEMPLATE_H
 
 #include "primitives.h"
-#include "pullplan.h"
 #include "shape.h"
+
+class Cane;
 
 // Pickup cane orientations
 enum PickupCaneOrientation
@@ -17,9 +18,9 @@ enum PickupCaneOrientation
 class SubpickupTemplate
 {
 	public:
-		SubpickupTemplate(PullPlan* plan, Point3D location, enum PickupCaneOrientation orientation, 
+		SubpickupTemplate(Cane* plan, Point3D location, enum PickupCaneOrientation orientation, 
 			float length, float width, enum GeometricShape shape);
-		PullPlan* plan;
+		Cane* plan;
 		Point3D location;
 		enum PickupCaneOrientation orientation;
 		float length;

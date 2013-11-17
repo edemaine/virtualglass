@@ -12,11 +12,10 @@
 #include "mesh.h"
 #include "constants.h"
 
-class PullPlan;
+class Cane;
 class CaneEditorViewWidget;
 class CaneCustomizeViewWidget;
 class NiceViewWidget;
-class AsyncPullPlanLibraryWidget;
 class PullTemplateLibraryWidget;
 class CaneGeometryThread;
 class TwistWidget;
@@ -41,9 +40,9 @@ class CaneEditorWidget : public QWidget
 
 	public:
 		CaneEditorWidget(QWidget* parent=0);
-		void resetPullPlan();
-		PullPlan* pullPlan();
-		void setPullPlan(PullPlan* p);
+		void resetCane();
+		Cane* pullPlan();
+		void setCane(Cane* p);
 		void seedTemplates();
 		void writePlanToPLYFile(QString& filename);
 		void writePlanToOBJFile(QString& filename);
@@ -82,9 +81,9 @@ class CaneEditorWidget : public QWidget
 		void geometryThreadFinishedMesh(bool completed, unsigned int quality);
 
 	private:
-		QMutex tempPullPlanMutex;
-		PullPlan* tempPullPlan;
-		bool tempPullPlanDirty;
+		QMutex tempCaneMutex;
+		Cane* tempCane;
+		bool tempCaneDirty;
 
 		QWaitCondition wakeWait;
 		QMutex wakeMutex;
@@ -97,7 +96,7 @@ class CaneEditorWidget : public QWidget
 		Geometry tempGeometry;
 
 		Geometry geometry;
-		PullPlan* plan;
+		Cane* plan;
 		CaneEditorViewWidget* viewWidget;	
 		CaneCustomizeViewWidget* customizeViewWidget;	
 		NiceViewWidget* niceViewWidget;

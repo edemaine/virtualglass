@@ -2,7 +2,7 @@
 #include <QFile>
 #include <QIODevice>
 #include "glasscolor.h"
-#include "pullplan.h"
+#include "cane.h"
 #include "pulltemplate.h"
 #include "pickup.h"
 #include "pickuptemplate.h"
@@ -31,13 +31,13 @@ GlassColor* randomGlassColor()
 	return colors[choice];
 }
 
-PullPlan* randomSimplePullPlan(enum GeometricShape outermostCasingShape, GlassColor* color)
+Cane* randomSimpleCane(enum GeometricShape outermostCasingShape, GlassColor* color)
 {
-	PullPlan* plan;
+	Cane* plan;
 	if (qrand() % 2)
-		plan = new PullPlan(PullTemplate::BASE_CIRCLE);
+		plan = new Cane(PullTemplate::BASE_CIRCLE);
 	else
-		plan = new PullPlan(PullTemplate::BASE_SQUARE);
+		plan = new Cane(PullTemplate::BASE_SQUARE);
 
 	plan->addCasing(outermostCasingShape);
 	plan->setCasingColor(color, 0);
@@ -46,14 +46,14 @@ PullPlan* randomSimplePullPlan(enum GeometricShape outermostCasingShape, GlassCo
 	return plan;
 }
 
-PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimplePlan)
+Cane* randomComplexCane(Cane* circleSimplePlan, Cane* squareSimplePlan)
 {
 	// set template
 	// select a random template that is `complex', and is dependent upon the templates available
 	// at revision 785 these are the templates between HORIZONTAL_LINE_CIRCLE and SURROUNDING_SQUARE
 	int randomTemplateNumber = qrand() % (PullTemplate::SURROUNDING_SQUARE - PullTemplate::HORIZONTAL_LINE_CIRCLE) 
 		+ PullTemplate::HORIZONTAL_LINE_CIRCLE;
-	PullPlan* plan = new PullPlan(static_cast<PullTemplate::Type>(randomTemplateNumber));
+	Cane* plan = new Cane(static_cast<PullTemplate::Type>(randomTemplateNumber));
 	
 	// set parameters
 	plan->setTwist(0.0);
@@ -78,7 +78,7 @@ PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimp
 	return plan;
 }
 
-Pickup* randomPickup(PullPlan* pullPlan1, PullPlan* pullPlan2)
+Pickup* randomPickup(Cane* pullPlan1, Cane* pullPlan2)
 {
 	int randomTemplateNumber = qrand() % (PickupTemplate::lastSeedTemplate() - PickupTemplate::firstSeedTemplate())
 		+ PickupTemplate::firstSeedTemplate();

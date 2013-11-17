@@ -2,7 +2,7 @@
 
 #include "subpulltemplate.h"
 
-SubpullTemplate :: SubpullTemplate(PullPlan* plan, enum GeometricShape _s, Point2D location, float diameter)
+SubpullTemplate :: SubpullTemplate(Cane* plan, enum GeometricShape _s, Point2D location, float diameter)
 {
 	this->plan = plan;
 	this->shape = _s;

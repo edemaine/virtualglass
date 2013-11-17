@@ -110,7 +110,7 @@ HEADERS += vgapp.h \
 	dependancy.h \
 	shape.h \
 	templateparameter.h \
-	pullplan.h \
+	cane.h \
 	pulltemplate.h \
 	subpulltemplate.h \
 	pickup.h \
@@ -168,7 +168,7 @@ SOURCES += main.cpp \
 	randomglass.cpp \
 	templateparameter.cpp \
 	canecustomizeviewwidget.cpp \
-	pullplan.cpp \
+	cane.cpp \
 	subpulltemplate.cpp \
 	globalglass.cpp \
 	piece.cpp \

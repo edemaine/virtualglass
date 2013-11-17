@@ -3,7 +3,7 @@
 
 #include "canegeometrythread.h"
 #include "caneeditorwidget.h"
-#include "pullplan.h"
+#include "cane.h"
 #include "globalgraphicssetting.h"
 
 CaneGeometryThread::CaneGeometryThread(CaneEditorWidget* _ppew) : ppew(_ppew)
@@ -21,31 +21,31 @@ void CaneGeometryThread::run()
 
 		compute:
 
-		// get lock for ppew's tempPullPlan 
+		// get lock for ppew's tempCane 
 		// and make a copy to get out of his way as fast as possible	
-		ppew->tempPullPlanMutex.lock();
-		PullPlan* myTempPullPlan = deep_copy(ppew->tempPullPlan);
-		ppew->tempPullPlanDirty = false;
-		ppew->tempPullPlanMutex.unlock();	
+		ppew->tempCaneMutex.lock();
+		Cane* myTempCane = deep_copy(ppew->tempCane);
+		ppew->tempCaneDirty = false;
+		ppew->tempCaneMutex.unlock();	
 	
 		// now lock the geometry
 		ppew->tempGeometryMutex.lock();
-		completed = generateMesh(myTempPullPlan, &(ppew->tempGeometry), GlobalGraphicsSetting::VERY_HIGH);
+		completed = generateMesh(myTempCane, &(ppew->tempGeometry), GlobalGraphicsSetting::VERY_HIGH);
 		ppew->tempGeometryMutex.unlock();	
 		ppew->geometryDirtyMutex.lock();
 		ppew->geometryDirty = true;
 		ppew->geometryDirtyMutex.unlock();
 
-		ppew->tempPullPlanMutex.lock();
-		pullPlanChanged = ppew->tempPullPlanDirty;
-		ppew->tempPullPlanMutex.unlock();
+		ppew->tempCaneMutex.lock();
+		pullPlanChanged = ppew->tempCaneDirty;
+		ppew->tempCaneMutex.unlock();
 		if (pullPlanChanged)
 		{
-			deep_delete(myTempPullPlan);
+			deep_delete(myTempCane);
 			goto compute;
 		}
 		
-		deep_delete(myTempPullPlan);
+		deep_delete(myTempCane);
 		emit finishedMesh(completed, GlobalGraphicsSetting::VERY_HIGH);
 	}
 }

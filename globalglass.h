@@ -3,7 +3,7 @@
 #define GLOBALGLASS_H 
 
 class GlassColor;
-class PullPlan;
+class Cane;
 
 namespace GlobalGlass
 {
@@ -15,8 +15,8 @@ namespace GlobalGlass
 	// so *they do not call circlePlan() and squarePlan()*.
 	// Hopefully this doesn't change o_o
 	GlassColor* color();
-	PullPlan* circlePlan();
-	PullPlan* squarePlan();
+	Cane* circlePlan();
+	Cane* squarePlan();
 
 }
 

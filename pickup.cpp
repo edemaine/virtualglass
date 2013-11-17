@@ -4,7 +4,7 @@
 #include "subpickuptemplate.h"
 #include "pulltemplate.h"
 #include "globalglass.h"
-#include "pullplan.h"
+#include "cane.h"
 #include "glasscolor.h"
 #include "pickup.h"
 #include "pieceeditorwidget.h"

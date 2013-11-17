@@ -1,12 +1,12 @@
 
 #include "glassmime.h"
-#include "pullplan.h"
+#include "cane.h"
 #include "glasscolor.h"
 #include "canerenderdata.h"
 #include "canelibrarywidget.h"
 #include "canecrosssectionrender.h"
 
-CaneLibraryWidget :: CaneLibraryWidget(PullPlan *_pullPlan, MainWindow *_window) 
+CaneLibraryWidget :: CaneLibraryWidget(Cane *_pullPlan, MainWindow *_window) 
 	: AsyncRenderWidget(_window), pullPlan(_pullPlan)
 {
 	setFixedSize(100, 100);

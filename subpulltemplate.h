@@ -5,13 +5,13 @@
 #include "primitives.h"
 #include "shape.h"
 
-class PullPlan;
+class Cane;
 
 class SubpullTemplate
 {
 	public:
-		SubpullTemplate(PullPlan* plan, enum GeometricShape s, Point2D location, float diameter);
-		PullPlan* plan;
+		SubpullTemplate(Cane* plan, enum GeometricShape s, Point2D location, float diameter);
+		Cane* plan;
 		enum GeometricShape shape;
 		Point2D location;
 		float diameter;

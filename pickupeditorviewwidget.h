@@ -8,7 +8,7 @@
 #include "geometry.h"
 
 class Piece;
-class PullPlan;
+class Cane;
 class NiceViewWidget;
 
 class PickupEditorViewWidget : public QWidget
@@ -44,7 +44,7 @@ class PickupEditorViewWidget : public QWidget
 		float adjustedY(float rawX);
 		float rawX(float adjustedX);
 		float rawY(float adjustedY);
-		void getSubplanAt(float x, float y, PullPlan** plan, int* subplanIndex);
+		void getSubplanAt(float x, float y, Cane** plan, int* subplanIndex);
 };
 
 

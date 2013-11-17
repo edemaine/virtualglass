@@ -1,6 +1,6 @@
 
 #include "globalglass.h"
-#include "pullplan.h"
+#include "cane.h"
 #include "glasscolor.h"
 #include "pulltemplate.h"
 #include "shape.h"
@@ -8,8 +8,8 @@
 namespace GlobalGlass
 {
 	GlassColor* _color = 0;
-	PullPlan* _circlePlan = 0;
-	PullPlan* _squarePlan = 0;
+	Cane* _circlePlan = 0;
+	Cane* _squarePlan = 0;
 
 	GlassColor* color()
 	{
@@ -18,17 +18,17 @@ namespace GlobalGlass
 		return _color;
 	}
 	
-	PullPlan* circlePlan()
+	Cane* circlePlan()
 	{
 		if (_circlePlan == 0)
-			_circlePlan = new PullPlan(PullTemplate::BASE_CIRCLE);
+			_circlePlan = new Cane(PullTemplate::BASE_CIRCLE);
 		return _circlePlan;
 	}
 
-	PullPlan* squarePlan()
+	Cane* squarePlan()
 	{
 		if (_squarePlan == 0)
-			_squarePlan = new PullPlan(PullTemplate::BASE_SQUARE);
+			_squarePlan = new Cane(PullTemplate::BASE_SQUARE);
 		return _squarePlan;
 	}
 }

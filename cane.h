@@ -1,7 +1,7 @@
 
 
-#ifndef PULLPLAN_H
-#define PULLPLAN_H
+#ifndef CANE_H
+#define CANE_H
 
 #include <vector>
 #include <stack>
@@ -16,13 +16,13 @@
 using std::vector;
 using std::stack;
 
-class PullPlan;
+class Cane;
 class GlassColor;
 
-class PullPlan
+class Cane
 {
 	public:
-		PullPlan(enum PullTemplate::Type t);
+		Cane(enum PullTemplate::Type t);
 
 		void setTemplateType(enum PullTemplate::Type t);
 		enum PullTemplate::Type templateType() const;
@@ -51,7 +51,7 @@ class PullPlan
 		unsigned int casingCount(); 
 		bool hasMinimumCasingCount();
 
-		PullPlan* copy() const;
+		Cane* copy() const;
 
 		SubpullTemplate getSubpullTemplate(unsigned int index);
 		void setSubpullTemplate(SubpullTemplate t, unsigned int index);	
@@ -60,7 +60,7 @@ class PullPlan
 		unsigned int subpullCount();	
 
 		bool hasDependencyOn(GlassColor* color);
-		bool hasDependencyOn(PullPlan* pullPlan);
+		bool hasDependencyOn(Cane* cane);
 
 		void undo();
 		void redo();
@@ -90,8 +90,8 @@ class PullPlan
 
 };
 
-PullPlan *deep_copy(const PullPlan *plan);
-void deep_delete(PullPlan *plan);
+Cane *deep_copy(const Cane *plan);
+void deep_delete(Cane *plan);
 
 #endif
 

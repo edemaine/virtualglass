@@ -20,7 +20,7 @@ class QActionGroup;
 class QScrollArea;
 
 class GlassColor;
-class PullPlan;
+class Cane;
 class Pickup;
 class Piece;
 class Email;
@@ -71,7 +71,7 @@ class MainWindow : public QMainWindow
 		void setupLibrary();
 		void setupEditors();
 		void setupColorEditor();
-		void setupPullPlanEditor();
+		void setupCaneEditor();
 		void setupPieceEditor();
 		void setupConnections();
 		void setupMenus();
@@ -82,19 +82,19 @@ class MainWindow : public QMainWindow
 		void moveCurrentEditingObject(int d);
 		void clearLibrary();
 		bool glassColorIsDependancy(GlassColor* color);
-		bool pullPlanIsDependancy(PullPlan* plan);
+		bool pullPlanIsDependancy(Cane* plan);
 		void updateWindowTitle();
 		void setDirtyBit(bool v);
 		void setSaveFilename(QString filename);
 		void getLibraryContents(vector<GlassColor*>& colors, 
-			vector<PullPlan*>& plans, vector<Piece*>& pieces);
+			vector<Cane*>& plans, vector<Piece*>& pieces);
 		void getDependantLibraryContents(GlassColor* color, 
-			vector<GlassColor*>& colors, vector<PullPlan*>& plans);
-		void getDependantLibraryContents(PullPlan* plan, 
-			vector<GlassColor*>& colors, vector<PullPlan*>& plans);
+			vector<GlassColor*>& colors, vector<Cane*>& plans);
+		void getDependantLibraryContents(Cane* plan, 
+			vector<GlassColor*>& colors, vector<Cane*>& plans);
 		void getDependantLibraryContents(Piece* piece, 
-			vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces);
-		void addToLibrary(vector<GlassColor*>& colors, vector<PullPlan*>& plans, vector<Piece*>& pieces);
+			vector<GlassColor*>& colors, vector<Cane*>& plans, vector<Piece*>& pieces);
+		void addToLibrary(vector<GlassColor*>& colors, vector<Cane*>& plans, vector<Piece*>& pieces);
 		bool findLibraryWidgetData(GlassLibraryWidget* lw, int* type, QVBoxLayout** layout, int* index);
 
 		// Variables
@@ -115,7 +115,7 @@ class MainWindow : public QMainWindow
 		QPushButton* shareFileButton;
 
 		QPushButton* newGlassColorButton;
-		QPushButton* newPullPlanButton;
+		QPushButton* newCaneButton;
 		QPushButton* newPieceButton;
 
 		QMenu *fileMenu;
@@ -184,7 +184,7 @@ class MainWindow : public QMainWindow
 
 		// library slots
 		void newGlassColorButtonClicked();
-		void newPullPlanButtonClicked();
+		void newCaneButtonClicked();
 		void newPieceButtonClicked();
 		void updateLibrary();
 

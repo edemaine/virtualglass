@@ -8,7 +8,7 @@
 
 #include "constants.h"
 #include "glasscolor.h"
-#include "pullplan.h"
+#include "cane.h"
 #include "glassmime.h"
 #include "canelibrarywidget.h"
 #include "glasscolorlibrarywidget.h"
@@ -16,7 +16,7 @@
 #include "globalbackgroundcolor.h"
 #include "canecrosssectionrender.h"
 
-CaneEditorViewWidget :: CaneEditorViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
+CaneEditorViewWidget :: CaneEditorViewWidget(Cane* plan, QWidget* parent) : QWidget(parent)
 {
 	// setup draw widget
 	setAcceptDrops(true);
@@ -86,7 +86,7 @@ void CaneEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	}
 
 	// Check for convenience subplan-to-subplan drag
-	PullPlan* selectedSubplan = getSubplanAt(mouseLoc);
+	Cane* selectedSubplan = getSubplanAt(mouseLoc);
 	if (selectedSubplan != NULL)
 	{
 	        char buf[500];
@@ -172,7 +172,7 @@ int CaneEditorViewWidget :: getSubplanIndexAt(Point2D loc)
 	return -1;			
 }
 
-PullPlan* CaneEditorViewWidget :: getSubplanAt(Point2D loc)
+Cane* CaneEditorViewWidget :: getSubplanAt(Point2D loc)
 {
 	int subplanIndex = getSubplanIndexAt(loc);
 	if (subplanIndex == -1)
@@ -349,9 +349,9 @@ void CaneEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEvent*
 		case GlassMime::PULLPLAN_MIME:
 		case GlassMime::PULLPLAN_LIBRARY_MIME:
 		{
-			PullPlan* draggedPlan;
+			Cane* draggedPlan;
 			if (type == GlassMime::PULLPLAN_MIME)
-				draggedPlan = reinterpret_cast<PullPlan*>(ptr);
+				draggedPlan = reinterpret_cast<Cane*>(ptr);
 			else 
 				draggedPlan = reinterpret_cast<CaneLibraryWidget*>(ptr)->pullPlan;
 			highlightColor.r = highlightColor.g = highlightColor.b = highlightColor.a = 1.0;
@@ -424,9 +424,9 @@ void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 		case GlassMime::PULLPLAN_MIME:
 		case GlassMime::PULLPLAN_LIBRARY_MIME: 
 		{
-			PullPlan* draggedPlan;
+			Cane* draggedPlan;
 			if (type == GlassMime::PULLPLAN_MIME)
-				draggedPlan = reinterpret_cast<PullPlan*>(ptr);
+				draggedPlan = reinterpret_cast<Cane*>(ptr);
 			else
 				draggedPlan = reinterpret_cast<CaneLibraryWidget*>(ptr)->pullPlan;
 			for (set<unsigned int>::iterator it = subplansHighlighted.begin(); it != subplansHighlighted.end(); ++it)
@@ -456,7 +456,7 @@ void CaneEditorViewWidget :: updateEverything()
 	this->repaint();	
 }
 
-void CaneEditorViewWidget :: setPullPlan(PullPlan* plan) 
+void CaneEditorViewWidget :: setCane(Cane* plan) 
 {
 	this->plan = plan;
 	updateEverything();
@@ -498,7 +498,7 @@ void CaneEditorViewWidget :: paintShape(Point2D upperLeft, float size, enum Geom
 }
 
 void CaneEditorViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth, float drawHeight, 
-	PullPlan* plan, bool highlightThis, bool outermostLevel, QPainter* painter) 
+	Cane* plan, bool highlightThis, bool outermostLevel, QPainter* painter) 
 {
 
 	// Fill the subplan area with some `cleared out' color

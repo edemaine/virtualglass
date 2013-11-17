@@ -1,5 +1,6 @@
 
 #include "piece.h"
+#include "cane.h"
 
 Piece :: Piece(enum PieceTemplate::Type _type)
 {
@@ -107,7 +108,7 @@ float* Piece :: twistPtr()
 	return &(this->state.twist);
 }
 
-bool Piece :: hasDependencyOn(PullPlan* plan)
+bool Piece :: hasDependencyOn(Cane* plan)
 {
 	bool pickupPlansDependOn = false;
 

@@ -4,7 +4,7 @@
 #include "Vector.hpp"
 #include "Box.hpp"
 #include "Matrix.hpp"
-#include "pullplan.h"
+#include "cane.h"
 #include "globalglass.h"
 
 #include <list>
@@ -122,7 +122,7 @@ public:
 	Node root;
 };
 
-bool load_svg(std::string const &filename, SVG &into, PullPlan *pullPlan);
+bool load_svg(std::string const &filename, SVG &into, Cane *pullPlan);
 
 };
 

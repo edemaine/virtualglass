@@ -4,17 +4,17 @@
 #include "globalglass.h"
 #include "constants.h"
 #include "glasscolor.h"
-#include "pullplan.h"
+#include "cane.h"
 #include "pulltemplate.h"
 #include "subpulltemplate.h"
 #include "canecustomizeviewwidget.h"
 #include "globalbackgroundcolor.h"
 
-CaneCustomizeViewWidget::CaneCustomizeViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
+CaneCustomizeViewWidget::CaneCustomizeViewWidget(Cane* plan, QWidget* parent) : QWidget(parent)
 {
 	// setup draw widget
 	setMinimumSize(200, 200);
-	setPullPlan(plan);
+	setCane(plan);
 	mouseStartingLoc.x = FLT_MAX;
 	mouseStartingLoc.y = FLT_MAX;
 	clickedLoc.x = FLT_MAX;
@@ -428,7 +428,7 @@ void CaneCustomizeViewWidget :: keyPressEvent(QKeyEvent* event)
 	}
 }
 
-void CaneCustomizeViewWidget :: setPullPlan(PullPlan* _plan)
+void CaneCustomizeViewWidget :: setCane(Cane* _plan)
 {
 	plan = _plan;
 
@@ -513,7 +513,7 @@ void CaneCustomizeViewWidget :: paintShape(Point2D upperLeft, float size, enum G
 
 }
 void CaneCustomizeViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth, float drawHeight,
-	PullPlan* plan, bool outermostLevel, QPainter* painter)
+	Cane* plan, bool outermostLevel, QPainter* painter)
 {
 	// Fill the subplan area with some `cleared out' color
 	painter->setBrush(GlobalBackgroundColor::qcolor);

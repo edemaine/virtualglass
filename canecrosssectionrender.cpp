@@ -1,7 +1,7 @@
 
 #include <QPainter>
 #include <QColor>
-#include "pullplan.h"
+#include "cane.h"
 #include "canecrosssectionrender.h"
 #include "glasscolor.h"
 #include "globalbackgroundcolor.h"
@@ -46,7 +46,7 @@ void paintShape(float x, float y, float size, enum GeometricShape shape, QPainte
 
 
 void drawSubplan(float x, float y, float drawWidth, float drawHeight, 
-	PullPlan* plan, bool outermostLevel, QPainter* painter) 
+	Cane* plan, bool outermostLevel, QPainter* painter) 
 {
 	painter->setBrush(GlobalBackgroundColor::qcolor);
 	painter->setPen(Qt::NoPen);
@@ -93,7 +93,7 @@ void drawSubplan(float x, float y, float drawWidth, float drawHeight,
 	}
 }
 
-void render(QPainter* painter, int size, PullPlan* plan)
+void render(QPainter* painter, int size, Cane* plan)
 {
 	painter->setRenderHint(QPainter::Antialiasing);
 

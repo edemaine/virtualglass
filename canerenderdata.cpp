@@ -2,7 +2,7 @@
 #include <time.h>
 
 #include "glasscolor.h"
-#include "pullplan.h"
+#include "cane.h"
 #include "geometry.h"
 #include "mesh.h"
 #include "canerenderdata.h"
@@ -17,20 +17,20 @@ using std::pair;
 using std::make_pair;
 using std::vector;
 
-CaneRenderData::CaneRenderData(PullPlan const *_plan) : plan(deep_copy(_plan)) 
+CaneRenderData::CaneRenderData(Cane const *_cane) : cane(deep_copy(_cane)) 
 {
 }
 
 CaneRenderData::~CaneRenderData() 
 {
-	deep_delete(plan);
-	plan = NULL;
+	deep_delete(cane);
+	cane = NULL;
 }
 
 Geometry *CaneRenderData::getGeometry() 
 {
 	Geometry *geom = new Geometry();
-	generateMesh(plan, geom, GlobalGraphicsSetting::HIGH);
+	generateMesh(cane, geom, GlobalGraphicsSetting::HIGH);
 	return geom;
 }
 

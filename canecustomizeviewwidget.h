@@ -12,7 +12,7 @@
 
 class QPainter;
 class GlassColor;
-class PullPlan;
+class Cane;
 
 using std::vector;
 
@@ -21,8 +21,8 @@ class CaneCustomizeViewWidget : public QWidget
 	Q_OBJECT
 
 	public:
-		CaneCustomizeViewWidget(PullPlan* plan, QWidget* parent=0);
-		void setPullPlan(PullPlan* plan);
+		CaneCustomizeViewWidget(Cane* plan, QWidget* parent=0);
+		void setCane(Cane* plan);
 		void addCircleClicked();
 		void addSquareClicked();
 		void copySelectionClicked();
@@ -30,7 +30,7 @@ class CaneCustomizeViewWidget : public QWidget
 	
 	signals:
 		void someDataChanged();
-		void pullPlanChanged(PullPlan* p);
+		void pullPlanChanged(Cane* p);
 
 	public slots:
 		void updateEverything();
@@ -55,7 +55,7 @@ class CaneCustomizeViewWidget : public QWidget
 		float rawX(float adjustedX);
 		float rawY(float adjustedY);
 		void drawSubplan(Point2D upperLeft, float drawWidth, float drawHeight,
-			PullPlan* plan, bool outermostLevel, QPainter* painter);
+			Cane* plan, bool outermostLevel, QPainter* painter);
 		void paintShape(Point2D upperLeft, float size, enum GeometricShape s, QPainter* painter);
 		void setBoundaryPainter(QPainter* painter, bool outermostLevel, bool greyedOut);
 		void drawActionControls(QPainter* painter);
@@ -66,8 +66,8 @@ class CaneCustomizeViewWidget : public QWidget
 		void copySelection();
 	
 		GUIMode mode;
-		PullPlan* plan;
-		PullPlan* hoveringPlan;
+		Cane* plan;
+		Cane* hoveringPlan;
 		int hoveringIndex;
 		int activeBoxIndex;
 		Point2D mouseStartingLoc;

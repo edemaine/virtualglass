@@ -4,7 +4,7 @@
 #include "constants.h"
 #include "templateparameter.h"
 #include "globalglass.h"
-#include "pullplan.h"
+#include "cane.h"
 
 #include <tr1/unordered_map>
 #include <tr1/unordered_set>
@@ -14,7 +14,7 @@ using std::tr1::unordered_set;
 using std::pair;
 using std::make_pair;
 
-PullPlan :: PullPlan(PullTemplate::Type _templateType)
+Cane :: Cane(PullTemplate::Type _templateType)
 {
 	// setup default twist
 	this->state.twist = 0;
@@ -31,7 +31,7 @@ PullPlan :: PullPlan(PullTemplate::Type _templateType)
 	undoStack.push(this->state);
 }
 
-void PullPlan :: undo()
+void Cane :: undo()
 {
 	if (!canUndo())
 		return;
@@ -40,7 +40,7 @@ void PullPlan :: undo()
         this->state = undoStack.top();
 }
 
-void PullPlan :: redo()
+void Cane :: redo()
 {
 	if (!canRedo())
 		return;
@@ -49,24 +49,24 @@ void PullPlan :: redo()
 	this->state = undoStack.top();
 }
 
-bool PullPlan :: canUndo()
+bool Cane :: canUndo()
 {
 	return (undoStack.size() >= 2);
 }
 
-bool PullPlan :: canRedo()
+bool Cane :: canRedo()
 {
 	return (redoStack.size() > 0);
 }
 
-void PullPlan :: saveState()
+void Cane :: saveState()
 {
 	undoStack.push(this->state);
 	while (redoStack.size() > 0)
 		redoStack.pop();
 }
 
-bool PullPlan :: hasDependencyOn(PullPlan* plan) 
+bool Cane :: hasDependencyOn(Cane* plan) 
 {
 	if (this == plan)
 		return true;
@@ -78,7 +78,7 @@ bool PullPlan :: hasDependencyOn(PullPlan* plan)
 	return childrenAreDependent;
 }
 
-bool PullPlan :: hasDependencyOn(GlassColor* glassColor) 
+bool Cane :: hasDependencyOn(GlassColor* glassColor) 
 {
 	for (unsigned int i = 0; i < this->state.casings.size(); ++i) 
 	{
@@ -93,7 +93,7 @@ bool PullPlan :: hasDependencyOn(GlassColor* glassColor)
 	return childrenAreDependent;
 }
 
-void PullPlan :: setTemplateType(PullTemplate::Type _templateType) 
+void Cane :: setTemplateType(PullTemplate::Type _templateType) 
 {
 	if (_templateType == this->state.type)
 		return;
@@ -150,59 +150,59 @@ void PullPlan :: setTemplateType(PullTemplate::Type _templateType)
 	resetSubs(true);
 }
 
-void PullPlan :: setCasingColor(GlassColor* gc, unsigned int index) 
+void Cane :: setCasingColor(GlassColor* gc, unsigned int index) 
 {
 	if (index >= this->state.casings.size())
 		return;
 	this->state.casings[index].glassColor = gc;
 }
 
-void PullPlan :: setOutermostCasingColor(GlassColor* gc) 
+void Cane :: setOutermostCasingColor(GlassColor* gc) 
 {
 	int last = this->state.casings.size()-1;
 	this->state.casings[last].glassColor = gc;
 }
 
-const GlassColor* PullPlan :: outermostCasingColor() 
+const GlassColor* Cane :: outermostCasingColor() 
 {
 	int last = this->state.casings.size()-1;
 	return this->state.casings[last].glassColor;
 }
 
-const GlassColor* PullPlan :: getCasingColor(unsigned int index) 
+const GlassColor* Cane :: getCasingColor(unsigned int index) 
 {
 	if (index >= this->state.casings.size())
 		return NULL;
 	return this->state.casings[index].glassColor;
 }
 
-bool PullPlan :: hasMinimumCasingCount() 
+bool Cane :: hasMinimumCasingCount() 
 {
 	return (this->state.casings.size() < 2);
 }	
 		
-unsigned int PullPlan :: casingCount() 
+unsigned int Cane :: casingCount() 
 {
 	return this->state.casings.size();
 }
 
-enum PullTemplate::Type PullPlan :: templateType() const 
+enum PullTemplate::Type Cane :: templateType() const 
 {
 	return this->state.type;
 }
 
-unsigned int PullPlan :: count()
+unsigned int Cane :: count()
 {
 	return this->state.count;
 }
 
-void PullPlan :: setCount(unsigned int _count)
+void Cane :: setCount(unsigned int _count)
 {
 	this->state.count = _count;
 	resetSubs(false);
 }
 
-void PullPlan :: removeCasing() 
+void Cane :: removeCasing() 
 {
 	vector<Casing>& casings = this->state.casings;
 
@@ -231,7 +231,7 @@ void PullPlan :: removeCasing()
 }
 
 
-void PullPlan :: addCasing(enum GeometricShape _shape) 
+void Cane :: addCasing(enum GeometricShape _shape) 
 {
 	vector<Casing>& casings = this->state.casings;
 
@@ -267,7 +267,7 @@ void PullPlan :: addCasing(enum GeometricShape _shape)
 		this->state.subs[i].rescale(casings[0].thickness / oldInnermostCasingThickness);
 }
 
-void PullPlan :: setCasingThickness(float t, unsigned int index) 
+void Cane :: setCasingThickness(float t, unsigned int index) 
 {
 	vector<Casing> &casings = this->state.casings;	
 
@@ -289,7 +289,7 @@ void PullPlan :: setCasingThickness(float t, unsigned int index)
 		this->state.casings[index].thickness = t;
 }
 
-void PullPlan :: setOutermostCasingShape(enum GeometricShape _shape) 
+void Cane :: setOutermostCasingShape(enum GeometricShape _shape) 
 {
 	vector<Casing> &casings = this->state.casings;	
 
@@ -327,26 +327,26 @@ void PullPlan :: setOutermostCasingShape(enum GeometricShape _shape)
 	resetSubs(false);
 }
 
-float PullPlan :: getCasingThickness(unsigned int index) 
+float Cane :: getCasingThickness(unsigned int index) 
 {
 	return this->state.casings[index].thickness;
 }
 
-enum GeometricShape PullPlan :: outermostCasingShape() 
+enum GeometricShape Cane :: outermostCasingShape() 
 {
 	int last = this->state.casings.size()-1;
 	return this->state.casings[last].shape;
 }
 
-enum GeometricShape PullPlan :: getCasingShape(unsigned int index) 
+enum GeometricShape Cane :: getCasingShape(unsigned int index) 
 {
 	return this->state.casings[index].shape;
 }
 
-void PullPlan :: pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs,
+void Cane :: pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs,
 	enum GeometricShape _shape, Point2D p, float diameter) 
 {
-	PullPlan* plan = NULL;
+	Cane* plan = NULL;
 
 	// if it's not a hard reset and there are still old subplans to use and the next one matches shape
 	// with the shape we want to have, then use it
@@ -380,7 +380,7 @@ void PullPlan :: pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs
 // of subplans changed. For instance, changing a template parameter 
 // specifying the number of subcanes in a row changes the size and location 
 // of subplans, as well as increasing or decreasing the number of subplans.
-void PullPlan :: resetSubs(bool hardReset)
+void Cane :: resetSubs(bool hardReset)
 {
 	Point2D p = make_vector(0.0f, 0.0f);
 	float radius = this->state.casings[0].thickness;
@@ -560,70 +560,70 @@ void PullPlan :: resetSubs(bool hardReset)
 	this->state.subs = newSubs;
 }
 
-SubpullTemplate PullPlan :: getSubpullTemplate(unsigned int index)
+SubpullTemplate Cane :: getSubpullTemplate(unsigned int index)
 {
 	return this->state.subs[index];
 }
 
-void PullPlan :: setSubpullTemplate(SubpullTemplate t, unsigned int index)
+void Cane :: setSubpullTemplate(SubpullTemplate t, unsigned int index)
 {
 	this->state.subs[index] = t;
 }
 
-void PullPlan :: addSubpullTemplate(SubpullTemplate t)
+void Cane :: addSubpullTemplate(SubpullTemplate t)
 {
 	this->state.subs.push_back(t);
 }
 
-void PullPlan :: removeSubpullTemplate(unsigned int index)
+void Cane :: removeSubpullTemplate(unsigned int index)
 {
 	this->state.subs.erase(this->state.subs.begin() + index);
 }
 
-unsigned int PullPlan :: subpullCount()
+unsigned int Cane :: subpullCount()
 {
 	return this->state.subs.size();
 }
 
-float PullPlan :: twist()
+float Cane :: twist()
 {
 	return this->state.twist;
 }
 
-void PullPlan :: setTwist(float t)
+void Cane :: setTwist(float t)
 {
 	this->state.twist = t;
 }
 
-float* PullPlan :: twistPtr()
+float* Cane :: twistPtr()
 {
 	return &(this->state.twist);
 }
 
-PullPlan* PullPlan :: copy() const 
+Cane* Cane :: copy() const 
 {
-	PullPlan* c = new PullPlan(this->state.type);
+	Cane* c = new Cane(this->state.type);
 	c->state = this->state;
 	return c;
 }
 
-PullPlan *deep_copy(const PullPlan *_plan) 
+Cane *deep_copy(const Cane *_plan) 
 {
-	unordered_map<const PullPlan*, PullPlan*> copies;
-	PullPlan *plan = _plan->copy();
+	unordered_map<const Cane*, Cane*> copies;
+	Cane *plan = _plan->copy();
 	copies.insert(make_pair(_plan, plan));
 
-	vector<PullPlan*> to_update;
+	vector<Cane*> to_update;
 	to_update.push_back(plan);
 	//update sub-templates to point to copies as well:
 	while (!to_update.empty()) 
 	{
-		PullPlan *t = to_update.back();
+		Cane *t = to_update.back();
 		to_update.pop_back();
 		for (unsigned int i = 0; i < t->subpullCount(); ++i)
 		{
 			SubpullTemplate s = t->getSubpullTemplate(i);
-			unordered_map<const PullPlan*, PullPlan*>::iterator f = copies.find(s.plan);
+			unordered_map<const Cane*, Cane*>::iterator f = copies.find(s.plan);
 			if (f == copies.end()) 
 			{
 				f = copies.insert(make_pair(s.plan, s.plan->copy())).first;
@@ -636,15 +636,15 @@ PullPlan *deep_copy(const PullPlan *_plan)
 	return plan;
 }
 
-void deep_delete(PullPlan *plan) 
+void deep_delete(Cane *plan) 
 {
 	//Because pull plans don't delete their children (which is right):
-	unordered_set<PullPlan*> marked;
-	vector<PullPlan*> to_delete;
+	unordered_set<Cane*> marked;
+	vector<Cane*> to_delete;
 	to_delete.push_back(plan);
 	while (!to_delete.empty()) 
 	{
-		PullPlan *t = to_delete.back();
+		Cane *t = to_delete.back();
 		to_delete.pop_back();
 		for (unsigned int i = 0; i < t->subpullCount(); ++i)
 		{

@@ -5,17 +5,17 @@
 #include "asyncrenderinternal.h"
 
 class GlassColor;
-class PullPlan;
+class Cane;
 class Geometry;
 
 class CaneRenderData : public RenderData
 {
 	public:
-		CaneRenderData(PullPlan const *_plan);
+		CaneRenderData(Cane const *_cane);
 		virtual ~CaneRenderData();
 		virtual Geometry *getGeometry();
 	protected:
-		PullPlan *plan;
+		Cane *cane;
 };
 
 class GlassColorRenderData : public RenderData

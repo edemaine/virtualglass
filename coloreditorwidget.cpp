@@ -11,7 +11,7 @@
 #include <QMouseEvent>
 #include <QScrollBar>
 
-#include "pullplan.h"
+#include "cane.h"
 #include "niceviewwidget.h"
 #include "geometry.h"
 #include "mesh.h"

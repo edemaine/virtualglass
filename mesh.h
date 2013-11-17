@@ -13,7 +13,7 @@
 
 class GlassColor;
 class Pickup;
-class PullPlan;
+class Cane;
 class Piece;
 class SubpullTemplate;
 class Spline;
@@ -21,20 +21,18 @@ class Spline;
 using std::vector;
 
 void generateMesh(GlassColor* glassColor, Geometry* geometry, unsigned int quality);
-bool generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality);
+bool generateMesh(Cane* plan, Geometry* geometry, unsigned int quality);
 bool generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometry, unsigned int quality);
 
 namespace MeshInternal
 {
-	
-
 	struct Ancestor
 	{
-		PullPlan* parent;
+		Cane* parent;
 		unsigned int child;
 	};
 
-	struct Casing
+	struct CasingData
 	{
 		Color color;
 		enum GeometricShape outerShape;
@@ -45,7 +43,7 @@ namespace MeshInternal
 		float twist;
 	};
 
-	struct Cane
+	struct CaneData
 	{
 		Color color;	
 		enum GeometricShape shape;
@@ -56,17 +54,17 @@ namespace MeshInternal
 
 	// Methods
 	void generateMesh(Pickup* plan, Geometry *geometry, bool isTopLevel, unsigned int quality, clock_t end);
-	void generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality, clock_t end);
-	void recurseMesh(PullPlan* plan, Geometry *geometry, vector<Ancestor>& ancestors, 
+	void generateMesh(Cane* plan, Geometry* geometry, unsigned int quality, clock_t end);
+	void recurseMesh(Cane* plan, Geometry *geometry, vector<Ancestor>& ancestors, 
 		float length, unsigned int quality, bool isTopLevel, clock_t end);
 
 	float finalRadius(vector<Ancestor>& ancestors);
 	float totalTwist(vector<Ancestor>& ancestors);
 	unsigned int computeAxialResolution(float length, float twist, unsigned int quality);
 	unsigned int computeAngularResolution(float diameter, unsigned int quality, enum GeometricShape shape);
-	void meshBaseCasing(Geometry* g, vector<Ancestor>& ancestors, struct Casing casing, 
+	void meshBaseCasing(Geometry* g, vector<Ancestor>& ancestors, struct CasingData casing, 
 		unsigned int quality, bool ensureVisible);
-	void meshBaseCane(Geometry* g, vector<Ancestor>& ancestors, struct Cane cane, 
+	void meshBaseCane(Geometry* g, vector<Ancestor>& ancestors, struct CaneData cane, 
 		unsigned int quality, bool ensureVisible);
 	void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float length, float radius, 
 		unsigned int angularResolution, unsigned int axialResolution);

@@ -12,7 +12,7 @@
 #include "constants.h"
 
 class GlassColor;
-class PullPlan;
+class Cane;
 class PureColorLibraryWidget;
 class NiceViewWidget;
 class QVBoxLayout;

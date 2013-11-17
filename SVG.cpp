@@ -31,8 +31,8 @@ public:
 
 class Parse {
 public:
-Parse(std::istream &in, SVG &_into, PullPlan* myPullPlan) : into(_into) {
-	pullPlan = myPullPlan;
+Parse(std::istream &in, SVG &_into, Cane* myCane) : into(_into) {
+	pullPlan = myCane;
 	parser = XML_ParserCreate(NULL);
 	XML_SetUserData(parser, this);
 	XML_SetElementHandler(parser, &wrap_start_element, &wrap_end_element);
@@ -64,7 +64,7 @@ vector< Node * > stack;
 vector< string > errors;
 XML_Parser parser;
 SVG &into;
-PullPlan *pullPlan;
+Cane *pullPlan;
 
 bool svg_length(string const &from, double &into) {
 	std::istringstream str(from);
@@ -859,7 +859,7 @@ void Node::execute(Matrix const &xform, double tol, vector< vector< Vector2d > >
 	}
 }
 
-bool load_svg(std::string const &filename, SVG &into, PullPlan *pullPlan) {
+bool load_svg(std::string const &filename, SVG &into, Cane *pullPlan) {
 	std::ifstream file(filename.c_str());
 	Parse parse(file, into, pullPlan);
 	return parse.errors.empty();

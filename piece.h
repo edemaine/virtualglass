@@ -24,7 +24,7 @@ class Piece
 		Piece* copy() const;
 
 		bool hasDependencyOn(GlassColor* c);
-		bool hasDependencyOn(PullPlan* p);
+		bool hasDependencyOn(Cane* p);
 
 		void setTwist(float t);
 		float twist();

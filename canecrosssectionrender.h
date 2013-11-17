@@ -6,15 +6,15 @@
 #include "shape.h"
 
 class QPainter;
-class PullPlan;
+class Cane;
 
 namespace CaneCrossSectionRender
 {
 	void paintShape(float x, float y, float size, enum GeometricShape s, QPainter* p);
 	void setBoundaryPainter(QPainter* painter, bool outermostLevel);
-	void drawSubplan(float x, float y, float width, float height, PullPlan* plan, 
+	void drawSubplan(float x, float y, float width, float height, Cane* plan, 
 		bool outermostLevel, QPainter* painter);
-	void render(QPainter* painter, int size, PullPlan* plan);
+	void render(QPainter* painter, int size, Cane* plan);
 }
 
 #endif

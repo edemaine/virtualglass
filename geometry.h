@@ -5,12 +5,9 @@
 #include <vector>
 #include <string>
 #include "primitives.h"
-#include "pullplan.h"
 
 using std::vector;
 using std::string;
-
-class Cane;
 
 // Mesh stuff
 class Vertex

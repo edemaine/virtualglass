@@ -9,7 +9,7 @@
 #include <QApplication>
 #include <QScrollBar>
 
-#include "pullplan.h"
+#include "cane.h"
 #include "geometry.h"
 #include "caneeditorwidget.h"
 #include "caneeditorviewwidget.h"
@@ -29,7 +29,7 @@
 
 CaneEditorWidget :: CaneEditorWidget(QWidget* parent) : QWidget(parent)
 {
-	resetPullPlan();
+	resetCane();
 
 	viewWidget = new CaneEditorViewWidget(plan, this);	
 	customizeViewWidget = new CaneCustomizeViewWidget(plan, this);
@@ -66,9 +66,9 @@ void CaneEditorWidget :: reset3DCamera()
 	niceViewWidget->resetCamera();
 }
 
-void CaneEditorWidget :: resetPullPlan()
+void CaneEditorWidget :: resetCane()
 {
-	plan = new PullPlan(PullTemplate::HORIZONTAL_LINE_CIRCLE);
+	plan = new Cane(PullTemplate::HORIZONTAL_LINE_CIRCLE);
 }
 
 bool CaneEditorWidget :: canUndo()
@@ -114,8 +114,8 @@ void CaneEditorWidget :: writePlanToPLYFile(QString& filename)
 void CaneEditorWidget :: setupThreading()
 {
 	geometryDirty = false;
-	tempPullPlan = deep_copy(plan);
-	tempPullPlanDirty = true;
+	tempCane = deep_copy(plan);
+	tempCaneDirty = true;
 	geometryThread = new CaneGeometryThread(this);
 	geometryThread->start();
 }
@@ -143,11 +143,11 @@ void CaneEditorWidget :: updateEverything()
 	twistWidget->updateEverything();
 	twistWidget->setEnabled(plan->outermostCasingShape() == CIRCLE_SHAPE);
 	
-	tempPullPlanMutex.lock();
-	deep_delete(tempPullPlan);
-	tempPullPlan = deep_copy(plan);
-	tempPullPlanDirty = true;
-	tempPullPlanMutex.unlock();
+	tempCaneMutex.lock();
+	deep_delete(tempCane);
+	tempCane = deep_copy(plan);
+	tempCaneDirty = true;
+	tempCaneMutex.unlock();
 
 	QString message("Rendering cane...");
 	emit showMessage(message, 0); // show until next message 
@@ -505,7 +505,7 @@ void CaneEditorWidget :: seedTemplates()
 	for (int i = PullTemplate::firstSeedTemplate(); i <= PullTemplate::lastSeedTemplate(); ++i)
 	{
 		PullTemplate::Type t = static_cast<PullTemplate::Type>(i);
-		PullPlan plan(t);
+		Cane plan(t);
 
 		QPixmap templatePixmap(100, 100);
 		templatePixmap.fill(GlobalBackgroundColor::qcolor);
@@ -524,17 +524,17 @@ void CaneEditorWidget :: seedTemplates()
 	templateLibraryLayout->addWidget(ptlw);
 }
 
-void CaneEditorWidget :: setPullPlan(PullPlan* _plan)
+void CaneEditorWidget :: setCane(Cane* _plan)
 {
 	plan = _plan;
 	controlsTab->setCurrentIndex(0);
 	updateEverything();
 	twistWidget->setTwist(plan->twistPtr());
-	viewWidget->setPullPlan(plan);
-	customizeViewWidget->setPullPlan(plan);
+	viewWidget->setCane(plan);
+	customizeViewWidget->setCane(plan);
 }
 
-PullPlan* CaneEditorWidget :: pullPlan()
+Cane* CaneEditorWidget :: pullPlan()
 {
 	return plan;
 }

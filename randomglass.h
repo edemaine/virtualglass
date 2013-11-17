@@ -5,16 +5,16 @@
 #include "shape.h"
 
 class GlassColor;
-class PullPlan;
+class Cane;
 class Pickup;
 
 GlassColor* randomGlassColor();
 
-PullPlan* randomSimplePullPlan(enum GeometricShape outermostCasingShape, GlassColor* color);
+Cane* randomSimpleCane(enum GeometricShape outermostCasingShape, GlassColor* color);
 
-PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimplePlan);
+Cane* randomComplexCane(Cane* circleSimplePlan, Cane* squareSimplePlan);
 
-Pickup* randomPickup(PullPlan* plan1, PullPlan* plan2=NULL);
+Pickup* randomPickup(Cane* plan1, Cane* plan2=NULL);
 
 Piece* randomPiece(Pickup* pickup);
 

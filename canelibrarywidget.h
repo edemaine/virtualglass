@@ -4,13 +4,13 @@
 #include "asyncrenderwidget.h"
 #include "shape.h"
 
-class PullPlan;
+class Cane;
 
 class CaneLibraryWidget : public AsyncRenderWidget
 {
 	public:
-		CaneLibraryWidget(PullPlan *_plan, MainWindow* _window);
-		PullPlan *pullPlan;
+		CaneLibraryWidget(Cane *_plan, MainWindow* _window);
+		Cane *pullPlan;
 		const QPixmap *dragPixmap();
 		bool isDraggable();
 		GlassMime::Type mimeType();
