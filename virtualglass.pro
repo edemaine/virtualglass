@@ -155,7 +155,7 @@ HEADERS += vgapp.h \
 	piececustomizeviewwidget.h \ 
 	spline.h \
 	globaldepthpeelingsetting.h \
-	pullplancrosssectionrender.h \
+	canecrosssectionrender.h \
 	piececrosssectionrender.h \
 	globalbackgroundcolor.h \
 	glassopengl.h \
@@ -214,7 +214,7 @@ SOURCES += main.cpp \
 	piececustomizeviewwidget.cpp \
 	spline.cpp \
 	globaldepthpeelingsetting.cpp \
-	pullplancrosssectionrender.cpp \
+	canecrosssectionrender.cpp \
 	piececrosssectionrender.cpp \
 	glassopengl.cpp \
 	email.cpp \

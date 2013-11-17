@@ -22,7 +22,7 @@
 #include "templateparameter.h"
 #include "pullplangeometrythread.h"
 #include "twistwidget.h"
-#include "pullplancrosssectionrender.h"
+#include "canecrosssectionrender.h"
 #include "globalbackgroundcolor.h"
 #include "globalgraphicssetting.h"
 #include "constants.h"
@@ -511,7 +511,7 @@ void PullPlanEditorWidget :: seedTemplates()
 		templatePixmap.fill(GlobalBackgroundColor::qcolor);
 
 		QPainter painter(&templatePixmap);
-		PullPlanCrossSectionRender::render(&painter, 100, &plan);
+		CaneCrossSectionRender::render(&painter, 100, &plan);
 		painter.end();
 
 		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(templatePixmap, t);

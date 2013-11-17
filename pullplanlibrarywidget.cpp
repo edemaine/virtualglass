@@ -4,7 +4,7 @@
 #include "glasscolor.h"
 #include "pullplanrenderdata.h"
 #include "pullplanlibrarywidget.h"
-#include "pullplancrosssectionrender.h"
+#include "canecrosssectionrender.h"
 
 PullPlanLibraryWidget :: PullPlanLibraryWidget(PullPlan *_pullPlan, MainWindow *_window) 
 	: AsyncRenderWidget(_window), pullPlan(_pullPlan)
@@ -49,7 +49,7 @@ void PullPlanLibraryWidget :: updateDragPixmap()
 	_pixmap.fill(Qt::transparent); 
 
 	QPainter painter(&_pixmap);
-	PullPlanCrossSectionRender::render(&painter, 100, pullPlan);
+	CaneCrossSectionRender::render(&painter, 100, pullPlan);
 	painter.end();
 
 	_dragPixmap = _pixmap;

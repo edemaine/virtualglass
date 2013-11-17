@@ -11,7 +11,7 @@
 #include "niceviewwidget.h"
 #include "glassmime.h"
 #include "glasscolor.h"
-#include "pullplancrosssectionrender.h"
+#include "canecrosssectionrender.h"
 
 PickupEditorViewWidget :: PickupEditorViewWidget(Piece* piece, QWidget* parent) : QWidget(parent)
 {
@@ -117,7 +117,7 @@ void PickupEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 		QPixmap pixmap(100, 100);
 		pixmap.fill(Qt::transparent);
 		QPainter painter(&pixmap);
-		PullPlanCrossSectionRender::render(&painter, 100, subplan);
+		CaneCrossSectionRender::render(&painter, 100, subplan);
 		painter.end();
 		drag->setPixmap(pixmap);
 

@@ -1,6 +1,6 @@
 
-#ifndef PULLPLANCROSSECTIONRENDER_H
-#define PULLPLANCROSSECTIONRENDER_H
+#ifndef CANECROSSECTIONRENDER_H
+#define CANECROSSECTIONRENDER_H
 
 #include "primitives.h"
 #include "shape.h"
@@ -8,7 +8,7 @@
 class QPainter;
 class PullPlan;
 
-namespace PullPlanCrossSectionRender
+namespace CaneCrossSectionRender
 {
 	void paintShape(float x, float y, float size, enum GeometricShape s, QPainter* p);
 	void setBoundaryPainter(QPainter* painter, bool outermostLevel);

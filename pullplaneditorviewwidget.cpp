@@ -14,7 +14,7 @@
 #include "glasscolorlibrarywidget.h"
 #include "pullplaneditorviewwidget.h"
 #include "globalbackgroundcolor.h"
-#include "pullplancrosssectionrender.h"
+#include "canecrosssectionrender.h"
 
 PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
 {
@@ -101,7 +101,7 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 		QPixmap pixmap(100, 100);
 		pixmap.fill(Qt::transparent);
 		QPainter painter(&pixmap);
-		PullPlanCrossSectionRender::render(&painter, 100, selectedSubplan);
+		CaneCrossSectionRender::render(&painter, 100, selectedSubplan);
 		painter.end();
 		drag->setPixmap(pixmap);
 

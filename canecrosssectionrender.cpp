@@ -2,11 +2,11 @@
 #include <QPainter>
 #include <QColor>
 #include "pullplan.h"
-#include "pullplancrosssectionrender.h"
+#include "canecrosssectionrender.h"
 #include "glasscolor.h"
 #include "globalbackgroundcolor.h"
 
-namespace PullPlanCrossSectionRender
+namespace CaneCrossSectionRender
 {
 
 void setBoundaryPainter(QPainter* painter, bool outermostLevel) 
