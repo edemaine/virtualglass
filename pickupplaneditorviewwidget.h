@@ -11,14 +11,14 @@ class Piece;
 class PullPlan;
 class NiceViewWidget;
 
-class PickupPlanEditorViewWidget : public QWidget
+class PickupEditorViewWidget : public QWidget
 {
 	Q_OBJECT
 
 	friend class PieceEditorWidget;
 
 	public:
-		PickupPlanEditorViewWidget(Piece* piece, QWidget* parent=0);
+		PickupEditorViewWidget(Piece* piece, QWidget* parent=0);
 		void setPiece(Piece* p);
 
 	signals:

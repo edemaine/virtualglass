@@ -677,7 +677,7 @@ void generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality, cloc
 	geometry->compute_normals_from_triangles();
 }
 
-void generateMesh(PickupPlan* pickup, Geometry *geometry, bool isTopLevel, unsigned int quality, clock_t end)
+void generateMesh(Pickup* pickup, Geometry *geometry, bool isTopLevel, unsigned int quality, clock_t end)
 {
 	if (pickup == NULL)
 		return;

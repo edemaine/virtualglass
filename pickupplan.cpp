@@ -9,7 +9,7 @@
 #include "pickupplan.h"
 #include "pieceeditorwidget.h"
 
-PickupPlan :: PickupPlan(enum PickupTemplate::Type _type) 
+Pickup :: Pickup(enum PickupTemplate::Type _type) 
 {
 	this->state.casingGlassColor = GlobalGlass::color();
 	this->state.underlayGlassColor = GlobalGlass::color();
@@ -17,59 +17,59 @@ PickupPlan :: PickupPlan(enum PickupTemplate::Type _type)
 	setTemplateType(_type, true);
 }
 
-PickupPlan* PickupPlan :: copy() const 
+Pickup* Pickup :: copy() const 
 {
-	PickupPlan* c = new PickupPlan(this->state.type);
+	Pickup* c = new Pickup(this->state.type);
 	c->state = this->state;
 	return c;
 }
 
-SubpickupTemplate PickupPlan::getSubpickupTemplate(unsigned int index)
+SubpickupTemplate Pickup::getSubpickupTemplate(unsigned int index)
 {
 	return this->state.subs[index];
 }
 
-void PickupPlan::setSubpickupTemplate(SubpickupTemplate t, unsigned int index)
+void Pickup::setSubpickupTemplate(SubpickupTemplate t, unsigned int index)
 {
 	this->state.subs[index] = t;
 }
 
-unsigned int PickupPlan::subpickupCount()
+unsigned int Pickup::subpickupCount()
 {
 	return this->state.subs.size();
 }
 
-GlassColor* PickupPlan::overlayGlassColor()
+GlassColor* Pickup::overlayGlassColor()
 {
 	return this->state.overlayGlassColor;
 }
 
-GlassColor* PickupPlan::underlayGlassColor()
+GlassColor* Pickup::underlayGlassColor()
 {
 	return this->state.underlayGlassColor;
 }
 
-GlassColor* PickupPlan::casingGlassColor()
+GlassColor* Pickup::casingGlassColor()
 {
 	return this->state.casingGlassColor;
 }
 
-void PickupPlan::setOverlayGlassColor(GlassColor* c)
+void Pickup::setOverlayGlassColor(GlassColor* c)
 {
 	this->state.overlayGlassColor = c;
 }
 
-void PickupPlan::setUnderlayGlassColor(GlassColor* c)
+void Pickup::setUnderlayGlassColor(GlassColor* c)
 {
 	this->state.underlayGlassColor = c;
 }
 
-void PickupPlan::setCasingGlassColor(GlassColor* c)
+void Pickup::setCasingGlassColor(GlassColor* c)
 {
 	this->state.casingGlassColor = c;
 }
 
-void PickupPlan :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
+void Pickup :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
 	Point3D location, enum PickupCaneOrientation ori, float length, float width, enum GeometricShape shape) 
 {
 	if (newSubs->size() < this->state.subs.size())
@@ -84,7 +84,7 @@ void PickupPlan :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
 	}
 }
 
-void PickupPlan :: updateSubs() 
+void Pickup :: updateSubs() 
 {
 	vector<SubpickupTemplate> newSubs;
 
@@ -240,7 +240,7 @@ void PickupPlan :: updateSubs()
 }
 
 
-void PickupPlan :: setTemplateType(enum PickupTemplate::Type _type, bool force) 
+void Pickup :: setTemplateType(enum PickupTemplate::Type _type, bool force) 
 {
 	if (!force && this->state.type == _type)
 		return;
@@ -282,33 +282,33 @@ void PickupPlan :: setTemplateType(enum PickupTemplate::Type _type, bool force)
 	updateSubs();
 }
 
-enum PickupTemplate::Type PickupPlan :: templateType() 
+enum PickupTemplate::Type Pickup :: templateType() 
 {
 	return this->state.type;
 }
 
-unsigned int PickupPlan :: parameterCount()
+unsigned int Pickup :: parameterCount()
 {
 	return this->state.parameters.size();
 }
 
-void PickupPlan :: getParameter(unsigned int _index, TemplateParameter* dest)
+void Pickup :: getParameter(unsigned int _index, TemplateParameter* dest)
 {
 	assert(_index < this->state.parameters.size());
 	*dest = this->state.parameters[_index];
 }
 
-void PickupPlan :: setParameter(unsigned int _index, int _value)
+void Pickup :: setParameter(unsigned int _index, int _value)
 {
 	assert(_index < this->state.parameters.size());
 	this->state.parameters[_index].value = _value;
 	updateSubs();
 }
 
-PickupPlan *deep_copy(const PickupPlan *_pickup) 
+Pickup *deep_copy(const Pickup *_pickup) 
 {
 	assert(_pickup);
-	PickupPlan *pickup = _pickup->copy();
+	Pickup *pickup = _pickup->copy();
 	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
 	{
 		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
@@ -318,7 +318,7 @@ PickupPlan *deep_copy(const PickupPlan *_pickup)
 	return pickup;
 }
 
-void deep_delete(PickupPlan *pickup)
+void deep_delete(Pickup *pickup)
 {
 	assert(pickup);
 	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)

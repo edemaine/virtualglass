@@ -26,7 +26,7 @@ class PieceGeometryThread;
 class TwistWidget;	
 class PieceCustomizeViewWidget;
 class PieceLibraryWidget;
-class PickupPlanEditorViewWidget;
+class PickupEditorViewWidget;
 class NiceViewWidget;
 class Piece;
 	
@@ -97,7 +97,7 @@ class PieceEditorWidget : public QWidget
 
 		Piece* _piece;
 
-		PickupPlanEditorViewWidget* pickupViewWidget;	
+		PickupEditorViewWidget* pickupViewWidget;	
 		PieceCustomizeViewWidget* pieceCustomizeViewWidget;
 		NiceViewWidget* pieceNiceViewWidget;
 		QStackedWidget* pieceViewStack;

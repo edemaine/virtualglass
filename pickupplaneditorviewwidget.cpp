@@ -13,7 +13,7 @@
 #include "glasscolor.h"
 #include "pullplancrosssectionrender.h"
 
-PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(Piece* piece, QWidget* parent) : QWidget(parent)
+PickupEditorViewWidget :: PickupEditorViewWidget(Piece* piece, QWidget* parent) : QWidget(parent)
 {
 	setAcceptDrops(true);
 	setMinimumSize(200, 200);
@@ -29,12 +29,12 @@ PickupPlanEditorViewWidget :: PickupPlanEditorViewWidget(Piece* piece, QWidget* 
 	setupConnections();
 }
 
-void PickupPlanEditorViewWidget :: setupConnections()
+void PickupEditorViewWidget :: setupConnections()
 {
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }
 
-void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** subplan, int* subplanIndex)
+void PickupEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** subplan, int* subplanIndex)
 {
 	int hitIndex = -1;
 	float hitDepth = -100.0;
@@ -94,7 +94,7 @@ void PickupPlanEditorViewWidget :: getSubplanAt(float x, float y, PullPlan** sub
 	}
 }
 
-void PickupPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
+void PickupEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 {
 	// Check for convenience subplan-to-subplan drag
 	float x = (adjustedX(event->pos().x()) - squareSize/2) / float(squareSize/2-10);
@@ -126,7 +126,7 @@ void PickupPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	}
 }
 
-void PickupPlanEditorViewWidget :: resizeEvent(QResizeEvent* event)
+void PickupEditorViewWidget :: resizeEvent(QResizeEvent* event)
 {
 	int width, height;
 
@@ -147,32 +147,32 @@ void PickupPlanEditorViewWidget :: resizeEvent(QResizeEvent* event)
 	}
 }
 
-float PickupPlanEditorViewWidget :: adjustedX(float rawX)
+float PickupEditorViewWidget :: adjustedX(float rawX)
 {
 	return rawX - ulX;
 }
 
-float PickupPlanEditorViewWidget :: adjustedY(float rawY)
+float PickupEditorViewWidget :: adjustedY(float rawY)
 {
 	return rawY - ulY;
 }
 
-float PickupPlanEditorViewWidget :: rawX(float adjustedX)
+float PickupEditorViewWidget :: rawX(float adjustedX)
 {
 	return adjustedX + ulX;
 }
 
-float PickupPlanEditorViewWidget :: rawY(float adjustedY)
+float PickupEditorViewWidget :: rawY(float adjustedY)
 {
 	return adjustedY + ulY;
 }
 
-void PickupPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
+void PickupEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 {
 	event->acceptProposedAction();
 }
 
-void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
+void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 {
 	void* droppedObject;
 	PullPlan* droppedPlan = 0;
@@ -229,13 +229,13 @@ void PickupPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	}
 }
 
-void PickupPlanEditorViewWidget :: setPiece(Piece* _piece)
+void PickupEditorViewWidget :: setPiece(Piece* _piece)
 {
 	this->piece = _piece;
 	updateEverything();
 }
 
-void PickupPlanEditorViewWidget :: updateEverything()
+void PickupEditorViewWidget :: updateEverything()
 {
 	this->niceViewWidget->repaint();
 }

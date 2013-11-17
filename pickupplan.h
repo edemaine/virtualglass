@@ -1,7 +1,7 @@
 
 
-#ifndef PICKUPPLAN_H
-#define PICKUPPLAN_H
+#ifndef PICKUP_H
+#define PICKUP_H
 
 #include <vector>
 #include "shape.h"
@@ -13,13 +13,13 @@ class TemplateParameter;
 
 using std::vector;
 
-class PickupPlan
+class Pickup
 {
 	friend class Piece;
 
 	public:
-		PickupPlan(enum PickupTemplate::Type t);
-		PickupPlan();
+		Pickup(enum PickupTemplate::Type t);
+		Pickup();
 
 		void setTemplateType(enum PickupTemplate::Type t, bool force=false);
 		enum PickupTemplate::Type templateType();
@@ -28,7 +28,7 @@ class PickupPlan
 		void getParameter(unsigned int index, TemplateParameter* dest);
 		void setParameter(unsigned int index, int value);
 
-		PickupPlan* copy() const;
+		Pickup* copy() const;
 
 		SubpickupTemplate getSubpickupTemplate(unsigned int index);
 		void setSubpickupTemplate(SubpickupTemplate t, unsigned int index);
@@ -59,8 +59,8 @@ class PickupPlan
 			enum PickupCaneOrientation ori, float length, float width, enum GeometricShape s); 
 };
 
-PickupPlan *deep_copy(const PickupPlan *);
-void deep_delete(PickupPlan *);
+Pickup *deep_copy(const Pickup *);
+void deep_delete(Pickup *);
 
 #endif
 

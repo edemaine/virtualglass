@@ -21,7 +21,7 @@ class QScrollArea;
 
 class GlassColor;
 class PullPlan;
-class PickupPlan;
+class Pickup;
 class Piece;
 class Email;
 class NiceViewWidget;

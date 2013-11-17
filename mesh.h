@@ -12,7 +12,7 @@
 #include "shape.h"
 
 class GlassColor;
-class PickupPlan;
+class Pickup;
 class PullPlan;
 class Piece;
 class SubpullTemplate;
@@ -55,7 +55,7 @@ namespace MeshInternal
 	};
 
 	// Methods
-	void generateMesh(PickupPlan* plan, Geometry *geometry, bool isTopLevel, unsigned int quality, clock_t end);
+	void generateMesh(Pickup* plan, Geometry *geometry, bool isTopLevel, unsigned int quality, clock_t end);
 	void generateMesh(PullPlan* plan, Geometry* geometry, unsigned int quality, clock_t end);
 	void recurseMesh(PullPlan* plan, Geometry *geometry, vector<Ancestor>& ancestors, 
 		float length, unsigned int quality, bool isTopLevel, clock_t end);

@@ -766,7 +766,7 @@ pickup
 		subcane_2
 		...
 */
-void writePickup(Json::Value& root, PickupPlan* pickup, unsigned int pickupIndex,
+void writePickup(Json::Value& root, Pickup* pickup, unsigned int pickupIndex,
 	map<PullPlan*, unsigned int>& caneMap, map<GlassColor*, unsigned int>& colorMap)
 {
 	string pickupname = idAndNameToString(pickupIndex, "Pickup");
@@ -810,11 +810,11 @@ void writePickup(Json::Value& root, PickupPlan* pickup, unsigned int pickupIndex
 	}
 }
 
-PickupPlan* readPickup(string pickupname, Json::Value& root,
+Pickup* readPickup(string pickupname, Json::Value& root,
 	map<unsigned int, PullPlan*>& caneMap, map<unsigned int, GlassColor*>& colorMap)
 {
 	// read singletons: casing color, overlay color, underlay color, pickup template
-	PickupPlan* pickup = new PickupPlan(stringToPickupTemplate(root[pickupname]["Pickup template"].asString()));
+	Pickup* pickup = new Pickup(stringToPickupTemplate(root[pickupname]["Pickup template"].asString()));
 	pickup->setCasingGlassColor(safeColorMap(colorMap, root[pickupname]["Casing color pointer"].asUInt()));
 	pickup->setOverlayGlassColor(safeColorMap(colorMap, root[pickupname]["Overlay color pointer"].asUInt()));
 	pickup->setUnderlayGlassColor(safeColorMap(colorMap, root[pickupname]["Underlay color pointer"].asUInt()));
@@ -917,7 +917,7 @@ Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, PullPlan
 	for (unsigned int i = 0; i < root[piecename]["Pickups"].getMemberNames().size(); ++i)
 	{
 		string pickupname = root[piecename]["Pickups"].getMemberNames()[i];
-		piece->setPickupPlan(readPickup(pickupname, root[piecename]["Pickups"], caneMap, colorMap));
+		piece->setPickup(readPickup(pickupname, root[piecename]["Pickups"], caneMap, colorMap));
 	}
 
 	return piece;

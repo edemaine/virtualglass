@@ -78,11 +78,11 @@ PullPlan* randomComplexPullPlan(PullPlan* circleSimplePlan, PullPlan* squareSimp
 	return plan;
 }
 
-PickupPlan* randomPickup(PullPlan* pullPlan1, PullPlan* pullPlan2)
+Pickup* randomPickup(PullPlan* pullPlan1, PullPlan* pullPlan2)
 {
 	int randomTemplateNumber = qrand() % (PickupTemplate::lastSeedTemplate() - PickupTemplate::firstSeedTemplate())
 		+ PickupTemplate::firstSeedTemplate();
-	PickupPlan* pickup = new PickupPlan(static_cast<PickupTemplate::Type>(randomTemplateNumber));
+	Pickup* pickup = new Pickup(static_cast<PickupTemplate::Type>(randomTemplateNumber));
 
 	// set parameters
 	TemplateParameter p;
@@ -115,14 +115,14 @@ PickupPlan* randomPickup(PullPlan* pullPlan1, PullPlan* pullPlan2)
 	return pickup;
 }
 
-Piece* randomPiece(PickupPlan* pickup)
+Piece* randomPiece(Pickup* pickup)
 {
 	int randomTemplateNumber = qrand() % (PieceTemplate::lastSeedTemplate() - PieceTemplate::firstSeedTemplate())
 		+ PieceTemplate::firstSeedTemplate();
 	Piece* piece = new Piece(static_cast<PieceTemplate::Type>(randomTemplateNumber));
 
 	// set pickup
-	piece->setPickupPlan(pickup);
+	piece->setPickup(pickup);
 
 	return piece;
 }

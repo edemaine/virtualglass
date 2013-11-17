@@ -16,7 +16,7 @@ class QString;
 class QBuffer;
 class GlassColor;
 class PullPlan;
-class PickupPlan;
+class Pickup;
 class Piece;
 
 using std::map;
@@ -76,9 +76,9 @@ namespace GlassFileIOInternal
 	void readCanes(Json::Value& root, map<unsigned int, PullPlan*>& caneMap, map<unsigned int, GlassColor*>& colorMap, 
 		vector<PullPlan*>& readPlans);
 
-	void writePickup(Json::Value& root, PickupPlan* pickup, unsigned int pickupIndex, 
+	void writePickup(Json::Value& root, Pickup* pickup, unsigned int pickupIndex, 
 		map<PullPlan*, unsigned int>& caneMap, map<GlassColor*, unsigned int>& colorMap);
-	PickupPlan* readPickup(string pickupname, Json::Value& root, 
+	Pickup* readPickup(string pickupname, Json::Value& root, 
 		map<unsigned int, PullPlan*>& caneMap, map<unsigned int, GlassColor*>& colorMap);
 
 	void writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<PullPlan*, unsigned int>& caneMap,

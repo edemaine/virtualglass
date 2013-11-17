@@ -6,19 +6,19 @@ Piece :: Piece(enum PieceTemplate::Type _type)
 	this->state.twist = 0.0;
 	setTemplateType(_type, true);
 	// initialize the piece's pickup to be something boring and base
-	this->pickup = new PickupPlan(PickupTemplate::VERTICAL);
+	this->pickup = new Pickup(PickupTemplate::VERTICAL);
 
 	undoStackPiece.push(this->state);
 	undoStackPickup.push(this->pickup->state);
 }
 
-void Piece::setPickupPlan(PickupPlan* pickup)
+void Piece::setPickup(Pickup* pickup)
 {
 	this->pickup = pickup;
 	clearStateStacks();
 }
 
-PickupPlan* Piece::pickupPlan() const
+Pickup* Piece::pickupPlan() const
 {
 	return this->pickup;
 }
@@ -244,7 +244,7 @@ Piece *deep_copy(const Piece *_piece)
 	Piece *piece = _piece->copy();
 	//Replace pickup with a deep copy:
 	delete piece->pickupPlan();
-	piece->setPickupPlan(deep_copy(_piece->pickupPlan()));
+	piece->setPickup(deep_copy(_piece->pickupPlan()));
 	return piece;
 }
 
@@ -252,6 +252,6 @@ void deep_delete(Piece *piece)
 {
 	assert(piece);
 	deep_delete(piece->pickupPlan());
-	piece->setPickupPlan(NULL);
+	piece->setPickup(NULL);
 	delete piece;
 }
