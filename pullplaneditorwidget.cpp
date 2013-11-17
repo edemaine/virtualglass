@@ -16,7 +16,7 @@
 #include "pullplancustomizeviewwidget.h"
 #include "niceviewwidget.h"
 #include "pulltemplatelibrarywidget.h"
-#include "pullplanlibrarywidget.h"
+#include "canelibrarywidget.h"
 #include "mesh.h"
 #include "dependancy.h"
 #include "templateparameter.h"

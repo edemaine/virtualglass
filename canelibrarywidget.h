@@ -1,15 +1,15 @@
-#ifndef PULLPLANLIBRARYWIDGET_H
-#define PULLPLANLIBRARYWIDGET_H
+#ifndef CANELIBRARYWIDGET_H
+#define CANELIBRARYWIDGET_H
 
 #include "asyncrenderwidget.h"
 #include "shape.h"
 
 class PullPlan;
 
-class PullPlanLibraryWidget : public AsyncRenderWidget
+class CaneLibraryWidget : public AsyncRenderWidget
 {
 	public:
-		PullPlanLibraryWidget(PullPlan *_plan, MainWindow* _window);
+		CaneLibraryWidget(PullPlan *_plan, MainWindow* _window);
 		PullPlan *pullPlan;
 		const QPixmap *dragPixmap();
 		bool isDraggable();

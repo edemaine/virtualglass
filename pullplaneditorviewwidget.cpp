@@ -10,7 +10,7 @@
 #include "glasscolor.h"
 #include "pullplan.h"
 #include "glassmime.h"
-#include "pullplanlibrarywidget.h"
+#include "canelibrarywidget.h"
 #include "glasscolorlibrarywidget.h"
 #include "pullplaneditorviewwidget.h"
 #include "globalbackgroundcolor.h"
@@ -353,7 +353,7 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEv
 			if (type == GlassMime::PULLPLAN_MIME)
 				draggedPlan = reinterpret_cast<PullPlan*>(ptr);
 			else 
-				draggedPlan = reinterpret_cast<PullPlanLibraryWidget*>(ptr)->pullPlan;
+				draggedPlan = reinterpret_cast<CaneLibraryWidget*>(ptr)->pullPlan;
 			highlightColor.r = highlightColor.g = highlightColor.b = highlightColor.a = 1.0;
 			if (draggedPlan->hasDependencyOn(plan))
 				break;
@@ -428,7 +428,7 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 			if (type == GlassMime::PULLPLAN_MIME)
 				draggedPlan = reinterpret_cast<PullPlan*>(ptr);
 			else
-				draggedPlan = reinterpret_cast<PullPlanLibraryWidget*>(ptr)->pullPlan;
+				draggedPlan = reinterpret_cast<CaneLibraryWidget*>(ptr)->pullPlan;
 			for (set<unsigned int>::iterator it = subplansHighlighted.begin(); it != subplansHighlighted.end(); ++it)
 			{
 				SubpullTemplate sub = plan->getSubpullTemplate(*it);

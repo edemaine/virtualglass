@@ -29,7 +29,7 @@ class PullPlanEditorWidget;
 class ColorEditorWidget;
 class PieceEditorWidget;
 class GlassColorLibraryWidget;
-class PullPlanLibraryWidget;
+class CaneLibraryWidget;
 class PieceLibraryWidget;
 class GlassLibraryWidget;
 

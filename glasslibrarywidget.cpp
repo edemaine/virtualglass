@@ -7,7 +7,7 @@
 
 #include "glassmime.h"
 #include "glasscolorlibrarywidget.h"
-#include "pullplanlibrarywidget.h"
+#include "canelibrarywidget.h"
 #include "glasslibrarywidget.h"
 #include "globalbackgroundcolor.h"
 #include "mainwindow.h"

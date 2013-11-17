@@ -7,7 +7,7 @@
 #include "piece.h"
 #include "pickupeditorviewwidget.h"
 #include "glasscolorlibrarywidget.h"
-#include "pullplanlibrarywidget.h"
+#include "canelibrarywidget.h"
 #include "niceviewwidget.h"
 #include "glassmime.h"
 #include "glasscolor.h"
@@ -185,7 +185,7 @@ void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 			droppedPlan = reinterpret_cast<GlassColorLibraryWidget*>(droppedObject)->circlePlan;
 			break;
 		case GlassMime::PULLPLAN_LIBRARY_MIME:
-			droppedPlan = reinterpret_cast<PullPlanLibraryWidget*>(droppedObject)->pullPlan;
+			droppedPlan = reinterpret_cast<CaneLibraryWidget*>(droppedObject)->pullPlan;
 			break;
 		case GlassMime::PULLPLAN_MIME:
 			droppedPlan = reinterpret_cast<PullPlan*>(droppedObject);

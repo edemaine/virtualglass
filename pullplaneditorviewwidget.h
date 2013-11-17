@@ -9,7 +9,7 @@
 
 class GlassColor;
 class PullPlan;
-class PullPlanLibraryWidget;
+class CaneLibraryWidget;
 class GlassColorLibraryWidget;
 
 using std::set;

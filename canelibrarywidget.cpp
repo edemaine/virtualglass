@@ -3,17 +3,17 @@
 #include "pullplan.h"
 #include "glasscolor.h"
 #include "canerenderdata.h"
-#include "pullplanlibrarywidget.h"
+#include "canelibrarywidget.h"
 #include "canecrosssectionrender.h"
 
-PullPlanLibraryWidget :: PullPlanLibraryWidget(PullPlan *_pullPlan, MainWindow *_window) 
+CaneLibraryWidget :: CaneLibraryWidget(PullPlan *_pullPlan, MainWindow *_window) 
 	: AsyncRenderWidget(_window), pullPlan(_pullPlan)
 {
 	setFixedSize(100, 100);
 	updatePixmaps();
 }
 
-void PullPlanLibraryWidget :: updatePixmaps()
+void CaneLibraryWidget :: updatePixmaps()
 {
 	// This is fast enough to do in real time
 	updateDragPixmap();
@@ -28,22 +28,22 @@ void PullPlanLibraryWidget :: updatePixmaps()
 	setScene(camera, new CaneRenderData(pullPlan));
 }
 
-const QPixmap* PullPlanLibraryWidget :: dragPixmap()
+const QPixmap* CaneLibraryWidget :: dragPixmap()
 {
 	return &(this->_dragPixmap);
 }
 
-bool PullPlanLibraryWidget :: isDraggable()
+bool CaneLibraryWidget :: isDraggable()
 {
 	return true;
 }
 
-GlassMime::Type PullPlanLibraryWidget :: mimeType()
+GlassMime::Type CaneLibraryWidget :: mimeType()
 {
 	return GlassMime::PULLPLAN_LIBRARY_MIME;
 }
 
-void PullPlanLibraryWidget :: updateDragPixmap()
+void CaneLibraryWidget :: updateDragPixmap()
 {
 	QPixmap _pixmap(100, 100);
 	_pixmap.fill(Qt::transparent); 
