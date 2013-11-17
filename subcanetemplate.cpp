@@ -1,8 +1,8 @@
 
 
-#include "subpulltemplate.h"
+#include "subcanetemplate.h"
 
-SubpullTemplate :: SubpullTemplate(Cane* plan, enum GeometricShape _s, Point2D location, float diameter)
+SubcaneTemplate :: SubcaneTemplate(Cane* plan, enum GeometricShape _s, Point2D location, float diameter)
 {
 	this->plan = plan;
 	this->shape = _s;
@@ -10,7 +10,7 @@ SubpullTemplate :: SubpullTemplate(Cane* plan, enum GeometricShape _s, Point2D l
 	this->diameter = diameter;
 }
 
-void SubpullTemplate :: rescale(float ratio) 
+void SubcaneTemplate :: rescale(float ratio) 
 {
 	this->location.x *= ratio;
 	this->location.y *= ratio;

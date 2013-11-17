@@ -77,7 +77,7 @@ void drawSubcane(float x, float y, float drawWidth, float drawHeight,
 	// Recursively call drawing on subcanes
 	for (unsigned int i = cane->subpullCount()-1; i < cane->subpullCount(); --i)
 	{
-		SubpullTemplate sub = cane->getSubpullTemplate(i);
+		SubcaneTemplate sub = cane->getSubcaneTemplate(i);
 
 		float rX = x + (sub.location.x - sub.diameter/2.0) * drawWidth/2 + drawWidth/2;
 		float rY = y + (sub.location.y - sub.diameter/2.0) * drawWidth/2 + drawHeight/2;

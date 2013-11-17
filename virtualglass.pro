@@ -112,7 +112,7 @@ HEADERS += vgapp.h \
 	templateparameter.h \
 	cane.h \
 	pulltemplate.h \
-	subpulltemplate.h \
+	subcanetemplate.h \
 	pickup.h \
 	piece.h \
 	piecetemplate.h \
@@ -169,7 +169,7 @@ SOURCES += main.cpp \
 	templateparameter.cpp \
 	canecustomizeviewwidget.cpp \
 	cane.cpp \
-	subpulltemplate.cpp \
+	subcanetemplate.cpp \
 	globalglass.cpp \
 	piece.cpp \
 	piecetemplate.cpp \

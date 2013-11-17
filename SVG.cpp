@@ -455,8 +455,8 @@ void start_element(string const &name, map< string, string > &atts) {
 			float diameter = width/ pageSize * sqrt(2);
 
 			// Add square to pullPlan
-			pullPlan->addSubpullTemplate(
-				SubpullTemplate(GlobalGlass::squarePlan(), SQUARE_SHAPE, p, diameter));
+			pullPlan->addSubcaneTemplate(
+				SubcaneTemplate(GlobalGlass::squarePlan(), SQUARE_SHAPE, p, diameter));
 			} else {
 				node.moveto(make_vector(x,y));
 				node.lineto(make_vector(x+width,y));
@@ -482,8 +482,8 @@ void start_element(string const &name, map< string, string > &atts) {
 				float diameter = 2*r/ pageSize * sqrt(2);
 
 				// Add circle to pullPlan
-				pullPlan->addSubpullTemplate(
-					SubpullTemplate(GlobalGlass::circlePlan(), CIRCLE_SHAPE, p, diameter));
+				pullPlan->addSubcaneTemplate(
+					SubcaneTemplate(GlobalGlass::circlePlan(), CIRCLE_SHAPE, p, diameter));
 
 			} else {
 				Error(this) << "circle without cx, cy, or r.";

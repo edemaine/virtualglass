@@ -161,7 +161,7 @@ int CaneEditorViewWidget :: getSubplanIndexAt(Point2D loc)
 	// Recursively call drawing on subplans
 	for (unsigned int i = 0; i < plan->subpullCount(); ++i)
 	{
-		SubpullTemplate sub = plan->getSubpullTemplate(i);
+		SubcaneTemplate sub = plan->getSubcaneTemplate(i);
 		Point2D delta;
 		delta.x = loc.x - sub.location.x;
 		delta.y = loc.y - sub.location.y;
@@ -177,7 +177,7 @@ Cane* CaneEditorViewWidget :: getSubplanAt(Point2D loc)
 	int subplanIndex = getSubplanIndexAt(loc);
 	if (subplanIndex == -1)
 		return NULL;
-	return plan->getSubpullTemplate(subplanIndex).plan;
+	return plan->getSubcaneTemplate(subplanIndex).plan;
 }
 
 void CaneEditorViewWidget :: setMinMaxCasingRadii(float* min, float* max)
@@ -360,13 +360,13 @@ void CaneEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEvent*
 			int subplanIndexUnderMouse = getSubplanIndexAt(mouseLoc);
 			if (subplanIndexUnderMouse == -1)
 				break;
-			if (draggedPlan->outermostCasingShape() != plan->getSubpullTemplate(subplanIndexUnderMouse).shape)
+			if (draggedPlan->outermostCasingShape() != plan->getSubcaneTemplate(subplanIndexUnderMouse).shape)
 				break;
 			if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
 			{
 				for (unsigned int i = 0; i < plan->subpullCount(); ++i)
 				{
-					if (draggedPlan->outermostCasingShape() == plan->getSubpullTemplate(i).shape)
+					if (draggedPlan->outermostCasingShape() == plan->getSubcaneTemplate(i).shape)
 						subplansHighlighted.insert(i);
 				}
 			}
@@ -398,7 +398,7 @@ void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 			GlassColorLibraryWidget* draggedLibraryColor = reinterpret_cast<GlassColorLibraryWidget*>(ptr);
 			for (set<unsigned int>::iterator it = subplansHighlighted.begin(); it != subplansHighlighted.end(); ++it)
 			{
-				SubpullTemplate sub = plan->getSubpullTemplate(*it);
+				SubcaneTemplate sub = plan->getSubcaneTemplate(*it);
 				switch (sub.shape)
 				{
 					case CIRCLE_SHAPE:
@@ -408,7 +408,7 @@ void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 						sub.plan = draggedLibraryColor->squarePlan;
 						break;
 				}
-				plan->setSubpullTemplate(sub, *it);
+				plan->setSubcaneTemplate(sub, *it);
 			}
 			for (set<unsigned int>::iterator it = casingsHighlighted.begin(); it != casingsHighlighted.end(); ++it)
 				plan->setCasingColor(draggedLibraryColor->glassColor, *it);
@@ -431,11 +431,11 @@ void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 				draggedPlan = reinterpret_cast<CaneLibraryWidget*>(ptr)->pullPlan;
 			for (set<unsigned int>::iterator it = subplansHighlighted.begin(); it != subplansHighlighted.end(); ++it)
 			{
-				SubpullTemplate sub = plan->getSubpullTemplate(*it);
+				SubcaneTemplate sub = plan->getSubcaneTemplate(*it);
 				if (sub.shape == draggedPlan->outermostCasingShape())
 				{
 					sub.plan = draggedPlan;	
-					plan->setSubpullTemplate(sub, *it);
+					plan->setSubcaneTemplate(sub, *it);
 				}
 			}
 			break;
@@ -549,7 +549,7 @@ void CaneEditorViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth, flo
 	// Recursively call drawing on subplans
 	for (unsigned int i = plan->subpullCount()-1; i < plan->subpullCount(); --i)
 	{
-		SubpullTemplate sub = plan->getSubpullTemplate(i);
+		SubcaneTemplate sub = plan->getSubcaneTemplate(i);
 
 		Point2D subUpperLeft;
 		subUpperLeft.x = upperLeft.x + (sub.location.x - sub.diameter/2.0) * drawWidth/2 + drawWidth/2;

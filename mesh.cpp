@@ -7,7 +7,7 @@
 #include "cane.h"
 #include "pickup.h"
 #include "piece.h"
-#include "subpulltemplate.h"
+#include "subcanetemplate.h"
 #include "spline.h"
 
 using namespace MeshInternal;
@@ -175,7 +175,7 @@ void applyPieceTransform(Geometry* geometry, Piece* piece)
 
 void applyPlanTransform(Vertex& v, Ancestor a)
 {
-	SubpullTemplate subTemp = a.parent->getSubpullTemplate(a.child);
+	SubcaneTemplate subTemp = a.parent->getSubcaneTemplate(a.child);
 	applyResizeTransform(v, subTemp.diameter / 2.0);
 	applySubplanTransform(v, subTemp.location);
 	applyTwistTransform(v, a.parent->twist());
@@ -450,7 +450,7 @@ float finalRadius(vector<Ancestor>& ancestors)
 
 	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
 	{
-		radius *= (ancestors[i].parent->getSubpullTemplate(ancestors[i].child).diameter * 0.5); 
+		radius *= (ancestors[i].parent->getSubcaneTemplate(ancestors[i].child).diameter * 0.5); 
 	}
 
 	return radius;
@@ -712,7 +712,7 @@ void recurseMesh(Cane* plan, Geometry *geometry, vector<Ancestor>& ancestors, fl
 	{
 		me.child = i;
 		ancestors.push_back(me);
-		recurseMesh(plan->getSubpullTemplate(i).plan, geometry, ancestors, length, quality, false, end);
+		recurseMesh(plan->getSubcaneTemplate(i).plan, geometry, ancestors, length, quality, false, end);
 		ancestors.pop_back();
 	}
 

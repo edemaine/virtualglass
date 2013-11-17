@@ -593,7 +593,7 @@ void writeCane(Json::Value& root, Cane* cane, unsigned int caneIndex, map<const 
 	{
 		string subpullName = idAndNameToString(i, "Subcane");
 		root[canename]["Subcanes"][subpullName]["Index"] = i;
-		SubpullTemplate sub = cane->getSubpullTemplate(i);
+		SubcaneTemplate sub = cane->getSubcaneTemplate(i);
 		root[canename]["Subcanes"][subpullName]["Cane pointer"] = caneMap[sub.plan];
 		root[canename]["Subcanes"][subpullName]["Diameter"] = sub.diameter;
 		root[canename]["Subcanes"][subpullName]["Shape"] = geometricShapeToString(sub.shape);
@@ -655,7 +655,7 @@ void readCaneSubcanes(Json::Value& root, Cane* cane, map<unsigned int, Cane*>& c
 	{
 		Point2D location;
 		for (unsigned int i = 0; i < root["Subcanes"].getMemberNames().size(); ++i)
-			cane->addSubpullTemplate(SubpullTemplate(cane, CIRCLE_SHAPE, location, 1.0));
+			cane->addSubcaneTemplate(SubcaneTemplate(cane, CIRCLE_SHAPE, location, 1.0));
 	}
 
 	for (unsigned int i = 0; i < root["Subcanes"].getMemberNames().size(); ++i)
@@ -663,13 +663,13 @@ void readCaneSubcanes(Json::Value& root, Cane* cane, map<unsigned int, Cane*>& c
 		string subpullname = root["Subcanes"].getMemberNames()[i];
 		unsigned int subpullIndex = root["Subcanes"][subpullname]["Index"].asUInt();
 
-		SubpullTemplate sub = cane->getSubpullTemplate(subpullIndex);
+		SubcaneTemplate sub = cane->getSubcaneTemplate(subpullIndex);
 		sub.plan = safeCaneMap(caneMap, root["Subcanes"][subpullname]["Cane pointer"].asUInt());
 		sub.diameter = root["Subcanes"][subpullname]["Diameter"].asFloat();
 		sub.shape = stringToGeometricShape(root["Subcanes"][subpullname]["Shape"].asString());
 		sub.location.x = root["Subcanes"][subpullname]["X"].asFloat();
 		sub.location.y = root["Subcanes"][subpullname]["Y"].asFloat();
-		cane->setSubpullTemplate(sub, subpullIndex);
+		cane->setSubcaneTemplate(sub, subpullIndex);
 	}
 }
 

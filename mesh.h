@@ -15,7 +15,7 @@ class GlassColor;
 class Pickup;
 class Cane;
 class Piece;
-class SubpullTemplate;
+class SubcaneTemplate;
 class Spline;
 
 using std::vector;

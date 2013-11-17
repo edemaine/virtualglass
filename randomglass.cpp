@@ -6,7 +6,7 @@
 #include "pulltemplate.h"
 #include "pickup.h"
 #include "pickuptemplate.h"
-#include "subpulltemplate.h"
+#include "subcanetemplate.h"
 #include "piece.h"
 #include "piecetemplate.h"
 #include "randomglass.h"
@@ -62,7 +62,7 @@ Cane* randomComplexCane(Cane* circleSimplePlan, Cane* squareSimplePlan)
 	// set subplans
 	for (unsigned int i = 0; i < plan->subpullCount(); ++i)
 	{
-		SubpullTemplate t = plan->getSubpullTemplate(i);
+		SubcaneTemplate t = plan->getSubcaneTemplate(i);
 		switch (t.shape)
 		{
 			case CIRCLE_SHAPE:
@@ -72,7 +72,7 @@ Cane* randomComplexCane(Cane* circleSimplePlan, Cane* squareSimplePlan)
 				t.plan = squareSimplePlan;
 				break;
 		}
-		plan->setSubpullTemplate(t, i);
+		plan->setSubcaneTemplate(t, i);
 	}
 
 	return plan;

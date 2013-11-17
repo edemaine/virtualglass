@@ -343,7 +343,7 @@ enum GeometricShape Cane :: getCasingShape(unsigned int index)
 	return this->state.casings[index].shape;
 }
 
-void Cane :: pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs,
+void Cane :: pushNewSubpull(bool hardReset, vector<SubcaneTemplate>* newSubs,
 	enum GeometricShape _shape, Point2D p, float diameter) 
 {
 	Cane* plan = NULL;
@@ -368,7 +368,7 @@ void Cane :: pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs,
 		}
 	}
 
-	newSubs->push_back(SubpullTemplate(plan, _shape, p, diameter));
+	newSubs->push_back(SubcaneTemplate(plan, _shape, p, diameter));
 }
 
 // resetSubs()
@@ -385,7 +385,7 @@ void Cane :: resetSubs(bool hardReset)
 	Point2D p = make_vector(0.0f, 0.0f);
 	float radius = this->state.casings[0].thickness;
 
-	vector<SubpullTemplate> newSubs;
+	vector<SubcaneTemplate> newSubs;
 	
 	switch (this->state.type) 
 	{
@@ -560,22 +560,22 @@ void Cane :: resetSubs(bool hardReset)
 	this->state.subs = newSubs;
 }
 
-SubpullTemplate Cane :: getSubpullTemplate(unsigned int index)
+SubcaneTemplate Cane :: getSubcaneTemplate(unsigned int index)
 {
 	return this->state.subs[index];
 }
 
-void Cane :: setSubpullTemplate(SubpullTemplate t, unsigned int index)
+void Cane :: setSubcaneTemplate(SubcaneTemplate t, unsigned int index)
 {
 	this->state.subs[index] = t;
 }
 
-void Cane :: addSubpullTemplate(SubpullTemplate t)
+void Cane :: addSubcaneTemplate(SubcaneTemplate t)
 {
 	this->state.subs.push_back(t);
 }
 
-void Cane :: removeSubpullTemplate(unsigned int index)
+void Cane :: removeSubcaneTemplate(unsigned int index)
 {
 	this->state.subs.erase(this->state.subs.begin() + index);
 }
@@ -622,7 +622,7 @@ Cane *deep_copy(const Cane *_plan)
 		to_update.pop_back();
 		for (unsigned int i = 0; i < t->subpullCount(); ++i)
 		{
-			SubpullTemplate s = t->getSubpullTemplate(i);
+			SubcaneTemplate s = t->getSubcaneTemplate(i);
 			unordered_map<const Cane*, Cane*>::iterator f = copies.find(s.plan);
 			if (f == copies.end()) 
 			{
@@ -630,7 +630,7 @@ Cane *deep_copy(const Cane *_plan)
 				to_update.push_back(f->second);
 			}
 			s.plan = f->second;
-			t->setSubpullTemplate(s, i);
+			t->setSubcaneTemplate(s, i);
 		}
 	}
 	return plan;
@@ -648,11 +648,11 @@ void deep_delete(Cane *plan)
 		to_delete.pop_back();
 		for (unsigned int i = 0; i < t->subpullCount(); ++i)
 		{
-			SubpullTemplate s = t->getSubpullTemplate(i);
+			SubcaneTemplate s = t->getSubcaneTemplate(i);
 			if (marked.insert(s.plan).second) 
 				to_delete.push_back(s.plan);
 			s.plan = NULL;
-			t->setSubpullTemplate(s, i);
+			t->setSubcaneTemplate(s, i);
 		}
 		delete t;
 	}

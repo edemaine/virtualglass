@@ -9,7 +9,7 @@
 #include "pulltemplate.h"
 #include "shape.h"
 #include "primitives.h"
-#include "subpulltemplate.h"
+#include "subcanetemplate.h"
 #include "casing.h"
 #include "templateparameter.h"
 
@@ -53,10 +53,10 @@ class Cane
 
 		Cane* copy() const;
 
-		SubpullTemplate getSubpullTemplate(unsigned int index);
-		void setSubpullTemplate(SubpullTemplate t, unsigned int index);	
-		void addSubpullTemplate(SubpullTemplate t);
-		void removeSubpullTemplate(unsigned int index);
+		SubcaneTemplate getSubcaneTemplate(unsigned int index);
+		void setSubcaneTemplate(SubcaneTemplate t, unsigned int index);	
+		void addSubcaneTemplate(SubcaneTemplate t);
+		void removeSubcaneTemplate(unsigned int index);
 		unsigned int subpullCount();	
 
 		bool hasDependencyOn(GlassColor* color);
@@ -75,7 +75,7 @@ class Cane
 			vector<Casing> casings;
 			unsigned int count;
 			float twist;
-			vector<SubpullTemplate> subs;
+			vector<SubcaneTemplate> subs;
 		};	
 
 		stack<struct State> undoStack;
@@ -85,7 +85,7 @@ class Cane
 		// Methods
 		void initializeTemplate();
 		void resetSubs(bool hardReset);
-		void pushNewSubpull(bool hardReset, vector<SubpullTemplate>* newSubs,
+		void pushNewSubpull(bool hardReset, vector<SubcaneTemplate>* newSubs,
 			enum GeometricShape s, Point2D location, float diameter);
 
 };
