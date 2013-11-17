@@ -2,11 +2,11 @@
 #include <time.h>
 
 #include "canegeometrythread.h"
-#include "pullplaneditorwidget.h"
+#include "caneeditorwidget.h"
 #include "pullplan.h"
 #include "globalgraphicssetting.h"
 
-CaneGeometryThread::CaneGeometryThread(PullPlanEditorWidget* _ppew) : ppew(_ppew)
+CaneGeometryThread::CaneGeometryThread(CaneEditorWidget* _ppew) : ppew(_ppew)
 {
 	
 }

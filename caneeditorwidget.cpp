@@ -11,7 +11,7 @@
 
 #include "pullplan.h"
 #include "geometry.h"
-#include "pullplaneditorwidget.h"
+#include "caneeditorwidget.h"
 #include "caneeditorviewwidget.h"
 #include "canecustomizeviewwidget.h"
 #include "niceviewwidget.h"
@@ -27,7 +27,7 @@
 #include "globalgraphicssetting.h"
 #include "constants.h"
 
-PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
+CaneEditorWidget :: CaneEditorWidget(QWidget* parent) : QWidget(parent)
 {
 	resetPullPlan();
 
@@ -43,7 +43,7 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 	seedTemplates();
 }
 
-bool PullPlanEditorWidget :: eventFilter(QObject* obj, QEvent* event)
+bool CaneEditorWidget :: eventFilter(QObject* obj, QEvent* event)
 {
 	// Goal is to stop the count spin from eating undo/redo commands
 	// for its own text editing purpose. These events should instead
@@ -56,32 +56,32 @@ bool PullPlanEditorWidget :: eventFilter(QObject* obj, QEvent* event)
 	return false;
 }
 
-QImage PullPlanEditorWidget :: pullPlanImage()
+QImage CaneEditorWidget :: pullPlanImage()
 {
 	return niceViewWidget->grabFrameBuffer();
 }
 
-void PullPlanEditorWidget :: reset3DCamera()
+void CaneEditorWidget :: reset3DCamera()
 {
 	niceViewWidget->resetCamera();
 }
 
-void PullPlanEditorWidget :: resetPullPlan()
+void CaneEditorWidget :: resetPullPlan()
 {
 	plan = new PullPlan(PullTemplate::HORIZONTAL_LINE_CIRCLE);
 }
 
-bool PullPlanEditorWidget :: canUndo()
+bool CaneEditorWidget :: canUndo()
 {
         return this->plan->canUndo();
 }
 
-bool PullPlanEditorWidget :: canRedo()
+bool CaneEditorWidget :: canRedo()
 {
         return this->plan->canRedo();
 }
 
-void PullPlanEditorWidget :: undo()
+void CaneEditorWidget :: undo()
 {
         this->plan->undo();
 
@@ -91,7 +91,7 @@ void PullPlanEditorWidget :: undo()
         emit someDataChanged();
 }
 
-void PullPlanEditorWidget :: redo()
+void CaneEditorWidget :: redo()
 {
         this->plan->redo();
 
@@ -101,17 +101,17 @@ void PullPlanEditorWidget :: redo()
         emit someDataChanged();
 }
 
-void PullPlanEditorWidget :: writePlanToOBJFile(QString& filename)
+void CaneEditorWidget :: writePlanToOBJFile(QString& filename)
 {
 	geometry.save_obj_file(filename.toStdString());
 }
 
-void PullPlanEditorWidget :: writePlanToPLYFile(QString& filename)
+void CaneEditorWidget :: writePlanToPLYFile(QString& filename)
 {
 	geometry.save_ply_file(filename.toStdString());
 }
 
-void PullPlanEditorWidget :: setupThreading()
+void CaneEditorWidget :: setupThreading()
 {
 	geometryDirty = false;
 	tempPullPlan = deep_copy(plan);
@@ -120,7 +120,7 @@ void PullPlanEditorWidget :: setupThreading()
 	geometryThread->start();
 }
 
-void PullPlanEditorWidget :: updateEverything()
+void CaneEditorWidget :: updateEverything()
 {
 	// set casing buttons
 	switch (plan->outermostCasingShape())
@@ -166,7 +166,7 @@ void PullPlanEditorWidget :: updateEverything()
 	customizeViewWidget->updateEverything();
 }
 
-void PullPlanEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned int quality)
+void CaneEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned int quality)
 {
 	geometryDirtyMutex.lock();
 	bool dirty = geometryDirty;
@@ -203,7 +203,7 @@ void PullPlanEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned
 		emit showMessage("Cane is too complex to render completely.", 3);
 }
 
-void PullPlanEditorWidget :: setupLayout()
+void CaneEditorWidget :: setupLayout()
 {
 	// we use a grid layout, with the edit-y parts in the left column 
 	// and 3D view in the right column 
@@ -268,7 +268,7 @@ void PullPlanEditorWidget :: setupLayout()
 
 	countLabel = new QLabel("Count:", casingWidget);
 	countSpin = new QSpinBox(casingWidget);
-	countSpin->setRange(MIN_PULLPLAN_COUNT_PARAMETER_VALUE, MAX_PULLPLAN_COUNT_PARAMETER_VALUE);
+	countSpin->setRange(MIN_CANE_COUNT_PARAMETER_VALUE, MAX_CANE_COUNT_PARAMETER_VALUE);
 	countSpin->installEventFilter(this);
 	casingLayout->addStretch(1);
 	casingLayout->addWidget(countLabel);
@@ -324,7 +324,7 @@ void PullPlanEditorWidget :: setupLayout()
 }
 
 
-void PullPlanEditorWidget :: controlsTabChanged(int tab)
+void CaneEditorWidget :: controlsTabChanged(int tab)
 {
 	// change the blueprint view to match the tab
 	viewEditorStack->setCurrentIndex(tab); 
@@ -340,7 +340,7 @@ void PullPlanEditorWidget :: controlsTabChanged(int tab)
 	}
 }
 
-void PullPlanEditorWidget :: circleCasingButtonClicked()
+void CaneEditorWidget :: circleCasingButtonClicked()
 {
 	plan->setOutermostCasingShape(CIRCLE_SHAPE);
 	plan->saveState();
@@ -348,7 +348,7 @@ void PullPlanEditorWidget :: circleCasingButtonClicked()
 	emit someDataChanged();
 }
 
-void PullPlanEditorWidget :: squareCasingButtonClicked()
+void CaneEditorWidget :: squareCasingButtonClicked()
 {
 	plan->setOutermostCasingShape(SQUARE_SHAPE);
 	plan->saveState();
@@ -356,7 +356,7 @@ void PullPlanEditorWidget :: squareCasingButtonClicked()
 	emit someDataChanged();
 }
 
-void PullPlanEditorWidget :: removeCasingButtonClicked()
+void CaneEditorWidget :: removeCasingButtonClicked()
 {
 	plan->removeCasing();
 	plan->saveState();
@@ -364,7 +364,7 @@ void PullPlanEditorWidget :: removeCasingButtonClicked()
 	emit someDataChanged();
 }
 
-void PullPlanEditorWidget :: addCasingButtonClicked()
+void CaneEditorWidget :: addCasingButtonClicked()
 {
 	plan->addCasing(plan->outermostCasingShape());
 	plan->saveState();
@@ -372,27 +372,27 @@ void PullPlanEditorWidget :: addCasingButtonClicked()
 	emit someDataChanged();
 }
 
-void PullPlanEditorWidget :: copySelectedButtonClicked()
+void CaneEditorWidget :: copySelectedButtonClicked()
 {
 	customizeViewWidget->copySelectionClicked();
 }
 
-void PullPlanEditorWidget :: deleteSelectedButtonClicked()
+void CaneEditorWidget :: deleteSelectedButtonClicked()
 {
 	customizeViewWidget->deleteSelectionClicked();
 }
 
-void PullPlanEditorWidget :: addCircleButtonClicked()
+void CaneEditorWidget :: addCircleButtonClicked()
 {
 	customizeViewWidget->addCircleClicked();
 }
 
-void PullPlanEditorWidget :: addSquareButtonClicked()
+void CaneEditorWidget :: addSquareButtonClicked()
 {
 	customizeViewWidget->addSquareClicked();
 }
 	
-void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
+void CaneEditorWidget :: mousePressEvent(QMouseEvent* event)
 {
 	if (event->button() == Qt::LeftButton && pullTemplateLibraryScrollArea->geometry().contains(event->pos()))
 	{
@@ -404,7 +404,7 @@ void PullPlanEditorWidget :: mousePressEvent(QMouseEvent* event)
 		isDragging = false;
 }
 
-void PullPlanEditorWidget :: mouseMoveEvent(QMouseEvent* event)
+void CaneEditorWidget :: mouseMoveEvent(QMouseEvent* event)
 {
 	// If the left mouse button isn't down
 	if ((event->buttons() & Qt::LeftButton) == 0)
@@ -423,7 +423,7 @@ void PullPlanEditorWidget :: mouseMoveEvent(QMouseEvent* event)
 	lastDragPosition = event->pos();
 }
 
-void PullPlanEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
+void CaneEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 {
 	// If not dragging or dragging caused a scroll
 	if (!isDragging || (isDragging && maxDragDistance >= QApplication::startDragDistance()))
@@ -451,7 +451,7 @@ void PullPlanEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 	}
 }
 
-void PullPlanEditorWidget :: setupConnections()
+void CaneEditorWidget :: setupConnections()
 {
 	// editor controls
 	connect(circleCasingPushButton, SIGNAL(clicked()), this, SLOT(circleCasingButtonClicked()));
@@ -476,18 +476,18 @@ void PullPlanEditorWidget :: setupConnections()
 		this, SLOT(geometryThreadFinishedMesh(bool, unsigned int)));
 }
 	
-void PullPlanEditorWidget :: twistEnded()
+void CaneEditorWidget :: twistEnded()
 {
 	plan->saveState();
 }
 
-void PullPlanEditorWidget :: childWidgetDataChanged()
+void CaneEditorWidget :: childWidgetDataChanged()
 {
 	updateEverything();
 	emit someDataChanged();
 }
 
-void PullPlanEditorWidget :: countSpinChanged(int)
+void CaneEditorWidget :: countSpinChanged(int)
 {
 	// update template
 	unsigned int count = plan->count();
@@ -500,7 +500,7 @@ void PullPlanEditorWidget :: countSpinChanged(int)
 	}
 }
 
-void PullPlanEditorWidget :: seedTemplates()
+void CaneEditorWidget :: seedTemplates()
 {
 	for (int i = PullTemplate::firstSeedTemplate(); i <= PullTemplate::lastSeedTemplate(); ++i)
 	{
@@ -524,7 +524,7 @@ void PullPlanEditorWidget :: seedTemplates()
 	templateLibraryLayout->addWidget(ptlw);
 }
 
-void PullPlanEditorWidget :: setPullPlan(PullPlan* _plan)
+void CaneEditorWidget :: setPullPlan(PullPlan* _plan)
 {
 	plan = _plan;
 	controlsTab->setCurrentIndex(0);
@@ -534,7 +534,7 @@ void PullPlanEditorWidget :: setPullPlan(PullPlan* _plan)
 	customizeViewWidget->setPullPlan(plan);
 }
 
-PullPlan* PullPlanEditorWidget :: pullPlan()
+PullPlan* CaneEditorWidget :: pullPlan()
 {
 	return plan;
 }

@@ -4,16 +4,16 @@
 
 #include <QThread>
 
-class PullPlanEditorWidget;
+class CaneEditorWidget;
 
 class CaneGeometryThread : public QThread
 {
 	Q_OBJECT
 
 	public:
-		CaneGeometryThread(PullPlanEditorWidget* ppew);
+		CaneGeometryThread(CaneEditorWidget* ppew);
 		void run();
-		PullPlanEditorWidget* ppew;
+		CaneEditorWidget* ppew;
 
 	signals:
 		void finishedMesh(bool completed, unsigned int quality);

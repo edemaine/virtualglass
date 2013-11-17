@@ -34,7 +34,7 @@
 #include "pulltemplate.h"
 #include "pickup.h"
 #include "piece.h"
-#include "pullplaneditorwidget.h"
+#include "caneeditorwidget.h"
 #include "coloreditorwidget.h"
 #include "pieceeditorwidget.h"
 #include "randomglass.h"
@@ -891,7 +891,7 @@ void MainWindow :: setupColorEditor()
 void MainWindow :: setupPullPlanEditor()
 {
 	// Setup data objects - the current plan and library widget for this plan
-	pullPlanEditorWidget = new PullPlanEditorWidget(editorStack);
+	pullPlanEditorWidget = new CaneEditorWidget(editorStack);
 	pullPlanLibraryLayout->addWidget(
 		new CaneLibraryWidget(pullPlanEditorWidget->pullPlan(), this));
 	pullPlanEditorWidget->updateEverything();

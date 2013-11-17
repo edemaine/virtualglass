@@ -25,7 +25,7 @@ class Pickup;
 class Piece;
 class Email;
 class NiceViewWidget;
-class PullPlanEditorWidget;
+class CaneEditorWidget;
 class ColorEditorWidget;
 class PieceEditorWidget;
 class GlassColorLibraryWidget;
@@ -106,7 +106,7 @@ class MainWindow : public QMainWindow
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
 		ColorEditorWidget* glassColorEditorWidget;
-		PullPlanEditorWidget* pullPlanEditorWidget;
+		CaneEditorWidget* pullPlanEditorWidget;
 		PieceEditorWidget* pieceEditorWidget;
 
 		QPushButton* newFileButton;

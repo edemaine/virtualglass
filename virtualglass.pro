@@ -127,7 +127,7 @@ HEADERS += vgapp.h \
 	pickuptemplatelibrarywidget.h \
 	piecetemplatelibrarywidget.h \
 	caneeditorviewwidget.h \
-	pullplaneditorwidget.h \
+	caneeditorwidget.h \
 	pieceeditorwidget.h \
 	coloreditorwidget.h \
 	geometry.h mesh.h \ 
@@ -188,7 +188,7 @@ SOURCES += main.cpp \
 	pickuptemplatelibrarywidget.cpp \
 	piecetemplatelibrarywidget.cpp \
 	caneeditorviewwidget.cpp \
-	pullplaneditorwidget.cpp \ 
+	caneeditorwidget.cpp \ 
 	pieceeditorwidget.cpp \
 	coloreditorwidget.cpp \
 	peelrenderer.cpp \

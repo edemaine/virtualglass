@@ -1,6 +1,6 @@
 
-#ifndef PULLPLANEDITORWIDGET_H
-#define PULLPLANEDITORWIDGET_H
+#ifndef CANEEDITORWIDGET_H
+#define CANEEDITORWIDGET_H
 
 #include <QWidget>
 #include <QMutex>
@@ -30,17 +30,17 @@ class QSpinBox;
 class QHBoxLayout;
 class QScrollArea;
 
-#define MIN_PULLPLAN_COUNT_PARAMETER_VALUE 0
-#define MAX_PULLPLAN_COUNT_PARAMETER_VALUE 30
+#define MIN_CANE_COUNT_PARAMETER_VALUE 0
+#define MAX_CANE_COUNT_PARAMETER_VALUE 30
 
-class PullPlanEditorWidget : public QWidget
+class CaneEditorWidget : public QWidget
 {
 	Q_OBJECT
 
 	friend class CaneGeometryThread;
 
 	public:
-		PullPlanEditorWidget(QWidget* parent=0);
+		CaneEditorWidget(QWidget* parent=0);
 		void resetPullPlan();
 		PullPlan* pullPlan();
 		void setPullPlan(PullPlan* p);
