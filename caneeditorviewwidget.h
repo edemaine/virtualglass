@@ -1,6 +1,6 @@
 
-#ifndef PULLPLANEDITORVIEWWIDGET_H
-#define PULLPLANEDITORVIEWWIDGET_H
+#ifndef CANEEDITORVIEWWIDGET_H
+#define CANEEDITORVIEWWIDGET_H
 
 #include <QWidget>
 #include <set>
@@ -14,12 +14,12 @@ class GlassColorLibraryWidget;
 
 using std::set;
 
-class PullPlanEditorViewWidget : public QWidget
+class CaneEditorViewWidget : public QWidget
 {
 	Q_OBJECT
 
 	public:
-		PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent=0);
+		CaneEditorViewWidget(PullPlan* plan, QWidget* parent=0);
 		void setPullPlan(PullPlan* plan);
 		QRect usedRect();
 		static QPixmap renderPullPlan(PullPlan* plan);

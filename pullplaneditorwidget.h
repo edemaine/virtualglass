@@ -13,7 +13,7 @@
 #include "constants.h"
 
 class PullPlan;
-class PullPlanEditorViewWidget;
+class CaneEditorViewWidget;
 class CaneCustomizeViewWidget;
 class NiceViewWidget;
 class AsyncPullPlanLibraryWidget;
@@ -98,7 +98,7 @@ class PullPlanEditorWidget : public QWidget
 
 		Geometry geometry;
 		PullPlan* plan;
-		PullPlanEditorViewWidget* viewWidget;	
+		CaneEditorViewWidget* viewWidget;	
 		CaneCustomizeViewWidget* customizeViewWidget;	
 		NiceViewWidget* niceViewWidget;
 		TwistWidget* twistWidget;

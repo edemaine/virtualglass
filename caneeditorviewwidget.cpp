@@ -12,11 +12,11 @@
 #include "glassmime.h"
 #include "canelibrarywidget.h"
 #include "glasscolorlibrarywidget.h"
-#include "pullplaneditorviewwidget.h"
+#include "caneeditorviewwidget.h"
 #include "globalbackgroundcolor.h"
 #include "canecrosssectionrender.h"
 
-PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
+CaneEditorViewWidget :: CaneEditorViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
 {
 	// setup draw widget
 	setAcceptDrops(true);
@@ -26,12 +26,12 @@ PullPlanEditorViewWidget :: PullPlanEditorViewWidget(PullPlan* plan, QWidget* pa
 }
 
 
-QRect PullPlanEditorViewWidget :: usedRect()
+QRect CaneEditorViewWidget :: usedRect()
 {
 	return QRect(drawUpperLeft.x, drawUpperLeft.y, squareSize, squareSize);
 }
 
-void PullPlanEditorViewWidget :: resizeEvent(QResizeEvent* event)
+void CaneEditorViewWidget :: resizeEvent(QResizeEvent* event)
 {
 	int width, height;
 
@@ -52,7 +52,7 @@ void PullPlanEditorViewWidget :: resizeEvent(QResizeEvent* event)
 	}
 }
 
-float PullPlanEditorViewWidget :: getShapeRadius(enum GeometricShape shape, Point2D loc)
+float CaneEditorViewWidget :: getShapeRadius(enum GeometricShape shape, Point2D loc)
 {
 	switch (shape)
 	{
@@ -65,12 +65,12 @@ float PullPlanEditorViewWidget :: getShapeRadius(enum GeometricShape shape, Poin
 	return -1.0;
 }
 
-bool PullPlanEditorViewWidget :: isOnCasing(int casingIndex, Point2D loc)
+bool CaneEditorViewWidget :: isOnCasing(int casingIndex, Point2D loc)
 {
 	return fabs(plan->getCasingThickness(casingIndex) - getShapeRadius(plan->getCasingShape(casingIndex), loc)) < 0.025; 
 }
 
-void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
+void CaneEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 {
 	Point2D mouseLoc = mouseToCaneCoords(event->pos().x(), event->pos().y());
 
@@ -145,7 +145,7 @@ void PullPlanEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	}
 }
 
-int PullPlanEditorViewWidget :: getCasingIndexAt(Point2D loc)
+int CaneEditorViewWidget :: getCasingIndexAt(Point2D loc)
 {
 	for (unsigned int i = 0; i < plan->casingCount(); ++i) 
 	{
@@ -156,7 +156,7 @@ int PullPlanEditorViewWidget :: getCasingIndexAt(Point2D loc)
 	return -1;
 }
 
-int PullPlanEditorViewWidget :: getSubplanIndexAt(Point2D loc)
+int CaneEditorViewWidget :: getSubplanIndexAt(Point2D loc)
 {
 	// Recursively call drawing on subplans
 	for (unsigned int i = 0; i < plan->subpullCount(); ++i)
@@ -172,7 +172,7 @@ int PullPlanEditorViewWidget :: getSubplanIndexAt(Point2D loc)
 	return -1;			
 }
 
-PullPlan* PullPlanEditorViewWidget :: getSubplanAt(Point2D loc)
+PullPlan* CaneEditorViewWidget :: getSubplanAt(Point2D loc)
 {
 	int subplanIndex = getSubplanIndexAt(loc);
 	if (subplanIndex == -1)
@@ -180,7 +180,7 @@ PullPlan* PullPlanEditorViewWidget :: getSubplanAt(Point2D loc)
 	return plan->getSubpullTemplate(subplanIndex).plan;
 }
 
-void PullPlanEditorViewWidget :: setMinMaxCasingRadii(float* min, float* max)
+void CaneEditorViewWidget :: setMinMaxCasingRadii(float* min, float* max)
 {
 	// Goal here is to deal with casings of different shapes, and set upper and 
 	// lower bounds for the radius of a particular casing based upon how much it
@@ -230,7 +230,7 @@ void PullPlanEditorViewWidget :: setMinMaxCasingRadii(float* min, float* max)
 		*max = cti_plus_1 - 0.02;
 } 
 
-void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
+void CaneEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 {
 	if (!isDraggingCasing)
 		return;
@@ -247,7 +247,7 @@ void PullPlanEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 	emit someDataChanged();
 }
 
-void PullPlanEditorViewWidget :: mouseReleaseEvent(QMouseEvent*)
+void CaneEditorViewWidget :: mouseReleaseEvent(QMouseEvent*)
 {
 	isDraggingCasing = false;
 	plan->saveState();
@@ -255,25 +255,25 @@ void PullPlanEditorViewWidget :: mouseReleaseEvent(QMouseEvent*)
 	emit someDataChanged();
 }
 
-void PullPlanEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
+void CaneEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 {
 	event->acceptProposedAction();
 	updateHighlightedSubplansAndCasings(event);
 }
 
-void PullPlanEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
+void CaneEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 {
 	updateHighlightedSubplansAndCasings(event);
 	repaint();
 }
 
-void PullPlanEditorViewWidget :: dragLeaveEvent(QDragLeaveEvent*)
+void CaneEditorViewWidget :: dragLeaveEvent(QDragLeaveEvent*)
 {
 	subplansHighlighted.clear();
 	casingsHighlighted.clear();
 }
 
-Point2D PullPlanEditorViewWidget :: mouseToCaneCoords(float x, float y)
+Point2D CaneEditorViewWidget :: mouseToCaneCoords(float x, float y)
 {
 	Point2D mouseLoc;
 	mouseLoc.x = (x - drawUpperLeft.x - squareSize/2) / static_cast<float>(squareSize/2-10);
@@ -282,7 +282,7 @@ Point2D PullPlanEditorViewWidget :: mouseToCaneCoords(float x, float y)
 	return mouseLoc;
 }
 
-void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEvent* event)
+void CaneEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEvent* event)
 {
 	Point2D mouseLoc = mouseToCaneCoords(event->pos().x(), event->pos().y());
 
@@ -379,7 +379,7 @@ void PullPlanEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEv
 	}	
 }
 
-void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
+void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 {
 	// Just so the drop animation looks right
 	if (subplansHighlighted.size() == 0 && casingsHighlighted.size() == 0)
@@ -451,19 +451,19 @@ void PullPlanEditorViewWidget :: dropEvent(QDropEvent* event)
 	emit someDataChanged();
 }
 
-void PullPlanEditorViewWidget :: updateEverything()
+void CaneEditorViewWidget :: updateEverything()
 {
 	this->repaint();	
 }
 
-void PullPlanEditorViewWidget :: setPullPlan(PullPlan* plan) 
+void CaneEditorViewWidget :: setPullPlan(PullPlan* plan) 
 {
 	this->plan = plan;
 	updateEverything();
 }
 
 
-void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, bool outermostLevel) 
+void CaneEditorViewWidget :: setBoundaryPainter(QPainter* painter, bool outermostLevel) 
 {
 	if (outermostLevel)
 	{
@@ -478,7 +478,7 @@ void PullPlanEditorViewWidget :: setBoundaryPainter(QPainter* painter, bool oute
 	}
 }
 
-void PullPlanEditorViewWidget :: paintShape(Point2D upperLeft, float size, enum GeometricShape shape, QPainter* painter)
+void CaneEditorViewWidget :: paintShape(Point2D upperLeft, float size, enum GeometricShape shape, QPainter* painter)
 {
 	int roundedX, roundedY;
 
@@ -497,7 +497,7 @@ void PullPlanEditorViewWidget :: paintShape(Point2D upperLeft, float size, enum 
 	
 }
 
-void PullPlanEditorViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth, float drawHeight, 
+void CaneEditorViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth, float drawHeight, 
 	PullPlan* plan, bool highlightThis, bool outermostLevel, QPainter* painter) 
 {
 
@@ -566,7 +566,7 @@ void PullPlanEditorViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth,
 	}
 }
 
-void PullPlanEditorViewWidget :: paintEvent(QPaintEvent *event)
+void CaneEditorViewWidget :: paintEvent(QPaintEvent *event)
 {
 	QPainter painter;
 
