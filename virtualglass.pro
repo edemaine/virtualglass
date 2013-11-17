@@ -113,12 +113,12 @@ HEADERS += vgapp.h \
 	pullplan.h \
 	pulltemplate.h \
 	subpulltemplate.h \
-	pickupplan.h \
+	pickup.h \
 	piece.h \
 	piecetemplate.h \
 	pickuptemplate.h \
 	subpickuptemplate.h \
-	pickupplaneditorviewwidget.h \ 
+	pickupeditorviewwidget.h \ 
 	purecolorlibrarywidget.h \
 	casing.h \
 	mainwindow.h \
@@ -175,9 +175,9 @@ SOURCES += main.cpp \
 	piecetemplate.cpp \
 	pulltemplate.cpp \
 	pickuptemplate.cpp \
-	pickupplan.cpp \
+	pickup.cpp \
 	subpickuptemplate.cpp \
-	pickupplaneditorviewwidget.cpp \
+	pickupeditorviewwidget.cpp \
 	purecolorlibrarywidget.cpp \
 	casing.cpp \
 	geometry.cpp \

@@ -14,7 +14,7 @@
 #include <QApplication>
 #include <QScrollBar>
 
-#include "pickupplaneditorviewwidget.h"
+#include "pickupeditorviewwidget.h"
 #include "piece.h"
 #include "pieceeditorwidget.h"
 #include "piecegeometrythread.h"

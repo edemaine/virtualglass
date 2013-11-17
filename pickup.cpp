@@ -6,7 +6,7 @@
 #include "globalglass.h"
 #include "pullplan.h"
 #include "glasscolor.h"
-#include "pickupplan.h"
+#include "pickup.h"
 #include "pieceeditorwidget.h"
 
 Pickup :: Pickup(enum PickupTemplate::Type _type) 

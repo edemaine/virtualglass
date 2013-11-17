@@ -32,7 +32,7 @@
 #include "glasscolorlibrarywidget.h"
 #include "pullplan.h"
 #include "pulltemplate.h"
-#include "pickupplan.h"
+#include "pickup.h"
 #include "piece.h"
 #include "pullplaneditorwidget.h"
 #include "coloreditorwidget.h"

@@ -7,7 +7,7 @@
 
 #include "templateparameter.h"
 #include "piecetemplate.h"
-#include "pickupplan.h"
+#include "pickup.h"
 #include "glasscolor.h"
 #include "spline.h"
 

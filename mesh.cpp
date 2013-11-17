@@ -5,7 +5,7 @@
 #include "constants.h"
 #include "glasscolor.h"
 #include "pullplan.h"
-#include "pickupplan.h"
+#include "pickup.h"
 #include "piece.h"
 #include "subpulltemplate.h"
 #include "spline.h"

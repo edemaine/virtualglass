@@ -5,7 +5,7 @@
 #include <QDrag>
 
 #include "piece.h"
-#include "pickupplaneditorviewwidget.h"
+#include "pickupeditorviewwidget.h"
 #include "glasscolorlibrarywidget.h"
 #include "pullplanlibrarywidget.h"
 #include "niceviewwidget.h"
