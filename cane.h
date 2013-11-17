@@ -90,8 +90,8 @@ class Cane
 
 };
 
-Cane *deep_copy(const Cane *plan);
-void deep_delete(Cane *plan);
+Cane *deep_copy(const Cane *cane);
+void deep_delete(Cane *cane);
 
 #endif
 

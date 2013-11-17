@@ -10,11 +10,11 @@
 #include "canecustomizeviewwidget.h"
 #include "globalbackgroundcolor.h"
 
-CaneCustomizeViewWidget::CaneCustomizeViewWidget(Cane* plan, QWidget* parent) : QWidget(parent)
+CaneCustomizeViewWidget::CaneCustomizeViewWidget(Cane* cane, QWidget* parent) : QWidget(parent)
 {
 	// setup draw widget
 	setMinimumSize(200, 200);
-	setCane(plan);
+	setCane(cane);
 	mouseStartingLoc.x = FLT_MAX;
 	mouseStartingLoc.y = FLT_MAX;
 	clickedLoc.x = FLT_MAX;
@@ -33,10 +33,10 @@ CaneCustomizeViewWidget::CaneCustomizeViewWidget(Cane* plan, QWidget* parent) : 
 
 void CaneCustomizeViewWidget :: setCustomTemplate()
 {
-	PullTemplate::Type oldType = plan->templateType();
-	plan->setTemplateType(PullTemplate::CUSTOM);	
+	PullTemplate::Type oldType = cane->templateType();
+	cane->setTemplateType(PullTemplate::CUSTOM);	
 	if (oldType != PullTemplate::CUSTOM)
-		plan->saveState();
+		cane->saveState();
 }
 
 void CaneCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
@@ -107,7 +107,7 @@ void CaneCustomizeViewWidget :: updateIndexes(QPoint pos)
 
 	if (activeBoxIndex != -1 && activeBoxIndex != INT_MAX)
 	{
-		SubpullTemplate subpull = plan->getSubpullTemplate(activeBoxIndex);
+		SubpullTemplate subpull = cane->getSubpullTemplate(activeBoxIndex);
 		float dx = fabs(adjustedX(pos.x()) - (drawSize/2 * subpull.location.x + drawSize/2 + 10));
 		float dy = fabs(adjustedY(pos.y()) - (drawSize/2 * subpull.location.y + drawSize/2 + 10));
 		if (MAX(dx, dy) >= (subpull.diameter/2.0) * drawSize/2 + 3*boundingBoxSpace)
@@ -118,9 +118,9 @@ void CaneCustomizeViewWidget :: updateIndexes(QPoint pos)
 
 	if (activeBoxIndex == INT_MAX)
 	{
-		for (unsigned int i = 0; i < subplansSelected.size(); i++)
+		for (unsigned int i = 0; i < subcanesSelected.size(); i++)
 		{
-			SubpullTemplate subpull = plan->getSubpullTemplate(subplansSelected[i]);
+			SubpullTemplate subpull = cane->getSubpullTemplate(subcanesSelected[i]);
 			float dx = fabs(adjustedX(pos.x()) - (drawSize/2 * subpull.location.x + drawSize/2 + 10));
 			float dy = fabs(adjustedY(pos.y()) - (drawSize/2 * subpull.location.y + drawSize/2 + 10));
 
@@ -129,13 +129,13 @@ void CaneCustomizeViewWidget :: updateIndexes(QPoint pos)
 				case CIRCLE_SHAPE:
 					if (pow(double(dx*dx + dy*dy), 0.5) < (subpull.diameter/2.0)*drawSize/2)
 					{
-						activeBoxIndex = subplansSelected[i];
+						activeBoxIndex = subcanesSelected[i];
 					}
 					break;
 				case SQUARE_SHAPE:
 					if (MAX(dx, dy) < (subpull.diameter/2.0)*drawSize/2)
 					{
-						activeBoxIndex = subplansSelected[i];
+						activeBoxIndex = subcanesSelected[i];
 					}
 					break;
 			}
@@ -144,23 +144,23 @@ void CaneCustomizeViewWidget :: updateIndexes(QPoint pos)
 
 	if (activeBoxIndex == INT_MAX)
 	{
-		for (unsigned int i = 0; i < subplansSelected.size(); i++)
+		for (unsigned int i = 0; i < subcanesSelected.size(); i++)
 		{
-			SubpullTemplate subpull = plan->getSubpullTemplate(subplansSelected[i]);
+			SubpullTemplate subpull = cane->getSubpullTemplate(subcanesSelected[i]);
 			float dx = fabs(adjustedX(pos.x()) - (drawSize/2 * subpull.location.x + drawSize/2 + 10));
 			float dy = fabs(adjustedY(pos.y()) - (drawSize/2 * subpull.location.y + drawSize/2 + 10));
 			if (MAX(dx, dy) < (subpull.diameter/2.0) * drawSize/2 + boundingBoxSpace)
 			{
-				activeBoxIndex = subplansSelected[i];
+				activeBoxIndex = subcanesSelected[i];
 				break;
 			}
 		}
 	}
 
 	hoveringIndex = -1;
-	for (unsigned int i = 0; i < plan->subpullCount(); ++i)
+	for (unsigned int i = 0; i < cane->subpullCount(); ++i)
 	{
-		SubpullTemplate subpull = plan->getSubpullTemplate(i);
+		SubpullTemplate subpull = cane->getSubpullTemplate(i);
 		float dx = fabs(adjustedX(pos.x()) - (drawSize/2 * subpull.location.x + drawSize/2 + 10));
 		float dy = fabs(adjustedY(pos.y()) - (drawSize/2 * subpull.location.y + drawSize/2 + 10));
 		switch (subpull.shape)
@@ -210,15 +210,15 @@ void CaneCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 
 			if (isValidMovePosition(event))
 			{
-				for (unsigned int i = 0; i < subplansSelected.size(); i++)
+				for (unsigned int i = 0; i < subcanesSelected.size(); i++)
 				{
-					SubpullTemplate sub = plan->getSubpullTemplate(subplansSelected[i]);
+					SubpullTemplate sub = cane->getSubpullTemplate(subcanesSelected[i]);
 					sub.location.x += (adjustedX(event->pos().x()) - mouseStartingLoc.x)/(squareSize/2.0 - 10);
 					sub.location.y += (adjustedY(event->pos().y()) - mouseStartingLoc.y)/(squareSize/2.0 - 10);
-					plan->setSubpullTemplate(sub, subplansSelected[i]);
+					cane->setSubpullTemplate(sub, subcanesSelected[i]);
 				}
-				if (subplansSelected.size() > 0)
-					plan->saveState();
+				if (subcanesSelected.size() > 0)
+					cane->saveState();
 				emit someDataChanged();
 				mouseStartingLoc.x = adjustedX(event->pos().x());
 				mouseStartingLoc.y = adjustedY(event->pos().y());
@@ -236,7 +236,7 @@ void CaneCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 
 			if (activeBoxIndex != INT_MAX)
 			{
-				SubpullTemplate subpull = plan->getSubpullTemplate(activeBoxIndex);
+				SubpullTemplate subpull = cane->getSubpullTemplate(activeBoxIndex);
 				float dx = fabs(adjustedX(event->pos().x()) 
 					- (drawSize/2 * subpull.location.x + drawSize/2 + 10));
 				float dy = fabs(adjustedY(event->pos().y()) 
@@ -246,14 +246,14 @@ void CaneCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 				new_diameter /= float(drawSize/2);
 				new_diameter *= 2.0;
 				float proportion = new_diameter / subpull.diameter;
-				for (unsigned int i = 0; i < subplansSelected.size(); i++)
+				for (unsigned int i = 0; i < subcanesSelected.size(); i++)
 				{
-					SubpullTemplate sub = plan->getSubpullTemplate(subplansSelected[i]);
+					SubpullTemplate sub = cane->getSubpullTemplate(subcanesSelected[i]);
 					sub.diameter *= proportion;
-					plan->setSubpullTemplate(sub, subplansSelected[i]);
+					cane->setSubpullTemplate(sub, subcanesSelected[i]);
 				}
-				if (subplansSelected.size() > 0)
-					plan->saveState();
+				if (subcanesSelected.size() > 0)
+					cane->saveState();
 				emit someDataChanged();
 			}
 			else
@@ -275,18 +275,18 @@ void CaneCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 					no_proportion = dx/(activeBoxUR.x/2.0 - activeBoxLL.x/2.0);
 				}
 
-				for (unsigned int i = 0; i < subplansSelected.size(); i++)
+				for (unsigned int i = 0; i < subcanesSelected.size(); i++)
 				{
-					SubpullTemplate sub = plan->getSubpullTemplate(subplansSelected[i]);
+					SubpullTemplate sub = cane->getSubpullTemplate(subcanesSelected[i]);
 					sub.diameter *= no_proportion;
 					sub.location.x = (center_x - 10 - drawSize/2) / double(drawSize/2.0) 
 						+ ((sub.location.x - (center_x - 10 - drawSize/2) / double(drawSize/2.0)) * no_proportion);
 					sub.location.y = (center_y - 10 - drawSize/2) / double(drawSize/2.0) 
 						+ ((sub.location.y - (center_y - 10 - drawSize/2)/double(drawSize/2.0))*no_proportion);
-					plan->setSubpullTemplate(sub, subplansSelected[i]);
+					cane->setSubpullTemplate(sub, subcanesSelected[i]);
 				}
-				if (subplansSelected.size() > 0)
-					plan->saveState();
+				if (subcanesSelected.size() > 0)
+					cane->saveState();
 				emit someDataChanged();
 			}
 			break;
@@ -299,7 +299,7 @@ void CaneCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 	activeControlPoint = -1;
 	if (activeBoxIndex != -1 && activeBoxIndex != INT_MAX)
 	{
-		SubpullTemplate subpull = plan->getSubpullTemplate(activeBoxIndex);
+		SubpullTemplate subpull = cane->getSubpullTemplate(activeBoxIndex);
 		float dx = fabs(adjustedX(event->pos().x()) - (drawSize/2 * subpull.location.x + drawSize/2 + 10));
 		float dy = fabs(adjustedY(event->pos().y()) - (drawSize/2 * subpull.location.y + drawSize/2 + 10));
 		if (fabs((subpull.diameter/2.0)*drawSize/2 - dx) < boundingBoxSpace &&
@@ -329,7 +329,7 @@ void CaneCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 	clickMoved = false;
 	if (activeBoxIndex != -1 && activeBoxIndex != INT_MAX)
 	{
-		SubpullTemplate subpull = plan->getSubpullTemplate(activeBoxIndex);
+		SubpullTemplate subpull = cane->getSubpullTemplate(activeBoxIndex);
 		float dx = fabs(adjustedX(event->pos().x()) - (drawSize/2 * subpull.location.x + drawSize/2 + 10));
 		float dy = fabs(adjustedY(event->pos().y()) - (drawSize/2 * subpull.location.y + drawSize/2 + 10));
 		if (fabs((subpull.diameter/2.0)*drawSize/2+boundingBoxSpace - dx) < 2*boundingBoxSpace &&
@@ -352,9 +352,9 @@ void CaneCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 	if (mode == MOVE_MODE)
 	{
 		bool isIn = false;
-		for (unsigned int i = 0; i < subplansSelected.size(); i++)
+		for (unsigned int i = 0; i < subcanesSelected.size(); i++)
 		{
-			if (hoveringIndex == int(subplansSelected.at(i)))
+			if (hoveringIndex == int(subcanesSelected.at(i)))
 			{
 				isIn = true;
 				break;
@@ -364,18 +364,18 @@ void CaneCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 		{
 			if (event->modifiers() != Qt::ControlModifier && event->modifiers() != Qt::ShiftModifier)
 			{
-				subplansSelected.clear();
+				subcanesSelected.clear();
 			}
 			else
 			{
 				clickMoved = true;
 			}
-			subplansSelected.push_back((unsigned int)hoveringIndex);
+			subcanesSelected.push_back((unsigned int)hoveringIndex);
 			activeBoxIndex = hoveringIndex;
 		}
 		if (activeBoxIndex == -1)
 		{
-			subplansSelected.clear();
+			subcanesSelected.clear();
 		}
 	}
 
@@ -392,20 +392,20 @@ void CaneCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent* event)
 	{
 		if (event->modifiers() != Qt::ControlModifier && event->modifiers() != Qt::ShiftModifier)
 		{
-			subplansSelected.clear();
+			subcanesSelected.clear();
 			if (hoveringIndex != -1)
 			{
-				subplansSelected.push_back((unsigned int)hoveringIndex);
+				subcanesSelected.push_back((unsigned int)hoveringIndex);
 				activeBoxIndex = hoveringIndex;
 			}
 		}
 		else
 		{
-			for (unsigned int i = 0; i < subplansSelected.size(); i++)
+			for (unsigned int i = 0; i < subcanesSelected.size(); i++)
 			{
-				if (hoveringIndex == int(subplansSelected.at(i)))
+				if (hoveringIndex == int(subcanesSelected.at(i)))
 				{
-					subplansSelected.erase(subplansSelected.begin()+i);
+					subcanesSelected.erase(subcanesSelected.begin()+i);
 					break;
 				}
 			}
@@ -428,12 +428,12 @@ void CaneCustomizeViewWidget :: keyPressEvent(QKeyEvent* event)
 	}
 }
 
-void CaneCustomizeViewWidget :: setCane(Cane* _plan)
+void CaneCustomizeViewWidget :: setCane(Cane* _cane)
 {
-	plan = _plan;
+	cane = _cane;
 
 	// reset gui stuffs
-	subplansSelected.clear();
+	subcanesSelected.clear();
 	activeControlPoint = -1;
 	hoveringIndex = -1;
 	activeBoxIndex = -1;
@@ -462,9 +462,9 @@ void CaneCustomizeViewWidget :: boundActiveBox()
 	activeBoxLL.x = activeBoxLL.y = INT_MAX;
 	activeBoxUR.x = activeBoxUR.y = INT_MIN;
 	int drawSize = squareSize - 20;
-	for (unsigned int i = 0; i < subplansSelected.size(); i++)
+	for (unsigned int i = 0; i < subcanesSelected.size(); i++)
 	{
-		SubpullTemplate subpull = plan->getSubpullTemplate(subplansSelected[i]);
+		SubpullTemplate subpull = cane->getSubpullTemplate(subcanesSelected[i]);
 		float dx = drawSize/2 * subpull.location.x + drawSize/2 + 10;
 		float dy = drawSize/2 * subpull.location.y + drawSize/2 + 10;
 		if (dx - (subpull.diameter/2.0)*drawSize/2 < activeBoxLL.x)
@@ -512,21 +512,21 @@ void CaneCustomizeViewWidget :: paintShape(Point2D upperLeft, float size, enum G
 	}
 
 }
-void CaneCustomizeViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth, float drawHeight,
-	Cane* plan, bool outermostLevel, QPainter* painter)
+void CaneCustomizeViewWidget :: drawSubcane(Point2D upperLeft, float drawWidth, float drawHeight,
+	Cane* cane, bool outermostLevel, QPainter* painter)
 {
-	// Fill the subplan area with some `cleared out' color
+	// Fill the subcane area with some `cleared out' color
 	painter->setBrush(GlobalBackgroundColor::qcolor);
 	painter->setPen(Qt::NoPen);
-	paintShape(upperLeft, drawWidth, plan->outermostCasingShape(), painter);
+	paintShape(upperLeft, drawWidth, cane->outermostCasingShape(), painter);
 
 	// Do casing colors outermost to innermost to get concentric rings of each casing's color
 	// Skip outermost casing (that is done by your parent) and innermost (that is the `invisible'
 	// casing for you to resize your subcanes)
-	for (unsigned int i = plan->casingCount() - 1; i < plan->casingCount(); --i)
+	for (unsigned int i = cane->casingCount() - 1; i < cane->casingCount(); --i)
 	{
-		float casingWidth = drawWidth * plan->getCasingThickness(i);
-		float casingHeight = drawHeight * plan->getCasingThickness(i);
+		float casingWidth = drawWidth * cane->getCasingThickness(i);
+		float casingHeight = drawHeight * cane->getCasingThickness(i);
 		Point2D casingUpperLeft;
 		casingUpperLeft.x = upperLeft.x + drawWidth / 2 - casingWidth / 2;
 		casingUpperLeft.y = upperLeft.y + drawHeight / 2 - casingHeight / 2;
@@ -534,19 +534,19 @@ void CaneCustomizeViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth, 
 		// Fill with solid neutral grey (in case fill is transparent)
 		painter->setBrush(GlobalBackgroundColor::qcolor);
 		painter->setPen(Qt::NoPen); // Will draw boundary after all filling is done
-		paintShape(casingUpperLeft, casingWidth, plan->getCasingShape(i), painter);
+		paintShape(casingUpperLeft, casingWidth, cane->getCasingShape(i), painter);
 
-		Color casingColor = plan->getCasingColor(i)->color();
+		Color casingColor = cane->getCasingColor(i)->color();
 		QColor qc(255*casingColor.r, 255*casingColor.g, 255*casingColor.b, 255*casingColor.a);
 		painter->setBrush(qc);
 		setBoundaryPainter(painter, outermostLevel, outermostLevel);
-		paintShape(casingUpperLeft, casingWidth, plan->getCasingShape(i), painter);
+		paintShape(casingUpperLeft, casingWidth, cane->getCasingShape(i), painter);
 	}
 
-	// Recursively call drawing on subplans
-	for (unsigned int i = plan->subpullCount()-1; i < plan->subpullCount(); --i)
+	// Recursively call drawing on subcanes
+	for (unsigned int i = cane->subpullCount()-1; i < cane->subpullCount(); --i)
 	{
-		SubpullTemplate subpull = plan->getSubpullTemplate(i);
+		SubpullTemplate subpull = cane->getSubpullTemplate(i);
 
 		Point2D subUpperLeft;
 		subUpperLeft.x = upperLeft.x + (subpull.location.x - subpull.diameter/2.0) * drawWidth/2 + drawWidth/2;
@@ -554,7 +554,7 @@ void CaneCustomizeViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth, 
 		float rWidth = subpull.diameter * drawWidth/2;
 		float rHeight = subpull.diameter * drawHeight/2;
 
-		drawSubplan(subUpperLeft, rWidth, rHeight, subpull.plan, false, painter);
+		drawSubcane(subUpperLeft, rWidth, rHeight, subpull.plan, false, painter);
 
 		setBoundaryPainter(painter, outermostLevel);
 		painter->setBrush(Qt::NoBrush);
@@ -566,16 +566,16 @@ void CaneCustomizeViewWidget :: drawActionControls(QPainter* painter)
 {
 	int drawSize = squareSize - 20;
 
-	// Outline for individual selected plans
+	// Outline for individual selected canes
 	QPen pen;
 	pen.setWidth(2);
 	pen.setColor(Qt::black);
 	pen.setStyle(Qt::DotLine);
 	painter->setBrush(Qt::NoBrush); 
 	painter->setPen(pen);
-	for (unsigned int i = 0; i < subplansSelected.size(); i++)
+	for (unsigned int i = 0; i < subcanesSelected.size(); i++)
 	{
-		SubpullTemplate subpull = plan->getSubpullTemplate(subplansSelected[i]);
+		SubpullTemplate subpull = cane->getSubpullTemplate(subcanesSelected[i]);
 		painter->drawRect(rawX((subpull.location.x - subpull.diameter/2.0)*drawSize/2 + drawSize/2 + 10) - boundingBoxSpace, 
 			rawY((subpull.location.y - subpull.diameter/2.0)*drawSize/2+drawSize/2+10) - boundingBoxSpace,
 			subpull.diameter*drawSize/2.0 + 2*boundingBoxSpace,
@@ -583,7 +583,7 @@ void CaneCustomizeViewWidget :: drawActionControls(QPainter* painter)
 	}
 
 	// Outline for a group selection
-	if (subplansSelected.size() > 1)
+	if (subcanesSelected.size() > 1)
 	{
 		painter->drawRect(rawX(activeBoxLL.x)-3*boundingBoxSpace,
 			rawY(activeBoxLL.y)-3*boundingBoxSpace,
@@ -599,7 +599,7 @@ void CaneCustomizeViewWidget :: drawActionControls(QPainter* painter)
 	painter->setPen(pen);
 	if (activeBoxIndex != -1 && activeBoxIndex != INT_MAX)
 	{
-		SubpullTemplate subpull = plan->getSubpullTemplate(activeBoxIndex);
+		SubpullTemplate subpull = cane->getSubpullTemplate(activeBoxIndex);
 		painter->drawEllipse(rawX((subpull.location.x - subpull.diameter/2.0)*drawSize/2+drawSize/2+10)-boundingBoxSpace*2,
 			rawY((subpull.location.y - subpull.diameter/2.0)*drawSize/2+drawSize/2+10)-boundingBoxSpace*2,
 			boundingBoxSpace*2,
@@ -617,7 +617,7 @@ void CaneCustomizeViewWidget :: drawActionControls(QPainter* painter)
 			boundingBoxSpace*2,
 			boundingBoxSpace*2);
 	}
-	if (subplansSelected.size() > 1 && activeBoxIndex == INT_MAX)
+	if (subcanesSelected.size() > 1 && activeBoxIndex == INT_MAX)
 	{
 		painter->drawEllipse(rawX(activeBoxLL.x)-4*boundingBoxSpace,
 			rawY(activeBoxLL.y)-4*boundingBoxSpace,
@@ -652,9 +652,9 @@ void CaneCustomizeViewWidget :: paintEvent(QPaintEvent *event)
 
 	painter.setBrush(Qt::NoBrush);
 	setBoundaryPainter(&painter, true, true);
-	paintShape(drawUpperLeft, squareSize - 20, plan->outermostCasingShape(), &painter);
+	paintShape(drawUpperLeft, squareSize - 20, cane->outermostCasingShape(), &painter);
 
-	drawSubplan(drawUpperLeft, squareSize - 20, squareSize - 20, plan, true, &painter);
+	drawSubcane(drawUpperLeft, squareSize - 20, squareSize - 20, cane, true, &painter);
 
 	drawActionControls(&painter);
 
@@ -668,27 +668,27 @@ void CaneCustomizeViewWidget :: copySelectionClicked()
 
 void CaneCustomizeViewWidget :: copySelection()
 {
-	if (subplansSelected.size() == 0)
+	if (subcanesSelected.size() == 0)
 		return;
-	vector<SubpullTemplate> newSubplans;
-	newSubplans.clear();
-	for (unsigned int i = 0; i < subplansSelected.size(); i++)
+	vector<SubpullTemplate> newSubcanes;
+	newSubcanes.clear();
+	for (unsigned int i = 0; i < subcanesSelected.size(); i++)
 	{
-		SubpullTemplate sub = plan->getSubpullTemplate(subplansSelected[i]);
+		SubpullTemplate sub = cane->getSubpullTemplate(subcanesSelected[i]);
 		sub.location.x += 3*boundingBoxSpace/squareSize;
 		sub.location.y += 3*boundingBoxSpace/squareSize;
-		newSubplans.push_back(sub);
+		newSubcanes.push_back(sub);
 	}
-	int oldCount = plan->subpullCount();
-	for (unsigned int i = 0; i < subplansSelected.size(); i++)
+	int oldCount = cane->subpullCount();
+	for (unsigned int i = 0; i < subcanesSelected.size(); i++)
 	{
-		plan->addSubpullTemplate(newSubplans[i]);	
+		cane->addSubpullTemplate(newSubcanes[i]);	
 	}
-	plan->saveState();
-	subplansSelected.clear();
-	for (unsigned int i = 0; i < newSubplans.size(); i++)
+	cane->saveState();
+	subcanesSelected.clear();
+	for (unsigned int i = 0; i < newSubcanes.size(); i++)
 	{
-		subplansSelected.push_back(i+oldCount);
+		subcanesSelected.push_back(i+oldCount);
 	}
 	emit someDataChanged();
 	boundActiveBox();
@@ -702,18 +702,18 @@ void CaneCustomizeViewWidget :: deleteSelectionClicked()
 
 void CaneCustomizeViewWidget :: deleteSelection()
 {
-	for (unsigned int i = 0; i < subplansSelected.size(); i++)
+	for (unsigned int i = 0; i < subcanesSelected.size(); i++)
 	{
-		unsigned int n = subplansSelected[i];
-		plan->removeSubpullTemplate(n);
-		for (unsigned int j = i+1; j < subplansSelected.size(); j++)
+		unsigned int n = subcanesSelected[i];
+		cane->removeSubpullTemplate(n);
+		for (unsigned int j = i+1; j < subcanesSelected.size(); j++)
 		{
-			if (subplansSelected[j] > n)
-				subplansSelected[j] -= 1;
+			if (subcanesSelected[j] > n)
+				subcanesSelected[j] -= 1;
 		}
 	}
-	plan->saveState();
-	subplansSelected.clear();
+	cane->saveState();
+	subcanesSelected.clear();
 	hoveringIndex = -1;
 	activeBoxIndex = -1;
 	activeControlPoint = -1;
@@ -726,20 +726,20 @@ void CaneCustomizeViewWidget :: addCircleClicked()
 {
 	Point2D p = make_vector(0.0f, 0.0f);
 	float diameter = 0;
-	for (unsigned int i = 0; i < plan->subpullCount(); i++)
+	for (unsigned int i = 0; i < cane->subpullCount(); i++)
 	{
-		SubpullTemplate subpull = plan->getSubpullTemplate(i);
-		diameter += subpull.diameter / plan->subpullCount();
+		SubpullTemplate subpull = cane->getSubpullTemplate(i);
+		diameter += subpull.diameter / cane->subpullCount();
 	}
 	if (diameter == 0)
 	{
-		diameter = plan->getCasingThickness(0);
+		diameter = cane->getCasingThickness(0);
 	}
 	
-	plan->addSubpullTemplate(SubpullTemplate(GlobalGlass::circlePlan(), CIRCLE_SHAPE, p, diameter));
-	plan->saveState();
-	subplansSelected.clear();
-	subplansSelected.push_back(plan->subpullCount()-1);
+	cane->addSubpullTemplate(SubpullTemplate(GlobalGlass::circlePlan(), CIRCLE_SHAPE, p, diameter));
+	cane->saveState();
+	subcanesSelected.clear();
+	subcanesSelected.push_back(cane->subpullCount()-1);
 	emit someDataChanged();
 	boundActiveBox();
 	update();
@@ -749,19 +749,19 @@ void CaneCustomizeViewWidget :: addSquareClicked()
 {
 	Point2D p = make_vector(0.0f, 0.0f);
 	float diameter = 0;
-	for (unsigned int i = 0; i < plan->subpullCount(); i++)
+	for (unsigned int i = 0; i < cane->subpullCount(); i++)
 	{
-		SubpullTemplate subpull = plan->getSubpullTemplate(i);
-		diameter += subpull.diameter / plan->subpullCount();
+		SubpullTemplate subpull = cane->getSubpullTemplate(i);
+		diameter += subpull.diameter / cane->subpullCount();
 	}
 	if (diameter == 0)
 	{
-		diameter = plan->getCasingThickness(0);
+		diameter = cane->getCasingThickness(0);
 	}
-	plan->addSubpullTemplate(SubpullTemplate(GlobalGlass::squarePlan(), SQUARE_SHAPE, p, diameter));
-	plan->saveState();
-	subplansSelected.clear();
-	subplansSelected.push_back(plan->subpullCount()-1);
+	cane->addSubpullTemplate(SubpullTemplate(GlobalGlass::squarePlan(), SQUARE_SHAPE, p, diameter));
+	cane->saveState();
+	subcanesSelected.clear();
+	subcanesSelected.push_back(cane->subpullCount()-1);
 	emit someDataChanged();
 	boundActiveBox();
 	update();

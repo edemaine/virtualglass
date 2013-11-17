@@ -21,8 +21,8 @@ class CaneCustomizeViewWidget : public QWidget
 	Q_OBJECT
 
 	public:
-		CaneCustomizeViewWidget(Cane* plan, QWidget* parent=0);
-		void setCane(Cane* plan);
+		CaneCustomizeViewWidget(Cane* cane, QWidget* parent=0);
+		void setCane(Cane* cane);
 		void addCircleClicked();
 		void addSquareClicked();
 		void copySelectionClicked();
@@ -54,8 +54,8 @@ class CaneCustomizeViewWidget : public QWidget
 		float adjustedY(float rawX);
 		float rawX(float adjustedX);
 		float rawY(float adjustedY);
-		void drawSubplan(Point2D upperLeft, float drawWidth, float drawHeight,
-			Cane* plan, bool outermostLevel, QPainter* painter);
+		void drawSubcane(Point2D upperLeft, float drawWidth, float drawHeight,
+			Cane* cane, bool outermostLevel, QPainter* painter);
 		void paintShape(Point2D upperLeft, float size, enum GeometricShape s, QPainter* painter);
 		void setBoundaryPainter(QPainter* painter, bool outermostLevel, bool greyedOut);
 		void drawActionControls(QPainter* painter);
@@ -66,14 +66,14 @@ class CaneCustomizeViewWidget : public QWidget
 		void copySelection();
 	
 		GUIMode mode;
-		Cane* plan;
+		Cane* cane;
 		Cane* hoveringPlan;
 		int hoveringIndex;
 		int activeBoxIndex;
 		Point2D mouseStartingLoc;
 		Point2D clickedLoc;
 		bool clickMoved;
-		vector<unsigned int> subplansSelected;
+		vector<unsigned int> subcanesSelected;
 		Point2D activeBoxLL;
 		Point2D activeBoxUR;
 		int activeControlPoint;
