@@ -14,7 +14,7 @@
 
 class PullPlan;
 class PullPlanEditorViewWidget;
-class PullPlanCustomizeViewWidget;
+class CaneCustomizeViewWidget;
 class NiceViewWidget;
 class AsyncPullPlanLibraryWidget;
 class PullTemplateLibraryWidget;
@@ -99,7 +99,7 @@ class PullPlanEditorWidget : public QWidget
 		Geometry geometry;
 		PullPlan* plan;
 		PullPlanEditorViewWidget* viewWidget;	
-		PullPlanCustomizeViewWidget* customizeViewWidget;	
+		CaneCustomizeViewWidget* customizeViewWidget;	
 		NiceViewWidget* niceViewWidget;
 		TwistWidget* twistWidget;
 

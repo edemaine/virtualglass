@@ -140,7 +140,7 @@ HEADERS += vgapp.h \
 	canelibrarywidget.h \
 	glasscolorlibrarywidget.h \
 	piecelibrarywidget.h \
-	pullplancustomizeviewwidget.h \
+	canecustomizeviewwidget.h \
 	glassmime.h \
         glasscolor.h \
         SVG.hpp \
@@ -167,7 +167,7 @@ SOURCES += main.cpp \
 	glasslibrarywidget.cpp \
 	randomglass.cpp \
 	templateparameter.cpp \
-	pullplancustomizeviewwidget.cpp \
+	canecustomizeviewwidget.cpp \
 	pullplan.cpp \
 	subpulltemplate.cpp \
 	globalglass.cpp \

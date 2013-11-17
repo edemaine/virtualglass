@@ -13,7 +13,7 @@
 #include "geometry.h"
 #include "pullplaneditorwidget.h"
 #include "pullplaneditorviewwidget.h"
-#include "pullplancustomizeviewwidget.h"
+#include "canecustomizeviewwidget.h"
 #include "niceviewwidget.h"
 #include "pulltemplatelibrarywidget.h"
 #include "canelibrarywidget.h"
@@ -32,7 +32,7 @@ PullPlanEditorWidget :: PullPlanEditorWidget(QWidget* parent) : QWidget(parent)
 	resetPullPlan();
 
 	viewWidget = new PullPlanEditorViewWidget(plan, this);	
-	customizeViewWidget = new PullPlanCustomizeViewWidget(plan, this);
+	customizeViewWidget = new CaneCustomizeViewWidget(plan, this);
 	niceViewWidget = new NiceViewWidget(NiceViewWidget::PULLPLAN_CAMERA_MODE, this);
 	niceViewWidget->setGeometry(&geometry);
 

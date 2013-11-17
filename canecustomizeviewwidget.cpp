@@ -7,10 +7,10 @@
 #include "pullplan.h"
 #include "pulltemplate.h"
 #include "subpulltemplate.h"
-#include "pullplancustomizeviewwidget.h"
+#include "canecustomizeviewwidget.h"
 #include "globalbackgroundcolor.h"
 
-PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
+CaneCustomizeViewWidget::CaneCustomizeViewWidget(PullPlan* plan, QWidget* parent) : QWidget(parent)
 {
 	// setup draw widget
 	setMinimumSize(200, 200);
@@ -31,7 +31,7 @@ PullPlanCustomizeViewWidget::PullPlanCustomizeViewWidget(PullPlan* plan, QWidget
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(setCustomTemplate()));
 }
 
-void PullPlanCustomizeViewWidget :: setCustomTemplate()
+void CaneCustomizeViewWidget :: setCustomTemplate()
 {
 	PullTemplate::Type oldType = plan->templateType();
 	plan->setTemplateType(PullTemplate::CUSTOM);	
@@ -39,7 +39,7 @@ void PullPlanCustomizeViewWidget :: setCustomTemplate()
 		plan->saveState();
 }
 
-void PullPlanCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
+void CaneCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
 {
 	int width, height;
 
@@ -62,27 +62,27 @@ void PullPlanCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
 	boundingBoxSpace = MAX(squareSize / 100, 1);
 }
 
-float PullPlanCustomizeViewWidget :: adjustedX(float rawX)
+float CaneCustomizeViewWidget :: adjustedX(float rawX)
 {
 	return rawX - drawUpperLeft.x;
 }
 
-float PullPlanCustomizeViewWidget :: adjustedY(float rawY)
+float CaneCustomizeViewWidget :: adjustedY(float rawY)
 {
 	return rawY - drawUpperLeft.y;
 }
 
-float PullPlanCustomizeViewWidget :: rawX(float adjustedX)
+float CaneCustomizeViewWidget :: rawX(float adjustedX)
 {
 	return adjustedX + drawUpperLeft.x;
 }
 
-float PullPlanCustomizeViewWidget :: rawY(float adjustedY)
+float CaneCustomizeViewWidget :: rawY(float adjustedY)
 {
 	return adjustedY + drawUpperLeft.y;
 }
 
-void PullPlanCustomizeViewWidget :: updateIndexes(QPoint pos)
+void CaneCustomizeViewWidget :: updateIndexes(QPoint pos)
 {
 	int drawSize = squareSize - 20;
 	float delta_x = (adjustedX(pos.x()) - clickedLoc.x);
@@ -187,7 +187,7 @@ void PullPlanCustomizeViewWidget :: updateIndexes(QPoint pos)
 	update();
 }
 
-void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
+void CaneCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 {
 	int drawSize = squareSize - 20;
 	if (event->buttons() == Qt::NoButton)
@@ -320,7 +320,7 @@ void PullPlanCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 	}
 }
 
-void PullPlanCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
+void CaneCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 {
 	int drawSize = squareSize - 20;
 	mode = MOVE_MODE;
@@ -386,7 +386,7 @@ void PullPlanCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 	update();
 }
 
-void PullPlanCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent* event)
+void CaneCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent* event)
 {
 	if (!clickMoved)
 	{
@@ -420,7 +420,7 @@ void PullPlanCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent* event)
 	update();
 }
 
-void PullPlanCustomizeViewWidget :: keyPressEvent(QKeyEvent* event)
+void CaneCustomizeViewWidget :: keyPressEvent(QKeyEvent* event)
 {
 	if (event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Delete)
 	{
@@ -428,7 +428,7 @@ void PullPlanCustomizeViewWidget :: keyPressEvent(QKeyEvent* event)
 	}
 }
 
-void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* _plan)
+void CaneCustomizeViewWidget :: setPullPlan(PullPlan* _plan)
 {
 	plan = _plan;
 
@@ -444,12 +444,12 @@ void PullPlanCustomizeViewWidget :: setPullPlan(PullPlan* _plan)
 	boundActiveBox();
 }
 
-void PullPlanCustomizeViewWidget :: updateEverything()
+void CaneCustomizeViewWidget :: updateEverything()
 {
 	this->repaint();
 }
 
-bool PullPlanCustomizeViewWidget :: isValidMovePosition(QMouseEvent*)
+bool CaneCustomizeViewWidget :: isValidMovePosition(QMouseEvent*)
 {
 	/* This should check if the subcane can be moved to the given position
 	  (i.e. not intersecting with another subcane or leaving the casing).
@@ -457,7 +457,7 @@ bool PullPlanCustomizeViewWidget :: isValidMovePosition(QMouseEvent*)
 	return true;
 }
 
-void PullPlanCustomizeViewWidget :: boundActiveBox()
+void CaneCustomizeViewWidget :: boundActiveBox()
 {
 	activeBoxLL.x = activeBoxLL.y = INT_MAX;
 	activeBoxUR.x = activeBoxUR.y = INT_MIN;
@@ -478,7 +478,7 @@ void PullPlanCustomizeViewWidget :: boundActiveBox()
 	}
 }
 
-void PullPlanCustomizeViewWidget :: setBoundaryPainter(QPainter* painter, bool outermostLevel, bool greyedOut = false) 
+void CaneCustomizeViewWidget :: setBoundaryPainter(QPainter* painter, bool outermostLevel, bool greyedOut = false) 
 {
 	if (outermostLevel)
 	{
@@ -494,7 +494,7 @@ void PullPlanCustomizeViewWidget :: setBoundaryPainter(QPainter* painter, bool o
 		painter->setPen(Qt::NoPen);
 }
 
-void PullPlanCustomizeViewWidget :: paintShape(Point2D upperLeft, float size, enum GeometricShape shape, QPainter* painter)
+void CaneCustomizeViewWidget :: paintShape(Point2D upperLeft, float size, enum GeometricShape shape, QPainter* painter)
 {
 	int roundedX, roundedY;
 	
@@ -512,7 +512,7 @@ void PullPlanCustomizeViewWidget :: paintShape(Point2D upperLeft, float size, en
 	}
 
 }
-void PullPlanCustomizeViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth, float drawHeight,
+void CaneCustomizeViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth, float drawHeight,
 	PullPlan* plan, bool outermostLevel, QPainter* painter)
 {
 	// Fill the subplan area with some `cleared out' color
@@ -562,7 +562,7 @@ void PullPlanCustomizeViewWidget :: drawSubplan(Point2D upperLeft, float drawWid
 	}
 }
 
-void PullPlanCustomizeViewWidget :: drawActionControls(QPainter* painter)
+void CaneCustomizeViewWidget :: drawActionControls(QPainter* painter)
 {
 	int drawSize = squareSize - 20;
 
@@ -638,7 +638,7 @@ void PullPlanCustomizeViewWidget :: drawActionControls(QPainter* painter)
 	}
 }
 
-void PullPlanCustomizeViewWidget :: paintEvent(QPaintEvent *event)
+void CaneCustomizeViewWidget :: paintEvent(QPaintEvent *event)
 {
 	QPainter painter;
 
@@ -661,12 +661,12 @@ void PullPlanCustomizeViewWidget :: paintEvent(QPaintEvent *event)
 	painter.end();
 }
 
-void PullPlanCustomizeViewWidget :: copySelectionClicked()
+void CaneCustomizeViewWidget :: copySelectionClicked()
 {
 	copySelection();
 }
 
-void PullPlanCustomizeViewWidget :: copySelection()
+void CaneCustomizeViewWidget :: copySelection()
 {
 	if (subplansSelected.size() == 0)
 		return;
@@ -695,12 +695,12 @@ void PullPlanCustomizeViewWidget :: copySelection()
 	update();
 }
 
-void PullPlanCustomizeViewWidget :: deleteSelectionClicked()
+void CaneCustomizeViewWidget :: deleteSelectionClicked()
 {
 	deleteSelection();
 }
 
-void PullPlanCustomizeViewWidget :: deleteSelection()
+void CaneCustomizeViewWidget :: deleteSelection()
 {
 	for (unsigned int i = 0; i < subplansSelected.size(); i++)
 	{
@@ -722,7 +722,7 @@ void PullPlanCustomizeViewWidget :: deleteSelection()
 	update();
 }
 
-void PullPlanCustomizeViewWidget :: addCircleClicked()
+void CaneCustomizeViewWidget :: addCircleClicked()
 {
 	Point2D p = make_vector(0.0f, 0.0f);
 	float diameter = 0;
@@ -745,7 +745,7 @@ void PullPlanCustomizeViewWidget :: addCircleClicked()
 	update();
 }
 
-void PullPlanCustomizeViewWidget :: addSquareClicked()
+void CaneCustomizeViewWidget :: addSquareClicked()
 {
 	Point2D p = make_vector(0.0f, 0.0f);
 	float diameter = 0;

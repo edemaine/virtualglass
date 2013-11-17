@@ -1,5 +1,5 @@
-#ifndef PULLPLANCUSTOMIZEVIEWWIDGET_H
-#define PULLPLANCUSTOMIZEVIEWWIDGET_H
+#ifndef CANECUSTOMIZEVIEWWIDGET_H
+#define CANECUSTOMIZEVIEWWIDGET_H
 
 #include <QWidget>
 #include <QMouseEvent>
@@ -16,12 +16,12 @@ class PullPlan;
 
 using std::vector;
 
-class PullPlanCustomizeViewWidget : public QWidget
+class CaneCustomizeViewWidget : public QWidget
 {
 	Q_OBJECT
 
 	public:
-		PullPlanCustomizeViewWidget(PullPlan* plan, QWidget* parent=0);
+		CaneCustomizeViewWidget(PullPlan* plan, QWidget* parent=0);
 		void setPullPlan(PullPlan* plan);
 		void addCircleClicked();
 		void addSquareClicked();
