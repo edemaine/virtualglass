@@ -1,17 +1,17 @@
 
 #include <time.h>
 
-#include "pullplangeometrythread.h"
+#include "canegeometrythread.h"
 #include "pullplaneditorwidget.h"
 #include "pullplan.h"
 #include "globalgraphicssetting.h"
 
-PullPlanGeometryThread::PullPlanGeometryThread(PullPlanEditorWidget* _ppew) : ppew(_ppew)
+CaneGeometryThread::CaneGeometryThread(PullPlanEditorWidget* _ppew) : ppew(_ppew)
 {
 	
 }
 
-void PullPlanGeometryThread::run()
+void CaneGeometryThread::run()
 {
 	bool pullPlanChanged;
 	bool completed;

@@ -148,7 +148,7 @@ HEADERS += vgapp.h \
         Matrix.hpp \
 	glassfileio.h \
 	piecegeometrythread.h \
-	pullplangeometrythread.h \
+	canegeometrythread.h \
 	globalgraphicssetting.h \
 	twistwidget.h \
 	templatelibrarywidget.h \
@@ -208,7 +208,7 @@ SOURCES += main.cpp \
         SVG.cpp \
 	glassfileio.cpp \
 	piecegeometrythread.cpp \
-	pullplangeometrythread.cpp \
+	canegeometrythread.cpp \
 	twistwidget.cpp \
 	templatelibrarywidget.cpp \
 	piececustomizeviewwidget.cpp \

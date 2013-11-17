@@ -1,17 +1,17 @@
 
-#ifndef PULLPLANGEOMETRYTHREAD_H
-#define PULLPLANGEOMETRYTHREAD_H
+#ifndef CANEGEOMETRYTHREAD_H
+#define CANEGEOMETRYTHREAD_H
 
 #include <QThread>
 
 class PullPlanEditorWidget;
 
-class PullPlanGeometryThread : public QThread
+class CaneGeometryThread : public QThread
 {
 	Q_OBJECT
 
 	public:
-		PullPlanGeometryThread(PullPlanEditorWidget* ppew);
+		CaneGeometryThread(PullPlanEditorWidget* ppew);
 		void run();
 		PullPlanEditorWidget* ppew;
 

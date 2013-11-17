@@ -20,7 +20,7 @@
 #include "mesh.h"
 #include "dependancy.h"
 #include "templateparameter.h"
-#include "pullplangeometrythread.h"
+#include "canegeometrythread.h"
 #include "twistwidget.h"
 #include "canecrosssectionrender.h"
 #include "globalbackgroundcolor.h"
@@ -116,7 +116,7 @@ void PullPlanEditorWidget :: setupThreading()
 	geometryDirty = false;
 	tempPullPlan = deep_copy(plan);
 	tempPullPlanDirty = true;
-	geometryThread = new PullPlanGeometryThread(this);
+	geometryThread = new CaneGeometryThread(this);
 	geometryThread->start();
 }
 

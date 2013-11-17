@@ -18,7 +18,7 @@ class PullPlanCustomizeViewWidget;
 class NiceViewWidget;
 class AsyncPullPlanLibraryWidget;
 class PullTemplateLibraryWidget;
-class PullPlanGeometryThread;
+class CaneGeometryThread;
 class TwistWidget;
 
 class QImage;
@@ -37,7 +37,7 @@ class PullPlanEditorWidget : public QWidget
 {
 	Q_OBJECT
 
-	friend class PullPlanGeometryThread;
+	friend class CaneGeometryThread;
 
 	public:
 		PullPlanEditorWidget(QWidget* parent=0);
@@ -89,7 +89,7 @@ class PullPlanEditorWidget : public QWidget
 		QWaitCondition wakeWait;
 		QMutex wakeMutex;
 
-		PullPlanGeometryThread* geometryThread;
+		CaneGeometryThread* geometryThread;
 
 		QMutex geometryDirtyMutex;
 		bool geometryDirty;
