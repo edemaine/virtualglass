@@ -154,6 +154,8 @@ class MainWindow : public QMainWindow
 		bool dirtyBit;
 		QString saveFilename;
 
+		bool clickDown;
+
 		Email* email;
 
 	private slots:

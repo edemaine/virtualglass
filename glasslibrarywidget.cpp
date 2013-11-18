@@ -56,13 +56,13 @@ void GlassLibraryWidget :: updateStyleSheet()
 	setStyleSheet(style);
 }
 
-void GlassLibraryWidget::setDependancy(enum Dependancy _d)
+void GlassLibraryWidget :: setDependancy(enum Dependancy _d)
 {
 	dependancy = _d;
 	updateStyleSheet();
 }
 
-int GlassLibraryWidget::hitValue(QPoint p)
+int GlassLibraryWidget :: hitValue(QPoint p)
 {
 	if (0 < p.x() && p.x() < 20 && 0 < p.y() && p.y() < 20)
 		return 1;
@@ -72,7 +72,7 @@ int GlassLibraryWidget::hitValue(QPoint p)
 		return 0;
 }
 
-void GlassLibraryWidget::mousePressEvent(QMouseEvent* event)
+void GlassLibraryWidget :: mousePressEvent(QMouseEvent* event)
 {
         if (event->button() == Qt::LeftButton)
         {
@@ -81,7 +81,7 @@ void GlassLibraryWidget::mousePressEvent(QMouseEvent* event)
         }	
 }
 
-void GlassLibraryWidget::mouseMoveEvent(QMouseEvent* event)
+void GlassLibraryWidget :: mouseMoveEvent(QMouseEvent* event)
 {
         if ((event->pos() - clickDownPos).manhattanLength() > QApplication::startDragDistance()
                 || !this->rect().contains(event->pos()))
@@ -110,7 +110,7 @@ void GlassLibraryWidget::mouseMoveEvent(QMouseEvent* event)
 	}
 }
 
-void GlassLibraryWidget::mouseReleaseEvent(QMouseEvent*)
+void GlassLibraryWidget :: mouseReleaseEvent(QMouseEvent*)
 {
 	if (clickDown)
 	{
@@ -126,7 +126,7 @@ void GlassLibraryWidget::mouseReleaseEvent(QMouseEvent*)
 	clickDown = false;
 }
 
-void GlassLibraryWidget::paintEvent(QPaintEvent* event)
+void GlassLibraryWidget :: paintEvent(QPaintEvent* event)
 {
 	QLabel::paintEvent(event);
 

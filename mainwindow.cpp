@@ -65,6 +65,7 @@ MainWindow :: MainWindow()
 	// do the finishing touches to put the GUI in fresh state
 	setViewMode(EMPTY_VIEW_MODE);
 	setDirtyBit(false);
+	clickDown = false;
 
 	showMaximized();
 }
@@ -148,7 +149,11 @@ void MainWindow :: keyPressEvent(QKeyEvent* event)
 
 bool MainWindow :: eventFilter(QObject* obj, QEvent* event)
 {
-	if (obj == libraryScrollArea && event->type() == QEvent::KeyPress)
+	// Right now we only process stuff that happens in the libraryScrollArea
+	if (obj != libraryScrollArea)
+		return false;
+
+	if (event->type() == QEvent::KeyPress)
 	{
 		switch (dynamic_cast<QKeyEvent*>(event)->key())
 		{
@@ -162,6 +167,18 @@ bool MainWindow :: eventFilter(QObject* obj, QEvent* event)
 				return true;
 		}
 	}
+	else if (event->type() == QEvent::MouseButtonPress)
+	{
+		if (dynamic_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
+			clickDown = true;
+	}
+	else if (event->type() == QEvent::MouseButtonRelease)
+	{
+		if (clickDown)
+			setViewMode(EMPTY_VIEW_MODE);
+		clickDown = false;
+	}
+
 	return false;
 }
 

@@ -123,9 +123,7 @@ void PieceEditorWidget :: updateEverything()
 				dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget());
 		pktlw->setHighlighted(pktlw->type == _piece->pickup()->templateType());
 	}
-
 	pickupViewWidget->updateEverything();
-
 	TemplateParameter tp;
 	_piece->pickup()->getParameter(0, &tp);
 	pickupCountSpin->blockSignals(true);
@@ -135,7 +133,6 @@ void PieceEditorWidget :: updateEverything()
 
 	// update piece stuff
 	pieceCustomizeViewWidget->updateEverything();	
-
 	PieceTemplateLibraryWidget* ptlw;
 	for (int i = 0; i < pieceTemplateLibraryLayout->count(); ++i)
 	{
@@ -143,17 +140,23 @@ void PieceEditorWidget :: updateEverything()
 			dynamic_cast<QWidgetItem *>(pieceTemplateLibraryLayout->itemAt(i))->widget());
 		ptlw->setHighlighted(ptlw->type == _piece->templateType());
 	}
-
 	twistWidget->updateEverything();
 	
+	// Make a copy of the current state of the piece
 	tempPieceMutex.lock();
 	deep_delete(tempPiece);
 	tempPiece = deep_copy(_piece);
 	tempPieceDirty = true;
 	tempPieceMutex.unlock();
 
+	// Start up the rendering thread, clearing out geometry first
+	// so old piece/pickup don't stay visible and confuse the user
 	QString message("Rendering piece...");
 	emit showMessage(message, 0); // show until next message 
+	geometry.clear();
+	pickupViewWidget->geometry.clear();
+	pickupViewWidget->updateEverything();
+	pieceNiceViewWidget->repaint();
 	wakeWait.wakeOne();
 }
 
