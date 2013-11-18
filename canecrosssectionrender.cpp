@@ -84,7 +84,7 @@ void drawSubcane(float x, float y, float drawWidth, float drawHeight,
 		float rWidth = sub.diameter * drawWidth/2;
 		float rHeight = sub.diameter * drawHeight/2;
 
-		drawSubcane(rX, rY, rWidth, rHeight, sub.plan, 
+		drawSubcane(rX, rY, rWidth, rHeight, sub.cane, 
 			false, painter);
 
 		painter->setBrush(Qt::NoBrush);

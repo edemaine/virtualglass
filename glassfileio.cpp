@@ -203,7 +203,7 @@ Cane* safeCaneMap(map<unsigned int, Cane*>& caneMap, unsigned int index)
 {
 	if (caneMap.find(index) == caneMap.end())
 		// not quite right in some cases, should depend on expected shape
-		return GlobalGlass::circlePlan(); 
+		return GlobalGlass::circleCane(); 
 	return caneMap[index];
 }
 
@@ -684,8 +684,8 @@ void writeCanes(Json::Value& root, vector<Cane*>& canes, vector<GlassColor*>& co
 
 	// generate cane map
 	map<const Cane*, unsigned int> caneMap;
-	caneMap[GlobalGlass::circlePlan()] = 0;
-	caneMap[GlobalGlass::squarePlan()] = 1;
+	caneMap[GlobalGlass::circleCane()] = 0;
+	caneMap[GlobalGlass::squareCane()] = 1;
 	for (unsigned int i = 0; i < canes.size(); ++i)
 		caneMap[canes[i]] = i+2;
 
@@ -701,8 +701,8 @@ void readCanes(Json::Value& canesRoot, map<unsigned int, Cane*>& caneMap,
 	map<unsigned int, GlassColor*>& colorMap, vector<Cane*>& readCanes)
 {
 	// add global cane to map for completeness
-	caneMap[0] = GlobalGlass::circlePlan();
-	caneMap[1] = GlobalGlass::squarePlan();
+	caneMap[0] = GlobalGlass::circleCane();
+	caneMap[1] = GlobalGlass::squareCane();
 
 	// loop over canes
 	for (unsigned int i = 0; i < canesRoot.getMemberNames().size(); ++i)
@@ -886,7 +886,7 @@ void writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<Ca
 	}
 
 	// write pickups (currently only one)
-	writePickup(root[piecename]["Pickups"], piece->pickupPlan(), 0, caneMap, colorMap);
+	writePickup(root[piecename]["Pickups"], piece->pickup(), 0, caneMap, colorMap);
 }
 
 Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, Cane*>& caneMap, 
@@ -934,8 +934,8 @@ void writePieces(Json::Value& root, vector<Piece*>& pieces, vector<Cane*>& canes
 
 	// generate cane map
 	map<Cane*, unsigned int> caneMap;
-	caneMap[GlobalGlass::circlePlan()] = 0;
-	caneMap[GlobalGlass::squarePlan()] = 1;
+	caneMap[GlobalGlass::circleCane()] = 0;
+	caneMap[GlobalGlass::squareCane()] = 1;
 	for (unsigned int i = 0; i < canes.size(); ++i)
 		caneMap[canes[i]] = i+2;
 

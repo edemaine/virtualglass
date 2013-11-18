@@ -41,13 +41,13 @@ class CaneEditorWidget : public QWidget
 	public:
 		CaneEditorWidget(QWidget* parent=0);
 		void resetCane();
-		Cane* pullPlan();
-		void setCane(Cane* p);
+		Cane* cane();
+		void setCane(Cane* c);
 		void seedTemplates();
-		void writePlanToPLYFile(QString& filename);
-		void writePlanToOBJFile(QString& filename);
+		void writeCaneToPLYFile(QString& filename);
+		void writeCaneToOBJFile(QString& filename);
 		void updateEverything();
-		QImage pullPlanImage();
+		QImage caneImage();
 		void reset3DCamera();
 
 		void undo();
@@ -96,7 +96,7 @@ class CaneEditorWidget : public QWidget
 		Geometry tempGeometry;
 
 		Geometry geometry;
-		Cane* plan;
+		Cane* _cane;
 		CaneEditorViewWidget* viewWidget;	
 		CaneCustomizeViewWidget* customizeViewWidget;	
 		NiceViewWidget* niceViewWidget;
@@ -108,7 +108,7 @@ class CaneEditorWidget : public QWidget
 		QHBoxLayout* templateLibraryLayout;
 		QPushButton* addCasingButton;
 		QPushButton* removeCasingButton;
-		QPushButton* customizePlanButton;
+		QPushButton* customizeCaneButton;
 		QPushButton* circleCasingPushButton;
 		QPushButton* squareCasingPushButton;
 		QPushButton* addCircleButton;

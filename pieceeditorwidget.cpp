@@ -121,13 +121,13 @@ void PieceEditorWidget :: updateEverything()
 	{
 		pktlw = dynamic_cast<PickupTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget());
-		pktlw->setHighlighted(pktlw->type == _piece->pickupPlan()->templateType());
+		pktlw->setHighlighted(pktlw->type == _piece->pickup()->templateType());
 	}
 
 	pickupViewWidget->updateEverything();
 
 	TemplateParameter tp;
-	_piece->pickupPlan()->getParameter(0, &tp);
+	_piece->pickup()->getParameter(0, &tp);
 	pickupCountSpin->blockSignals(true);
 	pickupCountSpin->setRange(tp.lowerLimit, tp.upperLimit);
 	pickupCountSpin->setValue(tp.value);
@@ -202,10 +202,10 @@ void PieceEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned in
 void PieceEditorWidget :: pickupCountSpinChanged(int)
 {
 	TemplateParameter tp;
-	_piece->pickupPlan()->getParameter(0, &tp);
+	_piece->pickup()->getParameter(0, &tp);
 	if (tp.value != pickupCountSpin->value())
 	{
-		_piece->pickupPlan()->setParameter(0, pickupCountSpin->value());
+		_piece->pickup()->setParameter(0, pickupCountSpin->value());
 		_piece->saveState();
 		updateEverything();
 		emit someDataChanged();
@@ -266,9 +266,9 @@ void PieceEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 
 	if (pktlw != NULL)
 	{
-		if (pktlw->type != _piece->pickupPlan()->templateType())
+		if (pktlw->type != _piece->pickup()->templateType())
 		{
-			_piece->pickupPlan()->setTemplateType(pktlw->type);
+			_piece->pickup()->setTemplateType(pktlw->type);
 			_piece->saveState();
 			updateEverything();
 			emit someDataChanged();
@@ -514,7 +514,7 @@ void PieceEditorWidget :: updateLibraryWidgetPixmaps(PieceLibraryWidget* w)
 
 void PieceEditorWidget :: setPickupParameter(int param, int value)
 {
-	_piece->pickupPlan()->setParameter(param, value);
+	_piece->pickup()->setParameter(param, value);
 	_piece->saveState();
 	updateEverything();
 	emit someDataChanged();
@@ -530,7 +530,7 @@ void PieceEditorWidget :: setPieceTemplateType(enum PieceTemplate::Type _type)
 
 void PieceEditorWidget :: setPickupTemplateType(enum PickupTemplate::Type _type)
 {
-	_piece->pickupPlan()->setTemplateType(_type);
+	_piece->pickup()->setTemplateType(_type);
 	_piece->saveState();
 	updateEverything();
 	emit someDataChanged();

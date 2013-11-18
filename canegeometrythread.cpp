@@ -13,7 +13,7 @@ CaneGeometryThread::CaneGeometryThread(CaneEditorWidget* _ppew) : ppew(_ppew)
 
 void CaneGeometryThread::run()
 {
-	bool pullPlanChanged;
+	bool caneChanged;
 	bool completed;
 	while (1)
 	{
@@ -37,9 +37,9 @@ void CaneGeometryThread::run()
 		ppew->geometryDirtyMutex.unlock();
 
 		ppew->tempCaneMutex.lock();
-		pullPlanChanged = ppew->tempCaneDirty;
+		caneChanged = ppew->tempCaneDirty;
 		ppew->tempCaneMutex.unlock();
-		if (pullPlanChanged)
+		if (caneChanged)
 		{
 			deep_delete(myTempCane);
 			goto compute;

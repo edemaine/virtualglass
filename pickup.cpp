@@ -79,7 +79,7 @@ void Pickup :: pushNewSubcane(vector<SubpickupTemplate>* newSubs,
 	}
 	else // you've run out of existing subcanes copy from
 	{
-		newSubs->push_back(SubpickupTemplate(GlobalGlass::circlePlan(),
+		newSubs->push_back(SubpickupTemplate(GlobalGlass::circleCane(),
 			location, ori, length, width, shape));
 	}
 }

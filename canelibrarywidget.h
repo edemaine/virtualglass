@@ -10,7 +10,7 @@ class CaneLibraryWidget : public AsyncRenderWidget
 {
 	public:
 		CaneLibraryWidget(Cane *_plan, MainWindow* _window);
-		Cane *pullPlan;
+		Cane *cane;
 		const QPixmap *dragPixmap();
 		bool isDraggable();
 		GlassMime::Type mimeType();

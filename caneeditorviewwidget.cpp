@@ -353,7 +353,7 @@ void CaneEditorViewWidget :: updateHighlightedSubcanesAndCasings(QDragMoveEvent*
 			if (type == GlassMime::PULLPLAN_MIME)
 				draggedPlan = reinterpret_cast<Cane*>(ptr);
 			else 
-				draggedPlan = reinterpret_cast<CaneLibraryWidget*>(ptr)->pullPlan;
+				draggedPlan = reinterpret_cast<CaneLibraryWidget*>(ptr)->cane;
 			highlightColor.r = highlightColor.g = highlightColor.b = highlightColor.a = 1.0;
 			if (draggedPlan->hasDependencyOn(cane))
 				break;
@@ -402,10 +402,10 @@ void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 				switch (sub.shape)
 				{
 					case CIRCLE_SHAPE:
-						sub.cane = draggedLibraryColor->circlePlan;
+						sub.cane = draggedLibraryColor->circleCane;
 						break;
 					case SQUARE_SHAPE:
-						sub.cane = draggedLibraryColor->squarePlan;
+						sub.cane = draggedLibraryColor->squareCane;
 						break;
 				}
 				cane->setSubcaneTemplate(sub, *it);
@@ -428,7 +428,7 @@ void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 			if (type == GlassMime::PULLPLAN_MIME)
 				draggedPlan = reinterpret_cast<Cane*>(ptr);
 			else
-				draggedPlan = reinterpret_cast<CaneLibraryWidget*>(ptr)->pullPlan;
+				draggedPlan = reinterpret_cast<CaneLibraryWidget*>(ptr)->cane;
 			for (set<unsigned int>::iterator it = subcanesHighlighted.begin(); it != subcanesHighlighted.end(); ++it)
 			{
 				SubcaneTemplate sub = cane->getSubcaneTemplate(*it);

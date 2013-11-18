@@ -122,7 +122,7 @@ public:
 	Node root;
 };
 
-bool load_svg(std::string const &filename, SVG &into, Cane *pullPlan);
+bool load_svg(std::string const &filename, SVG &into, Cane *cane);
 
 };
 

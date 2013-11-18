@@ -31,7 +31,7 @@ class Piece
 		float* twistPtr();
 
 		void setPickup(Pickup* p);
-		Pickup* pickupPlan() const;
+		Pickup* pickup() const;
 
 		void setSpline(Spline s);
 		Spline spline();
@@ -43,7 +43,7 @@ class Piece
 		void saveState();		
 	
 	private:
-		Pickup* pickup;
+		Pickup* _pickup;
 
 		struct State
 		{

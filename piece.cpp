@@ -7,21 +7,21 @@ Piece :: Piece(enum PieceTemplate::Type _type)
 	this->state.twist = 0.0;
 	setTemplateType(_type, true);
 	// initialize the piece's pickup to be something boring and base
-	this->pickup = new Pickup(PickupTemplate::VERTICAL);
+	this->_pickup = new Pickup(PickupTemplate::VERTICAL);
 
 	undoStackPiece.push(this->state);
-	undoStackPickup.push(this->pickup->state);
+	undoStackPickup.push(this->_pickup->state);
 }
 
 void Piece::setPickup(Pickup* pickup)
 {
-	this->pickup = pickup;
+	this->_pickup = pickup;
 	clearStateStacks();
 }
 
-Pickup* Piece::pickupPlan() const
+Pickup* Piece::pickup() const
 {
-	return this->pickup;
+	return this->_pickup;
 }
 
 void Piece::clearStateStacks()
@@ -45,7 +45,7 @@ void Piece :: undo()
         undoStackPiece.pop();
         undoStackPickup.pop();
         this->state = undoStackPiece.top();
-	this->pickup->state = undoStackPickup.top();
+	this->_pickup->state = undoStackPickup.top();
 }
 
 void Piece :: redo()
@@ -57,7 +57,7 @@ void Piece :: redo()
         redoStackPiece.pop();
         redoStackPickup.pop();
         this->state = undoStackPiece.top();
-        this->pickup->state = undoStackPickup.top();
+        this->_pickup->state = undoStackPickup.top();
 }
 
 bool Piece :: canUndo()
@@ -75,7 +75,7 @@ void Piece :: saveState()
 	assert(undoStackPiece.size() == undoStackPickup.size());
 	assert(redoStackPiece.size() == redoStackPickup.size());
         undoStackPiece.push(this->state);
-        undoStackPickup.push(this->pickup->state);
+        undoStackPickup.push(this->_pickup->state);
         while (redoStackPiece.size() > 0)
 	{
                 redoStackPiece.pop();
@@ -110,37 +110,37 @@ float* Piece :: twistPtr()
 
 bool Piece :: hasDependencyOn(Cane* cane)
 {
-	bool pickupPlansDependOn = false;
+	bool pickupsDependOn = false;
 
-	for (unsigned int i = 0; i < this->pickup->subpickupCount(); ++i)
+	for (unsigned int i = 0; i < this->_pickup->subpickupCount(); ++i)
 	{
-		if (this->pickup->getSubpickupTemplate(i).cane->hasDependencyOn(cane))
+		if (this->_pickup->getSubpickupTemplate(i).cane->hasDependencyOn(cane))
 		{
-			pickupPlansDependOn = true;
+			pickupsDependOn = true;
 			break;
 		}
 	}
 
-	return pickupPlansDependOn;
+	return pickupsDependOn;
 }
 
 bool Piece :: hasDependencyOn(GlassColor* glassColor)
 {
-	bool pickupPlansDependOn = false;
+	bool pickupsDependOn = false;
 
-	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
+	for (unsigned int i = 0; i < _pickup->subpickupCount(); ++i)
 	{
-		if (pickup->getSubpickupTemplate(i).cane->hasDependencyOn(glassColor))
+		if (_pickup->getSubpickupTemplate(i).cane->hasDependencyOn(glassColor))
 		{
-			pickupPlansDependOn = true;		
+			pickupsDependOn = true;		
 			break;
 		}
 	}
 	
-	if (pickup->overlayGlassColor() == glassColor || pickup->underlayGlassColor() == glassColor)
-		pickupPlansDependOn = true;
+	if (_pickup->overlayGlassColor() == glassColor || _pickup->underlayGlassColor() == glassColor)
+		pickupsDependOn = true;
 
-	return pickupPlansDependOn;
+	return pickupsDependOn;
 }
 
 /*
@@ -152,7 +152,7 @@ Piece* Piece :: copy() const
 {
 	Piece* c = new Piece(this->state.type);
 	c->state = this->state;
-	c->pickup = this->pickup->copy();
+	c->_pickup = this->_pickup->copy();
 	
 	return c;
 }
@@ -244,15 +244,15 @@ Piece *deep_copy(const Piece *_piece)
 	assert(_piece);
 	Piece *piece = _piece->copy();
 	//Replace pickup with a deep copy:
-	delete piece->pickupPlan();
-	piece->setPickup(deep_copy(_piece->pickupPlan()));
+	delete piece->pickup();
+	piece->setPickup(deep_copy(_piece->pickup()));
 	return piece;
 }
 
 void deep_delete(Piece *piece) 
 {
 	assert(piece);
-	deep_delete(piece->pickupPlan());
+	deep_delete(piece->pickup());
 	piece->setPickup(NULL);
 	delete piece;
 }

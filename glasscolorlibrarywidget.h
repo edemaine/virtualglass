@@ -10,7 +10,7 @@ class GlassColorLibraryWidget : public AsyncRenderWidget
 {
 	public:
 		GlassColorLibraryWidget(GlassColor* _color, MainWindow* _window,
-			Cane* _circlePlan=NULL, Cane* _squarePlan=NULL);
+			Cane* _circleCane=NULL, Cane* _squareCane=NULL);
 		const QPixmap *dragPixmap();
 		bool isDraggable();
 		GlassMime::Type mimeType();
@@ -18,8 +18,8 @@ class GlassColorLibraryWidget : public AsyncRenderWidget
 		void updatePixmaps();
 		virtual void paintEvent(QPaintEvent *); //to overlay color name
 		GlassColor* glassColor;
-		Cane* circlePlan;
-		Cane* squarePlan;
+		Cane* circleCane;
+		Cane* squareCane;
 
 	private:
 		QPixmap _dragPixmap;

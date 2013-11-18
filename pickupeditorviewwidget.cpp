@@ -38,9 +38,9 @@ void PickupEditorViewWidget :: getSubcaneAt(float x, float y, Cane** subcane, in
 {
 	int hitIndex = -1;
 	float hitDepth = -100.0;
-	for (unsigned int i = 0; i < this->piece->pickupPlan()->subpickupCount(); ++i)
+	for (unsigned int i = 0; i < this->piece->pickup()->subpickupCount(); ++i)
 	{
-		SubpickupTemplate sp = this->piece->pickupPlan()->getSubpickupTemplate(i);
+		SubpickupTemplate sp = this->piece->pickup()->getSubpickupTemplate(i);
 		Point2D ll, ur;
 		ll = ur = make_vector<float>(0.0f, 0.0f);
 
@@ -85,7 +85,7 @@ void PickupEditorViewWidget :: getSubcaneAt(float x, float y, Cane** subcane, in
 	if (hitIndex != -1)
 	{
 		*subcaneIndex = hitIndex;
-		*subcane = this->piece->pickupPlan()->getSubpickupTemplate(hitIndex).cane;
+		*subcane = this->piece->pickup()->getSubpickupTemplate(hitIndex).cane;
 	}
 	else
 	{
@@ -182,10 +182,10 @@ void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 	switch (type)
 	{
 		case GlassMime::COLOR_LIBRARY_MIME:
-			droppedPlan = reinterpret_cast<GlassColorLibraryWidget*>(droppedObject)->circlePlan;
+			droppedPlan = reinterpret_cast<GlassColorLibraryWidget*>(droppedObject)->circleCane;
 			break;
 		case GlassMime::PULLPLAN_LIBRARY_MIME:
-			droppedPlan = reinterpret_cast<CaneLibraryWidget*>(droppedObject)->pullPlan;
+			droppedPlan = reinterpret_cast<CaneLibraryWidget*>(droppedObject)->cane;
 			break;
 		case GlassMime::PULLPLAN_MIME:
 			droppedPlan = reinterpret_cast<Cane*>(droppedObject);
@@ -207,18 +207,18 @@ void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 		event->accept();
 		if ((event->keyboardModifiers() & Qt::ShiftModifier))
 		{
-			for (unsigned int i = 0; i < this->piece->pickupPlan()->subpickupCount(); ++i)
+			for (unsigned int i = 0; i < this->piece->pickup()->subpickupCount(); ++i)
 			{
-				SubpickupTemplate t = this->piece->pickupPlan()->getSubpickupTemplate(i);
+				SubpickupTemplate t = this->piece->pickup()->getSubpickupTemplate(i);
 				t.cane = droppedPlan;
-				this->piece->pickupPlan()->setSubpickupTemplate(t, i);
+				this->piece->pickup()->setSubpickupTemplate(t, i);
 			}
 		}
 		else
 		{
-			SubpickupTemplate t = this->piece->pickupPlan()->getSubpickupTemplate(subcaneIndex);
+			SubpickupTemplate t = this->piece->pickup()->getSubpickupTemplate(subcaneIndex);
 			t.cane = droppedPlan;
-			this->piece->pickupPlan()->setSubpickupTemplate(t, subcaneIndex);
+			this->piece->pickup()->setSubpickupTemplate(t, subcaneIndex);
 		}
 		piece->saveState();
 		emit someDataChanged();

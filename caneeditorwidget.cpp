@@ -31,8 +31,8 @@ CaneEditorWidget :: CaneEditorWidget(QWidget* parent) : QWidget(parent)
 {
 	resetCane();
 
-	viewWidget = new CaneEditorViewWidget(plan, this);	
-	customizeViewWidget = new CaneCustomizeViewWidget(plan, this);
+	viewWidget = new CaneEditorViewWidget(_cane, this);	
+	customizeViewWidget = new CaneCustomizeViewWidget(_cane, this);
 	niceViewWidget = new NiceViewWidget(NiceViewWidget::PULLPLAN_CAMERA_MODE, this);
 	niceViewWidget->setGeometry(&geometry);
 
@@ -56,7 +56,7 @@ bool CaneEditorWidget :: eventFilter(QObject* obj, QEvent* event)
 	return false;
 }
 
-QImage CaneEditorWidget :: pullPlanImage()
+QImage CaneEditorWidget :: caneImage()
 {
 	return niceViewWidget->grabFrameBuffer();
 }
@@ -68,24 +68,24 @@ void CaneEditorWidget :: reset3DCamera()
 
 void CaneEditorWidget :: resetCane()
 {
-	plan = new Cane(PullTemplate::HORIZONTAL_LINE_CIRCLE);
+	_cane = new Cane(PullTemplate::HORIZONTAL_LINE_CIRCLE);
 }
 
 bool CaneEditorWidget :: canUndo()
 {
-        return this->plan->canUndo();
+        return this->_cane->canUndo();
 }
 
 bool CaneEditorWidget :: canRedo()
 {
-        return this->plan->canRedo();
+        return this->_cane->canRedo();
 }
 
 void CaneEditorWidget :: undo()
 {
-        this->plan->undo();
+        this->_cane->undo();
 
-	if (this->plan->templateType() != PullTemplate::CUSTOM)
+	if (this->_cane->templateType() != PullTemplate::CUSTOM)
 		controlsTab->setCurrentIndex(0);
 	updateEverything();
         emit someDataChanged();
@@ -93,20 +93,20 @@ void CaneEditorWidget :: undo()
 
 void CaneEditorWidget :: redo()
 {
-        this->plan->redo();
+        this->_cane->redo();
 
-	if (this->plan->templateType() != PullTemplate::CUSTOM)
+	if (this->_cane->templateType() != PullTemplate::CUSTOM)
 		controlsTab->setCurrentIndex(0);
         updateEverything();
         emit someDataChanged();
 }
 
-void CaneEditorWidget :: writePlanToOBJFile(QString& filename)
+void CaneEditorWidget :: writeCaneToOBJFile(QString& filename)
 {
 	geometry.save_obj_file(filename.toStdString());
 }
 
-void CaneEditorWidget :: writePlanToPLYFile(QString& filename)
+void CaneEditorWidget :: writeCaneToPLYFile(QString& filename)
 {
 	geometry.save_ply_file(filename.toStdString());
 }
@@ -114,7 +114,7 @@ void CaneEditorWidget :: writePlanToPLYFile(QString& filename)
 void CaneEditorWidget :: setupThreading()
 {
 	geometryDirty = false;
-	tempCane = deep_copy(plan);
+	tempCane = deep_copy(_cane);
 	tempCaneDirty = true;
 	geometryThread = new CaneGeometryThread(this);
 	geometryThread->start();
@@ -123,7 +123,7 @@ void CaneEditorWidget :: setupThreading()
 void CaneEditorWidget :: updateEverything()
 {
 	// set casing buttons
-	switch (plan->outermostCasingShape())
+	switch (_cane->outermostCasingShape())
 	{
 		case CIRCLE_SHAPE:
 			circleCasingPushButton->setDown(true);
@@ -134,18 +134,18 @@ void CaneEditorWidget :: updateEverything()
 			squareCasingPushButton->setDown(true);
 			break;
 	}
-	removeCasingButton->setEnabled(!plan->hasMinimumCasingCount());
+	removeCasingButton->setEnabled(!_cane->hasMinimumCasingCount());
 
-	countSpin->setValue(plan->count());
-	countLabel->setEnabled(plan->templateType() != PullTemplate::CUSTOM);
-	countSpin->setEnabled(plan->templateType() != PullTemplate::CUSTOM);
+	countSpin->setValue(_cane->count());
+	countLabel->setEnabled(_cane->templateType() != PullTemplate::CUSTOM);
+	countSpin->setEnabled(_cane->templateType() != PullTemplate::CUSTOM);
 
 	twistWidget->updateEverything();
-	twistWidget->setEnabled(plan->outermostCasingShape() == CIRCLE_SHAPE);
+	twistWidget->setEnabled(_cane->outermostCasingShape() == CIRCLE_SHAPE);
 	
 	tempCaneMutex.lock();
 	deep_delete(tempCane);
-	tempCane = deep_copy(plan);
+	tempCane = deep_copy(_cane);
 	tempCaneDirty = true;
 	tempCaneMutex.unlock();
 
@@ -159,7 +159,7 @@ void CaneEditorWidget :: updateEverything()
 	{
 		ptlw = dynamic_cast<PullTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(templateLibraryLayout->itemAt(i))->widget());
-		ptlw->setHighlighted(ptlw->type == plan->templateType());
+		ptlw->setHighlighted(ptlw->type == _cane->templateType());
 	}
 
 	viewWidget->updateEverything();
@@ -274,7 +274,7 @@ void CaneEditorWidget :: setupLayout()
 	casingLayout->addWidget(countLabel);
 	casingLayout->addWidget(countSpin);
 
-	twistWidget = new TwistWidget(plan->twistPtr(), 10, tab1Widget);
+	twistWidget = new TwistWidget(_cane->twistPtr(), 10, tab1Widget);
 
 	tab1Layout->addWidget(casingWidget);
 	tab1Layout->addWidget(twistWidget);
@@ -331,10 +331,10 @@ void CaneEditorWidget :: controlsTabChanged(int tab)
 
 	if (tab != 0) // customize mode	
 	{
-		PullTemplate::Type oldType = plan->templateType();
-		plan->setTemplateType(PullTemplate::CUSTOM);				
+		PullTemplate::Type oldType = _cane->templateType();
+		_cane->setTemplateType(PullTemplate::CUSTOM);				
 		if (oldType != PullTemplate::CUSTOM)
-			plan->saveState();
+			_cane->saveState();
 		updateEverything();
 		emit someDataChanged();
 	}
@@ -342,32 +342,32 @@ void CaneEditorWidget :: controlsTabChanged(int tab)
 
 void CaneEditorWidget :: circleCasingButtonClicked()
 {
-	plan->setOutermostCasingShape(CIRCLE_SHAPE);
-	plan->saveState();
+	_cane->setOutermostCasingShape(CIRCLE_SHAPE);
+	_cane->saveState();
 	updateEverything();
 	emit someDataChanged();
 }
 
 void CaneEditorWidget :: squareCasingButtonClicked()
 {
-	plan->setOutermostCasingShape(SQUARE_SHAPE);
-	plan->saveState();
+	_cane->setOutermostCasingShape(SQUARE_SHAPE);
+	_cane->saveState();
 	updateEverything();
 	emit someDataChanged();
 }
 
 void CaneEditorWidget :: removeCasingButtonClicked()
 {
-	plan->removeCasing();
-	plan->saveState();
+	_cane->removeCasing();
+	_cane->saveState();
 	updateEverything();
 	emit someDataChanged();
 }
 
 void CaneEditorWidget :: addCasingButtonClicked()
 {
-	plan->addCasing(plan->outermostCasingShape());
-	plan->saveState();
+	_cane->addCasing(_cane->outermostCasingShape());
+	_cane->saveState();
 	updateEverything();
 	emit someDataChanged();
 }
@@ -444,8 +444,8 @@ void CaneEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 		// put the user back in fill and case mode,
 		// as they're no longer working on a custom template
 		controlsTab->setCurrentIndex(0);
-		plan->setTemplateType(ptlw->type);	
-		plan->saveState();
+		_cane->setTemplateType(ptlw->type);	
+		_cane->saveState();
 		updateEverything();
 		emit someDataChanged();
 	}
@@ -478,7 +478,7 @@ void CaneEditorWidget :: setupConnections()
 	
 void CaneEditorWidget :: twistEnded()
 {
-	plan->saveState();
+	_cane->saveState();
 }
 
 void CaneEditorWidget :: childWidgetDataChanged()
@@ -490,11 +490,11 @@ void CaneEditorWidget :: childWidgetDataChanged()
 void CaneEditorWidget :: countSpinChanged(int)
 {
 	// update template
-	unsigned int count = plan->count();
+	unsigned int count = _cane->count();
 	if (count != static_cast<unsigned int>(countSpin->value()))
 	{
-		plan->setCount(countSpin->value());
-		plan->saveState();
+		_cane->setCount(countSpin->value());
+		_cane->saveState();
 		updateEverything();
 		emit someDataChanged();
 	}
@@ -505,13 +505,13 @@ void CaneEditorWidget :: seedTemplates()
 	for (int i = PullTemplate::firstSeedTemplate(); i <= PullTemplate::lastSeedTemplate(); ++i)
 	{
 		PullTemplate::Type t = static_cast<PullTemplate::Type>(i);
-		Cane plan(t);
+		Cane cane(t);
 
 		QPixmap templatePixmap(100, 100);
 		templatePixmap.fill(GlobalBackgroundColor::qcolor);
 
 		QPainter painter(&templatePixmap);
-		CaneCrossSectionRender::render(&painter, 100, &plan);
+		CaneCrossSectionRender::render(&painter, 100, &cane);
 		painter.end();
 
 		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(templatePixmap, t);
@@ -524,19 +524,19 @@ void CaneEditorWidget :: seedTemplates()
 	templateLibraryLayout->addWidget(ptlw);
 }
 
-void CaneEditorWidget :: setCane(Cane* _plan)
+void CaneEditorWidget :: setCane(Cane* _cane)
 {
-	plan = _plan;
+	this->_cane = _cane;
 	controlsTab->setCurrentIndex(0);
 	updateEverything();
-	twistWidget->setTwist(plan->twistPtr());
-	viewWidget->setCane(plan);
-	customizeViewWidget->setCane(plan);
+	twistWidget->setTwist(_cane->twistPtr());
+	viewWidget->setCane(_cane);
+	customizeViewWidget->setCane(_cane);
 }
 
-Cane* CaneEditorWidget :: pullPlan()
+Cane* CaneEditorWidget :: cane()
 {
-	return plan;
+	return this->_cane;
 }
 
 

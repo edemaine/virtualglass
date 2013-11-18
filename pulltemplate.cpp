@@ -31,7 +31,7 @@ namespace PullTemplate
 	}
 
 	// returns true only if it's for sure
-	bool templateHasNoSubplans(PullTemplate::Type t)
+	bool templateHasNoSubcanes(PullTemplate::Type t)
 	{
 		switch (t)
 		{
@@ -44,7 +44,7 @@ namespace PullTemplate
 	}
 
 	// returns true only if it's for sure
-	bool templateHasSubplans(PullTemplate::Type t)
+	bool templateHasSubcanes(PullTemplate::Type t)
 	{
 		switch (t)
 		{

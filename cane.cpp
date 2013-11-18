@@ -19,7 +19,7 @@ Cane :: Cane(PullTemplate::Type _templateType)
 	// setup default twist
 	this->state.twist = 0;
 
-	// initialize casings and subplans to something simple
+	// initialize casings and subcanes to something simple
 	this->state.casings.push_back(Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
 	this->state.casings[0].shape = CIRCLE_SHAPE;
 	this->state.count = 0;
@@ -66,14 +66,14 @@ void Cane :: saveState()
 		redoStack.pop();
 }
 
-bool Cane :: hasDependencyOn(Cane* plan) 
+bool Cane :: hasDependencyOn(Cane* cane) 
 {
-	if (this == plan)
+	if (this == cane)
 		return true;
 
 	bool childrenAreDependent = false;
 	for (unsigned int i = 0; i < this->state.subs.size(); ++i) 
-		childrenAreDependent = (childrenAreDependent || this->state.subs[i].plan->hasDependencyOn(plan)); 
+		childrenAreDependent = (childrenAreDependent || this->state.subs[i].cane->hasDependencyOn(cane)); 
 
 	return childrenAreDependent;
 }
@@ -88,7 +88,7 @@ bool Cane :: hasDependencyOn(GlassColor* glassColor)
 
 	bool childrenAreDependent = false;
 	for (unsigned int i = 0; i < this->state.subs.size(); ++i) 
-		childrenAreDependent = (childrenAreDependent || this->state.subs[i].plan->hasDependencyOn(glassColor)); 
+		childrenAreDependent = (childrenAreDependent || this->state.subs[i].cane->hasDependencyOn(glassColor)); 
 
 	return childrenAreDependent;
 }
@@ -100,7 +100,7 @@ void Cane :: setTemplateType(PullTemplate::Type _templateType)
 
 	// if you're switching to a template where count matters, and it's a funky value,
 	// set it to something more reasonable
-	if (this->state.count < 2 && templateHasSubplans(_templateType))
+	if (this->state.count < 2 && templateHasSubcanes(_templateType))
 		this->state.count = 7;
 
 	this->state.type = _templateType;
@@ -346,40 +346,40 @@ enum GeometricShape Cane :: getCasingShape(unsigned int index)
 void Cane :: pushNewSubpull(bool hardReset, vector<SubcaneTemplate>* newSubs,
 	enum GeometricShape _shape, Point2D p, float diameter) 
 {
-	Cane* plan = NULL;
+	Cane* cane = NULL;
 
-	// if it's not a hard reset and there are still old subplans to use and the next one matches shape
+	// if it's not a hard reset and there are still old subcanes to use and the next one matches shape
 	// with the shape we want to have, then use it
 	if (!hardReset && newSubs->size() < this->state.subs.size() 
 		&& _shape == this->state.subs[newSubs->size()].shape) 
 	{
-		plan = this->state.subs[newSubs->size()].plan;
+		cane = this->state.subs[newSubs->size()].cane;
 	}
-	else // otherwise just use whichever filler subplan matches the shape
+	else // otherwise just use whichever filler subcane matches the shape
 	{
 		switch (_shape) 
 		{
 			case CIRCLE_SHAPE:
-				plan = GlobalGlass::circlePlan();
+				cane = GlobalGlass::circleCane();
 				break;
 			case SQUARE_SHAPE:
-				plan = GlobalGlass::squarePlan();
+				cane = GlobalGlass::squareCane();
 				break;
 		}
 	}
 
-	newSubs->push_back(SubcaneTemplate(plan, _shape, p, diameter));
+	newSubs->push_back(SubcaneTemplate(cane, _shape, p, diameter));
 }
 
 // resetSubs()
 
 // Description:
 // This function is invoked after the template or a template parameter,
-// has changed in the pull plan. The purpose is to recompute the locations 
-// and sizes of subcanes, as well as add or remove subplans if the number 
-// of subplans changed. For instance, changing a template parameter 
+// has changed in the cane. The purpose is to recompute the locations 
+// and sizes of subcanes, as well as add or remove subcanes if the number 
+// of subcanes changed. For instance, changing a template parameter 
 // specifying the number of subcanes in a row changes the size and location 
-// of subplans, as well as increasing or decreasing the number of subplans.
+// of subcanes, as well as increasing or decreasing the number of subcanes.
 void Cane :: resetSubs(bool hardReset)
 {
 	Point2D p = make_vector(0.0f, 0.0f);
@@ -607,14 +607,14 @@ Cane* Cane :: copy() const
 	return c;
 }
 
-Cane *deep_copy(const Cane *_plan) 
+Cane *deep_copy(const Cane *_cane) 
 {
 	unordered_map<const Cane*, Cane*> copies;
-	Cane *plan = _plan->copy();
-	copies.insert(make_pair(_plan, plan));
+	Cane *cane = _cane->copy();
+	copies.insert(make_pair(_cane, cane));
 
 	vector<Cane*> to_update;
-	to_update.push_back(plan);
+	to_update.push_back(cane);
 	//update sub-templates to point to copies as well:
 	while (!to_update.empty()) 
 	{
@@ -623,25 +623,25 @@ Cane *deep_copy(const Cane *_plan)
 		for (unsigned int i = 0; i < t->subpullCount(); ++i)
 		{
 			SubcaneTemplate s = t->getSubcaneTemplate(i);
-			unordered_map<const Cane*, Cane*>::iterator f = copies.find(s.plan);
+			unordered_map<const Cane*, Cane*>::iterator f = copies.find(s.cane);
 			if (f == copies.end()) 
 			{
-				f = copies.insert(make_pair(s.plan, s.plan->copy())).first;
+				f = copies.insert(make_pair(s.cane, s.cane->copy())).first;
 				to_update.push_back(f->second);
 			}
-			s.plan = f->second;
+			s.cane = f->second;
 			t->setSubcaneTemplate(s, i);
 		}
 	}
-	return plan;
+	return cane;
 }
 
-void deep_delete(Cane *plan) 
+void deep_delete(Cane *cane) 
 {
-	//Because pull plans don't delete their children (which is right):
+	//Because canes don't delete their children (which is right):
 	unordered_set<Cane*> marked;
 	vector<Cane*> to_delete;
-	to_delete.push_back(plan);
+	to_delete.push_back(cane);
 	while (!to_delete.empty()) 
 	{
 		Cane *t = to_delete.back();
@@ -649,9 +649,9 @@ void deep_delete(Cane *plan)
 		for (unsigned int i = 0; i < t->subpullCount(); ++i)
 		{
 			SubcaneTemplate s = t->getSubcaneTemplate(i);
-			if (marked.insert(s.plan).second) 
-				to_delete.push_back(s.plan);
-			s.plan = NULL;
+			if (marked.insert(s.cane).second) 
+				to_delete.push_back(s.cane);
+			s.cane = NULL;
 			t->setSubcaneTemplate(s, i);
 		}
 		delete t;

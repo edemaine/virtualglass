@@ -554,7 +554,7 @@ void CaneCustomizeViewWidget :: drawSubcane(Point2D upperLeft, float drawWidth, 
 		float rWidth = subpull.diameter * drawWidth/2;
 		float rHeight = subpull.diameter * drawHeight/2;
 
-		drawSubcane(subUpperLeft, rWidth, rHeight, subpull.plan, false, painter);
+		drawSubcane(subUpperLeft, rWidth, rHeight, subpull.cane, false, painter);
 
 		setBoundaryPainter(painter, outermostLevel);
 		painter->setBrush(Qt::NoBrush);
@@ -736,7 +736,7 @@ void CaneCustomizeViewWidget :: addCircleClicked()
 		diameter = cane->getCasingThickness(0);
 	}
 	
-	cane->addSubcaneTemplate(SubcaneTemplate(GlobalGlass::circlePlan(), CIRCLE_SHAPE, p, diameter));
+	cane->addSubcaneTemplate(SubcaneTemplate(GlobalGlass::circleCane(), CIRCLE_SHAPE, p, diameter));
 	cane->saveState();
 	subcanesSelected.clear();
 	subcanesSelected.push_back(cane->subpullCount()-1);
@@ -758,7 +758,7 @@ void CaneCustomizeViewWidget :: addSquareClicked()
 	{
 		diameter = cane->getCasingThickness(0);
 	}
-	cane->addSubcaneTemplate(SubcaneTemplate(GlobalGlass::squarePlan(), SQUARE_SHAPE, p, diameter));
+	cane->addSubcaneTemplate(SubcaneTemplate(GlobalGlass::squareCane(), SQUARE_SHAPE, p, diameter));
 	cane->saveState();
 	subcanesSelected.clear();
 	subcanesSelected.push_back(cane->subpullCount()-1);

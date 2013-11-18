@@ -7,16 +7,16 @@
 #include "cane.h"
 
 GlassColorLibraryWidget :: GlassColorLibraryWidget(GlassColor* _glassColor, MainWindow* _window, 
-	Cane* _circlePlan, Cane* _squarePlan) : AsyncRenderWidget(_window), glassColor(_glassColor), 
-	circlePlan(_circlePlan), squarePlan(_squarePlan) 
+	Cane* _circleCane, Cane* _squareCane) : AsyncRenderWidget(_window), glassColor(_glassColor), 
+	circleCane(_circleCane), squareCane(_squareCane) 
 {
 	setFixedSize(100, 100);
-	if (_circlePlan == NULL)
-		circlePlan = new Cane(PullTemplate::BASE_CIRCLE);
-	circlePlan->setOutermostCasingColor(_glassColor);
-	if (_squarePlan == NULL)
-		squarePlan = new Cane(PullTemplate::BASE_SQUARE);
-	squarePlan->setOutermostCasingColor(_glassColor);
+	if (_circleCane == NULL)
+		circleCane = new Cane(PullTemplate::BASE_CIRCLE);
+	circleCane->setOutermostCasingColor(_glassColor);
+	if (_squareCane == NULL)
+		squareCane = new Cane(PullTemplate::BASE_SQUARE);
+	squareCane->setOutermostCasingColor(_glassColor);
 	updatePixmaps();
 }
 

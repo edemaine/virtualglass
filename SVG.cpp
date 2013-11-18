@@ -32,7 +32,7 @@ public:
 class Parse {
 public:
 Parse(std::istream &in, SVG &_into, Cane* myCane) : into(_into) {
-	pullPlan = myCane;
+	cane = myCane;
 	parser = XML_ParserCreate(NULL);
 	XML_SetUserData(parser, this);
 	XML_SetElementHandler(parser, &wrap_start_element, &wrap_end_element);
@@ -64,7 +64,7 @@ vector< Node * > stack;
 vector< string > errors;
 XML_Parser parser;
 SVG &into;
-Cane *pullPlan;
+Cane *cane;
 
 bool svg_length(string const &from, double &into) {
 	std::istringstream str(from);
@@ -454,9 +454,9 @@ void start_element(string const &name, map< string, string > &atts) {
 			// Scale radius
 			float diameter = width/ pageSize * sqrt(2);
 
-			// Add square to pullPlan
-			pullPlan->addSubcaneTemplate(
-				SubcaneTemplate(GlobalGlass::squarePlan(), SQUARE_SHAPE, p, diameter));
+			// Add square to cane
+			cane->addSubcaneTemplate(
+				SubcaneTemplate(GlobalGlass::squareCane(), SQUARE_SHAPE, p, diameter));
 			} else {
 				node.moveto(make_vector(x,y));
 				node.lineto(make_vector(x+width,y));
@@ -481,9 +481,9 @@ void start_element(string const &name, map< string, string > &atts) {
 				// Scale radius
 				float diameter = 2*r/ pageSize * sqrt(2);
 
-				// Add circle to pullPlan
-				pullPlan->addSubcaneTemplate(
-					SubcaneTemplate(GlobalGlass::circlePlan(), CIRCLE_SHAPE, p, diameter));
+				// Add circle to cane
+				cane->addSubcaneTemplate(
+					SubcaneTemplate(GlobalGlass::circleCane(), CIRCLE_SHAPE, p, diameter));
 
 			} else {
 				Error(this) << "circle without cx, cy, or r.";
@@ -859,9 +859,9 @@ void Node::execute(Matrix const &xform, double tol, vector< vector< Vector2d > >
 	}
 }
 
-bool load_svg(std::string const &filename, SVG &into, Cane *pullPlan) {
+bool load_svg(std::string const &filename, SVG &into, Cane *cane) {
 	std::ifstream file(filename.c_str());
-	Parse parse(file, into, pullPlan);
+	Parse parse(file, into, cane);
 	return parse.errors.empty();
 }
 

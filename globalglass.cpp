@@ -8,8 +8,8 @@
 namespace GlobalGlass
 {
 	GlassColor* _color = 0;
-	Cane* _circlePlan = 0;
-	Cane* _squarePlan = 0;
+	Cane* _circleCane = 0;
+	Cane* _squareCane = 0;
 
 	GlassColor* color()
 	{
@@ -18,18 +18,18 @@ namespace GlobalGlass
 		return _color;
 	}
 	
-	Cane* circlePlan()
+	Cane* circleCane()
 	{
-		if (_circlePlan == 0)
-			_circlePlan = new Cane(PullTemplate::BASE_CIRCLE);
-		return _circlePlan;
+		if (_circleCane == 0)
+			_circleCane = new Cane(PullTemplate::BASE_CIRCLE);
+		return _circleCane;
 	}
 
-	Cane* squarePlan()
+	Cane* squareCane()
 	{
-		if (_squarePlan == 0)
-			_squarePlan = new Cane(PullTemplate::BASE_SQUARE);
-		return _squarePlan;
+		if (_squareCane == 0)
+			_squareCane = new Cane(PullTemplate::BASE_SQUARE);
+		return _squareCane;
 	}
 }
 

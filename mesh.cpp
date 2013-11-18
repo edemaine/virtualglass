@@ -22,7 +22,7 @@ bool generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometr
 	if (pickupGeometry != NULL)
 	{
 		pickupGeometry->clear();
-		generateMesh(piece->pickupPlan(), pickupGeometry, true, quality, endPickup);
+		generateMesh(piece->pickup(), pickupGeometry, true, quality, endPickup);
 		completedPickup = clock() < endPickup;
 		pickupGeometry->compute_normals_from_triangles();
 	}
@@ -33,7 +33,7 @@ bool generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometr
 	if (pieceGeometry != NULL)
 	{
 		pieceGeometry->clear();
-		generateMesh(piece->pickupPlan(), pieceGeometry, false, quality, endPiece);
+		generateMesh(piece->pickup(), pieceGeometry, false, quality, endPiece);
 		completedPiece = clock() < endPiece;
 		applyPieceTransform(pieceGeometry, piece);
 		casePiece(pieceGeometry, piece);
@@ -148,7 +148,7 @@ void casePiece(Geometry* geometry, Piece* piece)
 {
 	// base thickness of casing off of representative (first) cane in pickup
 	float thickness;
-	SubpickupTemplate firstTemp = piece->pickupPlan()->getSubpickupTemplate(0);
+	SubpickupTemplate firstTemp = piece->pickup()->getSubpickupTemplate(0);
 	if (firstTemp.orientation == MURRINE_PICKUP_CANE_ORIENTATION)
 		thickness = firstTemp.length*2.5;	
 	else
@@ -156,7 +156,7 @@ void casePiece(Geometry* geometry, Piece* piece)
 	
 	// mesh the slab and apply the casing
 	unsigned int verticesStart = geometry->vertices.size();
-	meshPickupCasingSlab(geometry, piece->pickupPlan()->casingGlassColor()->color(), 0.0, thickness);
+	meshPickupCasingSlab(geometry, piece->pickup()->casingGlassColor()->color(), 0.0, thickness);
 	Spline spline = piece->spline();
 	for (uint32_t i = verticesStart; i < geometry->vertices.size(); ++i)
 		applyPieceTransform(geometry->vertices[i], 0.0 /* NO TWIST */, spline);

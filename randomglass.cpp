@@ -78,7 +78,7 @@ Cane* randomComplexCane(Cane* circleSimplePlan, Cane* squareSimplePlan)
 	return cane;
 }
 
-Pickup* randomPickup(Cane* pullPlan1, Cane* pullPlan2)
+Pickup* randomPickup(Cane* cane1, Cane* cane2)
 {
 	int randomTemplateNumber = qrand() % (PickupTemplate::lastSeedTemplate() - PickupTemplate::firstSeedTemplate())
 		+ PickupTemplate::firstSeedTemplate();
@@ -97,16 +97,16 @@ Pickup* randomPickup(Cane* pullPlan1, Cane* pullPlan2)
 	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
 	{
 		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
-		t.cane = pullPlan1;
+		t.cane = cane1;
 		pickup->setSubpickupTemplate(t, i);
 	}
 	// if a second cane is provided, alternate with the first one
-	if (pullPlan2 != NULL)
+	if (cane2 != NULL)
 	{
 		for (unsigned int i = 0; i < pickup->subpickupCount(); i+=2)
 		{
 			SubpickupTemplate t = pickup->getSubpickupTemplate(i);
-			t.cane = pullPlan2;
+			t.cane = cane2;
 			pickup->setSubpickupTemplate(t, i);
 		}
 	}

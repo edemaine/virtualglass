@@ -6,8 +6,8 @@
 #include "canelibrarywidget.h"
 #include "canecrosssectionrender.h"
 
-CaneLibraryWidget :: CaneLibraryWidget(Cane *_pullPlan, MainWindow *_window) 
-	: AsyncRenderWidget(_window), pullPlan(_pullPlan)
+CaneLibraryWidget :: CaneLibraryWidget(Cane *_cane, MainWindow *_window) 
+	: AsyncRenderWidget(_window), cane(_cane)
 {
 	setFixedSize(100, 100);
 	updatePixmaps();
@@ -25,7 +25,7 @@ void CaneLibraryWidget :: updatePixmaps()
 	camera.up = make_vector(0.0f, 0.0f, 1.0f);
 	camera.isPerspective = false;
 	camera.size = make_vector(300U, 300U);
-	setScene(camera, new CaneRenderData(pullPlan));
+	setScene(camera, new CaneRenderData(cane));
 }
 
 const QPixmap* CaneLibraryWidget :: dragPixmap()
@@ -49,7 +49,7 @@ void CaneLibraryWidget :: updateDragPixmap()
 	_pixmap.fill(Qt::transparent); 
 
 	QPainter painter(&_pixmap);
-	CaneCrossSectionRender::render(&painter, 100, pullPlan);
+	CaneCrossSectionRender::render(&painter, 100, cane);
 	painter.end();
 
 	_dragPixmap = _pixmap;

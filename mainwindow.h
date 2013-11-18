@@ -82,7 +82,7 @@ class MainWindow : public QMainWindow
 		void moveCurrentEditingObject(int d);
 		void clearLibrary();
 		bool glassColorIsDependancy(GlassColor* color);
-		bool pullPlanIsDependancy(Cane* cane);
+		bool caneIsDependancy(Cane* cane);
 		void updateWindowTitle();
 		void setDirtyBit(bool v);
 		void setSaveFilename(QString filename);
@@ -100,13 +100,13 @@ class MainWindow : public QMainWindow
 		// Variables
 		QScrollArea* libraryScrollArea;
 		QVBoxLayout* glassColorLibraryLayout;
-		QVBoxLayout* pullPlanLibraryLayout;
+		QVBoxLayout* caneLibraryLayout;
 		QVBoxLayout* pieceLibraryLayout;
 		QStackedWidget* editorStack; //editorStack.currentIndex() gives which mode
 		QWidget* centralWidget;
 		QHBoxLayout* centralLayout;
 		ColorEditorWidget* glassColorEditorWidget;
-		CaneEditorWidget* pullPlanEditorWidget;
+		CaneEditorWidget* caneEditorWidget;
 		PieceEditorWidget* pieceEditorWidget;
 
 		QPushButton* newFileButton;
