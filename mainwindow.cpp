@@ -428,7 +428,7 @@ void MainWindow::deleteLibraryWidget(GlassLibraryWidget* lw)
 	cur->widget()->moveToThread(QApplication::instance()->thread());
 	cur->widget()->deleteLater();
 	delete cur;
-	// this is a memory leak, as the glass color/pull plan/piece is never deleted
+	// this is a memory leak, as the glass color/cane/piece is never deleted
 	updateLibrary();
 
 	setDirtyBit(true);
@@ -634,7 +634,7 @@ void MainWindow :: randomComplexCaneExampleActionTriggered()
 	pullPlanLibraryLayout->addWidget(new CaneLibraryWidget(randomComplexPP, this));
 	setDirtyBit(true);
 
-	// add simple plans only if they are used
+	// add simple canes only if they are used
 	// memory leak! as unused ones never appear in library
 	if (randomComplexPP->hasDependencyOn(randomCPP))
 		pullPlanLibraryLayout->addWidget(new CaneLibraryWidget(randomCPP, this));
@@ -881,7 +881,7 @@ void MainWindow :: setupEditors()
 
 void MainWindow :: setupColorEditor()
 {
-	// Setup data objects - the current plan and library widget for this plan
+	// Setup data objects - the current cane and library widget for this cane
 	glassColorEditorWidget = new ColorEditorWidget(editorStack);
 	glassColorLibraryLayout->addWidget(
 		new GlassColorLibraryWidget(glassColorEditorWidget->glassColor(), this));
@@ -890,7 +890,7 @@ void MainWindow :: setupColorEditor()
 
 void MainWindow :: setupCaneEditor()
 {
-	// Setup data objects - the current plan and library widget for this plan
+	// Setup data objects - the current cane and library widget for this cane
 	pullPlanEditorWidget = new CaneEditorWidget(editorStack);
 	pullPlanLibraryLayout->addWidget(
 		new CaneLibraryWidget(pullPlanEditorWidget->pullPlan(), this));
@@ -899,7 +899,7 @@ void MainWindow :: setupCaneEditor()
 
 void MainWindow :: setupPieceEditor()
 {
-	// Setup data objects - the current plan and library widget for this plan
+	// Setup data objects - the current cane and library widget for this cane
 	pieceEditorWidget = new PieceEditorWidget(editorStack);
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(pieceEditorWidget->piece(), this));
 	pieceEditorWidget->updateEverything();
@@ -935,8 +935,8 @@ void MainWindow :: newPieceButtonClicked()
 	updateLibrary();
 }
 
-// returns whether the pull plan is a dependancy of something in the library
-// (either a pull plan or a piece)
+// returns whether the cane is a dependancy of something in the library
+// (either a cane or a piece)
 bool MainWindow :: glassColorIsDependancy(GlassColor* color)
 {
 	CaneLibraryWidget* pplw;
@@ -964,23 +964,23 @@ bool MainWindow :: glassColorIsDependancy(GlassColor* color)
 	return false;
 }
 
-// returns whether the pull plan is a dependancy of something in the library
-// (either another pull plan or a piece)
-bool MainWindow :: pullPlanIsDependancy(Cane* plan)
+// returns whether the cane is a dependancy of something in the library
+// (either another cane or a piece)
+bool MainWindow :: pullPlanIsDependancy(Cane* cane)
 {
 	CaneLibraryWidget* pplw;
 	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 	{
 		pplw = dynamic_cast<CaneLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
-		// Check whether the pull plan in the library is:
-		// 1. the parameter plan
-		// 2. a plan with the plan currently being edited as a subplan
-		if (pplw->pullPlan == plan)
+		// Check whether the cane in the library is:
+		// 1. the parameter cane
+		// 2. a cane with the cane currently being edited as a subcane
+		if (pplw->pullPlan == cane)
 		{
 			continue;
 		}
-		else if (pplw->pullPlan->hasDependencyOn(plan))
+		else if (pplw->pullPlan->hasDependencyOn(cane))
 		{
 			return true;
 		}
@@ -991,7 +991,7 @@ bool MainWindow :: pullPlanIsDependancy(Cane* plan)
 	{
 		plw = dynamic_cast<PieceLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
-		if (plw->piece->hasDependencyOn(plan))
+		if (plw->piece->hasDependencyOn(cane))
 		{
 			return true;
 		}
@@ -1090,10 +1090,10 @@ void MainWindow :: updateLibrary()
 			{
 				CaneLibraryWidget* pplw = dynamic_cast<CaneLibraryWidget*>(
 						dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget());
-				// Check whether the pull plan in the library is:
-				// 1. the plan currently being edited
-				// 2. a subplan of the plan current being edited
-				// 3. a plan with the plan currently being edited as a subplan
+				// Check whether the cane in the library is:
+				// 1. the cane currently being edited
+				// 2. a subcane of the cane current being edited
+				// 3. a cane with the cane currently being edited as a subcane
 				if (pullPlanEditorWidget->pullPlan() == pplw->pullPlan)
 				{
 					pplw->updatePixmaps();
@@ -1410,7 +1410,7 @@ void MainWindow::importSVGActionTriggered()
 	pullPlanEditorWidget->setCane(newEditorPlan);
 }
 
-void MainWindow::getDependantLibraryContents(Piece* piece, vector<GlassColor*>& colors, vector<Cane*>& plans, 
+void MainWindow::getDependantLibraryContents(Piece* piece, vector<GlassColor*>& colors, vector<Cane*>& canes, 
 	vector<Piece*>& pieces)
 {
 	for (int i = 0; i < glassColorLibraryLayout->count(); ++i)
@@ -1420,33 +1420,33 @@ void MainWindow::getDependantLibraryContents(Piece* piece, vector<GlassColor*>& 
 		if (piece->hasDependencyOn(cblw->glassColor))
 		{
 			colors.push_back(cblw->glassColor);
-			plans.push_back(cblw->circlePlan);
-			plans.push_back(cblw->squarePlan);
+			canes.push_back(cblw->circlePlan);
+			canes.push_back(cblw->squarePlan);
 		}
 	}
 
 	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 	{
-		Cane* plan = dynamic_cast<CaneLibraryWidget*>(
+		Cane* cane = dynamic_cast<CaneLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget())->pullPlan;
-		if (piece->hasDependencyOn(plan))
-			plans.push_back(plan);
+		if (piece->hasDependencyOn(cane))
+			canes.push_back(cane);
 	}
 	
 	pieces.push_back(piece);	
 }
 
-void MainWindow::getDependantLibraryContents(Cane* plan, vector<GlassColor*>& colors, vector<Cane*>& plans)
+void MainWindow::getDependantLibraryContents(Cane* cane, vector<GlassColor*>& colors, vector<Cane*>& canes)
 {
 	for (int i = 0; i < glassColorLibraryLayout->count(); ++i)
 	{
 		GlassColorLibraryWidget *cblw = dynamic_cast<GlassColorLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(glassColorLibraryLayout->itemAt(i))->widget());
-		if (plan->hasDependencyOn(cblw->glassColor))
+		if (cane->hasDependencyOn(cblw->glassColor))
 		{
 			colors.push_back(cblw->glassColor);
-			plans.push_back(cblw->circlePlan);
-			plans.push_back(cblw->squarePlan);
+			canes.push_back(cblw->circlePlan);
+			canes.push_back(cblw->squarePlan);
 		}
 	}
 
@@ -1454,12 +1454,12 @@ void MainWindow::getDependantLibraryContents(Cane* plan, vector<GlassColor*>& co
 	{
 		Cane* otherPlan = dynamic_cast<CaneLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(pullPlanLibraryLayout->itemAt(i))->widget())->pullPlan;
-		if (plan->hasDependencyOn(otherPlan))
-			plans.push_back(otherPlan);
+		if (cane->hasDependencyOn(otherPlan))
+			canes.push_back(otherPlan);
 	}
 }
 
-void MainWindow::getDependantLibraryContents(GlassColor* color, vector<GlassColor*>& colors, vector<Cane*>& plans)
+void MainWindow::getDependantLibraryContents(GlassColor* color, vector<GlassColor*>& colors, vector<Cane*>& canes)
 {
 	for (int i = 0; i < glassColorLibraryLayout->count(); ++i)
 	{
@@ -1468,29 +1468,29 @@ void MainWindow::getDependantLibraryContents(GlassColor* color, vector<GlassColo
 		if (cblw->glassColor == color)
 		{
 			colors.push_back(cblw->glassColor);
-			plans.push_back(cblw->circlePlan);
-			plans.push_back(cblw->squarePlan);
+			canes.push_back(cblw->circlePlan);
+			canes.push_back(cblw->squarePlan);
 			break;
 		}
 	}
 }
 
-void MainWindow::getLibraryContents(vector<GlassColor*>& colors, vector<Cane*>& plans, vector<Piece*>& pieces)
+void MainWindow::getLibraryContents(vector<GlassColor*>& colors, vector<Cane*>& canes, vector<Piece*>& pieces)
 {
 	for (int i = 0; i < glassColorLibraryLayout->count(); ++i)
 	{
 		GlassColorLibraryWidget *cblw = dynamic_cast<GlassColorLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(glassColorLibraryLayout->itemAt(i))->widget());
 		colors.push_back(cblw->glassColor);
-		plans.push_back(cblw->circlePlan);
-		plans.push_back(cblw->squarePlan);
+		canes.push_back(cblw->circlePlan);
+		canes.push_back(cblw->squarePlan);
 	}
 
 	for (int i = 0; i < pullPlanLibraryLayout->count(); ++i)
 	{
 		CaneLibraryWidget* pplw = dynamic_cast<CaneLibraryWidget*>(
 			dynamic_cast<QWidgetItem*>(pullPlanLibraryLayout->itemAt(i))->widget());
-		plans.push_back(pplw->pullPlan);
+		canes.push_back(pplw->pullPlan);
 	}
 
 	for (int i = 0; i < pieceLibraryLayout->count(); ++i)
@@ -1553,61 +1553,61 @@ void MainWindow::newFileActionTriggered()
 	setDirtyBit(false);
 }
 
-void MainWindow::addToLibrary(vector<GlassColor*>& colors, vector<Cane*>& plans, vector<Piece*>& pieces)
+void MainWindow::addToLibrary(vector<GlassColor*>& colors, vector<Cane*>& canes, vector<Piece*>& pieces)
 {
 	for (unsigned int i = 0; i < colors.size(); ++i)
 	{
-		// search ad hoc for plans that match the description of being 
-		// the type of plans that live in color bar library widgets, and 
+		// search ad hoc for canes that match the description of being 
+		// the type of canes that live in color bar library widgets, and 
 		// have the right color
 		// 
-		// this approach is biased *towards* sucking plans into color bar
-		// library widgets. if you actually make pull plans that look exactly
-		// like color bars (no subplans, one casing), it will rip the first one
-		// out of the pull plan list (where you had it) and put it in the 
+		// this approach is biased *towards* sucking canes into color bar
+		// library widgets. if you actually make canes that look exactly
+		// like color bars (no subcanes, one casing), it will rip the first one
+		// out of the cane list (where you had it) and put it in the 
 		// corresponding color library widget. 
 		//
 		// preserving the library exactly in all cases would require explicitly 
-		// writing membership in the save file, either in colors or pull plans.
+		// writing membership in the save file, either in colors or canes.
 		// we don't do this for now to keep the save files as simple as possible,
 		// and bias the user's mental model towards "color bars live in color
-		// objects" and away from "I need to make a new color bar pull plan to
+		// objects" and away from "I need to make a new color bar cane to
 		// use a color". 
 		//
-		// if the json file is never hand edited and the plans have the same label
+		// if the json file is never hand edited and the canes have the same label
 		// ordering as that induced when writing to a file, then save/load preserves
 		// the library exactly
 		Cane* circlePlan = NULL;
-		for (unsigned int j = 0; j < plans.size(); ++j)
+		for (unsigned int j = 0; j < canes.size(); ++j)
 		{
-			// we take the *first* matching plan because in getLibraryContents()
-			// we add the color library widget plans to the plans list *first*.
-			if (plans[j]->templateType() == PullTemplate::BASE_CIRCLE 
-				&& plans[j]->casingCount() == 1
-				&& plans[j]->outermostCasingColor() == colors[i])
+			// we take the *first* matching cane because in getLibraryContents()
+			// we add the color library widget canes to the canes list *first*.
+			if (canes[j]->templateType() == PullTemplate::BASE_CIRCLE 
+				&& canes[j]->casingCount() == 1
+				&& canes[j]->outermostCasingColor() == colors[i])
 			{
-				circlePlan = plans[j];
-				plans.erase(plans.begin() + j);
+				circlePlan = canes[j];
+				canes.erase(canes.begin() + j);
 				break;
 			}
 		}
 		Cane* squarePlan = NULL;
-		for (unsigned int j = 0; j < plans.size(); ++j)
+		for (unsigned int j = 0; j < canes.size(); ++j)
 		{
-			if (plans[j]->templateType() == PullTemplate::BASE_SQUARE 
-				&& plans[j]->casingCount() == 1
-				&& plans[j]->outermostCasingColor() == colors[i])
+			if (canes[j]->templateType() == PullTemplate::BASE_SQUARE 
+				&& canes[j]->casingCount() == 1
+				&& canes[j]->outermostCasingColor() == colors[i])
 			{
-				squarePlan = plans[j];
-				plans.erase(plans.begin() + j);
+				squarePlan = canes[j];
+				canes.erase(canes.begin() + j);
 				break;
 			}
 		}
 		glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(colors[i], this, 
 			circlePlan, squarePlan));
 	}
-	for (unsigned int i = 0; i < plans.size(); ++i)
-		pullPlanLibraryLayout->addWidget(new CaneLibraryWidget(plans[i], this));
+	for (unsigned int i = 0; i < canes.size(); ++i)
+		pullPlanLibraryLayout->addWidget(new CaneLibraryWidget(canes[i], this));
 	for (unsigned int i = 0; i < pieces.size(); ++i)
 		pieceLibraryLayout->addWidget(new PieceLibraryWidget(pieces[i], this));
 
@@ -1617,9 +1617,9 @@ void MainWindow::openFile(QString filename, bool add)
 {
 	// try to read in the file
 	vector<GlassColor*> colors;
-	vector<Cane*> plans;
+	vector<Cane*> canes;
 	vector<Piece*> pieces;
-	bool success = readGlassFile(filename, colors, plans, pieces);
+	bool success = readGlassFile(filename, colors, canes, pieces);
 
 	// if it failed, pop a sad little message box 
 	if (!success) 
@@ -1641,7 +1641,7 @@ void MainWindow::openFile(QString filename, bool add)
 		setDirtyBit(false);
 	}
 	
-	addToLibrary(colors, plans, pieces);	
+	addToLibrary(colors, canes, pieces);	
 }
 
 void MainWindow::openFileActionTriggered()
@@ -1743,19 +1743,19 @@ void MainWindow::shareFileActionTriggered()
 	
 	// Step 1. Grab selected object and dependancies and write them to a temp file
 	vector<GlassColor*> colors;
-	vector<Cane*> plans;
+	vector<Cane*> canes;
 	vector<Piece*> pieces;
 	switch (editorStack->currentIndex())
 	{
 		case PULLPLAN_VIEW_MODE:
-			getDependantLibraryContents(pullPlanEditorWidget->pullPlan(), colors, plans);
+			getDependantLibraryContents(pullPlanEditorWidget->pullPlan(), colors, canes);
 			break;
 		case PIECE_VIEW_MODE:
-			getDependantLibraryContents(pieceEditorWidget->piece(), colors, plans, pieces);
+			getDependantLibraryContents(pieceEditorWidget->piece(), colors, canes, pieces);
 			break;
 	}
 	QBuffer glassFileBuffer;
-	writeGlassFile(glassFileBuffer, colors, plans, pieces);	
+	writeGlassFile(glassFileBuffer, colors, canes, pieces);	
 
 
 	// Step 2. Grab a screenshot and write it to the buffer
@@ -1789,10 +1789,10 @@ void MainWindow::saveAllFileActionTriggered()
 		// call the actual file-saving code in GlassFileWriter
 		vector<GlassColor*> colors;
 		vector<Cane*> colorPlans;
-		vector<Cane*> plans;
+		vector<Cane*> canes;
 		vector<Piece*> pieces;
-		getLibraryContents(colors, plans, pieces);
-		writeGlassFile(saveFilename, colors, plans, pieces);	
+		getLibraryContents(colors, canes, pieces);
+		writeGlassFile(saveFilename, colors, canes, pieces);	
 		setDirtyBit(false);
 	}
 }
@@ -1813,10 +1813,10 @@ void MainWindow::saveAllAsFileActionTriggered()
 	setSaveFilename(userSpecifiedFilename);
 	
 	vector<GlassColor*> colors;
-	vector<Cane*> plans;
+	vector<Cane*> canes;
 	vector<Piece*> pieces;
-	getLibraryContents(colors, plans, pieces);
-	writeGlassFile(saveFilename, colors, plans, pieces);	
+	getLibraryContents(colors, canes, pieces);
+	writeGlassFile(saveFilename, colors, canes, pieces);	
 	setDirtyBit(false);
 }
 
@@ -1837,24 +1837,24 @@ void MainWindow::saveSelectedAsFileActionTriggered()
 		userSpecifiedFilename += ".glass";
 
 	vector<GlassColor*> colors;
-	vector<Cane*> plans;
+	vector<Cane*> canes;
 	vector<Piece*> pieces;
 	switch (editorStack->currentIndex())
 	{
 		case COLORBAR_VIEW_MODE:
-			getDependantLibraryContents(glassColorEditorWidget->glassColor(), colors, plans);
+			getDependantLibraryContents(glassColorEditorWidget->glassColor(), colors, canes);
 			break;
 		case PULLPLAN_VIEW_MODE:
-			getDependantLibraryContents(pullPlanEditorWidget->pullPlan(), colors, plans);
+			getDependantLibraryContents(pullPlanEditorWidget->pullPlan(), colors, canes);
 			break;
 		case PIECE_VIEW_MODE:
-			getDependantLibraryContents(pieceEditorWidget->piece(), colors, plans, pieces);
+			getDependantLibraryContents(pieceEditorWidget->piece(), colors, canes, pieces);
 			break;
 	}
 	
 	// pass off "curated" library to regular write file; 
 	// effectively pretending that the library only has your thing and its dependancies
-	writeGlassFile(userSpecifiedFilename, colors, plans, pieces);	
+	writeGlassFile(userSpecifiedFilename, colors, canes, pieces);	
 
 	// this doesn't impact dirty bit or saveFilename at all: it's a special operation that 
 	// virtualglass has that lives outside of the usual file-editor relationship, e.g. of a text editor. 

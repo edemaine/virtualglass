@@ -69,15 +69,15 @@ void Pickup::setCasingGlassColor(GlassColor* c)
 	this->state.casingGlassColor = c;
 }
 
-void Pickup :: pushNewSubplan(vector<SubpickupTemplate>* newSubs,
+void Pickup :: pushNewSubcane(vector<SubpickupTemplate>* newSubs,
 	Point3D location, enum PickupCaneOrientation ori, float length, float width, enum GeometricShape shape) 
 {
 	if (newSubs->size() < this->state.subs.size())
 	{
-		newSubs->push_back(SubpickupTemplate(this->state.subs[newSubs->size()].plan,
+		newSubs->push_back(SubpickupTemplate(this->state.subs[newSubs->size()].cane,
 			location, ori, length, width, shape));
 	}
-	else // you've run out of existing subplans copy from
+	else // you've run out of existing subcanes copy from
 	{
 		newSubs->push_back(SubpickupTemplate(GlobalGlass::circlePlan(),
 			location, ori, length, width, shape));
@@ -104,7 +104,7 @@ void Pickup :: updateSubs()
 					p.x = -1.0 + width / 2 + width * r;
 					p.y = -1.0 + width / 2 + width * c;
 					p.z = -length/2;
-					pushNewSubplan(&newSubs, p, MURRINE_PICKUP_CANE_ORIENTATION, 
+					pushNewSubcane(&newSubs, p, MURRINE_PICKUP_CANE_ORIENTATION, 
 						length, width-0.0001, SQUARE_SHAPE);
 				}
 			}
@@ -115,16 +115,16 @@ void Pickup :: updateSubs()
 				p.x = 1.0 - width / 2;
 				p.y = -1.0 + width / 2 + width * (parameters[0].value - 1 - i);
 				p.z = -width/2;
-				pushNewSubplan(&newSubs, p, MURRINE_PICKUP_CANE_ORIENTATION, width, width-0.0001, SQUARE_SHAPE);
+				pushNewSubcane(&newSubs, p, MURRINE_PICKUP_CANE_ORIENTATION, width, width-0.0001, SQUARE_SHAPE);
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = -1.0;
 				p.z = 0.0;
-				pushNewSubplan(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 2.0, width-0.0001, CIRCLE_SHAPE);
+				pushNewSubcane(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 2.0, width-0.0001, CIRCLE_SHAPE);
 			}
 			p.x = 1.0 - width / 2;
 			p.y = -1.0 + width / 2;
 			p.z = -width/2;
-			pushNewSubplan(&newSubs, p, MURRINE_PICKUP_CANE_ORIENTATION, width, width-0.0001, SQUARE_SHAPE);
+			pushNewSubcane(&newSubs, p, MURRINE_PICKUP_CANE_ORIENTATION, width, width-0.0001, SQUARE_SHAPE);
 			break;
 		case PickupTemplate::MURRINE_ROW:
 			p.x = p.y = p.z = 0.0;
@@ -133,17 +133,17 @@ void Pickup :: updateSubs()
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = -1.0;
 				p.z = 0.0;
-				pushNewSubplan(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0 - width/2, 
+				pushNewSubcane(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0 - width/2, 
 					width-0.0001, CIRCLE_SHAPE);
 				p.y = 0.0;
 				p.x = -1.0 + width / 2 + width * i;
 				p.z = -width/2;
-				pushNewSubplan(&newSubs, p, MURRINE_PICKUP_CANE_ORIENTATION, width, 
+				pushNewSubcane(&newSubs, p, MURRINE_PICKUP_CANE_ORIENTATION, width, 
 					width-0.0001, SQUARE_SHAPE);
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = width/2;
 				p.z = 0.0;
-				pushNewSubplan(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0 - width/2, 
+				pushNewSubcane(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0 - width/2, 
 					width-0.0001, CIRCLE_SHAPE);
 			}
 			break;
@@ -154,15 +154,15 @@ void Pickup :: updateSubs()
 			{
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = -1.0;
-				pushNewSubplan(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0, width-0.0001, SQUARE_SHAPE);
+				pushNewSubcane(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0, width-0.0001, SQUARE_SHAPE);
 				p.y = 0.0;
-				pushNewSubplan(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0, width-0.0001, SQUARE_SHAPE);
+				pushNewSubcane(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0, width-0.0001, SQUARE_SHAPE);
 			}
 			for (int i = 0; i < parameters[0].value; ++i)
 			{
 				p.x = 0.0 - width / 2 * (parameters[0].value % 2);
 				p.y = -1.0 + width / 2 + width * i;                                
-				pushNewSubplan(&newSubs, p, HORIZONTAL_PICKUP_CANE_ORIENTATION, 
+				pushNewSubcane(&newSubs, p, HORIZONTAL_PICKUP_CANE_ORIENTATION, 
 					1.0 + width / 2 * (parameters[0].value % 2), width-0.0001, SQUARE_SHAPE);
 			}
 			break;
@@ -173,7 +173,7 @@ void Pickup :: updateSubs()
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = -1.0;
 				//p.z = 2.0;
-				pushNewSubplan(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 2.0, width-0.0001, SQUARE_SHAPE);
+				pushNewSubcane(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 2.0, width-0.0001, SQUARE_SHAPE);
 			}
 			break;
 		case PickupTemplate::VERTICAL_WITH_LIP_WRAP:
@@ -181,11 +181,11 @@ void Pickup :: updateSubs()
 			width = 2.0 / MAX(parameters[0].value, 1);
 			p.x = -1.0;
 			p.y = 1.0 - width/2;
-			pushNewSubplan(&newSubs, p, HORIZONTAL_PICKUP_CANE_ORIENTATION, 2.0, width, SQUARE_SHAPE);
+			pushNewSubcane(&newSubs, p, HORIZONTAL_PICKUP_CANE_ORIENTATION, 2.0, width, SQUARE_SHAPE);
 			for (int i = 0; i < parameters[0].value; ++i) {
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = -1.0;
-				pushNewSubplan(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 2.0 - width, 
+				pushNewSubcane(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 2.0 - width, 
 					width-0.0001, SQUARE_SHAPE);
 			}
 			break;
@@ -197,13 +197,13 @@ void Pickup :: updateSubs()
 				p.x = -1.0 + verticals_width / 2 + verticals_width * i;
 				p.y = 0.0;
 				p.z = 0.0;
-				pushNewSubplan(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0, 
+				pushNewSubcane(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0, 
 					verticals_width-0.0001, SQUARE_SHAPE);
 				if (i % 2 == 1) {
 					p.x = -1.0;
 					p.y = -(horizontals_width / 2 + horizontals_width * (i-1) / 2);
 					p.z = 0.0;
-					pushNewSubplan(&newSubs, p, HORIZONTAL_PICKUP_CANE_ORIENTATION, 2.0, 
+					pushNewSubcane(&newSubs, p, HORIZONTAL_PICKUP_CANE_ORIENTATION, 2.0, 
 						horizontals_width-0.0001, SQUARE_SHAPE);
 				}
 			}
@@ -217,18 +217,18 @@ void Pickup :: updateSubs()
 				p.x = -1.0 + verticals_width / 2 + verticals_width * i;
 				p.y = -1.0;
 				p.z = 0.0;
-				pushNewSubplan(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 0.75,
+				pushNewSubcane(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 0.75,
 					verticals_width-0.0001, SQUARE_SHAPE);
 				p.x = -1.0 + verticals_width / 2 + verticals_width * i;
 				p.y = 0.25;
 				p.z = 0.0;
-				pushNewSubplan(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 0.75,
+				pushNewSubcane(&newSubs, p, VERTICAL_PICKUP_CANE_ORIENTATION, 0.75,
 					verticals_width-0.0001, SQUARE_SHAPE);
 				if (i % 3 == 2) {
 					p.x = -1.0;
 					p.y = 0.25 - horizontals_width / 2 - horizontals_width * (i-2) / 3;
 					p.z = 0.0;
-					pushNewSubplan(&newSubs, p, HORIZONTAL_PICKUP_CANE_ORIENTATION, 2.0, 
+					pushNewSubcane(&newSubs, p, HORIZONTAL_PICKUP_CANE_ORIENTATION, 2.0, 
 						horizontals_width-0.0001, SQUARE_SHAPE);
 				}
 			}
@@ -312,7 +312,7 @@ Pickup *deep_copy(const Pickup *_pickup)
 	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
 	{
 		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
-		t.plan = deep_copy(t.plan);
+		t.cane = deep_copy(t.cane);
 		pickup->setSubpickupTemplate(t, i);
 	}
 	return pickup;
@@ -324,8 +324,8 @@ void deep_delete(Pickup *pickup)
 	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
 	{
 		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
-		delete t.plan;
-		t.plan = NULL;
+		delete t.cane;
+		t.cane = NULL;
 		pickup->setSubpickupTemplate(t, i);
 	}
 	delete pickup;

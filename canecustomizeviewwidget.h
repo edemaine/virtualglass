@@ -30,7 +30,7 @@ class CaneCustomizeViewWidget : public QWidget
 	
 	signals:
 		void someDataChanged();
-		void pullPlanChanged(Cane* p);
+		void caneChanged(Cane* c);
 
 	public slots:
 		void updateEverything();
@@ -67,7 +67,6 @@ class CaneCustomizeViewWidget : public QWidget
 	
 		GUIMode mode;
 		Cane* cane;
-		Cane* hoveringPlan;
 		int hoveringIndex;
 		int activeBoxIndex;
 		Point2D mouseStartingLoc;
@@ -86,4 +85,4 @@ class CaneCustomizeViewWidget : public QWidget
 		void setCustomTemplate();
 };
 
-#endif // PULLPLANCUSTOMIZEVIEWWIDGET_H
+#endif // CANECUSTOMIZEVIEWWIDGET_H

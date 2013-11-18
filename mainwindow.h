@@ -82,19 +82,19 @@ class MainWindow : public QMainWindow
 		void moveCurrentEditingObject(int d);
 		void clearLibrary();
 		bool glassColorIsDependancy(GlassColor* color);
-		bool pullPlanIsDependancy(Cane* plan);
+		bool pullPlanIsDependancy(Cane* cane);
 		void updateWindowTitle();
 		void setDirtyBit(bool v);
 		void setSaveFilename(QString filename);
 		void getLibraryContents(vector<GlassColor*>& colors, 
-			vector<Cane*>& plans, vector<Piece*>& pieces);
+			vector<Cane*>& canes, vector<Piece*>& pieces);
 		void getDependantLibraryContents(GlassColor* color, 
-			vector<GlassColor*>& colors, vector<Cane*>& plans);
-		void getDependantLibraryContents(Cane* plan, 
-			vector<GlassColor*>& colors, vector<Cane*>& plans);
+			vector<GlassColor*>& colors, vector<Cane*>& canes);
+		void getDependantLibraryContents(Cane* cane, 
+			vector<GlassColor*>& colors, vector<Cane*>& canes);
 		void getDependantLibraryContents(Piece* piece, 
-			vector<GlassColor*>& colors, vector<Cane*>& plans, vector<Piece*>& pieces);
-		void addToLibrary(vector<GlassColor*>& colors, vector<Cane*>& plans, vector<Piece*>& pieces);
+			vector<GlassColor*>& colors, vector<Cane*>& canes, vector<Piece*>& pieces);
+		void addToLibrary(vector<GlassColor*>& colors, vector<Cane*>& canes, vector<Piece*>& pieces);
 		bool findLibraryWidgetData(GlassLibraryWidget* lw, int* type, QVBoxLayout** layout, int* index);
 
 		// Variables

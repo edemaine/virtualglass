@@ -16,12 +16,12 @@
 #include "globalbackgroundcolor.h"
 #include "canecrosssectionrender.h"
 
-CaneEditorViewWidget :: CaneEditorViewWidget(Cane* plan, QWidget* parent) : QWidget(parent)
+CaneEditorViewWidget :: CaneEditorViewWidget(Cane* cane, QWidget* parent) : QWidget(parent)
 {
 	// setup draw widget
 	setAcceptDrops(true);
 	setMinimumSize(200, 200);
-	this->plan = plan;
+	this->cane = cane;
 	isDraggingCasing = false;
 }
 
@@ -67,7 +67,7 @@ float CaneEditorViewWidget :: getShapeRadius(enum GeometricShape shape, Point2D 
 
 bool CaneEditorViewWidget :: isOnCasing(int casingIndex, Point2D loc)
 {
-	return fabs(plan->getCasingThickness(casingIndex) - getShapeRadius(plan->getCasingShape(casingIndex), loc)) < 0.025; 
+	return fabs(cane->getCasingThickness(casingIndex) - getShapeRadius(cane->getCasingShape(casingIndex), loc)) < 0.025; 
 }
 
 void CaneEditorViewWidget :: mousePressEvent(QMouseEvent* event)
@@ -75,7 +75,7 @@ void CaneEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	Point2D mouseLoc = mouseToCaneCoords(event->pos().x(), event->pos().y());
 
 	// Check for casing resize
-	for (unsigned int i = 0; i < plan->casingCount() - 1; ++i) 
+	for (unsigned int i = 0; i < cane->casingCount() - 1; ++i) 
 	{
 		if (isOnCasing(i, mouseLoc))
 		{
@@ -85,12 +85,12 @@ void CaneEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 		}	
 	}
 
-	// Check for convenience subplan-to-subplan drag
-	Cane* selectedSubplan = getSubplanAt(mouseLoc);
-	if (selectedSubplan != NULL)
+	// Check for convenience subcane-to-subcane drag
+	Cane* selectedSubcane = getSubcaneAt(mouseLoc);
+	if (selectedSubcane != NULL)
 	{
 	        char buf[500];
-		GlassMime::encode(buf, selectedSubplan, GlassMime::PULLPLAN_MIME);
+		GlassMime::encode(buf, selectedSubcane, GlassMime::PULLPLAN_MIME);
 		QByteArray pointerData(buf);
 		QMimeData* mimeData = new QMimeData;
 		mimeData->setText(pointerData);
@@ -101,7 +101,7 @@ void CaneEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 		QPixmap pixmap(100, 100);
 		pixmap.fill(Qt::transparent);
 		QPainter painter(&pixmap);
-		CaneCrossSectionRender::render(&painter, 100, selectedSubplan);
+		CaneCrossSectionRender::render(&painter, 100, selectedSubcane);
 		painter.end();
 		drag->setPixmap(pixmap);
 
@@ -115,7 +115,7 @@ void CaneEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	int selectedCasingIndex = getCasingIndexAt(mouseLoc);
 	if (selectedCasingIndex != -1)
 	{
-		const GlassColor* selectedColor = plan->getCasingColor(static_cast<unsigned int>(selectedCasingIndex)); 
+		const GlassColor* selectedColor = cane->getCasingColor(static_cast<unsigned int>(selectedCasingIndex)); 
 
 		QPixmap _pixmap(200, 200);
 		_pixmap.fill(Qt::transparent);
@@ -147,21 +147,21 @@ void CaneEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 
 int CaneEditorViewWidget :: getCasingIndexAt(Point2D loc)
 {
-	for (unsigned int i = 0; i < plan->casingCount(); ++i) 
+	for (unsigned int i = 0; i < cane->casingCount(); ++i) 
 	{
-		if (getShapeRadius(plan->getCasingShape(i), loc) < plan->getCasingThickness(i))
+		if (getShapeRadius(cane->getCasingShape(i), loc) < cane->getCasingThickness(i))
 			return i;
 	}
 
 	return -1;
 }
 
-int CaneEditorViewWidget :: getSubplanIndexAt(Point2D loc)
+int CaneEditorViewWidget :: getSubcaneIndexAt(Point2D loc)
 {
-	// Recursively call drawing on subplans
-	for (unsigned int i = 0; i < plan->subpullCount(); ++i)
+	// Recursively call drawing on subcanes
+	for (unsigned int i = 0; i < cane->subpullCount(); ++i)
 	{
-		SubcaneTemplate sub = plan->getSubcaneTemplate(i);
+		SubcaneTemplate sub = cane->getSubcaneTemplate(i);
 		Point2D delta;
 		delta.x = loc.x - sub.location.x;
 		delta.y = loc.y - sub.location.y;
@@ -172,12 +172,12 @@ int CaneEditorViewWidget :: getSubplanIndexAt(Point2D loc)
 	return -1;			
 }
 
-Cane* CaneEditorViewWidget :: getSubplanAt(Point2D loc)
+Cane* CaneEditorViewWidget :: getSubcaneAt(Point2D loc)
 {
-	int subplanIndex = getSubplanIndexAt(loc);
-	if (subplanIndex == -1)
+	int subcaneIndex = getSubcaneIndexAt(loc);
+	if (subcaneIndex == -1)
 		return NULL;
-	return plan->getSubcaneTemplate(subplanIndex).plan;
+	return cane->getSubcaneTemplate(subcaneIndex).cane;
 }
 
 void CaneEditorViewWidget :: setMinMaxCasingRadii(float* min, float* max)
@@ -199,20 +199,20 @@ void CaneEditorViewWidget :: setMinMaxCasingRadii(float* min, float* max)
 
 	if (draggedCasingIndex == 0) 
 	{
-		csi = plan->getCasingShape(0);
+		csi = cane->getCasingShape(0);
 		csi_minus_1 = csi;
-		csi_plus_1 = plan->getCasingShape(1);
+		csi_plus_1 = cane->getCasingShape(1);
 	
 		cti_minus_1 = 0.0;
-		cti_plus_1 = plan->getCasingThickness(1);	
+		cti_plus_1 = cane->getCasingThickness(1);	
 	}
 	else 
 	{
-		csi = plan->getCasingShape(draggedCasingIndex);
-		csi_minus_1 = plan->getCasingShape(draggedCasingIndex-1);
-		csi_plus_1 = plan->getCasingShape(draggedCasingIndex+1);
-		cti_minus_1 = plan->getCasingThickness(draggedCasingIndex-1);
-		cti_plus_1 = plan->getCasingThickness(draggedCasingIndex+1);
+		csi = cane->getCasingShape(draggedCasingIndex);
+		csi_minus_1 = cane->getCasingShape(draggedCasingIndex-1);
+		csi_plus_1 = cane->getCasingShape(draggedCasingIndex+1);
+		cti_minus_1 = cane->getCasingThickness(draggedCasingIndex-1);
+		cti_plus_1 = cane->getCasingThickness(draggedCasingIndex+1);
 	}
 		
 	if (csi == CIRCLE_SHAPE && csi_minus_1 == SQUARE_SHAPE)
@@ -236,13 +236,13 @@ void CaneEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 		return;
 
 	Point2D mouseLoc = mouseToCaneCoords(event->pos().x(), event->pos().y());
-	float radius = getShapeRadius(plan->getCasingShape(draggedCasingIndex), mouseLoc);
+	float radius = getShapeRadius(cane->getCasingShape(draggedCasingIndex), mouseLoc);
 
 	float min;
 	float max;
 
 	setMinMaxCasingRadii(&min, &max);	
-	plan->setCasingThickness(MIN(MAX(radius, min), max), draggedCasingIndex);
+	cane->setCasingThickness(MIN(MAX(radius, min), max), draggedCasingIndex);
 	updateEverything();
 	emit someDataChanged();
 }
@@ -250,7 +250,7 @@ void CaneEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 void CaneEditorViewWidget :: mouseReleaseEvent(QMouseEvent*)
 {
 	isDraggingCasing = false;
-	plan->saveState();
+	cane->saveState();
 	updateEverything();
 	emit someDataChanged();
 }
@@ -258,18 +258,18 @@ void CaneEditorViewWidget :: mouseReleaseEvent(QMouseEvent*)
 void CaneEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 {
 	event->acceptProposedAction();
-	updateHighlightedSubplansAndCasings(event);
+	updateHighlightedSubcanesAndCasings(event);
 }
 
 void CaneEditorViewWidget :: dragMoveEvent(QDragMoveEvent* event)
 {
-	updateHighlightedSubplansAndCasings(event);
+	updateHighlightedSubcanesAndCasings(event);
 	repaint();
 }
 
 void CaneEditorViewWidget :: dragLeaveEvent(QDragLeaveEvent*)
 {
-	subplansHighlighted.clear();
+	subcanesHighlighted.clear();
 	casingsHighlighted.clear();
 }
 
@@ -282,14 +282,14 @@ Point2D CaneEditorViewWidget :: mouseToCaneCoords(float x, float y)
 	return mouseLoc;
 }
 
-void CaneEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEvent* event)
+void CaneEditorViewWidget :: updateHighlightedSubcanesAndCasings(QDragMoveEvent* event)
 {
 	Point2D mouseLoc = mouseToCaneCoords(event->pos().x(), event->pos().y());
 
-	subplansHighlighted.clear();
+	subcanesHighlighted.clear();
 	casingsHighlighted.clear();
 
-	// determine highlighted subplan or casing
+	// determine highlighted subcane or casing
 	void* ptr;
 	enum GlassMime::Type type;
 	GlassMime::decode(event->mimeData()->text().toStdString().c_str(), &ptr, &type);
@@ -300,30 +300,30 @@ void CaneEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEvent*
 			GlassColorLibraryWidget* draggedLibraryColor 
 				= reinterpret_cast<GlassColorLibraryWidget*>(ptr);
 			highlightColor = draggedLibraryColor->glassColor->color();
-			int subplanIndexUnderMouse = getSubplanIndexAt(mouseLoc);
-			if (subplanIndexUnderMouse != -1)
+			int subcaneIndexUnderMouse = getSubcaneIndexAt(mouseLoc);
+			if (subcaneIndexUnderMouse != -1)
 			{
-				// if user is hovering over a subplan and the shift key is currently held down, fill in all subplans
+				// if user is hovering over a subcane and the shift key is currently held down, fill in all subcanes
 				// Note that this needs to wait until another event (say, a drag move) occurs to catch the shift button being down.
 				// The crazy thing is, on Windows a drag *blocks* the event loop, preventing the whole application from
 				// getting a keyPressEvent() until the drag is completed. So reading keyboardModifiers() actually 
 				// lets you notice that the shift key is down earlier, i.e. during the drag, which is the only time you care anyway.
 				if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
 				{
-					for (unsigned int i = 0; i < plan->subpullCount(); ++i)
-						subplansHighlighted.insert(i);
+					for (unsigned int i = 0; i < cane->subpullCount(); ++i)
+						subcanesHighlighted.insert(i);
 				}
 				else
-					subplansHighlighted.insert(subplanIndexUnderMouse);
+					subcanesHighlighted.insert(subcaneIndexUnderMouse);
 				break;
 			}
-			// If we didn't find a subplan under the mouse, see if there's a casing under it
+			// If we didn't find a subcane under the mouse, see if there's a casing under it
 			int casingIndexUnderMouse = getCasingIndexAt(mouseLoc);
 			if (casingIndexUnderMouse == -1)
 				break;
 			if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
 			{
-				for (unsigned int i = 0; i < plan->casingCount(); ++i)
+				for (unsigned int i = 0; i < cane->casingCount(); ++i)
 					casingsHighlighted.insert(i);
 			}
 			else
@@ -339,7 +339,7 @@ void CaneEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEvent*
 				break;
 			if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
 			{
-				for (unsigned int i = 0; i < plan->casingCount(); ++i)
+				for (unsigned int i = 0; i < cane->casingCount(); ++i)
 					casingsHighlighted.insert(i);
 			}
 			else
@@ -355,23 +355,23 @@ void CaneEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEvent*
 			else 
 				draggedPlan = reinterpret_cast<CaneLibraryWidget*>(ptr)->pullPlan;
 			highlightColor.r = highlightColor.g = highlightColor.b = highlightColor.a = 1.0;
-			if (draggedPlan->hasDependencyOn(plan))
+			if (draggedPlan->hasDependencyOn(cane))
 				break;
-			int subplanIndexUnderMouse = getSubplanIndexAt(mouseLoc);
-			if (subplanIndexUnderMouse == -1)
+			int subcaneIndexUnderMouse = getSubcaneIndexAt(mouseLoc);
+			if (subcaneIndexUnderMouse == -1)
 				break;
-			if (draggedPlan->outermostCasingShape() != plan->getSubcaneTemplate(subplanIndexUnderMouse).shape)
+			if (draggedPlan->outermostCasingShape() != cane->getSubcaneTemplate(subcaneIndexUnderMouse).shape)
 				break;
 			if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
 			{
-				for (unsigned int i = 0; i < plan->subpullCount(); ++i)
+				for (unsigned int i = 0; i < cane->subpullCount(); ++i)
 				{
-					if (draggedPlan->outermostCasingShape() == plan->getSubcaneTemplate(i).shape)
-						subplansHighlighted.insert(i);
+					if (draggedPlan->outermostCasingShape() == cane->getSubcaneTemplate(i).shape)
+						subcanesHighlighted.insert(i);
 				}
 			}
 			else
-				subplansHighlighted.insert(subplanIndexUnderMouse);
+				subcanesHighlighted.insert(subcaneIndexUnderMouse);
 			break;
 		}
 		default:
@@ -382,7 +382,7 @@ void CaneEditorViewWidget :: updateHighlightedSubplansAndCasings(QDragMoveEvent*
 void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 {
 	// Just so the drop animation looks right
-	if (subplansHighlighted.size() == 0 && casingsHighlighted.size() == 0)
+	if (subcanesHighlighted.size() == 0 && casingsHighlighted.size() == 0)
 		return;		
 	else
 		event->accept();
@@ -396,29 +396,29 @@ void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 		case GlassMime::COLOR_LIBRARY_MIME:
 		{
 			GlassColorLibraryWidget* draggedLibraryColor = reinterpret_cast<GlassColorLibraryWidget*>(ptr);
-			for (set<unsigned int>::iterator it = subplansHighlighted.begin(); it != subplansHighlighted.end(); ++it)
+			for (set<unsigned int>::iterator it = subcanesHighlighted.begin(); it != subcanesHighlighted.end(); ++it)
 			{
-				SubcaneTemplate sub = plan->getSubcaneTemplate(*it);
+				SubcaneTemplate sub = cane->getSubcaneTemplate(*it);
 				switch (sub.shape)
 				{
 					case CIRCLE_SHAPE:
-						sub.plan = draggedLibraryColor->circlePlan;
+						sub.cane = draggedLibraryColor->circlePlan;
 						break;
 					case SQUARE_SHAPE:
-						sub.plan = draggedLibraryColor->squarePlan;
+						sub.cane = draggedLibraryColor->squarePlan;
 						break;
 				}
-				plan->setSubcaneTemplate(sub, *it);
+				cane->setSubcaneTemplate(sub, *it);
 			}
 			for (set<unsigned int>::iterator it = casingsHighlighted.begin(); it != casingsHighlighted.end(); ++it)
-				plan->setCasingColor(draggedLibraryColor->glassColor, *it);
+				cane->setCasingColor(draggedLibraryColor->glassColor, *it);
 			break;
 		}
 		case GlassMime::COLOR_MIME:
 		{
 			GlassColor* draggedColor = reinterpret_cast<GlassColor*>(ptr);
 			for (set<unsigned int>::iterator it = casingsHighlighted.begin(); it != casingsHighlighted.end(); ++it)
-				plan->setCasingColor(draggedColor, *it);
+				cane->setCasingColor(draggedColor, *it);
 			break;
 		}
 		case GlassMime::PULLPLAN_MIME:
@@ -429,13 +429,13 @@ void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 				draggedPlan = reinterpret_cast<Cane*>(ptr);
 			else
 				draggedPlan = reinterpret_cast<CaneLibraryWidget*>(ptr)->pullPlan;
-			for (set<unsigned int>::iterator it = subplansHighlighted.begin(); it != subplansHighlighted.end(); ++it)
+			for (set<unsigned int>::iterator it = subcanesHighlighted.begin(); it != subcanesHighlighted.end(); ++it)
 			{
-				SubcaneTemplate sub = plan->getSubcaneTemplate(*it);
+				SubcaneTemplate sub = cane->getSubcaneTemplate(*it);
 				if (sub.shape == draggedPlan->outermostCasingShape())
 				{
-					sub.plan = draggedPlan;	
-					plan->setSubcaneTemplate(sub, *it);
+					sub.cane = draggedPlan;	
+					cane->setSubcaneTemplate(sub, *it);
 				}
 			}
 			break;
@@ -444,9 +444,9 @@ void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 			break;
 	}
 
-	subplansHighlighted.clear();
+	subcanesHighlighted.clear();
 	casingsHighlighted.clear();
-	plan->saveState();
+	cane->saveState();
 	updateEverything();
 	emit someDataChanged();
 }
@@ -456,9 +456,9 @@ void CaneEditorViewWidget :: updateEverything()
 	this->repaint();	
 }
 
-void CaneEditorViewWidget :: setCane(Cane* plan) 
+void CaneEditorViewWidget :: setCane(Cane* cane) 
 {
-	this->plan = plan;
+	this->cane = cane;
 	updateEverything();
 }
 
@@ -497,29 +497,29 @@ void CaneEditorViewWidget :: paintShape(Point2D upperLeft, float size, enum Geom
 	
 }
 
-void CaneEditorViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth, float drawHeight, 
-	Cane* plan, bool highlightThis, bool outermostLevel, QPainter* painter) 
+void CaneEditorViewWidget :: drawSubcane(Point2D upperLeft, float drawWidth, float drawHeight, 
+	Cane* cane, bool highlightThis, bool outermostLevel, QPainter* painter) 
 {
 
-	// Fill the subplan area with some `cleared out' color
+	// Fill the subcane area with some `cleared out' color
 	painter->setBrush(GlobalBackgroundColor::qcolor);
 	painter->setPen(Qt::NoPen);
-	paintShape(upperLeft, drawWidth, plan->outermostCasingShape(), painter);
+	paintShape(upperLeft, drawWidth, cane->outermostCasingShape(), painter);
 
 	if (highlightThis)
 	{
 		painter->setBrush(QColor(255*highlightColor.r, 255*highlightColor.g, 255*highlightColor.b,
 			255*highlightColor.a));
 		painter->setPen(Qt::NoPen);
-		paintShape(upperLeft, drawWidth, plan->outermostCasingShape(), painter);
+		paintShape(upperLeft, drawWidth, cane->outermostCasingShape(), painter);
 		return;
 	}
 
 	// Do casing colors outermost to innermost to get concentric rings of each casing's color
-	for (unsigned int i = plan->casingCount() - 1; i < plan->casingCount(); --i) 
+	for (unsigned int i = cane->casingCount() - 1; i < cane->casingCount(); --i) 
 	{
-		float casingWidth = drawWidth * plan->getCasingThickness(i);
-		float casingHeight = drawHeight * plan->getCasingThickness(i);
+		float casingWidth = drawWidth * cane->getCasingThickness(i);
+		float casingHeight = drawHeight * cane->getCasingThickness(i);
 		Point2D casingUpperLeft;
 		casingUpperLeft.x = upperLeft.x + drawWidth / 2 - casingWidth / 2;
 		casingUpperLeft.y = upperLeft.y + drawHeight / 2 - casingHeight / 2;
@@ -527,7 +527,7 @@ void CaneEditorViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth, flo
 		// Fill with solid neutral grey (in case fill is transparent)
 		painter->setBrush(GlobalBackgroundColor::qcolor);
 		painter->setPen(Qt::NoPen); // Will draw boundary after all filling is done
-		paintShape(casingUpperLeft, casingWidth, plan->getCasingShape(i), painter);
+		paintShape(casingUpperLeft, casingWidth, cane->getCasingShape(i), painter);
 		
 		// Fill with actual casing color (highlighting white or some other color)
 		if (outermostLevel && casingsHighlighted.find(i) != casingsHighlighted.end())
@@ -537,19 +537,19 @@ void CaneEditorViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth, flo
 		}
 		else
 		{
-			Color c = plan->getCasingColor(i)->color();
+			Color c = cane->getCasingColor(i)->color();
 			QColor qc(255*c.r, 255*c.g, 255*c.b, 255*c.a);
 			painter->setBrush(qc);
 		}
 
 		setBoundaryPainter(painter, outermostLevel);
-		paintShape(casingUpperLeft, casingWidth, plan->getCasingShape(i), painter);
+		paintShape(casingUpperLeft, casingWidth, cane->getCasingShape(i), painter);
 	}
 
-	// Recursively call drawing on subplans
-	for (unsigned int i = plan->subpullCount()-1; i < plan->subpullCount(); --i)
+	// Recursively call drawing on subcanes
+	for (unsigned int i = cane->subpullCount()-1; i < cane->subpullCount(); --i)
 	{
-		SubcaneTemplate sub = plan->getSubcaneTemplate(i);
+		SubcaneTemplate sub = cane->getSubcaneTemplate(i);
 
 		Point2D subUpperLeft;
 		subUpperLeft.x = upperLeft.x + (sub.location.x - sub.diameter/2.0) * drawWidth/2 + drawWidth/2;
@@ -557,8 +557,8 @@ void CaneEditorViewWidget :: drawSubplan(Point2D upperLeft, float drawWidth, flo
 		float rWidth = sub.diameter * drawWidth/2;
 		float rHeight = sub.diameter * drawHeight/2;
 
-		drawSubplan(subUpperLeft, rWidth, rHeight, sub.plan, 
-			outermostLevel && subplansHighlighted.find(i) != subplansHighlighted.end(), false, painter);
+		drawSubcane(subUpperLeft, rWidth, rHeight, sub.cane, 
+			outermostLevel && subcanesHighlighted.find(i) != subcanesHighlighted.end(), false, painter);
 		
 		painter->setBrush(Qt::NoBrush);
 		setBoundaryPainter(painter, outermostLevel); 
@@ -576,11 +576,11 @@ void CaneEditorViewWidget :: paintEvent(QPaintEvent *event)
 	painter.fillRect(event->rect(), GlobalBackgroundColor::qcolor);
 	Point2D upperLeft;
 	upperLeft.x = upperLeft.y = 10.0;
-	drawSubplan(upperLeft, squareSize - 20, squareSize - 20, plan, false, true, &painter);
+	drawSubcane(upperLeft, squareSize - 20, squareSize - 20, cane, false, true, &painter);
 
 	painter.setBrush(Qt::NoBrush);
 	setBoundaryPainter(&painter, true);
-	paintShape(upperLeft, squareSize - 20, plan->outermostCasingShape(), &painter);
+	paintShape(upperLeft, squareSize - 20, cane->outermostCasingShape(), &painter);
 
 	painter.end();
 }

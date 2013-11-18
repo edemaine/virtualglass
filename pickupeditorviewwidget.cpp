@@ -34,7 +34,7 @@ void PickupEditorViewWidget :: setupConnections()
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }
 
-void PickupEditorViewWidget :: getSubplanAt(float x, float y, Cane** subplan, int* subplanIndex)
+void PickupEditorViewWidget :: getSubcaneAt(float x, float y, Cane** subcane, int* subcaneIndex)
 {
 	int hitIndex = -1;
 	float hitDepth = -100.0;
@@ -84,29 +84,29 @@ void PickupEditorViewWidget :: getSubplanAt(float x, float y, Cane** subplan, in
 
 	if (hitIndex != -1)
 	{
-		*subplanIndex = hitIndex;
-		*subplan = this->piece->pickupPlan()->getSubpickupTemplate(hitIndex).plan;
+		*subcaneIndex = hitIndex;
+		*subcane = this->piece->pickupPlan()->getSubpickupTemplate(hitIndex).cane;
 	}
 	else
 	{
-		*subplanIndex = -1;
-		*subplan = NULL;
+		*subcaneIndex = -1;
+		*subcane = NULL;
 	}
 }
 
 void PickupEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 {
-	// Check for convenience subplan-to-subplan drag
+	// Check for convenience subcane-to-subcane drag
 	float x = (adjustedX(event->pos().x()) - squareSize/2) / float(squareSize/2-10);
 	float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
 
-	int subplanIndex;
-	Cane* subplan;
-	getSubplanAt(x, y, &subplan, &subplanIndex);
-	if (subplan != NULL)
+	int subcaneIndex;
+	Cane* subcane;
+	getSubcaneAt(x, y, &subcane, &subcaneIndex);
+	if (subcane != NULL)
 	{
 		char buf[500];
-		sprintf(buf, "%p %d", subplan, GlassMime::PULLPLAN_MIME);
+		sprintf(buf, "%p %d", subcane, GlassMime::PULLPLAN_MIME);
 		QByteArray pointerData(buf);
 		QMimeData* mimeData = new QMimeData;
 		mimeData->setText(pointerData);
@@ -117,7 +117,7 @@ void PickupEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 		QPixmap pixmap(100, 100);
 		pixmap.fill(Qt::transparent);
 		QPainter painter(&pixmap);
-		CaneCrossSectionRender::render(&painter, 100, subplan);
+		CaneCrossSectionRender::render(&painter, 100, subcane);
 		painter.end();
 		drag->setPixmap(pixmap);
 
@@ -194,15 +194,15 @@ void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 			return;
 	}
 
-	// otherwise it's a pull plan, and we do some complicated things now
+	// otherwise it's a pull cane, and we do some complicated things now
 	float x = (adjustedX(event->pos().x()) - squareSize/2) / float(squareSize/2-10);
 	float y = (adjustedY(event->pos().y()) - squareSize/2) / float(squareSize/2-10);
 
-	int subplanIndex;
-	Cane* subplan;	
-	getSubplanAt(x, y, &subplan, &subplanIndex); 	
+	int subcaneIndex;
+	Cane* subcane;	
+	getSubcaneAt(x, y, &subcane, &subcaneIndex); 	
 	
-	if (subplan != NULL)
+	if (subcane != NULL)
 	{
 		event->accept();
 		if ((event->keyboardModifiers() & Qt::ShiftModifier))
@@ -210,15 +210,15 @@ void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 			for (unsigned int i = 0; i < this->piece->pickupPlan()->subpickupCount(); ++i)
 			{
 				SubpickupTemplate t = this->piece->pickupPlan()->getSubpickupTemplate(i);
-				t.plan = droppedPlan;
+				t.cane = droppedPlan;
 				this->piece->pickupPlan()->setSubpickupTemplate(t, i);
 			}
 		}
 		else
 		{
-			SubpickupTemplate t = this->piece->pickupPlan()->getSubpickupTemplate(subplanIndex);
-			t.plan = droppedPlan;
-			this->piece->pickupPlan()->setSubpickupTemplate(t, subplanIndex);
+			SubpickupTemplate t = this->piece->pickupPlan()->getSubpickupTemplate(subcaneIndex);
+			t.cane = droppedPlan;
+			this->piece->pickupPlan()->setSubpickupTemplate(t, subcaneIndex);
 		}
 		piece->saveState();
 		emit someDataChanged();

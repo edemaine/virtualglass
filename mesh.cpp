@@ -43,11 +43,11 @@ bool generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometr
 	return completedPickup && completedPiece;		
 }
 
-bool generateMesh(Cane* plan, Geometry* geometry, unsigned int quality)
+bool generateMesh(Cane* cane, Geometry* geometry, unsigned int quality)
 {
 	clock_t start = clock();
 	clock_t end = start + CLOCKS_PER_SEC * 20;
-	generateMesh(plan, geometry, quality, end);
+	generateMesh(cane, geometry, quality, end);
 
 	return clock() < end;
 }
@@ -87,7 +87,7 @@ void applyTwistTransform(Vertex& v, float twist)
 }
 
 // Does move, resize, and twist
-void applySubplanTransform(Vertex& v, Point2D location)
+void applySubcaneTransform(Vertex& v, Point2D location)
 {
 	v.position.x += location.x;
 	v.position.y += location.y;
@@ -177,7 +177,7 @@ void applyPlanTransform(Vertex& v, Ancestor a)
 {
 	SubcaneTemplate subTemp = a.parent->getSubcaneTemplate(a.child);
 	applyResizeTransform(v, subTemp.diameter / 2.0);
-	applySubplanTransform(v, subTemp.location);
+	applySubcaneTransform(v, subTemp.location);
 	applyTwistTransform(v, a.parent->twist());
 }
 
@@ -663,12 +663,12 @@ void meshBaseCane(Geometry* geometry, vector<Ancestor>& ancestors, struct CaneDa
 		first_vert, geometry->vertices.size() - first_vert, cane.color));
 }
 
-void generateMesh(Cane* plan, Geometry* geometry, unsigned int quality, clock_t end)
+void generateMesh(Cane* cane, Geometry* geometry, unsigned int quality, clock_t end)
 {
 	geometry->clear();
 
 	vector<Ancestor> ancestors;
-	recurseMesh(plan, geometry, ancestors, 2.0, quality, true, end);			
+	recurseMesh(cane, geometry, ancestors, 2.0, quality, true, end);			
 
 	// Make skinnier to more closely mimic the canes found in pickups
 	for (uint32_t v = 0; v < geometry->vertices.size(); ++v)
@@ -688,7 +688,7 @@ void generateMesh(Pickup* pickup, Geometry *geometry, bool isTopLevel, unsigned 
 		vector<Ancestor> ancestors;
 		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
 		uint32_t startVert = geometry->vertices.size();
-		recurseMesh(t.plan, geometry, ancestors, t.length, quality, isTopLevel, end);
+		recurseMesh(t.cane, geometry, ancestors, t.length, quality, isTopLevel, end);
 		for (unsigned int j = startVert; j < geometry->vertices.size(); ++j)
 		{
 			applyPickupTransform(geometry->vertices[j], t);
@@ -700,19 +700,19 @@ void generateMesh(Pickup* pickup, Geometry *geometry, bool isTopLevel, unsigned 
 // since canes can be nested, recurseMesh() processes these nestings recursively.
 // keeping a running stack of ancestors nodes in the dependancy DAG
 // and applying them when a leaf node is encountered.
-void recurseMesh(Cane* plan, Geometry *geometry, vector<Ancestor>& ancestors, float length, 
+void recurseMesh(Cane* cane, Geometry *geometry, vector<Ancestor>& ancestors, float length, 
 	unsigned int quality, bool isTopLevel, clock_t end)
 {
-	if (plan == NULL || clock() > end)
+	if (cane == NULL || clock() > end)
 		return;
 
 	// Recurse through to children 
-	Ancestor me = {plan, 0};
-	for (unsigned int i = 0; i < plan->subpullCount(); ++i)
+	Ancestor me = {cane, 0};
+	for (unsigned int i = 0; i < cane->subpullCount(); ++i)
 	{
 		me.child = i;
 		ancestors.push_back(me);
-		recurseMesh(plan->getSubcaneTemplate(i).plan, geometry, ancestors, length, quality, false, end);
+		recurseMesh(cane->getSubcaneTemplate(i).cane, geometry, ancestors, length, quality, false, end);
 		ancestors.pop_back();
 	}
 
@@ -721,18 +721,18 @@ void recurseMesh(Cane* plan, Geometry *geometry, vector<Ancestor>& ancestors, fl
 	// we combined adjacent casing layers with the same color into
 	// a single casing "interval" to avoid the "darkening" that happens 
 	// by just stacking the same casing color several times 
-	for (unsigned int i = 0; i < plan->casingCount(); ++i) 
+	for (unsigned int i = 0; i < cane->casingCount(); ++i) 
 	{
 		// compute the interval of common color
 		unsigned int colorIntervalStart = i;
 		while (true)
 		{
-			if (i == plan->casingCount() - 1)
+			if (i == cane->casingCount() - 1)
 				break;
 			// note we compare RGBA values, not GlassColor object pointers
 			// because identical colors to the user likely means "equal RGBA values"
 			// and not "the same library objects"
-			if (plan->getCasingColor(i+1)->color() != plan->getCasingColor(colorIntervalStart)->color())
+			if (cane->getCasingColor(i+1)->color() != cane->getCasingColor(colorIntervalStart)->color())
 				break;
 			++i;
 		}
@@ -740,31 +740,31 @@ void recurseMesh(Cane* plan, Geometry *geometry, vector<Ancestor>& ancestors, fl
 		// if you're the outermost casing in the root node of the cane,
 		// you get a special flag that causes your alpha to be rounded up to some minimum
 		// value to fake incidence of refraction
-		bool outermostLayer = (i == plan->casingCount() - 1);
+		bool outermostLayer = (i == cane->casingCount() - 1);
 
 		if (colorIntervalStart == 0)
 		{
 			// punting on actually doing this geometry right and just making it a cylinder
 			// (that intersects its subcanes)
-			struct CaneData cane;
-			cane.color = plan->getCasingColor(0)->color();
-			cane.shape = plan->getCasingShape(i);
-			cane.length = length-0.001;
-			cane.radius = plan->getCasingThickness(i);
-			cane.twist = plan->twist();
-			meshBaseCane(geometry, ancestors, cane, quality, ensureVisible && outermostLayer);
+			struct CaneData caneData;
+			caneData.color = cane->getCasingColor(0)->color();
+			caneData.shape = cane->getCasingShape(i);
+			caneData.length = length-0.001;
+			caneData.radius = cane->getCasingThickness(i);
+			caneData.twist = cane->twist();
+			meshBaseCane(geometry, ancestors, caneData, quality, ensureVisible && outermostLayer);
 		}
 		else
 		{
-			struct CasingData casing;
-			casing.color = plan->getCasingColor(colorIntervalStart)->color(), 
-			casing.outerShape = plan->getCasingShape(i); 
-			casing.innerShape = plan->getCasingShape(colorIntervalStart-1);
-			casing.length = length; 
-			casing.outerRadius = plan->getCasingThickness(i);
-			casing.innerRadius = plan->getCasingThickness(colorIntervalStart-1)+0.01; 
-			casing.twist = plan->twist();
-			meshBaseCasing(geometry, ancestors, casing, quality, ensureVisible && outermostLayer);
+			struct CasingData casingData;
+			casingData.color = cane->getCasingColor(colorIntervalStart)->color(), 
+			casingData.outerShape = cane->getCasingShape(i); 
+			casingData.innerShape = cane->getCasingShape(colorIntervalStart-1);
+			casingData.length = length; 
+			casingData.outerRadius = cane->getCasingThickness(i);
+			casingData.innerRadius = cane->getCasingThickness(colorIntervalStart-1)+0.01; 
+			casingData.twist = cane->twist();
+			meshBaseCasing(geometry, ancestors, casingData, quality, ensureVisible && outermostLayer);
 		}
 	}
 }

@@ -2,9 +2,9 @@
 
 #include "subcanetemplate.h"
 
-SubcaneTemplate :: SubcaneTemplate(Cane* plan, enum GeometricShape _s, Point2D location, float diameter)
+SubcaneTemplate :: SubcaneTemplate(Cane* cane, enum GeometricShape _s, Point2D location, float diameter)
 {
-	this->plan = plan;
+	this->cane = cane;
 	this->shape = _s;
 	this->location = location;
 	this->diameter = diameter;

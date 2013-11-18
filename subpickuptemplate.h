@@ -18,9 +18,9 @@ enum PickupCaneOrientation
 class SubpickupTemplate
 {
 	public:
-		SubpickupTemplate(Cane* plan, Point3D location, enum PickupCaneOrientation orientation, 
+		SubpickupTemplate(Cane* cane, Point3D location, enum PickupCaneOrientation orientation, 
 			float length, float width, enum GeometricShape shape);
-		Cane* plan;
+		Cane* cane;
 		Point3D location;
 		enum PickupCaneOrientation orientation;
 		float length;

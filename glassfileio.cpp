@@ -594,7 +594,7 @@ void writeCane(Json::Value& root, Cane* cane, unsigned int caneIndex, map<const 
 		string subpullName = idAndNameToString(i, "Subcane");
 		root[canename]["Subcanes"][subpullName]["Index"] = i;
 		SubcaneTemplate sub = cane->getSubcaneTemplate(i);
-		root[canename]["Subcanes"][subpullName]["Cane pointer"] = caneMap[sub.plan];
+		root[canename]["Subcanes"][subpullName]["Cane pointer"] = caneMap[sub.cane];
 		root[canename]["Subcanes"][subpullName]["Diameter"] = sub.diameter;
 		root[canename]["Subcanes"][subpullName]["Shape"] = geometricShapeToString(sub.shape);
 		root[canename]["Subcanes"][subpullName]["X"] = sub.location.x;
@@ -664,7 +664,7 @@ void readCaneSubcanes(Json::Value& root, Cane* cane, map<unsigned int, Cane*>& c
 		unsigned int subpullIndex = root["Subcanes"][subpullname]["Index"].asUInt();
 
 		SubcaneTemplate sub = cane->getSubcaneTemplate(subpullIndex);
-		sub.plan = safeCaneMap(caneMap, root["Subcanes"][subpullname]["Cane pointer"].asUInt());
+		sub.cane = safeCaneMap(caneMap, root["Subcanes"][subpullname]["Cane pointer"].asUInt());
 		sub.diameter = root["Subcanes"][subpullname]["Diameter"].asFloat();
 		sub.shape = stringToGeometricShape(root["Subcanes"][subpullname]["Shape"].asString());
 		sub.location.x = root["Subcanes"][subpullname]["X"].asFloat();
@@ -682,7 +682,7 @@ void writeCanes(Json::Value& root, vector<Cane*>& canes, vector<GlassColor*>& co
 	for (unsigned int i = 0; i < colors.size(); ++i)
 		colorMap[colors[i]] = i+1;
 
-	// generate pull plan map
+	// generate cane map
 	map<const Cane*, unsigned int> caneMap;
 	caneMap[GlobalGlass::circlePlan()] = 0;
 	caneMap[GlobalGlass::squarePlan()] = 1;
@@ -700,7 +700,7 @@ void writeCanes(Json::Value& root, vector<Cane*>& canes, vector<GlassColor*>& co
 void readCanes(Json::Value& canesRoot, map<unsigned int, Cane*>& caneMap, 
 	map<unsigned int, GlassColor*>& colorMap, vector<Cane*>& readCanes)
 {
-	// add global plan to map for completeness
+	// add global cane to map for completeness
 	caneMap[0] = GlobalGlass::circlePlan();
 	caneMap[1] = GlobalGlass::squarePlan();
 
@@ -799,7 +799,7 @@ void writePickup(Json::Value& root, Pickup* pickup, unsigned int pickupIndex,
 		string subpullName = idAndNameToString(i, "Subcane");
 		root[pickupname]["Subcanes"][subpullName]["Index"] = i;
 		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
-		root[pickupname]["Subcanes"][subpullName]["Cane pointer"] = caneMap[t.plan];
+		root[pickupname]["Subcanes"][subpullName]["Cane pointer"] = caneMap[t.cane];
 		root[pickupname]["Subcanes"][subpullName]["Length"] = t.length;
 		root[pickupname]["Subcanes"][subpullName]["Width"] = t.width;
 		root[pickupname]["Subcanes"][subpullName]["Orientation"] = orientationToString(t.orientation);
@@ -837,7 +837,7 @@ Pickup* readPickup(string pickupname, Json::Value& root,
 		unsigned int subIndex = root[pickupname]["Subcanes"][subpullname]["Index"].asUInt();
 
 		SubpickupTemplate t = pickup->getSubpickupTemplate(subIndex);
-		t.plan = safeCaneMap(caneMap, root[pickupname]["Subcanes"][subpullname]["Cane pointer"].asUInt());
+		t.cane = safeCaneMap(caneMap, root[pickupname]["Subcanes"][subpullname]["Cane pointer"].asUInt());
 		t.length = root[pickupname]["Subcanes"][subpullname]["Length"].asFloat();
 		t.width = root[pickupname]["Subcanes"][subpullname]["Width"].asFloat();
 		t.orientation = stringToOrientation(root[pickupname]["Subcanes"][subpullname]["Orientation"].asString());
@@ -932,7 +932,7 @@ void writePieces(Json::Value& root, vector<Piece*>& pieces, vector<Cane*>& canes
 	for (unsigned int i = 0; i < colors.size(); ++i)
 		colorMap[colors[i]] = i+1;
 
-	// generate pull plan map
+	// generate cane map
 	map<Cane*, unsigned int> caneMap;
 	caneMap[GlobalGlass::circlePlan()] = 0;
 	caneMap[GlobalGlass::squarePlan()] = 1;

@@ -33,17 +33,17 @@ GlassColor* randomGlassColor()
 
 Cane* randomSimpleCane(enum GeometricShape outermostCasingShape, GlassColor* color)
 {
-	Cane* plan;
+	Cane* cane;
 	if (qrand() % 2)
-		plan = new Cane(PullTemplate::BASE_CIRCLE);
+		cane = new Cane(PullTemplate::BASE_CIRCLE);
 	else
-		plan = new Cane(PullTemplate::BASE_SQUARE);
+		cane = new Cane(PullTemplate::BASE_SQUARE);
 
-	plan->addCasing(outermostCasingShape);
-	plan->setCasingColor(color, 0);
-	plan->setCasingThickness((qrand() % 25) * 0.01 + 0.25, 0);
+	cane->addCasing(outermostCasingShape);
+	cane->setCasingColor(color, 0);
+	cane->setCasingThickness((qrand() % 25) * 0.01 + 0.25, 0);
 
-	return plan;
+	return cane;
 }
 
 Cane* randomComplexCane(Cane* circleSimplePlan, Cane* squareSimplePlan)
@@ -53,29 +53,29 @@ Cane* randomComplexCane(Cane* circleSimplePlan, Cane* squareSimplePlan)
 	// at revision 785 these are the templates between HORIZONTAL_LINE_CIRCLE and SURROUNDING_SQUARE
 	int randomTemplateNumber = qrand() % (PullTemplate::SURROUNDING_SQUARE - PullTemplate::HORIZONTAL_LINE_CIRCLE) 
 		+ PullTemplate::HORIZONTAL_LINE_CIRCLE;
-	Cane* plan = new Cane(static_cast<PullTemplate::Type>(randomTemplateNumber));
+	Cane* cane = new Cane(static_cast<PullTemplate::Type>(randomTemplateNumber));
 	
 	// set parameters
-	plan->setTwist(0.0);
-	plan->setCount(qrand() % 10 + 2);
+	cane->setTwist(0.0);
+	cane->setCount(qrand() % 10 + 2);
 
-	// set subplans
-	for (unsigned int i = 0; i < plan->subpullCount(); ++i)
+	// set subcanes
+	for (unsigned int i = 0; i < cane->subpullCount(); ++i)
 	{
-		SubcaneTemplate t = plan->getSubcaneTemplate(i);
+		SubcaneTemplate t = cane->getSubcaneTemplate(i);
 		switch (t.shape)
 		{
 			case CIRCLE_SHAPE:
-				t.plan = circleSimplePlan;
+				t.cane = circleSimplePlan;
 				break;
 			case SQUARE_SHAPE:
-				t.plan = squareSimplePlan;
+				t.cane = squareSimplePlan;
 				break;
 		}
-		plan->setSubcaneTemplate(t, i);
+		cane->setSubcaneTemplate(t, i);
 	}
 
-	return plan;
+	return cane;
 }
 
 Pickup* randomPickup(Cane* pullPlan1, Cane* pullPlan2)
@@ -93,20 +93,20 @@ Pickup* randomPickup(Cane* pullPlan1, Cane* pullPlan2)
 		pickup->setParameter(i, qrand() % ((p.upperLimit - p.lowerLimit)/3) + p.lowerLimit);
 	}	
 
-	// set subplans
+	// set subcanes
 	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
 	{
 		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
-		t.plan = pullPlan1;
+		t.cane = pullPlan1;
 		pickup->setSubpickupTemplate(t, i);
 	}
-	// if a second plan is provided, alternate with the first one
+	// if a second cane is provided, alternate with the first one
 	if (pullPlan2 != NULL)
 	{
 		for (unsigned int i = 0; i < pickup->subpickupCount(); i+=2)
 		{
 			SubpickupTemplate t = pickup->getSubpickupTemplate(i);
-			t.plan = pullPlan2;
+			t.cane = pullPlan2;
 			pickup->setSubpickupTemplate(t, i);
 		}
 	}

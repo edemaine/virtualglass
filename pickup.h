@@ -55,7 +55,7 @@ class Pickup
 		struct State state;
 
 		void updateSubs();
-		void pushNewSubplan(vector<SubpickupTemplate>* newSubs, Point3D location,
+		void pushNewSubcane(vector<SubpickupTemplate>* newSubs, Point3D location,
 			enum PickupCaneOrientation ori, float length, float width, enum GeometricShape s); 
 };
 

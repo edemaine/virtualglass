@@ -108,13 +108,13 @@ float* Piece :: twistPtr()
 	return &(this->state.twist);
 }
 
-bool Piece :: hasDependencyOn(Cane* plan)
+bool Piece :: hasDependencyOn(Cane* cane)
 {
 	bool pickupPlansDependOn = false;
 
 	for (unsigned int i = 0; i < this->pickup->subpickupCount(); ++i)
 	{
-		if (this->pickup->getSubpickupTemplate(i).plan->hasDependencyOn(plan))
+		if (this->pickup->getSubpickupTemplate(i).cane->hasDependencyOn(cane))
 		{
 			pickupPlansDependOn = true;
 			break;
@@ -130,7 +130,7 @@ bool Piece :: hasDependencyOn(GlassColor* glassColor)
 
 	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
 	{
-		if (pickup->getSubpickupTemplate(i).plan->hasDependencyOn(glassColor))
+		if (pickup->getSubpickupTemplate(i).cane->hasDependencyOn(glassColor))
 		{
 			pickupPlansDependOn = true;		
 			break;
@@ -145,8 +145,8 @@ bool Piece :: hasDependencyOn(GlassColor* glassColor)
 
 /*
 copy() is intended to be a copy at the correct depth consistent with
-a Piece as represented in the GUI: it is a shape and a pickup plan, 
-but does not include the pull plans used.
+a Piece as represented in the GUI: it is a shape and a pickup cane, 
+but does not include the canes used.
 */
 Piece* Piece :: copy() const
 {

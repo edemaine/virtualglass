@@ -10,8 +10,8 @@ class Cane;
 class SubcaneTemplate
 {
 	public:
-		SubcaneTemplate(Cane* plan, enum GeometricShape s, Point2D location, float diameter);
-		Cane* plan;
+		SubcaneTemplate(Cane* cane, enum GeometricShape s, Point2D location, float diameter);
+		Cane* cane;
 		enum GeometricShape shape;
 		Point2D location;
 		float diameter;
