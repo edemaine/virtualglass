@@ -175,7 +175,10 @@ bool MainWindow :: eventFilter(QObject* obj, QEvent* event)
 	else if (event->type() == QEvent::MouseButtonRelease)
 	{
 		if (clickDown)
+		{
 			setViewMode(EMPTY_VIEW_MODE);
+			updateLibrary();
+		}
 		clickDown = false;
 	}
 
