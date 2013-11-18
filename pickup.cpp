@@ -2,7 +2,7 @@
 #include "constants.h"
 #include "templateparameter.h"
 #include "subpickuptemplate.h"
-#include "pulltemplate.h"
+#include "canetemplate.h"
 #include "globalglass.h"
 #include "cane.h"
 #include "glasscolor.h"

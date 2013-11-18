@@ -31,7 +31,7 @@
 #include "canelibrarywidget.h"
 #include "glasscolorlibrarywidget.h"
 #include "cane.h"
-#include "pulltemplate.h"
+#include "canetemplate.h"
 #include "pickup.h"
 #include "piece.h"
 #include "caneeditorwidget.h"
@@ -39,7 +39,7 @@
 #include "pieceeditorwidget.h"
 #include "randomglass.h"
 #include "glassmime.h"
-#include "pulltemplate.h"
+#include "canetemplate.h"
 #include "mainwindow.h"
 #include "globalglass.h"
 #include "SVG.hpp"
@@ -917,7 +917,7 @@ void MainWindow :: newGlassColorButtonClicked()
 
 void MainWindow :: newCaneButtonClicked()
 {
-	Cane *newEditorCane = new Cane(PullTemplate::HORIZONTAL_LINE_CIRCLE);
+	Cane *newEditorCane = new Cane(CaneTemplate::HORIZONTAL_LINE_CIRCLE);
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(newEditorCane, this));
 	setViewMode(PULLPLAN_VIEW_MODE);
 	caneEditorWidget->setCane(newEditorCane);
@@ -1389,7 +1389,7 @@ void MainWindow::importSVGActionTriggered()
 		return;
 
 	SVG::SVG svg;
-	Cane *newEditorCane = new Cane(PullTemplate::BASE_SQUARE);
+	Cane *newEditorCane = new Cane(CaneTemplate::BASE_SQUARE);
 	if (!SVG::load_svg(userSpecifiedFilename.toUtf8().constData(), svg, newEditorCane)) 
 	{
 		QMessageBox::warning(this, "Import failed", "Failed to read " + userSpecifiedFilename);
@@ -1582,7 +1582,7 @@ void MainWindow::addToLibrary(vector<GlassColor*>& colors, vector<Cane*>& canes,
 		{
 			// we take the *first* matching cane because in getLibraryContents()
 			// we add the color library widget canes to the canes list *first*.
-			if (canes[j]->templateType() == PullTemplate::BASE_CIRCLE 
+			if (canes[j]->templateType() == CaneTemplate::BASE_CIRCLE 
 				&& canes[j]->casingCount() == 1
 				&& canes[j]->outermostCasingColor() == colors[i])
 			{
@@ -1594,7 +1594,7 @@ void MainWindow::addToLibrary(vector<GlassColor*>& colors, vector<Cane*>& canes,
 		Cane* squareCane = NULL;
 		for (unsigned int j = 0; j < canes.size(); ++j)
 		{
-			if (canes[j]->templateType() == PullTemplate::BASE_SQUARE 
+			if (canes[j]->templateType() == CaneTemplate::BASE_SQUARE 
 				&& canes[j]->casingCount() == 1
 				&& canes[j]->outermostCasingColor() == colors[i])
 			{

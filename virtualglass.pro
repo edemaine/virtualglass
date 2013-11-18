@@ -111,7 +111,7 @@ HEADERS += vgapp.h \
 	shape.h \
 	templateparameter.h \
 	cane.h \
-	pulltemplate.h \
+	canetemplate.h \
 	subcanetemplate.h \
 	pickup.h \
 	piece.h \
@@ -173,7 +173,7 @@ SOURCES += main.cpp \
 	globalglass.cpp \
 	piece.cpp \
 	piecetemplate.cpp \
-	pulltemplate.cpp \
+	canetemplate.cpp \
 	pickuptemplate.cpp \
 	pickup.cpp \
 	subpickuptemplate.cpp \

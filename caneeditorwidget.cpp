@@ -68,7 +68,7 @@ void CaneEditorWidget :: reset3DCamera()
 
 void CaneEditorWidget :: resetCane()
 {
-	_cane = new Cane(PullTemplate::HORIZONTAL_LINE_CIRCLE);
+	_cane = new Cane(CaneTemplate::HORIZONTAL_LINE_CIRCLE);
 }
 
 bool CaneEditorWidget :: canUndo()
@@ -85,7 +85,7 @@ void CaneEditorWidget :: undo()
 {
         this->_cane->undo();
 
-	if (this->_cane->templateType() != PullTemplate::CUSTOM)
+	if (this->_cane->templateType() != CaneTemplate::CUSTOM)
 		controlsTab->setCurrentIndex(0);
 	updateEverything();
         emit someDataChanged();
@@ -95,7 +95,7 @@ void CaneEditorWidget :: redo()
 {
         this->_cane->redo();
 
-	if (this->_cane->templateType() != PullTemplate::CUSTOM)
+	if (this->_cane->templateType() != CaneTemplate::CUSTOM)
 		controlsTab->setCurrentIndex(0);
         updateEverything();
         emit someDataChanged();
@@ -137,8 +137,8 @@ void CaneEditorWidget :: updateEverything()
 	removeCasingButton->setEnabled(!_cane->hasMinimumCasingCount());
 
 	countSpin->setValue(_cane->count());
-	countLabel->setEnabled(_cane->templateType() != PullTemplate::CUSTOM);
-	countSpin->setEnabled(_cane->templateType() != PullTemplate::CUSTOM);
+	countLabel->setEnabled(_cane->templateType() != CaneTemplate::CUSTOM);
+	countSpin->setEnabled(_cane->templateType() != CaneTemplate::CUSTOM);
 
 	twistWidget->updateEverything();
 	twistWidget->setEnabled(_cane->outermostCasingShape() == CIRCLE_SHAPE);
@@ -331,9 +331,9 @@ void CaneEditorWidget :: controlsTabChanged(int tab)
 
 	if (tab != 0) // customize mode	
 	{
-		PullTemplate::Type oldType = _cane->templateType();
-		_cane->setTemplateType(PullTemplate::CUSTOM);				
-		if (oldType != PullTemplate::CUSTOM)
+		CaneTemplate::Type oldType = _cane->templateType();
+		_cane->setTemplateType(CaneTemplate::CUSTOM);				
+		if (oldType != CaneTemplate::CUSTOM)
 			_cane->saveState();
 		updateEverything();
 		emit someDataChanged();
@@ -434,7 +434,7 @@ void CaneEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 	if (ptlw == NULL)
 		return;
 
-	if (ptlw->type == PullTemplate::CUSTOM)
+	if (ptlw->type == CaneTemplate::CUSTOM)
 	{
 		// simulate user pressing customize tab
 		controlsTab->setCurrentIndex(1);
@@ -502,9 +502,9 @@ void CaneEditorWidget :: countSpinChanged(int)
 
 void CaneEditorWidget :: seedTemplates()
 {
-	for (int i = PullTemplate::firstSeedTemplate(); i <= PullTemplate::lastSeedTemplate(); ++i)
+	for (int i = CaneTemplate::firstSeedTemplate(); i <= CaneTemplate::lastSeedTemplate(); ++i)
 	{
-		PullTemplate::Type t = static_cast<PullTemplate::Type>(i);
+		CaneTemplate::Type t = static_cast<CaneTemplate::Type>(i);
 		Cane cane(t);
 
 		QPixmap templatePixmap(100, 100);
@@ -520,7 +520,7 @@ void CaneEditorWidget :: seedTemplates()
 
 	// add the custom template last
 	PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
-		QPixmap::fromImage(QImage(":/images/pulltemplate_custom.png")), PullTemplate::CUSTOM);
+		QPixmap::fromImage(QImage(":/images/pulltemplate_custom.png")), CaneTemplate::CUSTOM);
 	templateLibraryLayout->addWidget(ptlw);
 }
 

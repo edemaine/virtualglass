@@ -2,7 +2,7 @@
 #include "globalglass.h"
 #include "cane.h"
 #include "glasscolor.h"
-#include "pulltemplate.h"
+#include "canetemplate.h"
 #include "shape.h"
 
 namespace GlobalGlass
@@ -21,14 +21,14 @@ namespace GlobalGlass
 	Cane* circleCane()
 	{
 		if (_circleCane == 0)
-			_circleCane = new Cane(PullTemplate::BASE_CIRCLE);
+			_circleCane = new Cane(CaneTemplate::BASE_CIRCLE);
 		return _circleCane;
 	}
 
 	Cane* squareCane()
 	{
 		if (_squareCane == 0)
-			_squareCane = new Cane(PullTemplate::BASE_SQUARE);
+			_squareCane = new Cane(CaneTemplate::BASE_SQUARE);
 		return _squareCane;
 	}
 }

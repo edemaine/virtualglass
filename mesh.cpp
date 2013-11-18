@@ -56,7 +56,7 @@ bool generateMesh(Cane* cane, Geometry* geometry, unsigned int quality)
 // So we totally assume it finishes and no time completion data is measured or returned.
 void generateMesh(GlassColor* gc, Geometry* geometry, unsigned int quality)
 {
-	Cane dummyCane(PullTemplate::BASE_CIRCLE);
+	Cane dummyCane(CaneTemplate::BASE_CIRCLE);
 	dummyCane.setOutermostCasingColor(gc);
 
 	geometry->clear();

@@ -5,7 +5,7 @@
 #include "constants.h"
 #include "glasscolor.h"
 #include "cane.h"
-#include "pulltemplate.h"
+#include "canetemplate.h"
 #include "subcanetemplate.h"
 #include "canecustomizeviewwidget.h"
 #include "globalbackgroundcolor.h"
@@ -33,9 +33,9 @@ CaneCustomizeViewWidget::CaneCustomizeViewWidget(Cane* cane, QWidget* parent) : 
 
 void CaneCustomizeViewWidget :: setCustomTemplate()
 {
-	PullTemplate::Type oldType = cane->templateType();
-	cane->setTemplateType(PullTemplate::CUSTOM);	
-	if (oldType != PullTemplate::CUSTOM)
+	CaneTemplate::Type oldType = cane->templateType();
+	cane->setTemplateType(CaneTemplate::CUSTOM);	
+	if (oldType != CaneTemplate::CUSTOM)
 		cane->saveState();
 }
 

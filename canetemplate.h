@@ -1,12 +1,12 @@
 
-#ifndef PULLTEMPLATE_H
-#define PULLTEMPLATE_H
+#ifndef CANETEMPLATE_H
+#define CANETEMPLATE_H
 
 // Pull template types
-namespace PullTemplate
+namespace CaneTemplate
 {
 	// When adding a new template, be sure to update the names[] array below
-	// and the first/last template functions in pulltemplate.cpp
+	// and the first/last template functions in canetemplate.cpp
 	enum Type
 	{
 		BASE_CIRCLE=1,
@@ -25,8 +25,8 @@ namespace PullTemplate
 	enum Type firstSeedTemplate();
 	enum Type lastSeedTemplate();
 
-	bool templateHasNoSubcanes(PullTemplate::Type t);
-	bool templateHasSubcanes(PullTemplate::Type t);
+	bool templateHasNoSubcanes(CaneTemplate::Type t);
+	bool templateHasSubcanes(CaneTemplate::Type t);
 }
 
 #endif

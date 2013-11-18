@@ -3,7 +3,7 @@
 #include "glasscolor.h"
 #include "canerenderdata.h"
 #include "glasscolorlibrarywidget.h"
-#include "pulltemplate.h"
+#include "canetemplate.h"
 #include "cane.h"
 
 GlassColorLibraryWidget :: GlassColorLibraryWidget(GlassColor* _glassColor, MainWindow* _window, 
@@ -12,10 +12,10 @@ GlassColorLibraryWidget :: GlassColorLibraryWidget(GlassColor* _glassColor, Main
 {
 	setFixedSize(100, 100);
 	if (_circleCane == NULL)
-		circleCane = new Cane(PullTemplate::BASE_CIRCLE);
+		circleCane = new Cane(CaneTemplate::BASE_CIRCLE);
 	circleCane->setOutermostCasingColor(_glassColor);
 	if (_squareCane == NULL)
-		squareCane = new Cane(PullTemplate::BASE_SQUARE);
+		squareCane = new Cane(CaneTemplate::BASE_SQUARE);
 	squareCane->setOutermostCasingColor(_glassColor);
 	updatePixmaps();
 }

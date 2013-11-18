@@ -7,7 +7,7 @@
 #include <jsoncpp/include/json/json.h>
 
 #include "shape.h"
-#include "pulltemplate.h"
+#include "canetemplate.h"
 #include "pickuptemplate.h"
 #include "piecetemplate.h"
 #include "subpickuptemplate.h"
@@ -52,8 +52,8 @@ namespace GlassFileIOInternal
 	string idAndNameToString(unsigned int id, string name);
 	unsigned int stringToId(string s);
 
-	string pullTemplateToString(enum PullTemplate::Type type); 
-	enum PullTemplate::Type stringToPullTemplate(string s);
+	string pullTemplateToString(enum CaneTemplate::Type type); 
+	enum CaneTemplate::Type stringToCaneTemplate(string s);
 
 	string pickupTemplateToString(enum PickupTemplate::Type type);
 	enum PickupTemplate::Type stringToPickupTemplate(string s);

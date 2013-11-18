@@ -1,8 +1,8 @@
 
-#include "pulltemplate.h"
+#include "canetemplate.h"
 
-// Pull template types
-namespace PullTemplate
+// Cane template types
+namespace CaneTemplate
 {
 	const char* names[] = 
 	{
@@ -31,7 +31,7 @@ namespace PullTemplate
 	}
 
 	// returns true only if it's for sure
-	bool templateHasNoSubcanes(PullTemplate::Type t)
+	bool templateHasNoSubcanes(CaneTemplate::Type t)
 	{
 		switch (t)
 		{
@@ -44,7 +44,7 @@ namespace PullTemplate
 	}
 
 	// returns true only if it's for sure
-	bool templateHasSubcanes(PullTemplate::Type t)
+	bool templateHasSubcanes(CaneTemplate::Type t)
 	{
 		switch (t)
 		{

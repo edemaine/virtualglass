@@ -279,31 +279,31 @@ unsigned int stringToId(string id)
 }
 
 // write
-string pullTemplateToString(enum PullTemplate::Type type)
+string pullTemplateToString(enum CaneTemplate::Type type)
 {
 	switch (type)
 	{
-		case PullTemplate::BASE_CIRCLE:
+		case CaneTemplate::BASE_CIRCLE:
 			return "Base Circle";
-		case PullTemplate::BASE_SQUARE:
+		case CaneTemplate::BASE_SQUARE:
 			return "Base Square";
-		case PullTemplate::HORIZONTAL_LINE_CIRCLE:
+		case CaneTemplate::HORIZONTAL_LINE_CIRCLE:
 			return "Horizontal Line Circle";
-		case PullTemplate::HORIZONTAL_LINE_SQUARE:
+		case CaneTemplate::HORIZONTAL_LINE_SQUARE:
 			return "Horizontal Line Square";
-		case PullTemplate::TRIPOD:
+		case CaneTemplate::TRIPOD:
 			return "Tripod";
-		case PullTemplate::CROSS:
+		case CaneTemplate::CROSS:
 			return "Cross";
-		case PullTemplate::SQUARE_OF_CIRCLES:
+		case CaneTemplate::SQUARE_OF_CIRCLES:
 			return "Square of Circles";
-		case PullTemplate::SQUARE_OF_SQUARES:
+		case CaneTemplate::SQUARE_OF_SQUARES:
 			return "Square of Squares"; 
-		case PullTemplate::SURROUNDING_CIRCLE:
+		case CaneTemplate::SURROUNDING_CIRCLE:
 			return "Surrounding Circle";
-		case PullTemplate::SURROUNDING_SQUARE:
+		case CaneTemplate::SURROUNDING_SQUARE:
 			return "Surrounding Square";
-		case PullTemplate::CUSTOM:
+		case CaneTemplate::CUSTOM:
 			return "Custom";
 		default:
 			return "Custom";
@@ -311,32 +311,32 @@ string pullTemplateToString(enum PullTemplate::Type type)
 }
 
 // read
-enum PullTemplate::Type stringToPullTemplate(string s)
+enum CaneTemplate::Type stringToCaneTemplate(string s)
 {
 	if (s == "Base Circle")
-		return PullTemplate::BASE_CIRCLE;
+		return CaneTemplate::BASE_CIRCLE;
 	if (s == "Base Square")
-		return PullTemplate::BASE_SQUARE;
+		return CaneTemplate::BASE_SQUARE;
 	if (s == "Horizontal Line Circle")
-		return PullTemplate::HORIZONTAL_LINE_CIRCLE;
+		return CaneTemplate::HORIZONTAL_LINE_CIRCLE;
 	if (s == "Horizontal Line Square")
-		return PullTemplate::HORIZONTAL_LINE_SQUARE;
+		return CaneTemplate::HORIZONTAL_LINE_SQUARE;
 	if (s == "Tripod")
-		return PullTemplate::TRIPOD;
+		return CaneTemplate::TRIPOD;
 	if (s == "Cross")
-		return PullTemplate::CROSS;
+		return CaneTemplate::CROSS;
 	if (s == "Square of Circles")
-		return PullTemplate::SQUARE_OF_CIRCLES;
+		return CaneTemplate::SQUARE_OF_CIRCLES;
 	if (s == "Square of Squares") 
-		return PullTemplate::SQUARE_OF_SQUARES;
+		return CaneTemplate::SQUARE_OF_SQUARES;
 	if (s == "Surrounding Circle")
-		return PullTemplate::SURROUNDING_CIRCLE;
+		return CaneTemplate::SURROUNDING_CIRCLE;
 	if (s == "Surrounding Square")
-		return PullTemplate::SURROUNDING_SQUARE;
+		return CaneTemplate::SURROUNDING_SQUARE;
 	if (s == "Custom")
-		return PullTemplate::CUSTOM;
+		return CaneTemplate::CUSTOM;
 		
-	return PullTemplate::CUSTOM;
+	return CaneTemplate::CUSTOM;
 }
 
 // write 
@@ -607,7 +607,7 @@ void writeCane(Json::Value& root, Cane* cane, unsigned int caneIndex, map<const 
 Cane* readCane(string canename, Json::Value& root, map<unsigned int, GlassColor*>& colorMap)
 {
 	// read singletons: pull template, twist
-	Cane* cane = new Cane(stringToPullTemplate(root[canename]["Pull template"].asString()));
+	Cane* cane = new Cane(stringToCaneTemplate(root[canename]["Pull template"].asString()));
 	cane->setTwist(root[canename]["Twist"].asFloat());
 
 	// make a temporary list of casings that can be modified freely, unlike those stashed inside
@@ -651,7 +651,7 @@ void readCaneSubcanes(Json::Value& root, Cane* cane, map<unsigned int, Cane*>& c
 {
 	// if the cane's template type is custom, then it is impossible to know how many subcanes it has
 	// so we make an initial pass over the subcanes just to build an initial list of the correct size
-	if (cane->templateType() == PullTemplate::CUSTOM)
+	if (cane->templateType() == CaneTemplate::CUSTOM)
 	{
 		Point2D location;
 		for (unsigned int i = 0; i < root["Subcanes"].getMemberNames().size(); ++i)

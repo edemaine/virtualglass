@@ -3,7 +3,7 @@
 #include <QIODevice>
 #include "glasscolor.h"
 #include "cane.h"
-#include "pulltemplate.h"
+#include "canetemplate.h"
 #include "pickup.h"
 #include "pickuptemplate.h"
 #include "subcanetemplate.h"
@@ -35,9 +35,9 @@ Cane* randomSimpleCane(enum GeometricShape outermostCasingShape, GlassColor* col
 {
 	Cane* cane;
 	if (qrand() % 2)
-		cane = new Cane(PullTemplate::BASE_CIRCLE);
+		cane = new Cane(CaneTemplate::BASE_CIRCLE);
 	else
-		cane = new Cane(PullTemplate::BASE_SQUARE);
+		cane = new Cane(CaneTemplate::BASE_SQUARE);
 
 	cane->addCasing(outermostCasingShape);
 	cane->setCasingColor(color, 0);
@@ -51,9 +51,9 @@ Cane* randomComplexCane(Cane* circleSimpleCane, Cane* squareSimpleCane)
 	// set template
 	// select a random template that is `complex', and is dependent upon the templates available
 	// at revision 785 these are the templates between HORIZONTAL_LINE_CIRCLE and SURROUNDING_SQUARE
-	int randomTemplateNumber = qrand() % (PullTemplate::SURROUNDING_SQUARE - PullTemplate::HORIZONTAL_LINE_CIRCLE) 
-		+ PullTemplate::HORIZONTAL_LINE_CIRCLE;
-	Cane* cane = new Cane(static_cast<PullTemplate::Type>(randomTemplateNumber));
+	int randomTemplateNumber = qrand() % (CaneTemplate::SURROUNDING_SQUARE - CaneTemplate::HORIZONTAL_LINE_CIRCLE) 
+		+ CaneTemplate::HORIZONTAL_LINE_CIRCLE;
+	Cane* cane = new Cane(static_cast<CaneTemplate::Type>(randomTemplateNumber));
 	
 	// set parameters
 	cane->setTwist(0.0);

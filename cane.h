@@ -6,7 +6,7 @@
 #include <vector>
 #include <stack>
 
-#include "pulltemplate.h"
+#include "canetemplate.h"
 #include "shape.h"
 #include "primitives.h"
 #include "subcanetemplate.h"
@@ -22,10 +22,10 @@ class GlassColor;
 class Cane
 {
 	public:
-		Cane(enum PullTemplate::Type t);
+		Cane(enum CaneTemplate::Type t);
 
-		void setTemplateType(enum PullTemplate::Type t);
-		enum PullTemplate::Type templateType() const;
+		void setTemplateType(enum CaneTemplate::Type t);
+		enum CaneTemplate::Type templateType() const;
 
 		void setCount(unsigned int count);
 		unsigned int count();
@@ -71,7 +71,7 @@ class Cane
 	private:
 		struct State
 		{
-			enum PullTemplate::Type type;
+			enum CaneTemplate::Type type;
 			vector<Casing> casings;
 			unsigned int count;
 			float twist;
