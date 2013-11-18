@@ -16,7 +16,7 @@ class Cane;
 class CaneEditorViewWidget;
 class CaneCustomizeViewWidget;
 class NiceViewWidget;
-class PullTemplateLibraryWidget;
+class CaneTemplateLibraryWidget;
 class CaneGeometryThread;
 class TwistWidget;
 

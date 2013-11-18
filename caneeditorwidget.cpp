@@ -15,7 +15,7 @@
 #include "caneeditorviewwidget.h"
 #include "canecustomizeviewwidget.h"
 #include "niceviewwidget.h"
-#include "pulltemplatelibrarywidget.h"
+#include "canetemplatelibrarywidget.h"
 #include "canelibrarywidget.h"
 #include "mesh.h"
 #include "dependancy.h"
@@ -154,10 +154,10 @@ void CaneEditorWidget :: updateEverything()
 	wakeWait.wakeOne(); // wake up the thread if it's sleeping
 
 	// Highlight correct pull template
-	PullTemplateLibraryWidget* ptlw; 
+	CaneTemplateLibraryWidget* ptlw; 
 	for (int i = 0; i < templateLibraryLayout->count(); ++i)
 	{
-		ptlw = dynamic_cast<PullTemplateLibraryWidget*>(
+		ptlw = dynamic_cast<CaneTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(templateLibraryLayout->itemAt(i))->widget());
 		ptlw->setHighlighted(ptlw->type == _cane->templateType());
 	}
@@ -429,7 +429,7 @@ void CaneEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 	if (!isDragging || (isDragging && maxDragDistance >= QApplication::startDragDistance()))
 		return;
 
-	PullTemplateLibraryWidget* ptlw = dynamic_cast<PullTemplateLibraryWidget*>(childAt(event->pos()));
+	CaneTemplateLibraryWidget* ptlw = dynamic_cast<CaneTemplateLibraryWidget*>(childAt(event->pos()));
 
 	if (ptlw == NULL)
 		return;
@@ -514,12 +514,12 @@ void CaneEditorWidget :: seedTemplates()
 		CaneCrossSectionRender::render(&painter, 100, &cane);
 		painter.end();
 
-		PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(templatePixmap, t);
+		CaneTemplateLibraryWidget *ptlw = new CaneTemplateLibraryWidget(templatePixmap, t);
 		templateLibraryLayout->addWidget(ptlw);
 	}
 
 	// add the custom template last
-	PullTemplateLibraryWidget *ptlw = new PullTemplateLibraryWidget(
+	CaneTemplateLibraryWidget *ptlw = new CaneTemplateLibraryWidget(
 		QPixmap::fromImage(QImage(":/images/pulltemplate_custom.png")), CaneTemplate::CUSTOM);
 	templateLibraryLayout->addWidget(ptlw);
 }

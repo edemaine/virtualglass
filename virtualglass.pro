@@ -123,7 +123,7 @@ HEADERS += vgapp.h \
 	casing.h \
 	mainwindow.h \
 	niceviewwidget.h \
-	pulltemplatelibrarywidget.h \
+	canetemplatelibrarywidget.h \
 	pickuptemplatelibrarywidget.h \
 	piecetemplatelibrarywidget.h \
 	caneeditorviewwidget.h \
@@ -184,7 +184,7 @@ SOURCES += main.cpp \
 	mesh.cpp \
 	mainwindow.cpp \
 	niceviewwidget.cpp \
-	pulltemplatelibrarywidget.cpp \
+	canetemplatelibrarywidget.cpp \
 	pickuptemplatelibrarywidget.cpp \
 	piecetemplatelibrarywidget.cpp \
 	caneeditorviewwidget.cpp \

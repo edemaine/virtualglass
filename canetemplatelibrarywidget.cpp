@@ -1,7 +1,7 @@
 
-#include "pulltemplatelibrarywidget.h"
+#include "canetemplatelibrarywidget.h"
 
-PullTemplateLibraryWidget :: PullTemplateLibraryWidget(QPixmap _view, 
+CaneTemplateLibraryWidget :: CaneTemplateLibraryWidget(QPixmap _view, 
 	enum CaneTemplate::Type _type, QWidget* _parent): TemplateLibraryWidget(_view, _parent)
 {
 	this->type = _type;
