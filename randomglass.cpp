@@ -46,7 +46,7 @@ Cane* randomSimpleCane(enum GeometricShape outermostCasingShape, GlassColor* col
 	return cane;
 }
 
-Cane* randomComplexCane(Cane* circleSimplePlan, Cane* squareSimplePlan)
+Cane* randomComplexCane(Cane* circleSimpleCane, Cane* squareSimpleCane)
 {
 	// set template
 	// select a random template that is `complex', and is dependent upon the templates available
@@ -66,10 +66,10 @@ Cane* randomComplexCane(Cane* circleSimplePlan, Cane* squareSimplePlan)
 		switch (t.shape)
 		{
 			case CIRCLE_SHAPE:
-				t.cane = circleSimplePlan;
+				t.cane = circleSimpleCane;
 				break;
 			case SQUARE_SHAPE:
-				t.cane = squareSimplePlan;
+				t.cane = squareSimpleCane;
 				break;
 		}
 		cane->setSubcaneTemplate(t, i);

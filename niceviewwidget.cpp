@@ -197,7 +197,7 @@ bool NiceViewWidget :: event(QEvent* event)
 	{
 		case QEvent::MouseButtonPress:
 		{
-			// In pickup plan mode, user does not move camera location, zoom, etc.
+			// In pickup mode, user does not move camera location, zoom, etc.
 			// The widget is a passive `display' widget only, with an interactive layer
 			// on top of it (PickupEditorViewWidget), which we pass the event up to.
 			if (cameraMode == PICKUPPLAN_CAMERA_MODE)

@@ -349,24 +349,24 @@ void CaneEditorViewWidget :: updateHighlightedSubcanesAndCasings(QDragMoveEvent*
 		case GlassMime::PULLPLAN_MIME:
 		case GlassMime::PULLPLAN_LIBRARY_MIME:
 		{
-			Cane* draggedPlan;
+			Cane* draggedCane;
 			if (type == GlassMime::PULLPLAN_MIME)
-				draggedPlan = reinterpret_cast<Cane*>(ptr);
+				draggedCane = reinterpret_cast<Cane*>(ptr);
 			else 
-				draggedPlan = reinterpret_cast<CaneLibraryWidget*>(ptr)->cane;
+				draggedCane = reinterpret_cast<CaneLibraryWidget*>(ptr)->cane;
 			highlightColor.r = highlightColor.g = highlightColor.b = highlightColor.a = 1.0;
-			if (draggedPlan->hasDependencyOn(cane))
+			if (draggedCane->hasDependencyOn(cane))
 				break;
 			int subcaneIndexUnderMouse = getSubcaneIndexAt(mouseLoc);
 			if (subcaneIndexUnderMouse == -1)
 				break;
-			if (draggedPlan->outermostCasingShape() != cane->getSubcaneTemplate(subcaneIndexUnderMouse).shape)
+			if (draggedCane->outermostCasingShape() != cane->getSubcaneTemplate(subcaneIndexUnderMouse).shape)
 				break;
 			if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
 			{
 				for (unsigned int i = 0; i < cane->subpullCount(); ++i)
 				{
-					if (draggedPlan->outermostCasingShape() == cane->getSubcaneTemplate(i).shape)
+					if (draggedCane->outermostCasingShape() == cane->getSubcaneTemplate(i).shape)
 						subcanesHighlighted.insert(i);
 				}
 			}
@@ -424,17 +424,17 @@ void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 		case GlassMime::PULLPLAN_MIME:
 		case GlassMime::PULLPLAN_LIBRARY_MIME: 
 		{
-			Cane* draggedPlan;
+			Cane* draggedCane;
 			if (type == GlassMime::PULLPLAN_MIME)
-				draggedPlan = reinterpret_cast<Cane*>(ptr);
+				draggedCane = reinterpret_cast<Cane*>(ptr);
 			else
-				draggedPlan = reinterpret_cast<CaneLibraryWidget*>(ptr)->cane;
+				draggedCane = reinterpret_cast<CaneLibraryWidget*>(ptr)->cane;
 			for (set<unsigned int>::iterator it = subcanesHighlighted.begin(); it != subcanesHighlighted.end(); ++it)
 			{
 				SubcaneTemplate sub = cane->getSubcaneTemplate(*it);
-				if (sub.shape == draggedPlan->outermostCasingShape())
+				if (sub.shape == draggedCane->outermostCasingShape())
 				{
-					sub.cane = draggedPlan;	
+					sub.cane = draggedCane;	
 					cane->setSubcaneTemplate(sub, *it);
 				}
 			}

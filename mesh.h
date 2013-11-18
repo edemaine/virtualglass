@@ -21,7 +21,7 @@ class Spline;
 using std::vector;
 
 void generateMesh(GlassColor* glassColor, Geometry* geometry, unsigned int quality);
-bool generateMesh(Cane* plan, Geometry* geometry, unsigned int quality);
+bool generateMesh(Cane* cane, Geometry* geometry, unsigned int quality);
 bool generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometry, unsigned int quality);
 
 namespace MeshInternal
@@ -53,9 +53,9 @@ namespace MeshInternal
 	};
 
 	// Methods
-	void generateMesh(Pickup* plan, Geometry *geometry, bool isTopLevel, unsigned int quality, clock_t end);
-	void generateMesh(Cane* plan, Geometry* geometry, unsigned int quality, clock_t end);
-	void recurseMesh(Cane* plan, Geometry *geometry, vector<Ancestor>& ancestors, 
+	void generateMesh(Pickup* cane, Geometry *geometry, bool isTopLevel, unsigned int quality, clock_t end);
+	void generateMesh(Cane* cane, Geometry* geometry, unsigned int quality, clock_t end);
+	void recurseMesh(Cane* cane, Geometry *geometry, vector<Ancestor>& ancestors, 
 		float length, unsigned int quality, bool isTopLevel, clock_t end);
 
 	float finalRadius(vector<Ancestor>& ancestors);
@@ -71,10 +71,10 @@ namespace MeshInternal
 	void getTemplatePoints(vector<Point2D>& points, unsigned int angularResolution, 
 		enum GeometricShape shape, float radius);
 
-	void applySubplanTransform(Vertex& v, Point2D location);
+	void applySubcaneTransform(Vertex& v, Point2D location);
 	void applyResizeTransform(Vertex& v, float scale);
 	void applyTwistTransform(Vertex& v, float twist);
-	void applyPlanTransform(Vertex& v, Ancestor a);
+	void applyCaneTransform(Vertex& v, Ancestor a);
 
 	void applyPickupTransform(Vertex& p, SubpickupTemplate& spt);
 	void meshPickupCasingSlab(Geometry* g, Color c, float y, float thickness);

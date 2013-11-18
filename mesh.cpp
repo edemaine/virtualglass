@@ -56,12 +56,12 @@ bool generateMesh(Cane* cane, Geometry* geometry, unsigned int quality)
 // So we totally assume it finishes and no time completion data is measured or returned.
 void generateMesh(GlassColor* gc, Geometry* geometry, unsigned int quality)
 {
-	Cane dummyPlan(PullTemplate::BASE_CIRCLE);
-	dummyPlan.setOutermostCasingColor(gc);
+	Cane dummyCane(PullTemplate::BASE_CIRCLE);
+	dummyCane.setOutermostCasingColor(gc);
 
 	geometry->clear();
 	vector<Ancestor> ancestors;
-	recurseMesh(&dummyPlan, geometry, ancestors, 2.0, quality, true, clock() + CLOCKS_PER_SEC * 20);
+	recurseMesh(&dummyCane, geometry, ancestors, 2.0, quality, true, clock() + CLOCKS_PER_SEC * 20);
 	geometry->compute_normals_from_triangles();
 }
 
@@ -173,7 +173,7 @@ void applyPieceTransform(Geometry* geometry, Piece* piece)
 		applyPieceTransform(geometry->vertices[i], piece->twist(), spline);
 }
 
-void applyPlanTransform(Vertex& v, Ancestor a)
+void applyCaneTransform(Vertex& v, Ancestor a)
 {
 	SubcaneTemplate subTemp = a.parent->getSubcaneTemplate(a.child);
 	applyResizeTransform(v, subTemp.diameter / 2.0);
@@ -542,7 +542,7 @@ void meshBaseCasing(Geometry* geometry, vector<Ancestor>& ancestors, struct Casi
 		applyTwistTransform(geometry->vertices[v], casing.twist);
 	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
 		for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
-			applyPlanTransform(geometry->vertices[v], ancestors[i]);
+			applyCaneTransform(geometry->vertices[v], ancestors[i]);
 
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
 		first_vert, geometry->vertices.size() - first_vert, casing.color));
@@ -657,7 +657,7 @@ void meshBaseCane(Geometry* geometry, vector<Ancestor>& ancestors, struct CaneDa
 		applyTwistTransform(geometry->vertices[v], cane.twist);
 	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
 		for (uint32_t v = first_vert; v < geometry->vertices.size(); ++v)
-			applyPlanTransform(geometry->vertices[v], ancestors[i]);
+			applyCaneTransform(geometry->vertices[v], ancestors[i]);
 
 	geometry->groups.push_back(Group(first_triangle, geometry->triangles.size() - first_triangle, 
 		first_vert, geometry->vertices.size() - first_vert, cane.color));

@@ -9,7 +9,7 @@ class Cane;
 class CaneLibraryWidget : public AsyncRenderWidget
 {
 	public:
-		CaneLibraryWidget(Cane *_plan, MainWindow* _window);
+		CaneLibraryWidget(Cane *_cane, MainWindow* _window);
 		Cane *cane;
 		const QPixmap *dragPixmap();
 		bool isDraggable();

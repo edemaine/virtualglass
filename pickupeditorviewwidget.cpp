@@ -175,20 +175,20 @@ void PickupEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
 void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 {
 	void* droppedObject;
-	Cane* droppedPlan = 0;
+	Cane* droppedCane = 0;
 	enum GlassMime::Type type;
 
 	GlassMime::decode(event->mimeData()->text().toStdString().c_str(), &droppedObject, &type);
 	switch (type)
 	{
 		case GlassMime::COLOR_LIBRARY_MIME:
-			droppedPlan = reinterpret_cast<GlassColorLibraryWidget*>(droppedObject)->circleCane;
+			droppedCane = reinterpret_cast<GlassColorLibraryWidget*>(droppedObject)->circleCane;
 			break;
 		case GlassMime::PULLPLAN_LIBRARY_MIME:
-			droppedPlan = reinterpret_cast<CaneLibraryWidget*>(droppedObject)->cane;
+			droppedCane = reinterpret_cast<CaneLibraryWidget*>(droppedObject)->cane;
 			break;
 		case GlassMime::PULLPLAN_MIME:
-			droppedPlan = reinterpret_cast<Cane*>(droppedObject);
+			droppedCane = reinterpret_cast<Cane*>(droppedObject);
 			break;
 		default:
 			return;
@@ -210,14 +210,14 @@ void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 			for (unsigned int i = 0; i < this->piece->pickup()->subpickupCount(); ++i)
 			{
 				SubpickupTemplate t = this->piece->pickup()->getSubpickupTemplate(i);
-				t.cane = droppedPlan;
+				t.cane = droppedCane;
 				this->piece->pickup()->setSubpickupTemplate(t, i);
 			}
 		}
 		else
 		{
 			SubpickupTemplate t = this->piece->pickup()->getSubpickupTemplate(subcaneIndex);
-			t.cane = droppedPlan;
+			t.cane = droppedCane;
 			this->piece->pickup()->setSubpickupTemplate(t, subcaneIndex);
 		}
 		piece->saveState();

@@ -12,9 +12,9 @@ GlassColor* randomGlassColor();
 
 Cane* randomSimpleCane(enum GeometricShape outermostCasingShape, GlassColor* color);
 
-Cane* randomComplexCane(Cane* circleSimplePlan, Cane* squareSimplePlan);
+Cane* randomComplexCane(Cane* circleSimpleCane, Cane* squareSimpleCane);
 
-Pickup* randomPickup(Cane* plan1, Cane* plan2=NULL);
+Pickup* randomPickup(Cane* cane1, Cane* cane2=NULL);
 
 Piece* randomPiece(Pickup* pickup);
 
