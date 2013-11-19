@@ -44,8 +44,6 @@ class GlassColor
 };
 
 GlassColor* deep_copy(const GlassColor* _gc);
-void deep_delete(GlassColor* _gc);
-
 
 #endif
 

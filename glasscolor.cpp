@@ -101,11 +101,6 @@ GlassColor* deep_copy(const GlassColor* _gc)
 	return _gc->copy();
 }
 
-void deep_delete(GlassColor* _gc)
-{
-	delete _gc;
-}
-
 
 
 

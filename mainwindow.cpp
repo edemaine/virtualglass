@@ -649,15 +649,16 @@ void MainWindow :: randomComplexCaneExampleActionTriggered()
 	Cane* complexCane = randomComplexCane(circleCane, squareCane);
 
 	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor, this));
-	caneLibraryLayout->addWidget(new CaneLibraryWidget(complexCane, this));
-	setDirtyBit(true);
-
-	// add simple canes only if they are used
-	// memory leak! as unused ones never appear in library
 	if (complexCane->hasDependencyOn(circleCane))
 		caneLibraryLayout->addWidget(new CaneLibraryWidget(circleCane, this));
+	else 
+		deep_delete(circleCane);
 	if (complexCane->hasDependencyOn(squareCane))
 		caneLibraryLayout->addWidget(new CaneLibraryWidget(squareCane, this));
+	else 
+		deep_delete(squareCane);
+	caneLibraryLayout->addWidget(new CaneLibraryWidget(complexCane, this));
+	setDirtyBit(true);
 
 	setViewMode(CANE_VIEW_MODE);
 	caneEditorWidget->setCane(complexCane);
@@ -690,14 +691,22 @@ void MainWindow :: randomComplexPieceExampleActionTriggered()
 	Cane* complexCane2 = randomComplexCane(circleCane, squareCane);
 	Piece* piece = randomPiece(randomPickup(complexCane1, complexCane2));
 
-	if (piece->hasDependencyOn(glassColor1)) // memory leak if returns no
+	if (piece->hasDependencyOn(glassColor1)) 
 		glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor1, this));
-	if (piece->hasDependencyOn(glassColor2)) // memory leak if returns no
+	else
+		delete glassColor1;
+	if (piece->hasDependencyOn(glassColor2)) 
 		glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor2, this));
-	if (piece->hasDependencyOn(circleCane)) // memory leak if returns no
+	else
+		delete glassColor2;
+	if (piece->hasDependencyOn(circleCane)) 
 		caneLibraryLayout->addWidget(new CaneLibraryWidget(circleCane, this));
-	if (piece->hasDependencyOn(squareCane)) // memory leak if returns no
+	else
+		delete circleCane;
+	if (piece->hasDependencyOn(squareCane)) 
 		caneLibraryLayout->addWidget(new CaneLibraryWidget(squareCane, this));
+	else
+		delete squareCane;
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(complexCane1, this));
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(complexCane2, this));
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(piece, this));
