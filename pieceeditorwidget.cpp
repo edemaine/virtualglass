@@ -153,10 +153,6 @@ void PieceEditorWidget :: updateEverything()
 	// so old piece/pickup don't stay visible and confuse the user
 	QString message("Rendering piece...");
 	emit showMessage(message, 0); // show until next message 
-	geometry.clear();
-	pickupViewWidget->geometry.clear();
-	pickupViewWidget->updateEverything();
-	pieceNiceViewWidget->repaint();
 	wakeWait.wakeOne();
 }
 

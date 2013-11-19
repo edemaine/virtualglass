@@ -62,7 +62,7 @@ class MainWindow : public QMainWindow
 		{
 			EMPTY_VIEW_MODE=0, // must start at 0 to match usage as QStackedWidget index
 			COLORBAR_VIEW_MODE,
-			PULLPLAN_VIEW_MODE,
+			CANE_VIEW_MODE,
 			PIECE_VIEW_MODE
 		};
 

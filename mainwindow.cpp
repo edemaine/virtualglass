@@ -70,11 +70,11 @@ MainWindow :: MainWindow()
 	showMaximized();
 }
 
-void MainWindow :: setViewMode(enum ViewMode _mode)
+void MainWindow :: setViewMode(enum ViewMode newMode)
 {
-	editorStack->setCurrentIndex(_mode);
+	editorStack->setCurrentIndex(newMode);
 
-	switch (_mode)
+	switch (newMode)
 	{
 		case EMPTY_VIEW_MODE:
 			exportPLYFileAction->setEnabled(false);
@@ -88,7 +88,7 @@ void MainWindow :: setViewMode(enum ViewMode _mode)
 			saveSelectedAsFileAction->setEnabled(true);
 			shareFileButton->setEnabled(false);
 			break;
-		case PULLPLAN_VIEW_MODE:
+		case CANE_VIEW_MODE:
 			caneEditorWidget->reset3DCamera();
 			exportPLYFileAction->setEnabled(true);
 			exportOBJFileAction->setEnabled(true);
@@ -203,7 +203,7 @@ void MainWindow :: moveCurrentEditingObject(int d)
 				}
 			}	
 			return;	
-		case PULLPLAN_VIEW_MODE:
+		case CANE_VIEW_MODE:
 			for (int i = 0; i < caneLibraryLayout->count(); ++i)
 			{
 				QLayoutItem* w = caneLibraryLayout->itemAt(i);
@@ -247,7 +247,7 @@ void MainWindow :: deleteCurrentEditingObject()
 		case COLORBAR_VIEW_MODE:
 			libraryLayout = glassColorLibraryLayout;
 			break;
-		case PULLPLAN_VIEW_MODE:
+		case CANE_VIEW_MODE:
 			libraryLayout = caneLibraryLayout;
 			break;
 		case PIECE_VIEW_MODE:
@@ -267,7 +267,7 @@ void MainWindow :: deleteCurrentEditingObject()
 				if (currentColor == dynamic_cast<GlassColorLibraryWidget*>(glw)->glassColor)
 					deleteLibraryWidget(glw);
 				break;
-			case PULLPLAN_VIEW_MODE:	
+			case CANE_VIEW_MODE:	
 				if (currentCane == dynamic_cast<CaneLibraryWidget*>(glw)->cane)
 					deleteLibraryWidget(glw);
 				break;
@@ -301,7 +301,7 @@ bool MainWindow::findLibraryWidgetData(GlassLibraryWidget* lw, int* type, QVBoxL
 			setEditorLibraryWidget(lw);
 			return false;
 		}
-		*type = PULLPLAN_VIEW_MODE;
+		*type = CANE_VIEW_MODE;
 	}
 	else if (plw != NULL)
 	{
@@ -321,7 +321,7 @@ bool MainWindow::findLibraryWidgetData(GlassLibraryWidget* lw, int* type, QVBoxL
 		case COLORBAR_VIEW_MODE:
 			*layout = glassColorLibraryLayout;
 			break;
-		case PULLPLAN_VIEW_MODE:
+		case CANE_VIEW_MODE:
 			*layout = caneLibraryLayout;
 			break;
 		case PIECE_VIEW_MODE:
@@ -361,7 +361,7 @@ void MainWindow::copyLibraryWidget(GlassLibraryWidget* lw)
 			glassColorEditorWidget->setGlassColor(newEditorGlassColor);
 			break;
 		}
-		case PULLPLAN_VIEW_MODE:
+		case CANE_VIEW_MODE:
 		{
 			Cane *newEditorCane = caneEditorWidget->cane()->copy();
 			caneLibraryLayout->insertWidget(index, 
@@ -425,7 +425,7 @@ void MainWindow::deleteLibraryWidget(GlassLibraryWidget* lw)
 				glassColorEditorWidget->setGlassColor(replacement);
 				break;	
 			}
-			case PULLPLAN_VIEW_MODE:
+			case CANE_VIEW_MODE:
 			{
 				Cane* replacement = dynamic_cast<CaneLibraryWidget*>(
 					dynamic_cast<QWidgetItem*>(layout->itemAt(r))->widget())->cane;
@@ -468,7 +468,7 @@ void MainWindow::setEditorLibraryWidget(GlassLibraryWidget* w)
 	}
 	else if (plplw != NULL)
 	{
-		setViewMode(PULLPLAN_VIEW_MODE);
+		setViewMode(CANE_VIEW_MODE);
 		caneEditorWidget->setCane(plplw->cane);
 		updateLibrary();
 	}
@@ -551,7 +551,7 @@ void MainWindow :: undoActionTriggered()
 		case COLORBAR_VIEW_MODE:
 			glassColorEditorWidget->undo();
 			break;
-		case PULLPLAN_VIEW_MODE:
+		case CANE_VIEW_MODE:
 			caneEditorWidget->undo();
 			break;
 		case PIECE_VIEW_MODE:
@@ -567,7 +567,7 @@ void MainWindow :: redoActionTriggered()
 		case COLORBAR_VIEW_MODE:
 			glassColorEditorWidget->redo();
 			break;
-		case PULLPLAN_VIEW_MODE:
+		case CANE_VIEW_MODE:
 			caneEditorWidget->redo();
 			break;
 		case PIECE_VIEW_MODE:
@@ -601,7 +601,7 @@ void MainWindow :: depthPeelActionTriggered()
 		case COLORBAR_VIEW_MODE:
 			glassColorEditorWidget->updateEverything();
 			break;
-		case PULLPLAN_VIEW_MODE:
+		case CANE_VIEW_MODE:
 			caneEditorWidget->updateEverything();
 			break;
 		case PIECE_VIEW_MODE:
@@ -629,86 +629,82 @@ void MainWindow :: depthPeelActionTriggered()
 
 void MainWindow :: randomSimpleCaneExampleActionTriggered()
 {
-	GlassColor* randomGC = randomGlassColor();
-	Cane* randomPP = randomSimpleCane(CIRCLE_SHAPE, randomGC);
+	GlassColor* glassColor = randomGlassColor();
+	Cane* cane = randomSimpleCane(CIRCLE_SHAPE, glassColor);
 
-	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(randomGC, this));
+	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor, this));
+	caneLibraryLayout->addWidget(new CaneLibraryWidget(cane, this));
 	setDirtyBit(true);
 
-	CaneLibraryWidget* pplw = new CaneLibraryWidget(randomPP, this);
-	caneLibraryLayout->addWidget(pplw);
-
-	setViewMode(PULLPLAN_VIEW_MODE);
-	caneEditorWidget->setCane(randomPP);
+	setViewMode(CANE_VIEW_MODE);
+	caneEditorWidget->setCane(cane);
 	updateLibrary();
 }
 
 void MainWindow :: randomComplexCaneExampleActionTriggered()
 {
-	GlassColor* randomGC = randomGlassColor();
-	Cane* randomCPP = randomSimpleCane(CIRCLE_SHAPE, randomGC);
-	Cane* randomSPP = randomSimpleCane(SQUARE_SHAPE, randomGC);
-	Cane* randomComplexPP = randomComplexCane(randomCPP, randomSPP);
+	GlassColor* glassColor = randomGlassColor();
+	Cane* circleCane = randomSimpleCane(CIRCLE_SHAPE, glassColor);
+	Cane* squareCane = randomSimpleCane(SQUARE_SHAPE, glassColor);
+	Cane* complexCane = randomComplexCane(circleCane, squareCane);
 
-	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(randomGC, this));
-	caneLibraryLayout->addWidget(new CaneLibraryWidget(randomComplexPP, this));
+	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor, this));
+	caneLibraryLayout->addWidget(new CaneLibraryWidget(complexCane, this));
 	setDirtyBit(true);
 
 	// add simple canes only if they are used
 	// memory leak! as unused ones never appear in library
-	if (randomComplexPP->hasDependencyOn(randomCPP))
-		caneLibraryLayout->addWidget(new CaneLibraryWidget(randomCPP, this));
-	if (randomComplexPP->hasDependencyOn(randomSPP))
-		caneLibraryLayout->addWidget(new CaneLibraryWidget(randomSPP, this));
+	if (complexCane->hasDependencyOn(circleCane))
+		caneLibraryLayout->addWidget(new CaneLibraryWidget(circleCane, this));
+	if (complexCane->hasDependencyOn(squareCane))
+		caneLibraryLayout->addWidget(new CaneLibraryWidget(squareCane, this));
 
-	setViewMode(PULLPLAN_VIEW_MODE);
-	caneEditorWidget->setCane(randomComplexPP);
+	setViewMode(CANE_VIEW_MODE);
+	caneEditorWidget->setCane(complexCane);
 	updateLibrary();
 }
 
 void MainWindow :: randomSimplePieceExampleActionTriggered()
 {
-	GlassColor* randomGC = randomGlassColor();
-	Cane* randomSPP = randomSimpleCane(SQUARE_SHAPE, randomGC);
-	Piece* randomP = randomPiece(randomPickup(randomSPP));
+	GlassColor* glassColor = randomGlassColor();
+	Cane* squareCane = randomSimpleCane(SQUARE_SHAPE, glassColor);
+	Piece* piece = randomPiece(randomPickup(squareCane));
 
-	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(randomGC, this));
-	caneLibraryLayout->addWidget(new CaneLibraryWidget(randomSPP, this));
+	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor, this));
+	caneLibraryLayout->addWidget(new CaneLibraryWidget(squareCane, this));
+	pieceLibraryLayout->addWidget(new PieceLibraryWidget(piece, this));
 	setDirtyBit(true);
 
-	PieceLibraryWidget* plw = new PieceLibraryWidget(randomP, this);
-	pieceLibraryLayout->addWidget(plw);
-
 	setViewMode(PIECE_VIEW_MODE);
-	pieceEditorWidget->setPiece(randomP);
+	pieceEditorWidget->setPiece(piece);
 	updateLibrary();
 }
 
 void MainWindow :: randomComplexPieceExampleActionTriggered()
 {
-	GlassColor* randomGC1 = randomGlassColor();
-	GlassColor* randomGC2 = randomGlassColor();
-	Cane* randomCPP = randomSimpleCane(CIRCLE_SHAPE, randomGC1);
-	Cane* randomSPP = randomSimpleCane(SQUARE_SHAPE, randomGC2);
-	Cane* randomComplexPP1 = randomComplexCane(randomCPP, randomSPP);
-	Cane* randomComplexPP2 = randomComplexCane(randomCPP, randomSPP);
-	Piece* randomP = randomPiece(randomPickup(randomComplexPP1, randomComplexPP2));
+	GlassColor* glassColor1 = randomGlassColor();
+	GlassColor* glassColor2 = randomGlassColor();
+	Cane* circleCane = randomSimpleCane(CIRCLE_SHAPE, glassColor1);
+	Cane* squareCane = randomSimpleCane(SQUARE_SHAPE, glassColor2);
+	Cane* complexCane1 = randomComplexCane(circleCane, squareCane);
+	Cane* complexCane2 = randomComplexCane(circleCane, squareCane);
+	Piece* piece = randomPiece(randomPickup(complexCane1, complexCane2));
 
-	if (randomP->hasDependencyOn(randomGC1)) // memory leak if returns no
-		glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(randomGC1, this));
-	if (randomP->hasDependencyOn(randomGC2)) // memory leak if returns no
-		glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(randomGC2, this));
-	if (randomP->hasDependencyOn(randomCPP)) // memory leak if returns no
-		caneLibraryLayout->addWidget(new CaneLibraryWidget(randomCPP, this));
-	if (randomP->hasDependencyOn(randomSPP)) // memory leak if returns no
-		caneLibraryLayout->addWidget(new CaneLibraryWidget(randomSPP, this));
-	caneLibraryLayout->addWidget(new CaneLibraryWidget(randomComplexPP1, this));
-	caneLibraryLayout->addWidget(new CaneLibraryWidget(randomComplexPP2, this));
-	pieceLibraryLayout->addWidget(new PieceLibraryWidget(randomP, this));
+	if (piece->hasDependencyOn(glassColor1)) // memory leak if returns no
+		glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor1, this));
+	if (piece->hasDependencyOn(glassColor2)) // memory leak if returns no
+		glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor2, this));
+	if (piece->hasDependencyOn(circleCane)) // memory leak if returns no
+		caneLibraryLayout->addWidget(new CaneLibraryWidget(circleCane, this));
+	if (piece->hasDependencyOn(squareCane)) // memory leak if returns no
+		caneLibraryLayout->addWidget(new CaneLibraryWidget(squareCane, this));
+	caneLibraryLayout->addWidget(new CaneLibraryWidget(complexCane1, this));
+	caneLibraryLayout->addWidget(new CaneLibraryWidget(complexCane2, this));
+	pieceLibraryLayout->addWidget(new PieceLibraryWidget(piece, this));
 	setDirtyBit(true);
 
 	setViewMode(PIECE_VIEW_MODE);
-	pieceEditorWidget->setPiece(randomP);
+	pieceEditorWidget->setPiece(piece);
 	updateLibrary();
 }
 
@@ -939,7 +935,7 @@ void MainWindow :: newCaneButtonClicked()
 {
 	Cane *newEditorCane = new Cane(CaneTemplate::HORIZONTAL_LINE_CIRCLE);
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(newEditorCane, this));
-	setViewMode(PULLPLAN_VIEW_MODE);
+	setViewMode(CANE_VIEW_MODE);
 	caneEditorWidget->setCane(newEditorCane);
 	setDirtyBit(true);
 	updateLibrary();
@@ -1093,7 +1089,7 @@ void MainWindow :: updateLibrary()
 
 			break;
 		}
-		case PULLPLAN_VIEW_MODE:
+		case CANE_VIEW_MODE:
 		{
 			undoAction->setEnabled(caneEditorWidget->canUndo());
 			redoAction->setEnabled(caneEditorWidget->canRedo());
@@ -1363,7 +1359,7 @@ void MainWindow::exportOBJActionTriggered()
 	// call it on currently selected object
 	switch (editorStack->currentIndex())
 	{
-		case PULLPLAN_VIEW_MODE:
+		case CANE_VIEW_MODE:
 			caneEditorWidget->writeCaneToOBJFile(userSpecifiedFilename);
 			return;	
 		case PIECE_VIEW_MODE:
@@ -1390,7 +1386,7 @@ void MainWindow::exportPLYActionTriggered()
 	// call it on currently selected object
 	switch (editorStack->currentIndex())
 	{
-		case PULLPLAN_VIEW_MODE:
+		case CANE_VIEW_MODE:
 			caneEditorWidget->writeCaneToPLYFile(userSpecifiedFilename);
 			return;	
 		case PIECE_VIEW_MODE:
@@ -1426,7 +1422,7 @@ void MainWindow::importSVGActionTriggered()
 	}
 
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(newEditorCane, this));
-	setViewMode(PULLPLAN_VIEW_MODE);
+	setViewMode(CANE_VIEW_MODE);
 	caneEditorWidget->setCane(newEditorCane);
 }
 
@@ -1712,7 +1708,7 @@ void MainWindow :: emailSuccess(QString to)
 	QMessageBox::information(this, "Email success", "Message successfully sent to " + to + ".");
 	switch (editorStack->currentIndex())
 	{
-		case PULLPLAN_VIEW_MODE:
+		case CANE_VIEW_MODE:
 		case PIECE_VIEW_MODE:
 			shareFileButton->setEnabled(!email->sending());
 			break;
@@ -1727,7 +1723,7 @@ void MainWindow :: emailFailure(QString error)
 	QMessageBox::warning(this, "Email failed", "Failed to send message: " + error + ".");
 	switch (editorStack->currentIndex())
 	{
-		case PULLPLAN_VIEW_MODE:
+		case CANE_VIEW_MODE:
 		case PIECE_VIEW_MODE:
 			shareFileButton->setEnabled(!email->sending());
 			break;
@@ -1767,7 +1763,7 @@ void MainWindow::shareFileActionTriggered()
 	vector<Piece*> pieces;
 	switch (editorStack->currentIndex())
 	{
-		case PULLPLAN_VIEW_MODE:
+		case CANE_VIEW_MODE:
 			getDependantLibraryContents(caneEditorWidget->cane(), colors, canes);
 			break;
 		case PIECE_VIEW_MODE:
@@ -1782,7 +1778,7 @@ void MainWindow::shareFileActionTriggered()
 	QImage screenshot;
 	switch (editorStack->currentIndex())
 	{
-		case PULLPLAN_VIEW_MODE:
+		case CANE_VIEW_MODE:
 			screenshot = caneEditorWidget->caneImage();
 			break;
 		case PIECE_VIEW_MODE:
@@ -1864,7 +1860,7 @@ void MainWindow::saveSelectedAsFileActionTriggered()
 		case COLORBAR_VIEW_MODE:
 			getDependantLibraryContents(glassColorEditorWidget->glassColor(), colors, canes);
 			break;
-		case PULLPLAN_VIEW_MODE:
+		case CANE_VIEW_MODE:
 			getDependantLibraryContents(caneEditorWidget->cane(), colors, canes);
 			break;
 		case PIECE_VIEW_MODE:
