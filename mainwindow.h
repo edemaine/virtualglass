@@ -56,7 +56,7 @@ class MainWindow : public QMainWindow
 		void copyLibraryWidget(GlassLibraryWidget* w);
 		void deleteLibraryWidget(GlassLibraryWidget* w);
 		void setEditorLibraryWidget(GlassLibraryWidget* w);
-		bool hasNoDependancies(GlassLibraryWidget* w);
+		bool hasDependancies(GlassLibraryWidget* w);
 
 	protected:
 		void closeEvent(QCloseEvent *event);
@@ -80,9 +80,6 @@ class MainWindow : public QMainWindow
 		void setupUndoRedo();
 		void setupLibrary();
 		void setupEditors();
-		void setupColorEditor();
-		void setupCaneEditor();
-		void setupPieceEditor();
 		void setupConnections();
 		void setupMenus();
 		void setupStatusBar();
@@ -105,6 +102,7 @@ class MainWindow : public QMainWindow
 			vector<GlassColor*>& colors, vector<Cane*>& canes, vector<Piece*>& pieces);
 		bool findLibraryWidgetData(GlassLibraryWidget* lw, int* type, QVBoxLayout** layout, int* index);
 		QVBoxLayout* currentLibraryLayout();
+		void updateUndoRedoEnabled(bool undo, bool redo);
 
 		// Variables
 		QScrollArea* libraryScrollArea;

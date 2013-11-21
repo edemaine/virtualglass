@@ -141,7 +141,7 @@ void GlassLibraryWidget :: paintEvent(QPaintEvent* event)
                 painter.drawLine(10, 5, 10, 15);
                 painter.drawLine(5, 10, 15, 10); 
                 
-		if (this->window->hasNoDependancies(this))
+		if (!this->window->hasDependancies(this))
 		{
 			color.setRgb(255, 255, 255);
 			painter.fillRect(100-3-15, 3, 15, 15, color);

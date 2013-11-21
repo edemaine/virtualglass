@@ -75,10 +75,7 @@ class UndoRedo : public QObject
 		void modifiedPiece(Piece* p);
 		*/
 
-		bool canUndo();
-		bool canRedo();
-
-		void clearState();
+		void clearHistory();
 
 	public slots:
 		void undo();

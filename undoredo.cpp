@@ -18,10 +18,11 @@ UndoRedo :: UndoRedo(MainWindow* _mainWindow)
 	this->mainWindow = _mainWindow;
 }
 
-void UndoRedo :: clearState()
+void UndoRedo :: clearHistory()
 {
 	clearUndoStack();
 	clearRedoStack();
+	mainWindow->updateUndoRedoEnabled(false, false);
 }
 
 void UndoRedo :: addedGlassColor(GlassColor* gc, unsigned int index)
@@ -37,6 +38,7 @@ void UndoRedo :: addedGlassColor(GlassColor* gc, unsigned int index)
 
 	undoStack.push(event);
 	clearRedoStack();
+	mainWindow->updateUndoRedoEnabled(true, false);
 }
 
 void UndoRedo :: deletedGlassColor(GlassColor* gc, unsigned int index)
@@ -49,6 +51,7 @@ void UndoRedo :: deletedGlassColor(GlassColor* gc, unsigned int index)
 
 	undoStack.push(event);
 	clearRedoStack();
+	mainWindow->updateUndoRedoEnabled(true, false);
 }
 
 void UndoRedo :: modifiedGlassColor(GlassColor* gc)
@@ -94,6 +97,7 @@ void UndoRedo :: modifiedGlassColor(GlassColor* gc)
 
 	undoStack.push(event);
 	clearRedoStack();
+	mainWindow->updateUndoRedoEnabled(true, false);
 }
 
 void UndoRedo :: movedGlassColor(unsigned int index, int direction)
@@ -106,6 +110,7 @@ void UndoRedo :: movedGlassColor(unsigned int index, int direction)
 	
 	undoStack.push(event);
 	clearRedoStack();
+	mainWindow->updateUndoRedoEnabled(true, false);
 }
 
 void UndoRedo :: clearUndoStack()
@@ -134,7 +139,7 @@ void UndoRedo :: clearRedoStack()
 
 void UndoRedo :: undo()
 {
-	if (!canUndo())
+	if (undoStack.empty())
 		return;
 
 	struct Event event = undoStack.top();
@@ -147,7 +152,6 @@ void UndoRedo :: undo()
 				int r = (event.index == 0) ? 1 : event.index-1;
 				mainWindow->glassColorEditorWidget->setGlassColor(dynamic_cast<GlassColorLibraryWidget*>(
 					dynamic_cast<QWidgetItem*>(mainWindow->glassColorLibraryLayout->itemAt(r))->widget())->glassColor);
-				mainWindow->updateLibrary();
 			}
 			else
 				mainWindow->setViewMode(MainWindow::EMPTY_VIEW_MODE);
@@ -165,6 +169,7 @@ void UndoRedo :: undo()
 			event.glassColor->setColor(event.glassColorState1.color);
 			event.glassColor->setShortName(event.glassColorState1.shortName);
 			event.glassColor->setLongName(event.glassColorState1.longName);
+			mainWindow->updateLibrary(event.glassColor);
 			break;
 		case MOVE_EVENT:
 		{
@@ -175,13 +180,13 @@ void UndoRedo :: undo()
 	}
 	redoStack.push(undoStack.top());
 	undoStack.pop();
-
-	mainWindow->updateLibrary(event.glassColor);
+	mainWindow->updateUndoRedoEnabled(!undoStack.empty(), !redoStack.empty());
+	mainWindow->setDirtyBit(true);
 }
 
 void UndoRedo :: redo()
 {
-	if (!canRedo())
+	if (redoStack.empty())
 		return;
 	struct Event event = redoStack.top();
 
@@ -193,6 +198,15 @@ void UndoRedo :: redo()
 			break;
 		case DELETE_EVENT:
 		{
+			if (mainWindow->glassColorLibraryLayout->count() > 1)
+			{
+				int r = (event.index == 0) ? 1 : event.index-1;
+				mainWindow->glassColorEditorWidget->setGlassColor(dynamic_cast<GlassColorLibraryWidget*>(
+					dynamic_cast<QWidgetItem*>(mainWindow->glassColorLibraryLayout->itemAt(r))->widget())->glassColor);
+			}
+			else
+				mainWindow->setViewMode(MainWindow::EMPTY_VIEW_MODE);
+
 			QLayoutItem* cur = mainWindow->glassColorLibraryLayout->takeAt(event.index);
 			cur->widget()->moveToThread(QApplication::instance()->thread());
 			cur->widget()->deleteLater();
@@ -202,6 +216,7 @@ void UndoRedo :: redo()
 			event.glassColor->setColor(event.glassColorState2.color);
 			event.glassColor->setShortName(event.glassColorState2.shortName);
 			event.glassColor->setLongName(event.glassColorState2.longName);
+			mainWindow->updateLibrary(event.glassColor);
 			break;
 		case MOVE_EVENT:
 		{
@@ -212,19 +227,9 @@ void UndoRedo :: redo()
 	}
 	undoStack.push(redoStack.top());
 	redoStack.pop();
-
-	mainWindow->updateLibrary(event.glassColor);
+	mainWindow->updateUndoRedoEnabled(!undoStack.empty(), !redoStack.empty());
+	mainWindow->setDirtyBit(true);
 }
 
-bool UndoRedo :: canUndo()
-{
-	return undoStack.size() > 0;
-}
-
-bool UndoRedo :: canRedo()
-{
-	return redoStack.size() > 0;
-}
-	
 
 

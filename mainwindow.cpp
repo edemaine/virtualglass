@@ -54,10 +54,10 @@ MainWindow :: MainWindow()
 
 	// allocate ALL the memory
 	centralLayout = new QHBoxLayout(centralWidget);
+	setupMenus(); // needs to come before setupUndoRedo()
 	setupLibrary();
 	setupUndoRedo(); // needs to come before setupEditors()
 	setupEditors();
-	setupMenus();
 	setupSaveFile();
 	setupStatusBar();
 	setupConnections();
@@ -111,6 +111,7 @@ void MainWindow :: setViewMode(enum ViewMode newMode)
 
 void MainWindow :: setupUndoRedo()
 {
+	updateUndoRedoEnabled(false, false);
 	undoRedo = new UndoRedo(this);
 }
 
@@ -212,7 +213,7 @@ void MainWindow :: moveCurrentEditingObject(int d)
 	if (layout == NULL)
 		return;
 
-	for (int i = 0; i < glassColorLibraryLayout->count(); ++i)
+	for (int i = 0; i < layout->count(); ++i)
 	{
 		QLayoutItem* w = layout->itemAt(i);
 
@@ -239,6 +240,7 @@ void MainWindow :: moveCurrentEditingObject(int d)
 			layout->insertWidget(MIN(MAX(i+d, 0), layout->count()), w->widget()); 
 			if (0 <= i+d && i+d <= layout->count() && editorStack->currentIndex() == GLASSCOLOR_VIEW_MODE)
 				undoRedo->movedGlassColor(i, d);
+			setDirtyBit(true);
 			return; 
 		}
 	}	
@@ -258,15 +260,15 @@ void MainWindow :: deleteCurrentEditingObject()
 			case GLASSCOLOR_VIEW_MODE:
 				if (glassColorEditorWidget->glassColor() == dynamic_cast<GlassColorLibraryWidget*>(glw)->glassColor)
 					deleteLibraryWidget(glw);
-				return;	
+				break;
 			case CANE_VIEW_MODE:	
 				if (caneEditorWidget->cane() == dynamic_cast<CaneLibraryWidget*>(glw)->cane)
 					deleteLibraryWidget(glw);
-				return;
+				break;
 			case PIECE_VIEW_MODE:	
 				if (pieceEditorWidget->piece() == dynamic_cast<PieceLibraryWidget*>(glw)->piece)
 					deleteLibraryWidget(glw);
-				return;
+				break;
 		}	
 	}	
 }
@@ -326,9 +328,7 @@ bool MainWindow::findLibraryWidgetData(GlassLibraryWidget* lw, int* type, QVBoxL
 	{
 		cur = (*layout)->itemAt((*index));
 		if (cur->widget() == lw)
-		{
 			break;
-		}
 	}
 
 	return true;
@@ -349,10 +349,10 @@ void MainWindow::copyLibraryWidget(GlassLibraryWidget* lw)
 		{
 			GlassColor* newGlassColor = glassColorEditorWidget->glassColor()->copy();
 			glassColorLibraryLayout->insertWidget(index, new GlassColorLibraryWidget(newGlassColor, this));
+			undoRedo->addedGlassColor(newGlassColor, index);
 			glassColorEditorWidget->setGlassColor(newGlassColor);
 			updateLibrary(newGlassColor);
 			setDirtyBit(true);
-			undoRedo->addedGlassColor(newGlassColor, index);
 			break;
 		}
 		case CANE_VIEW_MODE:
@@ -376,19 +376,18 @@ void MainWindow::copyLibraryWidget(GlassLibraryWidget* lw)
 	}
 }
 
-bool MainWindow::hasNoDependancies(GlassLibraryWidget* lw)
+bool MainWindow::hasDependancies(GlassLibraryWidget* lw)
 {
-	GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(lw);
-	CaneLibraryWidget* plplw = dynamic_cast<CaneLibraryWidget*>(lw);
+	GlassColorLibraryWidget* gclw = dynamic_cast<GlassColorLibraryWidget*>(lw);
+	CaneLibraryWidget* clw = dynamic_cast<CaneLibraryWidget*>(lw);
 
-	if (cblw != NULL)
-		return !glassColorIsDependancy(cblw->glassColor);
-	else if (plplw != NULL)
-		return !caneIsDependancy(plplw->cane);
+	if (gclw != NULL)
+		return glassColorIsDependancy(gclw->glassColor);
+	else if (clw != NULL)
+		return caneIsDependancy(clw->cane);
 	else
 		return true;
 }
-
 
 void MainWindow::deleteLibraryWidget(GlassLibraryWidget* lw)
 {
@@ -396,7 +395,7 @@ void MainWindow::deleteLibraryWidget(GlassLibraryWidget* lw)
 	QVBoxLayout* layout;
 	int index;
 
-	if (!hasNoDependancies(lw))
+	if (hasDependancies(lw))
 	{
 		QMessageBox::warning(this, "Delete failed", 
 			"This glass cannot be deleted:\nother objects use it.");
@@ -406,7 +405,39 @@ void MainWindow::deleteLibraryWidget(GlassLibraryWidget* lw)
 	if (!findLibraryWidgetData(lw, &typeCase, &layout, &index))
 		return;
 
-	// Record the deletion for undo/redo 
+	// Find and set the replacement selected object if a valid one remains
+	if (layout->count() > 1)
+	{
+		int r = (index == 0) ? 1 : index-1;
+		switch (typeCase)
+		{
+			case GLASSCOLOR_VIEW_MODE:
+			{
+				GlassColor* replacement = dynamic_cast<GlassColorLibraryWidget*>(
+					dynamic_cast<QWidgetItem*>(layout->itemAt(r))->widget())->glassColor;
+				glassColorEditorWidget->setGlassColor(replacement);
+				break;	
+			}
+			case CANE_VIEW_MODE:
+			{
+				Cane* replacement = dynamic_cast<CaneLibraryWidget*>(
+					dynamic_cast<QWidgetItem*>(layout->itemAt(r))->widget())->cane;
+				caneEditorWidget->setCane(replacement);
+				break;	
+			}
+			case PIECE_VIEW_MODE:
+			{
+				Piece* replacement = dynamic_cast<PieceLibraryWidget*>(
+					dynamic_cast<QWidgetItem*>(layout->itemAt(r))->widget())->piece;
+				pieceEditorWidget->setPiece(replacement);
+				break;	
+			}
+		}
+	}
+	else
+		setViewMode(EMPTY_VIEW_MODE);
+	updateLibrary();
+
 	switch (typeCase)
 	{
 		case GLASSCOLOR_VIEW_MODE:
@@ -421,48 +452,11 @@ void MainWindow::deleteLibraryWidget(GlassLibraryWidget* lw)
 		case PIECE_VIEW_MODE:
 			break;
 	}
-
-	// Find and set the replacement selected object if a valid one remains
-	if (layout->count() > 1)
-	{
-		int r = (index == 0) ? 1 : index-1;
-		switch (typeCase)
-		{
-			case GLASSCOLOR_VIEW_MODE:
-			{
-				GlassColor* replacement = dynamic_cast<GlassColorLibraryWidget*>(
-					dynamic_cast<QWidgetItem*>(layout->itemAt(r))->widget())->glassColor;
-				glassColorEditorWidget->setGlassColor(replacement);
-				updateLibrary(replacement);
-				break;	
-			}
-			case CANE_VIEW_MODE:
-			{
-				Cane* replacement = dynamic_cast<CaneLibraryWidget*>(
-					dynamic_cast<QWidgetItem*>(layout->itemAt(r))->widget())->cane;
-				caneEditorWidget->setCane(replacement);
-				updateLibrary(replacement);
-				break;	
-			}
-			case PIECE_VIEW_MODE:
-			{
-				Piece* replacement = dynamic_cast<PieceLibraryWidget*>(
-					dynamic_cast<QWidgetItem*>(layout->itemAt(r))->widget())->piece;
-				pieceEditorWidget->setPiece(replacement);
-				updateLibrary(replacement);
-				break;	
-			}
-		}
-	}
-	else
-		setViewMode(EMPTY_VIEW_MODE);
-
-	setDirtyBit(true);
-	// undo/redo will take care of deleting the glass object when it can no longer appear
 	QLayoutItem* cur = layout->takeAt(index);
 	cur->widget()->moveToThread(QApplication::instance()->thread());
 	cur->widget()->deleteLater();
 	delete cur;
+	setDirtyBit(true);
 }
 
 void MainWindow::setEditorLibraryWidget(GlassLibraryWidget* w)
@@ -626,6 +620,7 @@ void MainWindow :: randomSimpleCaneExampleActionTriggered()
 	Cane* cane = randomSimpleCane(CIRCLE_SHAPE, glassColor);
 
 	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor, this));
+	undoRedo->addedGlassColor(glassColor, glassColorLibraryLayout->count()-1);
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(cane, this));
 	setDirtyBit(true);
 
@@ -642,6 +637,7 @@ void MainWindow :: randomComplexCaneExampleActionTriggered()
 	Cane* complexCane = randomComplexCane(circleCane, squareCane);
 
 	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor, this));
+	undoRedo->addedGlassColor(glassColor, glassColorLibraryLayout->count()-1);
 	if (complexCane->hasDependencyOn(circleCane))
 		caneLibraryLayout->addWidget(new CaneLibraryWidget(circleCane, this));
 	else 
@@ -665,6 +661,7 @@ void MainWindow :: randomSimplePieceExampleActionTriggered()
 	Piece* piece = randomPiece(randomPickup(squareCane));
 
 	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor, this));
+	undoRedo->addedGlassColor(glassColor, glassColorLibraryLayout->count()-1);
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(squareCane, this));
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(piece, this));
 	setDirtyBit(true);
@@ -685,11 +682,17 @@ void MainWindow :: randomComplexPieceExampleActionTriggered()
 	Piece* piece = randomPiece(randomPickup(complexCane1, complexCane2));
 
 	if (piece->hasDependencyOn(glassColor1)) 
+	{
 		glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor1, this));
+		undoRedo->addedGlassColor(glassColor1, glassColorLibraryLayout->count()-1);
+	}
 	else
 		delete glassColor1;
 	if (piece->hasDependencyOn(glassColor2)) 
+	{
 		glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor2, this));
+		undoRedo->addedGlassColor(glassColor2, glassColorLibraryLayout->count()-1);
+	}
 	else
 		delete glassColor2;
 	if (piece->hasDependencyOn(circleCane)) 
@@ -847,9 +850,6 @@ void MainWindow :: setupLibrary()
 
 void MainWindow :: clearLibrary()
 {
-	// TODO: fix the memory leak here, as we delete
-	// all of the library objects but none of the glass objects they represent
-	// the non-trivial part is just the editors and their "current editing object"
 	QLayoutItem* w;
 	
 	while (glassColorLibraryLayout->count() > 0)
@@ -870,6 +870,11 @@ void MainWindow :: clearLibrary()
 		delete w->widget();
 		delete w;
 	}
+
+	// Since we just nuked library widgets, all glass objects in the widgets are
+	// still alive and live in the undo/redo stack. Clearing the undo/redo history
+	// causes them to be freed.
+	undoRedo->clearHistory();
 }
 
 void MainWindow :: setupEditors()
@@ -887,52 +892,32 @@ void MainWindow :: setupEditors()
 	editorStack->addWidget(whatToDoLabel);
 
 	// real editors
-	setupColorEditor();
-	editorStack->addWidget(glassColorEditorWidget);
-
-	setupCaneEditor();
-	editorStack->addWidget(caneEditorWidget);
-
-	setupPieceEditor();
-	editorStack->addWidget(pieceEditorWidget);
-}
-
-void MainWindow :: setupColorEditor()
-{
-	// Setup data objects - the current cane and library widget for this cane
 	glassColorEditorWidget = new ColorEditorWidget(undoRedo, editorStack);
-	glassColorLibraryLayout->addWidget(
-		new GlassColorLibraryWidget(glassColorEditorWidget->glassColor(), this));
+	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColorEditorWidget->glassColor(), this));
 	undoRedo->addedGlassColor(glassColorEditorWidget->glassColor(), glassColorLibraryLayout->count()-1);
 	glassColorEditorWidget->updateEverything();
-}
+	editorStack->addWidget(glassColorEditorWidget);
 
-void MainWindow :: setupCaneEditor()
-{
-	// Setup data objects - the current cane and library widget for this cane
 	caneEditorWidget = new CaneEditorWidget(editorStack);
-	caneLibraryLayout->addWidget(
-		new CaneLibraryWidget(caneEditorWidget->cane(), this));
+	caneLibraryLayout->addWidget(new CaneLibraryWidget(caneEditorWidget->cane(), this));
 	caneEditorWidget->updateEverything();
-}
+	editorStack->addWidget(caneEditorWidget);
 
-void MainWindow :: setupPieceEditor()
-{
-	// Setup data objects - the current cane and library widget for this cane
 	pieceEditorWidget = new PieceEditorWidget(editorStack);
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(pieceEditorWidget->piece(), this));
 	pieceEditorWidget->updateEverything();
+	editorStack->addWidget(pieceEditorWidget);
 }
 
 void MainWindow :: newGlassColorButtonClicked()
 {
 	GlassColor* newGlassColor = new GlassColor();
 	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(newGlassColor, this));
+	undoRedo->addedGlassColor(newGlassColor, glassColorLibraryLayout->count()-1);
 	setViewMode(GLASSCOLOR_VIEW_MODE);
 	glassColorEditorWidget->setGlassColor(newGlassColor);
 	updateLibrary(newGlassColor);
 	setDirtyBit(true);
-	undoRedo->addedGlassColor(newGlassColor, glassColorLibraryLayout->count()-1);
 }
 
 void MainWindow :: newCaneButtonClicked()
@@ -1088,11 +1073,14 @@ void MainWindow :: updateLibrary(Piece* piece)
 	updateLibraryHighlighting();
 }
 
+void MainWindow :: updateUndoRedoEnabled(bool undo, bool redo)
+{
+	undoAction->setEnabled(undo);
+	redoAction->setEnabled(redo);
+}
+
 void MainWindow :: updateLibraryHighlighting()
 {
-	undoAction->setEnabled(undoRedo->canUndo());
-	redoAction->setEnabled(undoRedo->canRedo());
-
 	switch (editorStack->currentIndex())
 	{
 		case EMPTY_VIEW_MODE:
@@ -1564,7 +1552,7 @@ void MainWindow::getLibraryContents(vector<GlassColor*>& colors, vector<Cane*>& 
 
 void MainWindow::newFileActionTriggered()
 {
-	// ask the person what they want to do with the current state
+	// ask the user what they want to do with the current state
 	if (dirtyBit)
 	{
 		QMessageBox msgBox;
@@ -1598,12 +1586,10 @@ void MainWindow::newFileActionTriggered()
 	clearLibrary();
 
 	// 3. add the three new guys from the editors into the library 
-	glassColorLibraryLayout->addWidget(
-		new GlassColorLibraryWidget(glassColorEditorWidget->glassColor(), this));
-	caneLibraryLayout->addWidget(
-		new CaneLibraryWidget(caneEditorWidget->cane(), this));
-	pieceLibraryLayout->addWidget(
-		new PieceLibraryWidget(pieceEditorWidget->piece(), this)); 
+	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColorEditorWidget->glassColor(), this));
+	undoRedo->addedGlassColor(glassColorEditorWidget->glassColor(), glassColorLibraryLayout->count()-1);
+	caneLibraryLayout->addWidget(new CaneLibraryWidget(caneEditorWidget->cane(), this));
+	pieceLibraryLayout->addWidget(new PieceLibraryWidget(pieceEditorWidget->piece(), this)); 
 
 	// 4. go back to empty view mode
 	setViewMode(EMPTY_VIEW_MODE);
@@ -1630,9 +1616,7 @@ void MainWindow::openFile(QString filename, bool add)
 
 	// deal with save filenames and dirty bits
 	if (add)
-	{
 		setDirtyBit(true);
-	}
 	else 
 	{
 		setViewMode(EMPTY_VIEW_MODE);
@@ -1689,8 +1673,8 @@ void MainWindow::openFile(QString filename, bool add)
 				break;
 			}
 		}
-		glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(colors[i], this, 
-			circleCane, squareCane));
+		glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(colors[i], this, circleCane, squareCane));
+		undoRedo->addedGlassColor(colors[i], glassColorLibraryLayout->count()-1);
 	}
 	for (unsigned int i = 0; i < canes.size(); ++i)
 		caneLibraryLayout->addWidget(new CaneLibraryWidget(canes[i], this));
