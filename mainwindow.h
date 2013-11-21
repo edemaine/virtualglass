@@ -3,7 +3,12 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <vector> 
+#include <stack>
+
 #include <QMainWindow>
+
+#include "undoredo.h"
 
 class QMouseEvent;
 class QKeyEvent;
@@ -19,6 +24,7 @@ class QAction;
 class QActionGroup;
 class QScrollArea;
 
+class UndoRedo;
 class GlassColor;
 class Cane;
 class Pickup;
@@ -34,10 +40,13 @@ class PieceLibraryWidget;
 class GlassLibraryWidget;
 
 using std::vector;
+using std::stack;
 
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
+
+	friend class UndoRedo;
 
 	public:
 		MainWindow();
@@ -61,13 +70,14 @@ class MainWindow : public QMainWindow
 		enum ViewMode
 		{
 			EMPTY_VIEW_MODE=0, // must start at 0 to match usage as QStackedWidget index
-			COLORBAR_VIEW_MODE,
+			GLASSCOLOR_VIEW_MODE,
 			CANE_VIEW_MODE,
 			PIECE_VIEW_MODE
 		};
 
 		// Methods
 		void setViewMode(enum ViewMode m);
+		void setupUndoRedo();
 		void setupLibrary();
 		void setupEditors();
 		void setupColorEditor();
@@ -77,7 +87,6 @@ class MainWindow : public QMainWindow
 		void setupMenus();
 		void setupStatusBar();
 		void setupSaveFile();
-		void initializeRandomPiece();
 		void deleteCurrentEditingObject();
 		void moveCurrentEditingObject(int d);
 		void clearLibrary();
@@ -94,7 +103,6 @@ class MainWindow : public QMainWindow
 			vector<GlassColor*>& colors, vector<Cane*>& canes);
 		void getDependantLibraryContents(Piece* piece, 
 			vector<GlassColor*>& colors, vector<Cane*>& canes, vector<Piece*>& pieces);
-		void addToLibrary(vector<GlassColor*>& colors, vector<Cane*>& canes, vector<Piece*>& pieces);
 		bool findLibraryWidgetData(GlassLibraryWidget* lw, int* type, QVBoxLayout** layout, int* index);
 
 		// Variables
@@ -129,37 +137,28 @@ class MainWindow : public QMainWindow
 		QAction *saveAllAsFileAction;
 		QAction *saveSelectedAsFileAction;
 		QAction *exitAction;
-
 		QMenu* editMenu;
 		QAction* undoAction;
 		QAction* redoAction;
-
 		QMenu* viewMenu;
 		QAction *fullscreenViewAction;
 		QAction *windowedViewAction;
-
 		QMenu *examplesMenu;
 		QAction *randomSimpleCaneAction;
 		QAction *randomSimplePieceAction;
 		QAction *randomComplexCaneAction;
 		QAction *randomComplexPieceAction;
-
 		QMenu *perfMenu;
 		QAction *depthPeelAction;
 
-		bool isDragging;
-		QPoint dragStartPosition;
-		int maxDragDistance;
-
 		bool dirtyBit;
 		QString saveFilename;
-
 		bool clickDown;
 
 		Email* email;
+		UndoRedo* undoRedo;
 
 	private slots:
-
 		void setDirtyBitTrue();
 		void attemptToQuit();
 
@@ -174,8 +173,6 @@ class MainWindow : public QMainWindow
 		void importSVGActionTriggered();
 		void exportPLYActionTriggered();
 		void exportOBJActionTriggered();
-		void undoActionTriggered();
-		void redoActionTriggered();
 		void windowedViewActionTriggered();
 		void fullscreenViewActionTriggered();
 		void randomSimpleCaneExampleActionTriggered();
@@ -188,7 +185,12 @@ class MainWindow : public QMainWindow
 		void newGlassColorButtonClicked();
 		void newCaneButtonClicked();
 		void newPieceButtonClicked();
+		void editorChangedData();
 		void updateLibrary();
+		void updateLibrary(GlassColor* gc);
+		void updateLibrary(Cane* c);
+		void updateLibrary(Piece* p);
+		void updateLibraryHighlighting();
 
 		// Status bar slots
 		void showStatusMessage(const QString& message, unsigned int timeout);

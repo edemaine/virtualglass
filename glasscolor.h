@@ -24,23 +24,10 @@ class GlassColor
 
 		GlassColor* copy() const;
 
-		void undo();
-		void redo();
-		bool canUndo();
-		bool canRedo();
-		void saveState();			
-
 	private:
-		struct State
-		{
-			Color color;
-			string shortName;	
-			string longName;	
-		};
-
-		stack<struct State> undoStack;
-		stack<struct State> redoStack;
-		struct State state;	
+		Color _color;
+		string _shortName;	
+		string _longName;	
 };
 
 GlassColor* deep_copy(const GlassColor* _gc);

@@ -11,6 +11,7 @@
 #include <QMouseEvent>
 #include <QScrollBar>
 
+#include "undoredo.h"
 #include "cane.h"
 #include "niceviewwidget.h"
 #include "geometry.h"
@@ -22,7 +23,7 @@
 #include "globalgraphicssetting.h"
 #include "constants.h"
 
-ColorEditorWidget :: ColorEditorWidget(QWidget* parent) : QWidget(parent)
+ColorEditorWidget :: ColorEditorWidget(UndoRedo* undoRedo, QWidget* parent) : QWidget(parent)
 {
 	resetGlassColor();
 
@@ -31,6 +32,7 @@ ColorEditorWidget :: ColorEditorWidget(QWidget* parent) : QWidget(parent)
 
 	setupLayout();
 	setupConnections();
+	this->undoRedo = undoRedo;
 
 	// fake selecting the first list for initialization
 	collectionComboBox->setCurrentIndex(0);
@@ -178,7 +180,7 @@ void ColorEditorWidget :: loadCollection(QString fileName)
 
 void ColorEditorWidget :: alphaSliderChangeEnded()
 {
-	this->color->saveState();
+	undoRedo->modifiedGlassColor(this->color);
 }
 
 void ColorEditorWidget :: alphaSliderPositionChanged(int)
@@ -193,38 +195,12 @@ void ColorEditorWidget :: alphaSliderPositionChanged(int)
 	emit someDataChanged();
 }
 
-bool ColorEditorWidget :: canUndo()
-{
-	return this->color->canUndo();
-}
-
-bool ColorEditorWidget :: canRedo()
-{
-	return this->color->canRedo();
-}
-
-void ColorEditorWidget :: undo()
-{
-	this->color->undo();
-	
-	updateEverything();
-	emit someDataChanged();	
-}
-
-void ColorEditorWidget :: redo()
-{
-	this->color->redo();
-	
-	updateEverything();
-	emit someDataChanged();	
-}
-
 void ColorEditorWidget :: setColorProperties(GlassColor* color)
 {
 	this->color->setColor(color->color());
 	this->color->setShortName(color->shortName());
 	this->color->setLongName(color->longName());
-	this->color->saveState();
+	undoRedo->modifiedGlassColor(this->color);
 
 	updateEverything();
 	emit someDataChanged();	
