@@ -35,35 +35,35 @@ PureColorLibraryWidget :: PureColorLibraryWidget(GlassColor* __color,
 
 	renderPixmap();
 
-	clickDown = false;
+	mouseDown = false;
 }
 
 void PureColorLibraryWidget :: mousePressEvent(QMouseEvent* event)
 {
 	if (event->button() == Qt::LeftButton)
 	{
-		clickDown = true;
-		clickDownPos = event->pos();
+		mouseDown = true;
+		mouseDownPos = event->pos();
 	}
 }
 
 void PureColorLibraryWidget :: mouseMoveEvent(QMouseEvent* event)
 {
-	if ((event->pos() - clickDownPos).manhattanLength() > QApplication::startDragDistance()
+	if ((event->pos() - mouseDownPos).manhattanLength() > QApplication::startDragDistance()
 		|| !this->rect().contains(event->pos()))
 	{
-		clickDown = false;
+		mouseDown = false;
 		event->ignore();
 	}
 }
 
 void PureColorLibraryWidget :: mouseReleaseEvent(QMouseEvent* event)
 {
-	if (clickDown)
+	if (mouseDown)
 		emit colorSelected(this->_color);
 	else
 		event->ignore();
-	clickDown = false;
+	mouseDown = false;
 }
 
 void PureColorLibraryWidget :: setSelected(bool s)

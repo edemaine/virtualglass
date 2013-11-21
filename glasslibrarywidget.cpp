@@ -76,14 +76,14 @@ void GlassLibraryWidget :: mousePressEvent(QMouseEvent* event)
 {
         if (event->button() == Qt::LeftButton)
         {
-                clickDown = true;
-                clickDownPos = event->pos();
+                mouseDown = true;
+                mouseDownPos = event->pos();
         }	
 }
 
 void GlassLibraryWidget :: mouseMoveEvent(QMouseEvent* event)
 {
-        if ((event->pos() - clickDownPos).manhattanLength() > QApplication::startDragDistance()
+        if ((event->pos() - mouseDownPos).manhattanLength() > QApplication::startDragDistance()
                 || !this->rect().contains(event->pos()))
 	{
 		char buf[500];
@@ -91,7 +91,7 @@ void GlassLibraryWidget :: mouseMoveEvent(QMouseEvent* event)
 
 		if (!this->isDraggable())
 		{
-			clickDown = false;
+			mouseDown = false;
 			return;
 		}
 
@@ -112,9 +112,9 @@ void GlassLibraryWidget :: mouseMoveEvent(QMouseEvent* event)
 
 void GlassLibraryWidget :: mouseReleaseEvent(QMouseEvent*)
 {
-	if (clickDown)
+	if (mouseDown)
 	{
-		int v = hitValue(clickDownPos);
+		int v = hitValue(mouseDownPos);
 		if (v > 0)
 			this->window->copyLibraryWidget(this);
 		else if (v < 0)
@@ -123,7 +123,7 @@ void GlassLibraryWidget :: mouseReleaseEvent(QMouseEvent*)
 			this->window->setEditorLibraryWidget(this);
 	}
 
-	clickDown = false;
+	mouseDown = false;
 }
 
 void GlassLibraryWidget :: paintEvent(QPaintEvent* event)

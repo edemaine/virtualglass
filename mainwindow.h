@@ -153,7 +153,7 @@ class MainWindow : public QMainWindow
 
 		bool dirtyBit;
 		QString saveFilename;
-		bool clickDown;
+		bool mouseDown;
 
 		Email* email;
 		UndoRedo* undoRedo;

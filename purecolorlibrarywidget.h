@@ -33,8 +33,8 @@ class PureColorLibraryWidget : public QLabel
 		void mouseReleaseEvent(QMouseEvent* e);
 
 	private:
-		bool clickDown;
-		QPoint clickDownPos;
+		bool mouseDown;
+		QPoint mouseDownPos;
 
 		bool isSelected;
 

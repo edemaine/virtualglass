@@ -32,8 +32,8 @@ class GlassLibraryWidget : public QLabel
 		void updateStyleSheet();
 		int hitValue(QPoint hit);
 		MainWindow* window;
-		bool clickDown;
-		QPoint clickDownPos;
+		bool mouseDown;
+		QPoint mouseDownPos;
 };
 
 #endif 

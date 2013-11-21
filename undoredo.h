@@ -31,10 +31,11 @@ class UndoRedo : public QObject
 	public:
 		enum EventType
 		{
-			ADD_EVENT,
-			DELETE_EVENT,
-			MODIFY_EVENT,
-			MOVE_EVENT
+			ADD,
+			DELETE,
+			MODIFY,
+			MOVE,
+			NO_UNDO
 		};
 
 		enum ObjectType
@@ -94,6 +95,7 @@ class UndoRedo : public QObject
 		void movedPiece(unsigned int index, int direction);
 		*/
 
+		void noPriorUndo();
 		void clearHistory();
 
 	public slots:
@@ -112,6 +114,8 @@ class UndoRedo : public QObject
 		void undoCaneEvent(struct Event& event);
 		void redoGlassColorEvent(struct Event& event);
 		void redoCaneEvent(struct Event& event);
+		bool canUndo();
+		bool canRedo();
 };
 
 #endif

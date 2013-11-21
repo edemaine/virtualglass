@@ -65,8 +65,9 @@ MainWindow :: MainWindow()
 
 	// do the finishing touches to put the GUI in fresh state
 	setViewMode(EMPTY_VIEW_MODE);
+	undoRedo->noPriorUndo();
 	setDirtyBit(false);
-	clickDown = false;
+	mouseDown = false;
 
 	showMaximized();
 }
@@ -177,16 +178,16 @@ bool MainWindow :: eventFilter(QObject* obj, QEvent* event)
 	else if (event->type() == QEvent::MouseButtonPress)
 	{
 		if (dynamic_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
-			clickDown = true;
+			mouseDown = true;
 	}
 	else if (event->type() == QEvent::MouseButtonRelease)
 	{
-		if (clickDown)
+		if (mouseDown)
 		{
 			setViewMode(EMPTY_VIEW_MODE);
 			updateLibrary();
 		}
-		clickDown = false;
+		mouseDown = false;
 	}
 
 	return false;
@@ -1633,6 +1634,7 @@ void MainWindow::newFileActionTriggered()
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(caneEditorWidget->cane(), this));
 	undoRedo->addedCane(caneEditorWidget->cane(), caneLibraryLayout->count()-1);
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(pieceEditorWidget->piece(), this)); 
+	undoRedo->noPriorUndo();
 
 	// 4. go back to empty view mode
 	setViewMode(EMPTY_VIEW_MODE);
@@ -1726,6 +1728,8 @@ void MainWindow::openFile(QString filename, bool add)
 	}
 	for (unsigned int i = 0; i < pieces.size(); ++i)
 		pieceLibraryLayout->addWidget(new PieceLibraryWidget(pieces[i], this));
+
+	undoRedo->noPriorUndo();
 }
 
 void MainWindow::openFileActionTriggered()
