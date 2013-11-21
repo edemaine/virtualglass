@@ -102,6 +102,7 @@ class MainWindow : public QMainWindow
 			vector<GlassColor*>& colors, vector<Cane*>& canes, vector<Piece*>& pieces);
 		bool findLibraryWidgetData(GlassLibraryWidget* lw, int* type, QVBoxLayout** layout, int* index);
 		QVBoxLayout* currentLibraryLayout();
+		void updateCurrentEditor();
 		void updateUndoRedoEnabled(bool undo, bool redo);
 
 		// Variables

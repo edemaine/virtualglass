@@ -11,6 +11,8 @@ using std::stack;
 
 class GlassColor 
 {
+	friend class UndoRedo;
+
 	public:
 		GlassColor();
 		GlassColor(Color __color, string __shortName, string __longName);

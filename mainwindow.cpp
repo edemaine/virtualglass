@@ -359,6 +359,7 @@ void MainWindow::copyLibraryWidget(GlassLibraryWidget* lw)
 		{
 			Cane *newCane = caneEditorWidget->cane()->copy();
 			caneLibraryLayout->insertWidget(index, new CaneLibraryWidget(newCane, this));
+			undoRedo->addedCane(newCane, index);
 			caneEditorWidget->setCane(newCane);
 			updateLibrary(newCane);
 			setDirtyBit(true);
@@ -448,7 +449,12 @@ void MainWindow::deleteLibraryWidget(GlassLibraryWidget* lw)
 			break;
 		}
 		case CANE_VIEW_MODE:
+		{
+			Cane* deleted = dynamic_cast<CaneLibraryWidget*>(
+				dynamic_cast<QWidgetItem*>(layout->itemAt(index))->widget())->cane;
+			undoRedo->deletedCane(deleted, index);
 			break;
+		}
 		case PIECE_VIEW_MODE:
 			break;
 	}
@@ -622,6 +628,7 @@ void MainWindow :: randomSimpleCaneExampleActionTriggered()
 	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor, this));
 	undoRedo->addedGlassColor(glassColor, glassColorLibraryLayout->count()-1);
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(cane, this));
+	undoRedo->addedCane(cane, caneLibraryLayout->count()-1);
 	setDirtyBit(true);
 
 	setViewMode(CANE_VIEW_MODE);
@@ -639,14 +646,21 @@ void MainWindow :: randomComplexCaneExampleActionTriggered()
 	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor, this));
 	undoRedo->addedGlassColor(glassColor, glassColorLibraryLayout->count()-1);
 	if (complexCane->hasDependencyOn(circleCane))
+	{
 		caneLibraryLayout->addWidget(new CaneLibraryWidget(circleCane, this));
+		undoRedo->addedCane(circleCane, caneLibraryLayout->count()-1);
+	}
 	else 
 		deep_delete(circleCane);
 	if (complexCane->hasDependencyOn(squareCane))
+	{
 		caneLibraryLayout->addWidget(new CaneLibraryWidget(squareCane, this));
+		undoRedo->addedCane(squareCane, caneLibraryLayout->count()-1);
+	}
 	else 
 		deep_delete(squareCane);
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(complexCane, this));
+	undoRedo->addedCane(complexCane, caneLibraryLayout->count()-1);
 	setDirtyBit(true);
 
 	setViewMode(CANE_VIEW_MODE);
@@ -663,6 +677,7 @@ void MainWindow :: randomSimplePieceExampleActionTriggered()
 	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor, this));
 	undoRedo->addedGlassColor(glassColor, glassColorLibraryLayout->count()-1);
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(squareCane, this));
+	undoRedo->addedCane(squareCane, caneLibraryLayout->count()-1);
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(piece, this));
 	setDirtyBit(true);
 
@@ -696,15 +711,23 @@ void MainWindow :: randomComplexPieceExampleActionTriggered()
 	else
 		delete glassColor2;
 	if (piece->hasDependencyOn(circleCane)) 
+	{
 		caneLibraryLayout->addWidget(new CaneLibraryWidget(circleCane, this));
+		undoRedo->addedCane(circleCane, caneLibraryLayout->count()-1);
+	}
 	else
 		delete circleCane;
 	if (piece->hasDependencyOn(squareCane)) 
+	{
 		caneLibraryLayout->addWidget(new CaneLibraryWidget(squareCane, this));
+		undoRedo->addedCane(squareCane, caneLibraryLayout->count()-1);
+	}
 	else
 		delete squareCane;
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(complexCane1, this));
+	undoRedo->addedCane(complexCane1, caneLibraryLayout->count()-1);
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(complexCane2, this));
+	undoRedo->addedCane(complexCane2, caneLibraryLayout->count()-1);
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(piece, this));
 	setDirtyBit(true);
 
@@ -898,8 +921,9 @@ void MainWindow :: setupEditors()
 	glassColorEditorWidget->updateEverything();
 	editorStack->addWidget(glassColorEditorWidget);
 
-	caneEditorWidget = new CaneEditorWidget(editorStack);
+	caneEditorWidget = new CaneEditorWidget(undoRedo, editorStack);
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(caneEditorWidget->cane(), this));
+	undoRedo->addedCane(caneEditorWidget->cane(), caneLibraryLayout->count()-1);
 	caneEditorWidget->updateEverything();
 	editorStack->addWidget(caneEditorWidget);
 
@@ -924,6 +948,7 @@ void MainWindow :: newCaneButtonClicked()
 {
 	Cane* newCane = new Cane(CaneTemplate::HORIZONTAL_LINE_CIRCLE);
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(newCane, this));
+	undoRedo->addedCane(newCane, caneLibraryLayout->count()-1);
 	setViewMode(CANE_VIEW_MODE);
 	caneEditorWidget->setCane(newCane);
 	updateLibrary(newCane);
@@ -1003,6 +1028,22 @@ bool MainWindow :: caneIsDependancy(Cane* cane)
 	}
 
 	return false;
+}
+
+void MainWindow :: updateCurrentEditor()
+{
+	switch (editorStack->currentIndex())
+	{
+		case GLASSCOLOR_VIEW_MODE:
+			glassColorEditorWidget->updateEverything();
+			break;
+		case CANE_VIEW_MODE:
+			caneEditorWidget->updateEverything();
+			break;
+		case PIECE_VIEW_MODE:
+			pieceEditorWidget->updateEverything();
+			break;
+	}
 }
 
 void MainWindow :: updateLibrary()
@@ -1454,6 +1495,7 @@ void MainWindow::importSVGActionTriggered()
 	}
 
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(newCane, this));
+	undoRedo->addedCane(newCane, caneLibraryLayout->count()-1);
 	setViewMode(CANE_VIEW_MODE);
 	caneEditorWidget->setCane(newCane);
 }
@@ -1589,6 +1631,7 @@ void MainWindow::newFileActionTriggered()
 	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColorEditorWidget->glassColor(), this));
 	undoRedo->addedGlassColor(glassColorEditorWidget->glassColor(), glassColorLibraryLayout->count()-1);
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(caneEditorWidget->cane(), this));
+	undoRedo->addedCane(caneEditorWidget->cane(), caneLibraryLayout->count()-1);
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(pieceEditorWidget->piece(), this)); 
 
 	// 4. go back to empty view mode
@@ -1677,7 +1720,10 @@ void MainWindow::openFile(QString filename, bool add)
 		undoRedo->addedGlassColor(colors[i], glassColorLibraryLayout->count()-1);
 	}
 	for (unsigned int i = 0; i < canes.size(); ++i)
+	{
 		caneLibraryLayout->addWidget(new CaneLibraryWidget(canes[i], this));
+		undoRedo->addedCane(canes[i], caneLibraryLayout->count()-1);
+	}
 	for (unsigned int i = 0; i < pieces.size(); ++i)
 		pieceLibraryLayout->addWidget(new PieceLibraryWidget(pieces[i], this));
 }

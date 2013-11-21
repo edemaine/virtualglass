@@ -15,13 +15,15 @@
 #include "caneeditorviewwidget.h"
 #include "globalbackgroundcolor.h"
 #include "canecrosssectionrender.h"
+#include "undoredo.h"
 
-CaneEditorViewWidget :: CaneEditorViewWidget(Cane* cane, QWidget* parent) : QWidget(parent)
+CaneEditorViewWidget :: CaneEditorViewWidget(Cane* cane, UndoRedo* undoRedo, QWidget* parent) : QWidget(parent)
 {
 	// setup draw widget
 	setAcceptDrops(true);
 	setMinimumSize(200, 200);
 	this->cane = cane;
+	this->undoRedo = undoRedo;
 	isDraggingCasing = false;
 }
 
@@ -250,7 +252,7 @@ void CaneEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 void CaneEditorViewWidget :: mouseReleaseEvent(QMouseEvent*)
 {
 	isDraggingCasing = false;
-	cane->saveState();
+	undoRedo->modifiedCane(cane);
 	updateEverything();
 	emit someDataChanged();
 }
@@ -446,7 +448,7 @@ void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 
 	subcanesHighlighted.clear();
 	casingsHighlighted.clear();
-	cane->saveState();
+	undoRedo->modifiedCane(cane);
 	updateEverything();
 	emit someDataChanged();
 }

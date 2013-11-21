@@ -26,19 +26,22 @@
 #include "globalbackgroundcolor.h"
 #include "globalgraphicssetting.h"
 #include "constants.h"
+#include "undoredo.h"
 
-CaneEditorWidget :: CaneEditorWidget(QWidget* parent) : QWidget(parent)
+CaneEditorWidget :: CaneEditorWidget(UndoRedo* undoRedo, QWidget* parent) : QWidget(parent)
 {
 	resetCane();
 
-	viewWidget = new CaneEditorViewWidget(_cane, this);	
-	customizeViewWidget = new CaneCustomizeViewWidget(_cane, this);
+	viewWidget = new CaneEditorViewWidget(_cane, undoRedo, this);	
+	customizeViewWidget = new CaneCustomizeViewWidget(_cane, undoRedo, this);
 	niceViewWidget = new NiceViewWidget(NiceViewWidget::PULLPLAN_CAMERA_MODE, this);
 	niceViewWidget->setGeometry(&geometry);
 
 	setupLayout();
 	setupThreading();
 	setupConnections();
+
+	this->undoRedo = undoRedo;
 
 	seedTemplates();
 }
@@ -69,36 +72,6 @@ void CaneEditorWidget :: reset3DCamera()
 void CaneEditorWidget :: resetCane()
 {
 	_cane = new Cane(CaneTemplate::HORIZONTAL_LINE_CIRCLE);
-}
-
-bool CaneEditorWidget :: canUndo()
-{
-        return this->_cane->canUndo();
-}
-
-bool CaneEditorWidget :: canRedo()
-{
-        return this->_cane->canRedo();
-}
-
-void CaneEditorWidget :: undo()
-{
-        this->_cane->undo();
-
-	if (this->_cane->templateType() != CaneTemplate::CUSTOM)
-		controlsTab->setCurrentIndex(0);
-	updateEverything();
-        emit someDataChanged();
-}
-
-void CaneEditorWidget :: redo()
-{
-        this->_cane->redo();
-
-	if (this->_cane->templateType() != CaneTemplate::CUSTOM)
-		controlsTab->setCurrentIndex(0);
-        updateEverything();
-        emit someDataChanged();
 }
 
 void CaneEditorWidget :: writeCaneToOBJFile(QString& filename)
@@ -334,7 +307,7 @@ void CaneEditorWidget :: controlsTabChanged(int tab)
 		CaneTemplate::Type oldType = _cane->templateType();
 		_cane->setTemplateType(CaneTemplate::CUSTOM);				
 		if (oldType != CaneTemplate::CUSTOM)
-			_cane->saveState();
+			undoRedo->modifiedCane(_cane);
 		updateEverything();
 		emit someDataChanged();
 	}
@@ -343,7 +316,7 @@ void CaneEditorWidget :: controlsTabChanged(int tab)
 void CaneEditorWidget :: circleCasingButtonClicked()
 {
 	_cane->setOutermostCasingShape(CIRCLE_SHAPE);
-	_cane->saveState();
+	undoRedo->modifiedCane(_cane);
 	updateEverything();
 	emit someDataChanged();
 }
@@ -351,7 +324,7 @@ void CaneEditorWidget :: circleCasingButtonClicked()
 void CaneEditorWidget :: squareCasingButtonClicked()
 {
 	_cane->setOutermostCasingShape(SQUARE_SHAPE);
-	_cane->saveState();
+	undoRedo->modifiedCane(_cane);
 	updateEverything();
 	emit someDataChanged();
 }
@@ -359,7 +332,7 @@ void CaneEditorWidget :: squareCasingButtonClicked()
 void CaneEditorWidget :: removeCasingButtonClicked()
 {
 	_cane->removeCasing();
-	_cane->saveState();
+	undoRedo->modifiedCane(_cane);
 	updateEverything();
 	emit someDataChanged();
 }
@@ -367,7 +340,7 @@ void CaneEditorWidget :: removeCasingButtonClicked()
 void CaneEditorWidget :: addCasingButtonClicked()
 {
 	_cane->addCasing(_cane->outermostCasingShape());
-	_cane->saveState();
+	undoRedo->modifiedCane(_cane);
 	updateEverything();
 	emit someDataChanged();
 }
@@ -445,7 +418,7 @@ void CaneEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 		// as they're no longer working on a custom template
 		controlsTab->setCurrentIndex(0);
 		_cane->setTemplateType(ptlw->type);	
-		_cane->saveState();
+		undoRedo->modifiedCane(_cane);
 		updateEverything();
 		emit someDataChanged();
 	}
@@ -478,7 +451,7 @@ void CaneEditorWidget :: setupConnections()
 	
 void CaneEditorWidget :: twistEnded()
 {
-	_cane->saveState();
+	undoRedo->modifiedCane(_cane);
 }
 
 void CaneEditorWidget :: childWidgetDataChanged()
@@ -494,7 +467,7 @@ void CaneEditorWidget :: countSpinChanged(int)
 	if (count != static_cast<unsigned int>(countSpin->value()))
 	{
 		_cane->setCount(countSpin->value());
-		_cane->saveState();
+		undoRedo->modifiedCane(_cane);
 		updateEverything();
 		emit someDataChanged();
 	}

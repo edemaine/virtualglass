@@ -12,14 +12,6 @@
 #include "mesh.h"
 #include "constants.h"
 
-class Cane;
-class CaneEditorViewWidget;
-class CaneCustomizeViewWidget;
-class NiceViewWidget;
-class CaneTemplateLibraryWidget;
-class CaneGeometryThread;
-class TwistWidget;
-
 class QImage;
 class QPushButton;
 class QStackedWidget;
@@ -28,6 +20,15 @@ class QTabWidget;
 class QSpinBox;
 class QHBoxLayout;
 class QScrollArea;
+
+class Cane;
+class CaneEditorViewWidget;
+class CaneCustomizeViewWidget;
+class NiceViewWidget;
+class CaneTemplateLibraryWidget;
+class CaneGeometryThread;
+class TwistWidget;
+class UndoRedo;
 
 #define MIN_CANE_COUNT_PARAMETER_VALUE 0
 #define MAX_CANE_COUNT_PARAMETER_VALUE 30
@@ -39,7 +40,7 @@ class CaneEditorWidget : public QWidget
 	friend class CaneGeometryThread;
 
 	public:
-		CaneEditorWidget(QWidget* parent=0);
+		CaneEditorWidget(UndoRedo* undoRedo, QWidget* parent=0);
 		void resetCane();
 		Cane* cane();
 		void setCane(Cane* c);
@@ -49,11 +50,6 @@ class CaneEditorWidget : public QWidget
 		void updateEverything();
 		QImage caneImage();
 		void reset3DCamera();
-
-		void undo();
-		void redo();
-		bool canUndo();
-		bool canRedo();
 
 	protected:
 		bool eventFilter(QObject* obj, QEvent* event);
@@ -101,6 +97,7 @@ class CaneEditorWidget : public QWidget
 		CaneCustomizeViewWidget* customizeViewWidget;	
 		NiceViewWidget* niceViewWidget;
 		TwistWidget* twistWidget;
+		UndoRedo* undoRedo;
 
 		QLabel* countLabel;
 		QSpinBox* countSpin;

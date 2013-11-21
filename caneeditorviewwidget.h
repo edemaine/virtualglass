@@ -11,6 +11,7 @@ class GlassColor;
 class Cane;
 class CaneLibraryWidget;
 class GlassColorLibraryWidget;
+class UndoRedo;
 
 using std::set;
 
@@ -19,7 +20,7 @@ class CaneEditorViewWidget : public QWidget
 	Q_OBJECT
 
 	public:
-		CaneEditorViewWidget(Cane* cane, QWidget* parent=0);
+		CaneEditorViewWidget(Cane* cane, UndoRedo* undoRedo, QWidget* parent=0);
 		void setCane(Cane* cane);
 		QRect usedRect();
 		static QPixmap renderCane(Cane* cane);
@@ -53,6 +54,7 @@ class CaneEditorViewWidget : public QWidget
 		Point2D mouseToCaneCoords(float x, float y);
 
 		Cane* cane;
+		UndoRedo* undoRedo;
 
 		bool isDraggingCasing;
 		unsigned int draggedCasingIndex;

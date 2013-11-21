@@ -13,6 +13,7 @@
 class QPainter;
 class GlassColor;
 class Cane;
+class UndoRedo;
 
 using std::vector;
 
@@ -21,7 +22,7 @@ class CaneCustomizeViewWidget : public QWidget
 	Q_OBJECT
 
 	public:
-		CaneCustomizeViewWidget(Cane* cane, QWidget* parent=0);
+		CaneCustomizeViewWidget(Cane* cane, UndoRedo* undoRedo, QWidget* parent=0);
 		void setCane(Cane* cane);
 		void addCircleClicked();
 		void addSquareClicked();
@@ -67,6 +68,7 @@ class CaneCustomizeViewWidget : public QWidget
 	
 		GUIMode mode;
 		Cane* cane;
+		UndoRedo* undoRedo;
 		int hoveringIndex;
 		int activeBoxIndex;
 		Point2D mouseStartingLoc;

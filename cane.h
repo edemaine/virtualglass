@@ -21,6 +21,8 @@ class GlassColor;
 
 class Cane
 {
+	friend class UndoRedo;
+	
 	public:
 		Cane(enum CaneTemplate::Type t);
 
@@ -62,32 +64,17 @@ class Cane
 		bool hasDependencyOn(GlassColor* color);
 		bool hasDependencyOn(Cane* cane);
 
-		void undo();
-		void redo();
-		bool canUndo();
-		bool canRedo();
-		void saveState();
-
 	private:
-		struct State
-		{
-			enum CaneTemplate::Type type;
-			vector<Casing> casings;
-			unsigned int count;
-			float twist;
-			vector<SubcaneTemplate> subs;
-		};	
-
-		stack<struct State> undoStack;
-		stack<struct State> redoStack;
-		struct State state;
-
-		// Methods
 		void initializeTemplate();
 		void resetSubs(bool hardReset);
 		void pushNewSubpull(bool hardReset, vector<SubcaneTemplate>* newSubs,
 			enum GeometricShape s, Point2D location, float diameter);
 
+		enum CaneTemplate::Type _type;
+		vector<Casing> _casings;
+		unsigned int _count;
+		float _twist;
+		vector<SubcaneTemplate> _subs;
 };
 
 Cane *deep_copy(const Cane *cane);
