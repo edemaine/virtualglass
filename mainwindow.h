@@ -104,6 +104,7 @@ class MainWindow : public QMainWindow
 		void getDependantLibraryContents(Piece* piece, 
 			vector<GlassColor*>& colors, vector<Cane*>& canes, vector<Piece*>& pieces);
 		bool findLibraryWidgetData(GlassLibraryWidget* lw, int* type, QVBoxLayout** layout, int* index);
+		QVBoxLayout* currentLibraryLayout();
 
 		// Variables
 		QScrollArea* libraryScrollArea;

@@ -191,98 +191,82 @@ bool MainWindow :: eventFilter(QObject* obj, QEvent* event)
 	return false;
 }
 
-void MainWindow :: moveCurrentEditingObject(int d)
+QVBoxLayout* MainWindow :: currentLibraryLayout()
 {
 	switch (editorStack->currentIndex())
 	{
 		case GLASSCOLOR_VIEW_MODE:
-			for (int i = 0; i < glassColorLibraryLayout->count(); ++i)
-			{
-				QLayoutItem* w = glassColorLibraryLayout->itemAt(i);
-				GlassColor* gc = dynamic_cast<GlassColorLibraryWidget*>(w->widget())->glassColor;
-				if (gc == glassColorEditorWidget->glassColor())
-				{
-					w = glassColorLibraryLayout->takeAt(i);
-					glassColorLibraryLayout->insertWidget(
-						MIN(MAX(i+d, 0), glassColorLibraryLayout->count()), w->widget()); 
-					if (0 <= i+d && i+d <= glassColorLibraryLayout->count())
-						undoRedo->movedGlassColor(i, d);
-					return;
-				}
-			}	
-			return;	
+			return glassColorLibraryLayout;
 		case CANE_VIEW_MODE:
-			for (int i = 0; i < caneLibraryLayout->count(); ++i)
-			{
-				QLayoutItem* w = caneLibraryLayout->itemAt(i);
-				Cane* p = dynamic_cast<CaneLibraryWidget*>(w->widget())->cane;
-				if (p == caneEditorWidget->cane())
-				{
-					w = caneLibraryLayout->takeAt(i);
-					caneLibraryLayout->insertWidget(
-						MIN(MAX(i+d, 0), caneLibraryLayout->count()), w->widget()); 
-					return;
-				}
-			}
-			return;	
+			return caneLibraryLayout;
 		case PIECE_VIEW_MODE:
-			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
-			{
-				QLayoutItem* w = pieceLibraryLayout->itemAt(i);
-				Piece* p = dynamic_cast<PieceLibraryWidget*>(w->widget())->piece;
-				if (p == pieceEditorWidget->piece())
-				{
-					w = pieceLibraryLayout->takeAt(i);
-					pieceLibraryLayout->insertWidget(
-						MIN(MAX(i+d, 0), pieceLibraryLayout->count()), w->widget()); 
-					return;
-				}
-			}
-			return;	
-	}
+			return pieceLibraryLayout;
+		default:
+			return NULL;
+	} 
+}
 
+void MainWindow :: moveCurrentEditingObject(int d)
+{
+	QVBoxLayout* layout = currentLibraryLayout();
+	if (layout == NULL)
+		return;
+
+	for (int i = 0; i < glassColorLibraryLayout->count(); ++i)
+	{
+		QLayoutItem* w = layout->itemAt(i);
+
+		bool foundCurrentEditingObject;
+		switch (editorStack->currentIndex())
+		{
+			case GLASSCOLOR_VIEW_MODE:
+				foundCurrentEditingObject = (dynamic_cast<GlassColorLibraryWidget*>(w->widget())->glassColor
+					== glassColorEditorWidget->glassColor());
+				break;
+			case CANE_VIEW_MODE:
+				foundCurrentEditingObject = (dynamic_cast<CaneLibraryWidget*>(w->widget())->cane
+					== caneEditorWidget->cane());
+				break;
+			case PIECE_VIEW_MODE:
+				foundCurrentEditingObject = (dynamic_cast<PieceLibraryWidget*>(w->widget())->piece
+					== pieceEditorWidget->piece());
+				break;
+		}
+
+		if (foundCurrentEditingObject)
+		{
+			w = layout->takeAt(i);
+			layout->insertWidget(MIN(MAX(i+d, 0), layout->count()), w->widget()); 
+			if (0 <= i+d && i+d <= layout->count() && editorStack->currentIndex() == GLASSCOLOR_VIEW_MODE)
+				undoRedo->movedGlassColor(i, d);
+			return; 
+		}
+	}	
 }
 
 void MainWindow :: deleteCurrentEditingObject()
 {
-	GlassColor* currentColor = glassColorEditorWidget->glassColor();
-	Cane* currentCane = caneEditorWidget->cane();
-	Piece* currentPiece = pieceEditorWidget->piece();
+	QVBoxLayout* layout = currentLibraryLayout();
+	if (layout == NULL)
+		return;
 
-	QVBoxLayout* libraryLayout = NULL;
-	switch (editorStack->currentIndex())
+	for (int i = 0; i < layout->count(); ++i)
 	{
-		case GLASSCOLOR_VIEW_MODE:
-			libraryLayout = glassColorLibraryLayout;
-			break;
-		case CANE_VIEW_MODE:
-			libraryLayout = caneLibraryLayout;
-			break;
-		case PIECE_VIEW_MODE:
-			libraryLayout = pieceLibraryLayout;
-			break;
-		default:
-			return;
-	}
-
-	for (int i = 0; i < libraryLayout->count(); ++i)
-	{
-		QLayoutItem* oldCur = libraryLayout->itemAt(i);
-		GlassLibraryWidget* glw = dynamic_cast<GlassLibraryWidget*>(oldCur->widget());
+		GlassLibraryWidget* glw = dynamic_cast<GlassLibraryWidget*>(layout->itemAt(i)->widget());
 		switch (editorStack->currentIndex())
 		{
 			case GLASSCOLOR_VIEW_MODE:
-				if (currentColor == dynamic_cast<GlassColorLibraryWidget*>(glw)->glassColor)
+				if (glassColorEditorWidget->glassColor() == dynamic_cast<GlassColorLibraryWidget*>(glw)->glassColor)
 					deleteLibraryWidget(glw);
-				break;
+				return;	
 			case CANE_VIEW_MODE:	
-				if (currentCane == dynamic_cast<CaneLibraryWidget*>(glw)->cane)
+				if (caneEditorWidget->cane() == dynamic_cast<CaneLibraryWidget*>(glw)->cane)
 					deleteLibraryWidget(glw);
-				break;
+				return;
 			case PIECE_VIEW_MODE:	
-				if (currentPiece == dynamic_cast<PieceLibraryWidget*>(glw)->piece)
+				if (pieceEditorWidget->piece() == dynamic_cast<PieceLibraryWidget*>(glw)->piece)
 					deleteLibraryWidget(glw);
-				break;
+				return;
 		}	
 	}	
 }
@@ -1465,11 +1449,11 @@ void MainWindow::importSVGActionTriggered()
 		return;
 
 	SVG::SVG svg;
-	Cane *newEditorCane = new Cane(CaneTemplate::BASE_SQUARE);
-	if (!SVG::load_svg(userSpecifiedFilename.toUtf8().constData(), svg, newEditorCane)) 
+	Cane* newCane = new Cane(CaneTemplate::BASE_SQUARE);
+	if (!SVG::load_svg(userSpecifiedFilename.toUtf8().constData(), svg, newCane)) 
 	{
 		QMessageBox::warning(this, "Import failed", "Failed to read " + userSpecifiedFilename);
-		deep_delete(newEditorCane);
+		deep_delete(newCane);
 		return;
 	}
 
@@ -1477,13 +1461,13 @@ void MainWindow::importSVGActionTriggered()
 	{
 		QMessageBox::warning(this, "Import failed", 
 			"The image in " + userSpecifiedFilename + " is not square.");
-		deep_delete(newEditorCane);
+		deep_delete(newCane);
 		return;
 	}
 
-	caneLibraryLayout->addWidget(new CaneLibraryWidget(newEditorCane, this));
+	caneLibraryLayout->addWidget(new CaneLibraryWidget(newCane, this));
 	setViewMode(CANE_VIEW_MODE);
-	caneEditorWidget->setCane(newEditorCane);
+	caneEditorWidget->setCane(newCane);
 }
 
 void MainWindow::getDependantLibraryContents(Piece* piece, vector<GlassColor*>& colors, vector<Cane*>& canes, 

@@ -78,6 +78,8 @@ class UndoRedo : public QObject
 		bool canUndo();
 		bool canRedo();
 
+		void clearState();
+
 	public slots:
 		void undo();
 		void redo();
@@ -89,6 +91,7 @@ class UndoRedo : public QObject
 		MainWindow* mainWindow;	
 
 		void clearRedoStack();
+		void clearUndoStack();
 };
 
 #endif

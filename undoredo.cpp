@@ -18,6 +18,12 @@ UndoRedo :: UndoRedo(MainWindow* _mainWindow)
 	this->mainWindow = _mainWindow;
 }
 
+void UndoRedo :: clearState()
+{
+	clearUndoStack();
+	clearRedoStack();
+}
+
 void UndoRedo :: addedGlassColor(GlassColor* gc, unsigned int index)
 {
 	struct Event event;
@@ -102,11 +108,23 @@ void UndoRedo :: movedGlassColor(unsigned int index, int direction)
 	clearRedoStack();
 }
 
+void UndoRedo :: clearUndoStack()
+{
+	// pop everything, actually delete DELETE_EVENT objects since
+	// they are objects that aren't currently in the library and never will come back
+	while (!undoStack.empty())
+	{
+		if (undoStack.top().type == DELETE_EVENT)
+			delete undoStack.top().glassColor;
+		undoStack.pop();
+	}
+} 
+
 void UndoRedo :: clearRedoStack()
 {
 	// pop everything, actually delete ADD_EVENT objects since
-	// they are objects that don't exist and never will come back
-	while (redoStack.size() > 0)
+	// they are objects that aren't currently in the library and never will come back
+	while (!redoStack.empty())
 	{
 		if (redoStack.top().type == ADD_EVENT)
 			delete redoStack.top().glassColor;
