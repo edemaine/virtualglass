@@ -60,6 +60,10 @@ class UndoRedo : public QObject
 			Cane* cane;
 			Cane* preCaneState;
 			Cane* postCaneState;
+
+			Piece* piece;
+			Piece* prePieceState;
+			Piece* postPieceState;
 		};
 
 		UndoRedo(MainWindow* mw);
@@ -71,13 +75,10 @@ class UndoRedo : public QObject
 		void deletedCane(Cane* c, unsigned int index);
 		void modifiedCane(Cane* c);
 		void movedCane(unsigned int index, int direction);		
-
-		/*
-		void newPiece(Piece* p);
-		void deletePiece(Piece* p);
+		void addedPiece(Piece* p, unsigned int index);
+		void deletedPiece(Piece* p, unsigned int index);
 		void modifiedPiece(Piece* p);
 		void movedPiece(unsigned int index, int direction);
-		*/
 
 		void noPriorUndo();
 		void clearHistory();
@@ -92,13 +93,15 @@ class UndoRedo : public QObject
 
 		MainWindow* mainWindow;	
 		
-		static void initEvent(struct Event& event);
+		static struct Event nulledEvent();
 		void clearRedoStack();
 		void clearUndoStack();
 		void undoGlassColorEvent(struct Event& event);
 		void undoCaneEvent(struct Event& event);
+		void undoPieceEvent(struct Event& event);
 		void redoGlassColorEvent(struct Event& event);
 		void redoCaneEvent(struct Event& event);
+		void redoPieceEvent(struct Event& event);
 		bool canUndo();
 		bool canRedo();
 };

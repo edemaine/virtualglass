@@ -12,8 +12,9 @@
 #include "glassmime.h"
 #include "glasscolor.h"
 #include "canecrosssectionrender.h"
+#include "undoredo.h"
 
-PickupEditorViewWidget :: PickupEditorViewWidget(Piece* piece, QWidget* parent) : QWidget(parent)
+PickupEditorViewWidget :: PickupEditorViewWidget(Piece* piece, UndoRedo* undoRedo, QWidget* parent) : QWidget(parent)
 {
 	setAcceptDrops(true);
 	setMinimumSize(200, 200);
@@ -25,6 +26,8 @@ PickupEditorViewWidget :: PickupEditorViewWidget(Piece* piece, QWidget* parent) 
 	this->setLayout(layout);
 	layout->addWidget(niceViewWidget, 1);
 	layout->setContentsMargins(0, 0, 0, 0);
+
+	this->undoRedo = undoRedo;
 
 	setupConnections();
 }
@@ -220,7 +223,7 @@ void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 			t.cane = droppedCane;
 			this->piece->pickup()->setSubpickupTemplate(t, subcaneIndex);
 		}
-		piece->saveState();
+		undoRedo->modifiedPiece(piece);
 		emit someDataChanged();
 	}
 	else

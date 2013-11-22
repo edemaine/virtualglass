@@ -5,13 +5,16 @@
 #include "piece.h"
 #include "constants.h"
 #include "globalbackgroundcolor.h"
+#include "undoredo.h"
 
-PieceCustomizeViewWidget :: PieceCustomizeViewWidget(Piece* _piece, QWidget* _parent) : QWidget(_parent)
+PieceCustomizeViewWidget :: PieceCustomizeViewWidget(Piece* _piece, UndoRedo* undoRedo, QWidget* _parent) : QWidget(_parent)
 {
 	// setup draw widget
 	setMinimumSize(200, 200);
 	this->piece = _piece;
 	this->zoom = this->defaultZoom = 12.0;
+
+	this->undoRedo = undoRedo;
 
 	isDraggingControlPoint = false;
 	draggedControlPointIndex = 0;
@@ -156,7 +159,7 @@ void PieceCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent*)
 {
 	if (isDraggingControlPoint)
 	{
-		piece->saveState();
+		undoRedo->modifiedPiece(piece);
 		isDraggingControlPoint = false;
 	}
 }

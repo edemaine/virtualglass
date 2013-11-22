@@ -239,8 +239,21 @@ void MainWindow :: moveCurrentEditingObject(int d)
 		{
 			w = layout->takeAt(i);
 			layout->insertWidget(MIN(MAX(i+d, 0), layout->count()), w->widget()); 
-			if (0 <= i+d && i+d <= layout->count() && editorStack->currentIndex() == GLASSCOLOR_VIEW_MODE)
-				undoRedo->movedGlassColor(i, d);
+			if (0 <= i+d && i+d <= layout->count())
+			{
+				switch (editorStack->currentIndex())
+				{
+					case GLASSCOLOR_VIEW_MODE:
+						undoRedo->movedGlassColor(i, d);
+						break;
+					case CANE_VIEW_MODE:
+						undoRedo->movedCane(i, d);
+						break;
+					case PIECE_VIEW_MODE:
+						undoRedo->movedPiece(i, d);
+						break;
+				}
+			}
 			setDirtyBit(true);
 			return; 
 		}
@@ -370,6 +383,7 @@ void MainWindow::copyLibraryWidget(GlassLibraryWidget* lw)
 		{
 			Piece* newPiece = pieceEditorWidget->piece()->copy();
 			pieceLibraryLayout->insertWidget(index, new PieceLibraryWidget(newPiece, this));
+			undoRedo->addedPiece(newPiece, index);
 			pieceEditorWidget->setPiece(newPiece);
 			updateLibrary(newPiece);
 			setDirtyBit(true);
@@ -457,7 +471,12 @@ void MainWindow::deleteLibraryWidget(GlassLibraryWidget* lw)
 			break;
 		}
 		case PIECE_VIEW_MODE:
+		{
+			Piece* deleted = dynamic_cast<PieceLibraryWidget*>(
+				dynamic_cast<QWidgetItem*>(layout->itemAt(index))->widget())->piece;
+			undoRedo->deletedPiece(deleted, index);
 			break;
+		}
 	}
 	QLayoutItem* cur = layout->takeAt(index);
 	cur->widget()->moveToThread(QApplication::instance()->thread());
@@ -680,6 +699,7 @@ void MainWindow :: randomSimplePieceExampleActionTriggered()
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(squareCane, this));
 	undoRedo->addedCane(squareCane, caneLibraryLayout->count()-1);
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(piece, this));
+	undoRedo->addedPiece(piece, pieceLibraryLayout->count()-1);
 	setDirtyBit(true);
 
 	setViewMode(PIECE_VIEW_MODE);
@@ -730,6 +750,7 @@ void MainWindow :: randomComplexPieceExampleActionTriggered()
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(complexCane2, this));
 	undoRedo->addedCane(complexCane2, caneLibraryLayout->count()-1);
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(piece, this));
+	undoRedo->addedPiece(piece, pieceLibraryLayout->count()-1);
 	setDirtyBit(true);
 
 	setViewMode(PIECE_VIEW_MODE);
@@ -928,8 +949,9 @@ void MainWindow :: setupEditors()
 	caneEditorWidget->updateEverything();
 	editorStack->addWidget(caneEditorWidget);
 
-	pieceEditorWidget = new PieceEditorWidget(editorStack);
+	pieceEditorWidget = new PieceEditorWidget(undoRedo, editorStack);
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(pieceEditorWidget->piece(), this));
+	undoRedo->addedPiece(pieceEditorWidget->piece(), pieceLibraryLayout->count()-1);
 	pieceEditorWidget->updateEverything();
 	editorStack->addWidget(pieceEditorWidget);
 }
@@ -960,6 +982,7 @@ void MainWindow :: newPieceButtonClicked()
 {
 	Piece* newPiece = new Piece(PieceTemplate::TUMBLER);
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(newPiece, this));
+	undoRedo->addedPiece(newPiece, pieceLibraryLayout->count()-1);
 	setViewMode(PIECE_VIEW_MODE);
 	pieceEditorWidget->setPiece(newPiece);
 	updateLibrary(newPiece);
@@ -1634,6 +1657,7 @@ void MainWindow::newFileActionTriggered()
 	caneLibraryLayout->addWidget(new CaneLibraryWidget(caneEditorWidget->cane(), this));
 	undoRedo->addedCane(caneEditorWidget->cane(), caneLibraryLayout->count()-1);
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(pieceEditorWidget->piece(), this)); 
+	undoRedo->addedPiece(pieceEditorWidget->piece(), pieceLibraryLayout->count()-1);
 	undoRedo->noPriorUndo();
 
 	// 4. go back to empty view mode
@@ -1727,7 +1751,10 @@ void MainWindow::openFile(QString filename, bool add)
 		undoRedo->addedCane(canes[i], caneLibraryLayout->count()-1);
 	}
 	for (unsigned int i = 0; i < pieces.size(); ++i)
+	{
 		pieceLibraryLayout->addWidget(new PieceLibraryWidget(pieces[i], this));
+		undoRedo->addedPiece(pieces[i], pieceLibraryLayout->count()-1);
+	}
 
 	undoRedo->noPriorUndo();
 }

@@ -28,19 +28,22 @@
 #include "globalbackgroundcolor.h"
 #include "globalgraphicssetting.h"
 #include "constants.h"
+#include "undoredo.h"
 
-PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
+PieceEditorWidget :: PieceEditorWidget(UndoRedo* undoRedo, QWidget* parent) : QWidget(parent)
 {
 	resetPiece();
 
-	this->pickupViewWidget = new PickupEditorViewWidget(_piece, this);	
+	this->pickupViewWidget = new PickupEditorViewWidget(_piece, undoRedo, this);	
 	this->pieceNiceViewWidget = new NiceViewWidget(NiceViewWidget::PIECE_CAMERA_MODE, this);
 	pieceNiceViewWidget->setGeometry(&geometry);
-	this->pieceCustomizeViewWidget = new PieceCustomizeViewWidget(_piece, this);
+	this->pieceCustomizeViewWidget = new PieceCustomizeViewWidget(_piece, undoRedo, this);
 
 	setupLayout();
 	setupThreading();
 	setupConnections();
+
+	this->undoRedo = undoRedo;
 
 	seedTemplates();
 }
@@ -56,36 +59,6 @@ bool PieceEditorWidget :: eventFilter(QObject* obj, QEvent* event)
 		return true;
 	}
 	return false;
-}
-
-bool PieceEditorWidget :: canUndo()
-{
-	return this->_piece->canUndo();
-}
-
-bool PieceEditorWidget :: canRedo()
-{
-	return this->_piece->canRedo();
-}
-
-void PieceEditorWidget :: undo()
-{
-	this->_piece->undo();
-
-	if (this->_piece->templateType() != PieceTemplate::CUSTOM)
-		pieceControlsTab->setCurrentIndex(0);
-	updateEverything();
-	emit someDataChanged();
-}
-
-void PieceEditorWidget :: redo()
-{
-	this->_piece->redo();
-
-	if (this->_piece->templateType() != PieceTemplate::CUSTOM)
-		pieceControlsTab->setCurrentIndex(0);
-	updateEverything();
-	emit someDataChanged();
 }
 
 QImage PieceEditorWidget :: pieceImage()
@@ -141,6 +114,8 @@ void PieceEditorWidget :: updateEverything()
 		ptlw->setHighlighted(ptlw->type == _piece->templateType());
 	}
 	twistWidget->updateEverything();
+	if (this->_piece->templateType() != PieceTemplate::CUSTOM)
+		pieceControlsTab->setCurrentIndex(0);
 	
 	// Make a copy of the current state of the piece
 	tempPieceMutex.lock();
@@ -205,7 +180,7 @@ void PieceEditorWidget :: pickupCountSpinChanged(int)
 	if (tp.value != pickupCountSpin->value())
 	{
 		_piece->pickup()->setParameter(0, pickupCountSpin->value());
-		_piece->saveState();
+		undoRedo->modifiedPiece(_piece);
 		updateEverything();
 		emit someDataChanged();
 	}
@@ -268,7 +243,7 @@ void PieceEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 		if (pktlw->type != _piece->pickup()->templateType())
 		{
 			_piece->pickup()->setTemplateType(pktlw->type);
-			_piece->saveState();
+			undoRedo->modifiedPiece(_piece);
 			updateEverything();
 			emit someDataChanged();
 		}
@@ -281,7 +256,7 @@ void PieceEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 		{
 			pieceControlsTab->setCurrentIndex(0);
 			_piece->setTemplateType(ptlw->type);
-			_piece->saveState();
+			undoRedo->modifiedPiece(_piece);
 			updateEverything();
 			emit someDataChanged();
 		}
@@ -429,7 +404,7 @@ void PieceEditorWidget :: setupConnections()
 
 void PieceEditorWidget :: twistEnded()
 {
-	this->_piece->saveState();
+	undoRedo->modifiedPiece(_piece);
 }
 
 void PieceEditorWidget :: addControlPointButtonClicked()
@@ -437,7 +412,7 @@ void PieceEditorWidget :: addControlPointButtonClicked()
 	Spline spline = _piece->spline();
 	spline.addPoint(Point2D(make_vector(0.0f, 0.0f)));
 	_piece->setSpline(spline);
-	_piece->saveState();
+	undoRedo->modifiedPiece(_piece);
 	updateEverything();
 	emit someDataChanged();
 }
@@ -447,7 +422,7 @@ void PieceEditorWidget :: removeControlPointButtonClicked()
 	Spline spline = _piece->spline();
 	spline.removePoint();
 	_piece->setSpline(spline);
-	_piece->saveState();
+	undoRedo->modifiedPiece(_piece);
 	updateEverything();
 	emit someDataChanged();
 }
@@ -460,7 +435,7 @@ void PieceEditorWidget :: pieceControlsTabChanged(int tab)
 	if (tab != 0) // customize mode
 	{
 		_piece->setTemplateType(PieceTemplate::CUSTOM);
-		_piece->saveState();
+		undoRedo->modifiedPiece(_piece);
 		updateEverything();
 		emit someDataChanged();
 	}
@@ -514,7 +489,7 @@ void PieceEditorWidget :: updateLibraryWidgetPixmaps(PieceLibraryWidget* w)
 void PieceEditorWidget :: setPickupParameter(int param, int value)
 {
 	_piece->pickup()->setParameter(param, value);
-	_piece->saveState();
+	undoRedo->modifiedPiece(_piece);
 	updateEverything();
 	emit someDataChanged();
 }
@@ -522,7 +497,7 @@ void PieceEditorWidget :: setPickupParameter(int param, int value)
 void PieceEditorWidget :: setPieceTemplateType(enum PieceTemplate::Type _type)
 {
 	_piece->setTemplateType(_type);
-	_piece->saveState();
+	undoRedo->modifiedPiece(_piece);
 	updateEverything();
 	emit someDataChanged();
 }
@@ -530,7 +505,7 @@ void PieceEditorWidget :: setPieceTemplateType(enum PieceTemplate::Type _type)
 void PieceEditorWidget :: setPickupTemplateType(enum PickupTemplate::Type _type)
 {
 	_piece->pickup()->setTemplateType(_type);
-	_piece->saveState();
+	undoRedo->modifiedPiece(_piece);
 	updateEverything();
 	emit someDataChanged();
 }

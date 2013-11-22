@@ -21,7 +21,9 @@ class Piece
 
 		void setTemplateType(enum PieceTemplate::Type t, bool force=false);
 		enum PieceTemplate::Type templateType();
+
 		Piece* copy() const;
+		void set(Piece* p);
 
 		bool hasDependencyOn(GlassColor* c);
 		bool hasDependencyOn(Cane* p);
@@ -36,28 +38,12 @@ class Piece
 		void setSpline(Spline s);
 		Spline spline();
 
-		void undo();
-		void redo();
-		bool canUndo();
-		bool canRedo();
-		void saveState();		
-	
 	private:
-		Pickup* _pickup;
+		Pickup* pickup_;
 
-		struct State
-		{
-			float twist;
-			enum PieceTemplate::Type type;
-			Spline spline;
-		};	
-
-		void clearStateStacks();
-		stack<struct State> undoStackPiece;
-		stack<struct Pickup::State> undoStackPickup;
-		stack<struct State> redoStackPiece;
-		stack<struct Pickup::State> redoStackPickup;
-		struct State state;		
+		float twist_;
+		enum PieceTemplate::Type type_;
+		Spline spline_;
 };
 
 Piece *deep_copy(const Piece *);

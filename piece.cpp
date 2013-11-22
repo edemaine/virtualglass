@@ -2,119 +2,56 @@
 #include "piece.h"
 #include "cane.h"
 
-Piece :: Piece(enum PieceTemplate::Type _type)
+Piece :: Piece(enum PieceTemplate::Type type)
 {
-	this->state.twist = 0.0;
-	setTemplateType(_type, true);
+	this->twist_ = 0.0;
+	setTemplateType(type, true);
 	// initialize the piece's pickup to be something boring and base
-	this->_pickup = new Pickup(PickupTemplate::VERTICAL);
-
-	undoStackPiece.push(this->state);
-	undoStackPickup.push(this->_pickup->state);
+	this->pickup_ = new Pickup(PickupTemplate::VERTICAL);
 }
 
 void Piece::setPickup(Pickup* pickup)
 {
-	this->_pickup = pickup;
-	clearStateStacks();
+	this->pickup_ = pickup;
 }
 
 Pickup* Piece::pickup() const
 {
-	return this->_pickup;
-}
-
-void Piece::clearStateStacks()
-{
-	while (undoStackPiece.size() > 1)
-		undoStackPiece.pop();
-	while (undoStackPickup.size() > 1)
-		undoStackPickup.pop();
-	while (redoStackPiece.size() > 0)
-		redoStackPiece.pop();
-	while (redoStackPickup.size() > 0)
-		redoStackPickup.pop();
-}
-
-void Piece :: undo()
-{
-	if (!canUndo())
-		return;
-        redoStackPiece.push(undoStackPiece.top());
-        redoStackPickup.push(undoStackPickup.top());
-        undoStackPiece.pop();
-        undoStackPickup.pop();
-        this->state = undoStackPiece.top();
-	this->_pickup->state = undoStackPickup.top();
-}
-
-void Piece :: redo()
-{
-        if (!canRedo())
-                return;
-        undoStackPiece.push(redoStackPiece.top());
-        undoStackPickup.push(redoStackPickup.top());
-        redoStackPiece.pop();
-        redoStackPickup.pop();
-        this->state = undoStackPiece.top();
-        this->_pickup->state = undoStackPickup.top();
-}
-
-bool Piece :: canUndo()
-{
-        return (undoStackPiece.size() >= 2);
-}
-
-bool Piece :: canRedo()
-{
-        return (redoStackPiece.size() > 0);
-}
-
-void Piece :: saveState()
-{
-	assert(undoStackPiece.size() == undoStackPickup.size());
-	assert(redoStackPiece.size() == redoStackPickup.size());
-        undoStackPiece.push(this->state);
-        undoStackPickup.push(this->_pickup->state);
-        while (redoStackPiece.size() > 0)
-	{
-                redoStackPiece.pop();
-                redoStackPickup.pop();
-	}
+	return this->pickup_;
 }
 
 void Piece::setSpline(Spline s)
 {
-	this->state.spline = s;
+	this->spline_ = s;
 }
 
 Spline Piece::spline()
 {
-	return this->state.spline;
+	return this->spline_;
 }
 
 void Piece :: setTwist(float t)
 {
-	this->state.twist = t;
+	this->twist_ = t;
 }
 
 float Piece :: twist()
 {
-	return this->state.twist;
+	return this->twist_;
 }
 
 float* Piece :: twistPtr()
 {
-	return &(this->state.twist);
+	return &(this->twist_);
 }
 
 bool Piece :: hasDependencyOn(Cane* cane)
 {
 	bool pickupsDependOn = false;
 
-	for (unsigned int i = 0; i < this->_pickup->subpickupCount(); ++i)
+	for (unsigned int i = 0; i < this->pickup_->subpickupCount(); ++i)
 	{
-		if (this->_pickup->getSubpickupTemplate(i).cane->hasDependencyOn(cane))
+		if (this->pickup_->getSubpickupTemplate(i).cane->hasDependencyOn(cane))
 		{
 			pickupsDependOn = true;
 			break;
@@ -128,44 +65,53 @@ bool Piece :: hasDependencyOn(GlassColor* glassColor)
 {
 	bool pickupsDependOn = false;
 
-	for (unsigned int i = 0; i < _pickup->subpickupCount(); ++i)
+	for (unsigned int i = 0; i < pickup_->subpickupCount(); ++i)
 	{
-		if (_pickup->getSubpickupTemplate(i).cane->hasDependencyOn(glassColor))
+		if (pickup_->getSubpickupTemplate(i).cane->hasDependencyOn(glassColor))
 		{
 			pickupsDependOn = true;		
 			break;
 		}
 	}
 	
-	if (_pickup->overlayGlassColor() == glassColor || _pickup->underlayGlassColor() == glassColor)
+	if (pickup_->overlayGlassColor() == glassColor || pickup_->underlayGlassColor() == glassColor)
 		pickupsDependOn = true;
 
 	return pickupsDependOn;
 }
 
-/*
-copy() is intended to be a copy at the correct depth consistent with
-a Piece as represented in the GUI: it is a shape and a pickup cane, 
-but does not include the canes used.
-*/
+// copy() is intended to be a copy at the correct depth consistent with
+// a Piece as represented in the GUI: it is a shape and a pickup cane, 
+// but does not include the canes used.
 Piece* Piece :: copy() const
 {
-	Piece* c = new Piece(this->state.type);
-	c->state = this->state;
-	c->_pickup = this->_pickup->copy();
-	
-	return c;
+	Piece* p = new Piece(this->type_);
+
+	p->twist_ = this->twist_;
+	p->type_ = this->type_;
+	p->spline_ = this->spline_;
+	p->pickup_ = this->pickup_->copy();
+
+	return p;
 }
 
-void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
+void Piece :: set(Piece* p)
 {
-	if (!force && this->state.type == _type)
+	this->twist_ = p->twist_;
+	this->type_ = p->type_;
+	this->spline_ = p->spline_;	
+	this->pickup_->set(p->pickup_);
+}
+
+void Piece :: setTemplateType(enum PieceTemplate::Type type, bool force)
+{
+	if (!force && this->type_ == type)
 		return;
 
-	Spline &spline = this->state.spline;
+	Spline &spline = this->spline_;
 
-	this->state.type = _type;
-	switch (this->state.type)
+	this->type_ = type;
+	switch (this->type_)
 	{
 		case PieceTemplate::TUMBLER:
 			while (spline.controlPoints().size() < 4)
@@ -236,7 +182,7 @@ void Piece :: setTemplateType(enum PieceTemplate::Type _type, bool force)
 
 enum PieceTemplate::Type Piece :: templateType()
 {
-	return this->state.type;
+	return this->type_;
 }
 
 Piece *deep_copy(const Piece *_piece) 

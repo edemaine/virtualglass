@@ -29,6 +29,7 @@ class Pickup
 		void setParameter(unsigned int index, int value);
 
 		Pickup* copy() const;
+		void set(Pickup* p);
 
 		SubpickupTemplate getSubpickupTemplate(unsigned int index);
 		void setSubpickupTemplate(SubpickupTemplate t, unsigned int index);
@@ -42,17 +43,12 @@ class Pickup
 		void setCasingGlassColor(GlassColor* c);
 
 	private:
-		struct State
-		{
-			GlassColor* overlayGlassColor;
-			GlassColor* underlayGlassColor;
-			GlassColor* casingGlassColor;
-			vector<SubpickupTemplate> subs;
-			vector<TemplateParameter> parameters;
-			enum PickupTemplate::Type type;
-		};	
-
-		struct State state;
+		GlassColor* overlayGlassColor_;
+		GlassColor* underlayGlassColor_;
+		GlassColor* casingGlassColor_;
+		vector<SubpickupTemplate> subs_;
+		vector<TemplateParameter> parameters_;
+		enum PickupTemplate::Type type_;
 
 		void updateSubs();
 		void pushNewSubcane(vector<SubpickupTemplate>* newSubs, Point3D location,

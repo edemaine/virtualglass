@@ -10,6 +10,7 @@
 class Piece;
 class Cane;
 class NiceViewWidget;
+class UndoRedo;
 
 class PickupEditorViewWidget : public QWidget
 {
@@ -18,7 +19,7 @@ class PickupEditorViewWidget : public QWidget
 	friend class PieceEditorWidget;
 
 	public:
-		PickupEditorViewWidget(Piece* piece, QWidget* parent=0);
+		PickupEditorViewWidget(Piece* piece, UndoRedo* undoRedo, QWidget* parent=0);
 		void setPiece(Piece* p);
 
 	signals:
@@ -37,6 +38,7 @@ class PickupEditorViewWidget : public QWidget
 		Geometry geometry;
 		NiceViewWidget* niceViewWidget;
 		Piece* piece;
+		UndoRedo* undoRedo;
 		float ulX, ulY, squareSize;
 
 		void setupConnections();

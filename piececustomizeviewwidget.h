@@ -3,16 +3,18 @@
 #define PIECECUSTOMIZEVIEWWIDGET_H
 
 #include <QWidget>
+
 #include "primitives.h"
 
 class Piece;
+class UndoRedo;
 
 class PieceCustomizeViewWidget : public QWidget
 {
 	Q_OBJECT
 
 	public:
-		PieceCustomizeViewWidget(Piece* piece, QWidget* parent=0);
+		PieceCustomizeViewWidget(Piece* piece, UndoRedo* undoRedo, QWidget* parent=0);
 		void setPiece(Piece* piece);
 		QRect usedRect();
 		void resetZoom();
@@ -39,6 +41,7 @@ class PieceCustomizeViewWidget : public QWidget
 		void drawPiece();
 
 		Piece* piece;
+		UndoRedo* undoRedo;
 
 		bool isDraggingControlPoint;
 		unsigned int draggedControlPointIndex;

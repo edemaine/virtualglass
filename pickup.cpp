@@ -11,70 +11,87 @@
 
 Pickup :: Pickup(enum PickupTemplate::Type _type) 
 {
-	this->state.casingGlassColor = GlobalGlass::color();
-	this->state.underlayGlassColor = GlobalGlass::color();
-	this->state.overlayGlassColor = GlobalGlass::color();
+	this->casingGlassColor_ = GlobalGlass::color();
+	this->underlayGlassColor_ = GlobalGlass::color();
+	this->overlayGlassColor_ = GlobalGlass::color();
 	setTemplateType(_type, true);
 }
 
 Pickup* Pickup :: copy() const 
 {
-	Pickup* c = new Pickup(this->state.type);
-	c->state = this->state;
-	return c;
+	Pickup* p = new Pickup(this->type_);
+
+	p->overlayGlassColor_ = this->overlayGlassColor_;
+	p->underlayGlassColor_ = this->underlayGlassColor_;
+	p->casingGlassColor_ = this->casingGlassColor_;
+	p->subs_ = this->subs_;
+	p->parameters_ = this->parameters_;
+	p->type_ = this->type_;
+
+	return p;
+}
+
+void Pickup :: set(Pickup* p)
+{
+	this->overlayGlassColor_ = p->overlayGlassColor_;
+	this->underlayGlassColor_ = p->underlayGlassColor_;
+	this->casingGlassColor_ = p->casingGlassColor_;
+	this->subs_ = p->subs_;
+	this->parameters_ = p->parameters_;
+	this->type_ = p->type_;
 }
 
 SubpickupTemplate Pickup::getSubpickupTemplate(unsigned int index)
 {
-	return this->state.subs[index];
+	return this->subs_[index];
 }
 
 void Pickup::setSubpickupTemplate(SubpickupTemplate t, unsigned int index)
 {
-	this->state.subs[index] = t;
+	this->subs_[index] = t;
 }
 
 unsigned int Pickup::subpickupCount()
 {
-	return this->state.subs.size();
+	return this->subs_.size();
 }
 
 GlassColor* Pickup::overlayGlassColor()
 {
-	return this->state.overlayGlassColor;
+	return this->overlayGlassColor_;
 }
 
 GlassColor* Pickup::underlayGlassColor()
 {
-	return this->state.underlayGlassColor;
+	return this->underlayGlassColor_;
 }
 
 GlassColor* Pickup::casingGlassColor()
 {
-	return this->state.casingGlassColor;
+	return this->casingGlassColor_;
 }
 
 void Pickup::setOverlayGlassColor(GlassColor* c)
 {
-	this->state.overlayGlassColor = c;
+	this->overlayGlassColor_ = c;
 }
 
 void Pickup::setUnderlayGlassColor(GlassColor* c)
 {
-	this->state.underlayGlassColor = c;
+	this->underlayGlassColor_ = c;
 }
 
 void Pickup::setCasingGlassColor(GlassColor* c)
 {
-	this->state.casingGlassColor = c;
+	this->casingGlassColor_ = c;
 }
 
 void Pickup :: pushNewSubcane(vector<SubpickupTemplate>* newSubs,
 	Point3D location, enum PickupCaneOrientation ori, float length, float width, enum GeometricShape shape) 
 {
-	if (newSubs->size() < this->state.subs.size())
+	if (newSubs->size() < this->subs_.size())
 	{
-		newSubs->push_back(SubpickupTemplate(this->state.subs[newSubs->size()].cane,
+		newSubs->push_back(SubpickupTemplate(this->subs_[newSubs->size()].cane,
 			location, ori, length, width, shape));
 	}
 	else // you've run out of existing subcanes copy from
@@ -88,11 +105,11 @@ void Pickup :: updateSubs()
 {
 	vector<SubpickupTemplate> newSubs;
 
-	vector<TemplateParameter> &parameters = this->state.parameters;
+	vector<TemplateParameter> &parameters = this->parameters_;
 
 	Point3D p;
 	float width, length;
-	switch (this->state.type) 
+	switch (this->type_) 
 	{
 		case PickupTemplate::MURRINE:
 			width = 2.0 / MAX(parameters[0].value, 1);
@@ -236,20 +253,20 @@ void Pickup :: updateSubs()
 		}
 	}
 
-	this->state.subs = newSubs;
+	this->subs_ = newSubs;
 }
 
 
 void Pickup :: setTemplateType(enum PickupTemplate::Type _type, bool force) 
 {
-	if (!force && this->state.type == _type)
+	if (!force && this->type_ == _type)
 		return;
 
-	vector<TemplateParameter> &parameters = this->state.parameters;
+	vector<TemplateParameter> &parameters = this->parameters_;
 	
-	this->state.type = _type;
+	this->type_ = _type;
 	parameters.clear();
-	switch (this->state.type) 
+	switch (this->type_) 
 	{
 		case PickupTemplate::VERTICALS_AND_HORIZONTALS:
 			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 30));
@@ -278,30 +295,30 @@ void Pickup :: setTemplateType(enum PickupTemplate::Type _type, bool force)
 			break;
 	}
 
-	this->state.subs.clear(); // don't carry over any of the current stuff
+	this->subs_.clear(); // don't carry over any of the current stuff
 	updateSubs();
 }
 
 enum PickupTemplate::Type Pickup :: templateType() 
 {
-	return this->state.type;
+	return this->type_;
 }
 
 unsigned int Pickup :: parameterCount()
 {
-	return this->state.parameters.size();
+	return this->parameters_.size();
 }
 
 void Pickup :: getParameter(unsigned int _index, TemplateParameter* dest)
 {
-	assert(_index < this->state.parameters.size());
-	*dest = this->state.parameters[_index];
+	assert(_index < this->parameters_.size());
+	*dest = this->parameters_[_index];
 }
 
 void Pickup :: setParameter(unsigned int _index, int _value)
 {
-	assert(_index < this->state.parameters.size());
-	this->state.parameters[_index].value = _value;
+	assert(_index < this->parameters_.size());
+	this->parameters_[_index].value = _value;
 	updateSubs();
 }
 
