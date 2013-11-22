@@ -21,8 +21,6 @@ class GlassColor;
 
 class Cane
 {
-	friend class UndoRedo;
-	
 	public:
 		Cane(enum CaneTemplate::Type t);
 
@@ -54,6 +52,7 @@ class Cane
 		bool hasMinimumCasingCount();
 
 		Cane* copy() const;
+		void set(Cane* c);
 
 		SubcaneTemplate getSubcaneTemplate(unsigned int index);
 		void setSubcaneTemplate(SubcaneTemplate t, unsigned int index);	

@@ -11,25 +11,24 @@ using std::stack;
 
 class GlassColor 
 {
-	friend class UndoRedo;
-
 	public:
 		GlassColor();
-		GlassColor(Color __color, string __shortName, string __longName);
+		GlassColor(Color c, string s, string l);
 
 		const Color color() const;
-		void setColor(Color _color);
+		void setColor(Color c);
 		const string shortName() const;
-		void setShortName(string _name);
+		void setShortName(string s);
 		const string longName() const;
-		void setLongName(string _name);
+		void setLongName(string s);
 
 		GlassColor* copy() const;
+		void set(GlassColor* c);
 
 	private:
-		Color _color;
-		string _shortName;	
-		string _longName;	
+		Color color_;
+		string shortName_;	
+		string longName_;	
 };
 
 GlassColor* deep_copy(const GlassColor* _gc);

@@ -7,9 +7,9 @@ GlassColor :: GlassColor()
 	Color c;
 	c.r = c.g = c.b = 1.0;
 	c.a = 0.0;
-	this->_color = c;
-	this->_shortName = "R-100"; 
-	this->_longName = "R-100 Lead Crystal (Clear)";
+	this->color_ = c;
+	this->shortName_ = "R-100"; 
+	this->longName_ = "R-100 Lead Crystal (Clear)";
 }
 
 GlassColor :: GlassColor(Color color, string shortName, string longName)
@@ -19,42 +19,49 @@ GlassColor :: GlassColor(Color color, string shortName, string longName)
 	setLongName(longName);
 }
 
+void GlassColor :: set(GlassColor* c)
+{
+	this->color_ = c->color_;
+	this->shortName_ = c->shortName_;
+	this->longName_ = c->longName_;
+}
+
 void GlassColor :: setColor(Color color) 
 {
-	this->_color = color;
+	this->color_ = color;
 }
 
 const Color GlassColor :: color() const
 {
-	return this->_color;
+	return this->color_;
 }
 
 void GlassColor :: setShortName(string name)
 {
-	this->_shortName = name;
+	this->shortName_ = name;
 }
 
 void GlassColor :: setLongName(string name)
 {
-	this->_longName = name;
+	this->longName_ = name;
 }
 
 const string GlassColor :: shortName() const
 {
-	return this->_shortName;
+	return this->shortName_;
 }
 
 const string GlassColor :: longName() const
 {
-	return this->_longName;
+	return this->longName_;
 }
 
 GlassColor* GlassColor :: copy() const
 {
 	GlassColor* newGlassColor = new GlassColor();
-	newGlassColor->_color = this->_color;
-	newGlassColor->_shortName = this->_shortName;
-	newGlassColor->_longName = this->_longName;
+	newGlassColor->color_ = this->color_;
+	newGlassColor->shortName_ = this->shortName_;
+	newGlassColor->longName_ = this->longName_;
 	return newGlassColor;
 }
 

@@ -574,6 +574,15 @@ Cane* Cane :: copy() const
 	return c;
 }
 
+void Cane :: set(Cane* c)
+{
+	this->_type = c->_type;
+	this->_casings = c->_casings;
+	this->_count = c->_count;
+	this->_twist = c->_twist;
+	this->_subs = c->_subs;
+}
+
 Cane *deep_copy(const Cane *_cane) 
 {
 	unordered_map<const Cane*, Cane*> copies;

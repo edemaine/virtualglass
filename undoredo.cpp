@@ -26,6 +26,18 @@ void UndoRedo :: clearHistory()
 	mainWindow->updateUndoRedoEnabled(false, false);
 }
 
+// Just sets stuff to null so removing an event from the queue has
+// data properly freed.
+void UndoRedo :: initEvent(struct Event& event)
+{
+	event.glassColor = NULL;
+	event.preGlassColorState = NULL;
+	event.postGlassColorState = NULL;
+	event.cane = NULL;
+	event.preCaneState = NULL;
+	event.postCaneState = NULL;
+}
+
 void UndoRedo :: addedGlassColor(GlassColor* gc, unsigned int index)
 {
 	struct Event event;
@@ -33,9 +45,7 @@ void UndoRedo :: addedGlassColor(GlassColor* gc, unsigned int index)
 	event.objectType = GLASSCOLOR;	
 	event.index = index;
 	event.glassColor = gc;
-	event.glassColorState2.color = gc->_color;
-	event.glassColorState2.shortName = gc->_shortName;	
-	event.glassColorState2.longName = gc->_longName;	
+	event.postGlassColorState = gc->copy();
 
 	undoStack.push(event);
 	clearRedoStack();
@@ -49,11 +59,7 @@ void UndoRedo :: addedCane(Cane* c, unsigned int index)
 	event.objectType = CANE;	
 	event.index = index;
 	event.cane = c;
-	event.caneState2.type = c->_type;
-	event.caneState2.casings = c->_casings;
-	event.caneState2.count = c->_count;
-	event.caneState2.twist = c->_twist;
-	event.caneState2.subs = c->_subs;
+	event.postCaneState = c->copy();
 
 	undoStack.push(event);
 	clearRedoStack();
@@ -112,9 +118,7 @@ void UndoRedo :: modifiedGlassColor(GlassColor* gc)
 		
 		// At this point, guaranteed to be an ADD or MODIFY GLASSCOLOR event on our object
 		// Use final state from that event as starting state for this one.
-		event.glassColorState1.color = prevEvent.glassColorState2.color; 
-		event.glassColorState1.shortName = prevEvent.glassColorState2.shortName; 
-		event.glassColorState1.longName = prevEvent.glassColorState2.longName; 
+		event.preGlassColorState = prevEvent.postGlassColorState->copy(); 
 		break;
 	}
 	while (!tmpStack.empty()) // Reset undoStack to the way it was
@@ -123,9 +127,7 @@ void UndoRedo :: modifiedGlassColor(GlassColor* gc)
 		tmpStack.pop();
 	}
 	// end: set event.glassColorState1 value
-	event.glassColorState2.color = gc->_color;
-	event.glassColorState2.shortName = gc->_shortName;
-	event.glassColorState2.longName = gc->_longName;
+	event.postGlassColorState = gc->copy();
 
 	undoStack.push(event);
 	clearRedoStack();
@@ -158,11 +160,7 @@ void UndoRedo :: modifiedCane(Cane* c)
 		
 		// At this point, guaranteed to be an ADD or MODIFY CANE event on our object
 		// Use final state from that event as starting state for this one.
-		event.caneState1.type = prevEvent.caneState2.type; 
-		event.caneState1.casings = prevEvent.caneState2.casings;
-		event.caneState1.count = prevEvent.caneState2.count; 
-		event.caneState1.twist = prevEvent.caneState2.twist; 
-		event.caneState1.subs = prevEvent.caneState2.subs; 
+		event.preCaneState = prevEvent.postCaneState->copy();
 		break;
 	}
 	while (!tmpStack.empty()) // Reset undoStack to the way it was
@@ -171,11 +169,7 @@ void UndoRedo :: modifiedCane(Cane* c)
 		tmpStack.pop();
 	}
 	// end: set event.caneState1 value
-	event.caneState2.type = c->_type; 
-	event.caneState2.casings = c->_casings;
-	event.caneState2.count = c->_count; 
-	event.caneState2.twist = c->_twist; 
-	event.caneState2.subs = c->_subs; 
+	event.postCaneState = c->copy();
 
 	undoStack.push(event);
 	clearRedoStack();
@@ -214,20 +208,49 @@ void UndoRedo :: clearUndoStack()
 	// they are objects that aren't currently in the library and never will come back
 	while (!undoStack.empty())
 	{
-		if (undoStack.top().type != DELETE)
-		{
-			undoStack.pop();
-			continue;
-		}
-		
-		switch (undoStack.top().objectType)
+		struct Event event = undoStack.top();
+		switch (event.objectType)
 		{
 			case GLASSCOLOR:
-				delete undoStack.top().glassColor;
+			{
+				switch (event.type)
+				{
+					case ADD:
+						delete event.postGlassColorState;
+						break;
+					case DELETE: 
+						delete event.glassColor;
+						break;
+					case MODIFY:
+						delete event.preGlassColorState;
+						delete event.postGlassColorState;
+						break;
+					case MOVE:
+					case NO_UNDO: 
+						break;
+				}
 				break;
+			}
 			case CANE:
-				delete undoStack.top().cane;
+			{
+				switch (event.type)
+				{
+					case ADD:
+						delete event.postCaneState;
+						break;
+					case DELETE:
+						delete event.cane;
+						break;
+					case MODIFY:
+						delete event.preCaneState;
+						delete event.postCaneState;
+						break;
+					case MOVE:
+					case NO_UNDO:
+						break;
+				}	
 				break;
+			}
 		}
 		undoStack.pop();
 	}
@@ -239,20 +262,47 @@ void UndoRedo :: clearRedoStack()
 	// they are objects that aren't currently in the library and never will come back
 	while (!redoStack.empty())
 	{
-		if (redoStack.top().type != ADD)
-		{
-			redoStack.pop();
-			continue;
-		}
-
-		switch (redoStack.top().objectType)
+		struct Event event = redoStack.top();
+		switch (event.objectType)
 		{
 			case GLASSCOLOR:
-				delete redoStack.top().glassColor;
+			{
+				switch (event.type)
+				{
+					case ADD:
+						delete event.glassColor;
+						break;
+					case DELETE: 
+						break;
+					case MODIFY:
+						delete event.preGlassColorState;
+						delete event.postGlassColorState;
+						break;
+					case MOVE:
+					case NO_UNDO: 
+						break;
+				}
 				break;
+			}
 			case CANE:
-				delete redoStack.top().cane;
+			{
+				switch (event.type)
+				{
+					case ADD:
+						delete event.cane;
+						break;
+					case DELETE:
+						break;
+					case MODIFY:
+						delete event.preCaneState;
+						delete event.postCaneState;
+						break;
+					case MOVE:
+					case NO_UNDO:
+						break;
+				}	
 				break;
+			}
 		}
 		redoStack.pop();
 	}
@@ -283,9 +333,7 @@ void UndoRedo :: undoGlassColorEvent(struct Event& event)
 				event.index, new GlassColorLibraryWidget(event.glassColor, mainWindow));
 			break;
 		case MODIFY:
-			event.glassColor->_color = event.glassColorState1.color;
-			event.glassColor->_shortName = event.glassColorState1.shortName;
-			event.glassColor->_longName = event.glassColorState1.longName;
+			event.glassColor->set(event.preGlassColorState);
 			mainWindow->updateLibrary(event.glassColor);
 			mainWindow->updateCurrentEditor();
 			break;
@@ -324,11 +372,7 @@ void UndoRedo :: undoCaneEvent(struct Event& event)
                         mainWindow->caneLibraryLayout->insertWidget(event.index, new CaneLibraryWidget(event.cane, mainWindow));
 			break;
 		case MODIFY:
-			event.cane->_type = event.caneState1.type;
-			event.cane->_casings = event.caneState1.casings;
-			event.cane->_count = event.caneState1.count;
-			event.cane->_twist = event.caneState1.twist;
-			event.cane->_subs = event.caneState1.subs;
+			event.cane->set(event.preCaneState);
 			mainWindow->updateLibrary(event.cane);
 			mainWindow->updateCurrentEditor();
 			break;
@@ -417,9 +461,7 @@ void UndoRedo :: redoGlassColorEvent(struct Event& event)
 			break;
 		}
 		case MODIFY:
-			event.glassColor->_color = event.glassColorState2.color;
-			event.glassColor->_shortName = event.glassColorState2.shortName;
-			event.glassColor->_longName = event.glassColorState2.longName;
+			event.glassColor->set(event.postGlassColorState);
 			mainWindow->updateLibrary(event.glassColor);
 			mainWindow->updateCurrentEditor();
 			break;
@@ -458,11 +500,7 @@ void UndoRedo :: redoCaneEvent(struct Event& event)
 			break;
 		}
 		case MODIFY:
-			event.cane->_type = event.caneState2.type;
-			event.cane->_casings = event.caneState2.casings;
-			event.cane->_count = event.caneState2.count;
-			event.cane->_twist = event.caneState2.twist;
-			event.cane->_subs = event.caneState2.subs;
+			event.cane->set(event.postCaneState);
 			mainWindow->updateLibrary(event.cane);
 			mainWindow->updateCurrentEditor();
 			break;

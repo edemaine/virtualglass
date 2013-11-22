@@ -45,22 +45,6 @@ class UndoRedo : public QObject
 			PIECE
 		};
 
-		struct GlassColorState
-		{
-			Color color;
-			string shortName;
-			string longName;
-		};
-
-		struct CaneState
-		{
-			enum CaneTemplate::Type type;
-			vector<Casing> casings;
-			unsigned int count;
-			float twist;
-			vector<SubcaneTemplate> subs;
-		};		
-
 		struct Event
 		{
 			enum EventType type;	
@@ -70,12 +54,12 @@ class UndoRedo : public QObject
 			int direction;
 
 			GlassColor* glassColor;
-			struct GlassColorState glassColorState1;
-			struct GlassColorState glassColorState2;
+			GlassColor* preGlassColorState;
+			GlassColor* postGlassColorState;
 
 			Cane* cane;
-			struct CaneState caneState1;
-			struct CaneState caneState2;
+			Cane* preCaneState;
+			Cane* postCaneState;
 		};
 
 		UndoRedo(MainWindow* mw);
@@ -107,7 +91,8 @@ class UndoRedo : public QObject
 		stack<struct Event> redoStack;
 
 		MainWindow* mainWindow;	
-
+		
+		static void initEvent(struct Event& event);
 		void clearRedoStack();
 		void clearUndoStack();
 		void undoGlassColorEvent(struct Event& event);
