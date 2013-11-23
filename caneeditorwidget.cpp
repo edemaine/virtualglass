@@ -108,13 +108,13 @@ void CaneEditorWidget :: updateEverything()
 			break;
 	}
 	removeCasingButton->setEnabled(!_cane->hasMinimumCasingCount());
-
 	countSpin->setValue(_cane->count());
 	countLabel->setEnabled(_cane->templateType() != CaneTemplate::CUSTOM);
 	countSpin->setEnabled(_cane->templateType() != CaneTemplate::CUSTOM);
-
 	twistWidget->updateEverything();
 	twistWidget->setEnabled(_cane->outermostCasingShape() == CIRCLE_SHAPE);
+	if (_cane->templateType() != CaneTemplate::CUSTOM)
+		controlsTab->setCurrentIndex(0);
 	
 	tempCaneMutex.lock();
 	deep_delete(tempCane);
