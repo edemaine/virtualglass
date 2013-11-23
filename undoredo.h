@@ -94,6 +94,9 @@ class UndoRedo : public QObject
 		MainWindow* mainWindow;	
 		
 		static struct Event nulledEvent();
+		void movedObject(enum ObjectType objectType, unsigned int index, int direction);
+		void addedOrDeletedObject(enum ObjectType objectType, bool added, void* ptr,  unsigned int index);
+		struct Event mostRecentAddOrModifyEvent(enum ObjectType objectType, void* ptr);
 		void clearRedoStack();
 		void clearUndoStack();
 		void undoGlassColorEvent(struct Event& event);
@@ -104,6 +107,7 @@ class UndoRedo : public QObject
 		void redoPieceEvent(struct Event& event);
 		bool canUndo();
 		bool canRedo();
+		
 };
 
 #endif

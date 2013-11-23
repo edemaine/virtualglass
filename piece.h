@@ -14,7 +14,7 @@
 using std::vector;
 using std::stack;
 
-class Piece
+class Piece 
 {
 	public:
 		Piece(enum PieceTemplate::Type t);

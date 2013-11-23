@@ -47,217 +47,196 @@ struct UndoRedo::Event UndoRedo :: nulledEvent()
 	return event;
 }
 
-void UndoRedo :: addedGlassColor(GlassColor* gc, unsigned int index)
+
+void UndoRedo :: addedOrDeletedObject(enum ObjectType objectType, bool added, void* ptr,  unsigned int index)
 {
 	struct Event event = nulledEvent();
 
-	event.type = ADD;
-	event.objectType = GLASSCOLOR;	
+	event.type = added ? ADD : DELETE;
+	event.objectType = objectType;
 	event.index = index;
-	event.glassColor = gc;
-	event.postGlassColorState = gc->copy();
+	switch (objectType)
+	{
+		case GLASSCOLOR:
+		{
+			GlassColor* glassColor = static_cast<GlassColor*>(ptr);
+			event.glassColor = glassColor;
+			event.postGlassColorState = added ? glassColor->copy() : NULL;
+			break;
+		}
+		case CANE:	
+		{
+			Cane* cane = static_cast<Cane*>(ptr);	
+			event.cane = cane;
+			event.postCaneState = added ? cane->copy() : NULL;
+			break;
+		}
+		case PIECE:
+		{
+			Piece* piece = static_cast<Piece*>(ptr);
+			event.piece = piece;
+			event.postPieceState = added ? piece->copy() : NULL;
+			break;
+		}
+	}
 
 	undoStack.push(event);
 	clearRedoStack();
 	mainWindow->updateUndoRedoEnabled(true, false);
 }
 
-void UndoRedo :: addedCane(Cane* c, unsigned int index)
+
+void UndoRedo :: addedGlassColor(GlassColor* glassColor, unsigned int index)
 {
-	struct Event event = nulledEvent();
-
-	event.type = ADD;
-	event.objectType = CANE;	
-	event.index = index;
-	event.cane = c;
-	event.postCaneState = c->copy();
-
-	undoStack.push(event);
-	clearRedoStack();
-	mainWindow->updateUndoRedoEnabled(true, false);
+	addedOrDeletedObject(GLASSCOLOR, true, glassColor, index);
 }
 
-void UndoRedo :: addedPiece(Piece* p, unsigned int index)
+void UndoRedo :: addedCane(Cane* cane, unsigned int index)
 {
-	struct Event event = nulledEvent();
-
-	event.type = ADD;
-	event.objectType = PIECE;
-	event.index = index;
-	event.piece = p;
-	event.postPieceState = p->copy();
-
-	undoStack.push(event);
-	clearRedoStack();
-	mainWindow->updateUndoRedoEnabled(true, false);
+	addedOrDeletedObject(CANE, true, cane, index);
 }
 
-void UndoRedo :: deletedGlassColor(GlassColor* gc, unsigned int index)
+void UndoRedo :: addedPiece(Piece* piece, unsigned int index)
 {
-	struct Event event = nulledEvent();
-
-	event.type = DELETE;
-	event.objectType = GLASSCOLOR;	
-	event.index = index;
-	event.glassColor = gc;
-
-	undoStack.push(event);
-	clearRedoStack();
-	mainWindow->updateUndoRedoEnabled(true, false);
+	addedOrDeletedObject(PIECE, true, piece, index);
 }
 
-void UndoRedo :: deletedCane(Cane* c, unsigned int index)
+void UndoRedo :: deletedGlassColor(GlassColor* glassColor, unsigned int index)
 {
-	struct Event event = nulledEvent();
-
-	event.type = DELETE;
-	event.objectType = CANE;	
-	event.index = index;
-	event.cane = c;
-
-	undoStack.push(event);
-	clearRedoStack();
-	mainWindow->updateUndoRedoEnabled(true, false);
+	addedOrDeletedObject(GLASSCOLOR, false, glassColor, index);
 }
 
-void UndoRedo :: deletedPiece(Piece* p, unsigned int index)
+void UndoRedo :: deletedCane(Cane* cane, unsigned int index)
 {
-	struct Event event = nulledEvent();
-
-	event.type = DELETE;
-	event.objectType = PIECE;	
-	event.index = index;
-	event.piece = p;
-
-	undoStack.push(event);
-	clearRedoStack();
-	mainWindow->updateUndoRedoEnabled(true, false);
+	addedOrDeletedObject(CANE, false, cane, index);
 }
 
-void UndoRedo :: modifiedGlassColor(GlassColor* gc)
+void UndoRedo :: deletedPiece(Piece* piece, unsigned int index)
 {
-	struct Event event = nulledEvent();
+	addedOrDeletedObject(PIECE, false, piece, index);
+}
 
-	event.type = MODIFY;
-	event.objectType = GLASSCOLOR;	
-	event.glassColor = gc;	
+struct UndoRedo::Event UndoRedo :: mostRecentAddOrModifyEvent(enum ObjectType objectType, void* ptr)
+{
+	struct Event event;
+
 	stack<struct Event> tmpStack;
-	// start: set event.glassColorState1 value
-	while (true)
+	bool found = false;
+	while (!found)
 	{
 		struct Event prevEvent = undoStack.top();
-		if (prevEvent.objectType != GLASSCOLOR || prevEvent.glassColor != gc)
-		{
-			tmpStack.push(undoStack.top());
-			undoStack.pop();
-			continue;
-		}
+			
 		if (prevEvent.type != MODIFY && prevEvent.type != ADD)
 		{
 			tmpStack.push(undoStack.top());
 			undoStack.pop();
 			continue;
 		}
-		
-		// At this point, guaranteed to be an ADD or MODIFY GLASSCOLOR event on our object
-		// Use final state from that event as starting state for this one.
-		event.preGlassColorState = prevEvent.postGlassColorState->copy(); 
-		break;
+	
+		switch (objectType)
+		{
+			case GLASSCOLOR:
+			{
+				GlassColor* glassColor = static_cast<GlassColor*>(ptr);
+				if (prevEvent.glassColor == glassColor)
+					found = true;	
+				break;
+			}	
+			case CANE:
+			{
+				Cane* cane = static_cast<Cane*>(ptr);
+				if (prevEvent.cane == cane)
+					found = true;
+				break;
+			}	
+			case PIECE:
+			{
+				Piece* piece = static_cast<Piece*>(ptr);
+				if (prevEvent.piece == piece)
+					found = true;
+				break;
+			}
+		}
+
+		if (found)
+			event = prevEvent;
+		else
+		{
+			tmpStack.push(undoStack.top());
+			undoStack.pop();
+		}
 	}
-	while (!tmpStack.empty()) // Reset undoStack to the way it was
+
+	// restore the undoStack
+	while (!tmpStack.empty()) 
 	{
 		undoStack.push(tmpStack.top());
 		tmpStack.pop();
 	}
-	// end: set event.glassColorState1 value
-	event.postGlassColorState = gc->copy();
+
+	return event;
+}
+
+void UndoRedo :: modifiedGlassColor(GlassColor* glassColor)
+{
+	struct Event event = nulledEvent();
+
+	event.type = MODIFY;
+	event.objectType = GLASSCOLOR;	
+	event.glassColor = glassColor;	
+
+	struct Event prevEvent = mostRecentAddOrModifyEvent(GLASSCOLOR, glassColor);
+	event.preGlassColorState = prevEvent.postGlassColorState->copy();
+	event.postGlassColorState = glassColor->copy();
 
 	undoStack.push(event);
 	clearRedoStack();
 	mainWindow->updateUndoRedoEnabled(true, false);
 }
 
-void UndoRedo :: modifiedCane(Cane* c)
+void UndoRedo :: modifiedCane(Cane* cane)
 {
 	struct Event event = nulledEvent();
 
 	event.type = MODIFY;
 	event.objectType = CANE;	
-	event.cane = c;
-	stack<struct Event> tmpStack;
-	// start: set event.caneState1 value
-	while (true)
-	{
-		struct Event prevEvent = undoStack.top();
-		if (prevEvent.objectType != CANE || prevEvent.cane != c)
-		{
-			tmpStack.push(undoStack.top());
-			undoStack.pop();
-			continue;
-		}
-		if (prevEvent.type != MODIFY && prevEvent.type != ADD)
-		{
-			tmpStack.push(undoStack.top());
-			undoStack.pop();
-			continue;
-		}
-		
-		// At this point, guaranteed to be an ADD or MODIFY CANE event on our object
-		// Use final state from that event as starting state for this one.
-		event.preCaneState = prevEvent.postCaneState->copy();
-		break;
-	}
-	while (!tmpStack.empty()) // Reset undoStack to the way it was
-	{
-		undoStack.push(tmpStack.top());
-		tmpStack.pop();
-	}
-	// end: set event.caneState1 value
-	event.postCaneState = c->copy();
+	event.cane = cane;
+
+	struct Event prevEvent = mostRecentAddOrModifyEvent(CANE, cane);
+	event.preCaneState = prevEvent.postCaneState->copy();
+	event.postCaneState = cane->copy();
 
 	undoStack.push(event);
 	clearRedoStack();
 	mainWindow->updateUndoRedoEnabled(true, false);
 }
 
-void UndoRedo :: modifiedPiece(Piece* p)
+void UndoRedo :: modifiedPiece(Piece* piece)
 {
 	struct Event event = nulledEvent();
 
 	event.type = MODIFY;
 	event.objectType = PIECE;	
-	event.piece = p;
-	stack<struct Event> tmpStack;
-	// start: set event.caneState1 value
-	while (true)
-	{
-		struct Event prevEvent = undoStack.top();
-		if (prevEvent.objectType != PIECE || prevEvent.piece != p)
-		{
-			tmpStack.push(undoStack.top());
-			undoStack.pop();
-			continue;
-		}
-		if (prevEvent.type != MODIFY && prevEvent.type != ADD)
-		{
-			tmpStack.push(undoStack.top());
-			undoStack.pop();
-			continue;
-		}
-		
-		// At this point, guaranteed to be an ADD or MODIFY CANE event on our object
-		// Use final state from that event as starting state for this one.
-		event.prePieceState = prevEvent.postPieceState->copy();
-		break;
-	}
-	while (!tmpStack.empty()) // Reset undoStack to the way it was
-	{
-		undoStack.push(tmpStack.top());
-		tmpStack.pop();
-	}
-	// end: set event.caneState1 value
-	event.postPieceState = p->copy();
+	event.piece = piece;
 
+	struct Event prevEvent = mostRecentAddOrModifyEvent(PIECE, piece);
+	event.prePieceState = prevEvent.postPieceState->copy();
+	event.postPieceState = piece->copy();
+
+	undoStack.push(event);
+	clearRedoStack();
+	mainWindow->updateUndoRedoEnabled(true, false);
+}
+
+void UndoRedo :: movedObject(enum ObjectType objectType, unsigned int index, int direction)
+{
+	struct Event event = nulledEvent();
+
+	event.type = MOVE;
+	event.objectType = objectType;
+	event.index = index;
+	event.direction = direction;
+	
 	undoStack.push(event);
 	clearRedoStack();
 	mainWindow->updateUndoRedoEnabled(true, false);
@@ -265,44 +244,17 @@ void UndoRedo :: modifiedPiece(Piece* p)
 
 void UndoRedo :: movedGlassColor(unsigned int index, int direction)
 {
-	struct Event event = nulledEvent();
-
-	event.type = MOVE;
-	event.objectType = GLASSCOLOR;
-	event.index = index;
-	event.direction = direction;
-	
-	undoStack.push(event);
-	clearRedoStack();
-	mainWindow->updateUndoRedoEnabled(true, false);
+	movedObject(GLASSCOLOR, index, direction);
 }
 
 void UndoRedo :: movedCane(unsigned int index, int direction)
 {
-	struct Event event = nulledEvent();
-
-	event.type = MOVE;
-	event.objectType = CANE;
-	event.index = index;
-	event.direction = direction;
-	
-	undoStack.push(event);
-	clearRedoStack();
-	mainWindow->updateUndoRedoEnabled(true, false);
+	movedObject(CANE, index, direction);
 }
 
 void UndoRedo :: movedPiece(unsigned int index, int direction)
 {
-	struct Event event = nulledEvent();
-
-	event.type = MOVE;
-	event.objectType = PIECE;
-	event.index = index;
-	event.direction = direction;
-	
-	undoStack.push(event);
-	clearRedoStack();
-	mainWindow->updateUndoRedoEnabled(true, false);
+	movedObject(PIECE, index, direction);
 }
 
 void UndoRedo :: clearUndoStack()
