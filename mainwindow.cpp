@@ -402,7 +402,7 @@ bool MainWindow::hasDependancies(GlassLibraryWidget* lw)
 	else if (clw != NULL)
 		return caneIsDependency(clw->cane);
 	else
-		return true;
+		return false;
 }
 
 void MainWindow::deleteLibraryWidget(GlassLibraryWidget* lw)
