@@ -15,7 +15,7 @@
 GlassLibraryWidget :: GlassLibraryWidget(MainWindow* _window) : QLabel(_window)
 {
 	this->window = _window;
-	setDependancy(NO_DEPENDANCY);
+	setDependency(NO_DEPENDENCY);
 }
 
 const QPixmap* GlassLibraryWidget :: dragPixmap()
@@ -33,21 +33,21 @@ void GlassLibraryWidget :: updateStyleSheet()
 	QColor color;
 	QString style;
 	
-	switch (dependancy)
+	switch (dependency)
 	{
-		case NO_DEPENDANCY:	
+		case NO_DEPENDENCY:	
 			color = GlobalBackgroundColor::qcolor;
 			style.append("border: 2px solid " + color.name() + ";");
 			break;
-		case IS_DEPENDANCY:
+		case IS_DEPENDENCY:
 			color = QColor(0, 0, 255);	
 			style.append("border: 2px solid " + color.name() + ";");
 			break;
-		case USES_DEPENDANCY:
+		case USES_DEPENDENCY:
 			color = QColor(200, 100, 0);
 			style.append("border: 2px dotted " + color.name() + ";");
 			break;
-		case USEDBY_DEPENDANCY:
+		case USEDBY_DEPENDENCY:
 			color = QColor(0, 139, 69);
 			style.append("border: 2px dashed " + color.name() + ";");
 			break;
@@ -56,9 +56,9 @@ void GlassLibraryWidget :: updateStyleSheet()
 	setStyleSheet(style);
 }
 
-void GlassLibraryWidget :: setDependancy(enum Dependancy _d)
+void GlassLibraryWidget :: setDependency(enum Dependency _d)
 {
-	dependancy = _d;
+	dependency = _d;
 	updateStyleSheet();
 }
 
@@ -133,7 +133,7 @@ void GlassLibraryWidget :: paintEvent(QPaintEvent* event)
         QPainter painter;
         painter.begin(this);
         painter.setPen(QPen(Qt::black));
-        if (this->dependancy == IS_DEPENDANCY)
+        if (this->dependency == IS_DEPENDENCY)
         {
                 QColor color;
                 color.setRgb(255, 255, 255);

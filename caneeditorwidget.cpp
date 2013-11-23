@@ -18,7 +18,7 @@
 #include "canetemplatelibrarywidget.h"
 #include "canelibrarywidget.h"
 #include "mesh.h"
-#include "dependancy.h"
+#include "dependency.h"
 #include "templateparameter.h"
 #include "canegeometrythread.h"
 #include "twistwidget.h"

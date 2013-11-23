@@ -87,8 +87,8 @@ class MainWindow : public QMainWindow
 		void deleteCurrentEditingObject();
 		void moveCurrentEditingObject(int d);
 		void clearLibrary();
-		bool glassColorIsDependancy(GlassColor* color);
-		bool caneIsDependancy(Cane* cane);
+		bool glassColorIsDependency(GlassColor* color);
+		bool caneIsDependency(Cane* cane);
 		void updateWindowTitle();
 		void setDirtyBit(bool v);
 		void setSaveFilename(QString filename);

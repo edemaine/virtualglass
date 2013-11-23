@@ -108,7 +108,7 @@ HEADERS += vgapp.h \
 	globalglass.h \
 	randomglass.h \
 	glasslibrarywidget.h \
-	dependancy.h \
+	dependency.h \
 	shape.h \
 	templateparameter.h \
 	cane.h \

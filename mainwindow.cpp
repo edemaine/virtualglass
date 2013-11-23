@@ -24,7 +24,7 @@
 #include <QBuffer>
 
 #include "constants.h"
-#include "dependancy.h"
+#include "dependency.h"
 #include "email.h"
 #include "niceviewwidget.h"
 #include "piecelibrarywidget.h"
@@ -398,9 +398,9 @@ bool MainWindow::hasDependancies(GlassLibraryWidget* lw)
 	CaneLibraryWidget* clw = dynamic_cast<CaneLibraryWidget*>(lw);
 
 	if (gclw != NULL)
-		return glassColorIsDependancy(gclw->glassColor);
+		return glassColorIsDependency(gclw->glassColor);
 	else if (clw != NULL)
-		return caneIsDependancy(clw->cane);
+		return caneIsDependency(clw->cane);
 	else
 		return true;
 }
@@ -991,7 +991,7 @@ void MainWindow :: newPieceButtonClicked()
 
 // returns whether the cane is a dependancy of something in the library
 // (either a cane or a piece)
-bool MainWindow :: glassColorIsDependancy(GlassColor* color)
+bool MainWindow :: glassColorIsDependency(GlassColor* color)
 {
 	CaneLibraryWidget* pplw;
 	for (int i = 0; i < caneLibraryLayout->count(); ++i)
@@ -1020,7 +1020,7 @@ bool MainWindow :: glassColorIsDependancy(GlassColor* color)
 
 // returns whether the cane is a dependancy of something in the library
 // (either another cane or a piece)
-bool MainWindow :: caneIsDependancy(Cane* cane)
+bool MainWindow :: caneIsDependency(Cane* cane)
 {
 	CaneLibraryWidget* pplw;
 	for (int i = 0; i < caneLibraryLayout->count(); ++i)
@@ -1154,19 +1154,19 @@ void MainWindow :: updateLibraryHighlighting()
 			{
 				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(glassColorLibraryLayout->itemAt(i))->widget());
-				cblw->setDependancy(NO_DEPENDANCY);
+				cblw->setDependency(NO_DEPENDENCY);
 			}
 			for (int i = 0; i < caneLibraryLayout->count(); ++i)
 			{
 				CaneLibraryWidget* pplw = dynamic_cast<CaneLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(caneLibraryLayout->itemAt(i))->widget());
-				pplw->setDependancy(NO_DEPENDANCY);
+				pplw->setDependency(NO_DEPENDENCY);
 			}
 			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
 			{
 				PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
-				plw->setDependancy(NO_DEPENDANCY);
+				plw->setDependency(NO_DEPENDENCY);
 			}
 			break;
 		}
@@ -1177,9 +1177,9 @@ void MainWindow :: updateLibraryHighlighting()
 				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(glassColorLibraryLayout->itemAt(i))->widget());
 				if (glassColorEditorWidget->glassColor() == cblw->glassColor)
-					cblw->setDependancy(IS_DEPENDANCY);
+					cblw->setDependency(IS_DEPENDENCY);
 				else
-					cblw->setDependancy(NO_DEPENDANCY);
+					cblw->setDependency(NO_DEPENDENCY);
 			}
 
 			for (int i = 0; i < caneLibraryLayout->count(); ++i)
@@ -1187,9 +1187,9 @@ void MainWindow :: updateLibraryHighlighting()
 				CaneLibraryWidget* pplw = dynamic_cast<CaneLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(caneLibraryLayout->itemAt(i))->widget());
 				if (pplw->cane->hasDependencyOn(glassColorEditorWidget->glassColor()))
-					pplw->setDependancy(USES_DEPENDANCY);
+					pplw->setDependency(USES_DEPENDENCY);
 				else
-					pplw->setDependancy(NO_DEPENDANCY);
+					pplw->setDependency(NO_DEPENDENCY);
 			}
 
 			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
@@ -1197,9 +1197,9 @@ void MainWindow :: updateLibraryHighlighting()
 				PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 				if (plw->piece->hasDependencyOn(glassColorEditorWidget->glassColor()))
-					plw->setDependancy(USES_DEPENDANCY);
+					plw->setDependency(USES_DEPENDENCY);
 				else
-					plw->setDependancy(NO_DEPENDANCY);
+					plw->setDependency(NO_DEPENDENCY);
 			}
 
 			break;
@@ -1211,9 +1211,9 @@ void MainWindow :: updateLibraryHighlighting()
 				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(glassColorLibraryLayout->itemAt(i))->widget());
 				if (caneEditorWidget->cane()->hasDependencyOn(cblw->glassColor))
-					cblw->setDependancy(USEDBY_DEPENDANCY);
+					cblw->setDependency(USEDBY_DEPENDENCY);
 				else
-					cblw->setDependancy(NO_DEPENDANCY);
+					cblw->setDependency(NO_DEPENDENCY);
 			}
 			for (int i = 0; i < caneLibraryLayout->count(); ++i)
 			{
@@ -1224,22 +1224,22 @@ void MainWindow :: updateLibraryHighlighting()
 				// 2. a subcane of the cane current being edited
 				// 3. a cane with the cane currently being edited as a subcane
 				if (caneEditorWidget->cane() == pplw->cane)
-					pplw->setDependancy(IS_DEPENDANCY);
+					pplw->setDependency(IS_DEPENDENCY);
 				else if (caneEditorWidget->cane()->hasDependencyOn(pplw->cane))
-					pplw->setDependancy(USEDBY_DEPENDANCY);
+					pplw->setDependency(USEDBY_DEPENDENCY);
 				else if (pplw->cane->hasDependencyOn(caneEditorWidget->cane()))
-					pplw->setDependancy(USES_DEPENDANCY);
+					pplw->setDependency(USES_DEPENDENCY);
 				else
-					pplw->setDependancy(NO_DEPENDANCY);
+					pplw->setDependency(NO_DEPENDENCY);
 			}
 			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
 			{
 				PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 				if (plw->piece->hasDependencyOn(caneEditorWidget->cane()))
-					plw->setDependancy(USES_DEPENDANCY);
+					plw->setDependency(USES_DEPENDENCY);
 				else
-					plw->setDependancy(NO_DEPENDANCY);
+					plw->setDependency(NO_DEPENDENCY);
 			}
 
 			break;
@@ -1251,27 +1251,27 @@ void MainWindow :: updateLibraryHighlighting()
 				GlassColorLibraryWidget* cblw = dynamic_cast<GlassColorLibraryWidget*>(
 					dynamic_cast<QWidgetItem *>(glassColorLibraryLayout->itemAt(i))->widget());
 				if (pieceEditorWidget->piece()->hasDependencyOn(cblw->glassColor))
-					cblw->setDependancy(USEDBY_DEPENDANCY);
+					cblw->setDependency(USEDBY_DEPENDENCY);
 				else
-					cblw->setDependancy(NO_DEPENDANCY);
+					cblw->setDependency(NO_DEPENDENCY);
 			}
 			for (int i = 0; i < caneLibraryLayout->count(); ++i)
 			{
 				CaneLibraryWidget* pplw = dynamic_cast<CaneLibraryWidget*>(
 					dynamic_cast<QWidgetItem*>(caneLibraryLayout->itemAt(i))->widget());
 				if (pieceEditorWidget->piece()->hasDependencyOn(pplw->cane))
-					pplw->setDependancy(USEDBY_DEPENDANCY);
+					pplw->setDependency(USEDBY_DEPENDENCY);
 				else
-					pplw->setDependancy(NO_DEPENDANCY);
+					pplw->setDependency(NO_DEPENDENCY);
 			}
 			for (int i = 0; i < pieceLibraryLayout->count(); ++i)
 			{
 				PieceLibraryWidget* plw = dynamic_cast<PieceLibraryWidget*>(
 						dynamic_cast<QWidgetItem *>(pieceLibraryLayout->itemAt(i))->widget());
 				if (plw->piece == pieceEditorWidget->piece())
-					plw->setDependancy(IS_DEPENDANCY);
+					plw->setDependency(IS_DEPENDENCY);
 				else
-					plw->setDependancy(NO_DEPENDANCY);
+					plw->setDependency(NO_DEPENDENCY);
 			}
 
 			break;
