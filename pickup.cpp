@@ -41,7 +41,7 @@ void Pickup :: set(Pickup* p)
 	this->type_ = p->type_;
 }
 
-SubpickupTemplate Pickup::getSubpickupTemplate(unsigned int index)
+SubpickupTemplate Pickup :: subpickupTemplate(unsigned int index)
 {
 	return this->subs_[index];
 }
@@ -309,7 +309,7 @@ unsigned int Pickup :: parameterCount()
 	return this->parameters_.size();
 }
 
-void Pickup :: getParameter(unsigned int _index, TemplateParameter* dest)
+void Pickup :: parameter(unsigned int _index, TemplateParameter* dest)
 {
 	assert(_index < this->parameters_.size());
 	*dest = this->parameters_[_index];
@@ -328,7 +328,7 @@ Pickup *deep_copy(const Pickup *_pickup)
 	Pickup *pickup = _pickup->copy();
 	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
 	{
-		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
+		SubpickupTemplate t = pickup->subpickupTemplate(i);
 		t.cane = deep_copy(t.cane);
 		pickup->setSubpickupTemplate(t, i);
 	}
@@ -340,7 +340,7 @@ void deep_delete(Pickup *pickup)
 	assert(pickup);
 	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
 	{
-		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
+		SubpickupTemplate t = pickup->subpickupTemplate(i);
 		delete t.cane;
 		t.cane = NULL;
 		pickup->setSubpickupTemplate(t, i);

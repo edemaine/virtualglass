@@ -98,7 +98,7 @@ void PieceEditorWidget :: updateEverything()
 	}
 	pickupViewWidget->updateEverything();
 	TemplateParameter tp;
-	_piece->pickup()->getParameter(0, &tp);
+	_piece->pickup()->parameter(0, &tp);
 	pickupCountSpin->blockSignals(true);
 	pickupCountSpin->setRange(tp.lowerLimit, tp.upperLimit);
 	pickupCountSpin->setValue(tp.value);
@@ -176,7 +176,7 @@ void PieceEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned in
 void PieceEditorWidget :: pickupCountSpinChanged(int)
 {
 	TemplateParameter tp;
-	_piece->pickup()->getParameter(0, &tp);
+	_piece->pickup()->parameter(0, &tp);
 	if (tp.value != pickupCountSpin->value())
 	{
 		_piece->pickup()->setParameter(0, pickupCountSpin->value());

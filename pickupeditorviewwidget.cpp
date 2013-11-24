@@ -37,13 +37,13 @@ void PickupEditorViewWidget :: setupConnections()
 	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
 }
 
-void PickupEditorViewWidget :: getSubcaneAt(float x, float y, Cane** subcane, int* subcaneIndex)
+void PickupEditorViewWidget :: subcaneAt(float x, float y, Cane** subcane, int* subcaneIndex)
 {
 	int hitIndex = -1;
 	float hitDepth = -100.0;
 	for (unsigned int i = 0; i < this->piece->pickup()->subpickupCount(); ++i)
 	{
-		SubpickupTemplate sp = this->piece->pickup()->getSubpickupTemplate(i);
+		SubpickupTemplate sp = this->piece->pickup()->subpickupTemplate(i);
 		Point2D ll, ur;
 		ll = ur = make_vector<float>(0.0f, 0.0f);
 
@@ -88,7 +88,7 @@ void PickupEditorViewWidget :: getSubcaneAt(float x, float y, Cane** subcane, in
 	if (hitIndex != -1)
 	{
 		*subcaneIndex = hitIndex;
-		*subcane = this->piece->pickup()->getSubpickupTemplate(hitIndex).cane;
+		*subcane = this->piece->pickup()->subpickupTemplate(hitIndex).cane;
 	}
 	else
 	{
@@ -105,7 +105,7 @@ void PickupEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 
 	int subcaneIndex;
 	Cane* subcane;
-	getSubcaneAt(x, y, &subcane, &subcaneIndex);
+	subcaneAt(x, y, &subcane, &subcaneIndex);
 	if (subcane != NULL)
 	{
 		char buf[500];
@@ -203,7 +203,7 @@ void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 
 	int subcaneIndex;
 	Cane* subcane;	
-	getSubcaneAt(x, y, &subcane, &subcaneIndex); 	
+	subcaneAt(x, y, &subcane, &subcaneIndex); 	
 	
 	if (subcane != NULL)
 	{
@@ -212,14 +212,14 @@ void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 		{
 			for (unsigned int i = 0; i < this->piece->pickup()->subpickupCount(); ++i)
 			{
-				SubpickupTemplate t = this->piece->pickup()->getSubpickupTemplate(i);
+				SubpickupTemplate t = this->piece->pickup()->subpickupTemplate(i);
 				t.cane = droppedCane;
 				this->piece->pickup()->setSubpickupTemplate(t, i);
 			}
 		}
 		else
 		{
-			SubpickupTemplate t = this->piece->pickup()->getSubpickupTemplate(subcaneIndex);
+			SubpickupTemplate t = this->piece->pickup()->subpickupTemplate(subcaneIndex);
 			t.cane = droppedCane;
 			this->piece->pickup()->setSubpickupTemplate(t, subcaneIndex);
 		}

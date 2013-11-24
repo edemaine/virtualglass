@@ -35,15 +35,15 @@ class Cane : public QObject
 		unsigned int count();
 
 		void setCasingThickness(float t, unsigned int index);
-		float getCasingThickness(unsigned int index);
+		float casingThickness(unsigned int index);
 
 		void setOutermostCasingShape(enum GeometricShape s);
-		enum GeometricShape getCasingShape(unsigned int index);
+		enum GeometricShape casingShape(unsigned int index);
 		enum GeometricShape outermostCasingShape();
 
 		void setCasingColor(GlassColor* gc, unsigned int index);
 		void setOutermostCasingColor(GlassColor* gc);
-		const GlassColor* getCasingColor(unsigned int index);
+		const GlassColor* casingColor(unsigned int index);
 		const GlassColor* outermostCasingColor();
 
 		float twist();
@@ -58,7 +58,7 @@ class Cane : public QObject
 		Cane* copy() const;
 		void set(Cane* c);
 
-		SubcaneTemplate getSubcaneTemplate(unsigned int index);
+		SubcaneTemplate subcaneTemplate(unsigned int index);
 		void setSubcaneTemplate(SubcaneTemplate t, unsigned int index);	
 		void addSubcaneTemplate(SubcaneTemplate t);
 		void removeSubcaneTemplate(unsigned int index);

@@ -25,13 +25,13 @@ class Pickup
 		enum PickupTemplate::Type templateType();
 
 		unsigned int parameterCount();
-		void getParameter(unsigned int index, TemplateParameter* dest);
+		void parameter(unsigned int index, TemplateParameter* dest);
 		void setParameter(unsigned int index, int value);
 
 		Pickup* copy() const;
 		void set(Pickup* p);
 
-		SubpickupTemplate getSubpickupTemplate(unsigned int index);
+		SubpickupTemplate subpickupTemplate(unsigned int index);
 		void setSubpickupTemplate(SubpickupTemplate t, unsigned int index);
 		unsigned int subpickupCount();
 

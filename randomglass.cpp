@@ -62,7 +62,7 @@ Cane* randomComplexCane(Cane* circleSimpleCane, Cane* squareSimpleCane)
 	// set subcanes
 	for (unsigned int i = 0; i < cane->subpullCount(); ++i)
 	{
-		SubcaneTemplate t = cane->getSubcaneTemplate(i);
+		SubcaneTemplate t = cane->subcaneTemplate(i);
 		switch (t.shape)
 		{
 			case CIRCLE_SHAPE:
@@ -88,7 +88,7 @@ Pickup* randomPickup(Cane* cane1, Cane* cane2)
 	TemplateParameter p;
 	for (unsigned int i = 0; i < pickup->parameterCount(); ++i)
 	{
-		pickup->getParameter(i, &p);
+		pickup->parameter(i, &p);
 		// not setting to upper intervals of parameter values for efficiency reasons 
 		pickup->setParameter(i, qrand() % ((p.upperLimit - p.lowerLimit)/3) + p.lowerLimit);
 	}	
@@ -96,7 +96,7 @@ Pickup* randomPickup(Cane* cane1, Cane* cane2)
 	// set subcanes
 	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
 	{
-		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
+		SubpickupTemplate t = pickup->subpickupTemplate(i);
 		t.cane = cane1;
 		pickup->setSubpickupTemplate(t, i);
 	}
@@ -105,7 +105,7 @@ Pickup* randomPickup(Cane* cane1, Cane* cane2)
 	{
 		for (unsigned int i = 0; i < pickup->subpickupCount(); i+=2)
 		{
-			SubpickupTemplate t = pickup->getSubpickupTemplate(i);
+			SubpickupTemplate t = pickup->subpickupTemplate(i);
 			t.cane = cane2;
 			pickup->setSubpickupTemplate(t, i);
 		}

@@ -56,7 +56,7 @@ bool Piece :: hasDependencyOn(Cane* cane)
 
 	for (unsigned int i = 0; i < this->pickup_->subpickupCount(); ++i)
 	{
-		if (this->pickup_->getSubpickupTemplate(i).cane->hasDependencyOn(cane))
+		if (this->pickup_->subpickupTemplate(i).cane->hasDependencyOn(cane))
 		{
 			pickupsDependOn = true;
 			break;
@@ -72,7 +72,7 @@ bool Piece :: hasDependencyOn(GlassColor* glassColor)
 
 	for (unsigned int i = 0; i < pickup_->subpickupCount(); ++i)
 	{
-		if (pickup_->getSubpickupTemplate(i).cane->hasDependencyOn(glassColor))
+		if (pickup_->subpickupTemplate(i).cane->hasDependencyOn(glassColor))
 		{
 			pickupsDependOn = true;		
 			break;

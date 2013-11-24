@@ -148,7 +148,7 @@ void casePiece(Geometry* geometry, Piece* piece)
 {
 	// base thickness of casing off of representative (first) cane in pickup
 	float thickness;
-	SubpickupTemplate firstTemp = piece->pickup()->getSubpickupTemplate(0);
+	SubpickupTemplate firstTemp = piece->pickup()->subpickupTemplate(0);
 	if (firstTemp.orientation == MURRINE_PICKUP_CANE_ORIENTATION)
 		thickness = firstTemp.length*2.5;	
 	else
@@ -162,8 +162,8 @@ void casePiece(Geometry* geometry, Piece* piece)
 		applyPieceTransform(geometry->vertices[i], 0.0 /* NO TWIST */, spline);
 
 	//for now we don't do these, but the intent is to reintroduce soon
-	//meshPickupCasingSlab(geometry, pickup->underlayGlassColor()->getColor(), thickness + 0.1, 0.05);
-	//meshPickupCasingSlab(geometry, pickup->overlayGlassColor()->getColor(), -(thickness + 0.1), 0.05);
+	//meshPickupCasingSlab(geometry, pickup->underlayGlassColor()->color(), thickness + 0.1, 0.05);
+	//meshPickupCasingSlab(geometry, pickup->overlayGlassColor()->color(), -(thickness + 0.1), 0.05);
 }
 
 void applyPieceTransform(Geometry* geometry, Piece* piece)
@@ -175,7 +175,7 @@ void applyPieceTransform(Geometry* geometry, Piece* piece)
 
 void applyCaneTransform(Vertex& v, Ancestor a)
 {
-	SubcaneTemplate subTemp = a.parent->getSubcaneTemplate(a.child);
+	SubcaneTemplate subTemp = a.parent->subcaneTemplate(a.child);
 	applyResizeTransform(v, subTemp.diameter / 2.0);
 	applySubcaneTransform(v, subTemp.location);
 	applyTwistTransform(v, a.parent->twist());
@@ -450,7 +450,7 @@ float finalRadius(vector<Ancestor>& ancestors)
 
 	for (unsigned int i = ancestors.size() - 1; i < ancestors.size(); --i)
 	{
-		radius *= (ancestors[i].parent->getSubcaneTemplate(ancestors[i].child).diameter * 0.5); 
+		radius *= (ancestors[i].parent->subcaneTemplate(ancestors[i].child).diameter * 0.5); 
 	}
 
 	return radius;
@@ -686,7 +686,7 @@ void generateMesh(Pickup* pickup, Geometry *geometry, bool isTopLevel, unsigned 
 	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
 	{
 		vector<Ancestor> ancestors;
-		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
+		SubpickupTemplate t = pickup->subpickupTemplate(i);
 		uint32_t startVert = geometry->vertices.size();
 		recurseMesh(t.cane, geometry, ancestors, t.length, quality, isTopLevel, end);
 		for (unsigned int j = startVert; j < geometry->vertices.size(); ++j)
@@ -712,7 +712,7 @@ void recurseMesh(Cane* cane, Geometry *geometry, vector<Ancestor>& ancestors, fl
 	{
 		me.child = i;
 		ancestors.push_back(me);
-		recurseMesh(cane->getSubcaneTemplate(i).cane, geometry, ancestors, length, quality, false, end);
+		recurseMesh(cane->subcaneTemplate(i).cane, geometry, ancestors, length, quality, false, end);
 		ancestors.pop_back();
 	}
 
@@ -732,7 +732,7 @@ void recurseMesh(Cane* cane, Geometry *geometry, vector<Ancestor>& ancestors, fl
 			// note we compare RGBA values, not GlassColor object pointers
 			// because identical colors to the user likely means "equal RGBA values"
 			// and not "the same library objects"
-			if (cane->getCasingColor(i+1)->color() != cane->getCasingColor(colorIntervalStart)->color())
+			if (cane->casingColor(i+1)->color() != cane->casingColor(colorIntervalStart)->color())
 				break;
 			++i;
 		}
@@ -747,22 +747,22 @@ void recurseMesh(Cane* cane, Geometry *geometry, vector<Ancestor>& ancestors, fl
 			// punting on actually doing this geometry right and just making it a cylinder
 			// (that intersects its subcanes)
 			struct CaneData caneData;
-			caneData.color = cane->getCasingColor(0)->color();
-			caneData.shape = cane->getCasingShape(i);
+			caneData.color = cane->casingColor(0)->color();
+			caneData.shape = cane->casingShape(i);
 			caneData.length = length-0.001;
-			caneData.radius = cane->getCasingThickness(i);
+			caneData.radius = cane->casingThickness(i);
 			caneData.twist = cane->twist();
 			meshBaseCane(geometry, ancestors, caneData, quality, ensureVisible && outermostLayer);
 		}
 		else
 		{
 			struct CasingData casingData;
-			casingData.color = cane->getCasingColor(colorIntervalStart)->color(), 
-			casingData.outerShape = cane->getCasingShape(i); 
-			casingData.innerShape = cane->getCasingShape(colorIntervalStart-1);
+			casingData.color = cane->casingColor(colorIntervalStart)->color(), 
+			casingData.outerShape = cane->casingShape(i); 
+			casingData.innerShape = cane->casingShape(colorIntervalStart-1);
 			casingData.length = length; 
-			casingData.outerRadius = cane->getCasingThickness(i);
-			casingData.innerRadius = cane->getCasingThickness(colorIntervalStart-1)+0.01; 
+			casingData.outerRadius = cane->casingThickness(i);
+			casingData.innerRadius = cane->casingThickness(colorIntervalStart-1)+0.01; 
 			casingData.twist = cane->twist();
 			meshBaseCasing(geometry, ancestors, casingData, quality, ensureVisible && outermostLayer);
 		}

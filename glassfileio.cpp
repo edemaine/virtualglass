@@ -579,9 +579,9 @@ void writeCane(Json::Value& root, Cane* cane, unsigned int caneIndex, map<const 
 	{
 		string casingName = idAndNameToString(i, "Casing");
 		root[canename]["Casings"][casingName]["Index"] = i;
-		root[canename]["Casings"][casingName]["Shape"] = geometricShapeToString(cane->getCasingShape(i));
-		root[canename]["Casings"][casingName]["Thickness"] = cane->getCasingThickness(i);
-		root[canename]["Casings"][casingName]["Color pointer"] = colorMap[cane->getCasingColor(i)];
+		root[canename]["Casings"][casingName]["Shape"] = geometricShapeToString(cane->casingShape(i));
+		root[canename]["Casings"][casingName]["Thickness"] = cane->casingThickness(i);
+		root[canename]["Casings"][casingName]["Color pointer"] = colorMap[cane->casingColor(i)];
 	}
 
 	// write pull template parameters
@@ -593,7 +593,7 @@ void writeCane(Json::Value& root, Cane* cane, unsigned int caneIndex, map<const 
 	{
 		string subpullName = idAndNameToString(i, "Subcane");
 		root[canename]["Subcanes"][subpullName]["Index"] = i;
-		SubcaneTemplate sub = cane->getSubcaneTemplate(i);
+		SubcaneTemplate sub = cane->subcaneTemplate(i);
 		root[canename]["Subcanes"][subpullName]["Cane pointer"] = caneMap[sub.cane];
 		root[canename]["Subcanes"][subpullName]["Diameter"] = sub.diameter;
 		root[canename]["Subcanes"][subpullName]["Shape"] = geometricShapeToString(sub.shape);
@@ -663,7 +663,7 @@ void readCaneSubcanes(Json::Value& root, Cane* cane, map<unsigned int, Cane*>& c
 		string subpullname = root["Subcanes"].getMemberNames()[i];
 		unsigned int subpullIndex = root["Subcanes"][subpullname]["Index"].asUInt();
 
-		SubcaneTemplate sub = cane->getSubcaneTemplate(subpullIndex);
+		SubcaneTemplate sub = cane->subcaneTemplate(subpullIndex);
 		sub.cane = safeCaneMap(caneMap, root["Subcanes"][subpullname]["Cane pointer"].asUInt());
 		sub.diameter = root["Subcanes"][subpullname]["Diameter"].asFloat();
 		sub.shape = stringToGeometricShape(root["Subcanes"][subpullname]["Shape"].asString());
@@ -782,7 +782,7 @@ void writePickup(Json::Value& root, Pickup* pickup, unsigned int pickupIndex,
 	for (unsigned int i = 0; i < pickup->parameterCount(); ++i)
 	{
 		TemplateParameter tmpParam;
-		pickup->getParameter(i, &tmpParam);
+		pickup->parameter(i, &tmpParam);
 
 		string paramName = idAndNameToString(i, "PickupTemplateParam");
 		root[pickupname]["Pickup template parameters"][paramName]["Index"] = i;
@@ -798,7 +798,7 @@ void writePickup(Json::Value& root, Pickup* pickup, unsigned int pickupIndex,
 	{
 		string subpullName = idAndNameToString(i, "Subcane");
 		root[pickupname]["Subcanes"][subpullName]["Index"] = i;
-		SubpickupTemplate t = pickup->getSubpickupTemplate(i);
+		SubpickupTemplate t = pickup->subpickupTemplate(i);
 		root[pickupname]["Subcanes"][subpullName]["Cane pointer"] = caneMap[t.cane];
 		root[pickupname]["Subcanes"][subpullName]["Length"] = t.length;
 		root[pickupname]["Subcanes"][subpullName]["Width"] = t.width;
@@ -836,7 +836,7 @@ Pickup* readPickup(string pickupname, Json::Value& root,
 		string subpullname = root[pickupname]["Subcanes"].getMemberNames()[i];
 		unsigned int subIndex = root[pickupname]["Subcanes"][subpullname]["Index"].asUInt();
 
-		SubpickupTemplate t = pickup->getSubpickupTemplate(subIndex);
+		SubpickupTemplate t = pickup->subpickupTemplate(subIndex);
 		t.cane = safeCaneMap(caneMap, root[pickupname]["Subcanes"][subpullname]["Cane pointer"].asUInt());
 		t.length = root[pickupname]["Subcanes"][subpullname]["Length"].asFloat();
 		t.width = root[pickupname]["Subcanes"][subpullname]["Width"].asFloat();

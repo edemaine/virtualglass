@@ -46,11 +46,11 @@ class CaneEditorViewWidget : public QWidget
 			bool highlightThis, bool outermostLevel, QPainter* painter);
 		void updateHighlightedSubcanesAndCasings(QDragMoveEvent* event);
 		bool isOnCasing(int casingIndex, Point2D loc);
-		float getShapeRadius(enum GeometricShape s, Point2D loc);
+		float shapeRadius(enum GeometricShape s, Point2D loc);
 		void setMinMaxCasingRadii(float* min, float* max);
-		Cane* getSubcaneAt(Point2D loc);
-		int getSubcaneIndexAt(Point2D loc);
-		int getCasingIndexAt(Point2D loc);
+		Cane* subcaneAt(Point2D loc);
+		int subcaneIndexAt(Point2D loc);
+		int casingIndexAt(Point2D loc);
 		Point2D mouseToCaneCoords(float x, float y);
 
 		Cane* cane;

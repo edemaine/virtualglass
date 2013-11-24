@@ -55,29 +55,29 @@ void drawSubcane(float x, float y, float drawWidth, float drawHeight,
 	// Do casing colors outermost to innermost to get concentric rings of each casing's color
 	for (unsigned int i = cane->casingCount() - 1; i < cane->casingCount(); --i) 
 	{
-		int casingWidth = drawWidth * cane->getCasingThickness(i);
-		int casingHeight = drawHeight * cane->getCasingThickness(i);
+		int casingWidth = drawWidth * cane->casingThickness(i);
+		int casingHeight = drawHeight * cane->casingThickness(i);
 		int casingX = x + drawWidth / 2 - casingWidth / 2;
 		int casingY = y + drawHeight / 2 - casingHeight / 2;
 
 		// Fill with solid neutral grey (in case fill is transparent)
 		painter->setBrush(GlobalBackgroundColor::qcolor);
 		painter->setPen(Qt::NoPen); // Will draw boundary after all filling is done
-		paintShape(casingX, casingY, casingWidth, cane->getCasingShape(i), painter);
+		paintShape(casingX, casingY, casingWidth, cane->casingShape(i), painter);
 		
 		// Fill with actual casing color (highlighting white or some other color)
-		Color c = cane->getCasingColor(i)->color();
+		Color c = cane->casingColor(i)->color();
 		QColor qc(255*c.r, 255*c.g, 255*c.b, 255*c.a);
 		painter->setBrush(qc);
 
 		setBoundaryPainter(painter, outermostLevel);
-		paintShape(casingX, casingY, casingWidth, cane->getCasingShape(i), painter);
+		paintShape(casingX, casingY, casingWidth, cane->casingShape(i), painter);
 	}
 
 	// Recursively call drawing on subcanes
 	for (unsigned int i = cane->subpullCount()-1; i < cane->subpullCount(); --i)
 	{
-		SubcaneTemplate sub = cane->getSubcaneTemplate(i);
+		SubcaneTemplate sub = cane->subcaneTemplate(i);
 
 		float rX = x + (sub.location.x - sub.diameter/2.0) * drawWidth/2 + drawWidth/2;
 		float rY = y + (sub.location.y - sub.diameter/2.0) * drawWidth/2 + drawHeight/2;

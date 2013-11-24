@@ -46,7 +46,7 @@ class PickupEditorViewWidget : public QWidget
 		float adjustedY(float rawX);
 		float rawX(float adjustedX);
 		float rawY(float adjustedY);
-		void getSubcaneAt(float x, float y, Cane** cane, int* subcaneIndex);
+		void subcaneAt(float x, float y, Cane** cane, int* subcaneIndex);
 };
 
 

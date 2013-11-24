@@ -54,7 +54,7 @@ void CaneEditorViewWidget :: resizeEvent(QResizeEvent* event)
 	}
 }
 
-float CaneEditorViewWidget :: getShapeRadius(enum GeometricShape shape, Point2D loc)
+float CaneEditorViewWidget :: shapeRadius(enum GeometricShape shape, Point2D loc)
 {
 	switch (shape)
 	{
@@ -69,7 +69,7 @@ float CaneEditorViewWidget :: getShapeRadius(enum GeometricShape shape, Point2D 
 
 bool CaneEditorViewWidget :: isOnCasing(int casingIndex, Point2D loc)
 {
-	return fabs(cane->getCasingThickness(casingIndex) - getShapeRadius(cane->getCasingShape(casingIndex), loc)) < 0.025; 
+	return fabs(cane->casingThickness(casingIndex) - shapeRadius(cane->casingShape(casingIndex), loc)) < 0.025; 
 }
 
 void CaneEditorViewWidget :: mousePressEvent(QMouseEvent* event)
@@ -88,7 +88,7 @@ void CaneEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	}
 
 	// Check for convenience subcane-to-subcane drag
-	Cane* selectedSubcane = getSubcaneAt(mouseLoc);
+	Cane* selectedSubcane = subcaneAt(mouseLoc);
 	if (selectedSubcane != NULL)
 	{
 	        char buf[500];
@@ -114,10 +114,10 @@ void CaneEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	}	
 
 	// Check for convenience casing-to-casing drag
-	int selectedCasingIndex = getCasingIndexAt(mouseLoc);
+	int selectedCasingIndex = casingIndexAt(mouseLoc);
 	if (selectedCasingIndex != -1)
 	{
-		const GlassColor* selectedColor = cane->getCasingColor(static_cast<unsigned int>(selectedCasingIndex)); 
+		const GlassColor* selectedColor = cane->casingColor(static_cast<unsigned int>(selectedCasingIndex)); 
 
 		QPixmap _pixmap(200, 200);
 		_pixmap.fill(Qt::transparent);
@@ -147,39 +147,39 @@ void CaneEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 	}
 }
 
-int CaneEditorViewWidget :: getCasingIndexAt(Point2D loc)
+int CaneEditorViewWidget :: casingIndexAt(Point2D loc)
 {
 	for (unsigned int i = 0; i < cane->casingCount(); ++i) 
 	{
-		if (getShapeRadius(cane->getCasingShape(i), loc) < cane->getCasingThickness(i))
+		if (shapeRadius(cane->casingShape(i), loc) < cane->casingThickness(i))
 			return i;
 	}
 
 	return -1;
 }
 
-int CaneEditorViewWidget :: getSubcaneIndexAt(Point2D loc)
+int CaneEditorViewWidget :: subcaneIndexAt(Point2D loc)
 {
 	// Recursively call drawing on subcanes
 	for (unsigned int i = 0; i < cane->subpullCount(); ++i)
 	{
-		SubcaneTemplate sub = cane->getSubcaneTemplate(i);
+		SubcaneTemplate sub = cane->subcaneTemplate(i);
 		Point2D delta;
 		delta.x = loc.x - sub.location.x;
 		delta.y = loc.y - sub.location.y;
-		if (getShapeRadius(sub.shape, delta) < sub.diameter/2.0)
+		if (shapeRadius(sub.shape, delta) < sub.diameter/2.0)
 			return i;
 	}
 
 	return -1;			
 }
 
-Cane* CaneEditorViewWidget :: getSubcaneAt(Point2D loc)
+Cane* CaneEditorViewWidget :: subcaneAt(Point2D loc)
 {
-	int subcaneIndex = getSubcaneIndexAt(loc);
+	int subcaneIndex = subcaneIndexAt(loc);
 	if (subcaneIndex == -1)
 		return NULL;
-	return cane->getSubcaneTemplate(subcaneIndex).cane;
+	return cane->subcaneTemplate(subcaneIndex).cane;
 }
 
 void CaneEditorViewWidget :: setMinMaxCasingRadii(float* min, float* max)
@@ -201,20 +201,20 @@ void CaneEditorViewWidget :: setMinMaxCasingRadii(float* min, float* max)
 
 	if (draggedCasingIndex == 0) 
 	{
-		csi = cane->getCasingShape(0);
+		csi = cane->casingShape(0);
 		csi_minus_1 = csi;
-		csi_plus_1 = cane->getCasingShape(1);
+		csi_plus_1 = cane->casingShape(1);
 	
 		cti_minus_1 = 0.0;
-		cti_plus_1 = cane->getCasingThickness(1);	
+		cti_plus_1 = cane->casingThickness(1);	
 	}
 	else 
 	{
-		csi = cane->getCasingShape(draggedCasingIndex);
-		csi_minus_1 = cane->getCasingShape(draggedCasingIndex-1);
-		csi_plus_1 = cane->getCasingShape(draggedCasingIndex+1);
-		cti_minus_1 = cane->getCasingThickness(draggedCasingIndex-1);
-		cti_plus_1 = cane->getCasingThickness(draggedCasingIndex+1);
+		csi = cane->casingShape(draggedCasingIndex);
+		csi_minus_1 = cane->casingShape(draggedCasingIndex-1);
+		csi_plus_1 = cane->casingShape(draggedCasingIndex+1);
+		cti_minus_1 = cane->casingThickness(draggedCasingIndex-1);
+		cti_plus_1 = cane->casingThickness(draggedCasingIndex+1);
 	}
 		
 	if (csi == CIRCLE_SHAPE && csi_minus_1 == SQUARE_SHAPE)
@@ -238,7 +238,7 @@ void CaneEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 		return;
 
 	Point2D mouseLoc = mouseToCaneCoords(event->pos().x(), event->pos().y());
-	float radius = getShapeRadius(cane->getCasingShape(draggedCasingIndex), mouseLoc);
+	float radius = shapeRadius(cane->casingShape(draggedCasingIndex), mouseLoc);
 
 	float min;
 	float max;
@@ -302,7 +302,7 @@ void CaneEditorViewWidget :: updateHighlightedSubcanesAndCasings(QDragMoveEvent*
 			GlassColorLibraryWidget* draggedLibraryColor 
 				= reinterpret_cast<GlassColorLibraryWidget*>(ptr);
 			highlightColor = draggedLibraryColor->glassColor->color();
-			int subcaneIndexUnderMouse = getSubcaneIndexAt(mouseLoc);
+			int subcaneIndexUnderMouse = subcaneIndexAt(mouseLoc);
 			if (subcaneIndexUnderMouse != -1)
 			{
 				// if user is hovering over a subcane and the shift key is currently held down, fill in all subcanes
@@ -320,7 +320,7 @@ void CaneEditorViewWidget :: updateHighlightedSubcanesAndCasings(QDragMoveEvent*
 				break;
 			}
 			// If we didn't find a subcane under the mouse, see if there's a casing under it
-			int casingIndexUnderMouse = getCasingIndexAt(mouseLoc);
+			int casingIndexUnderMouse = casingIndexAt(mouseLoc);
 			if (casingIndexUnderMouse == -1)
 				break;
 			if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
@@ -336,7 +336,7 @@ void CaneEditorViewWidget :: updateHighlightedSubcanesAndCasings(QDragMoveEvent*
 		{
 			GlassColor* draggedColor = reinterpret_cast<GlassColor*>(ptr);
 			highlightColor = draggedColor->color();
-			int casingIndexUnderMouse = getCasingIndexAt(mouseLoc);
+			int casingIndexUnderMouse = casingIndexAt(mouseLoc);
 			if (casingIndexUnderMouse == -1)
 				break;
 			if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
@@ -359,16 +359,16 @@ void CaneEditorViewWidget :: updateHighlightedSubcanesAndCasings(QDragMoveEvent*
 			highlightColor.r = highlightColor.g = highlightColor.b = highlightColor.a = 1.0;
 			if (draggedCane->hasDependencyOn(cane))
 				break;
-			int subcaneIndexUnderMouse = getSubcaneIndexAt(mouseLoc);
+			int subcaneIndexUnderMouse = subcaneIndexAt(mouseLoc);
 			if (subcaneIndexUnderMouse == -1)
 				break;
-			if (draggedCane->outermostCasingShape() != cane->getSubcaneTemplate(subcaneIndexUnderMouse).shape)
+			if (draggedCane->outermostCasingShape() != cane->subcaneTemplate(subcaneIndexUnderMouse).shape)
 				break;
 			if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
 			{
 				for (unsigned int i = 0; i < cane->subpullCount(); ++i)
 				{
-					if (draggedCane->outermostCasingShape() == cane->getSubcaneTemplate(i).shape)
+					if (draggedCane->outermostCasingShape() == cane->subcaneTemplate(i).shape)
 						subcanesHighlighted.insert(i);
 				}
 			}
@@ -400,7 +400,7 @@ void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 			GlassColorLibraryWidget* draggedLibraryColor = reinterpret_cast<GlassColorLibraryWidget*>(ptr);
 			for (set<unsigned int>::iterator it = subcanesHighlighted.begin(); it != subcanesHighlighted.end(); ++it)
 			{
-				SubcaneTemplate sub = cane->getSubcaneTemplate(*it);
+				SubcaneTemplate sub = cane->subcaneTemplate(*it);
 				switch (sub.shape)
 				{
 					case CIRCLE_SHAPE:
@@ -433,7 +433,7 @@ void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 				draggedCane = reinterpret_cast<CaneLibraryWidget*>(ptr)->cane;
 			for (set<unsigned int>::iterator it = subcanesHighlighted.begin(); it != subcanesHighlighted.end(); ++it)
 			{
-				SubcaneTemplate sub = cane->getSubcaneTemplate(*it);
+				SubcaneTemplate sub = cane->subcaneTemplate(*it);
 				if (sub.shape == draggedCane->outermostCasingShape())
 				{
 					sub.cane = draggedCane;	
@@ -520,8 +520,8 @@ void CaneEditorViewWidget :: drawSubcane(Point2D upperLeft, float drawWidth, flo
 	// Do casing colors outermost to innermost to get concentric rings of each casing's color
 	for (unsigned int i = cane->casingCount() - 1; i < cane->casingCount(); --i) 
 	{
-		float casingWidth = drawWidth * cane->getCasingThickness(i);
-		float casingHeight = drawHeight * cane->getCasingThickness(i);
+		float casingWidth = drawWidth * cane->casingThickness(i);
+		float casingHeight = drawHeight * cane->casingThickness(i);
 		Point2D casingUpperLeft;
 		casingUpperLeft.x = upperLeft.x + drawWidth / 2 - casingWidth / 2;
 		casingUpperLeft.y = upperLeft.y + drawHeight / 2 - casingHeight / 2;
@@ -529,7 +529,7 @@ void CaneEditorViewWidget :: drawSubcane(Point2D upperLeft, float drawWidth, flo
 		// Fill with solid neutral grey (in case fill is transparent)
 		painter->setBrush(GlobalBackgroundColor::qcolor);
 		painter->setPen(Qt::NoPen); // Will draw boundary after all filling is done
-		paintShape(casingUpperLeft, casingWidth, cane->getCasingShape(i), painter);
+		paintShape(casingUpperLeft, casingWidth, cane->casingShape(i), painter);
 		
 		// Fill with actual casing color (highlighting white or some other color)
 		if (outermostLevel && casingsHighlighted.find(i) != casingsHighlighted.end())
@@ -539,19 +539,19 @@ void CaneEditorViewWidget :: drawSubcane(Point2D upperLeft, float drawWidth, flo
 		}
 		else
 		{
-			Color c = cane->getCasingColor(i)->color();
+			Color c = cane->casingColor(i)->color();
 			QColor qc(255*c.r, 255*c.g, 255*c.b, 255*c.a);
 			painter->setBrush(qc);
 		}
 
 		setBoundaryPainter(painter, outermostLevel);
-		paintShape(casingUpperLeft, casingWidth, cane->getCasingShape(i), painter);
+		paintShape(casingUpperLeft, casingWidth, cane->casingShape(i), painter);
 	}
 
 	// Recursively call drawing on subcanes
 	for (unsigned int i = cane->subpullCount()-1; i < cane->subpullCount(); --i)
 	{
-		SubcaneTemplate sub = cane->getSubcaneTemplate(i);
+		SubcaneTemplate sub = cane->subcaneTemplate(i);
 
 		Point2D subUpperLeft;
 		subUpperLeft.x = upperLeft.x + (sub.location.x - sub.diameter/2.0) * drawWidth/2 + drawWidth/2;

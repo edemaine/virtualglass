@@ -114,7 +114,6 @@ void Cane :: setTemplateType(CaneTemplate::Type t)
 			// we don't touch anything, who knows what's going on in there
 			break;
 	}
-
 	resetSubs(true);
 }
 
@@ -137,7 +136,7 @@ const GlassColor* Cane :: outermostCasingColor()
 	return this->casings_[last].glassColor;
 }
 
-const GlassColor* Cane :: getCasingColor(unsigned int index) 
+const GlassColor* Cane :: casingColor(unsigned int index) 
 {
 	if (index >= this->casings_.size())
 		return NULL;
@@ -295,7 +294,7 @@ void Cane :: setOutermostCasingShape(enum GeometricShape _shape)
 	resetSubs(false);
 }
 
-float Cane :: getCasingThickness(unsigned int index) 
+float Cane :: casingThickness(unsigned int index) 
 {
 	return this->casings_[index].thickness;
 }
@@ -306,7 +305,7 @@ enum GeometricShape Cane :: outermostCasingShape()
 	return this->casings_[last].shape;
 }
 
-enum GeometricShape Cane :: getCasingShape(unsigned int index) 
+enum GeometricShape Cane :: casingShape(unsigned int index) 
 {
 	return this->casings_[index].shape;
 }
@@ -528,7 +527,7 @@ void Cane :: resetSubs(bool hardReset)
 	this->subcanes_ = newSubs;
 }
 
-SubcaneTemplate Cane :: getSubcaneTemplate(unsigned int index)
+SubcaneTemplate Cane :: subcaneTemplate(unsigned int index)
 {
 	return this->subcanes_[index];
 }
@@ -603,7 +602,7 @@ Cane *deep_copy(const Cane *_cane)
 		to_update.pop_back();
 		for (unsigned int i = 0; i < t->subpullCount(); ++i)
 		{
-			SubcaneTemplate s = t->getSubcaneTemplate(i);
+			SubcaneTemplate s = t->subcaneTemplate(i);
 			unordered_map<const Cane*, Cane*>::iterator f = copies.find(s.cane);
 			if (f == copies.end()) 
 			{
@@ -629,7 +628,7 @@ void deep_delete(Cane *cane)
 		to_delete.pop_back();
 		for (unsigned int i = 0; i < t->subpullCount(); ++i)
 		{
-			SubcaneTemplate s = t->getSubcaneTemplate(i);
+			SubcaneTemplate s = t->subcaneTemplate(i);
 			if (marked.insert(s.cane).second) 
 				to_delete.push_back(s.cane);
 			s.cane = NULL;
