@@ -6,6 +6,8 @@
 #include <vector>
 #include <stack>
 
+#include <QObject>
+
 #include "canetemplate.h"
 #include "shape.h"
 #include "primitives.h"
@@ -19,8 +21,10 @@ using std::stack;
 class Cane;
 class GlassColor;
 
-class Cane
+class Cane : public QObject
 {
+	Q_OBJECT
+
 	public:
 		Cane(enum CaneTemplate::Type t);
 
@@ -63,17 +67,23 @@ class Cane
 		bool hasDependencyOn(GlassColor* color);
 		bool hasDependencyOn(Cane* cane);
 
+	signals:
+		void modified();
+
 	private:
 		void initializeTemplate();
 		void resetSubs(bool hardReset);
 		void pushNewSubpull(bool hardReset, vector<SubcaneTemplate>* newSubs,
 			enum GeometricShape s, Point2D location, float diameter);
 
-		enum CaneTemplate::Type _type;
-		vector<Casing> _casings;
-		unsigned int _count;
-		float _twist;
-		vector<SubcaneTemplate> _subs;
+		enum CaneTemplate::Type type_;
+		vector<Casing> casings_;
+		unsigned int count_;
+		float twist_;
+		vector<SubcaneTemplate> subcanes_;
+
+	private slots:
+		void dependencyModified();
 };
 
 Cane *deep_copy(const Cane *cane);

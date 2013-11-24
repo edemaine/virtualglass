@@ -5,6 +5,8 @@
 #include <vector>
 #include <stack>
 
+#include <QObject>
+
 #include "templateparameter.h"
 #include "piecetemplate.h"
 #include "pickup.h"
@@ -14,8 +16,10 @@
 using std::vector;
 using std::stack;
 
-class Piece 
+class Piece : public QObject
 {
+	Q_OBJECT
+
 	public:
 		Piece(enum PieceTemplate::Type t);
 
@@ -38,12 +42,18 @@ class Piece
 		void setSpline(Spline s);
 		Spline spline();
 
+	signals:
+		void modified();
+
 	private:
 		Pickup* pickup_;
 
 		float twist_;
 		enum PieceTemplate::Type type_;
 		Spline spline_;
+	
+	private slots:
+		void dependencyModified();
 };
 
 Piece *deep_copy(const Piece *);

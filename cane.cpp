@@ -17,16 +17,21 @@ using std::make_pair;
 Cane :: Cane(CaneTemplate::Type t)
 {
 	// setup default twist
-	this->_twist = 0;
+	this->twist_ = 0;
 
 	// initialize casings and subcanes to something simple
-	this->_casings.push_back(Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
-	this->_casings[0].shape = CIRCLE_SHAPE;
-	this->_count = 0;
-	this->_type = CaneTemplate::BASE_CIRCLE;
+	this->casings_.push_back(Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
+	this->casings_[0].shape = CIRCLE_SHAPE;
+	this->count_ = 0;
+	this->type_ = CaneTemplate::BASE_CIRCLE;
 
 	// now initialize for real
 	setTemplateType(t);
+}
+
+void Cane :: dependencyModified()
+{
+	emit modified();
 }
 
 bool Cane :: hasDependencyOn(Cane* cane) 
@@ -35,40 +40,40 @@ bool Cane :: hasDependencyOn(Cane* cane)
 		return true;
 
 	bool childrenAreDependent = false;
-	for (unsigned int i = 0; i < this->_subs.size(); ++i) 
-		childrenAreDependent = (childrenAreDependent || this->_subs[i].cane->hasDependencyOn(cane)); 
+	for (unsigned int i = 0; i < this->subcanes_.size(); ++i) 
+		childrenAreDependent = (childrenAreDependent || this->subcanes_[i].cane->hasDependencyOn(cane)); 
 
 	return childrenAreDependent;
 }
 
 bool Cane :: hasDependencyOn(GlassColor* glassColor) 
 {
-	for (unsigned int i = 0; i < this->_casings.size(); ++i) 
+	for (unsigned int i = 0; i < this->casings_.size(); ++i) 
 	{
-		if (this->_casings[i].glassColor == glassColor)
+		if (this->casings_[i].glassColor == glassColor)
 			return true;
 	} 
 
 	bool childrenAreDependent = false;
-	for (unsigned int i = 0; i < this->_subs.size(); ++i) 
-		childrenAreDependent = (childrenAreDependent || this->_subs[i].cane->hasDependencyOn(glassColor)); 
+	for (unsigned int i = 0; i < this->subcanes_.size(); ++i) 
+		childrenAreDependent = (childrenAreDependent || this->subcanes_[i].cane->hasDependencyOn(glassColor)); 
 
 	return childrenAreDependent;
 }
 
 void Cane :: setTemplateType(CaneTemplate::Type t)
 {
-	if (t == this->_type)
+	if (t == this->type_)
 		return;
 
 	// if you're switching to a template where count matters, and it's a funky value,
 	// set it to something more reasonable
-	if (this->_count < 2 && templateHasSubcanes(t))
-		this->_count = 7;
+	if (this->count_ < 2 && templateHasSubcanes(t))
+		this->count_ = 7;
 
-	this->_type = t;
+	this->type_ = t;
 
-	vector<Casing> &casings = this->_casings;
+	vector<Casing> &casings = this->casings_;
 	switch (t) 
 	{
 		case CaneTemplate::BASE_CIRCLE:
@@ -76,7 +81,7 @@ void Cane :: setTemplateType(CaneTemplate::Type t)
 			break;
 		case CaneTemplate::BASE_SQUARE:
 			casings[0].shape = SQUARE_SHAPE;
-			this->_twist = 0.0;
+			this->twist_ = 0.0;
 			if (casings.size() > 1) 
 				casings[0].thickness = MIN(casings[0].thickness, 0.9 * 1 / SQRT_TWO * casings[1].thickness);
 			break;
@@ -96,7 +101,7 @@ void Cane :: setTemplateType(CaneTemplate::Type t)
 		case CaneTemplate::SQUARE_OF_SQUARES:
 		case CaneTemplate::SQUARE_OF_CIRCLES:
 			casings[0].shape = SQUARE_SHAPE;
-			this->_twist = 0.0;
+			this->twist_ = 0.0;
 			if (casings.size() > 1)
 				casings[0].thickness = MIN(casings[0].thickness, 0.9 * 1 / SQRT_TWO * casings[1].thickness);
 			break;
@@ -115,59 +120,59 @@ void Cane :: setTemplateType(CaneTemplate::Type t)
 
 void Cane :: setCasingColor(GlassColor* gc, unsigned int index) 
 {
-	if (index >= this->_casings.size())
+	if (index >= this->casings_.size())
 		return;
-	this->_casings[index].glassColor = gc;
+	this->casings_[index].glassColor = gc;
 }
 
 void Cane :: setOutermostCasingColor(GlassColor* gc) 
 {
-	int last = this->_casings.size()-1;
-	this->_casings[last].glassColor = gc;
+	int last = this->casings_.size()-1;
+	this->casings_[last].glassColor = gc;
 }
 
 const GlassColor* Cane :: outermostCasingColor() 
 {
-	int last = this->_casings.size()-1;
-	return this->_casings[last].glassColor;
+	int last = this->casings_.size()-1;
+	return this->casings_[last].glassColor;
 }
 
 const GlassColor* Cane :: getCasingColor(unsigned int index) 
 {
-	if (index >= this->_casings.size())
+	if (index >= this->casings_.size())
 		return NULL;
-	return this->_casings[index].glassColor;
+	return this->casings_[index].glassColor;
 }
 
 bool Cane :: hasMinimumCasingCount() 
 {
-	return (this->_casings.size() < 2);
+	return (this->casings_.size() < 2);
 }	
 		
 unsigned int Cane :: casingCount() 
 {
-	return this->_casings.size();
+	return this->casings_.size();
 }
 
 enum CaneTemplate::Type Cane :: templateType() const 
 {
-	return this->_type;
+	return this->type_;
 }
 
 unsigned int Cane :: count()
 {
-	return this->_count;
+	return this->count_;
 }
 
-void Cane :: setCount(unsigned int _count)
+void Cane :: setCount(unsigned int count_)
 {
-	this->_count = _count;
+	this->count_ = count_;
 	resetSubs(false);
 }
 
 void Cane :: removeCasing() 
 {
-	vector<Casing>& casings = this->_casings;
+	vector<Casing>& casings = this->casings_;
 
 	int count = casings.size();
 	if (count < 2) 
@@ -189,14 +194,14 @@ void Cane :: removeCasing()
 	}
 
 	// rescale subcanes
-	for (unsigned int i = 0; i < this->_subs.size(); ++i)
-		this->_subs[i].rescale(casings[0].thickness / oldInnermostCasingThickness);
+	for (unsigned int i = 0; i < this->subcanes_.size(); ++i)
+		this->subcanes_[i].rescale(casings[0].thickness / oldInnermostCasingThickness);
 }
 
 
 void Cane :: addCasing(enum GeometricShape _shape) 
 {
-	vector<Casing>& casings = this->_casings;
+	vector<Casing>& casings = this->casings_;
 
 	// rescale casings
 	float oldInnermostCasingThickness = casings[0].thickness;
@@ -223,16 +228,16 @@ void Cane :: addCasing(enum GeometricShape _shape)
 	// add the new casing
 	casings.push_back(Casing(1.0, _shape, GlobalGlass::color()));
 	if (this->outermostCasingShape() != CIRCLE_SHAPE)
-		this->_twist = 0.0;
+		this->twist_ = 0.0;
 
 	// update subpulls by rescaling them according to innermost casing rescaling
-	for (unsigned int i = 0; i < this->_subs.size(); ++i) 
-		this->_subs[i].rescale(casings[0].thickness / oldInnermostCasingThickness);
+	for (unsigned int i = 0; i < this->subcanes_.size(); ++i) 
+		this->subcanes_[i].rescale(casings[0].thickness / oldInnermostCasingThickness);
 }
 
 void Cane :: setCasingThickness(float t, unsigned int index) 
 {
-	vector<Casing> &casings = this->_casings;	
+	vector<Casing> &casings = this->casings_;	
 
 	// this currently doesn't enforce any overlapping issues with
 	// differently-shaped casings. It assumes they are being set 
@@ -244,17 +249,17 @@ void Cane :: setCasingThickness(float t, unsigned int index)
 	{
 		float scaleRatio = t / casings[0].thickness;
 		casings[0].thickness = t;
-		for (unsigned int i = 0; i < this->_subs.size(); ++i) 
-			this->_subs[i].rescale(scaleRatio);
+		for (unsigned int i = 0; i < this->subcanes_.size(); ++i) 
+			this->subcanes_[i].rescale(scaleRatio);
 	}
 	// otherwise just change the casing
 	else
-		this->_casings[index].thickness = t;
+		this->casings_[index].thickness = t;
 }
 
 void Cane :: setOutermostCasingShape(enum GeometricShape _shape) 
 {
-	vector<Casing> &casings = this->_casings;	
+	vector<Casing> &casings = this->casings_;	
 
 	if (_shape == this->outermostCasingShape()) 
 		return;
@@ -276,34 +281,34 @@ void Cane :: setOutermostCasingShape(enum GeometricShape _shape)
 		// "I am this shape" (e.g. BASE_*), then changing casing shape should
 		// change template type implicitly, since a a BASE_CIRCLE consisting of 
 		// a single SQUARE_SHAPE casing makes no sense
-		if (this->_type == CaneTemplate::BASE_CIRCLE && _shape == SQUARE_SHAPE)
+		if (this->type_ == CaneTemplate::BASE_CIRCLE && _shape == SQUARE_SHAPE)
 			this->setTemplateType(CaneTemplate::BASE_SQUARE);
-		else if (this->_type == CaneTemplate::BASE_SQUARE && _shape == CIRCLE_SHAPE)
+		else if (this->type_ == CaneTemplate::BASE_SQUARE && _shape == CIRCLE_SHAPE)
 			this->setTemplateType(CaneTemplate::BASE_CIRCLE);
 	}
 
 	// DO THE CHANGE
 	casings[casings.size()-1].shape = _shape;
 	if (this->outermostCasingShape() != CIRCLE_SHAPE)
-		this->_twist = 0.0;
+		this->twist_ = 0.0;
 
 	resetSubs(false);
 }
 
 float Cane :: getCasingThickness(unsigned int index) 
 {
-	return this->_casings[index].thickness;
+	return this->casings_[index].thickness;
 }
 
 enum GeometricShape Cane :: outermostCasingShape() 
 {
-	int last = this->_casings.size()-1;
-	return this->_casings[last].shape;
+	int last = this->casings_.size()-1;
+	return this->casings_[last].shape;
 }
 
 enum GeometricShape Cane :: getCasingShape(unsigned int index) 
 {
-	return this->_casings[index].shape;
+	return this->casings_[index].shape;
 }
 
 void Cane :: pushNewSubpull(bool hardReset, vector<SubcaneTemplate>* newSubs,
@@ -313,10 +318,10 @@ void Cane :: pushNewSubpull(bool hardReset, vector<SubcaneTemplate>* newSubs,
 
 	// if it's not a hard reset and there are still old subcanes to use and the next one matches shape
 	// with the shape we want to have, then use it
-	if (!hardReset && newSubs->size() < this->_subs.size() 
-		&& _shape == this->_subs[newSubs->size()].shape) 
+	if (!hardReset && newSubs->size() < this->subcanes_.size() 
+		&& _shape == this->subcanes_[newSubs->size()].shape) 
 	{
-		cane = this->_subs[newSubs->size()].cane;
+		cane = this->subcanes_[newSubs->size()].cane;
 	}
 	else // otherwise just use whichever filler subcane matches the shape
 	{
@@ -346,20 +351,20 @@ void Cane :: pushNewSubpull(bool hardReset, vector<SubcaneTemplate>* newSubs,
 void Cane :: resetSubs(bool hardReset)
 {
 	Point2D p = make_vector(0.0f, 0.0f);
-	float radius = this->_casings[0].thickness;
+	float radius = this->casings_[0].thickness;
 
 	vector<SubcaneTemplate> newSubs;
 	
-	switch (this->_type) 
+	switch (this->type_) 
 	{
 		case CaneTemplate::BASE_CIRCLE:
 		case CaneTemplate::BASE_SQUARE:
 			break;
 		case CaneTemplate::HORIZONTAL_LINE_CIRCLE:
 		{
-			for (unsigned int i = 0; i < this->_count; ++i) 
+			for (unsigned int i = 0; i < this->count_; ++i) 
 			{
-				float littleRadius = (2 * radius / this->_count) / 2;
+				float littleRadius = (2 * radius / this->count_) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
 				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0);
 			}
@@ -368,9 +373,9 @@ void Cane :: resetSubs(bool hardReset)
 		case CaneTemplate::HORIZONTAL_LINE_SQUARE:
 		{
 			radius *= 0.9;
-			for (unsigned int i = 0; i < this->_count; ++i) 
+			for (unsigned int i = 0; i < this->count_; ++i) 
 			{
-				float littleRadius = (2 * radius / this->_count) / 2;
+				float littleRadius = (2 * radius / this->count_) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
 				pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, littleRadius * 2.0);
 			}
@@ -378,10 +383,10 @@ void Cane :: resetSubs(bool hardReset)
 		}
 		case CaneTemplate::SURROUNDING_CIRCLE:
 		{
-			if (this->_count == 0)
+			if (this->count_ == 0)
 				break;
 
-			unsigned int littleCount = MAX(this->_count-1, 3);
+			unsigned int littleCount = MAX(this->count_-1, 3);
 			float theta = TWO_PI / littleCount;
 			float k = sin(theta/2) / (1 + sin(theta/2));
 			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, (1 - 2 * k) * 2 * radius);
@@ -397,11 +402,11 @@ void Cane :: resetSubs(bool hardReset)
 		case CaneTemplate::CROSS:
 		case CaneTemplate::TRIPOD:
 		{
-			if (this->_count == 0)
+			if (this->count_ == 0)
 				break;
 
-			unsigned int wings = 3 + static_cast<int>(this->_type == CaneTemplate::CROSS);
-			unsigned int sideCount = (this->_count + 1) / wings; 
+			unsigned int wings = 3 + static_cast<int>(this->type_ == CaneTemplate::CROSS);
+			unsigned int sideCount = (this->count_ + 1) / wings; 
 			float littleRadius = (radius / (sideCount + 0.5)) / 2.0;
 	
 			p.x = p.y = 0.0;
@@ -420,14 +425,14 @@ void Cane :: resetSubs(bool hardReset)
 		case CaneTemplate::SQUARE_OF_CIRCLES:
 		case CaneTemplate::SQUARE_OF_SQUARES:
 		{
-			if (this->_count == 0)
+			if (this->count_ == 0)
 				break;
 
-			if (this->_casings[0].shape == CIRCLE_SHAPE)
+			if (this->casings_[0].shape == CIRCLE_SHAPE)
 				radius *= 1 / SQRT_TWO;
 
 			unsigned int sideCount = 0;
-			while (sideCount * sideCount < this->_count)
+			while (sideCount * sideCount < this->count_)
 				++sideCount;
 			float littleRadius = radius / sideCount;
 
@@ -442,7 +447,7 @@ void Cane :: resetSubs(bool hardReset)
 					j = s;
 					p.x = -radius + littleRadius + 2 * littleRadius * i;
 					p.y = -radius + littleRadius + 2 * littleRadius * j;
-					if (this->_type == CaneTemplate::SQUARE_OF_CIRCLES)
+					if (this->type_ == CaneTemplate::SQUARE_OF_CIRCLES)
 						pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 					else
 						pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius);
@@ -452,7 +457,7 @@ void Cane :: resetSubs(bool hardReset)
 					i = s;
 					p.x = -radius + littleRadius + 2 * littleRadius * i;
 					p.y = -radius + littleRadius + 2 * littleRadius * j;
-					if (this->_type == CaneTemplate::SQUARE_OF_CIRCLES)
+					if (this->type_ == CaneTemplate::SQUARE_OF_CIRCLES)
 						pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
 					else
 						pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius);
@@ -463,13 +468,13 @@ void Cane :: resetSubs(bool hardReset)
 		}
 		case CaneTemplate::SURROUNDING_SQUARE:
 		{
-			if (this->_count == 0)
+			if (this->count_ == 0)
 				break;
 
 			// (1-8) : 2, (9-12) : 3, (13-16) : 4
-			unsigned int sideCount = (MAX(this->_count, 5) + 3) / 4; 
+			unsigned int sideCount = (MAX(this->count_, 5) + 3) / 4; 
 
-			if (this->_casings[0].shape == CIRCLE_SHAPE)
+			if (this->casings_[0].shape == CIRCLE_SHAPE)
 				radius *= 1 / SQRT_TWO;
 
 			float littleRadius = radius / (sideCount + 1);
@@ -505,82 +510,82 @@ void Cane :: resetSubs(bool hardReset)
 		}
 		case CaneTemplate::CUSTOM:
 		{
-			for (unsigned int i = 0; i < this->_subs.size(); i++)
+			for (unsigned int i = 0; i < this->subcanes_.size(); i++)
 			{
-				p.x = this->_subs[i].location.x * radius;
-				p.y = this->_subs[i].location.y * radius;
+				p.x = this->subcanes_[i].location.x * radius;
+				p.y = this->subcanes_[i].location.y * radius;
 				// never do a hard reset of custom, because 
 				// it's a `soft' template change from a rigid one 
 				// to a custom one, so mapping from old cane locations/subcanes
 				// to new ones is direct and very natural
-				pushNewSubpull(false, &newSubs, this->_subs[i].shape, this->_subs[i].location, 
-					this->_subs[i].diameter);
+				pushNewSubpull(false, &newSubs, this->subcanes_[i].shape, this->subcanes_[i].location, 
+					this->subcanes_[i].diameter);
 			}
 			break;
 		}
 	}
 
-	this->_subs = newSubs;
+	this->subcanes_ = newSubs;
 }
 
 SubcaneTemplate Cane :: getSubcaneTemplate(unsigned int index)
 {
-	return this->_subs[index];
+	return this->subcanes_[index];
 }
 
 void Cane :: setSubcaneTemplate(SubcaneTemplate t, unsigned int index)
 {
-	this->_subs[index] = t;
+	this->subcanes_[index] = t;
 }
 
 void Cane :: addSubcaneTemplate(SubcaneTemplate t)
 {
-	this->_subs.push_back(t);
+	this->subcanes_.push_back(t);
 }
 
 void Cane :: removeSubcaneTemplate(unsigned int index)
 {
-	this->_subs.erase(this->_subs.begin() + index);
+	this->subcanes_.erase(this->subcanes_.begin() + index);
 }
 
 unsigned int Cane :: subpullCount()
 {
-	return this->_subs.size();
+	return this->subcanes_.size();
 }
 
 float Cane :: twist()
 {
-	return this->_twist;
+	return this->twist_;
 }
 
 void Cane :: setTwist(float t)
 {
-	this->_twist = t;
+	this->twist_ = t;
 }
 
 float* Cane :: twistPtr()
 {
-	return &(this->_twist);
+	return &(this->twist_);
 }
 
 Cane* Cane :: copy() const 
 {
-	Cane* c = new Cane(this->_type);
-	c->_type = this->_type;
-	c->_casings = this->_casings;
-	c->_count = this->_count;
-	c->_twist = this->_twist;
-	c->_subs = this->_subs;
+	Cane* c = new Cane(this->type_);
+	c->type_ = this->type_;
+	c->casings_ = this->casings_;
+	c->count_ = this->count_;
+	c->twist_ = this->twist_;
+	c->subcanes_ = this->subcanes_;
 	return c;
 }
 
 void Cane :: set(Cane* c)
 {
-	this->_type = c->_type;
-	this->_casings = c->_casings;
-	this->_count = c->_count;
-	this->_twist = c->_twist;
-	this->_subs = c->_subs;
+	this->type_ = c->type_;
+	this->casings_ = c->casings_;
+	this->count_ = c->count_;
+	this->twist_ = c->twist_;
+	this->subcanes_ = c->subcanes_;
 }
 
 Cane *deep_copy(const Cane *_cane) 

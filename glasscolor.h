@@ -4,13 +4,17 @@
 #include <stack>
 #include <string>
 
+#include <QObject>
+
 #include "primitives.h"
 
 using std::string;
 using std::stack;
 
-class GlassColor 
+class GlassColor : public QObject 
 {
+	Q_OBJECT
+
 	public:
 		GlassColor();
 		GlassColor(Color c, string s, string l);
@@ -24,6 +28,9 @@ class GlassColor
 
 		GlassColor* copy() const;
 		void set(GlassColor* c);
+
+	signals: 
+		void modified();
 
 	private:
 		Color color_;

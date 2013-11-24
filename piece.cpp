@@ -45,6 +45,11 @@ float* Piece :: twistPtr()
 	return &(this->twist_);
 }
 
+void Piece :: dependencyModified()
+{
+	emit modified();
+}
+
 bool Piece :: hasDependencyOn(Cane* cane)
 {
 	bool pickupsDependOn = false;
