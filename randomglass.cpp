@@ -4,7 +4,6 @@
 #include "glasscolor.h"
 #include "cane.h"
 #include "canetemplate.h"
-#include "pickup.h"
 #include "pickuptemplate.h"
 #include "subcanetemplate.h"
 #include "piece.h"

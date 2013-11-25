@@ -8,12 +8,16 @@ class Cane;
 
 class CaneLibraryWidget : public AsyncRenderWidget
 {
+	Q_OBJECT
+
 	public:
 		CaneLibraryWidget(Cane *_cane, MainWindow* _window);
 		Cane *cane;
 		const QPixmap *dragPixmap();
 		bool isDraggable();
 		GlassMime::Type mimeType();
+
+	public slots:
 		void updatePixmaps();
 
 	private:
@@ -21,4 +25,4 @@ class CaneLibraryWidget : public AsyncRenderWidget
 		void updateDragPixmap();
 };
 
-#endif //PULLPLANLIBRARYWIDGET_H
+#endif 

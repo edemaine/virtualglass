@@ -15,7 +15,7 @@ CaneCustomizeViewWidget::CaneCustomizeViewWidget(Cane* cane, UndoRedo* undoRedo,
 {
 	// setup draw widget
 	setMinimumSize(200, 200);
-	setCane(cane);
+	this->cane = cane;
 	this->undoRedo = undoRedo;
 	mouseStartingLoc.x = FLT_MAX;
 	mouseStartingLoc.y = FLT_MAX;
@@ -29,16 +29,7 @@ CaneCustomizeViewWidget::CaneCustomizeViewWidget(Cane* cane, UndoRedo* undoRedo,
 	boundingBoxSpace = 1; //squareSize isn't set yet, so can't do MAX(squareSize / 100, 1);
 	boundActiveBox();
 	this->setMouseTracking(true);
-	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
-	connect(this, SIGNAL(someDataChanged()), this, SLOT(setCustomTemplate()));
-}
-
-void CaneCustomizeViewWidget :: setCustomTemplate()
-{
-	CaneTemplate::Type oldType = cane->templateType();
-	cane->setTemplateType(CaneTemplate::CUSTOM);	
-	if (oldType != CaneTemplate::CUSTOM)
-		undoRedo->modifiedCane(cane);
+	connect(this->cane, SIGNAL(modified()), this, SLOT(updateEverything()));
 }
 
 void CaneCustomizeViewWidget :: resizeEvent(QResizeEvent* event)
@@ -221,7 +212,6 @@ void CaneCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 				}
 				if (subcanesSelected.size() > 0)
 					undoRedo->modifiedCane(cane);
-				emit someDataChanged();
 				mouseStartingLoc.x = adjustedX(event->pos().x());
 				mouseStartingLoc.y = adjustedY(event->pos().y());
 			}
@@ -256,7 +246,6 @@ void CaneCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 				}
 				if (subcanesSelected.size() > 0)
 					undoRedo->modifiedCane(cane);
-				emit someDataChanged();
 			}
 			else
 			{
@@ -289,7 +278,6 @@ void CaneCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 				}
 				if (subcanesSelected.size() > 0)
 					undoRedo->modifiedCane(cane);
-				emit someDataChanged();
 			}
 			break;
 		}
@@ -416,7 +404,6 @@ void CaneCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent* event)
 	
 	mouseStartingLoc.x = adjustedX(event->pos().x());
 	mouseStartingLoc.y = adjustedY(event->pos().y());
-	emit someDataChanged();
 	boundActiveBox();
 	updateIndexes(event->pos());
 	update();
@@ -692,7 +679,6 @@ void CaneCustomizeViewWidget :: copySelection()
 	{
 		subcanesSelected.push_back(i+oldCount);
 	}
-	emit someDataChanged();
 	boundActiveBox();
 	update();
 }
@@ -719,7 +705,6 @@ void CaneCustomizeViewWidget :: deleteSelection()
 	hoveringIndex = -1;
 	activeBoxIndex = -1;
 	activeControlPoint = -1;
-	emit someDataChanged();
 	boundActiveBox();
 	update();
 }
@@ -742,7 +727,6 @@ void CaneCustomizeViewWidget :: addCircleClicked()
 	undoRedo->modifiedCane(cane);
 	subcanesSelected.clear();
 	subcanesSelected.push_back(cane->subpullCount()-1);
-	emit someDataChanged();
 	boundActiveBox();
 	update();
 }
@@ -764,7 +748,6 @@ void CaneCustomizeViewWidget :: addSquareClicked()
 	undoRedo->modifiedCane(cane);
 	subcanesSelected.clear();
 	subcanesSelected.push_back(cane->subpullCount()-1);
-	emit someDataChanged();
 	boundActiveBox();
 	update();
 }

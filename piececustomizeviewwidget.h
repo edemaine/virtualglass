@@ -19,9 +19,6 @@ class PieceCustomizeViewWidget : public QWidget
 		QRect usedRect();
 		void resetZoom();
 	
-	signals:
-		void someDataChanged();
-
 	protected:
 		void mousePressEvent(QMouseEvent* event);
 		void mouseMoveEvent(QMouseEvent* event);

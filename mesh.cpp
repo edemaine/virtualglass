@@ -5,7 +5,6 @@
 #include "constants.h"
 #include "glasscolor.h"
 #include "cane.h"
-#include "pickup.h"
 #include "piece.h"
 #include "subcanetemplate.h"
 #include "spline.h"

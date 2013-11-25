@@ -12,7 +12,6 @@
 #include "subpickuptemplate.h"
 #include "templateparameter.h"
 #include "piecetemplate.h"
-#include "pickup.h"
 #include "glasscolor.h"
 #include "spline.h"
 
@@ -38,8 +37,8 @@ class Piece : public QObject
 		Piece* copy() const;
 		void set(Piece* p);
 
-		bool hasDependencyOn(GlassColor* c);
-		bool hasDependencyOn(Cane* p);
+		bool hasDependencyOn(GlassColor* c) const;
+		bool hasDependencyOn(Cane* p) const;
 
 		SubpickupTemplate subpickupTemplate(unsigned int index) const;
 		void setSubpickupTemplate(SubpickupTemplate t, unsigned int index);
@@ -47,7 +46,6 @@ class Piece : public QObject
 
 		void setTwist(float t);
 		float twist() const;
-		float* twistPtr();
 
 		void setSpline(Spline s);
 		Spline spline() const;

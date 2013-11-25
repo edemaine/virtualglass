@@ -29,10 +29,6 @@ class CaneCustomizeViewWidget : public QWidget
 		void copySelectionClicked();
 		void deleteSelectionClicked();
 	
-	signals:
-		void someDataChanged();
-		void caneChanged(Cane* c);
-
 	public slots:
 		void updateEverything();
 
@@ -82,9 +78,6 @@ class CaneCustomizeViewWidget : public QWidget
 		float squareSize;
 
 		int boundingBoxSpace;
-
-	public slots:
-		void setCustomTemplate();
 };
 
 #endif // CANECUSTOMIZEVIEWWIDGET_H

@@ -25,9 +25,6 @@ class CaneEditorViewWidget : public QWidget
 		QRect usedRect();
 		static QPixmap renderCane(Cane* cane);
 	
-	signals:
-		void someDataChanged();
-
 	protected:
 		void mousePressEvent(QMouseEvent* event);
 		void mouseMoveEvent(QMouseEvent* event);

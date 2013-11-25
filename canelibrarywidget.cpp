@@ -11,6 +11,7 @@ CaneLibraryWidget :: CaneLibraryWidget(Cane *_cane, MainWindow *_window)
 {
 	setFixedSize(100, 100);
 	updatePixmaps();
+	connect(this->cane, SIGNAL(modified()), this, SLOT(updatePixmaps()));
 }
 
 void CaneLibraryWidget :: updatePixmaps()

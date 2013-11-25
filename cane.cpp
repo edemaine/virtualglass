@@ -1,4 +1,6 @@
 
+#include <QDebug>
+
 #include "casing.h"
 #include "glasscolor.h"
 #include "constants.h"
@@ -30,7 +32,7 @@ Cane :: Cane(CaneTemplate::Type t)
 	setTemplateType(t);
 }
 
-bool Cane :: hasDependencyOn(GlassColor* glassColor)
+bool Cane :: hasDependencyOn(GlassColor* glassColor) const
 {
 	for (unsigned int i = 0; i < this->casings_.size(); ++i)
 	{
@@ -45,7 +47,7 @@ bool Cane :: hasDependencyOn(GlassColor* glassColor)
 	return childrenAreDependent;
 }
 
-bool Cane :: hasDependencyOn(Cane* cane)
+bool Cane :: hasDependencyOn(Cane* cane) const
 {
 	if (this == cane)
 		return true;
@@ -102,20 +104,20 @@ void Cane :: dependencyModified()
 	emit modified();
 }
 
-void Cane :: setTemplateType(CaneTemplate::Type t)
+void Cane :: setTemplateType(CaneTemplate::Type type)
 {
-	if (t == this->type_)
+	if (type == this->type_)
 		return;
 
 	// if you're switching to a template where count matters, and it's a funky value,
 	// set it to something more reasonable
-	if (this->count_ < 2 && templateHasSubcanes(t))
+	if (this->count_ < 2 && templateHasSubcanes(type))
 		this->count_ = 7;
 
-	this->type_ = t;
+	this->type_ = type;
 
 	vector<Casing> &casings = this->casings_;
-	switch (t) 
+	switch (type) 
 	{
 		case CaneTemplate::BASE_CIRCLE:
 			casings[0].shape = CIRCLE_SHAPE;
@@ -158,11 +160,15 @@ void Cane :: setTemplateType(CaneTemplate::Type t)
 	resetSubcanes(true); // emits modified()
 }
 
-void Cane :: setCasingColor(GlassColor* gc, unsigned int index) 
+void Cane :: setCasingColor(GlassColor* glassColor, unsigned int index) 
 {
 	if (index >= this->casings_.size())
 		return;
-	this->casings_[index].glassColor = gc;
+	GlassColor* old = this->casings_[index].glassColor;
+	this->casings_[index].glassColor = NULL;
+	this->removeCasingDependency(old);
+	this->casings_[index].glassColor = glassColor;
+	this->addCasingDependency(glassColor);
 	emit modified();
 }
 
@@ -172,25 +178,25 @@ void Cane :: setOutermostCasingColor(GlassColor* gc)
 	setCasingColor(gc, last);
 }
 
-const GlassColor* Cane :: casingColor(unsigned int index) 
+const GlassColor* Cane :: casingColor(unsigned int index) const 
 {
 	if (index >= this->casings_.size())
 		return NULL;
 	return this->casings_[index].glassColor;
 }
 
-const GlassColor* Cane :: outermostCasingColor() 
+const GlassColor* Cane :: outermostCasingColor() const
 {
 	int last = this->casings_.size()-1;
 	return casingColor(last);
 }
 
-bool Cane :: hasMinimumCasingCount() 
+bool Cane :: hasMinimumCasingCount() const 
 {
 	return (this->casings_.size() < 2);
 }	
 		
-unsigned int Cane :: casingCount() 
+unsigned int Cane :: casingCount() const 
 {
 	return this->casings_.size();
 }
@@ -200,7 +206,7 @@ enum CaneTemplate::Type Cane :: templateType() const
 	return this->type_;
 }
 
-unsigned int Cane :: count()
+unsigned int Cane :: count() const
 {
 	return this->count_;
 }
@@ -226,7 +232,7 @@ void Cane :: removeCasing()
 	float diff = 1.0 - casings[count-2].thickness;
 	Casing removedCasing = casings.back();
 	casings.pop_back();
-	removeCasingDependency(removedCasing.glassColor);
+	this->removeCasingDependency(removedCasing.glassColor);
 	casings[count-2].thickness = 1.0;
 	for (unsigned int i = 0; i < casings.size()-1; ++i) 
 	{
@@ -272,7 +278,7 @@ void Cane :: addCasing(enum GeometricShape _shape)
 
 	// add the new casing
 	casings.push_back(Casing(1.0, _shape, GlobalGlass::color()));
-	addCasingDependency(GlobalGlass::color());
+	this->addCasingDependency(GlobalGlass::color());
 	if (this->outermostCasingShape() != CIRCLE_SHAPE)
 		this->twist_ = 0.0;
 
@@ -345,18 +351,18 @@ void Cane :: setOutermostCasingShape(enum GeometricShape _shape)
 	resetSubcanes(false); // calls emit modified
 }
 
-float Cane :: casingThickness(unsigned int index) 
+float Cane :: casingThickness(unsigned int index) const 
 {
 	return this->casings_[index].thickness;
 }
 
-enum GeometricShape Cane :: outermostCasingShape() 
+enum GeometricShape Cane :: outermostCasingShape() const 
 {
 	int last = this->casings_.size()-1;
 	return casingShape(last);
 }
 
-enum GeometricShape Cane :: casingShape(unsigned int index) 
+enum GeometricShape Cane :: casingShape(unsigned int index) const
 {
 	return this->casings_[index].shape;
 }
@@ -592,38 +598,42 @@ void Cane :: resetSubcanes(bool hardReset)
 	emit modified();
 }
 
-SubcaneTemplate Cane :: subcaneTemplate(unsigned int index)
+SubcaneTemplate Cane :: subcaneTemplate(unsigned int index) const
 {
 	return this->subcanes_[index];
 }
 
-void Cane :: setSubcaneTemplate(SubcaneTemplate t, unsigned int index)
+void Cane :: setSubcaneTemplate(SubcaneTemplate subcane, unsigned int index)
 {
-	this->subcanes_[index] = t;
+	Cane* old = this->subcanes_[index].cane;
+	this->subcanes_[index].cane = NULL;
+	this->removeSubcaneDependency(old);
+	this->subcanes_[index] = subcane;
+	this->addSubcaneDependency(subcane.cane);
 	emit modified();
 }
 
 void Cane :: addSubcaneTemplate(SubcaneTemplate t)
 {
 	this->subcanes_.push_back(t);
-	addSubcaneDependency(t.cane);
+	this->addSubcaneDependency(t.cane);
 	emit modified();
 }
 
 void Cane :: removeSubcaneTemplate(unsigned int index)
 {
-	SubcaneTemplate t = this->subcanes_[index];
+	SubcaneTemplate old = this->subcanes_[index];
 	this->subcanes_.erase(this->subcanes_.begin() + index);
-	removeSubcaneDependency(t.cane);
+	this->removeSubcaneDependency(old.cane);
 	emit modified();
 }
 
-unsigned int Cane :: subpullCount()
+unsigned int Cane :: subpullCount() const
 {
 	return this->subcanes_.size();
 }
 
-float Cane :: twist()
+float Cane :: twist() const
 {
 	return this->twist_;
 }
@@ -632,11 +642,6 @@ void Cane :: setTwist(float t)
 {
 	this->twist_ = t;
 	emit modified();
-}
-
-float* Cane :: twistPtr()
-{
-	return &(this->twist_);
 }
 
 Cane* Cane :: copy() const 

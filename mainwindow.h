@@ -63,9 +63,6 @@ class MainWindow : public QMainWindow
 		void contextMenuEvent(QContextMenuEvent *event);
 		bool eventFilter(QObject* obj, QEvent* event);
 
-	signals:
-		void someDataChanged();
-
 	private:
 		enum ViewMode
 		{
@@ -159,7 +156,7 @@ class MainWindow : public QMainWindow
 		UndoRedo* undoRedo;
 
 	private slots:
-		void setDirtyBitTrue();
+		void glassObjectModified();
 		void attemptToQuit();
 
 		// menu slots
@@ -185,11 +182,6 @@ class MainWindow : public QMainWindow
 		void newGlassColorButtonClicked();
 		void newCaneButtonClicked();
 		void newPieceButtonClicked();
-		void editorChangedData();
-		void updateLibrary();
-		void updateLibrary(GlassColor* gc);
-		void updateLibrary(Cane* c);
-		void updateLibrary(Piece* p);
 		void updateLibraryHighlighting();
 
 		// Status bar slots

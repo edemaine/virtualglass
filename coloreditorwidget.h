@@ -33,18 +33,11 @@ class ColorEditorWidget : public QWidget
 		ColorEditorWidget(UndoRedo* undoRedo, QWidget* parent=0);
 		void resetGlassColor();
 		void setGlassColor(GlassColor* _color);
-		void updateEverything();
-		GlassColor* glassColor();
+		GlassColor* glassColor() const;
 		NiceViewWidget* niceViewWidget;
-		void undo();
-		void redo();
-		bool canUndo();
-		bool canRedo();
-
-	signals:
-		void someDataChanged();
 
 	public slots:
+		void updateEverything();
 		void setColorProperties(GlassColor* color);
 
 	private slots:
@@ -55,7 +48,7 @@ class ColorEditorWidget : public QWidget
 	private:
 		UndoRedo* undoRedo;
 		Geometry geometry;
-		GlassColor* color;	
+		GlassColor* glassColor_;	
 		QComboBox* collectionComboBox;
 		QGridLayout* editorLayout;
 		QSlider* alphaSlider;

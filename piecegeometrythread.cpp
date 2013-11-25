@@ -25,7 +25,7 @@ void PieceGeometryThread::run()
 
 		// get a copy of the piece
 		pew->tempPieceMutex.lock();
-		Piece* myTempPiece = deep_copy(pew->tempPiece);
+		Piece* myTempPiece = deep_copy(pew->tempPiece_);
 		pew->tempPieceDirty = false;
 		pew->tempPieceMutex.unlock();	
 		

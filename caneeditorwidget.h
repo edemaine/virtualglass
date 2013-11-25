@@ -47,9 +47,11 @@ class CaneEditorWidget : public QWidget
 		void seedTemplates();
 		void writeCaneToPLYFile(QString& filename);
 		void writeCaneToOBJFile(QString& filename);
-		void updateEverything();
 		QImage caneImage();
 		void reset3DCamera();
+
+	public slots:
+		void updateEverything();
 
 	protected:
 		bool eventFilter(QObject* obj, QEvent* event);
@@ -58,7 +60,6 @@ class CaneEditorWidget : public QWidget
 		void mouseReleaseEvent(QMouseEvent* event);
 
 	signals:
-		void someDataChanged();
 		void showMessage(const QString& message, unsigned int timeout);
 
 	private slots:
@@ -70,7 +71,6 @@ class CaneEditorWidget : public QWidget
 		void addSquareButtonClicked();
 		void copySelectedButtonClicked();
 		void deleteSelectedButtonClicked();
-		void childWidgetDataChanged();
 		void twistEnded();
 		void countSpinChanged(int);
 		void controlsTabChanged(int);
@@ -92,7 +92,7 @@ class CaneEditorWidget : public QWidget
 		Geometry tempGeometry;
 
 		Geometry geometry;
-		Cane* _cane;
+		Cane* cane_;
 		CaneEditorViewWidget* viewWidget;	
 		CaneCustomizeViewWidget* customizeViewWidget;	
 		NiceViewWidget* niceViewWidget;

@@ -9,13 +9,17 @@ class QDoubleSpinBox;
 class QSlider;
 class QPushButton;
 
+class Cane;
+class Piece;
+
 class TwistWidget : public QWidget
 {
 	Q_OBJECT
 
 	public:
-		TwistWidget(float* twist, unsigned int range, QWidget* parent=0);
-		void setTwist(float* twist);
+		TwistWidget(Cane* c, Piece* p, unsigned int r, QWidget* parent=0);
+		void setCane(Cane* c);
+		void setPiece(Piece* p);
 
 	protected:
 		bool eventFilter(QObject* obj, QEvent* event);
@@ -35,7 +39,8 @@ class TwistWidget : public QWidget
 	private:
 		QDoubleSpinBox* spin;
 		QSlider* slider;
-		float* twist;
+		Cane* cane;
+		Piece* piece;
 		unsigned int range;
 };
 

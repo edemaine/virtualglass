@@ -18,6 +18,7 @@ GlassColorLibraryWidget :: GlassColorLibraryWidget(GlassColor* _glassColor, Main
 		squareCane = new Cane(CaneTemplate::BASE_SQUARE);
 	squareCane->setOutermostCasingColor(_glassColor);
 	updatePixmaps();
+	connect(this->glassColor, SIGNAL(modified()), this, SLOT(updatePixmaps()));
 }
 
 void GlassColorLibraryWidget :: paintEvent(QPaintEvent *event)

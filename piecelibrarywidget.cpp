@@ -1,6 +1,7 @@
 
 
 #include "piecelibrarywidget.h"
+#include "piece.h"
 
 PieceLibraryWidget :: PieceLibraryWidget(Piece* _piece, MainWindow* _window)
 	: AsyncRenderWidget(_window), piece(_piece)
@@ -10,6 +11,7 @@ PieceLibraryWidget :: PieceLibraryWidget(Piece* _piece, MainWindow* _window)
 	eyePosition.y = 0.0;
 	eyePosition.z = 0.0;
 	updatePixmap();
+	connect(this->piece, SIGNAL(modified()), this, SLOT(updatePixmap()));
 }
 
 void PieceLibraryWidget :: updateEyePosition(Vector3f _eyePosition)

@@ -13,11 +13,10 @@ PieceCustomizeViewWidget :: PieceCustomizeViewWidget(Piece* _piece, UndoRedo* un
 	setMinimumSize(200, 200);
 	this->piece = _piece;
 	this->zoom = this->defaultZoom = 12.0;
-
 	this->undoRedo = undoRedo;
-
 	isDraggingControlPoint = false;
 	draggedControlPointIndex = 0;
+	connect(this->piece, SIGNAL(modified()), this, SLOT(updateEverything()));
 }
 
 void PieceCustomizeViewWidget :: resetZoom()
@@ -152,7 +151,6 @@ void PieceCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 		spline.set(draggedControlPointIndex, p);
 		piece->setSpline(spline);
 	}
-	emit someDataChanged();
 }
 
 void PieceCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent*)
@@ -171,7 +169,9 @@ void PieceCustomizeViewWidget :: updateEverything()
 
 void PieceCustomizeViewWidget :: setPiece(Piece* _piece)
 {
+	disconnect(this->piece, SIGNAL(modified()), this, SLOT(updateEverything()));
 	this->piece = _piece;
+	connect(this->piece, SIGNAL(modified()), this, SLOT(updateEverything()));
 	resetZoom();
 	updateEverything();
 }

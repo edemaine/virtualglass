@@ -75,6 +75,7 @@ Spline Piece::spline() const
 void Piece :: setTwist(float t)
 {
 	this->twist_ = t;
+	emit modified();
 }
 
 float Piece :: twist() const
@@ -82,17 +83,12 @@ float Piece :: twist() const
 	return this->twist_;
 }
 
-float* Piece :: twistPtr()
-{
-	return &(this->twist_);
-}
-
 void Piece :: dependencyModified()
 {
 	emit modified();
 }
 
-bool Piece :: hasDependencyOn(Cane* cane)
+bool Piece :: hasDependencyOn(Cane* cane) const
 {
 	bool pickupsDependOn = false;
 
@@ -108,7 +104,7 @@ bool Piece :: hasDependencyOn(Cane* cane)
 	return pickupsDependOn;
 }
 
-bool Piece :: hasDependencyOn(GlassColor* glassColor)
+bool Piece :: hasDependencyOn(GlassColor* glassColor) const
 {
 	bool pickupsDependOn = false;
 
@@ -196,6 +192,7 @@ void Piece :: set(Piece* p)
 	}
 	this->pickupParameters_ = p->pickupParameters_;
 	this->pickupType_ = p->pickupType_;
+	emit modified();
 }
 
 void Piece :: setPieceTemplateType(enum PieceTemplate::Type type, bool force)
@@ -272,7 +269,7 @@ void Piece :: setPieceTemplateType(enum PieceTemplate::Type type, bool force)
 		case PieceTemplate::CUSTOM:
 			break;
 	}
-
+	emit modified();
 }
 
 enum PieceTemplate::Type Piece :: pieceTemplateType() const
@@ -285,9 +282,14 @@ SubpickupTemplate Piece :: subpickupTemplate(unsigned int index) const
 	return this->subcanes_[index];
 }
 
-void Piece :: setSubpickupTemplate(SubpickupTemplate t, unsigned int index)
+void Piece :: setSubpickupTemplate(SubpickupTemplate subcane, unsigned int index)
 {
-	this->subcanes_[index] = t;
+	Cane* old = this->subcanes_[index].cane;
+	this->subcanes_[index].cane = NULL;
+	this->removeSubcaneDependency(old);
+	this->subcanes_[index] = subcane;
+	this->addSubcaneDependency(subcane.cane);	
+	emit modified();
 }
 
 unsigned int Piece :: subpickupCount() const
@@ -317,6 +319,7 @@ void Piece :: setOverlayGlassColor(GlassColor* glassColor)
 	this->removeCasingDependency(old);
 	this->overlayGlassColor_ = glassColor;
 	this->addCasingDependency(old);
+	emit modified();
 }
 
 void Piece :: setUnderlayGlassColor(GlassColor* glassColor)
@@ -326,6 +329,7 @@ void Piece :: setUnderlayGlassColor(GlassColor* glassColor)
 	this->removeCasingDependency(old);
 	this->underlayGlassColor_ = glassColor;
 	this->addCasingDependency(old);
+	emit modified();
 }
 
 void Piece :: setCasingGlassColor(GlassColor* glassColor)
@@ -335,6 +339,7 @@ void Piece :: setCasingGlassColor(GlassColor* glassColor)
 	this->removeCasingDependency(old);
 	this->casingGlassColor_ = glassColor;
 	this->addCasingDependency(old);
+	emit modified();
 }
 
 void Piece :: pushNewSubcane(vector<SubpickupTemplate>* newSubcanes,
@@ -602,12 +607,13 @@ Piece *deep_copy(const Piece *_piece)
 void deep_delete(Piece *piece) 
 {
 	assert(piece);
+	vector<SubpickupTemplate> subcanes;
         for (unsigned int i = 0; i < piece->subpickupCount(); ++i)
+		subcanes.push_back(piece->subpickupTemplate(i));
+        for (unsigned int i = 0; i < subcanes.size(); ++i)
         {
-                SubpickupTemplate t = piece->subpickupTemplate(i);
-                delete t.cane;
-                t.cane = NULL;
-                piece->setSubpickupTemplate(t, i);
+                delete subcanes[i].cane;
+                subcanes[i].cane = NULL;
         }	
 	delete piece;
 }

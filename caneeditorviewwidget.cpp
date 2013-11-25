@@ -27,7 +27,6 @@ CaneEditorViewWidget :: CaneEditorViewWidget(Cane* cane, UndoRedo* undoRedo, QWi
 	isDraggingCasing = false;
 }
 
-
 QRect CaneEditorViewWidget :: usedRect()
 {
 	return QRect(drawUpperLeft.x, drawUpperLeft.y, squareSize, squareSize);
@@ -245,16 +244,12 @@ void CaneEditorViewWidget :: mouseMoveEvent(QMouseEvent* event)
 
 	setMinMaxCasingRadii(&min, &max);	
 	cane->setCasingThickness(MIN(MAX(radius, min), max), draggedCasingIndex);
-	updateEverything();
-	emit someDataChanged();
 }
 
 void CaneEditorViewWidget :: mouseReleaseEvent(QMouseEvent*)
 {
 	isDraggingCasing = false;
 	undoRedo->modifiedCane(cane);
-	updateEverything();
-	emit someDataChanged();
 }
 
 void CaneEditorViewWidget :: dragEnterEvent(QDragEnterEvent* event)
@@ -449,8 +444,6 @@ void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 	subcanesHighlighted.clear();
 	casingsHighlighted.clear();
 	undoRedo->modifiedCane(cane);
-	updateEverything();
-	emit someDataChanged();
 }
 
 void CaneEditorViewWidget :: updateEverything()

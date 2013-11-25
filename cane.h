@@ -32,40 +32,39 @@ class Cane : public QObject
 		enum CaneTemplate::Type templateType() const;
 
 		void setCount(unsigned int count);
-		unsigned int count();
+		unsigned int count() const;
 
 		void setCasingThickness(float t, unsigned int index);
-		float casingThickness(unsigned int index);
+		float casingThickness(unsigned int index) const;
 
 		void setOutermostCasingShape(enum GeometricShape s);
-		enum GeometricShape casingShape(unsigned int index);
-		enum GeometricShape outermostCasingShape();
+		enum GeometricShape casingShape(unsigned int index) const;
+		enum GeometricShape outermostCasingShape() const;
 
 		void setCasingColor(GlassColor* gc, unsigned int index);
 		void setOutermostCasingColor(GlassColor* gc);
-		const GlassColor* casingColor(unsigned int index);
-		const GlassColor* outermostCasingColor();
+		const GlassColor* casingColor(unsigned int index) const;
+		const GlassColor* outermostCasingColor() const;
 
-		float twist();
+		float twist() const;
 		void setTwist(float t);
-		float* twistPtr();
 
 		void addCasing(enum GeometricShape s);
 		void removeCasing();
-		unsigned int casingCount(); 
-		bool hasMinimumCasingCount();
+		unsigned int casingCount() const; 
+		bool hasMinimumCasingCount() const;
 
 		Cane* copy() const;
 		void set(Cane* c);
 
-		SubcaneTemplate subcaneTemplate(unsigned int index);
+		SubcaneTemplate subcaneTemplate(unsigned int index) const;
 		void setSubcaneTemplate(SubcaneTemplate t, unsigned int index);	
 		void addSubcaneTemplate(SubcaneTemplate t);
 		void removeSubcaneTemplate(unsigned int index);
-		unsigned int subpullCount();	
+		unsigned int subpullCount() const;	
 
-		bool hasDependencyOn(GlassColor* color);
-		bool hasDependencyOn(Cane* cane);
+		bool hasDependencyOn(GlassColor* color) const;
+		bool hasDependencyOn(Cane* cane) const;
 
 	signals:
 		void modified();

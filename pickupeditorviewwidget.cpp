@@ -26,15 +26,9 @@ PickupEditorViewWidget :: PickupEditorViewWidget(Piece* piece, UndoRedo* undoRed
 	this->setLayout(layout);
 	layout->addWidget(niceViewWidget, 1);
 	layout->setContentsMargins(0, 0, 0, 0);
-
 	this->undoRedo = undoRedo;
 
-	setupConnections();
-}
-
-void PickupEditorViewWidget :: setupConnections()
-{
-	connect(this, SIGNAL(someDataChanged()), this, SLOT(updateEverything()));
+	connect(this->piece, SIGNAL(modified()), this, SLOT(updateEverything()));
 }
 
 void PickupEditorViewWidget :: subcaneAt(float x, float y, Cane** subcane, int* subcaneIndex)
@@ -224,7 +218,6 @@ void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 			this->piece->setSubpickupTemplate(t, subcaneIndex);
 		}
 		undoRedo->modifiedPiece(piece);
-		emit someDataChanged();
 	}
 	else
 	{
@@ -234,7 +227,9 @@ void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 
 void PickupEditorViewWidget :: setPiece(Piece* _piece)
 {
+	disconnect(this->piece, SIGNAL(modified()), this, SLOT(updateEverything())); 
 	this->piece = _piece;
+	connect(this->piece, SIGNAL(modified()), this, SLOT(updateEverything())); 
 	updateEverything();
 }
 

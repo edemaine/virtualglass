@@ -40,7 +40,7 @@ class PieceEditorWidget : public QWidget
 	public:
 		PieceEditorWidget(UndoRedo* undoRedo, QWidget* parent=0);
 		void resetPiece();
-		Piece* piece();
+		Piece* piece() const;
 		void updateLibraryWidgetPixmaps(PieceLibraryWidget* w);
 		void seedTemplates();
 		void setPiece(Piece* p);
@@ -51,10 +51,9 @@ class PieceEditorWidget : public QWidget
 		void writePieceToOBJFile(QString& filename);
 		void reset3DCamera();
 		QImage pieceImage();
-		void undo();
-		void redo();
-		bool canUndo();
-		bool canRedo();
+	
+	public slots:
+		void updateEverything();
 
 	protected:
 		bool eventFilter(QObject* obj, QEvent* event);
@@ -63,15 +62,10 @@ class PieceEditorWidget : public QWidget
 		void mouseReleaseEvent(QMouseEvent*);
 
 	signals:
-		void someDataChanged();
 		void showMessage(const QString& message, unsigned int timeout);
-
-	public slots:
-		void updateEverything();
 
 	private slots:
 		void pieceControlsTabChanged(int);
-		void childWidgetDataChanged();
 		void twistEnded();
 		void pickupCountSpinChanged(int);
 		void geometryThreadFinishedMesh(bool completed, unsigned int quality);
@@ -79,13 +73,14 @@ class PieceEditorWidget : public QWidget
 		void removeControlPointButtonClicked();
 
 	private:
-		QMutex tempPieceMutex;
-		Piece* tempPiece;
-		bool tempPieceDirty;
+		Piece* piece_;
+		UndoRedo* undoRedo;
 
+		Piece* tempPiece_;
+		QMutex tempPieceMutex;
+		bool tempPieceDirty;
 		QWaitCondition wakeWait;
 		QMutex wakeMutex;
-
 		PieceGeometryThread* geometryThread;
 
 		QMutex geometryDirtyMutex;
@@ -96,8 +91,6 @@ class PieceEditorWidget : public QWidget
 
 		Geometry geometry;
 
-		Piece* _piece;
-		UndoRedo* undoRedo;
 
 		PickupEditorViewWidget* pickupViewWidget;	
 		PieceCustomizeViewWidget* pieceCustomizeViewWidget;

@@ -22,9 +22,6 @@ class PickupEditorViewWidget : public QWidget
 		PickupEditorViewWidget(Piece* piece, UndoRedo* undoRedo, QWidget* parent=0);
 		void setPiece(Piece* p);
 
-	signals:
-		void someDataChanged();
-
 	public slots:
 		void updateEverything();
 
@@ -41,7 +38,6 @@ class PickupEditorViewWidget : public QWidget
 		UndoRedo* undoRedo;
 		float ulX, ulY, squareSize;
 
-		void setupConnections();
 		float adjustedX(float rawX);
 		float adjustedY(float rawX);
 		float rawX(float adjustedX);

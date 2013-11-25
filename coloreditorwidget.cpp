@@ -25,7 +25,7 @@
 
 ColorEditorWidget :: ColorEditorWidget(UndoRedo* undoRedo, QWidget* parent) : QWidget(parent)
 {
-	resetGlassColor();
+	this->glassColor_ = new GlassColor();
 
 	niceViewWidget = new NiceViewWidget(NiceViewWidget::GLASSCOLOR_CAMERA_MODE, this);
 	niceViewWidget->setGeometry(&geometry);
@@ -40,17 +40,19 @@ ColorEditorWidget :: ColorEditorWidget(UndoRedo* undoRedo, QWidget* parent) : QW
 
 void ColorEditorWidget :: resetGlassColor()
 {
-	color = new GlassColor();
+	setGlassColor(new GlassColor());
 }
 
-GlassColor* ColorEditorWidget :: glassColor() 
+GlassColor* ColorEditorWidget :: glassColor() const 
 {
-	return color;
+	return this->glassColor_;
 }
 
-void ColorEditorWidget :: setGlassColor(GlassColor* _color) 
+void ColorEditorWidget :: setGlassColor(GlassColor* color) 
 {
-	color = _color;
+	disconnect(this->glassColor_, SIGNAL(modified()), this, SLOT(updateEverything()));
+	this->glassColor_= color;
+	connect(this->glassColor_, SIGNAL(modified()), this, SLOT(updateEverything()));
 	updateEverything();
 }
 
@@ -126,6 +128,7 @@ void ColorEditorWidget :: setupConnections()
 	connect(collectionComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(collectionComboBoxChanged(int)));
 	connect(alphaSlider, SIGNAL(valueChanged(int)), this, SLOT(alphaSliderPositionChanged(int)));
 	connect(alphaSlider, SIGNAL(sliderReleased()), this, SLOT(alphaSliderChangeEnded()));
+	connect(this->glassColor_, SIGNAL(modified()), this, SLOT(updateEverything()));
 }
 
 bool compareGlassColors(GlassColor* c1, GlassColor* c2)
@@ -180,38 +183,31 @@ void ColorEditorWidget :: loadCollection(QString fileName)
 
 void ColorEditorWidget :: alphaSliderChangeEnded()
 {
-	undoRedo->modifiedGlassColor(this->color);
+	undoRedo->modifiedGlassColor(this->glassColor_);
 }
 
 void ColorEditorWidget :: alphaSliderPositionChanged(int)
 {
-	if (alphaSlider->sliderPosition() == static_cast<int>(color->color().a * 255))
+	if (alphaSlider->sliderPosition() == static_cast<int>(this->glassColor_->color().a * 255))
 		return;
 
-	Color c = color->color();
+	Color c = this->glassColor_->color();
 	c.a = (255 - alphaSlider->sliderPosition()) / 255.0;
-	color->setColor(c);
-	updateEverything();
-	emit someDataChanged();
+	this->glassColor_->setColor(c);
 }
 
 void ColorEditorWidget :: setColorProperties(GlassColor* color)
 {
-	this->color->setColor(color->color());
-	this->color->setShortName(color->shortName());
-	this->color->setLongName(color->longName());
-	undoRedo->modifiedGlassColor(this->color);
-
-	updateEverything();
-	emit someDataChanged();	
+	this->glassColor_->set(color);
+	undoRedo->modifiedGlassColor(this->glassColor_);
 }
 
 void ColorEditorWidget :: updateEverything()
 {
-	generateMesh(color, &geometry, GlobalGraphicsSetting::VERY_HIGH);
+	generateMesh(this->glassColor_, &geometry, GlobalGraphicsSetting::VERY_HIGH);
 	niceViewWidget->repaint();
 
-	this->alphaSlider->setSliderPosition(255 - (int) (color->color().a * 255));
+	this->alphaSlider->setSliderPosition(255 - static_cast<int>(this->glassColor_->color().a * 255));
 
 	QLayoutItem* w;
 	PureColorLibraryWidget* pclw;
@@ -223,7 +219,7 @@ void ColorEditorWidget :: updateEverything()
 			// but we could do something fancier, checking that the names match
 			w = colorLibraryLayouts[i]->itemAt(j);
 			pclw = dynamic_cast<PureColorLibraryWidget*>(w->widget());
-			if (color->shortName().compare(pclw->shortName()) == 0)
+			if (this->glassColor_->shortName().compare(pclw->shortName()) == 0)
 				pclw->setSelected(true);
 			else
 				pclw->setSelected(false);

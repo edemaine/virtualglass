@@ -338,6 +338,7 @@ void UndoRedo :: undoGlassColorEvent(struct Event& event)
 				int r = (event.index == 0) ? 1 : event.index-1;
 				mainWindow->glassColorEditorWidget->setGlassColor(dynamic_cast<GlassColorLibraryWidget*>(
 					dynamic_cast<QWidgetItem*>(mainWindow->glassColorLibraryLayout->itemAt(r))->widget())->glassColor);
+				mainWindow->glassObjectModified();
 			}
 			else
 				mainWindow->setViewMode(MainWindow::EMPTY_VIEW_MODE);
@@ -350,11 +351,10 @@ void UndoRedo :: undoGlassColorEvent(struct Event& event)
 		case DELETE:
                         mainWindow->glassColorLibraryLayout->insertWidget(
 				event.index, new GlassColorLibraryWidget(event.glassColor, mainWindow));
+			mainWindow->glassObjectModified();
 			break;
 		case MODIFY:
 			event.glassColor->set(event.preGlassColorState);
-			mainWindow->updateLibrary(event.glassColor);
-			mainWindow->updateCurrentEditor();
 			break;
 		case MOVE:
 		{
@@ -378,6 +378,7 @@ void UndoRedo :: undoCaneEvent(struct Event& event)
 				int r = (event.index == 0) ? 1 : event.index-1;
 				mainWindow->caneEditorWidget->setCane(dynamic_cast<CaneLibraryWidget*>(
 					dynamic_cast<QWidgetItem*>(mainWindow->caneLibraryLayout->itemAt(r))->widget())->cane);
+				mainWindow->glassObjectModified();
 			}
 			else
 				mainWindow->setViewMode(MainWindow::EMPTY_VIEW_MODE);
@@ -389,11 +390,10 @@ void UndoRedo :: undoCaneEvent(struct Event& event)
 		}
 		case DELETE:
                         mainWindow->caneLibraryLayout->insertWidget(event.index, new CaneLibraryWidget(event.cane, mainWindow));
+			mainWindow->glassObjectModified();
 			break;
 		case MODIFY:
 			event.cane->set(event.preCaneState);
-			mainWindow->updateLibrary(event.cane);
-			mainWindow->updateCurrentEditor();
 			break;
 		case MOVE:
 		{
@@ -417,6 +417,7 @@ void UndoRedo :: undoPieceEvent(struct Event& event)
 				int r = (event.index == 0) ? 1 : event.index-1;
 				mainWindow->pieceEditorWidget->setPiece(dynamic_cast<PieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem*>(mainWindow->pieceLibraryLayout->itemAt(r))->widget())->piece);
+				mainWindow->glassObjectModified();
 			}
 			else
 				mainWindow->setViewMode(MainWindow::EMPTY_VIEW_MODE);
@@ -428,11 +429,10 @@ void UndoRedo :: undoPieceEvent(struct Event& event)
 		}
 		case DELETE:
                         mainWindow->pieceLibraryLayout->insertWidget(event.index, new PieceLibraryWidget(event.piece, mainWindow));
+			mainWindow->glassObjectModified();
 			break;
 		case MODIFY:
 			event.piece->set(event.prePieceState);
-			mainWindow->updateLibrary(event.piece);
-			mainWindow->updateCurrentEditor();
 			break;
 		case MOVE:
 		{
@@ -505,6 +505,7 @@ void UndoRedo :: redoGlassColorEvent(struct Event& event)
 		case ADD:
                         mainWindow->glassColorLibraryLayout->insertWidget(
 				event.index, new GlassColorLibraryWidget(event.glassColor, mainWindow));
+			mainWindow->glassObjectModified();
 			break;
 		case DELETE:
 		{
@@ -513,6 +514,7 @@ void UndoRedo :: redoGlassColorEvent(struct Event& event)
 				int r = (event.index == 0) ? 1 : event.index-1;
 				mainWindow->glassColorEditorWidget->setGlassColor(dynamic_cast<GlassColorLibraryWidget*>(
 					dynamic_cast<QWidgetItem*>(mainWindow->glassColorLibraryLayout->itemAt(r))->widget())->glassColor);
+				mainWindow->glassObjectModified();
 			}
 			else
 				mainWindow->setViewMode(MainWindow::EMPTY_VIEW_MODE);
@@ -524,8 +526,6 @@ void UndoRedo :: redoGlassColorEvent(struct Event& event)
 		}
 		case MODIFY:
 			event.glassColor->set(event.postGlassColorState);
-			mainWindow->updateLibrary(event.glassColor);
-			mainWindow->updateCurrentEditor();
 			break;
 		case MOVE:
 		{
@@ -544,6 +544,7 @@ void UndoRedo :: redoCaneEvent(struct Event& event)
 	{
 		case ADD:
                         mainWindow->caneLibraryLayout->insertWidget(event.index, new CaneLibraryWidget(event.cane, mainWindow));
+			mainWindow->glassObjectModified();
 			break;
 		case DELETE:
 		{
@@ -552,6 +553,7 @@ void UndoRedo :: redoCaneEvent(struct Event& event)
 				int r = (event.index == 0) ? 1 : event.index-1;
 				mainWindow->caneEditorWidget->setCane(dynamic_cast<CaneLibraryWidget*>(
 					dynamic_cast<QWidgetItem*>(mainWindow->caneLibraryLayout->itemAt(r))->widget())->cane);
+				mainWindow->glassObjectModified();
 			}
 			else
 				mainWindow->setViewMode(MainWindow::EMPTY_VIEW_MODE);
@@ -563,8 +565,6 @@ void UndoRedo :: redoCaneEvent(struct Event& event)
 		}
 		case MODIFY:
 			event.cane->set(event.postCaneState);
-			mainWindow->updateLibrary(event.cane);
-			mainWindow->updateCurrentEditor();
 			break;
 		case MOVE:
 		{
@@ -584,6 +584,7 @@ void UndoRedo :: redoPieceEvent(struct Event& event)
 	{
 		case ADD:
                         mainWindow->pieceLibraryLayout->insertWidget(event.index, new PieceLibraryWidget(event.piece, mainWindow));
+			mainWindow->glassObjectModified();
 			break;
 		case DELETE:
 		{
@@ -592,6 +593,7 @@ void UndoRedo :: redoPieceEvent(struct Event& event)
 				int r = (event.index == 0) ? 1 : event.index-1;
 				mainWindow->pieceEditorWidget->setPiece(dynamic_cast<PieceLibraryWidget*>(
 					dynamic_cast<QWidgetItem*>(mainWindow->pieceLibraryLayout->itemAt(r))->widget())->piece);
+				mainWindow->glassObjectModified();
 			}
 			else
 				mainWindow->setViewMode(MainWindow::EMPTY_VIEW_MODE);
@@ -603,8 +605,6 @@ void UndoRedo :: redoPieceEvent(struct Event& event)
 		}
 		case MODIFY:
 			event.piece->set(event.postPieceState);
-			mainWindow->updateLibrary(event.piece);
-			mainWindow->updateCurrentEditor();
 			break;
 		case MOVE:
 		{

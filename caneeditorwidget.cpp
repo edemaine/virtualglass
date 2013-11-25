@@ -30,10 +30,10 @@
 
 CaneEditorWidget :: CaneEditorWidget(UndoRedo* undoRedo, QWidget* parent) : QWidget(parent)
 {
-	resetCane();
+	this->cane_ = new Cane(CaneTemplate::HORIZONTAL_LINE_CIRCLE);
 
-	viewWidget = new CaneEditorViewWidget(_cane, undoRedo, this);	
-	customizeViewWidget = new CaneCustomizeViewWidget(_cane, undoRedo, this);
+	viewWidget = new CaneEditorViewWidget(cane_, undoRedo, this);	
+	customizeViewWidget = new CaneCustomizeViewWidget(cane_, undoRedo, this);
 	niceViewWidget = new NiceViewWidget(NiceViewWidget::PULLPLAN_CAMERA_MODE, this);
 	niceViewWidget->setGeometry(&geometry);
 
@@ -71,7 +71,7 @@ void CaneEditorWidget :: reset3DCamera()
 
 void CaneEditorWidget :: resetCane()
 {
-	_cane = new Cane(CaneTemplate::HORIZONTAL_LINE_CIRCLE);
+	this->setCane(new Cane(CaneTemplate::HORIZONTAL_LINE_CIRCLE));
 }
 
 void CaneEditorWidget :: writeCaneToOBJFile(QString& filename)
@@ -87,7 +87,7 @@ void CaneEditorWidget :: writeCaneToPLYFile(QString& filename)
 void CaneEditorWidget :: setupThreading()
 {
 	geometryDirty = false;
-	tempCane = deep_copy(_cane);
+	tempCane = deep_copy(cane_);
 	tempCaneDirty = true;
 	geometryThread = new CaneGeometryThread(this);
 	geometryThread->start();
@@ -96,7 +96,7 @@ void CaneEditorWidget :: setupThreading()
 void CaneEditorWidget :: updateEverything()
 {
 	// set casing buttons
-	switch (_cane->outermostCasingShape())
+	switch (cane_->outermostCasingShape())
 	{
 		case CIRCLE_SHAPE:
 			circleCasingPushButton->setDown(true);
@@ -107,18 +107,18 @@ void CaneEditorWidget :: updateEverything()
 			squareCasingPushButton->setDown(true);
 			break;
 	}
-	removeCasingButton->setEnabled(!_cane->hasMinimumCasingCount());
-	countSpin->setValue(_cane->count());
-	countLabel->setEnabled(_cane->templateType() != CaneTemplate::CUSTOM);
-	countSpin->setEnabled(_cane->templateType() != CaneTemplate::CUSTOM);
+	removeCasingButton->setEnabled(!cane_->hasMinimumCasingCount());
+	countSpin->setValue(cane_->count());
+	countLabel->setEnabled(cane_->templateType() != CaneTemplate::CUSTOM);
+	countSpin->setEnabled(cane_->templateType() != CaneTemplate::CUSTOM);
 	twistWidget->updateEverything();
-	twistWidget->setEnabled(_cane->outermostCasingShape() == CIRCLE_SHAPE);
-	if (_cane->templateType() != CaneTemplate::CUSTOM)
+	twistWidget->setEnabled(cane_->outermostCasingShape() == CIRCLE_SHAPE);
+	if (cane_->templateType() != CaneTemplate::CUSTOM)
 		controlsTab->setCurrentIndex(0);
 	
 	tempCaneMutex.lock();
 	deep_delete(tempCane);
-	tempCane = deep_copy(_cane);
+	tempCane = deep_copy(cane_);
 	tempCaneDirty = true;
 	tempCaneMutex.unlock();
 
@@ -132,7 +132,7 @@ void CaneEditorWidget :: updateEverything()
 	{
 		ptlw = dynamic_cast<CaneTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(templateLibraryLayout->itemAt(i))->widget());
-		ptlw->setHighlighted(ptlw->type == _cane->templateType());
+		ptlw->setHighlighted(ptlw->type == cane_->templateType());
 	}
 
 	viewWidget->updateEverything();
@@ -247,7 +247,7 @@ void CaneEditorWidget :: setupLayout()
 	casingLayout->addWidget(countLabel);
 	casingLayout->addWidget(countSpin);
 
-	twistWidget = new TwistWidget(_cane->twistPtr(), 10, tab1Widget);
+	twistWidget = new TwistWidget(this->cane_, NULL, 10, tab1Widget);
 
 	tab1Layout->addWidget(casingWidget);
 	tab1Layout->addWidget(twistWidget);
@@ -304,45 +304,35 @@ void CaneEditorWidget :: controlsTabChanged(int tab)
 
 	if (tab != 0) // customize mode	
 	{
-		CaneTemplate::Type oldType = _cane->templateType();
-		_cane->setTemplateType(CaneTemplate::CUSTOM);				
+		CaneTemplate::Type oldType = cane_->templateType();
+		cane_->setTemplateType(CaneTemplate::CUSTOM);				
 		if (oldType != CaneTemplate::CUSTOM)
-			undoRedo->modifiedCane(_cane);
-		updateEverything();
-		emit someDataChanged();
+			undoRedo->modifiedCane(cane_);
 	}
 }
 
 void CaneEditorWidget :: circleCasingButtonClicked()
 {
-	_cane->setOutermostCasingShape(CIRCLE_SHAPE);
-	undoRedo->modifiedCane(_cane);
-	updateEverything();
-	emit someDataChanged();
+	cane_->setOutermostCasingShape(CIRCLE_SHAPE);
+	undoRedo->modifiedCane(cane_);
 }
 
 void CaneEditorWidget :: squareCasingButtonClicked()
 {
-	_cane->setOutermostCasingShape(SQUARE_SHAPE);
-	undoRedo->modifiedCane(_cane);
-	updateEverything();
-	emit someDataChanged();
+	cane_->setOutermostCasingShape(SQUARE_SHAPE);
+	undoRedo->modifiedCane(cane_);
 }
 
 void CaneEditorWidget :: removeCasingButtonClicked()
 {
-	_cane->removeCasing();
-	undoRedo->modifiedCane(_cane);
-	updateEverything();
-	emit someDataChanged();
+	cane_->removeCasing();
+	undoRedo->modifiedCane(cane_);
 }
 
 void CaneEditorWidget :: addCasingButtonClicked()
 {
-	_cane->addCasing(_cane->outermostCasingShape());
-	undoRedo->modifiedCane(_cane);
-	updateEverything();
-	emit someDataChanged();
+	cane_->addCasing(cane_->outermostCasingShape());
+	undoRedo->modifiedCane(cane_);
 }
 
 void CaneEditorWidget :: copySelectedButtonClicked()
@@ -417,10 +407,8 @@ void CaneEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 		// put the user back in fill and case mode,
 		// as they're no longer working on a custom template
 		controlsTab->setCurrentIndex(0);
-		_cane->setTemplateType(ptlw->type);	
-		undoRedo->modifiedCane(_cane);
-		updateEverything();
-		emit someDataChanged();
+		cane_->setTemplateType(ptlw->type);	
+		undoRedo->modifiedCane(cane_);
 	}
 }
 
@@ -440,36 +428,27 @@ void CaneEditorWidget :: setupConnections()
 	connect(countSpin, SIGNAL(valueChanged(int)), this, SLOT(countSpinChanged(int)));
 	connect(controlsTab, SIGNAL(currentChanged(int)), this, SLOT(controlsTabChanged(int)));
 
-	// subeditors
-	connect(viewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
-	connect(customizeViewWidget, SIGNAL(someDataChanged()), this, SLOT(childWidgetDataChanged()));
-	
 	// render thread	
 	connect(geometryThread, SIGNAL(finishedMesh(bool, unsigned int)), 
 		this, SLOT(geometryThreadFinishedMesh(bool, unsigned int)));
+
+	// modified() events
+	connect(this->cane_, SIGNAL(modified()), this, SLOT(updateEverything()));
 }
 	
 void CaneEditorWidget :: twistEnded()
 {
-	undoRedo->modifiedCane(_cane);
-}
-
-void CaneEditorWidget :: childWidgetDataChanged()
-{
-	updateEverything();
-	emit someDataChanged();
+	undoRedo->modifiedCane(cane_);
 }
 
 void CaneEditorWidget :: countSpinChanged(int)
 {
 	// update template
-	unsigned int count = _cane->count();
+	unsigned int count = cane_->count();
 	if (count != static_cast<unsigned int>(countSpin->value()))
 	{
-		_cane->setCount(countSpin->value());
-		undoRedo->modifiedCane(_cane);
-		updateEverything();
-		emit someDataChanged();
+		cane_->setCount(countSpin->value());
+		undoRedo->modifiedCane(cane_);
 	}
 }
 
@@ -497,19 +476,21 @@ void CaneEditorWidget :: seedTemplates()
 	templateLibraryLayout->addWidget(ptlw);
 }
 
-void CaneEditorWidget :: setCane(Cane* _cane)
+void CaneEditorWidget :: setCane(Cane* cane_)
 {
-	this->_cane = _cane;
+	disconnect(this->cane_, SIGNAL(modified()), this, SLOT(updateEverything()));
+	this->cane_ = cane_;
+	connect(this->cane_, SIGNAL(modified()), this, SLOT(updateEverything()));
 	controlsTab->setCurrentIndex(0);
 	updateEverything();
-	twistWidget->setTwist(_cane->twistPtr());
-	viewWidget->setCane(_cane);
-	customizeViewWidget->setCane(_cane);
+	twistWidget->setCane(cane_);
+	viewWidget->setCane(cane_);
+	customizeViewWidget->setCane(cane_);
 }
 
 Cane* CaneEditorWidget :: cane()
 {
-	return this->_cane;
+	return this->cane_;
 }
 
 

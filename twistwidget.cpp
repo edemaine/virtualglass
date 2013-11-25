@@ -1,4 +1,6 @@
 
+#include <cstdio>
+
 #include <QDoubleSpinBox>
 #include <QSlider>
 #include <QHBoxLayout>
@@ -6,14 +8,16 @@
 #include <QPushButton>
 #include <QEvent>
 
-#include <cstdio>
-
+#include "cane.h"
+#include "piece.h"
 #include "twistwidget.h"
 
-TwistWidget :: TwistWidget(float* _twist, unsigned int _range, QWidget* parent) : QWidget(parent)
+TwistWidget :: TwistWidget(Cane* cane, Piece* piece, unsigned int range, QWidget* parent) : QWidget(parent) 
 {
-	this->twist = _twist;
-	this->range = _range;
+	assert(cane == NULL || piece == NULL);
+	this->cane = cane;
+	this->piece  = piece;
+	this->range = range;
 
 	QHBoxLayout* layout = new QHBoxLayout(this);
 	this->setLayout(layout);
@@ -48,8 +52,10 @@ TwistWidget :: TwistWidget(float* _twist, unsigned int _range, QWidget* parent) 
 	connect(slider, SIGNAL(valueChanged(int)), this, SLOT(sliderValueChanged(int)));	
 	connect(slider, SIGNAL(sliderReleased()), this, SLOT(sliderChangeEnded()));	
 	connect(spin, SIGNAL(valueChanged(double)), this, SLOT(spinValueChanged(double)));	
-
-	updateEverything();
+	if (this->cane != NULL)
+		connect(this->cane, SIGNAL(modified()), this, SLOT(updateEverything()));
+	if (this->piece != NULL)
+		connect(this->piece, SIGNAL(modified()), this, SLOT(updateEverything()));
 }
 
 bool TwistWidget :: eventFilter(QObject* obj, QEvent* event)
@@ -68,10 +74,16 @@ bool TwistWidget :: eventFilter(QObject* obj, QEvent* event)
 void TwistWidget :: updateEverything()
 {
 	slider->blockSignals(true);
-	slider->setValue(10 * *(this->twist));
+	if (this->cane != NULL)
+		slider->setValue(10 * this->cane->twist());
+	else if (this->piece != NULL)
+		slider->setValue(10 * this->piece->twist());
 	slider->blockSignals(false);
 	spin->blockSignals(true);
-	spin->setValue(*(this->twist));
+	if (this->cane != NULL)
+		spin->setValue(this->cane->twist());
+	else if (this->piece != NULL)
+		spin->setValue(this->piece->twist());
 	spin->blockSignals(false);
 }
 
@@ -82,22 +94,42 @@ void TwistWidget :: sliderChangeEnded()
 
 void TwistWidget :: spinValueChanged(double v)
 {
-	*(this->twist) = v;
-	updateEverything();
-	emit valueChanged();
+	if (this->cane != NULL)
+		this->cane->setTwist(v);
+	else if (this->piece != NULL)
+		this->piece->setTwist(v);
 	emit valueChangeEnded();
 }
 
 void TwistWidget :: sliderValueChanged(int v)
 {
-	*(this->twist) = v * 0.1;
-	updateEverything();
-	emit valueChanged();
+	if (this->cane != NULL)
+		this->cane->setTwist(v * 0.1);
+	else if (this->piece != NULL)
+		this->piece->setTwist(v * 0.1);
 }
 
-void TwistWidget :: setTwist(float* _twist)
+void TwistWidget :: setCane(Cane* _cane)
 {
-	this->twist = _twist;
+	if (this->cane != NULL)
+		disconnect(this->cane, SIGNAL(modified()), this, SLOT(updateEverything()));
+	if (this->piece != NULL)
+		disconnect(this->piece, SIGNAL(modified()), this, SLOT(updateEverything()));
+	this->cane = _cane;
+	connect(this->cane, SIGNAL(modified()), this, SLOT(updateEverything()));
+	this->piece = NULL;
+	updateEverything();
+}
+
+void TwistWidget :: setPiece(Piece* _piece)
+{
+	if (this->cane != NULL)
+		disconnect(this->cane, SIGNAL(modified()), this, SLOT(updateEverything()));
+	if (this->piece != NULL)
+		disconnect(this->piece, SIGNAL(modified()), this, SLOT(updateEverything()));
+	this->cane = NULL;
+	this->piece = _piece;
+	connect(this->piece, SIGNAL(modified()), this, SLOT(updateEverything()));
 	updateEverything();
 }
 
