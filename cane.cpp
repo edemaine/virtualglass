@@ -60,13 +60,8 @@ bool Cane :: hasDependencyOn(Cane* cane)
 unsigned int Cane :: casingDependencyOccurrances(GlassColor* glassColor)
 {
 	int occurrances = 0;
-
 	for (unsigned int i = 0; i < this->casings_.size(); ++i)
-	{
-		if (this->casings_[i].glassColor == glassColor)
-			++occurrances;
-	}	
-
+		occurrances += (this->casings_[i].glassColor == glassColor);
 	return occurrances;
 }
 
@@ -85,13 +80,8 @@ void Cane :: removeCasingDependency(GlassColor* glassColor)
 unsigned int Cane :: subcaneDependencyOccurrances(Cane* cane)
 {
 	int occurrances = 0;
-
 	for (unsigned int i = 0; i < this->subcanes_.size(); ++i)
-	{
-		if (this->subcanes_[i].cane == cane)
-			++occurrances;
-	}	
-
+		occurrances += (this->subcanes_[i].cane == cane);
 	return occurrances;
 }
 
@@ -589,15 +579,16 @@ void Cane :: resetSubcanes(bool hardReset)
 	{
 		SubcaneTemplate lastSubcane = this->subcanes_.back();
 		this->subcanes_.pop_back();
-		removeSubcaneDependency(lastSubcane.cane);
+		this->removeSubcaneDependency(lastSubcane.cane);
 	}
 	while (newSubcanes.size() > 0)
 	{
 		SubcaneTemplate lastSubcane = newSubcanes.back();
 		newSubcanes.pop_back();
 		this->subcanes_.push_back(lastSubcane);
-		addSubcaneDependency(lastSubcane.cane);
+		this->addSubcaneDependency(lastSubcane.cane);
 	}
+
 	emit modified();
 }
 

@@ -28,8 +28,8 @@ class Piece : public QObject
 
 		void setPieceTemplateType(enum PieceTemplate::Type t, bool force=false);
 		void setPickupTemplateType(enum PickupTemplate::Type t, bool force=false);
-		enum PieceTemplate::Type pieceTemplateType();
-		enum PickupTemplate::Type pickupTemplateType();
+		enum PieceTemplate::Type pieceTemplateType() const;
+		enum PickupTemplate::Type pickupTemplateType() const;
 
 		unsigned int pickupParameterCount() const;
 		void pickupParameter(unsigned int index, TemplateParameter* dest) const;
@@ -52,9 +52,9 @@ class Piece : public QObject
 		void setSpline(Spline s);
 		Spline spline() const;
 
-		GlassColor* overlayGlassColor();
-		GlassColor* underlayGlassColor();
-		GlassColor* casingGlassColor();
+		GlassColor* overlayGlassColor() const;
+		GlassColor* underlayGlassColor() const;
+		GlassColor* casingGlassColor() const;
 		void setOverlayGlassColor(GlassColor* c);
 		void setUnderlayGlassColor(GlassColor* c);
 		void setCasingGlassColor(GlassColor* c);
@@ -63,6 +63,10 @@ class Piece : public QObject
 		void modified();
 
 	private:
+		void updateSubcanes();
+		void pushNewSubcane(vector<SubpickupTemplate>* newSubs, Point3D location,
+			enum PickupCaneOrientation ori, float length, float width, enum GeometricShape s);
+
 		float twist_;
 		enum PieceTemplate::Type pieceType_;
 		Spline spline_;
@@ -74,10 +78,14 @@ class Piece : public QObject
 		vector<TemplateParameter> pickupParameters_;
 		enum PickupTemplate::Type pickupType_;
 
-		void updateSubcanes();
-		void pushNewSubcane(vector<SubpickupTemplate>* newSubs, Point3D location,
-			enum PickupCaneOrientation ori, float length, float width, enum GeometricShape s);
-	
+		unsigned int casingDependencyOccurrances(GlassColor* gc);
+		void addCasingDependency(GlassColor* gc);
+		void removeCasingDependency(GlassColor* gc);
+
+		unsigned int subcaneDependencyOccurrances(Cane* c);
+		void addSubcaneDependency(Cane* cane);
+		void removeSubcaneDependency(Cane* cane);		
+
 	private slots:
 		void dependencyModified();
 };

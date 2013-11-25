@@ -12,7 +12,54 @@ Piece :: Piece(enum PieceTemplate::Type pieceType, enum PickupTemplate::Type pic
 	this->casingGlassColor_ = GlobalGlass::color();
 	this->underlayGlassColor_ = GlobalGlass::color();
 	this->overlayGlassColor_ = GlobalGlass::color();
+	addCasingDependency(GlobalGlass::color());
         setPickupTemplateType(pickupType, true);
+}
+
+unsigned int Piece :: casingDependencyOccurrances(GlassColor* glassColor)
+{
+	int occurrances = 0;
+
+	if (this->casingGlassColor_ == glassColor)
+		++occurrances;
+	if (this->underlayGlassColor_ == glassColor)
+		++occurrances;
+	if (this->overlayGlassColor_ == glassColor)
+		++occurrances;
+
+        return occurrances;
+}
+
+void Piece :: addCasingDependency(GlassColor* glassColor)
+{
+	if (casingDependencyOccurrances(glassColor) == 1)
+		connect(glassColor, SIGNAL(modified()), this, SLOT(dependencyModified()));
+}
+
+void Piece :: removeCasingDependency(GlassColor* glassColor)
+{
+	if (casingDependencyOccurrances(glassColor) == 0)
+		disconnect(glassColor, SIGNAL(modified()), this, SLOT(dependencyModified()));
+}
+
+unsigned int Piece :: subcaneDependencyOccurrances(Cane* cane)
+{
+        int occurrances = 0;
+	for (unsigned int i = 0; i < this->subcanes_.size(); ++i)
+		occurrances += (this->subcanes_[i].cane == cane);
+        return occurrances;
+}
+
+void Piece :: addSubcaneDependency(Cane* cane)
+{
+	if (subcaneDependencyOccurrances(cane) == 1)
+		connect(cane, SIGNAL(modified()), this, SLOT(dependencyModified()));
+}
+
+void Piece :: removeSubcaneDependency(Cane* cane)
+{
+	if (subcaneDependencyOccurrances(cane) == 0)
+		disconnect(cane, SIGNAL(modified()), this, SLOT(dependencyModified()));
 }
 
 void Piece::setSpline(Spline s)
@@ -80,9 +127,6 @@ bool Piece :: hasDependencyOn(GlassColor* glassColor)
 	return pickupsDependOn;
 }
 
-// copy() is intended to be a copy at the correct depth consistent with
-// a Piece as represented in the GUI: it is a shape and a pickup cane, 
-// but does not include the canes used.
 Piece* Piece :: copy() const
 {
 	Piece* p = new Piece(this->pieceType_, this->pickupType_);
@@ -90,11 +134,32 @@ Piece* Piece :: copy() const
 	p->twist_ = this->twist_;
 	p->pieceType_ = this->pieceType_;
 	p->spline_ = this->spline_;
-
+	GlassColor* old = p->overlayGlassColor_;
+	p->overlayGlassColor_ = NULL;
+	p->removeCasingDependency(old);
 	p->overlayGlassColor_ = this->overlayGlassColor_;
+	p->addCasingDependency(p->overlayGlassColor_);
+	old = p->underlayGlassColor_;
+	p->underlayGlassColor_ = NULL;
+	p->removeCasingDependency(old);
 	p->underlayGlassColor_ = this->underlayGlassColor_;
+	p->addCasingDependency(p->underlayGlassColor_);
+	old = p->casingGlassColor_;
+	p->casingGlassColor_ = NULL;
+	p->removeCasingDependency(old);
 	p->casingGlassColor_ = this->casingGlassColor_;
-	p->subcanes_ = this->subcanes_;
+	p->addCasingDependency(p->casingGlassColor_);
+	while (p->subcanes_.size() > 0)
+	{
+		SubpickupTemplate lastSubcane = p->subcanes_.back();
+		p->subcanes_.pop_back();
+		p->removeSubcaneDependency(lastSubcane.cane);
+	}
+	for (unsigned int i = 0; i < this->subcanes_.size(); ++i)
+	{
+		p->subcanes_.push_back(this->subcanes_[i]);
+		p->addSubcaneDependency(this->subcanes_[i].cane);
+	}
 	p->pickupParameters_ = this->pickupParameters_;
 	p->pickupType_ = this->pickupType_;
 
@@ -106,11 +171,29 @@ void Piece :: set(Piece* p)
 	this->twist_ = p->twist_;
 	this->pieceType_ = p->pieceType_;
 	this->spline_ = p->spline_;	
-
+	GlassColor* old = this->overlayGlassColor_;
+	this->overlayGlassColor_ = NULL;
+	this->removeCasingDependency(old);
 	this->overlayGlassColor_ = p->overlayGlassColor_;
+	old = this->underlayGlassColor_;
+	this->underlayGlassColor_ = NULL;
+	this->removeCasingDependency(old);
 	this->underlayGlassColor_ = p->underlayGlassColor_;
+	old = this->casingGlassColor_;
+	this->casingGlassColor_ = NULL;
+	this->removeCasingDependency(old);
 	this->casingGlassColor_ = p->casingGlassColor_;
-	this->subcanes_ = p->subcanes_;
+	while (this->subcanes_.size() > 0)
+	{
+		SubpickupTemplate subcane = this->subcanes_.back();
+		this->subcanes_.pop_back();
+		this->removeSubcaneDependency(subcane.cane);	
+	}	
+	for (unsigned int i = 0; i < p->subcanes_.size(); ++i)
+	{
+		this->subcanes_.push_back(p->subcanes_[i]);
+		this->addSubcaneDependency(p->subcanes_[i].cane);
+	}
 	this->pickupParameters_ = p->pickupParameters_;
 	this->pickupType_ = p->pickupType_;
 }
@@ -192,7 +275,7 @@ void Piece :: setPieceTemplateType(enum PieceTemplate::Type type, bool force)
 
 }
 
-enum PieceTemplate::Type Piece :: pieceTemplateType()
+enum PieceTemplate::Type Piece :: pieceTemplateType() const
 {
 	return this->pieceType_;
 }
@@ -212,34 +295,46 @@ unsigned int Piece :: subpickupCount() const
 	return this->subcanes_.size();
 }
 
-GlassColor* Piece :: overlayGlassColor()
+GlassColor* Piece :: overlayGlassColor() const
 {
 	return this->overlayGlassColor_;
 }
 
-GlassColor* Piece :: underlayGlassColor()
+GlassColor* Piece :: underlayGlassColor() const
 {
 	return this->underlayGlassColor_;
 }
 
-GlassColor* Piece :: casingGlassColor()
+GlassColor* Piece :: casingGlassColor() const
 {
 	return this->casingGlassColor_;
 }
 
-void Piece :: setOverlayGlassColor(GlassColor* c)
+void Piece :: setOverlayGlassColor(GlassColor* glassColor)
 {
-	this->overlayGlassColor_ = c;
+	GlassColor* old = this->overlayGlassColor_;
+	this->overlayGlassColor_ = NULL;
+	this->removeCasingDependency(old);
+	this->overlayGlassColor_ = glassColor;
+	this->addCasingDependency(old);
 }
 
-void Piece :: setUnderlayGlassColor(GlassColor* c)
+void Piece :: setUnderlayGlassColor(GlassColor* glassColor)
 {
-	this->underlayGlassColor_ = c;
+	GlassColor* old = this->underlayGlassColor_;
+	this->underlayGlassColor_ = NULL;
+	this->removeCasingDependency(old);
+	this->underlayGlassColor_ = glassColor;
+	this->addCasingDependency(old);
 }
 
-void Piece :: setCasingGlassColor(GlassColor* c)
+void Piece :: setCasingGlassColor(GlassColor* glassColor)
 {
-	this->casingGlassColor_ = c;
+	GlassColor* old = this->casingGlassColor_;
+	this->casingGlassColor_ = NULL;
+	this->removeCasingDependency(old);
+	this->casingGlassColor_ = glassColor;
+	this->addCasingDependency(old);
 }
 
 void Piece :: pushNewSubcane(vector<SubpickupTemplate>* newSubcanes,
@@ -409,7 +504,21 @@ void Piece :: updateSubcanes()
 		}
 	}
 
-	this->subcanes_ = newSubcanes;
+	while (this->subcanes_.size() > 0)
+	{
+		SubpickupTemplate lastSubcane = this->subcanes_.back();
+		this->subcanes_.pop_back();
+		this->removeSubcaneDependency(lastSubcane.cane);
+	}
+	while (newSubcanes.size() > 0)
+	{
+		SubpickupTemplate lastSubcane = newSubcanes.back();
+		newSubcanes.pop_back();
+		this->subcanes_.push_back(lastSubcane);
+		this->addSubcaneDependency(lastSubcane.cane);
+	}
+
+	emit modified();
 }
 
 void Piece :: setPickupTemplateType(enum PickupTemplate::Type _type, bool force) 
@@ -450,11 +559,10 @@ void Piece :: setPickupTemplateType(enum PickupTemplate::Type _type, bool force)
 			break;
 	}
 
-	this->subcanes_.clear(); // don't carry over any of the current stuff
 	updateSubcanes();
 }
 
-enum PickupTemplate::Type Piece :: pickupTemplateType() 
+enum PickupTemplate::Type Piece :: pickupTemplateType() const 
 {
 	return this->pickupType_;
 }
