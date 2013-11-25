@@ -76,11 +76,6 @@ namespace GlassFileIOInternal
 	void readCanes(Json::Value& root, map<unsigned int, Cane*>& caneMap, map<unsigned int, GlassColor*>& colorMap, 
 		vector<Cane*>& readPlans);
 
-	void writePickup(Json::Value& root, Pickup* pickup, unsigned int pickupIndex, 
-		map<Cane*, unsigned int>& caneMap, map<GlassColor*, unsigned int>& colorMap);
-	Pickup* readPickup(string pickupname, Json::Value& root, 
-		map<unsigned int, Cane*>& caneMap, map<unsigned int, GlassColor*>& colorMap);
-
 	void writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<Cane*, unsigned int>& caneMap,
 		map<GlassColor*, unsigned int>& colorMap);
 	Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, Cane*>& caneMap, 

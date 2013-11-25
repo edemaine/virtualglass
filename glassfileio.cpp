@@ -735,189 +735,163 @@ void readCanes(Json::Value& canesRoot, map<unsigned int, Cane*>& caneMap,
 		readCanes.push_back(caneMap[caneIndices[i]]);	
 }
 
-/*
-following layers of pickup information in the Json representation:
-
-pickup
-	pickup template
-	casing color
-	overlay color
-	underlay color
-	pickup template parameters
-		parameter_1
-			index
-			name
-			value
-			lower limit
-			upper limit
-		parameter_2
-		...
-	subcanes
-		subcane_1
-			index
-			pull id
-			length
-			width
-			orientation
-			shape
-			x
-			y
-			z
-		subcane_2
-		...
-*/
-void writePickup(Json::Value& root, Pickup* pickup, unsigned int pickupIndex,
-	map<Cane*, unsigned int>& caneMap, map<GlassColor*, unsigned int>& colorMap)
-{
-	string pickupname = idAndNameToString(pickupIndex, "Pickup");
-
-	// write singletons: casing color, overlay color, underlay color, pickup template
-	root[pickupname]["Pickup template"] = pickupTemplateToString(pickup->templateType()); 
-	root[pickupname]["Casing color pointer"] = colorMap[pickup->casingGlassColor()]; 
-	root[pickupname]["Overlay color pointer"] = colorMap[pickup->overlayGlassColor()];
-	root[pickupname]["Underlay color pointer"] = colorMap[pickup->underlayGlassColor()];
-		
-	// write pickup template parameters
-	root[pickupname]["Pickup template parameters"];
-	for (unsigned int i = 0; i < pickup->parameterCount(); ++i)
-	{
-		TemplateParameter tmpParam;
-		pickup->parameter(i, &tmpParam);
-
-		string paramName = idAndNameToString(i, "PickupTemplateParam");
-		root[pickupname]["Pickup template parameters"][paramName]["Index"] = i;
-		root[pickupname]["Pickup template parameters"][paramName]["Name"] = tmpParam.name;
-		root[pickupname]["Pickup template parameters"][paramName]["Value"] = tmpParam.value;
-		root[pickupname]["Pickup template parameters"][paramName]["Lower limit"] = tmpParam.lowerLimit;
-		root[pickupname]["Pickup template parameters"][paramName]["Upper limit"] = tmpParam.upperLimit;
-	}
-
-	// write subpulls
-	root[pickupname]["Subcanes"];
-	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
-	{
-		string subpullName = idAndNameToString(i, "Subcane");
-		root[pickupname]["Subcanes"][subpullName]["Index"] = i;
-		SubpickupTemplate t = pickup->subpickupTemplate(i);
-		root[pickupname]["Subcanes"][subpullName]["Cane pointer"] = caneMap[t.cane];
-		root[pickupname]["Subcanes"][subpullName]["Length"] = t.length;
-		root[pickupname]["Subcanes"][subpullName]["Width"] = t.width;
-		root[pickupname]["Subcanes"][subpullName]["Orientation"] = orientationToString(t.orientation);
-		root[pickupname]["Subcanes"][subpullName]["Shape"] = geometricShapeToString(t.shape);
-		root[pickupname]["Subcanes"][subpullName]["X"] = t.location.x;
-		root[pickupname]["Subcanes"][subpullName]["Y"] = t.location.y;
-		root[pickupname]["Subcanes"][subpullName]["Z"] = t.location.z;
-	}
-}
-
-Pickup* readPickup(string pickupname, Json::Value& root,
-	map<unsigned int, Cane*>& caneMap, map<unsigned int, GlassColor*>& colorMap)
-{
-	// read singletons: casing color, overlay color, underlay color, pickup template
-	Pickup* pickup = new Pickup(stringToPickupTemplate(root[pickupname]["Pickup template"].asString()));
-	pickup->setCasingGlassColor(safeColorMap(colorMap, root[pickupname]["Casing color pointer"].asUInt()));
-	pickup->setOverlayGlassColor(safeColorMap(colorMap, root[pickupname]["Overlay color pointer"].asUInt()));
-	pickup->setUnderlayGlassColor(safeColorMap(colorMap, root[pickupname]["Underlay color pointer"].asUInt()));
-
-	// read pickup template parameters
-	for (unsigned int i = 0; i < root[pickupname]["Pickup template parameters"].getMemberNames().size(); ++i)
-	{
-		string paramname = root[pickupname]["Pickup template parameters"].getMemberNames()[i];
-		unsigned int paramIndex = root[pickupname]["Pickup template parameters"][paramname]["Index"].asUInt();	
-
-		int paramValue = root[pickupname]["Pickup template parameters"][paramname]["Value"].asInt();	
-		pickup->setParameter(paramIndex, paramValue); 
-		// we just ignore name and lower/upper limits for now...they are redundant with pickup template type
-	}
-
-	// read subpulls
-	for (unsigned int i = 0; i < root[pickupname]["Subcanes"].getMemberNames().size(); ++i)
-	{
-		string subpullname = root[pickupname]["Subcanes"].getMemberNames()[i];
-		unsigned int subIndex = root[pickupname]["Subcanes"][subpullname]["Index"].asUInt();
-
-		SubpickupTemplate t = pickup->subpickupTemplate(subIndex);
-		t.cane = safeCaneMap(caneMap, root[pickupname]["Subcanes"][subpullname]["Cane pointer"].asUInt());
-		t.length = root[pickupname]["Subcanes"][subpullname]["Length"].asFloat();
-		t.width = root[pickupname]["Subcanes"][subpullname]["Width"].asFloat();
-		t.orientation = stringToOrientation(root[pickupname]["Subcanes"][subpullname]["Orientation"].asString());
-		t.shape = stringToGeometricShape(root[pickupname]["Subcanes"][subpullname]["Shape"].asString());
-		t.location.x = root[pickupname]["Subcanes"][subpullname]["X"].asFloat();
-		t.location.y = root[pickupname]["Subcanes"][subpullname]["Y"].asFloat();
-		t.location.z = root[pickupname]["Subcanes"][subpullname]["Z"].asFloat();
-		pickup->setSubpickupTemplate(t, subIndex);
-	}
-
-	return pickup;
-}
 
 /* 
 following layers of piece information in the Json representation:
 piece
 	piece template
 	twist
-	basedness
 	piece spline parameters
 		parameter1
 			index
 			value 
 		parameter2
 		...
-	pickups (done separately)
+	pickups
+		pickup1
+			pickup template
+			casing color
+			overlay color
+			underlay color
+			pickup template parameters
+				parameter_1
+					index
+					name
+					value
+					lower limit
+					upper limit
+				parameter_2
+				...
+			subcanes
+				subcane_1
+					index
+					pull id
+					length
+					width
+					orientation
+					shape
+					x
+					y
+					z
+				subcane_2
+			...
 */
 void writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<Cane*, unsigned int>& caneMap,
 	map<GlassColor*, unsigned int>& colorMap)
 {
 	string piecename = idAndNameToString(pieceIndex, "Piece");
+	Json::Value& pieceRoot = root[piecename];
 
-	// write singletons: piece template, twist
-	root[piecename]["Piece template"] = pieceTemplateToString(piece->templateType());
-	root[piecename]["Twist"] = piece->twist();
-
-	// write piece template parameters
-	root[piecename]["Piece spline control points"];
+	// write piece info
+	pieceRoot["Piece template"] = pieceTemplateToString(piece->pieceTemplateType());
+	pieceRoot["Twist"] = piece->twist();
+	pieceRoot["Piece spline control points"];
 	Spline spline = piece->spline();
 	for (unsigned int i = 0; i < spline.controlPoints().size(); ++i)
 	{
 		string paramName = idAndNameToString(i, "PieceSplineCtrlPt");
-		root[piecename]["Piece spline control points"][paramName]["Index"] = i;
-		root[piecename]["Piece spline control points"][paramName]["X"] = spline.controlPoints()[i].x;
-		root[piecename]["Piece spline control points"][paramName]["Y"] = spline.controlPoints()[i].y;
+		pieceRoot["Piece spline control points"][paramName]["Index"] = i;
+		pieceRoot["Piece spline control points"][paramName]["X"] = spline.controlPoints()[i].x;
+		pieceRoot["Piece spline control points"][paramName]["Y"] = spline.controlPoints()[i].y;
 	}
 
-	// write pickups (currently only one)
-	writePickup(root[piecename]["Pickups"], piece->pickup(), 0, caneMap, colorMap);
+	// write pickup info
+	string pickupname = idAndNameToString(0, "Pickup");
+	Json::Value& pickupRoot = pieceRoot["Pickups"][pickupname];
+
+	pickupRoot["Pickup template"] = pickupTemplateToString(piece->pickupTemplateType()); 
+	pickupRoot["Casing color pointer"] = colorMap[piece->casingGlassColor()]; 
+	pickupRoot["Overlay color pointer"] = colorMap[piece->overlayGlassColor()];
+	pickupRoot["Underlay color pointer"] = colorMap[piece->underlayGlassColor()];
+		
+	pickupRoot["Pickup template parameters"];
+	for (unsigned int i = 0; i < piece->pickupParameterCount(); ++i)
+	{
+		TemplateParameter tmpParam;
+		piece->pickupParameter(i, &tmpParam);
+
+		string paramName = idAndNameToString(i, "PickupTemplateParam");
+		pickupRoot["Pickup template parameters"][paramName]["Index"] = i;
+		pickupRoot["Pickup template parameters"][paramName]["Name"] = tmpParam.name;
+		pickupRoot["Pickup template parameters"][paramName]["Value"] = tmpParam.value;
+		pickupRoot["Pickup template parameters"][paramName]["Lower limit"] = tmpParam.lowerLimit;
+		pickupRoot["Pickup template parameters"][paramName]["Upper limit"] = tmpParam.upperLimit;
+	}
+
+	pickupRoot["Subcanes"];
+	for (unsigned int i = 0; i < piece->subpickupCount(); ++i)
+	{
+		string subpullName = idAndNameToString(i, "Subcane");
+		pickupRoot["Subcanes"][subpullName]["Index"] = i;
+		SubpickupTemplate t = piece->subpickupTemplate(i);
+		pickupRoot["Subcanes"][subpullName]["Cane pointer"] = caneMap[t.cane];
+		pickupRoot["Subcanes"][subpullName]["Length"] = t.length;
+		pickupRoot["Subcanes"][subpullName]["Width"] = t.width;
+		pickupRoot["Subcanes"][subpullName]["Orientation"] = orientationToString(t.orientation);
+		pickupRoot["Subcanes"][subpullName]["Shape"] = geometricShapeToString(t.shape);
+		pickupRoot["Subcanes"][subpullName]["X"] = t.location.x;
+		pickupRoot["Subcanes"][subpullName]["Y"] = t.location.y;
+		pickupRoot["Subcanes"][subpullName]["Z"] = t.location.z;
+	}
 }
 
 Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, Cane*>& caneMap, 
 	map<unsigned int, GlassColor*>& colorMap)
 {
-	// read singletons: piece template
-	Piece* piece = new Piece(stringToPieceTemplate(root[piecename]["Piece template"].asString()));
-	piece->setTwist(root[piecename]["Twist"].asFloat());
+	Json::Value& pieceRoot = root[piecename];
+	string pickupname = pieceRoot["Pickups"].getMemberNames()[0];
+	Json::Value& pickupRoot = root[piecename]["Pickups"][pickupname];	
 
-	// read piece template parameters
+	Piece* piece = new Piece(stringToPieceTemplate(pieceRoot["Piece template"].asString()),
+		stringToPickupTemplate(pickupRoot["Pickup template"].asString()));
+
+	// Read in piece stuff
+	piece->setTwist(pieceRoot["Twist"].asFloat());
 	Spline spline = piece->spline();
-	for (unsigned int i = spline.controlPoints().size(); 
-		i < root[piecename]["Piece spline control points"].getMemberNames().size(); ++i)
+	for (unsigned int i = spline.controlPoints().size(); i < pieceRoot["Piece spline control points"].getMemberNames().size(); ++i)
 		spline.addPoint(Point2D()); // pad spline to be big enough for all the parameters
-	for (unsigned int i = 0; i < root[piecename]["Piece spline control points"].getMemberNames().size(); ++i)
+	for (unsigned int i = 0; i < pieceRoot["Piece spline control points"].getMemberNames().size(); ++i)
 	{
-		string paramname = root[piecename]["Piece spline control points"].getMemberNames()[i];
-		unsigned int paramIndex = root[piecename]["Piece spline control points"][paramname]["Index"].asUInt();
+		string paramname = pieceRoot["Piece spline control points"].getMemberNames()[i];
+		unsigned int paramIndex = pieceRoot["Piece spline control points"][paramname]["Index"].asUInt();
 
 		Point2D paramValue;
-		paramValue.x = root[piecename]["Piece spline control points"][paramname]["X"].asFloat();	
-		paramValue.y = root[piecename]["Piece spline control points"][paramname]["Y"].asFloat();	
+		paramValue.x = pieceRoot["Piece spline control points"][paramname]["X"].asFloat();	
+		paramValue.y = pieceRoot["Piece spline control points"][paramname]["Y"].asFloat();	
 		spline.set(paramIndex, paramValue);
 	}
 	piece->setSpline(spline);
 
-	// read pickups (currently only one)
-	for (unsigned int i = 0; i < root[piecename]["Pickups"].getMemberNames().size(); ++i)
+	// Read pickup info 
+	piece->setCasingGlassColor(safeColorMap(colorMap, pickupRoot["Casing color pointer"].asUInt()));
+	piece->setOverlayGlassColor(safeColorMap(colorMap, pickupRoot["Overlay color pointer"].asUInt()));
+	piece->setUnderlayGlassColor(safeColorMap(colorMap, pickupRoot["Underlay color pointer"].asUInt()));
+
+	for (unsigned int i = 0; i < pickupRoot["Pickup template parameters"].getMemberNames().size(); ++i)
 	{
-		string pickupname = root[piecename]["Pickups"].getMemberNames()[i];
-		piece->setPickup(readPickup(pickupname, root[piecename]["Pickups"], caneMap, colorMap));
+		string paramname = pickupRoot["Pickup template parameters"].getMemberNames()[i];
+		unsigned int paramIndex = pickupRoot["Pickup template parameters"][paramname]["Index"].asUInt();	
+
+		int paramValue = pickupRoot["Pickup template parameters"][paramname]["Value"].asInt();	
+		piece->setPickupParameter(paramIndex, paramValue); 
+		// we just ignore name and lower/upper limits for now...they are redundant with pickup template type
+	}
+
+	for (unsigned int i = 0; i < pickupRoot["Subcanes"].getMemberNames().size(); ++i)
+	{
+		string subpullname = pickupRoot["Subcanes"].getMemberNames()[i];
+		unsigned int subIndex = pickupRoot["Subcanes"][subpullname]["Index"].asUInt();
+
+		SubpickupTemplate t = piece->subpickupTemplate(subIndex);
+		t.cane = safeCaneMap(caneMap, pickupRoot["Subcanes"][subpullname]["Cane pointer"].asUInt());
+		t.length = pickupRoot["Subcanes"][subpullname]["Length"].asFloat();
+		t.width = pickupRoot["Subcanes"][subpullname]["Width"].asFloat();
+		t.orientation = stringToOrientation(pickupRoot["Subcanes"][subpullname]["Orientation"].asString());
+		t.shape = stringToGeometricShape(pickupRoot["Subcanes"][subpullname]["Shape"].asString());
+		t.location.x = pickupRoot["Subcanes"][subpullname]["X"].asFloat();
+		t.location.y = pickupRoot["Subcanes"][subpullname]["Y"].asFloat();
+		t.location.z = pickupRoot["Subcanes"][subpullname]["Z"].asFloat();
+		piece->setSubpickupTemplate(t, subIndex);
 	}
 
 	return piece;

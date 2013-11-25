@@ -73,7 +73,7 @@ void PieceEditorWidget :: reset3DCamera()
 
 void PieceEditorWidget :: resetPiece()
 {
-	_piece = new Piece(PieceTemplate::TUMBLER);
+	_piece = new Piece(PieceTemplate::TUMBLER, PickupTemplate::VERTICAL);
 }
 
 void PieceEditorWidget :: writePieceToOBJFile(QString& filename)
@@ -94,11 +94,11 @@ void PieceEditorWidget :: updateEverything()
 	{
 		pktlw = dynamic_cast<PickupTemplateLibraryWidget*>(
 				dynamic_cast<QWidgetItem *>(pickupTemplateLibraryLayout->itemAt(i))->widget());
-		pktlw->setHighlighted(pktlw->type == _piece->pickup()->templateType());
+		pktlw->setHighlighted(pktlw->type == _piece->pickupTemplateType());
 	}
 	pickupViewWidget->updateEverything();
 	TemplateParameter tp;
-	_piece->pickup()->parameter(0, &tp);
+	_piece->pickupParameter(0, &tp);
 	pickupCountSpin->blockSignals(true);
 	pickupCountSpin->setRange(tp.lowerLimit, tp.upperLimit);
 	pickupCountSpin->setValue(tp.value);
@@ -111,10 +111,10 @@ void PieceEditorWidget :: updateEverything()
 	{
 		ptlw = dynamic_cast<PieceTemplateLibraryWidget*>(
 			dynamic_cast<QWidgetItem *>(pieceTemplateLibraryLayout->itemAt(i))->widget());
-		ptlw->setHighlighted(ptlw->type == _piece->templateType());
+		ptlw->setHighlighted(ptlw->type == _piece->pieceTemplateType());
 	}
 	twistWidget->updateEverything();
-	if (this->_piece->templateType() != PieceTemplate::CUSTOM)
+	if (this->_piece->pieceTemplateType() != PieceTemplate::CUSTOM)
 		pieceControlsTab->setCurrentIndex(0);
 	
 	// Make a copy of the current state of the piece
@@ -176,10 +176,10 @@ void PieceEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned in
 void PieceEditorWidget :: pickupCountSpinChanged(int)
 {
 	TemplateParameter tp;
-	_piece->pickup()->parameter(0, &tp);
+	_piece->pickupParameter(0, &tp);
 	if (tp.value != pickupCountSpin->value())
 	{
-		_piece->pickup()->setParameter(0, pickupCountSpin->value());
+		_piece->setPickupParameter(0, pickupCountSpin->value());
 		undoRedo->modifiedPiece(_piece);
 		updateEverything();
 		emit someDataChanged();
@@ -240,9 +240,9 @@ void PieceEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 
 	if (pktlw != NULL)
 	{
-		if (pktlw->type != _piece->pickup()->templateType())
+		if (pktlw->type != _piece->pickupTemplateType())
 		{
-			_piece->pickup()->setTemplateType(pktlw->type);
+			_piece->setPickupTemplateType(pktlw->type);
 			undoRedo->modifiedPiece(_piece);
 			updateEverything();
 			emit someDataChanged();
@@ -255,7 +255,7 @@ void PieceEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 		else
 		{
 			pieceControlsTab->setCurrentIndex(0);
-			_piece->setTemplateType(ptlw->type);
+			_piece->setPieceTemplateType(ptlw->type);
 			undoRedo->modifiedPiece(_piece);
 			updateEverything();
 			emit someDataChanged();
@@ -434,7 +434,7 @@ void PieceEditorWidget :: pieceControlsTabChanged(int tab)
 
 	if (tab != 0) // customize mode
 	{
-		_piece->setTemplateType(PieceTemplate::CUSTOM);
+		_piece->setPieceTemplateType(PieceTemplate::CUSTOM);
 		undoRedo->modifiedPiece(_piece);
 		updateEverything();
 		emit someDataChanged();
@@ -462,7 +462,7 @@ void PieceEditorWidget :: seedTemplates()
 	for (int i = PieceTemplate::firstSeedTemplate(); i <= PieceTemplate::lastSeedTemplate(); ++i)
 	{
 		PieceTemplate::Type t = static_cast<PieceTemplate::Type>(i);
-		Piece dummyPiece(t);
+		Piece dummyPiece(t, PickupTemplate::VERTICAL);
 
 		QPixmap templatePixmap(100, 100);
 		templatePixmap.fill(GlobalBackgroundColor::qcolor);
@@ -488,7 +488,7 @@ void PieceEditorWidget :: updateLibraryWidgetPixmaps(PieceLibraryWidget* w)
 
 void PieceEditorWidget :: setPickupParameter(int param, int value)
 {
-	_piece->pickup()->setParameter(param, value);
+	_piece->setPickupParameter(param, value);
 	undoRedo->modifiedPiece(_piece);
 	updateEverything();
 	emit someDataChanged();
@@ -496,7 +496,7 @@ void PieceEditorWidget :: setPickupParameter(int param, int value)
 
 void PieceEditorWidget :: setPieceTemplateType(enum PieceTemplate::Type _type)
 {
-	_piece->setTemplateType(_type);
+	_piece->setPieceTemplateType(_type);
 	undoRedo->modifiedPiece(_piece);
 	updateEverything();
 	emit someDataChanged();
@@ -504,7 +504,7 @@ void PieceEditorWidget :: setPieceTemplateType(enum PieceTemplate::Type _type)
 
 void PieceEditorWidget :: setPickupTemplateType(enum PickupTemplate::Type _type)
 {
-	_piece->pickup()->setTemplateType(_type);
+	_piece->setPickupTemplateType(_type);
 	undoRedo->modifiedPiece(_piece);
 	updateEverything();
 	emit someDataChanged();

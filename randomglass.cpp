@@ -78,51 +78,40 @@ Cane* randomComplexCane(Cane* circleSimpleCane, Cane* squareSimpleCane)
 	return cane;
 }
 
-Pickup* randomPickup(Cane* cane1, Cane* cane2)
+Piece* randomPiece(Cane* cane1, Cane* cane2)
 {
-	int randomTemplateNumber = qrand() % (PickupTemplate::lastSeedTemplate() - PickupTemplate::firstSeedTemplate())
+	int randomPickupTemplateNumber = qrand() % (PickupTemplate::lastSeedTemplate() - PickupTemplate::firstSeedTemplate())
 		+ PickupTemplate::firstSeedTemplate();
-	Pickup* pickup = new Pickup(static_cast<PickupTemplate::Type>(randomTemplateNumber));
+	int randomPieceTemplateNumber = qrand() % (PieceTemplate::lastSeedTemplate() - PieceTemplate::firstSeedTemplate())
+		+ PieceTemplate::firstSeedTemplate();
+	Piece* piece = new Piece(static_cast<PieceTemplate::Type>(randomPieceTemplateNumber), static_cast<PickupTemplate::Type>(randomPickupTemplateNumber));
 
 	// set parameters
 	TemplateParameter p;
-	for (unsigned int i = 0; i < pickup->parameterCount(); ++i)
+	for (unsigned int i = 0; i < piece->pickupParameterCount(); ++i)
 	{
-		pickup->parameter(i, &p);
+		piece->pickupParameter(i, &p);
 		// not setting to upper intervals of parameter values for efficiency reasons 
-		pickup->setParameter(i, qrand() % ((p.upperLimit - p.lowerLimit)/3) + p.lowerLimit);
+		piece->setPickupParameter(i, qrand() % ((p.upperLimit - p.lowerLimit)/3) + p.lowerLimit);
 	}	
 
 	// set subcanes
-	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
+	for (unsigned int i = 0; i < piece->subpickupCount(); ++i)
 	{
-		SubpickupTemplate t = pickup->subpickupTemplate(i);
+		SubpickupTemplate t = piece->subpickupTemplate(i);
 		t.cane = cane1;
-		pickup->setSubpickupTemplate(t, i);
+		piece->setSubpickupTemplate(t, i);
 	}
 	// if a second cane is provided, alternate with the first one
 	if (cane2 != NULL)
 	{
-		for (unsigned int i = 0; i < pickup->subpickupCount(); i+=2)
+		for (unsigned int i = 0; i < piece->subpickupCount(); i+=2)
 		{
-			SubpickupTemplate t = pickup->subpickupTemplate(i);
+			SubpickupTemplate t = piece->subpickupTemplate(i);
 			t.cane = cane2;
-			pickup->setSubpickupTemplate(t, i);
+			piece->setSubpickupTemplate(t, i);
 		}
 	}
-
-
-	return pickup;
-}
-
-Piece* randomPiece(Pickup* pickup)
-{
-	int randomTemplateNumber = qrand() % (PieceTemplate::lastSeedTemplate() - PieceTemplate::firstSeedTemplate())
-		+ PieceTemplate::firstSeedTemplate();
-	Piece* piece = new Piece(static_cast<PieceTemplate::Type>(randomTemplateNumber));
-
-	// set pickup
-	piece->setPickup(pickup);
 
 	return piece;
 }

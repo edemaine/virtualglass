@@ -114,7 +114,6 @@ HEADERS += vgapp.h \
 	cane.h \
 	canetemplate.h \
 	subcanetemplate.h \
-	pickup.h \
 	piece.h \
 	piecetemplate.h \
 	pickuptemplate.h \
@@ -177,7 +176,6 @@ SOURCES += main.cpp \
 	piecetemplate.cpp \
 	canetemplate.cpp \
 	pickuptemplate.cpp \
-	pickup.cpp \
 	subpickuptemplate.cpp \
 	pickupeditorviewwidget.cpp \
 	purecolorlibrarywidget.cpp \

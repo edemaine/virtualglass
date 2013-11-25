@@ -4,8 +4,12 @@
 #define PICKUP_H
 
 #include <vector>
+
+#include <QObject>
+
 #include "shape.h"
 #include "pickuptemplate.h"
+#include "templateparameter.h"
 #include "subpickuptemplate.h"
 
 class GlassColor;
@@ -13,8 +17,10 @@ class TemplateParameter;
 
 using std::vector;
 
-class Pickup
+class Pickup : public QObject
 {
+	Q_OBJECT
+
 	friend class Piece;
 
 	public:
@@ -42,6 +48,9 @@ class Pickup
 		void setUnderlayGlassColor(GlassColor* c);
 		void setCasingGlassColor(GlassColor* c);
 
+	signals:
+		void modified();
+
 	private:
 		GlassColor* overlayGlassColor_;
 		GlassColor* underlayGlassColor_;
@@ -53,6 +62,7 @@ class Pickup
 		void updateSubs();
 		void pushNewSubcane(vector<SubpickupTemplate>* newSubs, Point3D location,
 			enum PickupCaneOrientation ori, float length, float width, enum GeometricShape s); 
+
 };
 
 Pickup *deep_copy(const Pickup *);

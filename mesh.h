@@ -53,7 +53,7 @@ namespace MeshInternal
 	};
 
 	// Methods
-	void generateMesh(Pickup* cane, Geometry *geometry, bool isTopLevel, unsigned int quality, clock_t end);
+	void generatePickupMesh(Piece* piece, Geometry *geometry, bool isTopLevel, unsigned int quality, clock_t end);
 	void generateMesh(Cane* cane, Geometry* geometry, unsigned int quality, clock_t end);
 	void recurseMesh(Cane* cane, Geometry *geometry, vector<Ancestor>& ancestors, 
 		float length, unsigned int quality, bool isTopLevel, clock_t end);

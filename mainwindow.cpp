@@ -692,7 +692,7 @@ void MainWindow :: randomSimplePieceExampleActionTriggered()
 {
 	GlassColor* glassColor = randomGlassColor();
 	Cane* squareCane = randomSimpleCane(SQUARE_SHAPE, glassColor);
-	Piece* piece = randomPiece(randomPickup(squareCane));
+	Piece* piece = randomPiece(squareCane);
 
 	glassColorLibraryLayout->addWidget(new GlassColorLibraryWidget(glassColor, this));
 	undoRedo->addedGlassColor(glassColor, glassColorLibraryLayout->count()-1);
@@ -715,7 +715,7 @@ void MainWindow :: randomComplexPieceExampleActionTriggered()
 	Cane* squareCane = randomSimpleCane(SQUARE_SHAPE, glassColor2);
 	Cane* complexCane1 = randomComplexCane(circleCane, squareCane);
 	Cane* complexCane2 = randomComplexCane(circleCane, squareCane);
-	Piece* piece = randomPiece(randomPickup(complexCane1, complexCane2));
+	Piece* piece = randomPiece(complexCane1, complexCane2);
 
 	if (piece->hasDependencyOn(glassColor1)) 
 	{
@@ -980,7 +980,7 @@ void MainWindow :: newCaneButtonClicked()
 
 void MainWindow :: newPieceButtonClicked()
 {
-	Piece* newPiece = new Piece(PieceTemplate::TUMBLER);
+	Piece* newPiece = new Piece(PieceTemplate::TUMBLER, PickupTemplate::VERTICAL);
 	pieceLibraryLayout->addWidget(new PieceLibraryWidget(newPiece, this));
 	undoRedo->addedPiece(newPiece, pieceLibraryLayout->count()-1);
 	setViewMode(PIECE_VIEW_MODE);

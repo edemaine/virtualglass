@@ -22,7 +22,7 @@ bool generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometr
 	if (pickupGeometry != NULL)
 	{
 		pickupGeometry->clear();
-		generateMesh(piece->pickup(), pickupGeometry, true, quality, endPickup);
+		generatePickupMesh(piece, pickupGeometry, true, quality, endPickup);
 		completedPickup = clock() < endPickup;
 		pickupGeometry->compute_normals_from_triangles();
 	}
@@ -33,7 +33,7 @@ bool generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometr
 	if (pieceGeometry != NULL)
 	{
 		pieceGeometry->clear();
-		generateMesh(piece->pickup(), pieceGeometry, false, quality, endPiece);
+		generatePickupMesh(piece, pieceGeometry, false, quality, endPiece);
 		completedPiece = clock() < endPiece;
 		applyPieceTransform(pieceGeometry, piece);
 		casePiece(pieceGeometry, piece);
@@ -148,7 +148,7 @@ void casePiece(Geometry* geometry, Piece* piece)
 {
 	// base thickness of casing off of representative (first) cane in pickup
 	float thickness;
-	SubpickupTemplate firstTemp = piece->pickup()->subpickupTemplate(0);
+	SubpickupTemplate firstTemp = piece->subpickupTemplate(0);
 	if (firstTemp.orientation == MURRINE_PICKUP_CANE_ORIENTATION)
 		thickness = firstTemp.length*2.5;	
 	else
@@ -156,7 +156,7 @@ void casePiece(Geometry* geometry, Piece* piece)
 	
 	// mesh the slab and apply the casing
 	unsigned int verticesStart = geometry->vertices.size();
-	meshPickupCasingSlab(geometry, piece->pickup()->casingGlassColor()->color(), 0.0, thickness);
+	meshPickupCasingSlab(geometry, piece->casingGlassColor()->color(), 0.0, thickness);
 	Spline spline = piece->spline();
 	for (uint32_t i = verticesStart; i < geometry->vertices.size(); ++i)
 		applyPieceTransform(geometry->vertices[i], 0.0 /* NO TWIST */, spline);
@@ -677,16 +677,15 @@ void generateMesh(Cane* cane, Geometry* geometry, unsigned int quality, clock_t 
 	geometry->compute_normals_from_triangles();
 }
 
-void generateMesh(Pickup* pickup, Geometry *geometry, bool isTopLevel, unsigned int quality, clock_t end)
+void generatePickupMesh(Piece* piece, Geometry *geometry, bool isTopLevel, unsigned int quality, clock_t end)
 {
-	if (pickup == NULL)
-		return;
+	assert(piece);
 
 	geometry->clear();
-	for (unsigned int i = 0; i < pickup->subpickupCount(); ++i)
+	for (unsigned int i = 0; i < piece->subpickupCount(); ++i)
 	{
 		vector<Ancestor> ancestors;
-		SubpickupTemplate t = pickup->subpickupTemplate(i);
+		SubpickupTemplate t = piece->subpickupTemplate(i);
 		uint32_t startVert = geometry->vertices.size();
 		recurseMesh(t.cane, geometry, ancestors, t.length, quality, isTopLevel, end);
 		for (unsigned int j = startVert; j < geometry->vertices.size(); ++j)

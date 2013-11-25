@@ -21,6 +21,7 @@ Cane :: Cane(CaneTemplate::Type t)
 
 	// initialize casings and subcanes to something simple
 	this->casings_.push_back(Casing(1.0, CIRCLE_SHAPE, GlobalGlass::color()));
+	this->addCasingDependency(GlobalGlass::color());
 	this->casings_[0].shape = CIRCLE_SHAPE;
 	this->count_ = 0;
 	this->type_ = CaneTemplate::BASE_CIRCLE;
@@ -29,36 +30,86 @@ Cane :: Cane(CaneTemplate::Type t)
 	setTemplateType(t);
 }
 
-void Cane :: dependencyModified()
+bool Cane :: hasDependencyOn(GlassColor* glassColor)
 {
-	emit modified();
+	for (unsigned int i = 0; i < this->casings_.size(); ++i)
+	{
+		if (this->casings_[i].glassColor == glassColor)
+			return true;
+	}
+
+	bool childrenAreDependent = false;
+	for (unsigned int i = 0; i < this->subcanes_.size(); ++i)
+		childrenAreDependent = (childrenAreDependent || this->subcanes_[i].cane->hasDependencyOn(glassColor));
+
+	return childrenAreDependent;
 }
 
-bool Cane :: hasDependencyOn(Cane* cane) 
+bool Cane :: hasDependencyOn(Cane* cane)
 {
 	if (this == cane)
 		return true;
 
 	bool childrenAreDependent = false;
-	for (unsigned int i = 0; i < this->subcanes_.size(); ++i) 
-		childrenAreDependent = (childrenAreDependent || this->subcanes_[i].cane->hasDependencyOn(cane)); 
+	for (unsigned int i = 0; i < this->subcanes_.size(); ++i)
+		childrenAreDependent = (childrenAreDependent || this->subcanes_[i].cane->hasDependencyOn(cane));
 
 	return childrenAreDependent;
 }
 
-bool Cane :: hasDependencyOn(GlassColor* glassColor) 
+unsigned int Cane :: casingDependencyOccurrances(GlassColor* glassColor)
 {
-	for (unsigned int i = 0; i < this->casings_.size(); ++i) 
+	int occurrances = 0;
+
+	for (unsigned int i = 0; i < this->casings_.size(); ++i)
 	{
 		if (this->casings_[i].glassColor == glassColor)
-			return true;
-	} 
+			++occurrances;
+	}	
 
-	bool childrenAreDependent = false;
-	for (unsigned int i = 0; i < this->subcanes_.size(); ++i) 
-		childrenAreDependent = (childrenAreDependent || this->subcanes_[i].cane->hasDependencyOn(glassColor)); 
+	return occurrances;
+}
 
-	return childrenAreDependent;
+void Cane :: addCasingDependency(GlassColor* glassColor)
+{
+	if (casingDependencyOccurrances(glassColor) == 1)
+		connect(glassColor, SIGNAL(modified()), this, SLOT(dependencyModified()));
+}
+
+void Cane :: removeCasingDependency(GlassColor* glassColor)
+{
+	if (casingDependencyOccurrances(glassColor) == 0)
+		disconnect(glassColor, SIGNAL(modified()), this, SLOT(dependencyModified()));
+}
+
+unsigned int Cane :: subcaneDependencyOccurrances(Cane* cane)
+{
+	int occurrances = 0;
+
+	for (unsigned int i = 0; i < this->subcanes_.size(); ++i)
+	{
+		if (this->subcanes_[i].cane == cane)
+			++occurrances;
+	}	
+
+	return occurrances;
+}
+
+void Cane :: addSubcaneDependency(Cane* cane)
+{
+	if (subcaneDependencyOccurrances(cane) == 1)
+		connect(cane, SIGNAL(modified()), this, SLOT(dependencyModified()));
+}
+
+void Cane :: removeSubcaneDependency(Cane* cane)
+{
+	if (subcaneDependencyOccurrances(cane) == 0)
+		disconnect(cane, SIGNAL(modified()), this, SLOT(dependencyModified()));
+}
+
+void Cane :: dependencyModified()
+{
+	emit modified();
 }
 
 void Cane :: setTemplateType(CaneTemplate::Type t)
@@ -114,7 +165,7 @@ void Cane :: setTemplateType(CaneTemplate::Type t)
 			// we don't touch anything, who knows what's going on in there
 			break;
 	}
-	resetSubs(true);
+	resetSubcanes(true); // emits modified()
 }
 
 void Cane :: setCasingColor(GlassColor* gc, unsigned int index) 
@@ -122,18 +173,13 @@ void Cane :: setCasingColor(GlassColor* gc, unsigned int index)
 	if (index >= this->casings_.size())
 		return;
 	this->casings_[index].glassColor = gc;
+	emit modified();
 }
 
 void Cane :: setOutermostCasingColor(GlassColor* gc) 
 {
 	int last = this->casings_.size()-1;
-	this->casings_[last].glassColor = gc;
-}
-
-const GlassColor* Cane :: outermostCasingColor() 
-{
-	int last = this->casings_.size()-1;
-	return this->casings_[last].glassColor;
+	setCasingColor(gc, last);
 }
 
 const GlassColor* Cane :: casingColor(unsigned int index) 
@@ -141,6 +187,12 @@ const GlassColor* Cane :: casingColor(unsigned int index)
 	if (index >= this->casings_.size())
 		return NULL;
 	return this->casings_[index].glassColor;
+}
+
+const GlassColor* Cane :: outermostCasingColor() 
+{
+	int last = this->casings_.size()-1;
+	return casingColor(last);
 }
 
 bool Cane :: hasMinimumCasingCount() 
@@ -166,7 +218,7 @@ unsigned int Cane :: count()
 void Cane :: setCount(unsigned int count_)
 {
 	this->count_ = count_;
-	resetSubs(false);
+	resetSubcanes(false);
 }
 
 void Cane :: removeCasing() 
@@ -182,7 +234,9 @@ void Cane :: removeCasing()
 	// "puff out" the casing thicknesses so second outermost now has radius of 
 	// previous outermost one
 	float diff = 1.0 - casings[count-2].thickness;
+	Casing removedCasing = casings.back();
 	casings.pop_back();
+	removeCasingDependency(removedCasing.glassColor);
 	casings[count-2].thickness = 1.0;
 	for (unsigned int i = 0; i < casings.size()-1; ++i) 
 	{
@@ -195,6 +249,8 @@ void Cane :: removeCasing()
 	// rescale subcanes
 	for (unsigned int i = 0; i < this->subcanes_.size(); ++i)
 		this->subcanes_[i].rescale(casings[0].thickness / oldInnermostCasingThickness);
+
+	emit modified();
 }
 
 
@@ -226,12 +282,15 @@ void Cane :: addCasing(enum GeometricShape _shape)
 
 	// add the new casing
 	casings.push_back(Casing(1.0, _shape, GlobalGlass::color()));
+	addCasingDependency(GlobalGlass::color());
 	if (this->outermostCasingShape() != CIRCLE_SHAPE)
 		this->twist_ = 0.0;
 
 	// update subpulls by rescaling them according to innermost casing rescaling
 	for (unsigned int i = 0; i < this->subcanes_.size(); ++i) 
 		this->subcanes_[i].rescale(casings[0].thickness / oldInnermostCasingThickness);
+
+	emit modified();
 }
 
 void Cane :: setCasingThickness(float t, unsigned int index) 
@@ -254,6 +313,8 @@ void Cane :: setCasingThickness(float t, unsigned int index)
 	// otherwise just change the casing
 	else
 		this->casings_[index].thickness = t;
+	
+	emit modified();
 }
 
 void Cane :: setOutermostCasingShape(enum GeometricShape _shape) 
@@ -291,7 +352,7 @@ void Cane :: setOutermostCasingShape(enum GeometricShape _shape)
 	if (this->outermostCasingShape() != CIRCLE_SHAPE)
 		this->twist_ = 0.0;
 
-	resetSubs(false);
+	resetSubcanes(false); // calls emit modified
 }
 
 float Cane :: casingThickness(unsigned int index) 
@@ -302,7 +363,7 @@ float Cane :: casingThickness(unsigned int index)
 enum GeometricShape Cane :: outermostCasingShape() 
 {
 	int last = this->casings_.size()-1;
-	return this->casings_[last].shape;
+	return casingShape(last);
 }
 
 enum GeometricShape Cane :: casingShape(unsigned int index) 
@@ -310,17 +371,17 @@ enum GeometricShape Cane :: casingShape(unsigned int index)
 	return this->casings_[index].shape;
 }
 
-void Cane :: pushNewSubpull(bool hardReset, vector<SubcaneTemplate>* newSubs,
+void Cane :: pushNewSubcane(bool hardReset, vector<SubcaneTemplate>* newSubcanes,
 	enum GeometricShape _shape, Point2D p, float diameter) 
 {
 	Cane* cane = NULL;
 
 	// if it's not a hard reset and there are still old subcanes to use and the next one matches shape
 	// with the shape we want to have, then use it
-	if (!hardReset && newSubs->size() < this->subcanes_.size() 
-		&& _shape == this->subcanes_[newSubs->size()].shape) 
+	if (!hardReset && newSubcanes->size() < this->subcanes_.size() 
+		&& _shape == this->subcanes_[newSubcanes->size()].shape) 
 	{
-		cane = this->subcanes_[newSubs->size()].cane;
+		cane = this->subcanes_[newSubcanes->size()].cane;
 	}
 	else // otherwise just use whichever filler subcane matches the shape
 	{
@@ -335,10 +396,10 @@ void Cane :: pushNewSubpull(bool hardReset, vector<SubcaneTemplate>* newSubs,
 		}
 	}
 
-	newSubs->push_back(SubcaneTemplate(cane, _shape, p, diameter));
+	newSubcanes->push_back(SubcaneTemplate(cane, _shape, p, diameter));
 }
 
-// resetSubs()
+// resetSubcanes()
 
 // Description:
 // This function is invoked after the template or a template parameter,
@@ -347,12 +408,12 @@ void Cane :: pushNewSubpull(bool hardReset, vector<SubcaneTemplate>* newSubs,
 // of subcanes changed. For instance, changing a template parameter 
 // specifying the number of subcanes in a row changes the size and location 
 // of subcanes, as well as increasing or decreasing the number of subcanes.
-void Cane :: resetSubs(bool hardReset)
+void Cane :: resetSubcanes(bool hardReset)
 {
 	Point2D p = make_vector(0.0f, 0.0f);
 	float radius = this->casings_[0].thickness;
 
-	vector<SubcaneTemplate> newSubs;
+	vector<SubcaneTemplate> newSubcanes;
 	
 	switch (this->type_) 
 	{
@@ -365,7 +426,7 @@ void Cane :: resetSubs(bool hardReset)
 			{
 				float littleRadius = (2 * radius / this->count_) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
-				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0);
+				pushNewSubcane(hardReset, &newSubcanes, CIRCLE_SHAPE, p, littleRadius * 2.0);
 			}
 			break;
 		}
@@ -376,7 +437,7 @@ void Cane :: resetSubs(bool hardReset)
 			{
 				float littleRadius = (2 * radius / this->count_) / 2;
 				p.x = -radius + littleRadius + i * 2 * littleRadius;
-				pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, littleRadius * 2.0);
+				pushNewSubcane(hardReset, &newSubcanes, SQUARE_SHAPE, p, littleRadius * 2.0);
 			}
 			break;
 		}
@@ -388,13 +449,13 @@ void Cane :: resetSubs(bool hardReset)
 			unsigned int littleCount = MAX(this->count_-1, 3);
 			float theta = TWO_PI / littleCount;
 			float k = sin(theta/2) / (1 + sin(theta/2));
-			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, (1 - 2 * k) * 2 * radius);
+			pushNewSubcane(hardReset, &newSubcanes, CIRCLE_SHAPE, p, (1 - 2 * k) * 2 * radius);
 			p.x = p.y = 0.0;
 			for (unsigned int i = 0; i < littleCount; ++i) 
 			{
 				p.x = (1.0 - k) * radius * cos(TWO_PI / littleCount * i);
 				p.y = (1.0 - k) * radius * sin(TWO_PI / littleCount * i);
-				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * k * radius);
+				pushNewSubcane(hardReset, &newSubcanes, CIRCLE_SHAPE, p, 2 * k * radius);
 			}
 			break;
 		}
@@ -409,14 +470,14 @@ void Cane :: resetSubs(bool hardReset)
 			float littleRadius = (radius / (sideCount + 0.5)) / 2.0;
 	
 			p.x = p.y = 0.0;
-			pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2.0);
+			pushNewSubcane(hardReset, &newSubcanes, CIRCLE_SHAPE, p, littleRadius * 2.0);
 			for (unsigned int i = 0; i < sideCount; ++i) 
 			{
 				for (unsigned int theta = 0; theta < wings; ++theta) 
 				{
 					p.x = (littleRadius * 2 * (i+1)) * cos(TWO_PI / wings * theta);
 					p.y = (littleRadius * 2 * (i+1)) * sin(TWO_PI / wings * theta);
-					pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, littleRadius * 2);
+					pushNewSubcane(hardReset, &newSubcanes, CIRCLE_SHAPE, p, littleRadius * 2);
 				}
 			}
 			break;
@@ -447,9 +508,9 @@ void Cane :: resetSubs(bool hardReset)
 					p.x = -radius + littleRadius + 2 * littleRadius * i;
 					p.y = -radius + littleRadius + 2 * littleRadius * j;
 					if (this->type_ == CaneTemplate::SQUARE_OF_CIRCLES)
-						pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
+						pushNewSubcane(hardReset, &newSubcanes, CIRCLE_SHAPE, p, 2 * littleRadius);
 					else
-						pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius);
+						pushNewSubcane(hardReset, &newSubcanes, SQUARE_SHAPE, p, 2 * littleRadius);
 				}
 				for (j = s; j <= s; --j) 
 				{
@@ -457,9 +518,9 @@ void Cane :: resetSubs(bool hardReset)
 					p.x = -radius + littleRadius + 2 * littleRadius * i;
 					p.y = -radius + littleRadius + 2 * littleRadius * j;
 					if (this->type_ == CaneTemplate::SQUARE_OF_CIRCLES)
-						pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
+						pushNewSubcane(hardReset, &newSubcanes, CIRCLE_SHAPE, p, 2 * littleRadius);
 					else
-						pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 2 * littleRadius);
+						pushNewSubcane(hardReset, &newSubcanes, SQUARE_SHAPE, p, 2 * littleRadius);
 				}
 				
 			}
@@ -479,31 +540,31 @@ void Cane :: resetSubs(bool hardReset)
 			float littleRadius = radius / (sideCount + 1);
 
 			p.x = p.y = 0.0;
-			pushNewSubpull(hardReset, &newSubs, SQUARE_SHAPE, p, 
+			pushNewSubcane(hardReset, &newSubcanes, SQUARE_SHAPE, p, 
 				2 * littleRadius * (sideCount-1));
 			for (unsigned int i = 0; i < sideCount; ++i)
 			{
 				p.x = -2 * littleRadius * sideCount / 2.0 + 2 * littleRadius * i;
 				p.y = -2 * littleRadius * sideCount / 2.0;
-				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
+				pushNewSubcane(hardReset, &newSubcanes, CIRCLE_SHAPE, p, 2 * littleRadius);
 			}
 			for (unsigned int j = 0; j < sideCount; ++j)
 			{
 				p.x = -2 * littleRadius * sideCount / 2.0 + 2 * littleRadius * sideCount; 
 				p.y = -2 * littleRadius * sideCount / 2.0 + 2 * littleRadius * j;
-				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
+				pushNewSubcane(hardReset, &newSubcanes, CIRCLE_SHAPE, p, 2 * littleRadius);
 			}
 			for (unsigned int i = sideCount; i >= 1; --i) 
 			{
 				p.x = -2 * littleRadius * sideCount / 2.0 + 2 * littleRadius * i;
 				p.y = -2 * littleRadius * sideCount / 2.0 + 2 * littleRadius * sideCount;
-				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
+				pushNewSubcane(hardReset, &newSubcanes, CIRCLE_SHAPE, p, 2 * littleRadius);
 			}
 			for (unsigned int j = sideCount; j >= 1; --j) 
 			{
 				p.x = -2 * littleRadius * sideCount / 2.0;
 				p.y = -2 * littleRadius * sideCount / 2.0 + 2 * littleRadius * j;
-				pushNewSubpull(hardReset, &newSubs, CIRCLE_SHAPE, p, 2 * littleRadius);
+				pushNewSubcane(hardReset, &newSubcanes, CIRCLE_SHAPE, p, 2 * littleRadius);
 			}
 			break;
 		}
@@ -517,14 +578,27 @@ void Cane :: resetSubs(bool hardReset)
 				// it's a `soft' template change from a rigid one 
 				// to a custom one, so mapping from old cane locations/subcanes
 				// to new ones is direct and very natural
-				pushNewSubpull(false, &newSubs, this->subcanes_[i].shape, this->subcanes_[i].location, 
+				pushNewSubcane(false, &newSubcanes, this->subcanes_[i].shape, this->subcanes_[i].location, 
 					this->subcanes_[i].diameter);
 			}
 			break;
 		}
 	}
 
-	this->subcanes_ = newSubs;
+	while (this->subcanes_.size() > 0)
+	{
+		SubcaneTemplate lastSubcane = this->subcanes_.back();
+		this->subcanes_.pop_back();
+		removeSubcaneDependency(lastSubcane.cane);
+	}
+	while (newSubcanes.size() > 0)
+	{
+		SubcaneTemplate lastSubcane = newSubcanes.back();
+		newSubcanes.pop_back();
+		this->subcanes_.push_back(lastSubcane);
+		addSubcaneDependency(lastSubcane.cane);
+	}
+	emit modified();
 }
 
 SubcaneTemplate Cane :: subcaneTemplate(unsigned int index)
@@ -535,16 +609,22 @@ SubcaneTemplate Cane :: subcaneTemplate(unsigned int index)
 void Cane :: setSubcaneTemplate(SubcaneTemplate t, unsigned int index)
 {
 	this->subcanes_[index] = t;
+	emit modified();
 }
 
 void Cane :: addSubcaneTemplate(SubcaneTemplate t)
 {
 	this->subcanes_.push_back(t);
+	addSubcaneDependency(t.cane);
+	emit modified();
 }
 
 void Cane :: removeSubcaneTemplate(unsigned int index)
 {
+	SubcaneTemplate t = this->subcanes_[index];
 	this->subcanes_.erase(this->subcanes_.begin() + index);
+	removeSubcaneDependency(t.cane);
+	emit modified();
 }
 
 unsigned int Cane :: subpullCount()
@@ -560,6 +640,7 @@ float Cane :: twist()
 void Cane :: setTwist(float t)
 {
 	this->twist_ = t;
+	emit modified();
 }
 
 float* Cane :: twistPtr()
@@ -571,23 +652,67 @@ Cane* Cane :: copy() const
 {
 	Cane* c = new Cane(this->type_);
 	c->type_ = this->type_;
-	c->casings_ = this->casings_;
+	while (c->casings_.size() > 0)
+	{
+		Casing lastCasing = c->casings_.back();
+		c->casings_.pop_back();
+		c->removeCasingDependency(lastCasing.glassColor);
+	}
+	for (unsigned int i = 0; i < this->casings_.size(); ++i)
+	{
+		c->casings_.push_back(this->casings_[i]);
+		c->addCasingDependency(this->casings_[i].glassColor);	
+	}
 	c->count_ = this->count_;
 	c->twist_ = this->twist_;
-	c->subcanes_ = this->subcanes_;
+	while (c->subcanes_.size() > 0)
+	{
+		SubcaneTemplate lastSubcane = c->subcanes_.back();
+		c->subcanes_.pop_back();
+		c->removeSubcaneDependency(lastSubcane.cane);
+	}
+	for (unsigned int i = 0; i < this->subcanes_.size(); ++i)
+	{
+		c->subcanes_.push_back(this->subcanes_[i]);
+		c->addSubcaneDependency(this->subcanes_[i].cane);	
+	}
+
 	return c;
 }
 
 void Cane :: set(Cane* c)
 {
 	this->type_ = c->type_;
-	this->casings_ = c->casings_;
+	while (this->casings_.size() > 0)
+	{
+		Casing lastCasing = this->casings_.back();
+		this->casings_.pop_back();
+		this->removeCasingDependency(lastCasing.glassColor);
+	}
+	for (unsigned int i = 0; i < c->casings_.size(); ++i)
+	{
+		this->casings_.push_back(c->casings_[i]);
+		this->addCasingDependency(c->casings_[i].glassColor);	
+	}
 	this->count_ = c->count_;
 	this->twist_ = c->twist_;
-	this->subcanes_ = c->subcanes_;
+	while (this->subcanes_.size() > 0)
+	{
+		SubcaneTemplate lastSubcane = this->subcanes_.back();
+		this->subcanes_.pop_back();
+		this->removeSubcaneDependency(lastSubcane.cane);
+	}
+	for (unsigned int i = 0; i < c->subcanes_.size(); ++i)
+	{
+		this->subcanes_.push_back(c->subcanes_[i]);
+		this->addSubcaneDependency(c->subcanes_[i].cane);	
+	}
+	emit modified();
 }
 
-Cane *deep_copy(const Cane *_cane) 
+// WARNING: Does not create any modification signals in the copy.
+// To be used as a reference only, and not to be modified.
+Cane * deep_copy(const Cane *_cane) 
 {
 	unordered_map<const Cane*, Cane*> copies;
 	Cane *cane = _cane->copy();
@@ -610,12 +735,13 @@ Cane *deep_copy(const Cane *_cane)
 				to_update.push_back(f->second);
 			}
 			s.cane = f->second;
-			t->setSubcaneTemplate(s, i);
+			t->setSubcaneTemplate(s, i);			
 		}
 	}
 	return cane;
 }
 
+// WARNING: Does not remove any modification signals found in the copy.
 void deep_delete(Cane *cane) 
 {
 	//Because canes don't delete their children (which is right):

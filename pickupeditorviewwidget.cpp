@@ -41,9 +41,9 @@ void PickupEditorViewWidget :: subcaneAt(float x, float y, Cane** subcane, int* 
 {
 	int hitIndex = -1;
 	float hitDepth = -100.0;
-	for (unsigned int i = 0; i < this->piece->pickup()->subpickupCount(); ++i)
+	for (unsigned int i = 0; i < this->piece->subpickupCount(); ++i)
 	{
-		SubpickupTemplate sp = this->piece->pickup()->subpickupTemplate(i);
+		SubpickupTemplate sp = this->piece->subpickupTemplate(i);
 		Point2D ll, ur;
 		ll = ur = make_vector<float>(0.0f, 0.0f);
 
@@ -88,7 +88,7 @@ void PickupEditorViewWidget :: subcaneAt(float x, float y, Cane** subcane, int* 
 	if (hitIndex != -1)
 	{
 		*subcaneIndex = hitIndex;
-		*subcane = this->piece->pickup()->subpickupTemplate(hitIndex).cane;
+		*subcane = this->piece->subpickupTemplate(hitIndex).cane;
 	}
 	else
 	{
@@ -210,18 +210,18 @@ void PickupEditorViewWidget :: dropEvent(QDropEvent* event)
 		event->accept();
 		if ((event->keyboardModifiers() & Qt::ShiftModifier))
 		{
-			for (unsigned int i = 0; i < this->piece->pickup()->subpickupCount(); ++i)
+			for (unsigned int i = 0; i < this->piece->subpickupCount(); ++i)
 			{
-				SubpickupTemplate t = this->piece->pickup()->subpickupTemplate(i);
+				SubpickupTemplate t = this->piece->subpickupTemplate(i);
 				t.cane = droppedCane;
-				this->piece->pickup()->setSubpickupTemplate(t, i);
+				this->piece->setSubpickupTemplate(t, i);
 			}
 		}
 		else
 		{
-			SubpickupTemplate t = this->piece->pickup()->subpickupTemplate(subcaneIndex);
+			SubpickupTemplate t = this->piece->subpickupTemplate(subcaneIndex);
 			t.cane = droppedCane;
-			this->piece->pickup()->setSubpickupTemplate(t, subcaneIndex);
+			this->piece->setSubpickupTemplate(t, subcaneIndex);
 		}
 		undoRedo->modifiedPiece(piece);
 		emit someDataChanged();

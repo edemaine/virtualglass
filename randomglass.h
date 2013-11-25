@@ -6,7 +6,7 @@
 
 class GlassColor;
 class Cane;
-class Pickup;
+class Piece;
 
 GlassColor* randomGlassColor();
 
@@ -14,9 +14,7 @@ Cane* randomSimpleCane(enum GeometricShape outermostCasingShape, GlassColor* col
 
 Cane* randomComplexCane(Cane* circleSimpleCane, Cane* squareSimpleCane);
 
-Pickup* randomPickup(Cane* cane1, Cane* cane2=NULL);
-
-Piece* randomPiece(Pickup* pickup);
+Piece* randomPiece(Cane* cane1, Cane* cane2=NULL);
 
 #endif
 

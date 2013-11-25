@@ -72,9 +72,17 @@ class Cane : public QObject
 
 	private:
 		void initializeTemplate();
-		void resetSubs(bool hardReset);
-		void pushNewSubpull(bool hardReset, vector<SubcaneTemplate>* newSubs,
+		void resetSubcanes(bool hardReset);
+		void pushNewSubcane(bool hardReset, vector<SubcaneTemplate>* newSubcanes,
 			enum GeometricShape s, Point2D location, float diameter);
+
+		unsigned int casingDependencyOccurrances(GlassColor* glassColor);
+		void addCasingDependency(GlassColor* gc);
+		void removeCasingDependency(GlassColor* gc);
+
+		unsigned int subcaneDependencyOccurrances(Cane* cane);
+		void addSubcaneDependency(Cane* cane);
+		void removeSubcaneDependency(Cane* cane);
 
 		enum CaneTemplate::Type type_;
 		vector<Casing> casings_;
@@ -86,7 +94,7 @@ class Cane : public QObject
 		void dependencyModified();
 };
 
-Cane *deep_copy(const Cane *cane);
+Cane * deep_copy(const Cane *cane);
 void deep_delete(Cane *cane);
 
 #endif

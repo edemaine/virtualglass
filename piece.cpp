@@ -1,23 +1,18 @@
 
 #include "piece.h"
 #include "cane.h"
+#include "constants.h"
+#include "globalglass.h"
 
-Piece :: Piece(enum PieceTemplate::Type type)
+Piece :: Piece(enum PieceTemplate::Type pieceType, enum PickupTemplate::Type pickupType)
 {
 	this->twist_ = 0.0;
-	setTemplateType(type, true);
-	// initialize the piece's pickup to be something boring and base
-	this->pickup_ = new Pickup(PickupTemplate::VERTICAL);
-}
+	setPieceTemplateType(pieceType, true);
 
-void Piece::setPickup(Pickup* pickup)
-{
-	this->pickup_ = pickup;
-}
-
-Pickup* Piece::pickup() const
-{
-	return this->pickup_;
+	this->casingGlassColor_ = GlobalGlass::color();
+	this->underlayGlassColor_ = GlobalGlass::color();
+	this->overlayGlassColor_ = GlobalGlass::color();
+        setPickupTemplateType(pickupType, true);
 }
 
 void Piece::setSpline(Spline s)
@@ -25,7 +20,7 @@ void Piece::setSpline(Spline s)
 	this->spline_ = s;
 }
 
-Spline Piece::spline()
+Spline Piece::spline() const
 {
 	return this->spline_;
 }
@@ -35,7 +30,7 @@ void Piece :: setTwist(float t)
 	this->twist_ = t;
 }
 
-float Piece :: twist()
+float Piece :: twist() const
 {
 	return this->twist_;
 }
@@ -54,9 +49,9 @@ bool Piece :: hasDependencyOn(Cane* cane)
 {
 	bool pickupsDependOn = false;
 
-	for (unsigned int i = 0; i < this->pickup_->subpickupCount(); ++i)
+	for (unsigned int i = 0; i < this->subpickupCount(); ++i)
 	{
-		if (this->pickup_->subpickupTemplate(i).cane->hasDependencyOn(cane))
+		if (this->subpickupTemplate(i).cane->hasDependencyOn(cane))
 		{
 			pickupsDependOn = true;
 			break;
@@ -70,16 +65,16 @@ bool Piece :: hasDependencyOn(GlassColor* glassColor)
 {
 	bool pickupsDependOn = false;
 
-	for (unsigned int i = 0; i < pickup_->subpickupCount(); ++i)
+	for (unsigned int i = 0; i < this->subpickupCount(); ++i)
 	{
-		if (pickup_->subpickupTemplate(i).cane->hasDependencyOn(glassColor))
+		if (this->subpickupTemplate(i).cane->hasDependencyOn(glassColor))
 		{
 			pickupsDependOn = true;		
 			break;
 		}
 	}
 	
-	if (pickup_->overlayGlassColor() == glassColor || pickup_->underlayGlassColor() == glassColor)
+	if (overlayGlassColor_ == glassColor || underlayGlassColor_ == glassColor)
 		pickupsDependOn = true;
 
 	return pickupsDependOn;
@@ -90,12 +85,18 @@ bool Piece :: hasDependencyOn(GlassColor* glassColor)
 // but does not include the canes used.
 Piece* Piece :: copy() const
 {
-	Piece* p = new Piece(this->type_);
+	Piece* p = new Piece(this->pieceType_, this->pickupType_);
 
 	p->twist_ = this->twist_;
-	p->type_ = this->type_;
+	p->pieceType_ = this->pieceType_;
 	p->spline_ = this->spline_;
-	p->pickup_ = this->pickup_->copy();
+
+	p->overlayGlassColor_ = this->overlayGlassColor_;
+	p->underlayGlassColor_ = this->underlayGlassColor_;
+	p->casingGlassColor_ = this->casingGlassColor_;
+	p->subcanes_ = this->subcanes_;
+	p->pickupParameters_ = this->pickupParameters_;
+	p->pickupType_ = this->pickupType_;
 
 	return p;
 }
@@ -103,20 +104,26 @@ Piece* Piece :: copy() const
 void Piece :: set(Piece* p)
 {
 	this->twist_ = p->twist_;
-	this->type_ = p->type_;
+	this->pieceType_ = p->pieceType_;
 	this->spline_ = p->spline_;	
-	this->pickup_->set(p->pickup_);
+
+	this->overlayGlassColor_ = p->overlayGlassColor_;
+	this->underlayGlassColor_ = p->underlayGlassColor_;
+	this->casingGlassColor_ = p->casingGlassColor_;
+	this->subcanes_ = p->subcanes_;
+	this->pickupParameters_ = p->pickupParameters_;
+	this->pickupType_ = p->pickupType_;
 }
 
-void Piece :: setTemplateType(enum PieceTemplate::Type type, bool force)
+void Piece :: setPieceTemplateType(enum PieceTemplate::Type type, bool force)
 {
-	if (!force && this->type_ == type)
+	if (!force && this->pieceType_ == type)
 		return;
 
 	Spline &spline = this->spline_;
 
-	this->type_ = type;
-	switch (this->type_)
+	this->pieceType_ = type;
+	switch (this->pieceType_)
 	{
 		case PieceTemplate::TUMBLER:
 			while (spline.controlPoints().size() < 4)
@@ -185,25 +192,315 @@ void Piece :: setTemplateType(enum PieceTemplate::Type type, bool force)
 
 }
 
-enum PieceTemplate::Type Piece :: templateType()
+enum PieceTemplate::Type Piece :: pieceTemplateType()
 {
-	return this->type_;
+	return this->pieceType_;
+}
+
+SubpickupTemplate Piece :: subpickupTemplate(unsigned int index) const
+{
+	return this->subcanes_[index];
+}
+
+void Piece :: setSubpickupTemplate(SubpickupTemplate t, unsigned int index)
+{
+	this->subcanes_[index] = t;
+}
+
+unsigned int Piece :: subpickupCount() const
+{
+	return this->subcanes_.size();
+}
+
+GlassColor* Piece :: overlayGlassColor()
+{
+	return this->overlayGlassColor_;
+}
+
+GlassColor* Piece :: underlayGlassColor()
+{
+	return this->underlayGlassColor_;
+}
+
+GlassColor* Piece :: casingGlassColor()
+{
+	return this->casingGlassColor_;
+}
+
+void Piece :: setOverlayGlassColor(GlassColor* c)
+{
+	this->overlayGlassColor_ = c;
+}
+
+void Piece :: setUnderlayGlassColor(GlassColor* c)
+{
+	this->underlayGlassColor_ = c;
+}
+
+void Piece :: setCasingGlassColor(GlassColor* c)
+{
+	this->casingGlassColor_ = c;
+}
+
+void Piece :: pushNewSubcane(vector<SubpickupTemplate>* newSubcanes,
+        Point3D location, enum PickupCaneOrientation ori, float length, float width, enum GeometricShape shape)
+{
+	if (newSubcanes->size() < this->subcanes_.size())
+	{
+		newSubcanes->push_back(SubpickupTemplate(this->subcanes_[newSubcanes->size()].cane,
+			location, ori, length, width, shape));
+	}
+	else // you've run out of existing subcanes copy from
+	{
+		newSubcanes->push_back(SubpickupTemplate(GlobalGlass::circleCane(),
+			location, ori, length, width, shape));
+	}
+}
+
+void Piece :: updateSubcanes() 
+{
+	vector<SubpickupTemplate> newSubcanes;
+
+	vector<TemplateParameter> &parameters = this->pickupParameters_;
+
+	Point3D p;
+	float width, length;
+	switch (this->pickupType_) 
+	{
+		case PickupTemplate::MURRINE:
+			width = 2.0 / MAX(parameters[0].value, 1);
+			length = parameters[1].value*0.005 + 0.005;
+			for (int r = 0; r < parameters[0].value; ++r)
+			{
+				for (int c = 0; c < parameters[0].value; ++c)
+				{
+					p.x = -1.0 + width / 2 + width * r;
+					p.y = -1.0 + width / 2 + width * c;
+					p.z = -length/2;
+					pushNewSubcane(&newSubcanes, p, MURRINE_PICKUP_CANE_ORIENTATION, 
+						length, width-0.0001, SQUARE_SHAPE);
+				}
+			}
+			break;
+		case PickupTemplate::MURRINE_COLUMN:
+			width = 2.0 / MAX(parameters[0].value, 1);
+			for (int i = 0; i < parameters[0].value-1; ++i) {
+				p.x = 1.0 - width / 2;
+				p.y = -1.0 + width / 2 + width * (parameters[0].value - 1 - i);
+				p.z = -width/2;
+				pushNewSubcane(&newSubcanes, p, MURRINE_PICKUP_CANE_ORIENTATION, width, width-0.0001, SQUARE_SHAPE);
+				p.x = -1.0 + width / 2 + width * i;
+				p.y = -1.0;
+				p.z = 0.0;
+				pushNewSubcane(&newSubcanes, p, VERTICAL_PICKUP_CANE_ORIENTATION, 2.0, width-0.0001, CIRCLE_SHAPE);
+			}
+			p.x = 1.0 - width / 2;
+			p.y = -1.0 + width / 2;
+			p.z = -width/2;
+			pushNewSubcane(&newSubcanes, p, MURRINE_PICKUP_CANE_ORIENTATION, width, width-0.0001, SQUARE_SHAPE);
+			break;
+		case PickupTemplate::MURRINE_ROW:
+			p.x = p.y = p.z = 0.0;
+			width = 2.0 / MAX(parameters[0].value, 1);
+			for (int i = 0; i < parameters[0].value; ++i) {
+				p.x = -1.0 + width / 2 + width * i;
+				p.y = -1.0;
+				p.z = 0.0;
+				pushNewSubcane(&newSubcanes, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0 - width/2, 
+					width-0.0001, CIRCLE_SHAPE);
+				p.y = 0.0;
+				p.x = -1.0 + width / 2 + width * i;
+				p.z = -width/2;
+				pushNewSubcane(&newSubcanes, p, MURRINE_PICKUP_CANE_ORIENTATION, width, 
+					width-0.0001, SQUARE_SHAPE);
+				p.x = -1.0 + width / 2 + width * i;
+				p.y = width/2;
+				p.z = 0.0;
+				pushNewSubcane(&newSubcanes, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0 - width/2, 
+					width-0.0001, CIRCLE_SHAPE);
+			}
+			break;
+		case PickupTemplate::RETICELLO_VERTICAL_HORIZONTAL:
+			p.x = p.y = p.z = 0.0;
+			width = 2.0 / MAX(parameters[0].value, 1);
+			for (int i = 0; i < parameters[0].value/2; ++i)
+			{
+				p.x = -1.0 + width / 2 + width * i;
+				p.y = -1.0;
+				pushNewSubcane(&newSubcanes, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0, width-0.0001, SQUARE_SHAPE);
+				p.y = 0.0;
+				pushNewSubcane(&newSubcanes, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0, width-0.0001, SQUARE_SHAPE);
+			}
+			for (int i = 0; i < parameters[0].value; ++i)
+			{
+				p.x = 0.0 - width / 2 * (parameters[0].value % 2);
+				p.y = -1.0 + width / 2 + width * i;                                
+				pushNewSubcane(&newSubcanes, p, HORIZONTAL_PICKUP_CANE_ORIENTATION, 
+					1.0 + width / 2 * (parameters[0].value % 2), width-0.0001, SQUARE_SHAPE);
+			}
+			break;
+		case PickupTemplate::VERTICAL:
+			p.x = p.y = p.z = 0.0;
+			width = 2.0 / MAX(parameters[0].value, 1);
+			for (int i = 0; i < parameters[0].value; ++i) {
+				p.x = -1.0 + width / 2 + width * i;
+				p.y = -1.0;
+				//p.z = 2.0;
+				pushNewSubcane(&newSubcanes, p, VERTICAL_PICKUP_CANE_ORIENTATION, 2.0, width-0.0001, SQUARE_SHAPE);
+			}
+			break;
+		case PickupTemplate::VERTICAL_WITH_LIP_WRAP:
+			p.x = p.y = p.z = 0.0;
+			width = 2.0 / MAX(parameters[0].value, 1);
+			p.x = -1.0;
+			p.y = 1.0 - width/2;
+			pushNewSubcane(&newSubcanes, p, HORIZONTAL_PICKUP_CANE_ORIENTATION, 2.0, width, SQUARE_SHAPE);
+			for (int i = 0; i < parameters[0].value; ++i) {
+				p.x = -1.0 + width / 2 + width * i;
+				p.y = -1.0;
+				pushNewSubcane(&newSubcanes, p, VERTICAL_PICKUP_CANE_ORIENTATION, 2.0 - width, 
+					width-0.0001, SQUARE_SHAPE);
+			}
+			break;
+		case PickupTemplate::VERTICALS_AND_HORIZONTALS:
+		{
+			float verticals_width = 2.0 / MAX(parameters[0].value, 1);
+			float horizontals_width = 1.0 / MAX(parameters[0].value/2, 1);
+			for (int i = 0; i < parameters[0].value; ++i) {
+				p.x = -1.0 + verticals_width / 2 + verticals_width * i;
+				p.y = 0.0;
+				p.z = 0.0;
+				pushNewSubcane(&newSubcanes, p, VERTICAL_PICKUP_CANE_ORIENTATION, 1.0, 
+					verticals_width-0.0001, SQUARE_SHAPE);
+				if (i % 2 == 1) {
+					p.x = -1.0;
+					p.y = -(horizontals_width / 2 + horizontals_width * (i-1) / 2);
+					p.z = 0.0;
+					pushNewSubcane(&newSubcanes, p, HORIZONTAL_PICKUP_CANE_ORIENTATION, 2.0, 
+						horizontals_width-0.0001, SQUARE_SHAPE);
+				}
+			}
+			break;
+		}
+		case PickupTemplate::VERTICAL_HORIZONTAL_VERTICAL:
+		{
+			float verticals_width = 2.0 / MAX(parameters[0].value, 1);
+			float horizontals_width = 0.5 / MAX(parameters[0].value/3, 1);
+			for (int i = 0; i < parameters[0].value; ++i) {
+				p.x = -1.0 + verticals_width / 2 + verticals_width * i;
+				p.y = -1.0;
+				p.z = 0.0;
+				pushNewSubcane(&newSubcanes, p, VERTICAL_PICKUP_CANE_ORIENTATION, 0.75,
+					verticals_width-0.0001, SQUARE_SHAPE);
+				p.x = -1.0 + verticals_width / 2 + verticals_width * i;
+				p.y = 0.25;
+				p.z = 0.0;
+				pushNewSubcane(&newSubcanes, p, VERTICAL_PICKUP_CANE_ORIENTATION, 0.75,
+					verticals_width-0.0001, SQUARE_SHAPE);
+				if (i % 3 == 2) {
+					p.x = -1.0;
+					p.y = 0.25 - horizontals_width / 2 - horizontals_width * (i-2) / 3;
+					p.z = 0.0;
+					pushNewSubcane(&newSubcanes, p, HORIZONTAL_PICKUP_CANE_ORIENTATION, 2.0, 
+						horizontals_width-0.0001, SQUARE_SHAPE);
+				}
+			}
+			break;
+		}
+	}
+
+	this->subcanes_ = newSubcanes;
+}
+
+void Piece :: setPickupTemplateType(enum PickupTemplate::Type _type, bool force) 
+{
+	if (!force && this->pickupType_ == _type)
+		return;
+
+	vector<TemplateParameter> &parameters = this->pickupParameters_;
+	
+	this->pickupType_ = _type;
+	parameters.clear();
+	switch (this->pickupType_) 
+	{
+		case PickupTemplate::VERTICALS_AND_HORIZONTALS:
+			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 30));
+			break;
+		case PickupTemplate::VERTICAL:
+			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 30));
+			break;
+		case PickupTemplate::MURRINE_COLUMN:
+			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 30));
+			break;
+		case PickupTemplate::MURRINE_ROW:
+			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 30));
+			break;
+		case PickupTemplate::MURRINE:
+			parameters.push_back(TemplateParameter(6, string("Row/Column count:"), 6, 14));
+			parameters.push_back(TemplateParameter(10, string("Thickness:"), 1, 40));
+			break;
+		case PickupTemplate::RETICELLO_VERTICAL_HORIZONTAL:
+			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 30));
+			break;
+		case PickupTemplate::VERTICAL_HORIZONTAL_VERTICAL:
+			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 20));
+			break;
+		case PickupTemplate::VERTICAL_WITH_LIP_WRAP:
+			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 30));
+			break;
+	}
+
+	this->subcanes_.clear(); // don't carry over any of the current stuff
+	updateSubcanes();
+}
+
+enum PickupTemplate::Type Piece :: pickupTemplateType() 
+{
+	return this->pickupType_;
+}
+
+unsigned int Piece :: pickupParameterCount() const
+{
+	return this->pickupParameters_.size();
+}
+
+void Piece :: pickupParameter(unsigned int _index, TemplateParameter* dest) const
+{
+	assert(_index < this->pickupParameters_.size());
+	*dest = this->pickupParameters_[_index];
+}
+
+void Piece :: setPickupParameter(unsigned int _index, int _value)
+{
+	assert(_index < this->pickupParameters_.size());
+	this->pickupParameters_[_index].value = _value;
+	updateSubcanes();
 }
 
 Piece *deep_copy(const Piece *_piece) 
 {
 	assert(_piece);
 	Piece *piece = _piece->copy();
-	//Replace pickup with a deep copy:
-	delete piece->pickup();
-	piece->setPickup(deep_copy(_piece->pickup()));
+        for (unsigned int i = 0; i < _piece->subpickupCount(); ++i)
+        {
+                SubpickupTemplate t = _piece->subpickupTemplate(i);
+                t.cane = deep_copy(t.cane);
+                piece->setSubpickupTemplate(t, i);
+        }
 	return piece;
+
 }
 
 void deep_delete(Piece *piece) 
 {
 	assert(piece);
-	deep_delete(piece->pickup());
-	piece->setPickup(NULL);
+        for (unsigned int i = 0; i < piece->subpickupCount(); ++i)
+        {
+                SubpickupTemplate t = piece->subpickupTemplate(i);
+                delete t.cane;
+                t.cane = NULL;
+                piece->setSubpickupTemplate(t, i);
+        }	
 	delete piece;
 }
+
