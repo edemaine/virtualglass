@@ -30,9 +30,9 @@ void UndoRedo :: clearHistory()
 
 // Just sets stuff to null so removing an event from the queue has
 // data properly freed.
-struct UndoRedo::Event UndoRedo :: nulledEvent()
+UndoRedo::Event UndoRedo :: nulledEvent()
 {
-	struct Event event;
+	UndoRedo::Event event;
 
 	event.glassColor = NULL;
 	event.preGlassColorState = NULL;
@@ -50,7 +50,7 @@ struct UndoRedo::Event UndoRedo :: nulledEvent()
 
 void UndoRedo :: addedOrDeletedObject(enum ObjectType objectType, bool added, void* ptr,  unsigned int index)
 {
-	struct Event event = nulledEvent();
+	UndoRedo::Event event = nulledEvent();
 
 	event.type = added ? ADD : DELETE;
 	event.objectType = objectType;
@@ -116,15 +116,15 @@ void UndoRedo :: deletedPiece(Piece* piece, unsigned int index)
 	addedOrDeletedObject(PIECE, false, piece, index);
 }
 
-struct UndoRedo::Event UndoRedo :: mostRecentAddOrModifyEvent(enum ObjectType objectType, void* ptr)
+UndoRedo::Event UndoRedo :: mostRecentAddOrModifyEvent(enum ObjectType objectType, void* ptr)
 {
-	struct Event event;
+	UndoRedo::Event event;
 
-	stack<struct Event> tmpStack;
+	stack<UndoRedo::Event> tmpStack;
 	bool found = false;
 	while (!found)
 	{
-		struct Event prevEvent = undoStack.top();
+		UndoRedo::Event prevEvent = undoStack.top();
 			
 		if (prevEvent.type != MODIFY && prevEvent.type != ADD)
 		{
@@ -179,13 +179,13 @@ struct UndoRedo::Event UndoRedo :: mostRecentAddOrModifyEvent(enum ObjectType ob
 
 void UndoRedo :: modifiedGlassColor(GlassColor* glassColor)
 {
-	struct Event event = nulledEvent();
+	UndoRedo::Event event = nulledEvent();
 
 	event.type = MODIFY;
 	event.objectType = GLASSCOLOR;	
 	event.glassColor = glassColor;	
 
-	struct Event prevEvent = mostRecentAddOrModifyEvent(GLASSCOLOR, glassColor);
+	UndoRedo::Event prevEvent = mostRecentAddOrModifyEvent(GLASSCOLOR, glassColor);
 	event.preGlassColorState = prevEvent.postGlassColorState->copy();
 	event.postGlassColorState = glassColor->copy();
 
@@ -196,13 +196,13 @@ void UndoRedo :: modifiedGlassColor(GlassColor* glassColor)
 
 void UndoRedo :: modifiedCane(Cane* cane)
 {
-	struct Event event = nulledEvent();
+	UndoRedo::Event event = nulledEvent();
 
 	event.type = MODIFY;
 	event.objectType = CANE;	
 	event.cane = cane;
 
-	struct Event prevEvent = mostRecentAddOrModifyEvent(CANE, cane);
+	UndoRedo::Event prevEvent = mostRecentAddOrModifyEvent(CANE, cane);
 	event.preCaneState = prevEvent.postCaneState->copy();
 	event.postCaneState = cane->copy();
 
@@ -213,13 +213,13 @@ void UndoRedo :: modifiedCane(Cane* cane)
 
 void UndoRedo :: modifiedPiece(Piece* piece)
 {
-	struct Event event = nulledEvent();
+	UndoRedo::Event event = nulledEvent();
 
 	event.type = MODIFY;
 	event.objectType = PIECE;	
 	event.piece = piece;
 
-	struct Event prevEvent = mostRecentAddOrModifyEvent(PIECE, piece);
+	UndoRedo::Event prevEvent = mostRecentAddOrModifyEvent(PIECE, piece);
 	event.prePieceState = prevEvent.postPieceState->copy();
 	event.postPieceState = piece->copy();
 
@@ -230,7 +230,7 @@ void UndoRedo :: modifiedPiece(Piece* piece)
 
 void UndoRedo :: movedObject(enum ObjectType objectType, unsigned int index, int direction)
 {
-	struct Event event = nulledEvent();
+	UndoRedo::Event event = nulledEvent();
 
 	event.type = MOVE;
 	event.objectType = objectType;
@@ -261,7 +261,7 @@ void UndoRedo :: clearUndoStack()
 {
 	while (!undoStack.empty())
 	{
-		struct Event event = undoStack.top();
+		UndoRedo::Event event = undoStack.top();
 
 		if (event.preGlassColorState != NULL)
 			delete event.preGlassColorState;
@@ -296,7 +296,7 @@ void UndoRedo :: clearRedoStack()
 {
 	while (!redoStack.empty())
 	{
-		struct Event event = redoStack.top();
+		UndoRedo::Event event = redoStack.top();
 
 		if (event.preGlassColorState != NULL)
 			delete event.preGlassColorState;
@@ -327,7 +327,7 @@ void UndoRedo :: clearRedoStack()
 	}
 }
 
-void UndoRedo :: undoGlassColorEvent(struct Event& event)
+void UndoRedo :: undoGlassColorEvent(UndoRedo::Event& event)
 {
 	switch (event.type)
 	{
@@ -367,7 +367,7 @@ void UndoRedo :: undoGlassColorEvent(struct Event& event)
 	}
 }
 
-void UndoRedo :: undoCaneEvent(struct Event& event)
+void UndoRedo :: undoCaneEvent(UndoRedo::Event& event)
 {
 	switch (event.type)
 	{
@@ -406,7 +406,7 @@ void UndoRedo :: undoCaneEvent(struct Event& event)
 	}
 }
 
-void UndoRedo :: undoPieceEvent(struct Event& event)
+void UndoRedo :: undoPieceEvent(UndoRedo::Event& event)
 {
 	switch (event.type)
 	{
@@ -459,7 +459,7 @@ void UndoRedo :: undoPieceEvent(struct Event& event)
 // and cannot be processed to be pushed into the redoStack.
 void UndoRedo :: noPriorUndo()
 {
-	struct Event event = nulledEvent();
+	UndoRedo::Event event = nulledEvent();
 
 	event.type = NO_UNDO;
 
@@ -478,7 +478,7 @@ void UndoRedo :: undo()
 	if (!canUndo())
 		return;
 
-	struct Event event = undoStack.top();
+	UndoRedo::Event event = undoStack.top();
 	switch (undoStack.top().objectType)
 	{
 		case GLASSCOLOR:
@@ -498,7 +498,7 @@ void UndoRedo :: undo()
 }
 
 
-void UndoRedo :: redoGlassColorEvent(struct Event& event)
+void UndoRedo :: redoGlassColorEvent(UndoRedo::Event& event)
 {
 	switch (event.type)
 	{
@@ -538,7 +538,7 @@ void UndoRedo :: redoGlassColorEvent(struct Event& event)
 	}
 }
 
-void UndoRedo :: redoCaneEvent(struct Event& event)
+void UndoRedo :: redoCaneEvent(UndoRedo::Event& event)
 {
 	switch (event.type)
 	{
@@ -578,7 +578,7 @@ void UndoRedo :: redoCaneEvent(struct Event& event)
 
 }
 
-void UndoRedo :: redoPieceEvent(struct Event& event)
+void UndoRedo :: redoPieceEvent(UndoRedo::Event& event)
 {
 	switch (event.type)
 	{
@@ -628,7 +628,7 @@ void UndoRedo :: redo()
 	if (!canRedo())
 		return;
 
-	struct Event event = redoStack.top();
+	UndoRedo::Event event = redoStack.top();
 	switch (event.objectType)
 	{
 		case GLASSCOLOR:

@@ -28,7 +28,6 @@ class NiceViewWidget;
 class CaneTemplateLibraryWidget;
 class CaneGeometryThread;
 class TwistWidget;
-class UndoRedo;
 
 #define MIN_CANE_COUNT_PARAMETER_VALUE 0
 #define MAX_CANE_COUNT_PARAMETER_VALUE 30
@@ -40,7 +39,7 @@ class CaneEditorWidget : public QWidget
 	friend class CaneGeometryThread;
 
 	public:
-		CaneEditorWidget(UndoRedo* undoRedo, QWidget* parent=0);
+		CaneEditorWidget(QWidget* parent=0);
 		void resetCane();
 		Cane* cane();
 		void setCane(Cane* c);
@@ -97,7 +96,6 @@ class CaneEditorWidget : public QWidget
 		CaneCustomizeViewWidget* customizeViewWidget;	
 		NiceViewWidget* niceViewWidget;
 		TwistWidget* twistWidget;
-		UndoRedo* undoRedo;
 
 		QLabel* countLabel;
 		QSpinBox* countSpin;

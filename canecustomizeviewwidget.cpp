@@ -9,14 +9,13 @@
 #include "subcanetemplate.h"
 #include "canecustomizeviewwidget.h"
 #include "globalbackgroundcolor.h"
-#include "undoredo.h"
+#include "globalundoredo.h"
 
-CaneCustomizeViewWidget::CaneCustomizeViewWidget(Cane* cane, UndoRedo* undoRedo, QWidget* parent) : QWidget(parent)
+CaneCustomizeViewWidget::CaneCustomizeViewWidget(Cane* cane, QWidget* parent) : QWidget(parent)
 {
 	// setup draw widget
 	setMinimumSize(200, 200);
 	this->cane = cane;
-	this->undoRedo = undoRedo;
 	mouseStartingLoc.x = FLT_MAX;
 	mouseStartingLoc.y = FLT_MAX;
 	clickedLoc.x = FLT_MAX;
@@ -211,7 +210,7 @@ void CaneCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 					cane->setSubcaneTemplate(sub, subcanesSelected[i]);
 				}
 				if (subcanesSelected.size() > 0)
-					undoRedo->modifiedCane(cane);
+					GlobalUndoRedo::modifiedCane(cane);
 				mouseStartingLoc.x = adjustedX(event->pos().x());
 				mouseStartingLoc.y = adjustedY(event->pos().y());
 			}
@@ -245,7 +244,7 @@ void CaneCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 					cane->setSubcaneTemplate(sub, subcanesSelected[i]);
 				}
 				if (subcanesSelected.size() > 0)
-					undoRedo->modifiedCane(cane);
+					GlobalUndoRedo::modifiedCane(cane);
 			}
 			else
 			{
@@ -277,7 +276,7 @@ void CaneCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 					cane->setSubcaneTemplate(sub, subcanesSelected[i]);
 				}
 				if (subcanesSelected.size() > 0)
-					undoRedo->modifiedCane(cane);
+					GlobalUndoRedo::modifiedCane(cane);
 			}
 			break;
 		}
@@ -673,7 +672,7 @@ void CaneCustomizeViewWidget :: copySelection()
 	{
 		cane->addSubcaneTemplate(newSubcanes[i]);	
 	}
-	undoRedo->modifiedCane(cane);
+	GlobalUndoRedo::modifiedCane(cane);
 	subcanesSelected.clear();
 	for (unsigned int i = 0; i < newSubcanes.size(); i++)
 	{
@@ -700,7 +699,7 @@ void CaneCustomizeViewWidget :: deleteSelection()
 				subcanesSelected[j] -= 1;
 		}
 	}
-	undoRedo->modifiedCane(cane);
+	GlobalUndoRedo::modifiedCane(cane);
 	subcanesSelected.clear();
 	hoveringIndex = -1;
 	activeBoxIndex = -1;
@@ -724,7 +723,7 @@ void CaneCustomizeViewWidget :: addCircleClicked()
 	}
 	
 	cane->addSubcaneTemplate(SubcaneTemplate(GlobalGlass::circleCane(), CIRCLE_SHAPE, p, diameter));
-	undoRedo->modifiedCane(cane);
+	GlobalUndoRedo::modifiedCane(cane);
 	subcanesSelected.clear();
 	subcanesSelected.push_back(cane->subpullCount()-1);
 	boundActiveBox();
@@ -745,7 +744,7 @@ void CaneCustomizeViewWidget :: addSquareClicked()
 		diameter = cane->casingThickness(0);
 	}
 	cane->addSubcaneTemplate(SubcaneTemplate(GlobalGlass::squareCane(), SQUARE_SHAPE, p, diameter));
-	undoRedo->modifiedCane(cane);
+	GlobalUndoRedo::modifiedCane(cane);
 	subcanesSelected.clear();
 	subcanesSelected.push_back(cane->subpullCount()-1);
 	boundActiveBox();

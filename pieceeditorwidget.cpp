@@ -28,23 +28,21 @@
 #include "globalbackgroundcolor.h"
 #include "globalgraphicssetting.h"
 #include "constants.h"
-#include "undoredo.h"
+#include "globalundoredo.h"
 
-PieceEditorWidget :: PieceEditorWidget(UndoRedo* undoRedo, QWidget* parent) : QWidget(parent)
+PieceEditorWidget :: PieceEditorWidget(QWidget* parent) : QWidget(parent)
 {
 	this->piece_ = new Piece(PieceTemplate::TUMBLER, PickupTemplate::VERTICAL);
 	this->tempPiece_ = NULL;	
 
-	this->pickupViewWidget = new PickupEditorViewWidget(this->piece_, undoRedo, this);	
+	this->pickupViewWidget = new PickupEditorViewWidget(this->piece_, this);	
 	this->pieceNiceViewWidget = new NiceViewWidget(NiceViewWidget::PIECE_CAMERA_MODE, this);
 	pieceNiceViewWidget->setGeometry(&geometry);
-	this->pieceCustomizeViewWidget = new PieceCustomizeViewWidget(this->piece_, undoRedo, this);
+	this->pieceCustomizeViewWidget = new PieceCustomizeViewWidget(this->piece_, this);
 
 	setupLayout();
 	setupThreading();
 	setupConnections();
-
-	this->undoRedo = undoRedo;
 
 	seedTemplates();
 }
@@ -181,7 +179,7 @@ void PieceEditorWidget :: pickupCountSpinChanged(int)
 	if (tp.value != pickupCountSpin->value())
 	{
 		this->piece_->setPickupParameter(0, pickupCountSpin->value());
-		undoRedo->modifiedPiece(this->piece_);
+		GlobalUndoRedo::modifiedPiece(this->piece_);
 	}
 }
 
@@ -242,7 +240,7 @@ void PieceEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 		if (pktlw->type != this->piece_->pickupTemplateType())
 		{
 			this->piece_->setPickupTemplateType(pktlw->type);
-			undoRedo->modifiedPiece(this->piece_);
+			GlobalUndoRedo::modifiedPiece(this->piece_);
 		}
 	}
 	else if (ptlw != NULL)
@@ -253,7 +251,7 @@ void PieceEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 		{
 			pieceControlsTab->setCurrentIndex(0);
 			this->piece_->setPieceTemplateType(ptlw->type);
-			undoRedo->modifiedPiece(this->piece_);
+			GlobalUndoRedo::modifiedPiece(this->piece_);
 		}
 	}
 }
@@ -395,7 +393,7 @@ void PieceEditorWidget :: setupConnections()
 
 void PieceEditorWidget :: twistEnded()
 {
-	undoRedo->modifiedPiece(this->piece_);
+	GlobalUndoRedo::modifiedPiece(this->piece_);
 }
 
 void PieceEditorWidget :: addControlPointButtonClicked()
@@ -403,7 +401,7 @@ void PieceEditorWidget :: addControlPointButtonClicked()
 	Spline spline = this->piece_->spline();
 	spline.addPoint(Point2D(make_vector(0.0f, 0.0f)));
 	this->piece_->setSpline(spline);
-	undoRedo->modifiedPiece(this->piece_);
+	GlobalUndoRedo::modifiedPiece(this->piece_);
 }
 
 void PieceEditorWidget :: removeControlPointButtonClicked()
@@ -411,7 +409,7 @@ void PieceEditorWidget :: removeControlPointButtonClicked()
 	Spline spline = this->piece_->spline();
 	spline.removePoint();
 	this->piece_->setSpline(spline);
-	undoRedo->modifiedPiece(this->piece_);
+	GlobalUndoRedo::modifiedPiece(this->piece_);
 }
 
 void PieceEditorWidget :: pieceControlsTabChanged(int tab)
@@ -422,7 +420,7 @@ void PieceEditorWidget :: pieceControlsTabChanged(int tab)
 	if (tab != 0) // customize mode
 	{
 		this->piece_->setPieceTemplateType(PieceTemplate::CUSTOM);
-		undoRedo->modifiedPiece(this->piece_);
+		GlobalUndoRedo::modifiedPiece(this->piece_);
 	}
 }
 
@@ -468,19 +466,19 @@ void PieceEditorWidget :: updateLibraryWidgetPixmaps(PieceLibraryWidget* w)
 void PieceEditorWidget :: setPickupParameter(int param, int value)
 {
 	this->piece_->setPickupParameter(param, value);
-	undoRedo->modifiedPiece(this->piece_);
+	GlobalUndoRedo::modifiedPiece(this->piece_);
 }
 
 void PieceEditorWidget :: setPieceTemplateType(enum PieceTemplate::Type _type)
 {
 	this->piece_->setPieceTemplateType(_type);
-	undoRedo->modifiedPiece(this->piece_);
+	GlobalUndoRedo::modifiedPiece(this->piece_);
 }
 
 void PieceEditorWidget :: setPickupTemplateType(enum PickupTemplate::Type _type)
 {
 	this->piece_->setPickupTemplateType(_type);
-	undoRedo->modifiedPiece(this->piece_);
+	GlobalUndoRedo::modifiedPiece(this->piece_);
 }
 
 void PieceEditorWidget :: setPiece(Piece* piece)

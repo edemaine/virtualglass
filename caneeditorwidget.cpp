@@ -26,22 +26,20 @@
 #include "globalbackgroundcolor.h"
 #include "globalgraphicssetting.h"
 #include "constants.h"
-#include "undoredo.h"
+#include "globalundoredo.h"
 
-CaneEditorWidget :: CaneEditorWidget(UndoRedo* undoRedo, QWidget* parent) : QWidget(parent)
+CaneEditorWidget :: CaneEditorWidget(QWidget* parent) : QWidget(parent)
 {
 	this->cane_ = new Cane(CaneTemplate::HORIZONTAL_LINE_CIRCLE);
 
-	viewWidget = new CaneEditorViewWidget(cane_, undoRedo, this);	
-	customizeViewWidget = new CaneCustomizeViewWidget(cane_, undoRedo, this);
+	viewWidget = new CaneEditorViewWidget(cane_, this);	
+	customizeViewWidget = new CaneCustomizeViewWidget(cane_, this);
 	niceViewWidget = new NiceViewWidget(NiceViewWidget::PULLPLAN_CAMERA_MODE, this);
 	niceViewWidget->setGeometry(&geometry);
 
 	setupLayout();
 	setupThreading();
 	setupConnections();
-
-	this->undoRedo = undoRedo;
 
 	seedTemplates();
 }
@@ -307,32 +305,32 @@ void CaneEditorWidget :: controlsTabChanged(int tab)
 		CaneTemplate::Type oldType = cane_->templateType();
 		cane_->setTemplateType(CaneTemplate::CUSTOM);				
 		if (oldType != CaneTemplate::CUSTOM)
-			undoRedo->modifiedCane(cane_);
+			GlobalUndoRedo::modifiedCane(cane_);
 	}
 }
 
 void CaneEditorWidget :: circleCasingButtonClicked()
 {
 	cane_->setOutermostCasingShape(CIRCLE_SHAPE);
-	undoRedo->modifiedCane(cane_);
+	GlobalUndoRedo::modifiedCane(cane_);
 }
 
 void CaneEditorWidget :: squareCasingButtonClicked()
 {
 	cane_->setOutermostCasingShape(SQUARE_SHAPE);
-	undoRedo->modifiedCane(cane_);
+	GlobalUndoRedo::modifiedCane(cane_);
 }
 
 void CaneEditorWidget :: removeCasingButtonClicked()
 {
 	cane_->removeCasing();
-	undoRedo->modifiedCane(cane_);
+	GlobalUndoRedo::modifiedCane(cane_);
 }
 
 void CaneEditorWidget :: addCasingButtonClicked()
 {
 	cane_->addCasing(cane_->outermostCasingShape());
-	undoRedo->modifiedCane(cane_);
+	GlobalUndoRedo::modifiedCane(cane_);
 }
 
 void CaneEditorWidget :: copySelectedButtonClicked()
@@ -408,7 +406,7 @@ void CaneEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 		// as they're no longer working on a custom template
 		controlsTab->setCurrentIndex(0);
 		cane_->setTemplateType(ptlw->type);	
-		undoRedo->modifiedCane(cane_);
+		GlobalUndoRedo::modifiedCane(cane_);
 	}
 }
 
@@ -438,7 +436,7 @@ void CaneEditorWidget :: setupConnections()
 	
 void CaneEditorWidget :: twistEnded()
 {
-	undoRedo->modifiedCane(cane_);
+	GlobalUndoRedo::modifiedCane(cane_);
 }
 
 void CaneEditorWidget :: countSpinChanged(int)
@@ -448,7 +446,7 @@ void CaneEditorWidget :: countSpinChanged(int)
 	if (count != static_cast<unsigned int>(countSpin->value()))
 	{
 		cane_->setCount(countSpin->value());
-		undoRedo->modifiedCane(cane_);
+		GlobalUndoRedo::modifiedCane(cane_);
 	}
 }
 

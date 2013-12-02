@@ -455,7 +455,7 @@ float finalRadius(vector<Ancestor>& ancestors)
 	return radius;
 }
 
-void meshBaseCasing(Geometry* geometry, vector<Ancestor>& ancestors, struct CasingData casing,
+void meshBaseCasing(Geometry* geometry, vector<Ancestor>& ancestors, CasingData casing,
 	unsigned int quality, bool ensureVisible)
 {
 	if (ensureVisible)
@@ -548,7 +548,7 @@ void meshBaseCasing(Geometry* geometry, vector<Ancestor>& ancestors, struct Casi
 }
 
 // The cane should have length between 0.0 and 1.0 and is scaled up by a factor of 5.
-void meshBaseCane(Geometry* geometry, vector<Ancestor>& ancestors, struct CaneData cane,
+void meshBaseCane(Geometry* geometry, vector<Ancestor>& ancestors, CaneData cane,
 	unsigned int quality, bool ensureVisible)
 {
 	// cull out geometry that's extremely clear
@@ -744,7 +744,7 @@ void recurseMesh(Cane* cane, Geometry *geometry, vector<Ancestor>& ancestors, fl
 		{
 			// punting on actually doing this geometry right and just making it a cylinder
 			// (that intersects its subcanes)
-			struct CaneData caneData;
+			CaneData caneData;
 			caneData.color = cane->casingColor(0)->color();
 			caneData.shape = cane->casingShape(i);
 			caneData.length = length-0.001;
@@ -754,7 +754,7 @@ void recurseMesh(Cane* cane, Geometry *geometry, vector<Ancestor>& ancestors, fl
 		}
 		else
 		{
-			struct CasingData casingData;
+			CasingData casingData;
 			casingData.color = cane->casingColor(colorIntervalStart)->color(), 
 			casingData.outerShape = cane->casingShape(i); 
 			casingData.innerShape = cane->casingShape(colorIntervalStart-1);

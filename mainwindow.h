@@ -8,8 +8,6 @@
 
 #include <QMainWindow>
 
-#include "undoredo.h"
-
 class QMouseEvent;
 class QKeyEvent;
 class QLabel;
@@ -153,13 +151,14 @@ class MainWindow : public QMainWindow
 		bool mouseDown;
 
 		Email* email;
-		UndoRedo* undoRedo;
 
 	private slots:
 		void glassObjectModified();
 		void attemptToQuit();
 
 		// menu slots
+		void undoActionTriggered();
+		void redoActionTriggered();
 		void newFileActionTriggered();
 		void openFileActionTriggered();
 		void addFileActionTriggered();

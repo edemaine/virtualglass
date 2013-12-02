@@ -26,30 +26,33 @@ bool generateMesh(Piece* piece, Geometry* pieceGeometry, Geometry* pickupGeometr
 
 namespace MeshInternal
 {
-	struct Ancestor
+	class Ancestor
 	{
-		Cane* parent;
-		unsigned int child;
+		public:
+			Cane* parent;
+			unsigned int child;
 	};
 
-	struct CasingData
+	class CasingData
 	{
-		Color color;
-		enum GeometricShape outerShape;
-		float outerRadius;
-		enum GeometricShape innerShape;
-		float innerRadius;
-		float length;
-		float twist;
+		public:
+			Color color;
+			enum GeometricShape outerShape;
+			float outerRadius;
+			enum GeometricShape innerShape;
+			float innerRadius;
+			float length;
+			float twist;
 	};
 
-	struct CaneData
+	class CaneData
 	{
-		Color color;	
-		enum GeometricShape shape;
-		float radius;
-		float length;
-		float twist;
+		public:
+			Color color;	
+			enum GeometricShape shape;
+			float radius;
+			float length;
+			float twist;
 	};
 
 	// Methods
@@ -62,9 +65,9 @@ namespace MeshInternal
 	float totalTwist(vector<Ancestor>& ancestors);
 	unsigned int computeAxialResolution(float length, float twist, unsigned int quality);
 	unsigned int computeAngularResolution(float diameter, unsigned int quality, enum GeometricShape shape);
-	void meshBaseCasing(Geometry* g, vector<Ancestor>& ancestors, struct CasingData casing, 
+	void meshBaseCasing(Geometry* g, vector<Ancestor>& ancestors, CasingData casing, 
 		unsigned int quality, bool ensureVisible);
-	void meshBaseCane(Geometry* g, vector<Ancestor>& ancestors, struct CaneData cane, 
+	void meshBaseCane(Geometry* g, vector<Ancestor>& ancestors, CaneData cane, 
 		unsigned int quality, bool ensureVisible);
 	void meshCylinderWall(Geometry* geometry, enum GeometricShape shape, float length, float radius, 
 		unsigned int angularResolution, unsigned int axialResolution);

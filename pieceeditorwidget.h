@@ -29,7 +29,6 @@ class PieceLibraryWidget;
 class PickupEditorViewWidget;
 class NiceViewWidget;
 class Piece;
-class UndoRedo;
 	
 class PieceEditorWidget : public QWidget
 {
@@ -38,7 +37,7 @@ class PieceEditorWidget : public QWidget
 	friend class PieceGeometryThread;
 
 	public:
-		PieceEditorWidget(UndoRedo* undoRedo, QWidget* parent=0);
+		PieceEditorWidget(QWidget* parent=0);
 		void resetPiece();
 		Piece* piece() const;
 		void updateLibraryWidgetPixmaps(PieceLibraryWidget* w);
@@ -74,7 +73,6 @@ class PieceEditorWidget : public QWidget
 
 	private:
 		Piece* piece_;
-		UndoRedo* undoRedo;
 
 		Piece* tempPiece_;
 		QMutex tempPieceMutex;

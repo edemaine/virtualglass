@@ -11,7 +11,6 @@
 #include "geometry.h"
 #include "constants.h"
 
-class UndoRedo;
 class GlassColor;
 class Cane;
 class PureColorLibraryWidget;
@@ -30,7 +29,7 @@ class ColorEditorWidget : public QWidget
 	Q_OBJECT
 
 	public:
-		ColorEditorWidget(UndoRedo* undoRedo, QWidget* parent=0);
+		ColorEditorWidget(QWidget* parent=0);
 		void resetGlassColor();
 		void setGlassColor(GlassColor* _color);
 		GlassColor* glassColor() const;
@@ -46,7 +45,6 @@ class ColorEditorWidget : public QWidget
 		void collectionComboBoxChanged(int);		
 
 	private:
-		UndoRedo* undoRedo;
 		Geometry geometry;
 		GlassColor* glassColor_;	
 		QComboBox* collectionComboBox;

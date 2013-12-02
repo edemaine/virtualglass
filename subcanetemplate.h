@@ -11,12 +11,12 @@ class SubcaneTemplate
 {
 	public:
 		SubcaneTemplate(Cane* cane, enum GeometricShape s, Point2D location, float diameter);
+		void rescale(float ratio);
+
 		Cane* cane;
 		enum GeometricShape shape;
 		Point2D location;
 		float diameter;
-
-		void rescale(float ratio);
 };
 
 

@@ -20,6 +20,7 @@ class SubpickupTemplate
 	public:
 		SubpickupTemplate(Cane* cane, Point3D location, enum PickupCaneOrientation orientation, 
 			float length, float width, enum GeometricShape shape);
+
 		Cane* cane;
 		Point3D location;
 		enum PickupCaneOrientation orientation;

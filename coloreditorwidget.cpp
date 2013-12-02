@@ -11,7 +11,7 @@
 #include <QMouseEvent>
 #include <QScrollBar>
 
-#include "undoredo.h"
+#include "globalundoredo.h"
 #include "cane.h"
 #include "niceviewwidget.h"
 #include "geometry.h"
@@ -23,7 +23,7 @@
 #include "globalgraphicssetting.h"
 #include "constants.h"
 
-ColorEditorWidget :: ColorEditorWidget(UndoRedo* undoRedo, QWidget* parent) : QWidget(parent)
+ColorEditorWidget :: ColorEditorWidget(QWidget* parent) : QWidget(parent)
 {
 	this->glassColor_ = new GlassColor();
 
@@ -32,7 +32,6 @@ ColorEditorWidget :: ColorEditorWidget(UndoRedo* undoRedo, QWidget* parent) : QW
 
 	setupLayout();
 	setupConnections();
-	this->undoRedo = undoRedo;
 
 	// fake selecting the first list for initialization
 	collectionComboBox->setCurrentIndex(0);
@@ -183,7 +182,7 @@ void ColorEditorWidget :: loadCollection(QString fileName)
 
 void ColorEditorWidget :: alphaSliderChangeEnded()
 {
-	undoRedo->modifiedGlassColor(this->glassColor_);
+	GlobalUndoRedo::modifiedGlassColor(this->glassColor_);
 }
 
 void ColorEditorWidget :: alphaSliderPositionChanged(int)
@@ -199,7 +198,7 @@ void ColorEditorWidget :: alphaSliderPositionChanged(int)
 void ColorEditorWidget :: setColorProperties(GlassColor* color)
 {
 	this->glassColor_->set(color);
-	undoRedo->modifiedGlassColor(this->glassColor_);
+	GlobalUndoRedo::modifiedGlassColor(this->glassColor_);
 }
 
 void ColorEditorWidget :: updateEverything()

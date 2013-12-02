@@ -3,10 +3,7 @@
 #define UNDOREDO_H
 
 #include <stack>
-#include <string>
 #include <vector>
-
-#include <QObject>
 
 #include "primitives.h"
 #include "canetemplate.h"
@@ -20,14 +17,11 @@ class GlassColor;
 class Cane;
 class Piece;
 
-using std::string;
 using std::stack;
 using std::vector;
 
-class UndoRedo : public QObject
+class UndoRedo
 {
-	Q_OBJECT
-
 	public:
 		enum EventType
 		{
@@ -45,25 +39,26 @@ class UndoRedo : public QObject
 			PIECE
 		};
 
-		struct Event
+		class Event
 		{
-			enum EventType type;	
-			enum ObjectType objectType;	
+			public:
+				enum EventType type;	
+				enum ObjectType objectType;	
 
-			unsigned int index;
-			int direction;
+				unsigned int index;
+				int direction;
 
-			GlassColor* glassColor;
-			GlassColor* preGlassColorState;
-			GlassColor* postGlassColorState;
+				GlassColor* glassColor;
+				GlassColor* preGlassColorState;
+				GlassColor* postGlassColorState;
 
-			Cane* cane;
-			Cane* preCaneState;
-			Cane* postCaneState;
+				Cane* cane;
+				Cane* preCaneState;
+				Cane* postCaneState;
 
-			Piece* piece;
-			Piece* prePieceState;
-			Piece* postPieceState;
+				Piece* piece;
+				Piece* prePieceState;
+				Piece* postPieceState;
 		};
 
 		UndoRedo(MainWindow* mw);
@@ -83,31 +78,29 @@ class UndoRedo : public QObject
 		void noPriorUndo();
 		void clearHistory();
 
-	public slots:
 		void undo();
 		void redo();
 	
 	private:
-		stack<struct Event> undoStack;
-		stack<struct Event> redoStack;
+		stack<Event> undoStack;
+		stack<Event> redoStack;
 
 		MainWindow* mainWindow;	
 		
-		static struct Event nulledEvent();
+		static Event nulledEvent();
 		void movedObject(enum ObjectType objectType, unsigned int index, int direction);
 		void addedOrDeletedObject(enum ObjectType objectType, bool added, void* ptr,  unsigned int index);
-		struct Event mostRecentAddOrModifyEvent(enum ObjectType objectType, void* ptr);
+		Event mostRecentAddOrModifyEvent(enum ObjectType objectType, void* ptr);
 		void clearRedoStack();
 		void clearUndoStack();
-		void undoGlassColorEvent(struct Event& event);
-		void undoCaneEvent(struct Event& event);
-		void undoPieceEvent(struct Event& event);
-		void redoGlassColorEvent(struct Event& event);
-		void redoCaneEvent(struct Event& event);
-		void redoPieceEvent(struct Event& event);
+		void undoGlassColorEvent(Event& event);
+		void undoCaneEvent(Event& event);
+		void undoPieceEvent(Event& event);
+		void redoGlassColorEvent(Event& event);
+		void redoCaneEvent(Event& event);
+		void redoPieceEvent(Event& event);
 		bool canUndo();
 		bool canRedo();
-		
 };
 
 #endif
