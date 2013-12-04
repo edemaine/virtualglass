@@ -7,6 +7,7 @@
 
 #include "purecolorlibrarywidget.h"
 #include "glasscolor.h"
+#include "globalbackgroundcolor.h"
 
 PureColorLibraryWidget :: PureColorLibraryWidget(GlassColor* __color, 
 	QWidget* parent): QLabel(parent)
@@ -80,7 +81,7 @@ void PureColorLibraryWidget :: renderPixmap()
 	QPixmap pixmap(300, 40);
 
 	QPainter painter(&pixmap);
-	painter.fillRect(0, 0, 300, 40, Qt::white);
+	painter.fillRect(0, 0, 300, 40, GlobalBackgroundColor::qcolor);
 	if (isSelected) // do highlighting if selected
 	{
 		QPen pen;
