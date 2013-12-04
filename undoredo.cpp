@@ -349,7 +349,7 @@ void UndoRedo :: undoGlassColorEvent(UndoRedo::Event& event)
 			break;
 		}
 		case DELETE:
-                        mainWindow->glassColorLibraryLayout->insertWidget(
+			mainWindow->glassColorLibraryLayout->insertWidget(
 				event.index, new GlassColorLibraryWidget(event.glassColor, mainWindow));
 			mainWindow->glassObjectModified();
 			break;
@@ -389,7 +389,7 @@ void UndoRedo :: undoCaneEvent(UndoRedo::Event& event)
 			break;
 		}
 		case DELETE:
-                        mainWindow->caneLibraryLayout->insertWidget(event.index, new CaneLibraryWidget(event.cane, mainWindow));
+			mainWindow->caneLibraryLayout->insertWidget(event.index, new CaneLibraryWidget(event.cane, mainWindow));
 			mainWindow->glassObjectModified();
 			break;
 		case MODIFY:
@@ -428,7 +428,7 @@ void UndoRedo :: undoPieceEvent(UndoRedo::Event& event)
 			break;
 		}
 		case DELETE:
-                        mainWindow->pieceLibraryLayout->insertWidget(event.index, new PieceLibraryWidget(event.piece, mainWindow));
+			mainWindow->pieceLibraryLayout->insertWidget(event.index, new PieceLibraryWidget(event.piece, mainWindow));
 			mainWindow->glassObjectModified();
 			break;
 		case MODIFY:
@@ -503,7 +503,7 @@ void UndoRedo :: redoGlassColorEvent(UndoRedo::Event& event)
 	switch (event.type)
 	{
 		case ADD:
-                        mainWindow->glassColorLibraryLayout->insertWidget(
+			mainWindow->glassColorLibraryLayout->insertWidget(
 				event.index, new GlassColorLibraryWidget(event.glassColor, mainWindow));
 			mainWindow->glassObjectModified();
 			break;
@@ -543,7 +543,7 @@ void UndoRedo :: redoCaneEvent(UndoRedo::Event& event)
 	switch (event.type)
 	{
 		case ADD:
-                        mainWindow->caneLibraryLayout->insertWidget(event.index, new CaneLibraryWidget(event.cane, mainWindow));
+			mainWindow->caneLibraryLayout->insertWidget(event.index, new CaneLibraryWidget(event.cane, mainWindow));
 			mainWindow->glassObjectModified();
 			break;
 		case DELETE:
@@ -583,7 +583,7 @@ void UndoRedo :: redoPieceEvent(UndoRedo::Event& event)
 	switch (event.type)
 	{
 		case ADD:
-                        mainWindow->pieceLibraryLayout->insertWidget(event.index, new PieceLibraryWidget(event.piece, mainWindow));
+			mainWindow->pieceLibraryLayout->insertWidget(event.index, new PieceLibraryWidget(event.piece, mainWindow));
 			mainWindow->glassObjectModified();
 			break;
 		case DELETE:

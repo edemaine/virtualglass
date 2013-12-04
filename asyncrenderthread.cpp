@@ -17,17 +17,20 @@ using std::vector;
 
 using namespace AsyncRenderInternal;
 
-RenderThread::RenderThread(Controller *_controller) : controller(_controller), widget(NULL) {
+RenderThread::RenderThread(Controller *_controller) : controller(_controller), widget(NULL) 
+{
 	widget = new QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::DoubleBuffer | QGL::DepthBuffer));
 	widget->doneCurrent(); //make sure this widget's context isn't current!
 }
 
-RenderThread::~RenderThread() {
+RenderThread::~RenderThread() 
+{
 	delete widget;
 	widget = NULL;
 }
 
-void RenderThread::run() {
+void RenderThread::run() 
+{
 	assert(widget->context());
 	assert(widget->context()->isValid());
 	widget->makeCurrent();

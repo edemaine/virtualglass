@@ -74,17 +74,17 @@ int GlassLibraryWidget :: hitValue(QPoint p)
 
 void GlassLibraryWidget :: mousePressEvent(QMouseEvent* event)
 {
-        if (event->button() == Qt::LeftButton)
-        {
-                mouseDown = true;
-                mouseDownPos = event->pos();
-        }	
+	if (event->button() == Qt::LeftButton)
+	{
+		mouseDown = true;
+		mouseDownPos = event->pos();
+	}	
 }
 
 void GlassLibraryWidget :: mouseMoveEvent(QMouseEvent* event)
 {
-        if ((event->pos() - mouseDownPos).manhattanLength() > QApplication::startDragDistance()
-                || !this->rect().contains(event->pos()))
+	if ((event->pos() - mouseDownPos).manhattanLength() > QApplication::startDragDistance()
+		|| !this->rect().contains(event->pos()))
 	{
 		char buf[500];
 		QPixmap pixmap;
@@ -97,16 +97,16 @@ void GlassLibraryWidget :: mouseMoveEvent(QMouseEvent* event)
 
 		GlassMime::encode(buf, this, this->mimeType());
 
-                QByteArray pointerData(buf);
-                QMimeData* mimeData = new QMimeData;
-                mimeData->setText(pointerData);
+		QByteArray pointerData(buf);
+		QMimeData* mimeData = new QMimeData;
+		mimeData->setText(pointerData);
 
-                QDrag *drag = new QDrag(this);
-                drag->setMimeData(mimeData);
-                drag->setPixmap(*(this->dragPixmap()));
-                drag->setHotSpot(QPoint(50, 50));
+		QDrag *drag = new QDrag(this);
+		drag->setMimeData(mimeData);
+		drag->setPixmap(*(this->dragPixmap()));
+		drag->setHotSpot(QPoint(50, 50));
 
-                drag->exec(Qt::CopyAction);
+		drag->exec(Qt::CopyAction);
 	}
 }
 
@@ -130,24 +130,23 @@ void GlassLibraryWidget :: paintEvent(QPaintEvent* event)
 {
 	QLabel::paintEvent(event);
 
-        QPainter painter;
-        painter.begin(this);
-        painter.setPen(QPen(Qt::black));
-        if (this->dependency == IS_DEPENDENCY)
-        {
-                QColor color;
-                color.setRgb(255, 255, 255);
-                painter.fillRect(3, 3, 15, 15, color);
-                painter.drawLine(10, 5, 10, 15);
-                painter.drawLine(5, 10, 15, 10); 
-                
+	QPainter painter;
+	painter.begin(this);
+	painter.setPen(QPen(Qt::black));
+	if (this->dependency == IS_DEPENDENCY)
+	{
+		QColor color;
+		color.setRgb(255, 255, 255);
+		painter.fillRect(3, 3, 15, 15, color);
+		painter.drawLine(10, 5, 10, 15);
+		painter.drawLine(5, 10, 15, 10);  
 		if (!this->window->hasDependancies(this))
 		{
 			color.setRgb(255, 255, 255);
 			painter.fillRect(100-3-15, 3, 15, 15, color);
 			painter.drawLine(100-6, 10, 100-16, 10);
 		}
-        }
-        painter.end();
+	}
+	painter.end();
 }
 

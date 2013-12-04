@@ -35,9 +35,9 @@ class NiceViewWidget : public QGLWidget
 		bool event(QEvent* e);
 
 	private:
-        static const int max_rho = 30;
-        static const int min_rho = 1;
-        static const int rho_step = 1;
+		static const int max_rho = 30;
+		static const int min_rho = 1;
+		static const int rho_step = 1;
 
 		bool leftMouseDown;
 		Geometry *geometry;

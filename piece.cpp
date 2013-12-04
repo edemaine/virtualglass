@@ -13,7 +13,7 @@ Piece :: Piece(enum PieceTemplate::Type pieceType, enum PickupTemplate::Type pic
 	this->underlayGlassColor_ = GlobalGlass::color();
 	this->overlayGlassColor_ = GlobalGlass::color();
 	addCasingDependency(GlobalGlass::color());
-        setPickupTemplateType(pickupType, true);
+	setPickupTemplateType(pickupType, true);
 }
 
 unsigned int Piece :: casingDependencyOccurrances(GlassColor* glassColor)
@@ -27,7 +27,7 @@ unsigned int Piece :: casingDependencyOccurrances(GlassColor* glassColor)
 	if (this->overlayGlassColor_ == glassColor)
 		++occurrances;
 
-        return occurrances;
+	return occurrances;
 }
 
 void Piece :: addCasingDependency(GlassColor* glassColor)
@@ -44,10 +44,10 @@ void Piece :: removeCasingDependency(GlassColor* glassColor)
 
 unsigned int Piece :: subcaneDependencyOccurrances(Cane* cane)
 {
-        int occurrances = 0;
+	int occurrances = 0;
 	for (unsigned int i = 0; i < this->subcanes_.size(); ++i)
 		occurrances += (this->subcanes_[i].cane == cane);
-        return occurrances;
+	return occurrances;
 }
 
 void Piece :: addSubcaneDependency(Cane* cane)
@@ -343,7 +343,7 @@ void Piece :: setCasingGlassColor(GlassColor* glassColor)
 }
 
 void Piece :: pushNewSubcane(vector<SubpickupTemplate>* newSubcanes,
-        Point3D location, enum PickupCaneOrientation ori, float length, float width, enum GeometricShape shape)
+	Point3D location, enum PickupCaneOrientation ori, float length, float width, enum GeometricShape shape)
 {
 	if (newSubcanes->size() < this->subcanes_.size())
 	{
@@ -594,12 +594,12 @@ Piece *deep_copy(const Piece *_piece)
 {
 	assert(_piece);
 	Piece *piece = _piece->copy();
-        for (unsigned int i = 0; i < _piece->subpickupCount(); ++i)
-        {
-                SubpickupTemplate t = _piece->subpickupTemplate(i);
-                t.cane = deep_copy(t.cane);
-                piece->setSubpickupTemplate(t, i);
-        }
+	for (unsigned int i = 0; i < _piece->subpickupCount(); ++i)
+	{
+		SubpickupTemplate t = _piece->subpickupTemplate(i);
+		t.cane = deep_copy(t.cane);
+		piece->setSubpickupTemplate(t, i);
+	}
 	return piece;
 
 }
@@ -608,13 +608,13 @@ void deep_delete(Piece *piece)
 {
 	assert(piece);
 	vector<SubpickupTemplate> subcanes;
-        for (unsigned int i = 0; i < piece->subpickupCount(); ++i)
+	for (unsigned int i = 0; i < piece->subpickupCount(); ++i)
 		subcanes.push_back(piece->subpickupTemplate(i));
-        for (unsigned int i = 0; i < subcanes.size(); ++i)
-        {
-                delete subcanes[i].cane;
-                subcanes[i].cane = NULL;
-        }	
+	for (unsigned int i = 0; i < subcanes.size(); ++i)
+	{
+		delete subcanes[i].cane;
+		subcanes[i].cane = NULL;
+	}	
 	delete piece;
 }
 

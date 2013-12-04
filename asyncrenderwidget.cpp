@@ -9,32 +9,36 @@
 
 using namespace AsyncRenderInternal;
 
-AsyncRenderWidget::AsyncRenderWidget(MainWindow *_window) 
-	: GlassLibraryWidget(_window), id(0) {
+AsyncRenderWidget::AsyncRenderWidget(MainWindow *_window) : GlassLibraryWidget(_window), id(0) 
+{
 	Controller::controller().registerWidget(this);
 }
 
-AsyncRenderWidget::~AsyncRenderWidget() {
+AsyncRenderWidget::~AsyncRenderWidget() 
+{
 	Controller::controller().unregisterWidget(this);
 }
 
-void AsyncRenderWidget::setScene(Camera const &camera, RenderData *data) {
+void AsyncRenderWidget::setScene(Camera const &camera, RenderData *data) 
+{
 	assert(data);
 	Controller::controller().queue(this, camera, data);
 }
 
-void AsyncRenderWidget::setCamera(Camera const &) {
+void AsyncRenderWidget::setCamera(Camera const &) 
+{
 	bool functionIsWritten = false;
 	assert(functionIsWritten);
 }
 
-void AsyncRenderWidget::clearGeometry() {
+void AsyncRenderWidget::clearGeometry() 
+{
 	bool functionIsWritten = false;
 	assert(functionIsWritten);
 }
 
-void AsyncRenderWidget::renderFinished(Camera const &/*unused: camera */, RenderData *data, Geometry *geometry, QImage *image) {
-
+void AsyncRenderWidget::renderFinished(Camera const &/*unused: camera */, RenderData *data, Geometry *geometry, QImage *image) 
+{
 	assert(image);
 
 	setPixmap(QPixmap::fromImage(*image).scaled(size()));

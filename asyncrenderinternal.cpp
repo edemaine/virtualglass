@@ -6,9 +6,8 @@
 
 using namespace AsyncRenderInternal;
 
-//===========================================
-
-void Job::deleteData() {
+void Job::deleteData() 
+{
 	delete result;
 	result = NULL;
 	delete geometry;
@@ -17,23 +16,25 @@ void Job::deleteData() {
 	data = NULL;
 }
 
-//===========================================
-
-Controller &Controller::controller() {
+Controller &Controller::controller() 
+{
 	static Controller global_controller;
 	return global_controller;
 }
 
-Controller::Controller() : quitThreads(false), freshId(1) {
+Controller::Controller() : quitThreads(false), freshId(1) 
+{
 	//create compute thread(s):
-	for (unsigned int i = 0; i < 1; ++i) {
+	for (unsigned int i = 0; i < 1; ++i) 
+	{
 		ComputeThread *thread = new ComputeThread(this);
 		thread->start();
 		threads.push_back(thread);
 	}
 
 	//create render threads:
-	for (unsigned int i = 0; i < 1; ++i) {
+	for (unsigned int i = 0; i < 1; ++i) 
+	{
 		RenderThread *thread = new RenderThread(this);
 		connect(thread, SIGNAL(jobFinished(Job*)), this, SLOT(jobFinished(Job*)));
 		thread->start();
@@ -41,8 +42,8 @@ Controller::Controller() : quitThreads(false), freshId(1) {
 	}
 }
 
-Controller::~Controller() {
-
+Controller::~Controller() 
+{
 	std::cout << "Asking render and compute threads to quit." << std::endl;
 
 	computeQueueLock.lock();
@@ -53,7 +54,8 @@ Controller::~Controller() {
 
 	computeQueueHasData.wakeAll();
 	renderQueueHasData.wakeAll();
-	for (vector< QThread * >::iterator t = threads.begin(); t != threads.end(); ++t) {
+	for (vector< QThread * >::iterator t = threads.begin(); t != threads.end(); ++t) 
+	{
 		(*t)->wait();
 		delete *t;
 		*t = NULL;
@@ -61,18 +63,21 @@ Controller::~Controller() {
 
 	//Don't need to lock here, as all threads have stopped:
 
-	while (!computeQueue.empty()) {
+	while (!computeQueue.empty()) 
+	{
 		delete computeQueue.front();
 		computeQueue.pop_front();
 	}
 
-	while (!renderQueue.empty()) {
+	while (!renderQueue.empty()) 
+	{
 		delete renderQueue.front();
 		renderQueue.pop_front();
 	}
 }
 
-void Controller::registerWidget(AsyncRenderWidget *widget) {
+void Controller::registerWidget(AsyncRenderWidget *widget) 
+{
 	//widget gets a fresh id and gets added to our map:
 	assert(widget);
 	assert(widget->id == 0);
@@ -83,7 +88,8 @@ void Controller::registerWidget(AsyncRenderWidget *widget) {
 	idToWidget.insert(make_pair(widget->id, widget));
 }
 
-void Controller::unregisterWidget(AsyncRenderWidget *widget) {
+void Controller::unregisterWidget(AsyncRenderWidget *widget) 
+{
 	//widget is deleted from our map:
 	assert(widget);
 	assert(widget->id != 0);
@@ -92,10 +98,13 @@ void Controller::unregisterWidget(AsyncRenderWidget *widget) {
 	idToWidget.erase(f);
 }
 
-void replaceOrAddJob(deque< Job * > &queue, Job *job) {
+void replaceOrAddJob(deque< Job * > &queue, Job *job) 
+{
 	bool found = false;
-	for (deque< Job * >::iterator j = queue.begin(); j != queue.end(); ++j) {
-		if ((*j)->requesterId == job->requesterId) {
+	for (deque< Job * >::iterator j = queue.begin(); j != queue.end(); ++j) 
+	{
+		if ((*j)->requesterId == job->requesterId) 
+		{
 			assert(!found);
 			found = true;
 			//There's already a job in the queue from the same requester, so take its place in line and clean up its data:
@@ -104,13 +113,14 @@ void replaceOrAddJob(deque< Job * > &queue, Job *job) {
 			*j = job;
 		}
 	}
-	if (!found) {
+	if (!found) 
 		queue.push_back(job);
-	}
 }
 
-void Controller::queue(AsyncRenderWidget *widget, Camera const &camera, RenderData *data) {
+void Controller::queue(AsyncRenderWidget *widget, Camera const &camera, RenderData *data) 
+{
 	assert(widget->id != 0);
+
 	Job *job = new Job(widget->id, camera, data);
 	computeQueueLock.lock();
 	replaceOrAddJob(computeQueue, job);
@@ -118,7 +128,8 @@ void Controller::queue(AsyncRenderWidget *widget, Camera const &camera, RenderDa
 	computeQueueHasData.wakeOne();
 }
 
-void Controller::queue(AsyncRenderWidget *widget, Camera const &camera, Geometry *geometry) {
+void Controller::queue(AsyncRenderWidget *widget, Camera const &camera, Geometry *geometry) 
+{
 	Job *job = new Job(widget->id, camera, NULL, geometry);
 	renderQueueLock.lock();
 	replaceOrAddJob(renderQueue, job);
@@ -126,33 +137,42 @@ void Controller::queue(AsyncRenderWidget *widget, Camera const &camera, Geometry
 	renderQueueHasData.wakeOne();
 }
 
-void Controller::jobFinished(Job *job) {
+void Controller::jobFinished(Job *job) 
+{
 	assert(job);
+
 	unordered_map< uint32_t, AsyncRenderWidget * >::iterator f = idToWidget.find(job->requesterId);
-	if (f == idToWidget.end()) {
+	if (f == idToWidget.end()) 
 		job->deleteData();
-	} else {
+	else 
+	{
 		f->second->renderFinished(job->camera, job->data, job->geometry, job->result);
 		job->data = NULL;
 		job->geometry = NULL;
 		job->result = NULL;
 	}
+
 	delete job;
 }
 
 //============================================
 
-ComputeThread::ComputeThread(Controller *_controller) : controller(_controller) {
+ComputeThread::ComputeThread(Controller *_controller) : controller(_controller) 
+{
 	assert(controller);
 }
 
-ComputeThread::~ComputeThread() {
+ComputeThread::~ComputeThread() 
+{
 }
 
-void ComputeThread::run() {
+void ComputeThread::run() 
+{
 	controller->computeQueueLock.lock();
-	while (!controller->quitThreads) {
-		if (controller->computeQueue.empty()) {
+	while (!controller->quitThreads) 
+	{
+		if (controller->computeQueue.empty()) 
+		{
 			controller->computeQueueHasData.wait(&controller->computeQueueLock);
 			continue;
 		}
