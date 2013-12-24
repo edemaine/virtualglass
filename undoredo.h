@@ -10,6 +10,8 @@
 #include "casing.h"
 #include "subcanetemplate.h"
 
+#undef DELETE        // winnt.h defines this to 0x00010000L
+
 class QVBoxLayout;
 
 class MainWindow;

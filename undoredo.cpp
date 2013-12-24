@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <QApplication>
 
-#include "undoredo.h"
 #include "mainwindow.h"
 #include "glasscolor.h"
 #include "cane.h"
@@ -15,6 +14,7 @@
 #include "coloreditorwidget.h"
 #include "caneeditorwidget.h"
 #include "pieceeditorwidget.h"
+#include "undoredo.h"
 	
 UndoRedo :: UndoRedo(MainWindow* _mainWindow)
 {
@@ -52,7 +52,7 @@ void UndoRedo :: addedOrDeletedObject(enum ObjectType objectType, bool added, vo
 {
 	UndoRedo::Event event = nulledEvent();
 
-	event.type = added ? ADD : DELETE;
+    event.type = added ? ADD : DELETE;
 	event.objectType = objectType;
 	event.index = index;
 	switch (objectType)
