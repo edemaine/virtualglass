@@ -1,10 +1,5 @@
 # Project file for VirtualGlass
 
-# A workaround needed for Qt 5.2.0-beta1 for bugs:
-# https://bugreports.qt-project.org/browse/QTBUG-31340
-# https://bugreports.qt-project.org/browse/QTBUG-30586
-#cache()
-
 TEMPLATE = app
 DEPENDPATH += .
 INCLUDEPATH += . glew/ jsoncpp/include/

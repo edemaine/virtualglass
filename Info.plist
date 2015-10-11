@@ -48,13 +48,13 @@
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>virtualglass</string>
+	<string>VirtualGlass</string>
 	<key>CFBundleIconFile</key>
 	<string>virtualglass.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.virtualglass.virtualglass</string>
 	<key>CFBundleName</key>
-	<string>virtualglass</string>
+	<string>VirtualGlass</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>

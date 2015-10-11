@@ -14,7 +14,7 @@ cp ./Info.plist ./virtualglass.app/Contents/Info.plist
 # rename the app
 mv ./virtualglass.app/ ./VirtualGlass.app/ 
 # pull the neccessary frameworks into the bundle
-macdeployqt ./VirtualGlass.app/
+macdeployqt ./VirtualGlass.app/ -dmg
 
 # reset compilation setup to development settings
 qmake -spec macx-llvm -config debug virtualglass.pro
