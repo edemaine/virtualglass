@@ -1,9 +1,7 @@
 
-***** Revision r1061 *****
+***** Revision r1110 *****
 
--Undo/redo functionality has been added! This functionality saves all your changes to every color, cane, and piece, so mistakes can be easily undone and exploration of new designs is risk-free.
-
--The toolbar has been removed. Copying and deletion of colors, canes, and pieces can now be performed by clicking on a library object's "+" and "-". File operations such as "New File", "Open File", and "Save File" have been relegated to the File Menu.
+-Undo/redo behavior has changed. The old "local" undo/redo operated on the color, cane, or piece currently being edited has been changed to new "global" undo/redo that follows the sequence of operations performed on all objects, regardless of the object currently being edited. This is more consistent with similar features in other software.
 
 -Various bug fixes.
 
