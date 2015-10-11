@@ -14,7 +14,9 @@ int main(int argc, char** argv)
 	{
 		// fix Mac OS X 10.9 (mavericks) font issue
 		// https://bugreports.qt-project.org/browse/QTBUG-32789
+		// http://stackoverflow.com/questions/26946441/change-qt-font-to-native-system-default-font
 		QFont::insertSubstitution(".Lucida Grande UI", "Lucida Grande");
+		QFont::insertSubstitution(".Helvetica Neue DeskInterface", "Helvetica Neue");
 	}
 	#endif
 

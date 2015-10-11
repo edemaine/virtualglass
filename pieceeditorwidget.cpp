@@ -212,7 +212,7 @@ void PieceEditorWidget :: mouseMoveEvent(QMouseEvent* event)
 		return;
 	}
 
-	maxDragDistance = MAX(maxDragDistance, fabs(event->pos().x() - dragStartPosition.x()));
+	maxDragDistance = MAX(maxDragDistance, abs(event->pos().x() - dragStartPosition.x()));
 	if (!isDragging || maxDragDistance < QApplication::startDragDistance())
 		return;
 

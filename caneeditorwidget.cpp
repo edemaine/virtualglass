@@ -229,8 +229,8 @@ void CaneEditorWidget :: setupLayout()
 	squareCasingPushButton = new QPushButton(casingWidget); 
 	QIcon squareIcon(QPixmap::fromImage(QImage(":/images/square_icon.png")));
 	squareCasingPushButton->setIcon(squareIcon);
-	addCasingButton = new QPushButton("+", casingWidget);
-	removeCasingButton = new QPushButton("-", casingWidget);
+	addCasingButton = new QPushButton("Add", casingWidget);
+	removeCasingButton = new QPushButton("Remove", casingWidget);
 	casingLayout->addWidget(casingLabel);
 	casingLayout->addWidget(circleCasingPushButton);
 	casingLayout->addWidget(squareCasingPushButton);
@@ -374,7 +374,7 @@ void CaneEditorWidget :: mouseMoveEvent(QMouseEvent* event)
 		return;
 	}
 
-	maxDragDistance = MAX(maxDragDistance, fabs(event->pos().x() - dragStartPosition.x()));
+	maxDragDistance = MAX(maxDragDistance, abs(event->pos().x() - dragStartPosition.x()));
 	if (!isDragging || maxDragDistance < QApplication::startDragDistance())
 		return;
 
