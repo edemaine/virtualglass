@@ -17,7 +17,7 @@
 
 # DLL locations (Qt and MinGW dirs)
 # SET THESE TO YOUR INSTALLATION DIRS
-QTBIN="/c/Qt/4.8.4/bin"
+QTBIN="/c/Qt/4.8.6/bin"
 MINGWBIN="/c/MinGW/bin"
 # Set to directory containing compiled virtualglass.exe
 BUILDBIN="./release"

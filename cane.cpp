@@ -282,7 +282,7 @@ void Cane :: addCasing(enum GeometricShape _shape)
 	if (this->outermostCasingShape() != CIRCLE_SHAPE)
 		this->twist_ = 0.0;
 
-	// update subpulls by rescaling them according to innermost casing rescaling
+	// update subcanes by rescaling them according to innermost casing rescaling
 	for (unsigned int i = 0; i < this->subcanes_.size(); ++i) 
 		this->subcanes_[i].rescale(casings[0].thickness / oldInnermostCasingThickness);
 
@@ -628,7 +628,7 @@ void Cane :: removeSubcaneTemplate(unsigned int index)
 	emit modified();
 }
 
-unsigned int Cane :: subpullCount() const
+unsigned int Cane :: subcaneCount() const
 {
 	return this->subcanes_.size();
 }
@@ -721,7 +721,7 @@ Cane * deep_copy(const Cane *_cane)
 	{
 		Cane *t = to_update.back();
 		to_update.pop_back();
-		for (unsigned int i = 0; i < t->subpullCount(); ++i)
+		for (unsigned int i = 0; i < t->subcaneCount(); ++i)
 		{
 			SubcaneTemplate s = t->subcaneTemplate(i);
 			unordered_map<const Cane*, Cane*>::iterator f = copies.find(s.cane);
@@ -748,13 +748,11 @@ void deep_delete(Cane *cane)
 	{
 		Cane *t = to_delete.back();
 		to_delete.pop_back();
-		for (unsigned int i = 0; i < t->subpullCount(); ++i)
+		for (unsigned int i = 0; i < t->subcaneCount(); ++i)
 		{
-			SubcaneTemplate s = t->subcaneTemplate(i);
-			if (marked.insert(s.cane).second) 
-				to_delete.push_back(s.cane);
-			s.cane = NULL;
-			t->setSubcaneTemplate(s, i);
+			Cane* subcane = t->subcaneTemplate(i).cane;
+			if (marked.insert(subcane).second) 
+				to_delete.push_back(subcane);
 		}
 		delete t;
 	}

@@ -61,7 +61,7 @@ class Cane : public QObject
 		void setSubcaneTemplate(SubcaneTemplate t, unsigned int index);	
 		void addSubcaneTemplate(SubcaneTemplate t);
 		void removeSubcaneTemplate(unsigned int index);
-		unsigned int subpullCount() const;	
+		unsigned int subcaneCount() const;	
 
 		bool hasDependencyOn(GlassColor* color) const;
 		bool hasDependencyOn(Cane* cane) const;

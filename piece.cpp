@@ -65,6 +65,7 @@ void Piece :: removeSubcaneDependency(Cane* cane)
 void Piece::setSpline(Spline s)
 {
 	this->spline_ = s;
+	emit modified();
 }
 
 Spline Piece::spline() const

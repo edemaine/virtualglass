@@ -159,7 +159,7 @@ int CaneEditorViewWidget :: casingIndexAt(Point2D loc)
 int CaneEditorViewWidget :: subcaneIndexAt(Point2D loc)
 {
 	// Recursively call drawing on subcanes
-	for (unsigned int i = 0; i < cane->subpullCount(); ++i)
+	for (unsigned int i = 0; i < cane->subcaneCount(); ++i)
 	{
 		SubcaneTemplate sub = cane->subcaneTemplate(i);
 		Point2D delta;
@@ -267,6 +267,7 @@ void CaneEditorViewWidget :: dragLeaveEvent(QDragLeaveEvent*)
 {
 	subcanesHighlighted.clear();
 	casingsHighlighted.clear();
+	repaint();
 }
 
 Point2D CaneEditorViewWidget :: mouseToCaneCoords(float x, float y)
@@ -306,7 +307,7 @@ void CaneEditorViewWidget :: updateHighlightedSubcanesAndCasings(QDragMoveEvent*
 				// lets you notice that the shift key is down earlier, i.e. during the drag, which is the only time you care anyway.
 				if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
 				{
-					for (unsigned int i = 0; i < cane->subpullCount(); ++i)
+					for (unsigned int i = 0; i < cane->subcaneCount(); ++i)
 						subcanesHighlighted.insert(i);
 				}
 				else
@@ -360,7 +361,7 @@ void CaneEditorViewWidget :: updateHighlightedSubcanesAndCasings(QDragMoveEvent*
 				break;
 			if (event && (event->keyboardModifiers() & Qt::ShiftModifier))
 			{
-				for (unsigned int i = 0; i < cane->subpullCount(); ++i)
+				for (unsigned int i = 0; i < cane->subcaneCount(); ++i)
 				{
 					if (draggedCane->outermostCasingShape() == cane->subcaneTemplate(i).shape)
 						subcanesHighlighted.insert(i);
@@ -541,7 +542,7 @@ void CaneEditorViewWidget :: drawSubcane(Point2D upperLeft, float drawWidth, flo
 	}
 
 	// Recursively call drawing on subcanes
-	for (unsigned int i = cane->subpullCount()-1; i < cane->subpullCount(); --i)
+	for (unsigned int i = cane->subcaneCount()-1; i < cane->subcaneCount(); --i)
 	{
 		SubcaneTemplate sub = cane->subcaneTemplate(i);
 

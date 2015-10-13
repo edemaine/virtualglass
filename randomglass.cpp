@@ -59,7 +59,7 @@ Cane* randomComplexCane(Cane* circleSimpleCane, Cane* squareSimpleCane)
 	cane->setCount(qrand() % 10 + 2);
 
 	// set subcanes
-	for (unsigned int i = 0; i < cane->subpullCount(); ++i)
+	for (unsigned int i = 0; i < cane->subcaneCount(); ++i)
 	{
 		SubcaneTemplate t = cane->subcaneTemplate(i);
 		switch (t.shape)

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # update version file
-bash make-version.sh
+# bash make-version.sh
 # recreate makefiles for release
 qmake -spec macx-llvm -config release virtualglass.pro
 # clean everything and recompile

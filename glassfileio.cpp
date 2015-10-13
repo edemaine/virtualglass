@@ -587,18 +587,18 @@ void writeCane(Json::Value& root, Cane* cane, unsigned int caneIndex, map<const 
 	// write pull template parameters
 	root[canename]["Count"] = cane->count();
 
-	// loop over subpulls
+	// loop over subcanes
 	root[canename]["Subcanes"];
-	for (unsigned int i = 0; i < cane->subpullCount(); ++i)
+	for (unsigned int i = 0; i < cane->subcaneCount(); ++i)
 	{
-		string subpullName = idAndNameToString(i, "Subcane");
-		root[canename]["Subcanes"][subpullName]["Index"] = i;
+		string subcaneName = idAndNameToString(i, "Subcane");
+		root[canename]["Subcanes"][subcaneName]["Index"] = i;
 		SubcaneTemplate sub = cane->subcaneTemplate(i);
-		root[canename]["Subcanes"][subpullName]["Cane pointer"] = caneMap[sub.cane];
-		root[canename]["Subcanes"][subpullName]["Diameter"] = sub.diameter;
-		root[canename]["Subcanes"][subpullName]["Shape"] = geometricShapeToString(sub.shape);
-		root[canename]["Subcanes"][subpullName]["X"] = sub.location.x;
-		root[canename]["Subcanes"][subpullName]["Y"] = sub.location.y;
+		root[canename]["Subcanes"][subcaneName]["Cane pointer"] = caneMap[sub.cane];
+		root[canename]["Subcanes"][subcaneName]["Diameter"] = sub.diameter;
+		root[canename]["Subcanes"][subcaneName]["Shape"] = geometricShapeToString(sub.shape);
+		root[canename]["Subcanes"][subcaneName]["X"] = sub.location.x;
+		root[canename]["Subcanes"][subcaneName]["Y"] = sub.location.y;
 	}
 }
 
@@ -660,16 +660,16 @@ void readCaneSubcanes(Json::Value& root, Cane* cane, map<unsigned int, Cane*>& c
 
 	for (unsigned int i = 0; i < root["Subcanes"].getMemberNames().size(); ++i)
 	{
-		string subpullname = root["Subcanes"].getMemberNames()[i];
-		unsigned int subpullIndex = root["Subcanes"][subpullname]["Index"].asUInt();
+		string subcaneName = root["Subcanes"].getMemberNames()[i];
+		unsigned int subcaneIndex = root["Subcanes"][subcaneName]["Index"].asUInt();
 
-		SubcaneTemplate sub = cane->subcaneTemplate(subpullIndex);
-		sub.cane = safeCaneMap(caneMap, root["Subcanes"][subpullname]["Cane pointer"].asUInt());
-		sub.diameter = root["Subcanes"][subpullname]["Diameter"].asFloat();
-		sub.shape = stringToGeometricShape(root["Subcanes"][subpullname]["Shape"].asString());
-		sub.location.x = root["Subcanes"][subpullname]["X"].asFloat();
-		sub.location.y = root["Subcanes"][subpullname]["Y"].asFloat();
-		cane->setSubcaneTemplate(sub, subpullIndex);
+		SubcaneTemplate sub = cane->subcaneTemplate(subcaneIndex);
+		sub.cane = safeCaneMap(caneMap, root["Subcanes"][subcaneName]["Cane pointer"].asUInt());
+		sub.diameter = root["Subcanes"][subcaneName]["Diameter"].asFloat();
+		sub.shape = stringToGeometricShape(root["Subcanes"][subcaneName]["Shape"].asString());
+		sub.location.x = root["Subcanes"][subcaneName]["X"].asFloat();
+		sub.location.y = root["Subcanes"][subcaneName]["Y"].asFloat();
+		cane->setSubcaneTemplate(sub, subcaneIndex);
 	}
 }
 
@@ -821,17 +821,17 @@ void writePiece(Json::Value& root, Piece* piece, unsigned int pieceIndex, map<Ca
 	pickupRoot["Subcanes"];
 	for (unsigned int i = 0; i < piece->subpickupCount(); ++i)
 	{
-		string subpullName = idAndNameToString(i, "Subcane");
-		pickupRoot["Subcanes"][subpullName]["Index"] = i;
+		string subcaneName = idAndNameToString(i, "Subcane");
+		pickupRoot["Subcanes"][subcaneName]["Index"] = i;
 		SubpickupTemplate t = piece->subpickupTemplate(i);
-		pickupRoot["Subcanes"][subpullName]["Cane pointer"] = caneMap[t.cane];
-		pickupRoot["Subcanes"][subpullName]["Length"] = t.length;
-		pickupRoot["Subcanes"][subpullName]["Width"] = t.width;
-		pickupRoot["Subcanes"][subpullName]["Orientation"] = orientationToString(t.orientation);
-		pickupRoot["Subcanes"][subpullName]["Shape"] = geometricShapeToString(t.shape);
-		pickupRoot["Subcanes"][subpullName]["X"] = t.location.x;
-		pickupRoot["Subcanes"][subpullName]["Y"] = t.location.y;
-		pickupRoot["Subcanes"][subpullName]["Z"] = t.location.z;
+		pickupRoot["Subcanes"][subcaneName]["Cane pointer"] = caneMap[t.cane];
+		pickupRoot["Subcanes"][subcaneName]["Length"] = t.length;
+		pickupRoot["Subcanes"][subcaneName]["Width"] = t.width;
+		pickupRoot["Subcanes"][subcaneName]["Orientation"] = orientationToString(t.orientation);
+		pickupRoot["Subcanes"][subcaneName]["Shape"] = geometricShapeToString(t.shape);
+		pickupRoot["Subcanes"][subcaneName]["X"] = t.location.x;
+		pickupRoot["Subcanes"][subcaneName]["Y"] = t.location.y;
+		pickupRoot["Subcanes"][subcaneName]["Z"] = t.location.z;
 	}
 }
 
@@ -879,18 +879,18 @@ Piece* readPiece(string piecename, Json::Value& root, map<unsigned int, Cane*>& 
 
 	for (unsigned int i = 0; i < pickupRoot["Subcanes"].getMemberNames().size(); ++i)
 	{
-		string subpullname = pickupRoot["Subcanes"].getMemberNames()[i];
-		unsigned int subIndex = pickupRoot["Subcanes"][subpullname]["Index"].asUInt();
+		string subcaneName = pickupRoot["Subcanes"].getMemberNames()[i];
+		unsigned int subIndex = pickupRoot["Subcanes"][subcaneName]["Index"].asUInt();
 
 		SubpickupTemplate t = piece->subpickupTemplate(subIndex);
-		t.cane = safeCaneMap(caneMap, pickupRoot["Subcanes"][subpullname]["Cane pointer"].asUInt());
-		t.length = pickupRoot["Subcanes"][subpullname]["Length"].asFloat();
-		t.width = pickupRoot["Subcanes"][subpullname]["Width"].asFloat();
-		t.orientation = stringToOrientation(pickupRoot["Subcanes"][subpullname]["Orientation"].asString());
-		t.shape = stringToGeometricShape(pickupRoot["Subcanes"][subpullname]["Shape"].asString());
-		t.location.x = pickupRoot["Subcanes"][subpullname]["X"].asFloat();
-		t.location.y = pickupRoot["Subcanes"][subpullname]["Y"].asFloat();
-		t.location.z = pickupRoot["Subcanes"][subpullname]["Z"].asFloat();
+		t.cane = safeCaneMap(caneMap, pickupRoot["Subcanes"][subcaneName]["Cane pointer"].asUInt());
+		t.length = pickupRoot["Subcanes"][subcaneName]["Length"].asFloat();
+		t.width = pickupRoot["Subcanes"][subcaneName]["Width"].asFloat();
+		t.orientation = stringToOrientation(pickupRoot["Subcanes"][subcaneName]["Orientation"].asString());
+		t.shape = stringToGeometricShape(pickupRoot["Subcanes"][subcaneName]["Shape"].asString());
+		t.location.x = pickupRoot["Subcanes"][subcaneName]["X"].asFloat();
+		t.location.y = pickupRoot["Subcanes"][subcaneName]["Y"].asFloat();
+		t.location.z = pickupRoot["Subcanes"][subcaneName]["Z"].asFloat();
 		piece->setSubpickupTemplate(t, subIndex);
 	}
 

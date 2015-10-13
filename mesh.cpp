@@ -706,7 +706,7 @@ void recurseMesh(Cane* cane, Geometry *geometry, vector<Ancestor>& ancestors, fl
 
 	// Recurse through to children 
 	Ancestor me = {cane, 0};
-	for (unsigned int i = 0; i < cane->subpullCount(); ++i)
+	for (unsigned int i = 0; i < cane->subcaneCount(); ++i)
 	{
 		me.child = i;
 		ancestors.push_back(me);
