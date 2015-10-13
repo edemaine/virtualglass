@@ -830,7 +830,6 @@ void MainWindow :: setupLibrary()
 	libraryScrollArea->installEventFilter(this);	
 	libraryScrollArea->setBackgroundRole(QPalette::Dark);
 	libraryScrollArea->setWidgetResizable(true);
-	libraryScrollArea->setFixedWidth(358);
 	libraryScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	libraryScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
