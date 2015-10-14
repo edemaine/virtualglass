@@ -443,6 +443,7 @@ void CaneEditorViewWidget :: dropEvent(QDropEvent* event)
 
 	subcanesHighlighted.clear();
 	casingsHighlighted.clear();
+	repaint();
 	GlobalUndoRedo::modifiedCane(cane);
 }
 
