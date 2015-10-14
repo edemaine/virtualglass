@@ -484,10 +484,11 @@ void CaneCustomizeViewWidget :: setBoundaryPainter(QPainter* painter, bool outer
 
 void CaneCustomizeViewWidget :: paintShape(Point2D upperLeft, float size, enum GeometricShape shape, QPainter* painter)
 {
-	int roundedX, roundedY;
-	
-	roundedX = rawX(upperLeft.x) + 0.5;
-	roundedY = rawY(upperLeft.y) + 0.5;
+	int roundedX = rawX(upperLeft.x) + 0.5;
+	int roundedY = rawY(upperLeft.y) + 0.5;
+	int roundedSize = size;
+	if (size < 1) // If size is 0, drawEllipse/drawRect will cause a failed assertion it seems
+		return;
 
 	switch (shape)
 	{

@@ -6,6 +6,8 @@
 #include "glasscolor.h"
 #include "globalbackgroundcolor.h"
 
+// TODO: Replace similar code in CaneEditorViewWidget and CaneCustomizeViewWidget with calls to this code
+// (Will require some small changes to allow the slightly different rendering of those versions)
 namespace CaneCrossSectionRender
 {
 
@@ -27,21 +29,21 @@ void setBoundaryPainter(QPainter* painter, bool outermostLevel)
 
 void paintShape(float x, float y, float size, enum GeometricShape shape, QPainter* painter)
 {
-	int roundedX, roundedY;
-
-	roundedX = floor(x + 0.5);
-	roundedY = floor(y + 0.5);
+	int roundedX = floor(x + 0.5);
+	int roundedY = floor(y + 0.5);
+	int roundedSize = size;
+	if (roundedSize < 1) // If size is 0, drawEllipse/drawRect will cause a failed assertion it seems
+		return;	
 
 	switch (shape)
 	{
 		case CIRCLE_SHAPE:
-			painter->drawEllipse(roundedX, roundedY, size, size);
+			painter->drawEllipse(roundedX, roundedY, roundedSize, roundedSize);
 			break;
 		case SQUARE_SHAPE:
-			painter->drawRect(roundedX, roundedY, size, size);
+			painter->drawRect(roundedX, roundedY, roundedSize, roundedSize);
 			break;
 	}
-	
 }
 
 

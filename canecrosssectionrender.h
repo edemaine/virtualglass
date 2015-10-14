@@ -11,7 +11,7 @@ class Cane;
 namespace CaneCrossSectionRender
 {
 	void paintShape(float x, float y, float size, enum GeometricShape s, QPainter* p);
-	void setBoundaryPainter(QPainter* painter, bool outermostLevel);
+	void setBoundaryPainter(QPainter* painter, bool outermostLevel, bool greyedOuter);
 	void drawSubcane(float x, float y, float width, float height, Cane* cane, 
 		bool outermostLevel, QPainter* painter);
 	void render(QPainter* painter, int size, Cane* cane);
