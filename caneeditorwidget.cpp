@@ -226,7 +226,9 @@ void CaneEditorWidget :: setupLayout()
 	circleCasingPushButton = new QPushButton(casingWidget); 
 	QIcon circleIcon(QPixmap::fromImage(QImage(":/images/circle_icon.png")));
 	circleCasingPushButton->setIcon(circleIcon);
+	circleCasingPushButton->setIconSize(QSize(15, 15));
 	squareCasingPushButton = new QPushButton(casingWidget); 
+	squareCasingPushButton->setIconSize(QSize(15, 15));
 	QIcon squareIcon(QPixmap::fromImage(QImage(":/images/square_icon.png")));
 	squareCasingPushButton->setIcon(squareIcon);
 	addCasingButton = new QPushButton("Add", casingWidget);
