@@ -86,15 +86,14 @@ void GlassLibraryWidget :: mouseMoveEvent(QMouseEvent* event)
 	if ((event->pos() - mouseDownPos).manhattanLength() > QApplication::startDragDistance()
 		|| !this->rect().contains(event->pos()))
 	{
+		if (!this->isDraggable())
+			return;
+
+		mouseDown = false;
+
 		char buf[500];
 		QPixmap pixmap;
-
-		if (!this->isDraggable())
-		{
-			mouseDown = false;
-			return;
-		}
-
+		
 		GlassMime::encode(buf, this, this->mimeType());
 
 		QByteArray pointerData(buf);
