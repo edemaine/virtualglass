@@ -486,7 +486,7 @@ void CaneCustomizeViewWidget :: paintShape(Point2D upperLeft, float size, enum G
 {
 	int roundedX = rawX(upperLeft.x) + 0.5;
 	int roundedY = rawY(upperLeft.y) + 0.5;
-	int roundedSize = size;
+	//int roundedSize = size;
 	if (size < 1) // If size is 0, drawEllipse/drawRect will cause a failed assertion it seems
 		return;
 
