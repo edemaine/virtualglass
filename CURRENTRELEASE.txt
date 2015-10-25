@@ -1,5 +1,5 @@
 
-***** Revision r1110 *****
+***** Revision r1118 *****
 
 -Undo/redo behavior has changed. The old "local" undo/redo operated on the color, cane, or piece currently being edited has been changed to new "global" undo/redo that follows the sequence of operations performed on all objects, regardless of the object currently being edited. This is more consistent with similar features in other software.
 

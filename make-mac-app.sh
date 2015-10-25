@@ -7,6 +7,7 @@ qmake -spec macx-llvm -config release virtualglass.pro
 # clean everything and recompile
 rm -rf ./virtualglass.app/
 rm -rf ./VirtualGlass.app/
+rm ./VirtualGlass.dmg
 make clean
 make
 # copy our custom OS config file for file type associations, etc.
