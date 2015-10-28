@@ -446,8 +446,16 @@ void Piece :: updateSubcanes()
 			for (int i = 0; i < parameters[0].value; ++i) {
 				p.x = -1.0 + width / 2 + width * i;
 				p.y = -1.0;
-				//p.z = 2.0;
 				pushNewSubcane(&newSubcanes, p, VERTICAL_PICKUP_CANE_ORIENTATION, 2.0, width-0.0001, SQUARE_SHAPE);
+			}
+			break;
+		case PickupTemplate::HORIZONTAL:
+			p.x = p.y = p.z = 0.0;
+			width = 2.0 / MAX(parameters[0].value, 1);
+			for (int i = 0; i < parameters[0].value; ++i) {
+				p.x = -1.0;
+				p.y = -1.0 + width / 2 + width * i;
+				pushNewSubcane(&newSubcanes, p, HORIZONTAL_PICKUP_CANE_ORIENTATION, 2.0, width-0.0001, SQUARE_SHAPE);
 			}
 			break;
 		case PickupTemplate::VERTICAL_WITH_LIP_WRAP:
@@ -543,6 +551,9 @@ void Piece :: setPickupTemplateType(enum PickupTemplate::Type _type, bool force)
 			break;
 		case PickupTemplate::VERTICAL:
 			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 30));
+			break;
+		case PickupTemplate::HORIZONTAL:
+			parameters.push_back(TemplateParameter(10, string("Row count:"), 6, 30));
 			break;
 		case PickupTemplate::MURRINE_COLUMN:
 			parameters.push_back(TemplateParameter(10, string("Column count:"), 6, 30));

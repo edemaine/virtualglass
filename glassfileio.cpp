@@ -219,7 +219,7 @@ string orientationToString(enum PickupCaneOrientation ori)
 		case MURRINE_PICKUP_CANE_ORIENTATION:
 			return "Murrine";
 		default:
-			return "Horizontal";
+			return "Vertical";
 	}
 }	
 
@@ -233,7 +233,7 @@ enum PickupCaneOrientation stringToOrientation(string s)
 	if (s == "Murrine")
 		return MURRINE_PICKUP_CANE_ORIENTATION;
 
-	return HORIZONTAL_PICKUP_CANE_ORIENTATION;
+	return VERTICAL_PICKUP_CANE_ORIENTATION;
 }
 
 // write
@@ -346,6 +346,8 @@ string pickupTemplateToString(enum PickupTemplate::Type type)
 	{
 		case PickupTemplate::VERTICAL:
 			return "Vertical";
+		case PickupTemplate::HORIZONTAL:
+			return "Horizontal";
 		case PickupTemplate::RETICELLO_VERTICAL_HORIZONTAL:
 			return "Reticello vertical horizontal";
 		case PickupTemplate::MURRINE_COLUMN:
@@ -370,6 +372,8 @@ enum PickupTemplate::Type stringToPickupTemplate(string s)
 {
 	if (s == "Vertical")
 		return PickupTemplate::VERTICAL;
+	if (s == "Horizontal")
+		return PickupTemplate::HORIZONTAL;
 	if (s == "Reticello vertical horizontal")
 		return PickupTemplate::RETICELLO_VERTICAL_HORIZONTAL;
 	if (s == "Murrine column")
