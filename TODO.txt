@@ -1,0 +1,26 @@
+
+Things to implement. From Erik (27/10/15).
+When implemented, mention in SVN commit and remove from this list.
+
+Rotation within pattern -- I'm thinking ctrl-click on box handle.
+Delete/backspace key on keyboard should delete the currently selected thing
+(e.g. subcane in customize) instead of the currently selected cane.
+Select all (ctrl/apple A) in Customize.
+Rectangular select (two types, like Rhino/most CAD).
+Snap to x=0 or y=0 (center of overall cane)
+Ctrl D and other shortcuts for duplicate, etc. buttons at bottom
+All horizontal layout as one of the builtin pickup patterns
+Ability to add column of cane for organization (e.g. to keep simple cane separate from complex cane).
+Arrow keys to move subcanes around in customize cane.
+Square grid layout (in cane) should go up to at least 64
+Rectangles, just supporting pure color, not canes (called 'ribbons')
+
+Harder ones:
+
+Flip or shift/rotate cane in customize pickup
+Circular snap: fit circle to centers of selected cane and snap them to that circle, maybe uniformly space Linear snap
+Weird shapes of pure color, not cane (via SVG import, or click a polygon,
+or something)
+Grinding cane down (trimming to bounding circle, optionally)
+
+
