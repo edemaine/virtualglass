@@ -13,7 +13,6 @@ Snap to x=0 or y=0 (center of overall cane)
 Ctrl D and other shortcuts for duplicate, etc. buttons at bottom
 Ability to add column of cane for organization (e.g. to keep simple cane separate from complex cane).
 Arrow keys to move subcanes around in customize cane.
-[Andrew, 11/1/15] Square grid layout (in cane) should go up to at least 64
 Rectangles, just supporting pure color, not canes (called 'ribbons')
 
 ---- Harder ----
@@ -26,4 +25,5 @@ Grinding cane down (trimming to bounding circle, optionally)
 ---- Completed ----
 
 [Andrew, 10/28/15] All horizontal layout as one of the builtin pickup patterns
+[Andrew, 10/28/15] Square grid layout (in cane) should go up to at least 64
 

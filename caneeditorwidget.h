@@ -30,7 +30,7 @@ class CaneGeometryThread;
 class TwistWidget;
 
 #define MIN_CANE_COUNT_PARAMETER_VALUE 0
-#define MAX_CANE_COUNT_PARAMETER_VALUE 30
+#define MAX_CANE_COUNT_PARAMETER_VALUE 99
 
 class CaneEditorWidget : public QWidget
 {
