@@ -14,6 +14,7 @@ Ctrl D and other shortcuts for duplicate, etc. buttons at bottom
 Ability to add column of cane for organization (e.g. to keep simple cane separate from complex cane).
 Arrow keys to move subcanes around in customize cane.
 Rectangles, just supporting pure color, not canes (called 'ribbons')
+Different canes/colors/shapes should be exported to OBJ as distinct objects/meshes.
 
 ---- Harder ----
 
