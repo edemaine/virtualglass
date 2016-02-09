@@ -107,7 +107,7 @@ bool writeGlassFile(QBuffer& buffer, vector<GlassColor*>& colors, vector<Cane*>&
 bool readGlassFile(QString filename, vector<GlassColor*>& colors, vector<Cane*>& canes, 
 	vector<Piece*>& pieces)
 {
-	// TODO:fail when error is encountered, rather than charging blindly into the chars
+	// TODO: fail when error is encountered, rather than charging blindly into the chars
 	QFile openFile(filename);
 	openFile.open(QIODevice::ReadOnly | QIODevice::Text);
 	QTextStream fileInput(&openFile);
@@ -123,7 +123,9 @@ bool readGlassFile(QString filename, vector<GlassColor*>& colors, vector<Cane*>&
 	unsigned int revision;
 	string date;
 	GlassFileIOInternal::readBuildInformation(root, revision, date);
-	if (0 < revision && revision < 943) // if you got a valid number and it's not current
+	// TODO: have revision number checked against the number when this
+	// file io stuff was last changed (maybe that's actually 943?)
+	if (0 < revision && revision < 943) 
 		return false;
 
 	map<unsigned int, GlassColor*> colorMap;
@@ -136,6 +138,7 @@ bool readGlassFile(QString filename, vector<GlassColor*>& colors, vector<Cane*>&
 
 	if (root.isMember("Pieces"))
 		GlassFileIOInternal::readPieces(root["Pieces"], caneMap, colorMap, pieces);
+
 
 	return true;
 }
@@ -659,7 +662,7 @@ void readCaneSubcanes(Json::Value& root, Cane* cane, map<unsigned int, Cane*>& c
 	{
 		Point2D location;
 		for (unsigned int i = 0; i < root["Subcanes"].getMemberNames().size(); ++i)
-			cane->addSubcaneTemplate(SubcaneTemplate(cane, CIRCLE_SHAPE, location, 1.0));
+			cane->addSubcaneTemplate(SubcaneTemplate(GlobalGlass::circleCane(), CIRCLE_SHAPE, location, 1.0));
 	}
 
 	for (unsigned int i = 0; i < root["Subcanes"].getMemberNames().size(); ++i)
@@ -720,9 +723,8 @@ void readCanes(Json::Value& canesRoot, map<unsigned int, Cane*>& caneMap,
 	// loop again to fill in subcanes
 	for (unsigned int i = 0; i < canesRoot.getMemberNames().size(); ++i)
 	{
-		unsigned int caneIndex;
 		string canename = canesRoot.getMemberNames()[i];
-		caneIndex = stringToId(canename);
+		unsigned int caneIndex = stringToId(canename);
 		readCaneSubcanes(canesRoot[canename], caneMap[caneIndex], caneMap);
 	}
 
