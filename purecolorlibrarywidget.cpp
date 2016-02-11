@@ -24,8 +24,11 @@ PureColorLibraryWidget :: PureColorLibraryWidget(GlassColor* __color,
 	swatch->setFixedSize(20, 20);
 	QPixmap pixmap(20, 20);
 	QPainter painter(&pixmap);
+
 	Color c = _color->color();
-	painter.fillRect(QRect(0, 0, 20, 20), QBrush(QColor(255*c.r, 255*c.g, 255*c.b, 255*c.a)));
+	QColor qc;
+	qc.setRgbF(c.r, c.g, c.b, c.a);
+	painter.fillRect(QRect(0, 0, 20, 20), QBrush(qc));
 	painter.drawRect(QRect(0, 0, 19, 19));
 	swatch->setPixmap(pixmap);
 	layout->addWidget(swatch, 0);

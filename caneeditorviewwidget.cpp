@@ -121,7 +121,8 @@ void CaneEditorViewWidget :: mousePressEvent(QMouseEvent* event)
 		_pixmap.fill(Qt::transparent);
 		QPainter painter(&_pixmap);
 		Color c = selectedColor->color();
-		QColor qc(255*c.r, 255*c.g, 255*c.b, MAX(255*c.a, 30));
+		QColor qc;
+		qc.setRgbF(c.r, c.g, c.b, MAX(c.a, 0.12));
 		painter.setBrush(qc);
 		painter.setPen(Qt::NoPen);
 		painter.drawEllipse(10, 10, 180, 180);
@@ -505,8 +506,9 @@ void CaneEditorViewWidget :: drawSubcane(Point2D upperLeft, float drawWidth, flo
 
 	if (highlightThis)
 	{
-		painter->setBrush(QColor(255*highlightColor.r, 255*highlightColor.g, 255*highlightColor.b,
-			255*highlightColor.a));
+		QColor qc;
+		qc.setRgbF(highlightColor.r, highlightColor.g, highlightColor.b, highlightColor.a);
+		painter->setBrush(qc);
 		painter->setPen(Qt::NoPen);
 		paintShape(upperLeft, drawWidth, cane->outermostCasingShape(), painter);
 		return;
@@ -529,13 +531,15 @@ void CaneEditorViewWidget :: drawSubcane(Point2D upperLeft, float drawWidth, flo
 		// Fill with actual casing color (highlighting white or some other color)
 		if (outermostLevel && casingsHighlighted.find(i) != casingsHighlighted.end())
 		{
-			painter->setBrush(QColor(255*highlightColor.r, 255*highlightColor.g, 255*highlightColor.b, 
-				255*highlightColor.a));
+			QColor qc;
+			qc.setRgbF(highlightColor.r, highlightColor.g, highlightColor.b, highlightColor.a);
+			painter->setBrush(qc);
 		}
 		else
 		{
 			Color c = cane->casingColor(i)->color();
-			QColor qc(255*c.r, 255*c.g, 255*c.b, 255*c.a);
+			QColor qc;
+			qc.setRgbF(c.r, c.g, c.b, c.a);
 			painter->setBrush(qc);
 		}
 

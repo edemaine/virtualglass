@@ -25,7 +25,6 @@ class TwistWidget : public QWidget
 		bool eventFilter(QObject* obj, QEvent* event);
 
 	signals:
-		void valueChanged();
 		void valueChangeEnded();
 
 	public slots:

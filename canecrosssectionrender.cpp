@@ -13,7 +13,6 @@ namespace CaneCrossSectionRender
 
 void setBoundaryPainter(QPainter* painter, bool outermostLevel) 
 {
-
 	if (outermostLevel)
 	{
 		QPen pen;
@@ -69,7 +68,8 @@ void drawSubcane(float x, float y, float drawWidth, float drawHeight,
 		
 		// Fill with actual casing color (highlighting white or some other color)
 		Color c = cane->casingColor(i)->color();
-		QColor qc(255*c.r, 255*c.g, 255*c.b, 255*c.a);
+		QColor qc;
+		qc.setRgbF(c.r, c.g, c.b, c.a);
 		painter->setBrush(qc);
 
 		setBoundaryPainter(painter, outermostLevel);

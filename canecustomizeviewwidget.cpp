@@ -526,7 +526,8 @@ void CaneCustomizeViewWidget :: drawSubcane(Point2D upperLeft, float drawWidth, 
 		paintShape(casingUpperLeft, casingWidth, cane->casingShape(i), painter);
 
 		Color casingColor = cane->casingColor(i)->color();
-		QColor qc(255*casingColor.r, 255*casingColor.g, 255*casingColor.b, 255*casingColor.a);
+		QColor qc;
+		qc.setRgbF(casingColor.r, casingColor.g, casingColor.b, casingColor.a); 
 		painter->setBrush(qc);
 		setBoundaryPainter(painter, outermostLevel, outermostLevel);
 		paintShape(casingUpperLeft, casingWidth, cane->casingShape(i), painter);

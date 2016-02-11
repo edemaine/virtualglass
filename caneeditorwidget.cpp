@@ -423,7 +423,6 @@ void CaneEditorWidget :: setupConnections()
 	connect(deleteSelectedButton, SIGNAL(clicked()), this, SLOT(deleteSelectedButtonClicked()));
 	connect(addCircleButton, SIGNAL(clicked()), this, SLOT(addCircleButtonClicked()));
 	connect(addSquareButton, SIGNAL(clicked()), this, SLOT(addSquareButtonClicked()));
-	connect(twistWidget, SIGNAL(valueChanged()), this, SLOT(childWidgetDataChanged()));
 	connect(twistWidget, SIGNAL(valueChangeEnded()), this, SLOT(twistEnded()));
 	connect(countSpin, SIGNAL(valueChanged(int)), this, SLOT(countSpinChanged(int)));
 	connect(controlsTab, SIGNAL(currentChanged(int)), this, SLOT(controlsTabChanged(int)));
