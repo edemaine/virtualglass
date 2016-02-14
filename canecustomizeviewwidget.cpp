@@ -13,9 +13,11 @@
 
 CaneCustomizeViewWidget::CaneCustomizeViewWidget(Cane* cane, QWidget* parent) : QWidget(parent)
 {
-	// setup draw widget
+	// Drawing 
 	setMinimumSize(200, 200);
 	this->cane = cane;
+	
+	// Mouse tracking 
 	mouseStartingLoc.x = FLT_MAX;
 	mouseStartingLoc.y = FLT_MAX;
 	clickedLoc.x = FLT_MAX;
@@ -28,6 +30,11 @@ CaneCustomizeViewWidget::CaneCustomizeViewWidget(Cane* cane, QWidget* parent) : 
 	boundingBoxSpace = 1; //squareSize isn't set yet, so can't do MAX(squareSize / 100, 1);
 	boundActiveBox();
 	this->setMouseTracking(true);
+
+	// Keyboard tracking
+	this->setFocusPolicy(Qt::StrongFocus);
+
+	// Listen to your cane
 	connect(this->cane, SIGNAL(modified()), this, SLOT(updateEverything()));
 }
 

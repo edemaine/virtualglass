@@ -48,7 +48,6 @@ class MainWindow : public QMainWindow
 
 	public:
 		MainWindow();
-		void keyPressEvent(QKeyEvent* e);
 		QString windowTitle();
 		void openFile(QString filename, bool add);
 		void copyLibraryWidget(GlassLibraryWidget* w);
@@ -57,6 +56,7 @@ class MainWindow : public QMainWindow
 		bool hasDependancies(GlassLibraryWidget* w);
 
 	protected:
+		void keyPressEvent(QKeyEvent* e);
 		void closeEvent(QCloseEvent *event);
 		void contextMenuEvent(QContextMenuEvent *event);
 		bool eventFilter(QObject* obj, QEvent* event);

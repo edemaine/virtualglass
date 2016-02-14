@@ -9,13 +9,23 @@
 
 PieceCustomizeViewWidget :: PieceCustomizeViewWidget(Piece* _piece, QWidget* _parent) : QWidget(_parent)
 {
-	// setup draw widget
+	// Drawing
 	setMinimumSize(200, 200);
 	this->piece = _piece;
+
+	// View perspective
 	this->zoom = this->defaultZoom = 12.0;
+
+	// Mouse tracking
 	isDraggingControlPoint = false;
 	draggedControlPointIndex = 0;
+	
+	// Keyboard tracking
+	this->setFocusPolicy(Qt::StrongFocus);
+
+	// Listen to your piece
 	connect(this->piece, SIGNAL(modified()), this, SLOT(updateEverything()));
+
 }
 
 void PieceCustomizeViewWidget :: resetZoom()
@@ -158,6 +168,17 @@ void PieceCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent*)
 	{
 		GlobalUndoRedo::modifiedPiece(piece);
 		isDraggingControlPoint = false;
+	}
+}
+
+void PieceCustomizeViewWidget :: keyPressEvent(QKeyEvent* event)
+{
+        if (event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Delete)
+        {
+		Spline spline = this->piece->spline();
+		spline.removePoint();
+		this->piece->setSpline(spline);
+		GlobalUndoRedo::modifiedPiece(this->piece);
 	}
 }
 

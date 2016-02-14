@@ -1,12 +1,11 @@
 
-Things to implement. From Erik (10/27/15).
+Things to implement. Original list from Erik (10/27/15).
 Mark with your name and target deadline if you intend to implement them.
 When implemented, mention in SVN commit and add to the "completed" section.
 
 ---- Easier ----
 
 Rotation within pattern -- I'm thinking ctrl-click on box handle.
-Delete/backspace key on keyboard should delete the currently selected thing (e.g. subcane in customize) instead of the currently selected cane.
 Select all (ctrl/apple A) in Customize.
 Rectangular select (two types, like Rhino/most CAD).
 Snap to x=0 or y=0 (center of overall cane)
@@ -15,6 +14,7 @@ Ability to add column of cane for organization (e.g. to keep simple cane separat
 Arrow keys to move subcanes around in customize cane.
 Rectangles, just supporting pure color, not canes (called 'ribbons')
 Different canes/colors/shapes should be exported to OBJ as distinct objects/meshes.
+Delete/backspace keys (and other keys) on keyboard should behave as expected when pressed while editor view widgets have focus (e.g. pressing delete while using "Fill and Case" mode of cane editor should delete a casing if possible).  
 
 ---- Harder ----
 
@@ -27,4 +27,5 @@ Grinding cane down (trimming to bounding circle, optionally)
 
 [Andrew, 10/28/15] All horizontal layout as one of the builtin pickup patterns
 [Andrew, 10/28/15] Square grid layout (in cane) should go up to at least 64
+[Andrew, 2/14/16] Delete/backspace key on keyboard should delete the currently selected thing (e.g. subcane in customize cane, control point in customize piece) instead of the currently selected cane or piece. 
 
