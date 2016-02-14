@@ -11,7 +11,6 @@ Rectangular select (two types, like Rhino/most CAD).
 Snap to x=0 or y=0 (center of overall cane)
 Ctrl D and other shortcuts for duplicate, etc. buttons at bottom
 Ability to add column of cane for organization (e.g. to keep simple cane separate from complex cane).
-Arrow keys to move subcanes around in customize cane.
 Rectangles, just supporting pure color, not canes (called 'ribbons')
 Different canes/colors/shapes should be exported to OBJ as distinct objects/meshes.
 Delete/backspace keys (and other keys) on keyboard should behave as expected when pressed while editor view widgets have focus (e.g. pressing delete while using "Fill and Case" mode of cane editor should delete a casing if possible).  
@@ -28,4 +27,5 @@ Grinding cane down (trimming to bounding circle, optionally)
 [Andrew, 10/28/15] All horizontal layout as one of the builtin pickup patterns
 [Andrew, 10/28/15] Square grid layout (in cane) should go up to at least 64
 [Andrew, 2/14/16] Delete/backspace key on keyboard should delete the currently selected thing (e.g. subcane in customize cane, control point in customize piece) instead of the currently selected cane or piece. 
+[Andrew, 2/14/16] Arrow keys to move subcanes around in customize cane.
 

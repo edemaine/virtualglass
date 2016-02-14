@@ -47,7 +47,7 @@ class CaneCustomizeViewWidget : public QWidget
 		};
 
 		float adjustedX(float rawX);
-		float adjustedY(float rawX);
+		float adjustedY(float rawY);
 		float rawX(float adjustedX);
 		float rawY(float adjustedY);
 		void drawSubcane(Point2D upperLeft, float drawWidth, float drawHeight,
@@ -60,7 +60,8 @@ class CaneCustomizeViewWidget : public QWidget
 		void updateIndexes(QPoint pos);
 		void deleteSelection();
 		void copySelection();
-	
+		void moveSelection(float xRaw, float yRaw);
+		
 		GUIMode mode;
 		Cane* cane;
 		int hoveringIndex;

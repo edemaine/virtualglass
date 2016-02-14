@@ -420,7 +420,18 @@ void CaneCustomizeViewWidget :: keyPressEvent(QKeyEvent* event)
 	if (event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Delete)
 	{
 		deleteSelection();
+		return;
 	}
+
+	float moveDist = 0.01f;
+	if (event->key() == Qt::Key_Left)
+		moveSelection(-moveDist, 0);	
+	else if (event->key() == Qt::Key_Right)
+		moveSelection(moveDist, 0);	
+	else if (event->key() == Qt::Key_Down)
+		moveSelection(0, moveDist);
+	else if (event->key() == Qt::Key_Up)
+		moveSelection(0, -moveDist);
 }
 
 void CaneCustomizeViewWidget :: setCane(Cane* _cane)
@@ -715,6 +726,18 @@ void CaneCustomizeViewWidget :: deleteSelection()
 	activeControlPoint = -1;
 	boundActiveBox();
 	update();
+}
+
+void CaneCustomizeViewWidget :: moveSelection(float xRaw, float yRaw)
+{
+	for (unsigned int i = 0; i < subcanesSelected.size(); i++)
+	{
+		SubcaneTemplate temp = cane->subcaneTemplate(subcanesSelected[i]);
+		temp.location.x = adjustedX(rawX(temp.location.x) + xRaw);  
+		temp.location.y = adjustedY(rawY(temp.location.y) + yRaw); 
+		cane->setSubcaneTemplate(temp, subcanesSelected[i]);
+	}
+	GlobalUndoRedo::modifiedCane(cane);
 }
 
 void CaneCustomizeViewWidget :: addCircleClicked()
