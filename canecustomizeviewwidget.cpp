@@ -417,21 +417,45 @@ void CaneCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent* event)
 
 void CaneCustomizeViewWidget :: keyPressEvent(QKeyEvent* event)
 {
-	if (event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Delete)
+	float moveDist = 0.01f;
+	switch (event->key())
 	{
-		deleteSelection();
-		return;
+		// Pressing "delete"
+		case Qt::Key_Backspace:
+		case Qt::Key_Delete:
+			deleteSelection();
+			return;
+		// Pressing arrow keys
+		case Qt::Key_Left:
+			moveSelection(-moveDist, 0);	
+			return;
+		case Qt::Key_Right:
+			moveSelection(moveDist, 0);	
+			return;
+		case Qt::Key_Down:
+			moveSelection(0, moveDist);
+			return;
+		case Qt::Key_Up:
+			moveSelection(0, -moveDist);
+			return;
 	}
 
-	float moveDist = 0.01f;
-	if (event->key() == Qt::Key_Left)
-		moveSelection(-moveDist, 0);	
-	else if (event->key() == Qt::Key_Right)
-		moveSelection(moveDist, 0);	
-	else if (event->key() == Qt::Key_Down)
-		moveSelection(0, moveDist);
-	else if (event->key() == Qt::Key_Up)
-		moveSelection(0, -moveDist);
+	// Pressing "select all"
+	if (QKeySequence(event->modifiers() | event->key()) == QKeySequence(QKeySequence::SelectAll))
+	{
+		selectAll();
+		return;
+	}
+}
+
+void CaneCustomizeViewWidget :: selectAll()
+{
+	subcanesSelected.clear();
+	for (unsigned int i = 0; i < this->cane->count(); ++i)
+		subcanesSelected.push_back(i);
+	boundActiveBox();
+	updateIndexes(this->mapFromGlobal(QCursor::pos()));
+	update();
 }
 
 void CaneCustomizeViewWidget :: setCane(Cane* _cane)

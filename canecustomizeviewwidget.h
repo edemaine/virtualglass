@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QMouseEvent>
 #include <QDragMoveEvent>
+#include <QKeySequence>
 #include <cfloat>
 #include <vector>
 
@@ -61,7 +62,8 @@ class CaneCustomizeViewWidget : public QWidget
 		void deleteSelection();
 		void copySelection();
 		void moveSelection(float xRaw, float yRaw);
-		
+		void selectAll();		
+
 		GUIMode mode;
 		Cane* cane;
 		int hoveringIndex;
