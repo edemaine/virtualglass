@@ -1,7 +1,7 @@
 
-***** Revision r1118 *****
+***** Revision r1130 *****
 
--Undo/redo behavior has changed. The old "local" undo/redo operated on the color, cane, or piece currently being edited has been changed to new "global" undo/redo that follows the sequence of operations performed on all objects, regardless of the object currently being edited. This is more consistent with similar features in other software.
+-Several keyboard bindings have been added to manipulating custom cane layouts and piece shapes. For instance, delete now deletes the current selection. 
 
 -Various bug fixes.
 
