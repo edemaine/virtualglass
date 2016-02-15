@@ -350,10 +350,10 @@ void PieceEditorWidget :: setupLayout()
 	customPieceControlsWidget->setLayout(customPieceControlsLayout); 
 
 	addControlPointButton = new QPushButton("Add control point", customPieceControlsWidget);
-	removeControlPointButton = new QPushButton("Remove control point", customPieceControlsWidget);
+	deleteControlPointButton = new QPushButton("Delete control point", customPieceControlsWidget);
 	customPieceControlsLayout->addStretch(1);
 	customPieceControlsLayout->addWidget(addControlPointButton);
-	customPieceControlsLayout->addWidget(removeControlPointButton);
+	customPieceControlsLayout->addWidget(deleteControlPointButton);
 	customPieceControlsLayout->addStretch(1);
 
 	tab2Layout->addWidget(customPieceControlsWidget);
@@ -379,7 +379,7 @@ void PieceEditorWidget :: setupConnections()
 
 	// custom piece controls
 	connect(addControlPointButton, SIGNAL(clicked()), this, SLOT(addControlPointButtonClicked()));
-	connect(removeControlPointButton, SIGNAL(clicked()), this, SLOT(removeControlPointButtonClicked()));
+	connect(deleteControlPointButton, SIGNAL(clicked()), this, SLOT(deleteControlPointButtonClicked()));
 	
 	// threaded rendering
 	connect(geometryThread, SIGNAL(finishedMesh(bool, unsigned int)), 
@@ -404,7 +404,7 @@ void PieceEditorWidget :: addControlPointButtonClicked()
 	GlobalUndoRedo::modifiedPiece(this->piece_);
 }
 
-void PieceEditorWidget :: removeControlPointButtonClicked()
+void PieceEditorWidget :: deleteControlPointButtonClicked()
 {
 	Spline spline = this->piece_->spline();
 	spline.removePoint();

@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QMutex>
 #include <QWaitCondition>
+#include <QShortcut>
 #include <string>
 
 #include "geometry.h"
@@ -65,7 +66,7 @@ class CaneEditorWidget : public QWidget
 		void circleCasingButtonClicked();
 		void squareCasingButtonClicked();
 		void addCasingButtonClicked();
-		void removeCasingButtonClicked();
+		void deleteCasingButtonClicked();
 		void addCircleButtonClicked();
 		void addSquareButtonClicked();
 		void copySelectedButtonClicked();
@@ -102,7 +103,7 @@ class CaneEditorWidget : public QWidget
 
 		QHBoxLayout* templateLibraryLayout;
 		QPushButton* addCasingButton;
-		QPushButton* removeCasingButton;
+		QPushButton* deleteCasingButton;
 		QPushButton* customizeCaneButton;
 		QPushButton* circleCasingPushButton;
 		QPushButton* squareCasingPushButton;

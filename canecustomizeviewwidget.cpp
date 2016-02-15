@@ -446,6 +446,11 @@ void CaneCustomizeViewWidget :: keyPressEvent(QKeyEvent* event)
 		selectAll();
 		return;
 	}
+	if (QKeySequence(event->modifiers() | event->key()) == QKeySequence(QKeySequence::Copy))
+	{
+		copySelection();
+		return;
+	}
 }
 
 void CaneCustomizeViewWidget :: selectAll()

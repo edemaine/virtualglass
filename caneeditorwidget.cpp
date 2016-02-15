@@ -105,7 +105,7 @@ void CaneEditorWidget :: updateEverything()
 			squareCasingPushButton->setDown(true);
 			break;
 	}
-	removeCasingButton->setEnabled(!cane_->hasMinimumCasingCount());
+	deleteCasingButton->setEnabled(!cane_->hasMinimumCasingCount());
 	countSpin->setValue(cane_->count());
 	countLabel->setEnabled(cane_->templateType() != CaneTemplate::CUSTOM);
 	countSpin->setEnabled(cane_->templateType() != CaneTemplate::CUSTOM);
@@ -232,12 +232,12 @@ void CaneEditorWidget :: setupLayout()
 	QIcon squareIcon(QPixmap::fromImage(QImage(":/images/square_icon.png")));
 	squareCasingPushButton->setIcon(squareIcon);
 	addCasingButton = new QPushButton("Add", casingWidget);
-	removeCasingButton = new QPushButton("Remove", casingWidget);
+	deleteCasingButton = new QPushButton("Delete", casingWidget);
 	casingLayout->addWidget(casingLabel);
 	casingLayout->addWidget(circleCasingPushButton);
 	casingLayout->addWidget(squareCasingPushButton);
 	casingLayout->addWidget(addCasingButton);
-	casingLayout->addWidget(removeCasingButton);
+	casingLayout->addWidget(deleteCasingButton);
 
 	countLabel = new QLabel("Count:", casingWidget);
 	countSpin = new QSpinBox(casingWidget);
@@ -265,13 +265,13 @@ void CaneEditorWidget :: setupLayout()
 	customControlsWidget->setLayout(customControlsLayout);
 	addCircleButton = new QPushButton("Add Circle", customControlsWidget);
 	addSquareButton = new QPushButton("Add Square", customControlsWidget);
-	copySelectedButton = new QPushButton("Duplicate", customControlsWidget);
 	deleteSelectedButton = new QPushButton("Delete", customControlsWidget);
+	copySelectedButton = new QPushButton("Copy", customControlsWidget);
 	customControlsLayout->addStretch(1);
 	customControlsLayout->addWidget(addCircleButton);
 	customControlsLayout->addWidget(addSquareButton);
-	customControlsLayout->addWidget(copySelectedButton);
 	customControlsLayout->addWidget(deleteSelectedButton);
+	customControlsLayout->addWidget(copySelectedButton);
 	customControlsLayout->addStretch(1);
 	
 	tab2Layout->addWidget(customControlsWidget);
@@ -323,7 +323,7 @@ void CaneEditorWidget :: squareCasingButtonClicked()
 	GlobalUndoRedo::modifiedCane(cane_);
 }
 
-void CaneEditorWidget :: removeCasingButtonClicked()
+void CaneEditorWidget :: deleteCasingButtonClicked()
 {
 	cane_->removeCasing();
 	GlobalUndoRedo::modifiedCane(cane_);
@@ -418,7 +418,7 @@ void CaneEditorWidget :: setupConnections()
 	connect(circleCasingPushButton, SIGNAL(clicked()), this, SLOT(circleCasingButtonClicked()));
 	connect(squareCasingPushButton, SIGNAL(clicked()), this, SLOT(squareCasingButtonClicked()));
 	connect(addCasingButton, SIGNAL(clicked()), this, SLOT(addCasingButtonClicked()));
-	connect(removeCasingButton, SIGNAL(clicked()), this, SLOT(removeCasingButtonClicked()));
+	connect(deleteCasingButton, SIGNAL(clicked()), this, SLOT(deleteCasingButtonClicked()));
 	connect(copySelectedButton, SIGNAL(clicked()), this, SLOT(copySelectedButtonClicked()));
 	connect(deleteSelectedButton, SIGNAL(clicked()), this, SLOT(deleteSelectedButtonClicked()));
 	connect(addCircleButton, SIGNAL(clicked()), this, SLOT(addCircleButtonClicked()));

@@ -69,7 +69,7 @@ class PieceEditorWidget : public QWidget
 		void pickupCountSpinChanged(int);
 		void geometryThreadFinishedMesh(bool completed, unsigned int quality);
 		void addControlPointButtonClicked();
-		void removeControlPointButtonClicked();
+		void deleteControlPointButtonClicked();
 
 	private:
 		Piece* piece_;
@@ -96,7 +96,7 @@ class PieceEditorWidget : public QWidget
 		QStackedWidget* pieceViewStack;
 
 		QPushButton* addControlPointButton;
-		QPushButton* removeControlPointButton;
+		QPushButton* deleteControlPointButton;
 
 		QSpinBox* pickupCountSpin;
 
