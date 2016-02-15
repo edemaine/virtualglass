@@ -1,5 +1,5 @@
 
-***** Revision r1130 *****
+***** Revision r1132 *****
 
 -Several keyboard bindings have been added to manipulating custom cane layouts and piece shapes. For instance, delete now deletes the current selection. 
 
