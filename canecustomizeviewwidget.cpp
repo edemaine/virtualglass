@@ -23,6 +23,7 @@ CaneCustomizeViewWidget::CaneCustomizeViewWidget(Cane* cane, QWidget* parent) : 
 	clickedLoc.x = FLT_MAX;
 	clickedLoc.y = FLT_MAX;
 	clickMoved = false;
+	mouseChangedSubcanes = false;
 	hoveringIndex = -1;
 	activeBoxIndex = -1;
 	activeControlPoint = -1;
@@ -215,9 +216,8 @@ void CaneCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 					sub.location.x += (adjustedX(event->pos().x()) - mouseStartingLoc.x)/(squareSize/2.0 - 10);
 					sub.location.y += (adjustedY(event->pos().y()) - mouseStartingLoc.y)/(squareSize/2.0 - 10);
 					cane->setSubcaneTemplate(sub, subcanesSelected[i]);
+					mouseChangedSubcanes = true;
 				}
-				if (subcanesSelected.size() > 0)
-					GlobalUndoRedo::modifiedCane(cane);
 				mouseStartingLoc.x = adjustedX(event->pos().x());
 				mouseStartingLoc.y = adjustedY(event->pos().y());
 			}
@@ -249,9 +249,8 @@ void CaneCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 					SubcaneTemplate sub = cane->subcaneTemplate(subcanesSelected[i]);
 					sub.diameter *= proportion;
 					cane->setSubcaneTemplate(sub, subcanesSelected[i]);
+					mouseChangedSubcanes = true;
 				}
-				if (subcanesSelected.size() > 0)
-					GlobalUndoRedo::modifiedCane(cane);
 			}
 			else
 			{
@@ -260,8 +259,7 @@ void CaneCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 				float dx = fabs(adjustedX(event->pos().x()) - center_x)-3*boundingBoxSpace;
 				float dy = fabs(adjustedY(event->pos().y()) - center_y)-3*boundingBoxSpace;
 				float yx_proportion = (activeBoxUR.y-activeBoxLL.y)/(activeBoxUR.x-activeBoxLL.x);
-				// no = new/old
-				float no_proportion = 1.0;
+				float no_proportion = 1.0; // no = new/old
 
 				if (dy > dx*yx_proportion)
 				{
@@ -281,9 +279,8 @@ void CaneCustomizeViewWidget :: mouseMoveEvent(QMouseEvent* event)
 					sub.location.y = (center_y - 10 - drawSize/2) / double(drawSize/2.0) 
 						+ ((sub.location.y - (center_y - 10 - drawSize/2)/double(drawSize/2.0))*no_proportion);
 					cane->setSubcaneTemplate(sub, subcanesSelected[i]);
+					mouseChangedSubcanes = true;
 				}
-				if (subcanesSelected.size() > 0)
-					GlobalUndoRedo::modifiedCane(cane);
 			}
 			break;
 		}
@@ -323,6 +320,7 @@ void CaneCustomizeViewWidget :: mousePressEvent(QMouseEvent* event)
 	clickedLoc.x = adjustedX(event->pos().x());
 	clickedLoc.y = adjustedY(event->pos().y());
 	clickMoved = false;
+	mouseChangedSubcanes = false;
 	if (activeBoxIndex != -1 && activeBoxIndex != INT_MAX)
 	{
 		SubcaneTemplate subcane = cane->subcaneTemplate(activeBoxIndex);
@@ -407,7 +405,13 @@ void CaneCustomizeViewWidget :: mouseReleaseEvent(QMouseEvent* event)
 			}
 		}
 	}
-	
+
+	if (mouseChangedSubcanes)
+	{
+		if (subcanesSelected.size() > 0)
+			GlobalUndoRedo::modifiedCane(cane);
+	}
+
 	mouseStartingLoc.x = adjustedX(event->pos().x());
 	mouseStartingLoc.y = adjustedY(event->pos().y());
 	boundActiveBox();

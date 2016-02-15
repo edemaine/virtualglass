@@ -71,6 +71,7 @@ class CaneCustomizeViewWidget : public QWidget
 		Point2D mouseStartingLoc;
 		Point2D clickedLoc;
 		bool clickMoved;
+		bool mouseChangedSubcanes;
 		vector<unsigned int> subcanesSelected;
 		Point2D activeBoxLL;
 		Point2D activeBoxUR;
