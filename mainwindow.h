@@ -137,8 +137,6 @@ class MainWindow : public QMainWindow
 		QAction* undoAction;
 		QAction* redoAction;
 		QMenu* viewMenu;
-		QAction *fullscreenViewAction;
-		QAction *windowedViewAction;
 		QMenu *examplesMenu;
 		QAction *randomSimpleCaneAction;
 		QAction *randomSimplePieceAction;
@@ -170,8 +168,6 @@ class MainWindow : public QMainWindow
 		void importSVGActionTriggered();
 		void exportPLYActionTriggered();
 		void exportOBJActionTriggered();
-		void windowedViewActionTriggered();
-		void fullscreenViewActionTriggered();
 		void randomSimpleCaneExampleActionTriggered();
 		void randomSimplePieceExampleActionTriggered();
 		void randomComplexCaneExampleActionTriggered();

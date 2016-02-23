@@ -68,8 +68,6 @@ MainWindow :: MainWindow()
 	GlobalUndoRedo::noPriorUndo();
 	setDirtyBit(false);
 	mouseDown = false;
-
-	showMaximized();
 }
 
 void MainWindow :: glassObjectModified()
@@ -557,10 +555,6 @@ void MainWindow :: setupConnections()
 	connect(undoAction, SIGNAL(triggered()), this, SLOT(undoActionTriggered()));
 	connect(redoAction, SIGNAL(triggered()), this, SLOT(redoActionTriggered()));
 	
-	// View menu stuff
-	connect(fullscreenViewAction, SIGNAL(triggered()), this, SLOT(fullscreenViewActionTriggered()));
-	connect(windowedViewAction, SIGNAL(triggered()), this, SLOT(windowedViewActionTriggered()));
-
 	// Examples menu stuff
 	connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
 	connect(randomSimplePieceAction, SIGNAL(triggered()), this, SLOT(randomSimplePieceExampleActionTriggered()));
@@ -588,20 +582,6 @@ void MainWindow :: undoActionTriggered()
 void MainWindow :: redoActionTriggered()
 {
 	GlobalUndoRedo::redo();
-}
-
-void MainWindow :: fullscreenViewActionTriggered()
-{
-	showFullScreen();
-	fullscreenViewAction->setChecked(true);
-	windowedViewAction->setChecked(false);
-}
-
-void MainWindow :: windowedViewActionTriggered()
-{
-	showMaximized();
-	fullscreenViewAction->setChecked(false);
-	windowedViewAction->setChecked(true);
 }
 
 void MainWindow :: depthPeelActionTriggered()
@@ -1347,17 +1327,8 @@ void MainWindow::setupMenus()
 	editMenu->addAction(redoAction);
 
 	// View menu
-	viewMenu = menuBar()->addMenu("View");
-
-	fullscreenViewAction = new QAction("Full Screen", this);
-	fullscreenViewAction->setCheckable(true);
-	fullscreenViewAction->setChecked(false); 
-	viewMenu->addAction(fullscreenViewAction);	
-
-	windowedViewAction = new QAction("Windowed", this);
-	windowedViewAction->setCheckable(true);
-	windowedViewAction->setChecked(true); // start true b/c of showMaximized() call in constructor
-	viewMenu->addAction(windowedViewAction);	
+	// On OS X is mysteriously populated with an "Enter Fullscreen" option.
+	viewMenu = menuBar()->addMenu("View");	
 
 	// Examples menu
 	examplesMenu = menuBar()->addMenu("Examples"); 
