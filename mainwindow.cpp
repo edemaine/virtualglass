@@ -68,6 +68,11 @@ MainWindow :: MainWindow()
 	GlobalUndoRedo::noPriorUndo();
 	setDirtyBit(false);
 	mouseDown = false;
+
+	if (museum) {
+		clearLibrary();
+		randomComplexPieceExampleActionTriggered();
+	}
 }
 
 void MainWindow :: glassObjectModified()
