@@ -6,7 +6,6 @@
 #include <vector> 
 #include <stack>
 #include <QMainWindow>
-#include "museum.h"
 
 class QMouseEvent;
 class QKeyEvent;

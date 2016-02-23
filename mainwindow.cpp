@@ -46,6 +46,7 @@
 #include "globalgraphicssetting.h"
 #include "globaldepthpeelingsetting.h"
 #include "globalundoredo.h"
+#include "museum.h"
 
 MainWindow :: MainWindow()
 {

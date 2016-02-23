@@ -10,6 +10,7 @@
 #include <QApplication>
 #include <QMouseEvent>
 #include <QScrollBar>
+#include <QListWidget>
 
 #include "globalundoredo.h"
 #include "cane.h"
@@ -22,6 +23,7 @@
 #include "glassfileio.h"
 #include "globalgraphicssetting.h"
 #include "constants.h"
+#include "museum.h"
 
 ColorEditorWidget :: ColorEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -90,6 +92,9 @@ void ColorEditorWidget :: setupLayout()
 	collectionComboBox = new QComboBox(this);
 	collectionComboBox->setDuplicatesEnabled(true);
 	collectionComboBox->addItem("Add collection...");
+	if (museum)
+		collectionComboBox->model()->setData(collectionComboBox->model()->index(0,0), 
+			QVariant(0), Qt::UserRole-1);
 	editorLayout->addWidget(collectionComboBox, 0, 0);
 	
 	// Setup stack of collection libraries
