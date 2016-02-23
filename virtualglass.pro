@@ -96,6 +96,7 @@ HEADERS += vgapp.h \
         jsoncpp/include/json/reader.h \
         jsoncpp/include/json/value.h \
         jsoncpp/include/json/writer.h \
+	museum.h \
 	globalundoredo.h \
 	undoredo.h \
         primitives.h \

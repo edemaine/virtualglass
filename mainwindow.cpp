@@ -93,21 +93,21 @@ void MainWindow :: setViewMode(enum ViewMode newMode)
 		case GLASSCOLOR_VIEW_MODE:
 			exportPLYFileAction->setEnabled(false);
 			exportOBJFileAction->setEnabled(false);
-			saveSelectedAsFileAction->setEnabled(true);
+			saveSelectedAsFileAction->setEnabled(true && !museum);
 			shareFileButton->setEnabled(false);
 			break;
 		case CANE_VIEW_MODE:
 			caneEditorWidget->reset3DCamera();
-			exportPLYFileAction->setEnabled(true);
-			exportOBJFileAction->setEnabled(true);
-			saveSelectedAsFileAction->setEnabled(true);
+			exportPLYFileAction->setEnabled(true && !museum);
+			exportOBJFileAction->setEnabled(true && !museum);
+			saveSelectedAsFileAction->setEnabled(true && !museum);
 			shareFileButton->setEnabled(!email->sending());
 			break;
 		case PIECE_VIEW_MODE:
 			pieceEditorWidget->reset3DCamera();
-			exportPLYFileAction->setEnabled(true);
-			exportOBJFileAction->setEnabled(true);
-			saveSelectedAsFileAction->setEnabled(true);
+			exportPLYFileAction->setEnabled(true && !museum);
+			exportOBJFileAction->setEnabled(true && !museum);
+			saveSelectedAsFileAction->setEnabled(true && !museum);
 			shareFileButton->setEnabled(!email->sending());
 			break;
 	}
@@ -125,6 +125,9 @@ void MainWindow :: setupUndoRedo()
 QString MainWindow :: windowTitle()
 {
 	QString title = "VirtualGlass";
+	if (museum)
+		return title;
+
 	QFile inFile(":/version.txt");
 	if (inFile.open(QIODevice::ReadOnly)) {
 		QTextStream in(&inFile);
@@ -810,10 +813,12 @@ void MainWindow :: setupLibrary()
 
 	openFileButton = new QPushButton(toolbarMasterWidget);
 	openFileButton->setText("Open");
+	openFileButton->setEnabled(!museum);
 	toolbarLayout->addWidget(openFileButton);
 
 	saveFileButton = new QPushButton(toolbarMasterWidget);
 	saveFileButton->setText("Save");
+	saveFileButton->setEnabled(!museum);
 	toolbarLayout->addWidget(saveFileButton);
 
 	shareFileButton = new QPushButton(toolbarMasterWidget);
@@ -1280,10 +1285,12 @@ void MainWindow::setupMenus()
 	openFileAction = new QAction("Open", this);
 	openFileAction->setShortcuts(QKeySequence::Open);
 	openFileAction->setToolTip("Open an existing file.");
+	openFileAction->setEnabled(!museum);
 	fileMenu->addAction(openFileAction); 
 	
 	addFileAction = new QAction("Add", this);
 	addFileAction->setToolTip("Add an existing file.");
+	addFileAction->setEnabled(!museum);
 	fileMenu->addAction(addFileAction); 
 	
 	fileMenu->addSeparator();
@@ -1291,23 +1298,28 @@ void MainWindow::setupMenus()
 	saveAllFileAction = new QAction("Save", this);
 	saveAllFileAction->setShortcuts(QKeySequence::Save);
 	saveAllFileAction->setToolTip("Save library to file.");
+	saveAllFileAction->setEnabled(!museum);
 	fileMenu->addAction(saveAllFileAction); 
 
 	saveAllAsFileAction = new QAction("Save As", this);
 	saveAllAsFileAction->setShortcuts(QKeySequence::SaveAs);
 	saveAllAsFileAction->setToolTip("Save library to file.");
+	saveAllAsFileAction->setEnabled(!museum);
 	fileMenu->addAction(saveAllAsFileAction); 
 
 	saveSelectedAsFileAction = new QAction("Save Selected As", this);
 	saveSelectedAsFileAction->setToolTip("Save selected object to file.");
+	saveSelectedAsFileAction->setEnabled(!museum);
 	fileMenu->addAction(saveSelectedAsFileAction); 
 
 	importSVGFileAction = new QAction("Import cane from .svg", this);
 	importSVGFileAction->setToolTip("Import cane cross section from .svg file.");
+	importSVGFileAction->setEnabled(!museum);
 	fileMenu->addAction(importSVGFileAction); 
 
 	exportPLYFileAction = new QAction("Export glass to .ply", this);
 	exportPLYFileAction->setToolTip("Export cane or piece");
+	exportPLYFileAction->setEnabled(!museum);
 	fileMenu->addAction(exportPLYFileAction); 
 
 	exportOBJFileAction = new QAction("Export glass to .obj", this);
@@ -1375,6 +1387,7 @@ void MainWindow::setupMenus()
 	depthPeelAction->setCheckable(true);
 	depthPeelAction->setChecked(GlobalDepthPeelingSetting::enabled());
 	depthPeelAction->setToolTip(tr("Toggle transparency in 3D views. Turn off for better framerate."));
+	depthPeelAction->setEnabled(!museum);
 	perfMenu->addAction(depthPeelAction);
 }
 
@@ -1563,7 +1576,7 @@ void MainWindow::getLibraryContents(vector<GlassColor*>& colors, vector<Cane*>& 
 void MainWindow::newFileActionTriggered()
 {
 	// ask the user what they want to do with the current state
-	if (dirtyBit)
+	if (dirtyBit && !museum)
 	{
 		QMessageBox msgBox;
 		msgBox.setText("The glass library has been modified.");
@@ -1585,8 +1598,10 @@ void MainWindow::newFileActionTriggered()
 		}
 	}
 
-	// reset the system:
+	resetLibrary();
+}
 
+void MainWindow::resetLibrary() {
 	// 1. set editor objects to new (but default) objects
 	glassColorEditorWidget->resetGlassColor();
 	caneEditorWidget->resetCane();

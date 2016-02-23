@@ -55,7 +55,8 @@ Cane* randomComplexCane(Cane* circleSimpleCane, Cane* squareSimpleCane)
 	Cane* cane = new Cane(static_cast<CaneTemplate::Type>(randomTemplateNumber));
 	
 	// set parameters
-	cane->setTwist(0.0);
+	if (cane->outermostCasingShape() == CIRCLE_SHAPE)
+		cane->setTwist((qrand() % 20 + 10) * 0.1);
 	cane->setCount(qrand() % 10 + 2);
 
 	// set subcanes

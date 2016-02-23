@@ -5,8 +5,8 @@
 
 #include <vector> 
 #include <stack>
-
 #include <QMainWindow>
+#include "museum.h"
 
 class QMouseEvent;
 class QKeyEvent;
@@ -99,6 +99,7 @@ class MainWindow : public QMainWindow
 		QVBoxLayout* currentLibraryLayout();
 		void updateCurrentEditor();
 		void updateUndoRedoEnabled(bool undo, bool redo);
+		void resetLibrary();
 
 		// Variables
 		QScrollArea* libraryScrollArea;
