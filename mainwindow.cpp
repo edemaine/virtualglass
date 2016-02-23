@@ -47,6 +47,7 @@
 #include "globaldepthpeelingsetting.h"
 #include "globalundoredo.h"
 #include "museum.h"
+#include "emaildialog.h"
 
 MainWindow :: MainWindow()
 {
@@ -70,7 +71,8 @@ MainWindow :: MainWindow()
 	setDirtyBit(false);
 	mouseDown = false;
 
-	if (museum) {
+	if (museum) 
+	{
 		clearLibrary();
 		randomComplexPieceExampleActionTriggered();
 	}
@@ -133,7 +135,8 @@ QString MainWindow :: windowTitle()
 		return title;
 
 	QFile inFile(":/version.txt");
-	if (inFile.open(QIODevice::ReadOnly)) {
+	if (inFile.open(QIODevice::ReadOnly)) 
+	{
 		QTextStream in(&inFile);
 		QString revision = in.readLine();
 		QString date = in.readLine();
@@ -1578,7 +1581,8 @@ void MainWindow::newFileActionTriggered()
 	resetLibrary();
 }
 
-void MainWindow::resetLibrary() {
+void MainWindow::resetLibrary() 
+{
 	// 1. set editor objects to new (but default) objects
 	glassColorEditorWidget->resetGlassColor();
 	caneEditorWidget->resetCane();
@@ -1785,15 +1789,25 @@ void MainWindow::shareFileActionTriggered()
 			return;
 	}
 
-	bool ok;
-	QString userSpecifiedAddress = QInputDialog::getText(this, "Email your design", "Email address:", 
-		QLineEdit::Normal, "friend@internet.com", &ok);
+	QString userSpecifiedAddress;
+	if (museum) 
+	{
+		EmailDialog emailDialog;
+		int result = emailDialog.exec();
+		userSpecifiedAddress = emailDialog.address();
+		if (result == QDialog::Rejected || userSpecifiedAddress.isEmpty()) 
+			return;
+	}
+	else 
+	{
+		bool ok;
+		userSpecifiedAddress = QInputDialog::getText(this, "Email your design", "Email address:", 
+			QLineEdit::Normal, "friend@internet.com", &ok);
+		if (!ok || userSpecifiedAddress.isEmpty()) 
+			return;
+	}
 	
-	// Check for basic validity
-	if (!ok || userSpecifiedAddress.isEmpty()) 
-		return;
-
-	// Check for email address validity?
+	// Check for email address reasonableness?
 	if (!userSpecifiedAddress.contains("@"))
 	{
 		QMessageBox::warning(this, "Invalid email address", userSpecifiedAddress + " is an invalid email address.");

@@ -96,6 +96,7 @@ HEADERS += vgapp.h \
         jsoncpp/include/json/reader.h \
         jsoncpp/include/json/value.h \
         jsoncpp/include/json/writer.h \
+	emaildialog.h \
 	museum.h \
 	globalundoredo.h \
 	undoredo.h \
@@ -161,6 +162,7 @@ HEADERS += vgapp.h \
 SOURCES += main.cpp \ 
 	vgapp.cpp \
 	glew/glew.c \
+	emaildialog.cpp \
 	globalundoredo.cpp \
 	undoredo.cpp \
 	glasslibrarywidget.cpp \
