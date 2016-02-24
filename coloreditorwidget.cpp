@@ -269,10 +269,7 @@ void ColorEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
 
         PureColorLibraryWidget* pclw = dynamic_cast<PureColorLibraryWidget*>(childAt(event->pos()));
         if (pclw == NULL)
-	{
-		std::cout << "Poop" << std::endl;
                 return;
-	}
 
         glassColor_->setColor(pclw->color());
         glassColor_->setShortName(pclw->shortName());
