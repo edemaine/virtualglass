@@ -569,6 +569,10 @@ void MainWindow :: setupConnections()
 	connect(undoAction, SIGNAL(triggered()), this, SLOT(undoActionTriggered()));
 	connect(redoAction, SIGNAL(triggered()), this, SLOT(redoActionTriggered()));
 	
+	// View menu stuff
+	connect(fullscreenViewAction, SIGNAL(triggered()), this, SLOT(fullscreenViewActionTriggered()));
+	connect(windowedViewAction, SIGNAL(triggered()), this, SLOT(windowedViewActionTriggered()));
+
 	// Examples menu stuff
 	connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
 	connect(randomSimplePieceAction, SIGNAL(triggered()), this, SLOT(randomSimplePieceExampleActionTriggered()));
@@ -1347,6 +1351,16 @@ void MainWindow::setupMenus()
 	// On OS X is mysteriously populated with an "Enter Fullscreen" option.
 	viewMenu = menuBar()->addMenu("View");	
 
+	fullscreenViewAction = new QAction("Full Screen", this);
+	fullscreenViewAction->setCheckable(true);
+	fullscreenViewAction->setChecked(false);
+	viewMenu->addAction(fullscreenViewAction);
+
+	windowedViewAction = new QAction("Windowed", this);
+	windowedViewAction->setCheckable(true);
+	windowedViewAction->setChecked(true); // start true b/c of showMaximized() call in constructor
+	viewMenu->addAction(windowedViewAction);
+
 	// Examples menu
 	examplesMenu = menuBar()->addMenu("Examples"); 
 
@@ -1377,6 +1391,22 @@ void MainWindow::setupMenus()
 	depthPeelAction->setToolTip(tr("Toggle transparency in 3D views. Turn off for better framerate."));
 	depthPeelAction->setEnabled(!museum);
 	perfMenu->addAction(depthPeelAction);
+}
+
+void MainWindow :: fullscreenViewActionTriggered()
+{
+	showStatusMessage("Full screen trigger.", 3);	
+        showFullScreen();
+        fullscreenViewAction->setChecked(true);
+        windowedViewAction->setChecked(false);
+}
+
+void MainWindow :: windowedViewActionTriggered()
+{
+	showStatusMessage("Not Full screen trigger.", 3);	
+        showMaximized();
+        fullscreenViewAction->setChecked(false);
+        windowedViewAction->setChecked(true);
 }
 
 void MainWindow::exportOBJActionTriggered()
