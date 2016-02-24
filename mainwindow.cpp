@@ -48,7 +48,7 @@
 #include "globalgraphicssetting.h"
 #include "globaldepthpeelingsetting.h"
 #include "globalundoredo.h"
-#include "museum.h"
+#include "globalmuseumsetting.h"
 #include "emaildialog.h"
 
 MainWindow :: MainWindow()
@@ -134,21 +134,21 @@ void MainWindow :: setViewMode(enum ViewMode newMode)
 		case GLASSCOLOR_VIEW_MODE:
 			exportPLYFileAction->setEnabled(false);
 			exportOBJFileAction->setEnabled(false);
-			saveSelectedAsFileAction->setEnabled(true && !museum);
+			saveSelectedAsFileAction->setEnabled(true && !GlobalMuseumSetting::enabled());
 			shareFileButton->setEnabled(false);
 			break;
 		case CANE_VIEW_MODE:
 			caneEditorWidget->reset3DCamera();
-			exportPLYFileAction->setEnabled(true && !museum);
-			exportOBJFileAction->setEnabled(true && !museum);
-			saveSelectedAsFileAction->setEnabled(true && !museum);
+			exportPLYFileAction->setEnabled(true && !GlobalMuseumSetting::enabled());
+			exportOBJFileAction->setEnabled(true && !GlobalMuseumSetting::enabled());
+			saveSelectedAsFileAction->setEnabled(true && !GlobalMuseumSetting::enabled());
 			shareFileButton->setEnabled(!email->sending());
 			break;
 		case PIECE_VIEW_MODE:
 			pieceEditorWidget->reset3DCamera();
-			exportPLYFileAction->setEnabled(true && !museum);
-			exportOBJFileAction->setEnabled(true && !museum);
-			saveSelectedAsFileAction->setEnabled(true && !museum);
+			exportPLYFileAction->setEnabled(true && !GlobalMuseumSetting::enabled());
+			exportOBJFileAction->setEnabled(true && !GlobalMuseumSetting::enabled());
+			saveSelectedAsFileAction->setEnabled(true && !GlobalMuseumSetting::enabled());
 			shareFileButton->setEnabled(!email->sending());
 			break;
 	}
@@ -166,7 +166,7 @@ void MainWindow :: setupUndoRedo()
 QString MainWindow :: windowTitle()
 {
 	QString title = "VirtualGlass";
-	if (museum)
+	if (GlobalMuseumSetting::enabled())
 		return title;
 
 	QFile inFile(":/version.txt");
@@ -577,7 +577,7 @@ void MainWindow :: setupConnections()
 {
 	// Toolbar stuff
 	connect(newFileButton, SIGNAL(clicked()), this, SLOT(newFileActionTriggered()));
-	if (!museum)
+	if (!GlobalMuseumSetting::enabled())
 	{
 		connect(openFileButton, SIGNAL(clicked()), this, SLOT(openFileActionTriggered()));
 		connect(saveFileButton, SIGNAL(clicked()), this, SLOT(saveAllFileActionTriggered()));
@@ -841,7 +841,6 @@ void MainWindow :: setupLibrary()
 	libraryAreaLayout->setContentsMargins(0, 0, 0, 0);
 
 	// Toolbar stuff
-
 	QWidget* toolbarMasterWidget = new QWidget(libraryMasterWidget);
 	libraryAreaLayout->addWidget(toolbarMasterWidget);
 
@@ -853,16 +852,14 @@ void MainWindow :: setupLibrary()
 	newFileButton->setText("New");
 	toolbarLayout->addWidget(newFileButton);
 
-	if (!museum)
+	if (!GlobalMuseumSetting::enabled())
 	{
 		openFileButton = new QPushButton(toolbarMasterWidget);
 		openFileButton->setText("Open");
-		openFileButton->setEnabled(!museum);
 		toolbarLayout->addWidget(openFileButton);
 
 		saveFileButton = new QPushButton(toolbarMasterWidget);
 		saveFileButton->setText("Save");
-		saveFileButton->setEnabled(!museum);
 		toolbarLayout->addWidget(saveFileButton);
 	}
 
@@ -1333,12 +1330,12 @@ void MainWindow::setupMenus()
 	openFileAction = new QAction("Open", this);
 	openFileAction->setShortcuts(QKeySequence::Open);
 	openFileAction->setToolTip("Open an existing file.");
-	openFileAction->setEnabled(!museum);
+	openFileAction->setEnabled(!GlobalMuseumSetting::enabled());
 	fileMenu->addAction(openFileAction); 
 	
 	addFileAction = new QAction("Add", this);
 	addFileAction->setToolTip("Add an existing file.");
-	addFileAction->setEnabled(!museum);
+	addFileAction->setEnabled(!GlobalMuseumSetting::enabled());
 	fileMenu->addAction(addFileAction); 
 	
 	fileMenu->addSeparator();
@@ -1346,28 +1343,28 @@ void MainWindow::setupMenus()
 	saveAllFileAction = new QAction("Save", this);
 	saveAllFileAction->setShortcuts(QKeySequence::Save);
 	saveAllFileAction->setToolTip("Save library to file.");
-	saveAllFileAction->setEnabled(!museum);
+	saveAllFileAction->setEnabled(!GlobalMuseumSetting::enabled());
 	fileMenu->addAction(saveAllFileAction); 
 
 	saveAllAsFileAction = new QAction("Save As", this);
 	saveAllAsFileAction->setShortcuts(QKeySequence::SaveAs);
 	saveAllAsFileAction->setToolTip("Save library to file.");
-	saveAllAsFileAction->setEnabled(!museum);
+	saveAllAsFileAction->setEnabled(!GlobalMuseumSetting::enabled());
 	fileMenu->addAction(saveAllAsFileAction); 
 
 	saveSelectedAsFileAction = new QAction("Save Selected As", this);
 	saveSelectedAsFileAction->setToolTip("Save selected object to file.");
-	saveSelectedAsFileAction->setEnabled(!museum);
+	saveSelectedAsFileAction->setEnabled(!GlobalMuseumSetting::enabled());
 	fileMenu->addAction(saveSelectedAsFileAction); 
 
 	importSVGFileAction = new QAction("Import cane from .svg", this);
 	importSVGFileAction->setToolTip("Import cane cross section from .svg file.");
-	importSVGFileAction->setEnabled(!museum);
+	importSVGFileAction->setEnabled(!GlobalMuseumSetting::enabled());
 	fileMenu->addAction(importSVGFileAction); 
 
 	exportPLYFileAction = new QAction("Export glass to .ply", this);
 	exportPLYFileAction->setToolTip("Export cane or piece");
-	exportPLYFileAction->setEnabled(!museum);
+	exportPLYFileAction->setEnabled(!GlobalMuseumSetting::enabled());
 	fileMenu->addAction(exportPLYFileAction); 
 
 	exportOBJFileAction = new QAction("Export glass to .obj", this);
@@ -1438,7 +1435,7 @@ void MainWindow::setupMenus()
 	depthPeelAction->setCheckable(true);
 	depthPeelAction->setChecked(GlobalDepthPeelingSetting::enabled());
 	depthPeelAction->setToolTip(tr("Toggle transparency in 3D views. Turn off for better framerate."));
-	depthPeelAction->setEnabled(!museum);
+	depthPeelAction->setEnabled(!GlobalMuseumSetting::enabled());
 	perfMenu->addAction(depthPeelAction);
 }
 
@@ -1645,7 +1642,7 @@ void MainWindow::getLibraryContents(vector<GlassColor*>& colors, vector<Cane*>& 
 void MainWindow::newFileActionTriggered()
 {
 	// ask the user what they want to do with the current state
-	if (dirtyBit && !museum)
+	if (dirtyBit && !GlobalMuseumSetting::enabled())
 	{
 		QMessageBox msgBox;
 		msgBox.setText("The glass library has been modified.");
@@ -1884,7 +1881,7 @@ void MainWindow::shareFileActionTriggered()
 	}
 
 	QString userSpecifiedAddress;
-	if (museum) 
+	if (GlobalMuseumSetting::enabled()) 
 	{
 		EmailDialog emailDialog;
 		int result = emailDialog.exec();

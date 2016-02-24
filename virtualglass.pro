@@ -97,7 +97,6 @@ HEADERS += vgapp.h \
         jsoncpp/include/json/value.h \
         jsoncpp/include/json/writer.h \
 	emaildialog.h \
-	museum.h \
 	globalundoredo.h \
 	undoredo.h \
         primitives.h \
@@ -153,6 +152,7 @@ HEADERS += vgapp.h \
 	piececustomizeviewwidget.h \ 
 	spline.h \
 	globaldepthpeelingsetting.h \
+	globalmuseumsetting.h \
 	canecrosssectionrender.h \
 	piececrosssectionrender.h \
 	globalbackgroundcolor.h \
@@ -214,6 +214,7 @@ SOURCES += main.cpp \
 	piececustomizeviewwidget.cpp \
 	spline.cpp \
 	globaldepthpeelingsetting.cpp \
+	globalmuseumsetting.cpp \
 	canecrosssectionrender.cpp \
 	piececrosssectionrender.cpp \
 	glassopengl.cpp \

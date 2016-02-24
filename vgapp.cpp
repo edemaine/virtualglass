@@ -2,16 +2,30 @@
 #include <QFileOpenEvent>
 #include <QEvent>
 #include <QString>
+
 #include "vgapp.h"
 #include "randomglass.h"
 #include "email.h"
+#include "globalmuseumsetting.h"
 
 VGApp :: VGApp(int& argc, char **argv ) : QApplication(argc, argv)
 {
 	randomInit();
+	
+	// Preprocess command-line arguments to look for -museum
+	// Need to set this *before* the GUI is launched
+	for (int i = 1; i < argc; ++i)
+	{
+		if (QString(argv[i]) == QString("-museum"))
+		{
+			GlobalMuseumSetting::setEnabled(true);
+			break;
+		}
+	}
+
 	mainWindow = new MainWindow();
 	
-	// Command line arguments (use --args to pass these in on OS X)
+	// All other command line arguments (use --args to pass these in on OS X)
 	firstOpenRequest = true;
 	bool fullscreen = false;
 	for (int i = 1; i < argc; ++i)

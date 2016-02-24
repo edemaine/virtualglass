@@ -23,7 +23,7 @@
 #include "glassfileio.h"
 #include "globalgraphicssetting.h"
 #include "constants.h"
-#include "museum.h"
+#include "globalmuseumsetting.h"
 
 ColorEditorWidget :: ColorEditorWidget(QWidget* parent) : QWidget(parent)
 {
@@ -93,7 +93,7 @@ void ColorEditorWidget :: setupLayout()
 	collectionComboBox = new QComboBox(this);
 	collectionComboBox->setDuplicatesEnabled(true);
 	collectionComboBox->addItem("Add collection...");
-	if (museum)
+	if (GlobalMuseumSetting::enabled())
 		collectionComboBox->model()->setData(collectionComboBox->model()->index(0,0), 
 			QVariant(0), Qt::UserRole-1);
 	editorLayout->addWidget(collectionComboBox, 0, 0);
