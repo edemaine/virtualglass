@@ -570,8 +570,10 @@ void MainWindow :: setupConnections()
 	connect(redoAction, SIGNAL(triggered()), this, SLOT(redoActionTriggered()));
 	
 	// View menu stuff
+	#ifndef Q_OS_MACX
 	connect(fullscreenViewAction, SIGNAL(triggered()), this, SLOT(fullscreenViewActionTriggered()));
 	connect(windowedViewAction, SIGNAL(triggered()), this, SLOT(windowedViewActionTriggered()));
+	#endif
 
 	// Examples menu stuff
 	connect(randomSimpleCaneAction, SIGNAL(triggered()), this, SLOT(randomSimpleCaneExampleActionTriggered()));
@@ -1351,6 +1353,7 @@ void MainWindow::setupMenus()
 	// On OS X is mysteriously populated with an "Enter Fullscreen" option.
 	viewMenu = menuBar()->addMenu("View");	
 
+	#ifndef Q_OS_MACX
 	fullscreenViewAction = new QAction("Full Screen", this);
 	fullscreenViewAction->setCheckable(true);
 	fullscreenViewAction->setChecked(false);
@@ -1360,6 +1363,7 @@ void MainWindow::setupMenus()
 	windowedViewAction->setCheckable(true);
 	windowedViewAction->setChecked(true); // start true b/c of showMaximized() call in constructor
 	viewMenu->addAction(windowedViewAction);
+	#endif
 
 	// Examples menu
 	examplesMenu = menuBar()->addMenu("Examples"); 
@@ -1396,15 +1400,19 @@ void MainWindow::setupMenus()
 void MainWindow :: fullscreenViewActionTriggered()
 {
         showFullScreen();
+	#ifndef Q_OS_MACX
         fullscreenViewAction->setChecked(true);
         windowedViewAction->setChecked(false);
+	#endif
 }
 
 void MainWindow :: windowedViewActionTriggered()
 {
         showMaximized();
+	#ifndef Q_OS_MACX
         fullscreenViewAction->setChecked(false);
         windowedViewAction->setChecked(true);
+	#endif
 }
 
 void MainWindow::exportOBJActionTriggered()
