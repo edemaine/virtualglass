@@ -21,6 +21,10 @@ VGApp :: VGApp(int& argc, char **argv ) : QApplication(argc, argv)
 	{
 		if (QString(argv[i]) == QString("-fullscreen"))
 			fullscreen = true;
+		else if (QString(argv[i]) == QString("-randomcomplexpiece"))
+			mainWindow->randomComplexPieceExampleActionTriggered();
+		else if (QString(argv[i]) == QString("-randomcomplexcane"))
+			mainWindow->randomComplexCaneExampleActionTriggered();
 		else
 		{
 			mainWindow->openFile(QString(argv[i]), !firstOpenRequest);

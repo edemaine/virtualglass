@@ -71,11 +71,13 @@ MainWindow :: MainWindow()
 	setDirtyBit(false);
 	mouseDown = false;
 
-	if (museum) 
-	{
-		clearLibrary();
-		randomComplexPieceExampleActionTriggered();
-	}
+// This automatic museum functionality has been replaced by the
+// -randomcomplexpiece command-line argument.
+	//if (museum) 
+	//{
+	//	clearLibrary();
+	//	randomComplexPieceExampleActionTriggered();
+	//}
 }
 
 void MainWindow :: glassObjectModified()

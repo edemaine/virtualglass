@@ -150,7 +150,7 @@ class MainWindow : public QMainWindow
 
 		Email* email;
 
-	private slots:
+	public slots:
 		void glassObjectModified();
 		void attemptToQuit();
 
