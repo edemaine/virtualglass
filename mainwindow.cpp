@@ -537,8 +537,11 @@ void MainWindow :: setupConnections()
 {
 	// Toolbar stuff
 	connect(newFileButton, SIGNAL(clicked()), this, SLOT(newFileActionTriggered()));
-	connect(openFileButton, SIGNAL(clicked()), this, SLOT(openFileActionTriggered()));
-	connect(saveFileButton, SIGNAL(clicked()), this, SLOT(saveAllFileActionTriggered()));
+	if (!museum)
+	{
+		connect(openFileButton, SIGNAL(clicked()), this, SLOT(openFileActionTriggered()));
+		connect(saveFileButton, SIGNAL(clicked()), this, SLOT(saveAllFileActionTriggered()));
+	}
 	connect(shareFileButton, SIGNAL(clicked()), this, SLOT(shareFileActionTriggered()));
 	connect(email, SIGNAL(success(QString)), this, SLOT(emailSuccess(QString)));
 	connect(email, SIGNAL(failure(QString)), this, SLOT(emailFailure(QString)));
@@ -800,15 +803,18 @@ void MainWindow :: setupLibrary()
 	newFileButton->setText("New");
 	toolbarLayout->addWidget(newFileButton);
 
-	openFileButton = new QPushButton(toolbarMasterWidget);
-	openFileButton->setText("Open");
-	openFileButton->setEnabled(!museum);
-	toolbarLayout->addWidget(openFileButton);
+	if (!museum)
+	{
+		openFileButton = new QPushButton(toolbarMasterWidget);
+		openFileButton->setText("Open");
+		openFileButton->setEnabled(!museum);
+		toolbarLayout->addWidget(openFileButton);
 
-	saveFileButton = new QPushButton(toolbarMasterWidget);
-	saveFileButton->setText("Save");
-	saveFileButton->setEnabled(!museum);
-	toolbarLayout->addWidget(saveFileButton);
+		saveFileButton = new QPushButton(toolbarMasterWidget);
+		saveFileButton->setText("Save");
+		saveFileButton->setEnabled(!museum);
+		toolbarLayout->addWidget(saveFileButton);
+	}
 
 	shareFileButton = new QPushButton(toolbarMasterWidget);
 	shareFileButton->setText("Email");
