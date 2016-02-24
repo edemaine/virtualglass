@@ -8,6 +8,7 @@ class GlassColor;
 class Cane;
 class Piece;
 
+void randomInit();
 GlassColor* randomGlassColor();
 
 Cane* randomSimpleCane(enum GeometricShape outermostCasingShape, GlassColor* color);

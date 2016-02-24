@@ -1,6 +1,7 @@
 
 #include <QFile>
 #include <QIODevice>
+#include <QDateTime>
 #include "glasscolor.h"
 #include "cane.h"
 #include "canetemplate.h"
@@ -11,6 +12,15 @@
 #include "randomglass.h"
 #include "glassfileio.h"
 #include "globalglass.h"
+
+void randomInit()
+{
+	quint64 now = QDateTime::currentDateTime().toMSecsSinceEpoch();
+	// Convert qint64 to uint for qsrand.
+	if(sizeof(uint) > sizeof(quint64))
+		now &= (Q_UINT64_C(1) << 8*sizeof(uint)) - 1;
+	qsrand(now);
+}
 
 GlassColor* randomGlassColor()
 {

@@ -3,6 +3,7 @@
 #include <QEvent>
 #include <QString>
 #include "vgapp.h"
+#include "randomglass.h"
 
 // the point of subclassing QApplication is just to catch and handle
 // request to open files on Mac OS X. Unlike (supposedly) Windows 
@@ -12,6 +13,7 @@
 // http://qt-project.org/doc/qt-4.8/qfileopenevent.html
 VGApp :: VGApp(int& argc, char **argv ) : QApplication(argc, argv)
 {
+	randomInit();
 	mainWindow = new MainWindow();
 	
 	// hopefully this catches command line opens on some platforms (Win? Linux?)
