@@ -6,18 +6,12 @@
 #include "randomglass.h"
 #include "email.h"
 
-// the point of subclassing QApplication is just to catch and handle
-// request to open files on Mac OS X. Unlike (supposedly) Windows 
-// and Linux that give double-clicked files as command line arguments,
-// Mac sends an event instead. May be Qt-specific, can't tell.
-//
-// http://qt-project.org/doc/qt-4.8/qfileopenevent.html
 VGApp :: VGApp(int& argc, char **argv ) : QApplication(argc, argv)
 {
 	randomInit();
 	mainWindow = new MainWindow();
 	
-	// hopefully this catches command line opens on some platforms (Win? Linux?)
+	// Command line arguments (use --args to pass these in on OS X)
 	firstOpenRequest = true;
 	bool fullscreen = false;
 	for (int i = 1; i < argc; ++i)
@@ -30,9 +24,11 @@ VGApp :: VGApp(int& argc, char **argv ) : QApplication(argc, argv)
 			mainWindow->randomComplexCaneExampleActionTriggered();
 		else if (QString(argv[i]) == QString("-cc") && i < argc-1)
 			mainWindow->email->CCs.append(QString(argv[++i]));
-		else
+		else if (QString(argv[i]) == QString("-autosave"))
+			mainWindow->enableAutosave(QString(argv[++i]), 10);
+		else if (QString(argv[i]) == QString("-file") && i < argc-1)
 		{
-			mainWindow->openFile(QString(argv[i]), !firstOpenRequest);
+			mainWindow->openFile(QString(argv[++i]), !firstOpenRequest);
 			firstOpenRequest = false;
 		}
 	}
@@ -43,22 +39,22 @@ VGApp :: VGApp(int& argc, char **argv ) : QApplication(argc, argv)
 		mainWindow->windowedViewActionTriggered();
 }
 
-VGApp::~VGApp()
-{
-	// should probably free mainWindow...
-}
-
 bool VGApp::event(QEvent *event)
 {
+	// Double-clicking a .glass file to open it (OS X, others?)
 	switch (event->type()) 
 	{
 		case QEvent::FileOpen:
-			// and this catches command line opens on the rest (Mac?)
 			mainWindow->openFile(static_cast<QFileOpenEvent*>(event)->file(), !firstOpenRequest); 
 			firstOpenRequest = false;
 			return true;
 		default:
 			return QApplication::event(event);
 	}
+}
+
+VGApp::~VGApp()
+{
+	// should probably free mainWindow...
 }
 

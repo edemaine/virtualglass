@@ -20,6 +20,7 @@ class QMenu;
 class QAction;
 class QActionGroup;
 class QScrollArea;
+class QTimer;
 
 class UndoRedo;
 class GlassColor;
@@ -53,6 +54,8 @@ class MainWindow : public QMainWindow
 		void deleteLibraryWidget(GlassLibraryWidget* w);
 		void setEditorLibraryWidget(GlassLibraryWidget* w);
 		bool hasDependancies(GlassLibraryWidget* w);
+		void enableAutosave(QString outputDir, unsigned int delaySecs);
+		void disableAutosave();
 
 		Email* email;
 
@@ -152,10 +155,11 @@ class MainWindow : public QMainWindow
 		QString saveFilename;
 		bool mouseDown;
 
-	public slots:
-		void glassObjectModified();
-		void attemptToQuit();
+		QTimer* autosaveTimer;
+		QString autosaveDir;
+		bool autosaveDirtyBit;
 
+	public slots:
 		// menu slots
 		void undoActionTriggered();
 		void redoActionTriggered();
@@ -183,10 +187,16 @@ class MainWindow : public QMainWindow
 		void newPieceButtonClicked();
 		void updateLibraryHighlighting();
 
+	private slots:
+		void glassObjectModified();
+		void attemptToQuit();
+		void autosave();
+
 		// Status bar slots
 		void showStatusMessage(const QString& message, unsigned int timeout);
 		void emailSuccess(QString to);
 		void emailFailure(QString error);
+
 };
 
 #endif

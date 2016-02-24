@@ -3,7 +3,6 @@
 #include <QImage>
 #include <QMessageBox>
 #include <QFileDialog>
-#include <QDir>
 #include <QStackedWidget>
 #include <QMenuBar>
 #include <QMenu>
@@ -22,6 +21,9 @@
 #include <QInputDialog>
 #include <QLineEdit>
 #include <QBuffer>
+#include <QTimer>
+#include <QDateTime>
+#include <QDir>
 
 #include "constants.h"
 #include "dependency.h"
@@ -70,20 +72,51 @@ MainWindow :: MainWindow()
 	GlobalUndoRedo::noPriorUndo();
 	setDirtyBit(false);
 	mouseDown = false;
-
-// This automatic museum functionality has been replaced by the
-// -randomcomplexpiece command-line argument.
-	//if (museum) 
-	//{
-	//	clearLibrary();
-	//	randomComplexPieceExampleActionTriggered();
-	//}
 }
 
 void MainWindow :: glassObjectModified()
 {
 	updateLibraryHighlighting();
 	setDirtyBit(true);
+	autosaveDirtyBit = true;
+}
+
+void MainWindow :: enableAutosave(QString outputDir, unsigned int delaySecs)
+{
+	QDir curDir = QApplication::applicationDirPath();
+	if (curDir.dirName() == "MacOS")
+	{
+		curDir.cdUp(); curDir.cdUp(); curDir.cdUp();
+	}
+	curDir.mkdir(outputDir);
+	autosaveDir = curDir.absolutePath() + "/" + outputDir;
+	autosaveTimer = new QTimer(this);
+	autosaveTimer->start(delaySecs * 1000);
+	connect(autosaveTimer, SIGNAL(timeout()), this, SLOT(autosave()));	
+	autosaveDirtyBit = dirtyBit;
+}
+
+void MainWindow :: disableAutosave()
+{
+	disconnect(autosaveTimer, SIGNAL(timeout()), this, SLOT(autosave()));	
+	delete autosaveTimer;
+}
+
+void MainWindow :: autosave()
+{
+	if (!autosaveDirtyBit)
+		return;
+	QString filename = "autosave__" + QDateTime::currentDateTime().toString("dd_MMM_yyyy__hh_mm_ss");      
+	QString saveFilename = autosaveDir + "/" + filename + ".glass";
+	showStatusMessage("Autosaving to " + saveFilename, 1);
+
+	vector<GlassColor*> colors;
+	vector<Cane*> colorCanes;
+	vector<Cane*> canes;
+	vector<Piece*> pieces;
+	getLibraryContents(colors, canes, pieces);
+	writeGlassFile(saveFilename, colors, canes, pieces);	
+	autosaveDirtyBit = false;
 }
 
 void MainWindow :: setViewMode(enum ViewMode newMode)
@@ -273,6 +306,7 @@ void MainWindow :: moveCurrentEditingObject(int d)
 				}
 			}
 			setDirtyBit(true);
+			autosaveDirtyBit = true;
 			return; 
 		}
 	}	
@@ -386,6 +420,7 @@ void MainWindow::copyLibraryWidget(GlassLibraryWidget* lw)
 			glassColorEditorWidget->setGlassColor(newGlassColor);
 			updateLibraryHighlighting();
 			setDirtyBit(true);
+			autosaveDirtyBit = true;
 			break;
 		}
 		case CANE_VIEW_MODE:
@@ -397,6 +432,7 @@ void MainWindow::copyLibraryWidget(GlassLibraryWidget* lw)
 			caneEditorWidget->setCane(newCane);
 			updateLibraryHighlighting();
 			setDirtyBit(true);
+			autosaveDirtyBit = true;
 			break;
 		}
 		case PIECE_VIEW_MODE:
@@ -408,6 +444,7 @@ void MainWindow::copyLibraryWidget(GlassLibraryWidget* lw)
 			pieceEditorWidget->setPiece(newPiece);
 			updateLibraryHighlighting();
 			setDirtyBit(true);
+			autosaveDirtyBit = true;
 			break;
 		}
 	}
@@ -507,6 +544,7 @@ void MainWindow::deleteLibraryWidget(GlassLibraryWidget* lw)
 	cur->widget()->deleteLater();
 	delete cur;
 	setDirtyBit(true);
+	autosaveDirtyBit = true;
 }
 
 void MainWindow::setEditorLibraryWidget(GlassLibraryWidget* w)
@@ -646,6 +684,7 @@ void MainWindow :: randomSimpleCaneExampleActionTriggered()
 	caneEditorWidget->setCane(cane);
 	updateLibraryHighlighting();
 	setDirtyBit(true);
+	autosaveDirtyBit = true;
 }
 
 void MainWindow :: randomComplexCaneExampleActionTriggered()
@@ -683,6 +722,7 @@ void MainWindow :: randomComplexCaneExampleActionTriggered()
 	caneEditorWidget->setCane(complexCane);
 	updateLibraryHighlighting();
 	setDirtyBit(true);
+	autosaveDirtyBit = true;
 }
 
 void MainWindow :: randomSimplePieceExampleActionTriggered()
@@ -707,6 +747,7 @@ void MainWindow :: randomSimplePieceExampleActionTriggered()
 	pieceEditorWidget->setPiece(piece);
 	updateLibraryHighlighting();
 	setDirtyBit(true);
+	autosaveDirtyBit = true;
 }
 
 void MainWindow :: randomComplexPieceExampleActionTriggered()
@@ -767,6 +808,7 @@ void MainWindow :: randomComplexPieceExampleActionTriggered()
 	pieceEditorWidget->setPiece(piece);
 	updateLibraryHighlighting();
 	setDirtyBit(true);
+	autosaveDirtyBit = true;
 }
 
 void MainWindow :: setDirtyBit(bool v)
@@ -980,6 +1022,7 @@ void MainWindow :: newGlassColorButtonClicked()
 	setViewMode(GLASSCOLOR_VIEW_MODE);
 	updateLibraryHighlighting();
 	setDirtyBit(true);
+	autosaveDirtyBit = true;
 }
 
 void MainWindow :: newCaneButtonClicked()
@@ -993,6 +1036,7 @@ void MainWindow :: newCaneButtonClicked()
 	setViewMode(CANE_VIEW_MODE);
 	updateLibraryHighlighting();
 	setDirtyBit(true);
+	autosaveDirtyBit = true;
 }
 
 void MainWindow :: newPieceButtonClicked()
@@ -1006,6 +1050,7 @@ void MainWindow :: newPieceButtonClicked()
 	setViewMode(PIECE_VIEW_MODE);
 	updateLibraryHighlighting();
 	setDirtyBit(true);
+	autosaveDirtyBit = true;
 }
 
 // returns whether the cane is a dependancy of something in the library
@@ -1656,6 +1701,7 @@ void MainWindow::resetLibrary()
 	// reset filename
 	setSaveFilename("[unsaved]");
 	setDirtyBit(false);
+	autosaveDirtyBit = true;
 }
 
 void MainWindow::openFile(QString filename, bool add)
@@ -1675,13 +1721,17 @@ void MainWindow::openFile(QString filename, bool add)
 
 	// deal with save filenames and dirty bits
 	if (add)
+	{
 		setDirtyBit(true);
+		autosaveDirtyBit = true;
+	}
 	else 
 	{
 		setViewMode(EMPTY_VIEW_MODE);
 		clearLibrary();	
 		setSaveFilename(filename);
 		setDirtyBit(false);
+		autosaveDirtyBit = true;
 	}
 
 	for (unsigned int i = 0; i < colors.size(); ++i)
