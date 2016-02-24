@@ -39,6 +39,11 @@ class ColorEditorWidget : public QWidget
 		void updateEverything();
 		void setColorProperties(GlassColor* color);
 
+	protected:
+		void mousePressEvent(QMouseEvent* event);
+		void mouseMoveEvent(QMouseEvent* event);
+		void mouseReleaseEvent(QMouseEvent* event);
+
 	private slots:
 		void alphaSliderPositionChanged(int);
 		void alphaSliderChangeEnded();

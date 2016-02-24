@@ -21,6 +21,7 @@ PureColorLibraryWidget :: PureColorLibraryWidget(GlassColor* __color,
 	layout->setContentsMargins(10, 0, 0, 0);
 
 	swatch = new QLabel(this);
+	swatch->setAttribute(Qt::WA_TransparentForMouseEvents);
 	swatch->setFixedSize(20, 20);
 	QPixmap pixmap(20, 20);
 	QPainter painter(&pixmap);
@@ -34,40 +35,11 @@ PureColorLibraryWidget :: PureColorLibraryWidget(GlassColor* __color,
 	layout->addWidget(swatch, 0);
 
 	QLabel* nameLabel = new QLabel(_color->longName().c_str(), this);
+	nameLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
 	nameLabel->setPalette(QPalette(Qt::black));
 	layout->addWidget(nameLabel, 1);
 
 	renderPixmap();
-
-	mouseDown = false;
-}
-
-void PureColorLibraryWidget :: mousePressEvent(QMouseEvent* event)
-{
-	if (event->button() == Qt::LeftButton)
-	{
-		mouseDown = true;
-		mouseDownPos = event->pos();
-	}
-}
-
-void PureColorLibraryWidget :: mouseMoveEvent(QMouseEvent* event)
-{
-	if ((event->pos() - mouseDownPos).manhattanLength() > QApplication::startDragDistance()
-		|| !this->rect().contains(event->pos()))
-	{
-		mouseDown = false;
-		event->ignore();
-	}
-}
-
-void PureColorLibraryWidget :: mouseReleaseEvent(QMouseEvent* event)
-{
-	if (mouseDown)
-		emit colorSelected(this->_color);
-	else
-		event->ignore();
-	mouseDown = false;
 }
 
 void PureColorLibraryWidget :: setSelected(bool s)

@@ -59,7 +59,8 @@ void ColorEditorWidget :: setGlassColor(GlassColor* color)
 
 void ColorEditorWidget :: collectionComboBoxChanged(int _index)
 {
-	if (_index < collectionComboBox->count() - 1) // if it's not the ``Add collection...'' one
+	// if not the ``Add collection...'' one
+	if (_index < collectionComboBox->count() - 1) 
 	{
 		prevCollection = _index;
 		collectionStack->setCurrentIndex(_index);
@@ -175,10 +176,8 @@ void ColorEditorWidget :: loadCollection(QString fileName)
 
 	for (unsigned int i = 0; i < colors.size(); ++i)
 	{
-		PureColorLibraryWidget* pclw = new PureColorLibraryWidget(colors[i], colorLibraryWidget);
+		PureColorLibraryWidget* pclw = new PureColorLibraryWidget(colors[i], this); // TODO: change to: "colorLibraryWidget);"?
 		listLayout->addWidget(pclw);
-		connect(pclw, SIGNAL(colorSelected(GlassColor*)), 
-			this, SLOT(setColorProperties(GlassColor*)));
 		// memory leak here because GlassColor objects are now forgotten about
 	}
 
@@ -231,5 +230,55 @@ void ColorEditorWidget :: updateEverything()
 	}
 }
 
+void ColorEditorWidget :: mousePressEvent(QMouseEvent* event)
+{
+        if (event->button() == Qt::LeftButton && collectionStack->geometry().contains(event->pos()))
+        {
+                isDragging = true;
+                lastDragPosition = dragStartPosition = event->pos();
+                maxDragDistance = 0;
+        }
+        else
+                isDragging = false;
+}
+
+void ColorEditorWidget :: mouseMoveEvent(QMouseEvent* event)
+{
+        // If the left mouse button isn't down
+        if ((event->buttons() & Qt::LeftButton) == 0)
+        {
+                isDragging = false;
+                return;
+        }
+
+        maxDragDistance = MAX(maxDragDistance, abs(event->pos().y() - dragStartPosition.y()));
+        if (!isDragging || maxDragDistance < QApplication::startDragDistance())
+                return;
+
+        int movement = event->pos().y() - lastDragPosition.y();
+        QScrollArea* currentScrollArea = dynamic_cast<QScrollArea*>(collectionStack->currentWidget());
+        currentScrollArea->verticalScrollBar()->setValue(currentScrollArea->verticalScrollBar()->value() - movement);
+        lastDragPosition = event->pos();
+}
+
+void ColorEditorWidget :: mouseReleaseEvent(QMouseEvent* event)
+{
+        // If not dragging or dragging caused a scroll
+        if (!isDragging || (isDragging && maxDragDistance >= QApplication::startDragDistance()))
+                return;
+
+        PureColorLibraryWidget* pclw = dynamic_cast<PureColorLibraryWidget*>(childAt(event->pos()));
+        if (pclw == NULL)
+	{
+		std::cout << "Poop" << std::endl;
+                return;
+	}
+
+        glassColor_->setColor(pclw->color());
+        glassColor_->setShortName(pclw->shortName());
+        glassColor_->setLongName(pclw->longName());
+	this->alphaSlider->setSliderPosition(255 - static_cast<int>(this->glassColor_->color().a * 255));
+	updateEverything();
+}
 
 
