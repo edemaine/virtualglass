@@ -8,15 +8,15 @@
 int main(int argc, char** argv)
 {
 	// Must come before QApp creation
-	#if defined(Q_OS_MACX)
-	// Font fix from http://successfulsoftware.net/2013/10/23/fixing-qt-4-for-mac-os-x-10-9-mavericks/
+	// fix Mac OS X 10.9+ font issues
+	// https://bugreports.qt-project.org/browse/QTBUG-32789
+	// https://bugreports.qt.io/browse/QTBUG-47206	
+	#ifdef Q_OS_MACX
 	if ( QSysInfo::MacintoshVersion > QSysInfo::MV_10_8 )
 	{
-		// fix Mac OS X 10.9 (mavericks) font issue
-		// https://bugreports.qt-project.org/browse/QTBUG-32789
-		// http://stackoverflow.com/questions/26946441/change-qt-font-to-native-system-default-font
-		QFont::insertSubstitution(".Lucida Grande UI", "Lucida Grande");
-		QFont::insertSubstitution(".Helvetica Neue DeskInterface", "Helvetica Neue");
+		QFont::insertSubstitution(".Lucida Grande UI", "Lucida Grande"); // 10.9
+		QFont::insertSubstitution(".Helvetica Neue DeskInterface", "Helvetica Neue"); // 10.9
+		QFont::insertSubstitution(".SF NS Text", "Helvetica Neue"); // 10.11
 	}
 	#endif
 
@@ -32,10 +32,11 @@ int main(int argc, char** argv)
 	qsrand(QDateTime::currentDateTime().toTime_t());
 
 	QDir pluginsDir = QDir(app->applicationDirPath());
-	#if defined(Q_OS_WIN)
+	#ifdef Q_OS_WIN
 	if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
 		pluginsDir.cdUp();
-	#elif defined(Q_OS_MACX)
+	#endif
+	#ifdef Q_OS_MACX
 	if (pluginsDir.dirName() == "MacOS")
 	{
 		pluginsDir.cdUp();
