@@ -54,6 +54,8 @@ class MainWindow : public QMainWindow
 		void setEditorLibraryWidget(GlassLibraryWidget* w);
 		bool hasDependancies(GlassLibraryWidget* w);
 
+		Email* email;
+
 	protected:
 		void keyPressEvent(QKeyEvent* e);
 		void closeEvent(QCloseEvent *event);
@@ -149,8 +151,6 @@ class MainWindow : public QMainWindow
 		bool dirtyBit;
 		QString saveFilename;
 		bool mouseDown;
-
-		Email* email;
 
 	public slots:
 		void glassObjectModified();

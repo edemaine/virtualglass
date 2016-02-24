@@ -23,6 +23,9 @@ Email::Email() : socket (this)
 
 	// Initialize state to "I don't want to talk to the socket at all"
 	state = Quit;
+
+	// By default, always CC to the "from" address.
+	CCs.append(from);
 }
 
 bool Email::sending()
@@ -43,7 +46,13 @@ void Email::send(QString to, QString subject, QBuffer& glassFile, QBuffer& image
 
 	message += "From: " + from.toLatin1() + "\r\n";
 	message += "To: " + to.toLatin1() + "\r\n";
-	message += "Cc: " + from.toLatin1() + "\r\n";
+	if (!this->CCs.empty()) {
+		QList<QString>::iterator i = this->CCs.begin();
+		message += "Cc: " + *i;
+		for (++i; i != this->CCs.end(); ++i)
+			message += ", " + *i;
+		message += + "\r\n";
+	}
 	message += "Subject: " + subjectPrefix.toLatin1() + subject.toLatin1() + "\r\n";
 
 	message += "Content-Type: multipart/mixed; boundary=VirtualGlassBoundary\r\n";
@@ -154,6 +163,7 @@ void Email::socketReadyRead()
 			else 
 			{
 				socket.write("RCPT TO: <" + to.toLatin1() + ">\r\n");
+				ccit = CCs.begin();
 				state = To1;
 			}
 			break;
@@ -165,8 +175,10 @@ void Email::socketReadyRead()
 			}
 			else 
 			{
-				socket.write("RCPT TO: <" + from.toLatin1() + ">\r\n");
-				state = To2;
+				socket.write("RCPT TO: <" + ccit->toLatin1() + ">\r\n");
+				++ccit;
+				if (ccit == CCs.end())
+					state = To2;
 			}
 			break;
 		case To2:

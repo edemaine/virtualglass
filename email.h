@@ -21,6 +21,8 @@ class Email : public QObject
 		void send(QString to, QString subject, QBuffer& glassFile, QBuffer& image, QString imageType);
 		bool sending();
 
+		QList<QString> CCs;
+
 		static const QString subjectPrefix;
 		static const QString from;
 
@@ -40,6 +42,7 @@ class Email : public QObject
 		QByteArray message;
 		QSslSocket socket;
 		enum {Init, Helo, From, To1, To2, Data, Body, Quit} state;
+		QList<QString>::iterator ccit;
 };
 
 #endif

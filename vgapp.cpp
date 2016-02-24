@@ -4,6 +4,7 @@
 #include <QString>
 #include "vgapp.h"
 #include "randomglass.h"
+#include "email.h"
 
 // the point of subclassing QApplication is just to catch and handle
 // request to open files on Mac OS X. Unlike (supposedly) Windows 
@@ -27,6 +28,8 @@ VGApp :: VGApp(int& argc, char **argv ) : QApplication(argc, argv)
 			mainWindow->randomComplexPieceExampleActionTriggered();
 		else if (QString(argv[i]) == QString("-randomcomplexcane"))
 			mainWindow->randomComplexCaneExampleActionTriggered();
+		else if (QString(argv[i]) == QString("-cc") && i < argc-1)
+			mainWindow->email->CCs.append(QString(argv[++i]));
 		else
 		{
 			mainWindow->openFile(QString(argv[i]), !firstOpenRequest);
