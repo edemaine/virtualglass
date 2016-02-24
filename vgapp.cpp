@@ -35,9 +35,9 @@ VGApp :: VGApp(int& argc, char **argv ) : QApplication(argc, argv)
 	}
 
 	if (fullscreen)
-		mainWindow->showFullScreen();
+		mainWindow->fullscreenViewActionTriggered();
 	else	
-		mainWindow->showMaximized();
+		mainWindow->windowedViewActionTriggered();
 }
 
 VGApp::~VGApp()

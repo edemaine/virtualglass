@@ -1395,7 +1395,6 @@ void MainWindow::setupMenus()
 
 void MainWindow :: fullscreenViewActionTriggered()
 {
-	showStatusMessage("Full screen trigger.", 3);	
         showFullScreen();
         fullscreenViewAction->setChecked(true);
         windowedViewAction->setChecked(false);
@@ -1403,7 +1402,6 @@ void MainWindow :: fullscreenViewActionTriggered()
 
 void MainWindow :: windowedViewActionTriggered()
 {
-	showStatusMessage("Not Full screen trigger.", 3);	
         showMaximized();
         fullscreenViewAction->setChecked(false);
         windowedViewAction->setChecked(true);
