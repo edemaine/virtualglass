@@ -88,8 +88,11 @@ void MainWindow :: enableAutosave(QString outputDir, unsigned int delaySecs)
 	{
 		curDir.cdUp(); curDir.cdUp(); curDir.cdUp();
 	}
-	curDir.mkdir(outputDir);
-	autosaveDir = curDir.absolutePath() + "/" + outputDir;
+	curDir.mkpath(outputDir);
+	if (QDir(outputDir).isAbsolute())
+		autosaveDir = outputDir;
+	else
+		autosaveDir = curDir.absolutePath() + QDir::separator() + outputDir;
 	autosaveTimer = new QTimer(this);
 	autosaveTimer->start(delaySecs * 1000);
 	connect(autosaveTimer, SIGNAL(timeout()), this, SLOT(autosave()));	
@@ -106,7 +109,7 @@ void MainWindow :: autosave()
 {
 	if (!autosaveDirtyBit)
 		return;
-	QString filename = "autosave__" + QDateTime::currentDateTime().toString("dd_MMM_yyyy__hh_mm_ss");      
+	QString filename = "autosave_" + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss");      
 	QString saveFilename = autosaveDir + "/" + filename + ".glass";
 	showStatusMessage("Autosaving to " + saveFilename, 1);
 

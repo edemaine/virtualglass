@@ -38,7 +38,7 @@ VGApp :: VGApp(int& argc, char **argv ) : QApplication(argc, argv)
 			mainWindow->randomComplexCaneExampleActionTriggered();
 		else if (QString(argv[i]) == QString("-cc") && i < argc-1)
 			mainWindow->email->CCs.append(QString(argv[++i]));
-		else if (QString(argv[i]) == QString("-autosave"))
+		else if (QString(argv[i]) == QString("-autosave") && i < argc-1)
 			mainWindow->enableAutosave(QString(argv[++i]), 10);
 		else if (QString(argv[i]) == QString("-file") && i < argc-1)
 		{
