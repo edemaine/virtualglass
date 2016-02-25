@@ -1,8 +1,5 @@
+***** Revision r1153 *****
 
-***** Revision r1132 *****
+-Several command-line options have been added beyond the existing -fullscreen: -randomcomplexpiece and -randomcomplexcane start things off with random examples (as in the Examples menu); -autosave <dir> automatically saves every 10 seconds to the specified directory; -file <file> opens the specified file; -cc <email> adds additional carbon copies to emails generated from the Email button; -museum turns on touchscreen "museum" mode (warning: does not prompt you to save, and closes on idle).
 
--Several keyboard bindings have been added to manipulating custom cane layouts and piece shapes. For instance, delete now deletes the current selection. 
-
--Various bug fixes.
-
-
+-Random complex examples now have random twist.
