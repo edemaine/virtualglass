@@ -115,4 +115,9 @@ void renderWithoutDepthPeeling(const Geometry& geometry)
 
 }
 
-
+// On NVIDIA+integrated GPU machines, this tells Nvidia's Optimus driver
+// to use the NVIDIA/discrete/high performance GPU.
+// [http://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf]
+extern "C" {
+	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+}

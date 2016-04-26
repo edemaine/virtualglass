@@ -183,6 +183,14 @@ QString MainWindow :: windowTitle()
 	if (dirtyBit)
 		title += " *";
 	title += " " + saveFilename;
+	title += " / ";
+	title += (char*) glGetString(GL_VENDOR);
+	title += " ";
+	title += (char*) glGetString(GL_RENDERER);
+	title += " ";
+	title += (char*) glGetString(GL_VERSION);
+	//title += " ";
+	//title += (char*) glGetString(GL_SHADING_LANGUAGE_VERSION);
 
 	return title;
 }
@@ -1283,7 +1291,7 @@ void MainWindow::closeEvent(QCloseEvent * event)
 
 void MainWindow::attemptToQuit()
 {
-	if (!dirtyBit)
+	if (!dirtyBit || GlobalMuseumSetting::enabled())
 	{
 		QCoreApplication::exit();
 		return;
