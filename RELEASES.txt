@@ -1,3 +1,7 @@
+***** Revision r1156 *****
+
+-Add -nogpu (and -gpu) command-line options, to set initial state of GPU transparency menu option.
+
 ***** Revision r1153 *****
 
 -Several command-line options have been added beyond the existing -fullscreen: -randomcomplexpiece and -randomcomplexcane start things off with random examples (as in the Examples menu); -autosave <dir> automatically saves every 10 seconds to the specified directory; -file <file> opens the specified file; -cc <email> adds additional carbon copies to emails generated from the Email button; -museum turns on touchscreen "museum" mode (warning: does not prompt you to save).

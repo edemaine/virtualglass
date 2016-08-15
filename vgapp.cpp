@@ -7,13 +7,14 @@
 #include "randomglass.h"
 #include "email.h"
 #include "globalmuseumsetting.h"
+#include "globaldepthpeelingsetting.h"
 
 VGApp :: VGApp(int& argc, char **argv ) : QApplication(argc, argv)
 {
 	randomInit();
 	
-	// Preprocess command-line arguments to look for -museum
-	// Need to set this *before* the GUI is launched
+	// Preprocess command-line arguments to look for -museum and -[no]gpu.
+	// Need to set this *before* the GUI is launched, for MainWindow init.
 	for (int i = 1; i < argc; ++i)
 	{
 		if (QString(argv[i]) == QString("-museum"))
@@ -21,6 +22,10 @@ VGApp :: VGApp(int& argc, char **argv ) : QApplication(argc, argv)
 			GlobalMuseumSetting::setEnabled(true);
 			break;
 		}
+		else if (QString(argv[i]) == QString("-gpu"))
+			GlobalDepthPeelingSetting::setEnabled(true);
+		else if (QString(argv[i]) == QString("-nogpu"))
+			GlobalDepthPeelingSetting::setEnabled(false);
 	}
 
 	mainWindow = new MainWindow();
