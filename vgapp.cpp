@@ -2,6 +2,7 @@
 #include <QFileOpenEvent>
 #include <QEvent>
 #include <QString>
+#include <QMessageBox>
 
 #include "vgapp.h"
 #include "randomglass.h"
@@ -35,6 +36,7 @@ VGApp :: VGApp(int& argc, char **argv ) : QApplication(argc, argv)
 	bool fullscreen = false;
 	for (int i = 1; i < argc; ++i)
 	{
+		//QMessageBox::warning(mainWindow, "Argument", "Argument " + QString::number(i) + " is " + argv[i]);
 		if (QString(argv[i]) == QString("-fullscreen"))
 			fullscreen = true;
 		else if (QString(argv[i]) == QString("-randomcomplexpiece"))
@@ -45,9 +47,9 @@ VGApp :: VGApp(int& argc, char **argv ) : QApplication(argc, argv)
 			mainWindow->email->CCs.append(QString(argv[++i]));
 		else if (QString(argv[i]) == QString("-autosave") && i < argc-1)
 			mainWindow->enableAutosave(QString(argv[++i]), 10);
-		else if (QString(argv[i]) == QString("-file") && i < argc-1)
+		else if (QString(argv[i])[0] != QChar('-'))
 		{
-			mainWindow->openFile(QString(argv[++i]), !firstOpenRequest);
+			mainWindow->openFile(QString(argv[i]), !firstOpenRequest);
 			firstOpenRequest = false;
 		}
 	}

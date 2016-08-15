@@ -1,3 +1,7 @@
+***** Revision r1158 *****
+
+-Remove requirement for -file on command line, so VirtualGlass.exe can now directly take any filenames (not starting with -) on the command line. In particular, this lets VirtualGlass register to open .glass files when double clicking on Windows (after selecting it with Open With).
+
 ***** Revision r1156 *****
 
 -Add -nogpu (and -gpu) command-line options, to set initial state of GPU transparency menu option.
