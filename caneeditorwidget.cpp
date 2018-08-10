@@ -158,16 +158,12 @@ void CaneEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned int
 		niceViewWidget->repaint();
 	}
 	else
-	{
-		// try to get the lock again in 250 ms
-		QTimer::singleShot(250, this, SLOT(geometryThreadFinishedMesh(completed, quality))); 
+		// geometry being recomputed; wait for next finished message
 		return;
-	}
 
 	// report what happened if it's the high quality mesh
 	if (quality != GlobalGraphicsSetting::VERY_HIGH)
 		return;
-	QString result;
 	if (completed)
 		emit showMessage("Cane rendered successfully.", 3);
 	else

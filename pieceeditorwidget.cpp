@@ -156,16 +156,12 @@ void PieceEditorWidget :: geometryThreadFinishedMesh(bool completed, unsigned in
 		pieceNiceViewWidget->repaint();
 	}
 	else
-	{
-		// try to get the lock again in 250 ms
-		QTimer::singleShot(250, this, SLOT(geometryThreadFinishedMesh(completed, quality)));
+		// geometry being recomputed; wait for next finished message
 		return;
-	}
 
 	// report what happened if it's the high quality mesh
 	if (quality != GlobalGraphicsSetting::HIGH)
 		return;
-	QString result;
 	if (completed)
 		emit showMessage("Piece rendered successfully.", 3);
 	else
