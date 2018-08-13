@@ -1,11 +1,11 @@
 #!/bin/sh
-## Run this after any 'svn commit' but before compiling/building the software.
+## Run this after any 'git push origin master' but before compiling/building the software.
 ## It creates a version.txt file which is included as a Qt resource
 ## and ultimately shown on the titlebar.
 
-if ! svnversion
+if ! git --version
 then
-  ## Abort if svnversion fails (e.g. wrong version of Subversion)
+  ## Abort if no git installation
   exit 1
 fi
 if ! date +%F
@@ -14,6 +14,7 @@ then
   exit 1
 fi
 (
-  svnversion
+  git show -s --pretty=format:%h
+  echo ""
   date +%F
 ) >version.txt
